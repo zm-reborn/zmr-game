@@ -59,5 +59,7 @@ config.cfg
 *.filters
 *.vpc_crc
 *.sentinel
-vc120.pdb
+*.pdb
 *.lib
+Release_*/
+Debug_*/
