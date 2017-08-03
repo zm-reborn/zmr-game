@@ -1,0 +1,5 @@
+"VertexLitGeneric"
+{
+	"$baseTexture" "models\/largedoor_right"
+	"$translucent" 1
+}

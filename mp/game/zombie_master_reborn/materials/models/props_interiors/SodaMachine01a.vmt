@@ -1,0 +1,10 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "Models/props_interiors/SodaMachine01a"
+	"$surfaceprop" "metal"
+	"$envmap" "env_cubemap"
+	"$basealphaenvmapmask" 1
+	"$envmaptint" "[ .5 .5 .5]"
+	"$envmapcontrast" ".5"
+	"$envmapsaturation" "[1 1 1]"
+}

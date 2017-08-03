@@ -1,0 +1,12 @@
+"vertexlitgeneric"
+{
+	"$basetexture" "models/weapons/flashlight_zm/flashlight_diffuse"
+	"$surfaceprop" "weapon"
+	"$bumpmap" "models/weapons/flashlight_zm/flashlight_normal"
+	"$bumpscale" 1.0
+	"$envmap" "env_cubemap"
+	"$envmaptint" "[.23 .23 .23]"
+	"$envmapcontrast" 0.8
+	"$model" 1
+	
+}

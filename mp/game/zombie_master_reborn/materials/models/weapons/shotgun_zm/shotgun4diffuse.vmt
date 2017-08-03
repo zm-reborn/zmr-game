@@ -1,0 +1,5 @@
+"VertexLitGeneric"
+{
+	"$baseTexture" "models\weapons\shotgun_zm\shotgun4diffuse"
+	"$bumpmap" "models\weapons\shotgun_zm\shotgun4"
+}

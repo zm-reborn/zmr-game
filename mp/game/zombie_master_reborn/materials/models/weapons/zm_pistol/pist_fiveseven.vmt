@@ -1,0 +1,7 @@
+VertexLitGeneric
+{
+	"$basetexture"	"models\weapons\zm_pistol\pist_fiveseven"
+	"$envmap" "env_cubemap"
+	"$envmapmask" "models\weapons\zm_pistol\pist_fiveseven_ref"
+
+}

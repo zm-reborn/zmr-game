@@ -1,0 +1,8 @@
+"Blend"
+{
+	
+	"$fbtexture" "_rt_FullFrameFB"
+	"$blurtexture" "_rt_blur_y"
+	"$basetexture" "postprocess/alpha"
+	
+}

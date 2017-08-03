@@ -1,0 +1,5 @@
+"VertexLitGeneric"
+{
+	// Original shader: VertexLitTexture
+	"$basetexture" "models/Weapons/shell/casing01"
+}

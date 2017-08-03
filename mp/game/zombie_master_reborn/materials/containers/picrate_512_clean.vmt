@@ -1,0 +1,6 @@
+"LightmappedGeneric"
+{
+	// Original shader: BaseTimesLightmap
+	"$basetexture" "containers/picrate_512_clean"
+	"$surfaceprop" "wood"
+}

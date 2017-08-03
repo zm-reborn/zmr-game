@@ -1,0 +1,10 @@
+"VertexLitGeneric"
+{
+	"$baseTexture" "models/weapons/sledgehammer_zm/sledge_sheet"
+	"$selfillum" "1"
+	"$surfaceprop" "metal"
+    	"$bumpmap" "models/weapons/sledgehammer_zm/sledge_sheet_nrml"
+    	"$envmap" "env_cubemap"
+    	"$envmaptint" "[.6 .6 .6]"
+	"$normalmapalphaenvmapmask" 1
+}

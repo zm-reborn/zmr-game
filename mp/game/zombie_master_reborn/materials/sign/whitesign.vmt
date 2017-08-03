@@ -1,0 +1,8 @@
+"UnlitGeneric" 
+
+{
+	
+	"$basetexture" "sign/whitesign"
+	"$surfaceprop" "tile"
+//	"$selfillum" "1"
+}

@@ -1,0 +1,17 @@
+// "VertexLitGeneric"
+// {
+//	"$basetexture" "Models/props/deathball_sheet"
+//	"$surfaceprop" "metal"
+//}
+
+
+// envmaptint_fix
+"VertexLitGeneric"
+{
+	"$basetexture" "models/props/metalceiling005a"
+	"$surfaceprop" "metal"
+	"%keywords" "borealis"
+	"$envmaptint" "[ .16 .16 .16 ]"
+	"$bumpmap" "models/props/metalceiling005a_normal"
+	"$envmap" "env_cubemap"
+	"$normalmapalphaenvmapmask" 1

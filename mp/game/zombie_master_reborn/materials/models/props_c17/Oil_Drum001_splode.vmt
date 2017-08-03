@@ -1,0 +1,6 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "Models/props_c17/Oil_Drum001_splode"
+	"$surfaceprop" "metal"
+	"$bumpmap" "Models/props_c17/Oil_Drum001a_normal"
+}

@@ -1,0 +1,11 @@
+"VertexLitGeneric"
+{
+	"$baseTexture" "models\weapons\pistol_zm/pistol3rd_diffuse"
+	"$surfaceprop" "weapon"
+	"$bumpmap" "models/weapons/pistol_zm/pistol3rd_normal"
+	"$bumpscale" 1.3
+	"$envmap" "env_cubemap"
+	"$envmaptint" "[.26 .26 .26]"
+	"$envmapcontrast" 0.78
+	"$model" 1
+}

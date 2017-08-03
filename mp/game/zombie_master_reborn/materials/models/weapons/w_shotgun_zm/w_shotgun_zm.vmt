@@ -1,0 +1,6 @@
+"VertexLitGeneric"
+{
+	"$baseTexture" "models/weapons/w_shotgun_zm/w_shotgun_zm"
+	"$envmap" "env_cubemap"
+	"$envmaptint" "[.1 .1 .1]"
+}

@@ -1,0 +1,8 @@
+"UnLitGeneric"
+{
+	"$basetexture" "lostcoast\models\props_monastery\Monastery_Stain_Window001a"
+	"$surfaceprop" "glass"
+	"$model" 1
+	"$nocull" 1
+
+}

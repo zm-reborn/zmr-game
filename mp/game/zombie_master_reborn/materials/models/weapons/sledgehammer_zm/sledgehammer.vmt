@@ -1,0 +1,11 @@
+"VertexLitGeneric"
+{
+	"$baseTexture" "models\weapons\sledgehammer_zm\sledgehammer_diffuse"
+	"$surfaceprop" "weapon"
+	"$model" 1
+	"$bumpmap" "models/weapons/sledgehammer_zm/sledgehammer_normal"
+	"$envmap" "env_cubemap"
+	"$envmaptint" "[.20 .20 .22]"
+	"$normalmapalphaenvmapmask" 1
+
+}

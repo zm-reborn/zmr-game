@@ -1,0 +1,9 @@
+"vertexlitgeneric"
+{
+	"$basetexture" "models/weapons/pistol_zm/pistol_diffuse"
+	"$surfaceprop" "weapon"
+	"$bumpmap" "models/weapons/pistol_zm/pistol_normal"
+	"$envmap" "env_cubemap"	
+	"$normalmapalphaenvmapmask" 1
+	"$model" 1
+}

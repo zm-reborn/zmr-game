@@ -1,0 +1,7 @@
+"unlitgeneric"
+{
+	"$basetexture" "models/glow"
+	"$additive" 1
+	"$alpha" .9
+	"$model" 1
+}

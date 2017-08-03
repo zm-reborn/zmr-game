@@ -1,0 +1,8 @@
+"VertexLitGeneric"
+{
+	// Original shader: VertexLitTexture
+	"$basetexture" "models/lawyer/lawyer_facehirez"
+	"$bumpmap" "models/lawyer/lawyerhirez_normal"
+	"$halflambert" 1
+}
+

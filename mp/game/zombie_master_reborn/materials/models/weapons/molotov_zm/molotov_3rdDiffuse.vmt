@@ -1,0 +1,10 @@
+"VertexLitGeneric"
+{
+	"$baseTexture" "models\weapons\molotov_zm/molotov_3rdDiffuse"
+	"$bumpmap" "models\weapons\molotov_zm/molotov_3rdNormalsMap"
+	"$envmap" "env_cubemap"
+	"$envmaptint" "[ .45 .55 .45 ]"
+	"$normalmapalphaenvmapmask" "1"
+	"$envmapcontrast" "0.8"
+	//"$alphatest" "1"
+}

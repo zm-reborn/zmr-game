@@ -1,0 +1,21 @@
+"VertexLitGeneric"
+{
+	"$baseTexture" "models\shotgun/shotgun_zm_diffuse"
+	"$bumpmap" "models\shotgun/shotgun_zm_normals_env"
+	"$surfaceprop" "weapon"
+	"$envmap" "env_cubemap"
+	"$envmaptint" "[ .35 .4 .45 ]"
+	"$normalmapalphaenvmapmask" 1
+	//"$model" "1"
+	
+	//"$phong" "1"
+	//"$phongexponenttexture" "$phong_sheet_fullblack"
+	//"$phongexponent" "3"
+	//"$phongboost" "130"	
+	//"$phongfresnelranges"	"[2 3 6]"
+	//"$phongfresnelranges"	"[0.04 0.4 1]"
+
+	//"$phongexponenttexture" "models\shotgun/shotgun_zm_exp"
+
+	//"$phongalbedotint" "1"		
+}

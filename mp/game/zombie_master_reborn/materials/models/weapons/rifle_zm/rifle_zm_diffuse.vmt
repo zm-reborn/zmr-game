@@ -1,0 +1,16 @@
+"vertexlitgeneric"
+{
+	"$basetexture" "models/weapons/rifle_zm/rifle_zm_diffuse"
+	"$bumpmap" "models/weapons/rifle_zm/rifle_zm_normal"
+	"$bumpscale" "1.9"
+
+	"$envmap" "env_cubemap"	
+	"$normalmapalphaenvmapmask" "1"
+	"$envmapsaturation" "0.5"
+
+	"$phong" "1"
+	"$phongboost" "2.0"
+	"$phongexponent" "5.0"
+	"$phongfresnelranges" "[0.05 0.5 1]"
+//	"$halflambert" "1"
+}

@@ -1,0 +1,7 @@
+"LightmappedGeneric"
+
+//Texture by ExisM
+{
+    "$basetexture" "containers/warehouse_crate_1"
+    "$surfaceprop" "wood"
+}

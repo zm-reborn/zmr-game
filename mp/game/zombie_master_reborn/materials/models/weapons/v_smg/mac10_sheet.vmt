@@ -1,0 +1,8 @@
+"VertexLitGeneric"
+{
+	"$baseTexture" "models/weapons/v_smg/mac10_sheet"
+	"$envmapmask" "models/weapons/v_smg/mac10_spec"
+	"$envmap" "env_cubemap"
+	"$envmapsaturation" "0.7"
+	"$envmapcontrast" "0.6"
+}

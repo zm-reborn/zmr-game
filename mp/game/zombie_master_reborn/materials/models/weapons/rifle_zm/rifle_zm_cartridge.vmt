@@ -1,0 +1,6 @@
+"VertexLitGeneric"
+{
+	"$baseTexture" "models\weapons\rifle_zm/rifle_zm_cartridge"
+	"$envmap" "env_cubemap"
+	"$envmaptint" "[.3 .3 .3]"
+}

@@ -1,0 +1,9 @@
+"LightmappedGeneric"
+{
+	
+	"$translucent" 1
+	"$basetexture" "Decals/omh_2"
+	"$decal" 1
+	"$decalscale" 0.25
+	"%keywords" "debris"
+}

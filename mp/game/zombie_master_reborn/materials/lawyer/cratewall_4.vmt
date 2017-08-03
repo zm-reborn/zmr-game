@@ -1,0 +1,9 @@
+"LightmappedGeneric"
+{
+	// Original shader: BaseTimesLightmap
+	"$basetexture" "lawyer/cratewall_4"
+	"$surfaceprop" "wood_panel"
+	"$bumpmap" "lawyer/cratewall_4_normal"
+	"$envmap" "env_cubemap"
+	"$envmaptint" "[.07 .07 .07]"
+}

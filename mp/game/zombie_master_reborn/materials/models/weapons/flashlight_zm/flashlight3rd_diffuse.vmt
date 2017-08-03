@@ -1,0 +1,10 @@
+"vertexlitgeneric"
+{
+	"$basetexture" "models/weapons/flashlight_zm/flashlight3rd_diffuse"
+	"$surfaceprop" "weapon"
+	"$envmap" "env_cubemap"
+	"$envmaptint" "[.3 .3 .3]"
+	"$envmapcontrast" 0.8
+	"$model" 1
+	
+}

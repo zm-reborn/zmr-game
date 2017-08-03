@@ -1,0 +1,8 @@
+// envmaptint_fix
+"LightmappedGeneric"
+{
+	"$basetexture" "Metal/metalwall021e"
+	"$surfaceprop" "metal"
+	"%keywords" "c17industrial,wasteland"
+
+}

@@ -1,0 +1,11 @@
+// envmaptint_fix
+"LightmappedGeneric"
+{
+	"$basetexture" "Metal/metalceiling005a"
+	"$surfaceprop" "metal"
+	"%keywords" "borealis"
+	"$envmaptint" "[ .16 .16 .16 ]"
+	"$bumpmap" "Metal/metalceiling005a_normal"
+	"$envmap" "env_cubemap"
+	"$normalmapalphaenvmapmask" 1
+}

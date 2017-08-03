@@ -1,0 +1,8 @@
+"sprite"
+{
+	"$spriteorientation" "vp_parallel"
+	"$spriteorigin" "[ 0.50 0.50 ]"
+	"$basetexture" "sprites/flamefromabove"
+	"$additive" 1
+	"$vertexcolor" 1
+}

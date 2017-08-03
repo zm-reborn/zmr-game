@@ -1,0 +1,10 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "Models/props_vehicles/Apc001"
+	"$surfaceprop" "solidmetal"
+	"$envmap" "env_cubemap"
+	"$basealphaenvmapmask" 1
+	"$envmaptint" "[ .75 .75 .75]"
+	"$envmapsaturation" 1
+	"$envmapcontrast" 1
+}

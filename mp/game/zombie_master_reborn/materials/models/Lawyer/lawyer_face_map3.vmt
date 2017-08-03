@@ -1,0 +1,5 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/lawyer/lawyer_face_map3"
+	"$halflambert" 1
+}

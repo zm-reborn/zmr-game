@@ -1,0 +1,8 @@
+"LightmappedGeneric"
+{
+    "$basetexture" "lawyer/serverroomcarpet"
+    "$surfaceprop" "carpet"
+    "$bumpmap" "lawyer/serverroomcarpet_normal"
+    "$envmap" "env_cubemap"
+    "$envmaptint" "[.07 .07 .07]"
+}

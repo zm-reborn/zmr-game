@@ -1,0 +1,9 @@
+"VertexLitGeneric"
+{
+	// Original shader: VertexLitTexture
+	"$basetexture" "models/humans/male/group02/citizen_sheet_pi"
+	//"$envmap" "env_cubemap"
+	"$halflambert" 1
+	//"$bumpmap" "models/Humans/Male/Group02/citizen_sheet_pi_normal"
+	//"$basealphaenvmapmask" 1
+}

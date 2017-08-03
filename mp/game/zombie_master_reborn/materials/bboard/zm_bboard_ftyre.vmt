@@ -1,0 +1,15 @@
+"LightmappedGeneric" 
+
+{
+	// Original shader: BaseTimesLightmap
+	"$basetexture" "bboard/zm_bboard_ftyre"
+	"$surfaceprop" "tile"
+	"Proxies"
+	{
+		"ToggleTexture"
+		{
+			"toggletexturevar" "$basetexture"
+			"toggletextureframenumvar" "$frame"
+		}
+	}
+}

@@ -1,0 +1,8 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/ship1/largedoor_right"
+	"$translucent" 1
+	"$model"	1
+	
+	
+}

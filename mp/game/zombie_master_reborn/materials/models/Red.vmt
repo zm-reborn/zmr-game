@@ -1,0 +1,12 @@
+"vertexlitgeneric"
+{
+	"$basetexture" "models/red"
+	"$model" 1
+	"$additive" 1
+//	"$bumpmap" "models/shadertest/shader2_normal"
+//	"$normalmapalphaenvmapmask" 1
+	"$envmap" "Env_cubemap"
+//	"$envmapsphere"			1
+//	"$envmaptint" "[.8 .8 .8]"
+	"$alpha" .5
+}
