@@ -63,3 +63,8 @@ config.cfg
 *.lib
 Release_*/
 Debug_*/
+*.cache
+*.dt
+*.dat
+stats.txt
+server_blacklist.txt
