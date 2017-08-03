@@ -12,6 +12,10 @@
 // NVNT include to register in haptic user messages
 #include "haptics/haptic_msgs.h"
 
+#ifdef ZMR
+extern void RegisterZMUserMessages( void );
+#endif
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -49,5 +53,10 @@ void RegisterUserMessages( void )
 #ifndef _X360
 	// NVNT register haptic user messages
 	RegisterHapticMessages();
+#endif
+
+
+#ifdef ZMR
+    RegisterZMUserMessages();
 #endif
 }

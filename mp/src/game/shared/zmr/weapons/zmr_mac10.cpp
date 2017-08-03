@@ -1,0 +1,109 @@
+#include "cbase.h"
+
+#include "zmr/zmr_shareddefs.h"
+#include "zmr_base.h"
+
+
+#include "zmr/zmr_player_shared.h"
+
+
+#ifdef CLIENT_DLL
+#define CZMWeaponMac10 C_ZMWeaponMac10
+#endif
+
+class CZMWeaponMac10 : public CZMBaseWeapon
+{
+public:
+	DECLARE_CLASS( CZMWeaponMac10, CZMBaseWeapon );
+	DECLARE_NETWORKCLASS(); 
+	DECLARE_PREDICTABLE();
+#ifndef CLIENT_DLL
+	DECLARE_ACTTABLE();
+#endif
+
+    CZMWeaponMac10();
+
+
+#ifndef CLIENT_DLL
+    const char* GetDropAmmoName() OVERRIDE { return "item_ammo_smg1"; };
+    int GetDropAmmoAmount() OVERRIDE { return 30; };
+#endif
+
+
+    virtual const WeaponProficiencyInfo_t* GetProficiencyValues() OVERRIDE;
+
+
+
+    virtual const Vector& GetBulletSpread( void ) OVERRIDE
+    {
+        static Vector cone = VECTOR_CONE_2DEGREES;
+        return cone;
+    }
+    
+    virtual void AddViewKick( void ) OVERRIDE
+    {
+#define	EASY_DAMPEN			0.5f
+#define	MAX_VERTICAL_KICK	2.0f	// Degrees
+#define	SLIDE_LIMIT			1.0f	// Seconds
+	
+	    DoMachineGunKick( EASY_DAMPEN, MAX_VERTICAL_KICK, m_fFireDuration, SLIDE_LIMIT );
+    }
+    
+    virtual float GetFireRate( void ) OVERRIDE { return 0.066f; };
+};
+
+IMPLEMENT_NETWORKCLASS_ALIASED( ZMWeaponMac10, DT_ZM_WeaponMac10 )
+
+BEGIN_NETWORK_TABLE( CZMWeaponMac10, DT_ZM_WeaponMac10 )
+END_NETWORK_TABLE()
+
+#ifdef CLIENT_DLL
+BEGIN_PREDICTION_DATA( CZMWeaponMac10 )
+END_PREDICTION_DATA()
+#endif
+
+LINK_ENTITY_TO_CLASS( weapon_zm_mac10, CZMWeaponMac10 );
+PRECACHE_WEAPON_REGISTER( weapon_zm_mac10 );
+
+#ifndef CLIENT_DLL
+acttable_t	CZMWeaponMac10::m_acttable[] = 
+{
+	{ ACT_HL2MP_IDLE,					ACT_HL2MP_IDLE_PISTOL,					false },
+	{ ACT_HL2MP_RUN,					ACT_HL2MP_RUN_PISTOL,						false },
+	{ ACT_HL2MP_IDLE_CROUCH,			ACT_HL2MP_IDLE_CROUCH_PISTOL,				false },
+	{ ACT_HL2MP_WALK_CROUCH,			ACT_HL2MP_WALK_CROUCH_PISTOL,				false },
+	{ ACT_HL2MP_GESTURE_RANGE_ATTACK,	ACT_HL2MP_GESTURE_RANGE_ATTACK_SMG1,	false },
+	{ ACT_HL2MP_GESTURE_RELOAD,			ACT_HL2MP_GESTURE_RELOAD_PISTOL,			false },
+	{ ACT_HL2MP_JUMP,					ACT_HL2MP_JUMP_PISTOL,					false },
+	{ ACT_RANGE_ATTACK1,				ACT_RANGE_ATTACK_PISTOL,					false },
+};
+IMPLEMENT_ACTTABLE( CZMWeaponMac10 );
+#endif
+
+CZMWeaponMac10::CZMWeaponMac10()
+{
+    m_fMinRange1 = m_fMinRange2 = 0.0f;
+    m_fMaxRange1 = m_fMaxRange2 = 1400.0f;
+
+    m_bFiresUnderwater = false;
+
+#ifndef CLIENT_DLL
+    SetSlotFlag( ZMWEAPONSLOT_LARGE );
+#endif
+}
+
+const WeaponProficiencyInfo_t *CZMWeaponMac10::GetProficiencyValues()
+{
+	static WeaponProficiencyInfo_t proficiencyTable[] =
+	{
+		{ 7.0,		0.75	},
+		{ 5.00,		0.75	},
+		{ 10.0/3.0, 0.75	},
+		{ 5.0/3.0,	0.75	},
+		{ 1.00,		1.0		},
+	};
+
+	COMPILE_TIME_ASSERT( ARRAYSIZE(proficiencyTable) == WEAPON_PROFICIENCY_PERFECT + 1);
+
+	return proficiencyTable;
+}

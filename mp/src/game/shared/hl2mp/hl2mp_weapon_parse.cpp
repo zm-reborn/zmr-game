@@ -9,11 +9,12 @@
 #include "hl2mp_weapon_parse.h"
 #include "ammodef.h"
 
+#ifndef ZMR
 FileWeaponInfo_t* CreateWeaponInfo()
 {
 	return new CHL2MPSWeaponInfo;
 }
-
+#endif
 
 
 CHL2MPSWeaponInfo::CHL2MPSWeaponInfo()
