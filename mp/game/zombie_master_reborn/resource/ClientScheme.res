@@ -472,7 +472,7 @@ Scheme
 		{
 			"1"
 			{
-				"name"		"HalfLife2"
+				"name"		"zmweapons"
 				"tall"		"64"
 				"weight"	"0"
 				"antialias" "1"
@@ -484,7 +484,7 @@ Scheme
 		{
 			"1"
 			{
-				"name"		"HalfLife2"
+				"name"		"zmweapons"
 				"tall"		"64"
 				"weight"	"0"
 				"antialias" "1"
@@ -732,12 +732,36 @@ Scheme
 				"symbol"	"1"
 			}
 		}
+		"Trebuchet30" // ZMR
+		{
+			"1"
+			{
+				"name"		"Trebuchet MS"
+				"tall"		"30"
+				"weight"	"900"
+				"range"		"0x0000 0x007F"	//	Basic Latin
+				"antialias" "1"
+				"additive"	"1"
+			}
+		}
 		"Trebuchet24"
 		{
 			"1"
 			{
 				"name"		"Trebuchet MS"
 				"tall"		"24"
+				"weight"	"900"
+				"range"		"0x0000 0x007F"	//	Basic Latin
+				"antialias" "1"
+				"additive"	"1"
+			}
+		}
+		"Trebuchet20" // ZMR
+		{
+			"1"
+			{
+				"name"		"Trebuchet MS"
+				"tall"		"20"
 				"weight"	"900"
 				"range"		"0x0000 0x007F"	//	Basic Latin
 				"antialias" "1"
@@ -1578,6 +1602,7 @@ Scheme
 		"1"		"resource/HALFLIFE2.ttf"
 		"1"		"resource/HL2MP.ttf"
 		"2"		"resource/HL2crosshairs.ttf"
+		"1"		"resource/ZM.ttf" // ZMR
 	}
 
 }

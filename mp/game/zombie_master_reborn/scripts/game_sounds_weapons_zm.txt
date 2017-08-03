@@ -1,0 +1,402 @@
+// ZMR Sounds
+"Grenade_Molotov.Detonate"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"1.0"
+	"soundlevel"  "SNDLVL_75dB"
+
+	"rndwave"
+	{
+		"wave"	"physics/glass/glass_bottle_break2.wav"
+	}
+}
+
+"Grenade_Molotov.Detonate2"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"1.0"
+	"soundlevel"  "SNDLVL_75dB"
+
+	"rndwave"
+	{
+		"wave"	"ambient/fire/mtov_flame2.wav"
+	}
+}
+
+// weapon_shotgun_zm.txt
+"Weapon_Shotgun_ZM.Empty"
+{
+	"channel"		"CHAN_WEAPON"
+	"volume"		"0.7"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"			"95,100"
+
+	"wave"			"weapons/shotgun_zm/shotgun_empty_zm.wav"
+}
+
+"Weapon_Shotgun_ZM.Reload"
+{
+	"channel"		"CHAN_ITEM"
+	"volume"		"0.7"
+	"soundlevel"	"SNDLVL_NORM"
+
+	"rndwave"
+	{
+		"wave"			"weapons/shotgun_zm/shotgun_reload1_zm.wav"
+		"wave"			"weapons/shotgun_zm/shotgun_reload2_zm.wav"
+		"wave"			"weapons/shotgun_zm/shotgun_reload3_zm.wav"
+	}
+}
+
+"Weapon_Shotgun_ZM.Special1"
+{
+	"channel"		"CHAN_ITEM"
+	"volume"		"0.7"
+	"soundlevel"	"SNDLVL_NORM"
+
+	"wave"		"weapons/shotgun_zm/shotgun_cock_zm.wav"
+}
+
+"Weapon_Shotgun_ZM.Single"
+{
+	"channel"		"CHAN_WEAPON"
+	"volume"		"1.0"
+	"soundlevel"	"SNDLVL_GUNFIRE"
+	//"pitch"			"98,101"
+	//"rndwave"
+	//{
+	//	"wave"			"weapons/shotgun_zm/shotgun_fire2_zm.wav"
+	//	"wave"			"weapons/shotgun_zm/shotgun_fire6_zm.wav"
+	
+	"wave"			"^weapons/shotgun_zm/shotgun_fire7_zm_dist2.wav"
+	
+	//}
+}
+
+"Weapon_Shotgun_ZM.Double"
+{
+	"channel"		"CHAN_WEAPON"
+	"volume"		"1.0"
+	"soundlevel"	"SNDLVL_GUNFIRE" 
+	"pitch"			"90,95"
+
+	"wave"			"^weapons/shotgun_zm/shotgun_dbl_fire7_zm_dist.wav"
+}
+
+"Weapon_Shotgun_ZM.NPC_Reload"
+{
+	"channel"		"CHAN_ITEM"
+	"volume"		"0.7"
+	"soundlevel"	"SNDLVL_NORM"
+
+	"rndwave"
+	{
+		"wave"			"weapons/shotgun_zm/shotgun_reload1_zm.wav"
+		"wave"			"weapons/shotgun_zm/shotgun_reload2_zm.wav"
+		"wave"			"weapons/shotgun_zm/shotgun_reload3_zm.wav"
+	}
+}
+//TGB: NPC_Single is NOT USED
+"Weapon_Shotgun_ZM.NPC_Single"
+{
+	"channel"		"CHAN_WEAPON"
+	"volume"		"1.0"
+	"soundlevel"	"SNDLVL_NORM" //was SNDLVL_GUNFIRE
+	"pitch"			"98,101"
+
+	"wave"			"weapons/shotgun_zm/shotgun_fire6_zm.wav"
+}
+
+// weapon_rifle_zm.txt
+"Weapon_Rifle_ZM.Empty"
+{
+	"channel"		"CHAN_WEAPON"
+	"volume"		"0.7"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"			"95,100"
+
+	"wave"			"weapons/rifle_zm/zm_rifle_empty.wav"
+}
+
+"Weapon_Rifle_ZM.Reload"
+{
+	"channel"		"CHAN_ITEM"
+	"volume"		"0.6"
+	"soundlevel"	"SNDLVL_NORM"
+
+	"rndwave"
+	{
+		"wave"			"weapons/rifle_zm/zm_rifle_reload1.wav"
+		"wave"			"weapons/rifle_zm/zm_rifle_reload1.wav"
+		"wave"			"weapons/rifle_zm/zm_rifle_reload2.wav"
+	}
+}
+
+"Weapon_Rifle_ZM.Special1"
+{
+	"channel"		"CHAN_ITEM"
+	"volume"		"1.0"
+	"soundlevel"	"SNDLVL_NORM"
+
+	"wave"		"weapons/rifle_zm/zm_rifle_lever.wav"
+}
+
+"Weapon_Rifle_ZM.Single"
+{
+	"channel"		"CHAN_WEAPON"
+	"volume"		"0.75"
+	"soundlevel"	"SNDLVL_GUNFIRE"
+	"pitch"			"98,101"
+	"rndwave"
+	{
+		//"wave"				"^weapons/rifle_zm/zm_rifle_fire1.wav"
+		//"wave"			"weapons/rifle_zm/zm_rifle_fire2.wav"
+		"wave"				"^weapons/rifle_zm/zm_rifle_fire2.wav"
+	}
+}
+
+"Weapon_Rifle_ZM.NPC_Reload"
+{
+	"channel"		"CHAN_ITEM"
+	"volume"		"0.7"
+	"soundlevel"	"SNDLVL_NORM"
+
+	"rndwave"
+	{
+		"wave"			")weapons/rifle_zm/zm_rifle_reload1.wav"
+		"wave"			")weapons/rifle_zm/zm_rifle_reload2.wav"
+	}
+}
+//TGB: NPC_Single is NOT USED
+"Weapon_Rifle_ZM.NPC_Single"
+{
+	"channel"		"CHAN_WEAPON"
+	"volume"		"0.50"
+	"soundlevel"	"SNDLVL_GUNFIRE"
+	"pitch"			"98,101"
+
+	"wave"			"^weapons/rifle_zm/zm_rifle_fire2_dist.wav"
+}
+
+
+// weapon_zm_smg.txt
+"Weapon_SMG_ZM.Reload1"
+{
+	"channel"		"CHAN_ITEM"
+	"volume"		"0.6"
+	"soundlevel"	"SNDLVL_NORM"
+
+	"wave"		"weapons/smg_zm/smg_reload1.wav"
+}
+
+"Weapon_SMG_ZM.Reload2"
+{
+	"channel"		"CHAN_ITEM"
+	"volume"		"0.6"
+	"soundlevel"	"SNDLVL_NORM"
+
+	"wave"		"weapons/smg_zm/smg_reload2.wav"
+}
+
+"Weapon_SMG_ZM.Reload3"
+{
+	"channel"		"CHAN_ITEM"
+	"volume"		"0.6"
+	"soundlevel"	"SNDLVL_NORM"
+
+	"wave"		"weapons/smg_zm/smg_reload3.wav"
+}
+
+"Weapon_SMG_ZM.Empty"
+{
+	"channel"		"CHAN_WEAPON"
+	"volume"		"0.7"
+	"soundlevel"	"SNDLVL_NORM"
+
+	"wave"		"weapons/pistol/pistol_empty.wav"
+}
+
+"Weapon_SMG_ZM.Single"
+{
+	"channel"		"CHAN_WEAPON"
+	"volume"		"0.55" //0.55
+	"soundlevel"		"SNDLVL_90db"
+	"soundlevel"	"SNDLVL_GUNFIRE"
+	"pitch"			"95,105"
+
+	"wave"			"^weapons/smg_zm/smg_fire_distancefade.wav"
+}
+
+"Weapon_SMG_ZM.Double"
+{
+	"channel"		"CHAN_WEAPON"
+	"volume"		"0.61"
+	"soundlevel"	"SNDLVL_GUNFIRE"
+
+	"wave"		"^weapons/smg_zm/smg_fire_distancefade.wav"
+}
+
+//TGB: NPC_Single is NOT USED
+"Weapon_SMG_ZM.NPC_Single"
+{
+	"channel"		"CHAN_WEAPON"
+	"volume"		"0.8"
+	"soundlevel"	"SNDLVL_GUNFIRE"
+
+	"wave"			"^weapons/smg_zm/smg_fire_distancefade.wav"
+}
+
+"Weapon_SMG_ZM.Burst"
+{
+	"channel"		"CHAN_WEAPON"
+	"volume"		"0.7"
+	"soundlevel"	"SNDLVL_GUNFIRE"
+	"pitch"			"98,105"
+
+	"wave"		"^weapons/smg_zm/smg_fire_distancefade.wav"
+
+
+}
+
+"Weapon_SMG_ZM.NPC_Reload"
+{
+	"channel"		"CHAN_ITEM"
+	"volume"		"0.7"
+	"soundlevel"	"SNDLVL_NORM"
+
+	"wave"		"weapons/smg1/smg1_reload.wav"
+}
+
+// weapon_flashlight_zm.txt
+"Weapon_Flashlight_ZM.Single"
+{
+	"channel"		"CHAN_WEAPON"
+	"volume"		"0.55"
+	"soundlevel"	"SNDLVL_105dB"
+	"pitch"			"95,100"
+
+	"wave"			"weapons/flashlight_zm/flashlight_swing.wav"
+}
+
+"Weapon_Flashlight_ZM.Melee_Hit"
+{
+	"channel"		"CHAN_WEAPON"
+	"volume"		"0.55"
+	"soundlevel"	"SNDLVL_105dB"
+	"pitch"			"95,100"
+
+	"wave"			"weapons/flashlight_zm/flashlight_swinghit.wav"
+
+}
+
+"Weapon_Flashlight_ZM.Melee_HitWorld"
+{
+	"channel"		"CHAN_WEAPON"
+	"volume"		"0.55"
+	"soundlevel"	"SNDLVL_105dB"
+	"pitch"			"95,100"
+
+	"wave"			"weapons/flashlight_zm/flashlight_swinghit.wav"
+}
+
+// weapon_pistol.txt
+"Weapon_pistol_zm.Reload"
+{
+	"channel"		"CHAN_ITEM"
+	"volume"		"0.8"
+	"soundlevel"	"SNDLVL_NORM"
+
+	"wave"		")weapons/pistol_zm/pistol_zm_reload1.wav"
+}
+
+"Weapon_pistol_zm.NPC_Reload"
+{
+	"channel"		"CHAN_ITEM"
+	"volume"		"0.7"
+	"soundlevel"	"SNDLVL_NORM"
+
+	"wave"		"weapons/smg1/smg1_reload.wav"
+}
+
+"Weapon_pistol_zm.Empty"
+{
+	"channel"		"CHAN_WEAPON"
+	"volume"		"0.7"
+	"soundlevel"	"SNDLVL_NORM"
+
+	"wave"		"weapons/pistol_zm/pistol_zm_empty.wav"
+}
+
+"Weapon_pistol_zm.Single"
+{
+	"channel"		"CHAN_WEAPON"
+	"volume"		"0.8"
+	"soundlevel"	"SNDLVL_GUNFIRE"
+		"pitch"			"98,101"
+	"rndwave"
+	{
+		"wave"		"^weapons/pistol_zm/pistol_zm_fire1_dist.wav"
+		"wave"		"^weapons/pistol_zm/pistol_zm_fire2_dist.wav"
+
+	}
+
+}
+
+//TGB: NPC_Single is NOT USED
+"Weapon_pistol_zm.NPC_Single"
+{
+	"channel"		"CHAN_WEAPON"
+	"volume"		"0.9"
+	"soundlevel"	"SNDLVL_GUNFIRE"
+	"pitch"			"98,120"
+
+	"rndwave"
+	{
+		"wave"		")weapons/pistol_zm/pistol_zm_fire1.wav"
+		"wave"		")weapons/pistol_zm/pistol_zm_fire2.wav"
+
+	}
+}
+
+"Weapon_Fists_ZM.Melee_Hit"
+{
+	"channel"		"CHAN_WEAPON"
+	"volume"		"0.6"
+	"soundlevel"	"SNDLVL_105dB"
+	"pitch"			"95,100"
+
+	"wave"			"weapons/fists_zm/swing1.wav"
+
+}
+
+"Weapon_Sledge_ZM.Single"
+{
+	"channel"		"CHAN_WEAPON"
+	"volume"		"0.65"
+	"soundlevel"	"SNDLVL_105dB"
+	"pitch"			"95,100"
+
+	"wave"			"weapons/sledge_zm/sledge_swing.wav"
+
+}
+
+"Weapon_Sledge_ZM.Primary"
+{
+	"channel"		"CHAN_WEAPON"
+	"volume"		"0.75"
+	"soundlevel"	"SNDLVL_105dB"
+	"pitch"			"95,100"
+
+	"wave"			"weapons/sledge_zm/sledge_swing.wav"
+
+}
+
+"Weapon_Sledge_ZM.Secondary"
+{
+	"channel"		"CHAN_WEAPON"
+	"volume"		"0.75"
+	"soundlevel"	"SNDLVL_105dB"
+	"pitch"			"95,100"
+
+	"wave"			"weapons/sledge_zm/sledge_swingalt.wav"
+}

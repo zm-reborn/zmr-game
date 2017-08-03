@@ -1,7 +1,7 @@
 "GameInfo"
 {
 	game	"Zombie Master: Reborn"
-	title	"Zombie+Master"
+	title	""
 	title2	""
 	type multiplayer_only
 	nomodels 0

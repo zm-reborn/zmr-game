@@ -1421,17 +1421,18 @@
 	"wave"	"common/null.wav"
 }
 
-"Grenade_Molotov.Detonate"
-{
-	"channel"	"CHAN_VOICE"
-	"volume"	"1.0"
-	"soundlevel"  "SNDLVL_75dB"
-
-	"rndwave"
-	{
-		"wave"	"physics/glass/glass_bottle_break2.wav"
-	}
-}
+// ZMR - This will be defined in our .txt ...
+//"Grenade_Molotov.Detonate"
+//{
+//	"channel"	"CHAN_VOICE"
+//	"volume"	"1.0"
+//	"soundlevel"  "SNDLVL_75dB"
+//
+//	"rndwave"
+//	{
+//		"wave"	"physics/glass/glass_bottle_break2.wav"
+//	}
+//}
 
 "GrenadePathfollower.StopSounds"
 {
