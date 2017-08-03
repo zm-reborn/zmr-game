@@ -60,3 +60,4 @@ config.cfg
 *.vpc_crc
 *.sentinel
 vc120.pdb
+*.lib
