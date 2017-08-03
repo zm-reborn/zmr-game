@@ -47,6 +47,8 @@ extern IGameUIFuncs *gameuifuncs; // for key binding details
 
 CZMBuildMenu *g_pBuildMenu = nullptr;
 
+
+// ZMRTODO: Remove this old stuff...
 const char *TypeToImage[ZMCLASS_MAX] = {
 		"zombies/info_shambler",
 		"zombies/info_banshee",
@@ -63,33 +65,6 @@ const char *TypeToQueueImage[ZMCLASS_MAX] = {
 		"zombies/queue_immolator",
 };
 
-CON_COMMAND( zm_test, "" )
-{
-    if ( !g_pBuildMenu )
-    {
-        return;
-    }
-
-    
-    Msg( "Visible: %i\n", g_pBuildMenu->IsVisible() );
-    Msg( "Enabled: %i\n", g_pBuildMenu->IsEnabled() );
-    Msg( "Has focus: %i\n", g_pBuildMenu->HasFocus() );
-    Msg( "Mouse input: %i\n", g_pBuildMenu->IsMouseInputEnabled() );
-    Msg( "Mouse input disabled for this panel: %i\n", g_pBuildMenu->IsMouseInputDisabledForThisPanel() );
-    Msg( "Z-Pos: %i\n", g_pBuildMenu->GetZPos() );
-    Msg( "Has input elements: %i\n", g_pBuildMenu->HasInputElements() );
-}
-
-CON_COMMAND( zm_test2, "" )
-{
-    if ( !g_pBuildMenu )
-    {
-        return;
-    }
-
-    g_pBuildMenu->MoveToFront();
-}
-
 #define BURNZOMBIE_FLAG 16
 #define DRAGZOMBIE_FLAG 8
 #define HULK_FLAG 4  
@@ -98,8 +73,6 @@ CON_COMMAND( zm_test2, "" )
 
 CZMBuildMenu::CZMBuildMenu( IViewPort *pViewPort ) : Frame( g_pClientMode->GetViewport(), "ZMBuildMenu" )
 {
-    Msg( "CZMBuildMenu::CZMBuildMenu\n" );
-
 	g_pBuildMenu = this;
 
 	m_pViewPort = pViewPort;

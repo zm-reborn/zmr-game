@@ -10,6 +10,9 @@
 #endif
 
 #ifndef CLIENT_DLL
+#include "ammodef.h"
+
+
 #include "zmr/zmr_player.h"
 #else
 #include "zmr/c_zmr_player.h"
@@ -19,6 +22,9 @@
 #include "zmr/weapons/zmr_base.h"
 
 
+#ifndef CLIENT_DLL
+extern CAmmoDef* GetAmmoDef();
+#endif
 
 ConVar zm_sv_popcost_shambler( "zm_sv_popcost_shambler", "1", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE );
 ConVar zm_sv_popcost_banshee( "zm_sv_popcost_banshee", "3", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE );
@@ -283,22 +289,23 @@ int CZMRules::ItemShouldRespawn( CItem* pItem )
 
 bool CZMRules::CanHaveAmmo( CBaseCombatCharacter* pPlayer, int iAmmoIndex )
 {
-    CZMPlayer* pZMPlayer = static_cast<CZMPlayer*>( pPlayer );
+    CZMPlayer* pZMPlayer = ToZMPlayer( pPlayer );
 
-    if ( pZMPlayer->IsZM() ) return false;
+    if ( !pZMPlayer || pZMPlayer->IsZM() ) return false;
 
+
+    // Do we have a weapon to use the ammo with?
+    if ( !pZMPlayer->Weapon_GetWpnForAmmo( iAmmoIndex ) )
+    {
+        return false;
+    }
 
     return CGameRules::CanHaveAmmo( pPlayer, iAmmoIndex );
 }
 
 bool CZMRules::CanHaveAmmo( CBaseCombatCharacter* pPlayer, const char* szName )
 {
-    CZMPlayer* pZMPlayer = static_cast<CZMPlayer*>( pPlayer );
-
-    if ( pZMPlayer->IsZM() ) return false;
-
-
-    return CGameRules::CanHaveAmmo( pPlayer, szName );
+    return CGameRules::CanHaveAmmo( pPlayer, GetAmmoDef()->Index( szName ) );
 }
 
 bool CZMRules::CanHavePlayerItem( CBasePlayer* pPlayer, CBaseCombatWeapon* pBaseWeapon )
@@ -308,7 +315,7 @@ bool CZMRules::CanHavePlayerItem( CBasePlayer* pPlayer, CBaseCombatWeapon* pBase
 
     CZMBaseWeapon* pWep = dynamic_cast<CZMBaseWeapon*>( pBaseWeapon );
 
-    if (pZMPlayer && pWep )
+    if ( pZMPlayer && pWep )
     {
         if ( pWep->GetSlotFlag() != ZMWEAPONSLOT_NOLIMIT && pZMPlayer->GetWeaponSlotFlags() & pWep->GetSlotFlag() )
         {
