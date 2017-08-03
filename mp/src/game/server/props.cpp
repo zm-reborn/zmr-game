@@ -42,6 +42,11 @@
 #include "gamestats.h"
 #include "vehicle_base.h"
 
+
+#ifdef ZMR
+#include "zmr/zmr_player.h"
+#endif
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -1045,6 +1050,21 @@ int CBreakableProp::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 	{
 		return 1;
 	}
+
+#ifdef ZMR // Don't let other players damage our barrel! D:
+    if ( m_explodeDamage > 0 || m_explodeRadius > 0 )
+    {
+        IPhysicsObject* pPhys = VPhysicsGetObject();
+        CBaseEntity* pAttacker = info.GetAttacker();
+
+        if (pPhys && pAttacker
+        &&  pAttacker->GetTeamNumber() == ZMTEAM_HUMAN
+        &&  pPhys->GetGameFlags() & FVPHYSICS_PLAYER_HELD )
+        {
+            return 0;
+        }
+    }
+#endif
 
 	if( info.GetAttacker() && info.GetAttacker()->MyCombatCharacterPointer() )
 	{

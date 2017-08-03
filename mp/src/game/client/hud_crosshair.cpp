@@ -26,8 +26,17 @@
 #include "c_portal_player.h"
 #endif // PORTAL
 
+#ifdef ZMR
+#include "zmr/c_zmr_player.h"
+#endif
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
+
+
+#ifdef ZMR
+ConVar zm_cl_zmcrosshair( "zm_cl_zmcrosshair", "0", FCVAR_ARCHIVE, "Do we display the crosshair while being the ZM?" );
+#endif
 
 ConVar crosshair( "crosshair", "1", FCVAR_ARCHIVE );
 ConVar cl_observercrosshair( "cl_observercrosshair", "1", FCVAR_ARCHIVE );
@@ -104,6 +113,13 @@ bool CHudCrosshair::ShouldDraw( void )
 	if ( pPlayer->m_HL2Local.m_bZooming )
 		return false;
 	*/
+
+#ifdef ZMR
+    if ( !zm_cl_zmcrosshair.GetBool() && ToZMPlayer( pPlayer )->IsZM() )
+    {
+        return false;
+    }
+#endif
 
 	// draw a crosshair only if alive or spectating in eye
 	if ( IsX360() )

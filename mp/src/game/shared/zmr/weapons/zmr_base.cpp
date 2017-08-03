@@ -56,7 +56,7 @@ void CZMBaseWeapon::FreeWeaponSlot()
 
     if ( !pPlayer ) return;
 
-    Msg( "Freeing slot flag %i\n", GetSlotFlag() );
+
     pPlayer->RemoveWeaponSlotFlag( GetSlotFlag() );
 }
 #endif

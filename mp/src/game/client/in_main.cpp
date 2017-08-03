@@ -66,8 +66,14 @@ static int in_impulse = 0;
 static int in_cancel = 0;
 
 ConVar cl_anglespeedkey( "cl_anglespeedkey", "0.67", 0 );
+// ZMRTODO: Add this to the options menu.
+#ifdef ZMR // Change the default speeds.
+ConVar cl_yawspeed( "cl_yawspeed", "160", FCVAR_NONE, "Client yaw speed.", true, -300, true, 300 );
+ConVar cl_pitchspeed( "cl_pitchspeed", "100", FCVAR_NONE, "Client pitch speed.", true, -300, true, 300 );
+#else
 ConVar cl_yawspeed( "cl_yawspeed", "210", FCVAR_NONE, "Client yaw speed.", true, -100000, true, 100000 );
 ConVar cl_pitchspeed( "cl_pitchspeed", "225", FCVAR_NONE, "Client pitch speed.", true, -100000, true, 100000 );
+#endif
 ConVar cl_pitchdown( "cl_pitchdown", "89", FCVAR_CHEAT );
 ConVar cl_pitchup( "cl_pitchup", "89", FCVAR_CHEAT );
 #if defined( CSTRIKE_DLL )

@@ -1166,11 +1166,15 @@ void CHL2_Player::InitSprinting( void )
 //-----------------------------------------------------------------------------
 bool CHL2_Player::CanSprint()
 {
+#ifdef ZMR
+    return false; // No sprinting.
+#else
 	return ( m_bSprintEnabled &&										// Only if sprint is enabled 
 			!IsWalking() &&												// Not if we're walking
 			!( m_Local.m_bDucked && !m_Local.m_bDucking ) &&			// Nor if we're ducking
 			(GetWaterLevel() != 3) &&									// Certainly not underwater
 			(GlobalEntity_GetState("suit_no_sprint") != GLOBAL_ON) );	// Out of the question without the sprint module
+#endif
 }
 
 //-----------------------------------------------------------------------------
