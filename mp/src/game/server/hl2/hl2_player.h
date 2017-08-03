@@ -302,7 +302,14 @@ private:
 	Class_T				m_nControlClass;			// Class when player is controlling another entity
 	// This player's HL2 specific data that should only be replicated to 
 	//  the player and not to other players.
-	CNetworkVarEmbedded( CHL2PlayerLocalData, m_HL2Local );
+#ifdef ZMR
+public:
+    CNetworkVarEmbedded( CHL2PlayerLocalData, m_HL2Local );
+private:
+#else
+    CNetworkVarEmbedded( CHL2PlayerLocalData, m_HL2Local );
+#endif
+	
 
 	float				m_flTimeAllSuitDevicesOff;
 

@@ -44,6 +44,12 @@ extern ConVar cam_idealyaw;
 // For showing/hiding the scoreboard
 #include <game/client/iviewport.h>
 
+
+#ifdef ZMR
+#include "zmr/zmr_shareddefs.h"
+#include "zmr/ui/zmr_viewport.h"
+#endif
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -702,9 +708,11 @@ AdjustPitch
 */
 void CInput::AdjustPitch( float speed, QAngle& viewangles )
 {
+#ifndef ZMR // Allows us to use lookdown/lookup commands without having to use klook.
 	// only allow keyboard looking if mouse look is disabled
 	if ( UsingMouselook() == false )
 	{
+#endif
 		float	up, down;
 
 		if ( in_klook.state & 1 )
@@ -724,7 +732,9 @@ void CInput::AdjustPitch( float speed, QAngle& viewangles )
 		{
 			view->StopPitchDrift ();
 		}
-	}	
+#ifndef ZMR
+	}
+#endif
 }
 
 /*
@@ -1490,6 +1500,17 @@ int CInput::GetButtonBits( int bResetState )
 	{
 		bits |= IN_WEAPON2;
 	}
+
+#ifdef ZMR
+    if ( g_pZMView && !g_pZMView->IsVisible() )
+    {
+        bits |= IN_ZM_OBSERVERMODE;
+    }
+    else if ( bResetState )
+    {
+        bits &= ~IN_ZM_OBSERVERMODE;
+    }
+#endif
 
 	// Clear out any residual
 	bits &= ~s_ClearInputState;

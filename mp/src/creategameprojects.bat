@@ -1,1 +1,1 @@
-devtools\bin\vpc.exe /hl2mp +game /mksln games.sln
+devtools\bin\vpc.exe /zmr +game /mksln zmr-games.sln

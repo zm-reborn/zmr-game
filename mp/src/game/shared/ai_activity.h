@@ -2188,6 +2188,22 @@ typedef enum
 	ACT_MELEE_VM_INSPECT_IDLE,
 	ACT_MELEE_VM_INSPECT_END,
 
+#ifdef ZMR
+    // Viewmodel...
+	ACT_RIFLE_RELOAD_START,
+	ACT_RIFLE_RELOAD_FINISH,
+	ACT_RIFLE_LEVER,
+
+    // Player model...
+  	ACT_ZM_IDLE_SLEDGE,
+	ACT_ZM_RUN_SLEDGE,
+	ACT_ZM_IDLE_CROUCH_SLEDGE,
+	ACT_ZM_WALK_CROUCH_SLEDGE,
+	ACT_ZM_GESTURE_RANGE_ATTACK_SLEDGE,
+	//ACT_HL2MP_GESTURE_RELOAD_MELEE,
+	ACT_ZM_JUMP_SLEDGE,
+#endif
+
 	// this is the end of the global activities, private per-monster activities start here.
 	LAST_SHARED_ACTIVITY,
 } Activity;

@@ -252,4 +252,9 @@ void EventList_RegisterSharedEvents( void )
 
 	REGISTER_SHARED_ANIMEVENT( AE_TAUNT_ENABLE_MOVE, AE_TYPE_CLIENT | AE_TYPE_SERVER );
 	REGISTER_SHARED_ANIMEVENT( AE_TAUNT_DISABLE_MOVE, AE_TYPE_CLIENT | AE_TYPE_SERVER );
+
+#ifdef ZMR
+    extern void RegisterZMAnimEvents();
+    RegisterZMAnimEvents();
+#endif
 }
