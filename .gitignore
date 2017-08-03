@@ -54,3 +54,9 @@ config.cfg
 # shader files
 *.tmp
 
+
+# Our Stuff (not specific to ZMR)
+*.filters
+*.vpc_crc
+*.sentinel
+vc120.pdb
