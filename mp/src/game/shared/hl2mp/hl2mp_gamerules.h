@@ -142,8 +142,11 @@ public:
 
 	void PlayerKilled( CBasePlayer *pVictim, const CTakeDamageInfo &info );
 
-	
+#ifdef ZMR // ZMRCHANGE - Always teamplay. Client uses this so we can't override it in our class. That's just great.
+    bool    IsTeamplay( void ) { return true; }
+#else
 	bool	IsTeamplay( void ) { return m_bTeamPlayEnabled;	}
+#endif
 	void	CheckAllPlayersReady( void );
 
 	virtual bool IsConnectedUserInfoChangeAllowed( CBasePlayer *pPlayer );
