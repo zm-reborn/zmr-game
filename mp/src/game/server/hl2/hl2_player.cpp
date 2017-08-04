@@ -716,13 +716,16 @@ void CHL2_Player::PreThink(void)
 	CheckTimeBasedDamage();
 	VPROF_SCOPE_END();
 
+#ifndef ZMR // ZMRCHANGE - No zooming
 	VPROF_SCOPE_BEGIN( "CHL2_Player::PreThink-CheckSuitUpdate" );
 	CheckSuitUpdate();
 	VPROF_SCOPE_END();
 
+
 	VPROF_SCOPE_BEGIN( "CHL2_Player::PreThink-CheckSuitZoom" );
 	CheckSuitZoom();
 	VPROF_SCOPE_END();
+#endif
 
 	if (m_lifeState >= LIFE_DYING)
 	{
