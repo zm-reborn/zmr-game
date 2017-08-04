@@ -103,7 +103,6 @@ void respawn( CBaseEntity *pEdict, bool fCopyCorpse )
 		{		
 			//pPlayer->Spawn();
             pPlayer->ChangeTeam( ZMTEAM_SPECTATOR );
-            pPlayer->SetTeamSpecificProps();
 		}
 		else
 		{
