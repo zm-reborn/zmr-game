@@ -21,5 +21,5 @@ public:
 
 
 
-	int m_iPlayerDamage;
+	float m_flDamage;
 };

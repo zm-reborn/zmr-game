@@ -78,13 +78,101 @@ const CZMWeaponInfo& CZMBaseWeapon::GetWpnData() const
 
 void CZMBaseWeapon::FireBullets( const FireBulletsInfo_t &info )
 {
+    if ( !GetOwner() ) return;
+
+
 	FireBulletsInfo_t modinfo = info;
 
+    modinfo.m_flDamage = GetWpnData().m_flDamage;
+	modinfo.m_iPlayerDamage = (int)modinfo.m_flDamage;
+    
+    
 
-	modinfo.m_iPlayerDamage = GetWpnData().m_iPlayerDamage;
+    GetOwner()->FireBullets( modinfo );
+}
+
+void CZMBaseWeapon::PrimaryAttack( void )
+{
+    // If my clip is empty (and I use clips) start reload
+    if ( UsesClipsForAmmo1() && !m_iClip1 ) 
+    {
+        Reload();
+        return;
+    }
 
 
-	BaseClass::FireBullets( modinfo );
+    CZMPlayer* pPlayer = GetPlayerOwner();
+    if ( !pPlayer ) return;
+
+
+    pPlayer->DoMuzzleFlash();
+
+    SendWeaponAnim( GetPrimaryAttackActivity() );
+    pPlayer->SetAnimation( PLAYER_ATTACK1 );
+
+
+    FireBulletsInfo_t info;
+    info.m_vecSrc	 = pPlayer->Weapon_ShootPosition();
+    
+    info.m_vecDirShooting = pPlayer->CBasePlayer::GetAutoaimVector( AUTOAIM_SCALE_DEFAULT );
+
+
+    info.m_iShots = 1;
+
+    WeaponSound( SINGLE, m_flNextPrimaryAttack );
+    m_flNextPrimaryAttack = m_flNextPrimaryAttack + GetFireRate();
+
+    // ZMRTODO: See if this has any truth to it.
+    // To make the firing framerate independent, we may have to fire more than one bullet here on low-framerate systems, 
+    // especially if the weapon we're firing has a really fast rate of fire.
+    /*float fireRate = GetFireRate();
+
+    while ( m_flNextPrimaryAttack <= gpGlobals->curtime )
+    {
+        // MUST call sound before removing a round from the clip of a CMachineGun
+        WeaponSound(SINGLE, m_flNextPrimaryAttack);
+        m_flNextPrimaryAttack = m_flNextPrimaryAttack + fireRate;
+        info.m_iShots++;
+        if ( !fireRate )
+            break;
+    }*/
+
+    // Make sure we don't fire more than the amount in the clip
+    if ( UsesClipsForAmmo1() )
+    {
+        info.m_iShots = MIN( info.m_iShots, m_iClip1 );
+        m_iClip1 -= info.m_iShots;
+    }
+    else
+    {
+        info.m_iShots = MIN( info.m_iShots, pPlayer->GetAmmoCount( m_iPrimaryAmmoType ) );
+        pPlayer->RemoveAmmo( info.m_iShots, m_iPrimaryAmmoType );
+    }
+
+    info.m_flDistance = MAX_TRACE_LENGTH;
+    info.m_iAmmoType = m_iPrimaryAmmoType;
+    info.m_iTracerFreq = 2;
+
+#ifndef CLIENT_DLL
+    info.m_vecSpread = pPlayer->GetAttackSpread( this );
+#else
+    //!!!HACKHACK - what does the client want this function for? 
+    info.m_vecSpread = GetActiveWeapon()->GetBulletSpread();
+#endif
+
+    // Fire the bullets
+    // Use our FireBullets to get the weapon damage from .txt file.
+    FireBullets( info );
+
+
+    if ( !m_iClip1 && pPlayer->GetAmmoCount(m_iPrimaryAmmoType) <= 0 )
+    {
+        // HEV suit - indicate out of ammo condition
+        pPlayer->SetSuitUpdate( "!HEV_AMO0", FALSE, 0 ); 
+    }
+
+    // Add our view kick in
+    AddViewKick();
 }
 
 #ifdef CLIENT_DLL
