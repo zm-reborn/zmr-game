@@ -1,5 +1,10 @@
 #include "cbase.h"
 
+#ifndef CLIENT_DLL
+#include "items.h"
+#endif
+
+
 #include "zmr/zmr_shareddefs.h"
 #include "zmr_base.h"
 
@@ -26,7 +31,7 @@ public:
 
 #ifndef CLIENT_DLL
     const char* GetDropAmmoName() OVERRIDE { return "item_ammo_smg1"; };
-    int GetDropAmmoAmount() OVERRIDE { return 30; };
+    int GetDropAmmoAmount() OVERRIDE { return SIZE_AMMO_SMG1; };
 #endif
 
 

@@ -40,15 +40,22 @@ void ZM_DropAmmo( const CCommand &args )
         return;
     }
 
-
-    Vector src;
+    trace_t trace;
+    Vector src, end;
     Vector fwd;
+
     pPlayer->EyeVectors( &fwd, nullptr, nullptr );
 
-    src = pPlayer->EyePosition() + fwd * 60.0f;
+    src = pPlayer->EyePosition();
+    end = pPlayer->EyePosition() + fwd * 70.0f;
+
+    // Make sure we don't spawn in the wall.
+    Vector testhull( 6, 6, 6 );
+    
+    UTIL_TraceHull( src, end, -testhull, testhull, MASK_SOLID, pPlayer, COLLISION_GROUP_NONE, &trace );
 
 
-    CItem* ammobox = (CItem*)CBaseEntity::Create( ammoname, src, pWeapon->GetAbsAngles(), nullptr );
+    CItem* ammobox = (CItem*)CBaseEntity::Create( ammoname, trace.endpos, pWeapon->GetAbsAngles(), nullptr );
     
     if ( !ammobox ) return;
 
@@ -57,7 +64,8 @@ void ZM_DropAmmo( const CCommand &args )
 
     if ( pPhys )
     {
-        Vector vel = pPlayer->GetAbsVelocity() + fwd * 50.0f;
+        Vector vel = pPlayer->GetAbsVelocity() + fwd * 200.0f;
+
         AngularImpulse angvel( 100, 100, 100 );
 
         pPhys->AddVelocity( &vel, &angvel );

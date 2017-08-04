@@ -1,5 +1,9 @@
 #include "cbase.h"
 
+#ifndef CLIENT_DLL
+#include "items.h"
+#endif
+
 #include "ai_activity.h"
 #include "in_buttons.h"
 
@@ -31,7 +35,7 @@ public:
 
 #ifndef CLIENT_DLL
     const char* GetDropAmmoName() OVERRIDE { return "item_ammo_357"; };
-    int GetDropAmmoAmount() OVERRIDE { return 10; };
+    int GetDropAmmoAmount() OVERRIDE { return SIZE_AMMO_357; };
 #endif
 
 
