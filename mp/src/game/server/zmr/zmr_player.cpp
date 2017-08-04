@@ -174,6 +174,14 @@ void CZMPlayer::GiveDefaultItems()
 	}*/
 }
 
+void CZMPlayer::EquipSuit( bool bPlayEffects )
+{
+    // Never play the effect.
+    CBasePlayer::EquipSuit( false );
+
+    m_HL2Local.m_bDisplayReticle = true;
+}
+
 void CZMPlayer::Spawn()
 {
 	PickDefaultSpawnTeam();

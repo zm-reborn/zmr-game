@@ -62,7 +62,7 @@ public:
     virtual CBaseEntity* EntSelectSpawnPoint( void ) OVERRIDE;
 
     void GiveDefaultItems( void );
-
+    virtual void EquipSuit( bool = false ) OVERRIDE;
     
     virtual void PlayerUse( void ) OVERRIDE;
     //virtual void PlayUseDenySound() OVERRIDE;
