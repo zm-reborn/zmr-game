@@ -187,6 +187,7 @@ CHL2MPRules::CHL2MPRules()
 {
 #ifndef CLIENT_DLL
 	// Create the team managers
+#ifndef ZMR // ZMRCHANGE - Never create HL2DM teams.
 	for ( int i = 0; i < ARRAYSIZE( sTeamNames ); i++ )
 	{
 		CTeam *pTeam = static_cast<CTeam*>(CreateEntityByName( "team_manager" ));
@@ -194,6 +195,7 @@ CHL2MPRules::CHL2MPRules()
 
 		g_Teams.AddToTail( pTeam );
 	}
+#endif
 
 	m_bTeamPlayEnabled = teamplay.GetBool();
 	m_flIntermissionEndTime = 0.0f;
