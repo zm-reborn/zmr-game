@@ -60,6 +60,8 @@ public:
 #ifndef CLIENT_DLL
     virtual void CreateStandardEntities() OVERRIDE;
 
+    void ClientSettingsChanged( CBasePlayer* ) OVERRIDE;
+
     virtual const char* GetGameDescription( void ) OVERRIDE { return "Zombie Master Reborn"; } //
 
     virtual void Think() OVERRIDE;
