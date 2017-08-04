@@ -81,7 +81,8 @@ LINK_ENTITY_TO_CLASS( weapon_zm_sledge, CZMWeaponSledge );
 PRECACHE_WEAPON_REGISTER( weapon_zm_sledge );
 
 #ifndef CLIENT_DLL
-acttable_t CZMWeaponSledge::m_acttable[] = 
+// Old
+/*acttable_t CZMWeaponSledge::m_acttable[] = 
 {
     { ACT_RANGE_ATTACK1,				ACT_RANGE_ATTACK_SLAM,                  true },
     { ACT_HL2MP_IDLE,					ACT_HL2MP_IDLE_MELEE,					false },
@@ -91,8 +92,7 @@ acttable_t CZMWeaponSledge::m_acttable[] =
     { ACT_HL2MP_GESTURE_RANGE_ATTACK,	ACT_HL2MP_GESTURE_RANGE_ATTACK_MELEE,	false },
     { ACT_HL2MP_GESTURE_RELOAD,			ACT_HL2MP_GESTURE_RELOAD_MELEE,			false },
     { ACT_HL2MP_JUMP,					ACT_HL2MP_JUMP_MELEE,					false },
-};
-/*
+};*/
 acttable_t CZMWeaponSledge::m_acttable[] = 
 {
     { ACT_RANGE_ATTACK1,				ACT_RANGE_ATTACK_SLAM,              true },
@@ -104,7 +104,6 @@ acttable_t CZMWeaponSledge::m_acttable[] =
     { ACT_HL2MP_GESTURE_RELOAD,			ACT_HL2MP_GESTURE_RELOAD_MELEE,	    false },
     { ACT_HL2MP_JUMP,					ACT_ZM_JUMP_SLEDGE,					false },
 };
-*/
 IMPLEMENT_ACTTABLE( CZMWeaponSledge );
 #endif
 
