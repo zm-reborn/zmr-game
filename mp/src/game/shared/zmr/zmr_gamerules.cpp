@@ -174,7 +174,7 @@ CZMRules::CZMRules()
 
         if ( pTeam )
         {
-            Msg( "Removing old team: %s\n", pTeam->GetName() );
+            DevMsg( "Removing old team: %s\n", pTeam->GetName() );
 
             UTIL_Remove( pTeam );
         }
@@ -186,8 +186,6 @@ CZMRules::CZMRules()
 	// Create the team managers
 	for ( i = 0; i < ARRAYSIZE( g_sTeamNames ); i++ )
 	{
-        Msg( "Creating new team: %s\n", g_sTeamNames[i] );
-
 		CTeam *pTeam = static_cast<CTeam*>( CreateEntityByName( "team_manager" ) );
 		pTeam->Init( g_sTeamNames[i], i );
 

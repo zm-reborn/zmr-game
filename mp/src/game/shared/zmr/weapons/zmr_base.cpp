@@ -396,7 +396,7 @@ void CZMBaseWeapon::Equip( CBaseCombatCharacter* pCharacter )
 
         if ( pPlayer )
         {
-            Msg( "Adding slot flag %i\n", GetSlotFlag() );
+            DevMsg( "Adding slot flag %i\n", GetSlotFlag() );
             pPlayer->AddWeaponSlotFlag( GetSlotFlag() );
         }
     }
