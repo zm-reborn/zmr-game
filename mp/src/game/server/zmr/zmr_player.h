@@ -42,7 +42,6 @@ public:
     }
 
 
-    
     virtual void Precache( void ) OVERRIDE;
     virtual void Spawn() OVERRIDE;
     void PickDefaultSpawnTeam();
@@ -50,6 +49,8 @@ public:
 
     void SetPlayerModel( void );
     bool ValidatePlayerModel( const char* );
+
+    virtual void FlashlightTurnOn() OVERRIDE;
 
     
     virtual void PickupObject( CBaseEntity *pObject, bool bLimitMassAndSize ) OVERRIDE;

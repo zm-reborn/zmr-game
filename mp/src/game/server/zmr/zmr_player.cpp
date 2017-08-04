@@ -99,7 +99,6 @@ void CZMPlayer::SetTeamSpecificProps()
     case ZMTEAM_ZM :
         m_Local.m_iHideHUD |= HIDEHUD_HEALTH;
 
-
     case ZMTEAM_SPECTATOR :
         if ( IsZM() )
         {
@@ -196,6 +195,15 @@ void CZMPlayer::EquipSuit( bool bPlayEffects )
     CBasePlayer::EquipSuit( false );
 
     m_HL2Local.m_bDisplayReticle = true;
+}
+
+void CZMPlayer::FlashlightTurnOn()
+{
+    if ( IsHuman() && IsAlive() )
+    {
+        AddEffects( EF_DIMLIGHT );
+        EmitSound( "HL2Player.FlashlightOn" );
+    }
 }
 
 void CZMPlayer::SetPlayerModel( void )
