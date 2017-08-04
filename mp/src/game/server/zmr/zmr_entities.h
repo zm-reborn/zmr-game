@@ -89,6 +89,8 @@ public:
 
     void SendMenuUpdate();
 
+    void SetRallyPoint( const Vector& );
+
 
     inline int GetZombieFlags() { return m_fZombieFlags; };
 

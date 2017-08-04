@@ -543,7 +543,19 @@ void ZM_Cmd_CreateTrigger( const CCommand &args )
 
     if ( pTrap )
     {
+        if ( !pPlayer->HasEnoughRes( pTrap->GetTrapCost() ) )
+        {
+            ClientPrint( pPlayer, HUD_PRINTTALK, "You do not have enough resources for that!" );
+            return;
+        }
+
+
         pTrap->CreateTrigger( pos );
+
+        
+        pPlayer->SetResources( pPlayer->GetResources() - pTrap->GetTrapCost() );
+
+        ClientPrint( pPlayer, HUD_PRINTTALK, "Created trap!" );
     }
 }
 
@@ -575,20 +587,13 @@ void ZM_Cmd_SetRally( const CCommand &args )
     pos.z = atof( args.Arg( 4 ) );
     
 
-    CZMEntManipulate* pTrap = dynamic_cast<CZMEntManipulate*>( UTIL_EntityByIndex( entindex ) );
+    CZMEntZombieSpawn* pSpawn = dynamic_cast<CZMEntZombieSpawn*>( UTIL_EntityByIndex( entindex ) );
 
-    if ( pTrap )
+    if ( pSpawn )
     {
-        if ( pPlayer->HasEnoughRes( pTrap->GetTrapCost() ) )
-        {
-            pTrap->CreateTrigger( pos );
+        pSpawn->SetRallyPoint( pos );
 
-            pPlayer->SetResources( pPlayer->GetResources() - pTrap->GetTrapCost() );
-        }
-        else
-        {
-        
-        }
+        ClientPrint( pPlayer, HUD_PRINTTALK, "Set zombie spawn rally point!" );
     }
 }
 

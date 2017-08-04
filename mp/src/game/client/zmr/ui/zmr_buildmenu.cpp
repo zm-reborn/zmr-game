@@ -413,6 +413,7 @@ void CZMBuildMenu::OnClose()
     engine->ClientCmd( VarArgs( "zm_cmd_closebuildmenu %i", GetSpawnIndex() ) );
 
 
+    m_iLastSpawnIndex = GetSpawnIndex();
 	SetSpawnIndex( 0 );
 
 

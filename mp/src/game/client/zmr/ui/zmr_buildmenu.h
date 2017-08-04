@@ -50,6 +50,7 @@ public:
     IViewPort* m_pViewPort;
 
 
+    inline int GetLastSpawnIndex() { return m_iLastSpawnIndex; };
     inline int GetSpawnIndex() { return m_iSpawnIndex; };
     inline void SetSpawnIndex( int entindex ) { m_iSpawnIndex = entindex; };
 
@@ -57,6 +58,7 @@ public:
     inline void SetZombieFlags( int flags ) { m_fSpawnZombieFlags = flags; };
 
 private:
+    int m_iLastSpawnIndex;
     int m_iSpawnIndex;
     int m_fSpawnZombieFlags;
 
