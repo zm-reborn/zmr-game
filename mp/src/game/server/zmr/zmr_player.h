@@ -48,6 +48,9 @@ public:
     void PickDefaultSpawnTeam();
     virtual void ChangeTeam( int iTeam ) OVERRIDE;
 
+    void SetPlayerModel( void );
+    bool ValidatePlayerModel( const char* );
+
 
     virtual void PickupObject( CBaseEntity *pObject, bool bLimitMassAndSize ) OVERRIDE;
     virtual bool BumpWeapon( CBaseCombatWeapon *pWeapon ) OVERRIDE;

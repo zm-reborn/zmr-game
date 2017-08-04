@@ -50,7 +50,14 @@ CZMPlayer::~CZMPlayer( void )
 
 void CZMPlayer::Precache( void )
 {
+    // For now also precache the HL2DM stuff...
     BaseClass::Precache();
+    //CBasePlayer::Precache();
+
+
+#define DEF_PLAYER_MODEL    "models/male_pi.mdl"
+
+    //PrecacheModel ( "sprites/glow01.vmt" );
 
 #ifndef CLIENT_DLL
     // Can't be in gamerules object.
@@ -60,6 +67,14 @@ void CZMPlayer::Precache( void )
     UTIL_PrecacheOther( "npc_dragzombie" );
     UTIL_PrecacheOther( "npc_burnzombie" );
 #endif
+
+    PrecacheModel( DEF_PLAYER_MODEL );
+
+    //PrecacheFootStepSounds();
+
+    //PrecacheScriptSound( "NPC_MetroPolice.Die" );
+    //PrecacheScriptSound( "NPC_CombineS.Die" );
+    //PrecacheScriptSound( "NPC_Citizen.die" );
 }
 
 void CZMPlayer::ChangeTeam( int iTeam )
@@ -180,6 +195,54 @@ void CZMPlayer::EquipSuit( bool bPlayEffects )
     CBasePlayer::EquipSuit( false );
 
     m_HL2Local.m_bDisplayReticle = true;
+}
+
+void CZMPlayer::SetPlayerModel( void )
+{
+    const char *szModelName = nullptr;
+    const char *pszCurrentModelName = modelinfo->GetModelName( GetModel() );
+
+    szModelName = engine->GetClientConVarValue( engine->IndexOfEdict( edict() ), "cl_playermodel" );
+
+    if ( !ValidatePlayerModel( szModelName ) )
+    {
+        char szReturnString[512];
+
+        if ( !ValidatePlayerModel( pszCurrentModelName ) )
+        {
+            pszCurrentModelName = DEF_PLAYER_MODEL;
+        }
+
+        Q_snprintf( szReturnString, sizeof (szReturnString ), "cl_playermodel %s\n", pszCurrentModelName );
+        engine->ClientCommand ( edict(), szReturnString );
+
+        szModelName = pszCurrentModelName;
+    }
+
+    int modelIndex = modelinfo->GetModelIndex( szModelName );
+
+    if ( modelIndex == -1 )
+    {
+        szModelName = DEF_PLAYER_MODEL;
+
+        char szReturnString[512];
+
+        Q_snprintf( szReturnString, sizeof (szReturnString ), "cl_playermodel %s\n", szModelName );
+        engine->ClientCommand ( edict(), szReturnString );
+    }
+
+    SetModel( szModelName );
+
+    //SetupPlayerSoundsByModel( szModelName );
+    m_iPlayerSoundType = PLAYER_SOUNDS_CITIZEN;
+
+    //m_flNextModelChangeTime = gpGlobals->curtime + MODEL_CHANGE_INTERVAL;
+}
+
+bool CZMPlayer::ValidatePlayerModel( const char* szModelName )
+{
+    // ZMRTODO: Implement all player models.
+    return false;
 }
 
 void CZMPlayer::Spawn()

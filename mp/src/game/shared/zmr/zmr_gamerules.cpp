@@ -227,6 +227,53 @@ void CZMRules::Precache( void )
 }
 
 #ifndef CLIENT_DLL
+
+void CZMRules::ClientSettingsChanged( CBasePlayer* pPlayer )
+{
+	CZMPlayer* pZMPlayer = ToZMPlayer( pPlayer );
+
+	if ( !pZMPlayer ) return;
+
+
+
+	const char *pCurrentModel = modelinfo->GetModelName( pPlayer->GetModel() );
+	const char *szModelName = engine->GetClientConVarValue( engine->IndexOfEdict( pPlayer->edict() ), "cl_playermodel" );
+
+	//If we're different.
+	if ( stricmp( szModelName, pCurrentModel ) )
+	{
+		//Too soon, set the cvar back to what it was.
+		//Note: this will make this function be called again
+		//but since our models will match it'll just skip this whole dealio.
+		if ( pZMPlayer->GetNextModelChangeTime() >= gpGlobals->curtime )
+		{
+			char szReturnString[512];
+
+			Q_snprintf( szReturnString, sizeof (szReturnString ), "cl_playermodel %s\n", pCurrentModel );
+			engine->ClientCommand ( pZMPlayer->edict(), szReturnString );
+
+			Q_snprintf( szReturnString, sizeof( szReturnString ), "Please wait %d more seconds before trying to switch.\n", (int)(pZMPlayer->GetNextModelChangeTime() - gpGlobals->curtime) );
+			ClientPrint( pZMPlayer, HUD_PRINTTALK, szReturnString );
+			return;
+		}
+
+
+		pZMPlayer->SetPlayerModel();
+
+		const char *pszCurrentModelName = modelinfo->GetModelName( pZMPlayer->GetModel() );
+
+		char szReturnString[128];
+		Q_snprintf( szReturnString, sizeof( szReturnString ), "Your player model is: %s\n", pszCurrentModelName );
+
+		ClientPrint( pZMPlayer, HUD_PRINTTALK, szReturnString );
+	}
+
+    // Don't use HL2DM rules, it'll change player's team.
+	CTeamplayRules::ClientSettingsChanged( pPlayer );
+}
+
+
+
 static ConVar zm_sv_norestartround( "zm_sv_norestartround", "0" );
 
 

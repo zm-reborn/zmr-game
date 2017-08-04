@@ -146,9 +146,17 @@ private:
 	int m_iLastWeaponFireUsercmd;
 	int m_iModelType;
 	CNetworkVar( int, m_iSpawnInterpCounter );
+
+#ifdef ZMR // ZMRCHANGE - Make these protected so we can access them.
+protected:
 	CNetworkVar( int, m_iPlayerSoundType );
+    float m_flNextModelChangeTime;
+private:
+#else
+    CNetworkVar( int, m_iPlayerSoundType );
 
 	float m_flNextModelChangeTime;
+#endif
 	float m_flNextTeamChangeTime;
 
 	float m_flSlamProtectTime;	
