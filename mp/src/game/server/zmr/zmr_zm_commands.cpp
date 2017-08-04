@@ -159,6 +159,21 @@ void ZM_Cmd_CreateHidden( const CCommand &args )
     pos.y = atof( args.Arg( 2 ) );
     pos.z = atof( args.Arg( 3 ) ) + 1.0f;
 
+
+    CZMEntTriggerBlockHidden* pBlock;
+    for ( int i = 0; i < g_pBlockHidden->Count(); i++ )
+    {
+        pBlock = g_pBlockHidden->Element( i );
+
+        if (pBlock && pBlock->IsActive()
+        &&  pBlock->CollisionProp()
+        &&  pBlock->CollisionProp()->IsPointInBounds( pos ) )
+        {
+            ClientPrint( pPlayer, HUD_PRINTTALK, "No hidden zombie may be created there!" );
+            return;
+        }
+    }
+
     bool bVisible = false;
 
 

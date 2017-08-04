@@ -1,4 +1,7 @@
+#pragma once
+
 #include "cbase.h"
+
 
 class C_ZMEntBaseUsable : public C_BaseAnimating
 {
