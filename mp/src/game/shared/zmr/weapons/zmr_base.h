@@ -35,8 +35,10 @@ public:
     
 
     const CZMWeaponInfo& GetWpnData() const;
+    // NOTE: Always use this to get the damage from .txt file.
     virtual void FireBullets( const FireBulletsInfo_t &info ) OVERRIDE;
-
+    virtual void PrimaryAttack() OVERRIDE;
+    
 
     virtual bool IsPredicted() const OVERRIDE { return true; };
 

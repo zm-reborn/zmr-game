@@ -151,7 +151,7 @@ void CZMWeaponShotgun::PrimaryAttack( void )
 	info.m_pAttacker = pPlayer;
     
 	// Fire the bullets, and force the first shot to be perfectly accuracy
-	pPlayer->FireBullets( info );
+	FireBullets( info );
 	
 	QAngle punch;
 	punch.Init( SharedRandomFloat( "shotgunpax", -2, -1 ), SharedRandomFloat( "shotgunpay", -2, 2 ), 0 );

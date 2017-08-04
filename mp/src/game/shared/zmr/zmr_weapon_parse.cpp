@@ -12,12 +12,12 @@ FileWeaponInfo_t* CreateWeaponInfo()
 
 CZMWeaponInfo::CZMWeaponInfo()
 {
-	m_iPlayerDamage = 0;
+	m_flDamage = 0.0f;
 }
 
 void CZMWeaponInfo::Parse( KeyValues *pKeyValuesData, const char *szWeaponName )
 {
 	BaseClass::Parse( pKeyValuesData, szWeaponName );
 
-	m_iPlayerDamage = pKeyValuesData->GetInt( "damage", 0 );
+    m_flDamage = pKeyValuesData->GetFloat( "damage", 0.0f );
 }
