@@ -39,7 +39,7 @@ public:
 
 
 #ifndef CLIENT_DLL
-    void HandleAnimEvent( animevent_t* ) OVERRIDE;
+    void Operator_HandleAnimEvent( animevent_t*, CBaseCombatCharacter* ) OVERRIDE;
 #else
     bool OnFireEvent( C_BaseViewModel*, const Vector&, const QAngle&, int event, const char* ) OVERRIDE;
 #endif
@@ -80,8 +80,9 @@ CZMWeaponImprovised::CZMWeaponImprovised()
 #endif
 }
 
+// ZMRTODO: FIX THISS
 #ifndef CLIENT_DLL
-void CZMWeaponImprovised::HandleAnimEvent( animevent_t *pEvent )
+void CZMWeaponImprovised::Operator_HandleAnimEvent( animevent_t* pEvent, CBaseCombatCharacter* pOperator )
 {
     Msg( "Handling event: %i\n", pEvent->event );
 	switch( pEvent->event )
