@@ -14,6 +14,8 @@
 #include "explode.h"
 #include "engine/IEngineSound.h"
 
+#include "npcevent.h"
+
 
 #include "zmr/zmr_gamerules.h"
 #include "zmr_zombiebase.h"
@@ -24,7 +26,9 @@
 
 //#define TGB_DISMEMBER 0
 
-ConVar	sk_burnzombie_health( "sk_burnzombie_health","110" );
+extern ConVar zm_sk_burnzombie_health;
+extern ConVar zm_sk_burnzombie_dmg;
+
 #define BURNZOMBIE_ENEMY_DIST		250
 
 
@@ -57,6 +61,8 @@ public:
 
     // Fix
 	void TraceAttack( const CTakeDamageInfo&, const Vector&, trace_t*, CDmgAccumulator* ) OVERRIDE;
+
+    virtual void HandleAnimEvent( animevent_t *pEvent ) OVERRIDE;
 
 	void GatherConditions( void );
 
@@ -231,13 +237,31 @@ void CNPC_BurnZombie::TraceAttack( const CTakeDamageInfo& info, const Vector& ve
 	BaseClass::TraceAttack( infoCopy, vecDir, ptr, pAcc );
 }
 
+void CNPC_BurnZombie::HandleAnimEvent( animevent_t* pEvent )
+{
+    if (pEvent->event == AE_ZOMBIE_ATTACK_LEFT
+    ||  pEvent->event == AE_ZOMBIE_ATTACK_RIGHT)
+    {
+        Vector right, forward;
+        AngleVectors( GetLocalAngles(), &forward, &right, NULL );
+
+        right = right * -100;
+        forward = forward * 200;
+
+        ClawAttack( GetClawAttackRange(), zm_sk_burnzombie_dmg.GetFloat(), QAngle( -15, 20, -10 ), right + forward, ZOMBIE_BLOOD_LEFT_HAND );
+        return;
+    }
+
+    BaseClass::HandleAnimEvent( pEvent );
+}
+
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void CNPC_BurnZombie::Spawn( void )
 {
 	Precache();
 
-	m_iHealth			= sk_burnzombie_health.GetFloat();
+	m_iHealth			= zm_sk_burnzombie_health.GetFloat();
 	//TGB: 0.2 is about 80 degrees to either side
 //	m_flFieldOfView		= 0.2;
 	//TGB: try bigger

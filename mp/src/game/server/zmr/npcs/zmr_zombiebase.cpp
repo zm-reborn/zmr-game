@@ -115,6 +115,21 @@ void CZMBaseZombie::HandleAnimEvent( animevent_t* pEvent )
 		return;
 	}
 
+
+#ifdef _DEBUG
+    if (pEvent->event == AE_ZOMBIE_ATTACK_BOTH
+    ||  pEvent->event == AE_ZOMBIE_ATTACK_LEFT
+    ||  pEvent->event == AE_ZOMBIE_ATTACK_RIGHT)
+    {
+        Warning( "You forgot to implement %s%s%s attack (%i)\n",
+            pEvent->event == AE_ZOMBIE_ATTACK_RIGHT ? "right" : "",
+            pEvent->event == AE_ZOMBIE_ATTACK_LEFT ? "left" : "",
+            pEvent->event == AE_ZOMBIE_ATTACK_BOTH ? "both" : "",
+            pEvent->event );
+        Assert( 0 );
+    }
+#endif
+
     return BaseClass::HandleAnimEvent( pEvent );
 }
 

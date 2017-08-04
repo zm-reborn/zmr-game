@@ -62,13 +62,13 @@ enum
     COND_FASTZOMBIE_CLIMB_TOUCH	= LAST_BASE_ZOMBIE_CONDITION,
 };
 
-ConVar sk_fastzombie_health( "sk_fastzombie_health", "40");
-ConVar sk_fastzombie_clawdamage( "sk_fastzombie_clawdamage", "9");
-ConVar sk_fastzombie_leapdamage( "sk_fastzombie_leapdamage", "5"); //careful with this due to ambush stuff, can be free damage
 
+extern ConVar zm_sk_banshee_health;
+extern ConVar zm_sk_banshee_dmg_claw;
+extern ConVar zm_sk_banshee_dmg_leap;
 //static ConVar zm_popcost_banshee("zm_popcost_banshee", "5", FCVAR_NOTIFY | FCVAR_REPLICATED, "Population points taken up by banshees");
 
-static ConVar sv_climbing("sv_climbing", "1");
+static ConVar sv_climbing( "sv_climbing", "1" );
 
 
 //=========================================================
@@ -551,7 +551,7 @@ void CFastZombie::Spawn( void )
     m_fIsTorso = m_fIsHeadless = false;
 
     SetBloodColor( BLOOD_COLOR_RED );
-    m_iHealth			= sk_fastzombie_health.GetInt(); //TGB: was 50
+    m_iHealth			= zm_sk_banshee_health.GetInt();
     m_flFieldOfView		= 0.2;
 
     CapabilitiesClear();
@@ -962,23 +962,15 @@ void CFastZombie::HandleAnimEvent( animevent_t *pEvent )
         return;
     }
     
-    if ( pEvent->event == AE_ZOMBIE_ATTACK_RIGHT )
+    if (pEvent->event == AE_ZOMBIE_ATTACK_RIGHT
+    ||  pEvent->event == AE_ZOMBIE_ATTACK_LEFT)
     {
         Vector right;
         AngleVectors( GetLocalAngles(), NULL, &right, NULL );
         right = right * -50;
-//LAWYER: Claw attack changed from 3 to 10.
-        ClawAttack( GetClawAttackRange(), sk_fastzombie_clawdamage.GetFloat(), QAngle( -3, -5, -3 ), right, ZOMBIE_BLOOD_RIGHT_HAND );
-        return;
-    }
 
-    if ( pEvent->event == AE_ZOMBIE_ATTACK_LEFT )
-    {
-        Vector right;
-        AngleVectors( GetLocalAngles(), NULL, &right, NULL );
-        right = right * 50;
-        //LAWYER:  Same again
-        ClawAttack( GetClawAttackRange(), sk_fastzombie_clawdamage.GetFloat(), QAngle( -3, 5, -3 ), right, ZOMBIE_BLOOD_LEFT_HAND );
+        ClawAttack( GetClawAttackRange(), zm_sk_banshee_dmg_claw.GetFloat(), QAngle( -3, -5, -3 ), right,
+            pEvent->event == AE_ZOMBIE_ATTACK_RIGHT ? ZOMBIE_BLOOD_RIGHT_HAND : ZOMBIE_BLOOD_LEFT_HAND );
         return;
     }
 
@@ -1458,7 +1450,7 @@ void CFastZombie::LeapAttackTouch( CBaseEntity *pOther )
     AngleVectors( GetLocalAngles(), &forward );
     QAngle qaPunch( 15, random->RandomInt(-5,5), random->RandomInt(-5,5) );
     
-    float damage = sk_fastzombie_leapdamage.GetFloat();
+    float damage = zm_sk_banshee_dmg_leap.GetFloat();
 
     //if we were clinging moments ago, give a damage bonus
     if (m_flClingLeapStart >= (gpGlobals->curtime - 3.0f))

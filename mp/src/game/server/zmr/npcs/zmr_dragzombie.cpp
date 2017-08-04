@@ -65,7 +65,8 @@ static const char *pMoanSounds[] =
 //-----------------------------------------------------------------------------
 // Skill settings.
 //-----------------------------------------------------------------------------
-ConVar sk_dragzombie_health( "sk_dragzombie_health", "60");
+extern ConVar zm_sk_dragzombie_health;
+extern ConVar zm_sk_dragzombie_dmg;
 //ConVar sk_dragzombie_dmg_spit( "sk_dragzombie_poison_dmg_spit","0");
 
 class CNPC_DragZombie : public CAI_BlendingHost<CZMBaseZombie>
@@ -183,7 +184,7 @@ void CNPC_DragZombie::Spawn( void )
     m_fIsTorso = m_fIsHeadless = false;
 
     SetBloodColor( BLOOD_COLOR_RED );
-    m_iHealth = sk_dragzombie_health.GetFloat();
+    m_iHealth = zm_sk_dragzombie_health.GetFloat();
     m_flFieldOfView = 0.2;
 
     CapabilitiesClear();
@@ -524,97 +525,6 @@ void CNPC_DragZombie::BreatheOffShort( void )
 //-----------------------------------------------------------------------------
 void CNPC_DragZombie::HandleAnimEvent( animevent_t *pEvent )
 {
-    
-/*	if ( pEvent->event == AE_ZOMBIE_POISON_PICKUP_CRAB )
-    {
-        EnableCrab( m_nThrowCrab, false );
-        SetBodygroup( ZOMBIE_BODYGROUP_THROW, 1 );
-        return;
-    }
-
-    if ( pEvent->event == AE_ZOMBIE_POISON_THROW_WARN_SOUND )
-    {
-        BreatheOffShort();
-        EmitSound( "NPC_DragZombie.ThrowWarn" );
-        return;
-    }
-
-    if ( pEvent->event == AE_ZOMBIE_POISON_THROW_SOUND )
-    {
-        BreatheOffShort();
-        EmitSound( "NPC_DragZombie.Throw" );
-        return;
-    }
-
-    if ( pEvent->event == AE_ZOMBIE_POISON_THROW_CRAB )
-    {
-        SetBodygroup( ZOMBIE_BODYGROUP_THROW, 0 );
-
-        CBlackHeadcrab *pCrab = (CBlackHeadcrab *)CreateNoSpawn( GetHeadcrabClassname(), EyePosition(), vec3_angle, this );
-        pCrab->AddSpawnFlags( SF_NPC_FALL_TO_GROUND );
-        
-        // make me the crab's owner to avoid collision issues
-        pCrab->SetOwnerEntity( this );
-
-        pCrab->Spawn();
-
-        pCrab->SetLocalAngles( GetLocalAngles() );
-        pCrab->SetActivity( ACT_RANGE_ATTACK1 );
-        pCrab->SetNextThink( gpGlobals->curtime );
-        pCrab->PhysicsSimulate();
-
-        pCrab->GetMotor()->SetIdealYaw( GetAbsAngles().y );
-
-        if ( IsOnFire() )
-        {
-            pCrab->Ignite( 100.0 );
-        }
-
-        CBaseEntity *pEnemy = GetEnemy();
-        if ( pEnemy )
-        {
-            Vector vecEnemyEyePos = pEnemy->EyePosition();
-            pCrab->ThrowAt( vecEnemyEyePos );
-        }
-
-        m_flNextCrabThrowTime = gpGlobals->curtime + random->RandomInt( ZOMBIE_THROW_MIN_DELAY, ZOMBIE_THROW_MAX_DELAY );
-        return;
-    }
-*/
-/*		if ( pEvent->event == AE_ZOMBIE_ATTACK_RIGHT ) //LAWYER: This should use ConVars, but I'm too lazy at the moment
-    {
-        Vector right, forward;
-        AngleVectors( GetLocalAngles(), &forward, &right, NULL );
-        
-        right = right * 100;
-        forward = forward * 200;
-
-        ClawAttack( GetClawAttackRange(), (50), QAngle( -15, -20, -10 ), right + forward, ZOMBIE_BLOOD_RIGHT_HAND );
-        return;
-    }
-
-    if ( pEvent->event == AE_ZOMBIE_ATTACK_LEFT )
-    {
-        Vector right, forward;
-        AngleVectors( GetLocalAngles(), &forward, &right, NULL );
-
-        right = right * -100;
-        forward = forward * 200;
-
-        ClawAttack( GetClawAttackRange(), (50), QAngle( -15, 20, -10 ), right + forward, ZOMBIE_BLOOD_LEFT_HAND );
-        return;
-    }
-
-    if ( pEvent->event == AE_ZOMBIE_ATTACK_BOTH )
-    {
-        Vector forward;
-        QAngle qaPunch( 45, random->RandomInt(-5,5), random->RandomInt(-5,5) );
-        AngleVectors( GetLocalAngles(), &forward );
-        forward = forward * 200;
-        ClawAttack( GetClawAttackRange(), (100), qaPunch, forward, ZOMBIE_BLOOD_BOTH_HANDS );
-        return;
-    }
-*/
     if ( pEvent->event == AE_DRAGGY_SICK )
     {
         
@@ -642,7 +552,7 @@ void CNPC_DragZombie::HandleAnimEvent( animevent_t *pEvent )
 
             UTIL_BloodSpray( vSpitPos, vSpitDir, BLOOD_COLOR_RED, RandomInt( 4, 16 ), FX_BLOODSPRAY_ALL);
 
-            CBaseEntity *pHurt = CheckTraceHullAttack( DRAGZOMBIE_SPITRANGE + 10, -Vector(16,16,32), Vector(16,16,32), 3, DMG_ACID, 5.0f );
+            CBaseEntity *pHurt = CheckTraceHullAttack( DRAGZOMBIE_SPITRANGE + 10, -Vector(16,16,32), Vector(16,16,32), zm_sk_dragzombie_dmg.GetInt(), DMG_ACID, 5.0f );
 
             if ( pHurt )
             {
