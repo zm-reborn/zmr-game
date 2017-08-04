@@ -2351,6 +2351,12 @@ void ActivityList_RegisterSharedActivities( void )
 	REGISTER_SHARED_ACTIVITY( ACT_MELEE_VM_INSPECT_IDLE );
 	REGISTER_SHARED_ACTIVITY( ACT_MELEE_VM_INSPECT_END );
 
+
+#ifdef ZMR
+    extern void RegisterZMActivities();
+    RegisterZMActivities();
+#endif
+
 	AssertMsg( g_HighestActivity == LAST_SHARED_ACTIVITY - 1, "Not all activities from ai_activity.h registered in activitylist.cpp" ); 
 } 
 
