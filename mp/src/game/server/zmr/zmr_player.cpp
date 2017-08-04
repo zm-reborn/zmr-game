@@ -108,6 +108,7 @@ void CZMPlayer::SetTeamSpecificProps()
             SetMoveType( MOVETYPE_NOCLIP );
             SetCollisionGroup( COLLISION_GROUP_DEBRIS );
             AddSolidFlags( FSOLID_NOT_SOLID );
+            AddEffects( EF_NODRAW );
         }
         else
         {
