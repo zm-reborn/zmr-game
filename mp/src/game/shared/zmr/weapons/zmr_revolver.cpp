@@ -192,7 +192,7 @@ void CZMWeaponRevolver::Shoot()
 	info.m_vecSpread = GetActiveWeapon()->GetBulletSpread();
 #endif // CLIENT_DLL
 
-	pPlayer->FireBullets( info );
+	FireBullets( info );
 
 	if (!m_iClip1 && pPlayer->GetAmmoCount(m_iPrimaryAmmoType) <= 0)
 	{
