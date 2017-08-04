@@ -180,11 +180,6 @@ void CZMEntZombieSpawn::Spawn( void )
     {
         m_pRallyPoint = dynamic_cast<CZMEntRallyPoint*>( pEnt );
     }
-
-    //if ( m_pRallyPoint )
-    //{
-    //    
-    //}
 }
 
 void CZMEntZombieSpawn::InputToggle( inputdata_t &inputdata )
@@ -334,6 +329,23 @@ void CZMEntZombieSpawn::SendMenuUpdate()
 			}
 		}
 	MessageEnd();
+}
+
+void CZMEntZombieSpawn::SetRallyPoint( const Vector& pos )
+{
+    if ( !m_pRallyPoint )
+    {
+        m_pRallyPoint = dynamic_cast<CZMEntRallyPoint*>( CBaseEntity::Create( "info_rallypoint", pos, vec3_angle, this ) );
+
+        if ( !m_pRallyPoint )
+        {
+            Warning( "Unable to create rally point for zombie spawn %i!\n", entindex() );
+        }
+
+        return;
+    }
+
+    m_pRallyPoint->Teleport( &pos, nullptr, nullptr );
 }
 
 void CZMEntZombieSpawn::SpawnThink()
@@ -680,7 +692,7 @@ void CZMEntManipulate::Spawn( void )
 
 
     if ( m_nCost <= 0 ) m_nCost = 10;
-    if ( m_nTrapCost < 0 ) m_nTrapCost = 0;
+    if ( m_nTrapCost <= 0 ) m_nTrapCost = m_nCost * 1.5;
 
 
     Precache();
@@ -748,7 +760,7 @@ void CZMEntManipulate::Trigger( CBaseEntity* pActivator )
 
 void CZMEntManipulate::CreateTrigger( const Vector& pos )
 {
-    CZMEntManipulateTrigger* pTrigger = dynamic_cast<CZMEntManipulateTrigger*>( CBaseEntity::Create( "info_manipulatetrigger", pos, vec3_angle, nullptr ) );
+    CZMEntManipulateTrigger* pTrigger = dynamic_cast<CZMEntManipulateTrigger*>( CBaseEntity::Create( "info_manipulate_trigger", pos, vec3_angle, nullptr ) );
 
     if ( !pTrigger ) return;
 

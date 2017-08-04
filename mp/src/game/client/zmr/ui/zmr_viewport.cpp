@@ -372,7 +372,7 @@ void CZMFrame::OnLeftClick()
         case ZMCLICKMODE_RALLYPOINT :
             if ( g_pBuildMenu )
                 engine->ClientCmd( VarArgs( "zm_cmd_setrally %i %.1f %.1f %.1f",
-                    g_pBuildMenu->GetSpawnIndex(),
+                    g_pBuildMenu->GetLastSpawnIndex(),
                     pos[0],
                     pos[1],
                     pos[2] ) );
