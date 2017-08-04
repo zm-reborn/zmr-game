@@ -3048,7 +3048,12 @@ void CPhysicsProp::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 		HandleAnyCollisionInteractions( index, pEvent );
 	}
 
+#ifdef ZMR // ZMRCHANGE: Don't take physics damage if we're being held.
+    IPhysicsObject* pPhys = VPhysicsGetObject();
+    if ( !(pPhys && (pPhys->GetGameFlags() & FVPHYSICS_PLAYER_HELD)) && !HasSpawnFlags( SF_PHYSPROP_DONT_TAKE_PHYSICS_DAMAGE ) )
+#else
 	if ( !HasSpawnFlags( SF_PHYSPROP_DONT_TAKE_PHYSICS_DAMAGE ) )
+#endif
 	{
 		int damageType = 0;
 
