@@ -98,8 +98,9 @@ void CZMPlayer::SetTeamSpecificProps()
     {
     case ZMTEAM_ZM :
         m_Local.m_iHideHUD |= HIDEHUD_HEALTH;
-
     case ZMTEAM_SPECTATOR :
+        RemoveAllItems( true );
+
         if ( IsZM() )
         {
             m_takedamage = DAMAGE_NO;
