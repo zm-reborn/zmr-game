@@ -43,7 +43,9 @@ BEGIN_DATADESC( CPlayerResource )
 
 END_DATADESC()
 
+#ifndef ZMR // ZMRCHANGE - Use our own player manager.
 LINK_ENTITY_TO_CLASS( player_manager, CPlayerResource );
+#endif
 
 CPlayerResource *g_pPlayerResource;
 
