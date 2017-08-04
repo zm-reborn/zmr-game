@@ -219,6 +219,8 @@ $Project "Client (ZMR)"
 			$File	"zmr\c_zmr_entities.h"
 			$File	"zmr\c_zmr_player.cpp"
 			$File	"zmr\c_zmr_player.h"
+			$File	"zmr\c_zmr_player_resource.cpp"
+			$File	"zmr\c_zmr_player_resource.h"
 			
 			// Shared
 			$File	"$SRCDIR\game\shared\zmr\zmr_ammodef.cpp"

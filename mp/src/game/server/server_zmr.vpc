@@ -333,6 +333,8 @@ $Project "Server (ZMR)"
 			$File	"zmr\zmr_gameinterface.cpp"
 			$File	"zmr\zmr_player.cpp"
 			$File	"zmr\zmr_player.h"
+			$File	"zmr\zmr_player_resource.cpp"
+			$File	"zmr\zmr_player_resource.h"
 			$File	"zmr\zmr_sk_cvars.cpp"
 			$File	"zmr\zmr_zm_commands.cpp"
 			
