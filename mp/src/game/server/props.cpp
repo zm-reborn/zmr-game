@@ -465,7 +465,7 @@ void CBreakableProp::HandleFirstCollisionInteractions( int index, gamevcollision
 			HandleInteractionStick( index, pEvent );
 		}
 	}
-
+#ifndef ZMR // ZMRCHANGE: Don't let props break by simply throwing them. This affects explosive barrels and item crates.
 	if( HasInteraction( PROPINTER_PHYSGUN_FIRST_BREAK ) )
 	{
 		// Looks like it's best to break by having the object damage itself. 
@@ -488,7 +488,7 @@ void CBreakableProp::HandleFirstCollisionInteractions( int index, gamevcollision
 		TakeDamage( info );
 		return;
 	}
-	
+#endif
 	if( HasInteraction( PROPINTER_PHYSGUN_FIRST_PAINT ) )
 	{
 		IPhysicsObject *pObj = VPhysicsGetObject();
@@ -1051,14 +1051,14 @@ int CBreakableProp::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 		return 1;
 	}
 
-#ifdef ZMR // Don't let other players damage our barrel! D:
+#ifdef ZMR // ZMRCHANGE: Don't let other players damage our barrel! D:
     if ( m_explodeDamage > 0 || m_explodeRadius > 0 )
     {
         IPhysicsObject* pPhys = VPhysicsGetObject();
         CBaseEntity* pAttacker = info.GetAttacker();
 
         if (pPhys && pAttacker
-        &&  pAttacker->GetTeamNumber() == ZMTEAM_HUMAN
+        &&  pAttacker->IsPlayer()
         &&  pPhys->GetGameFlags() & FVPHYSICS_PLAYER_HELD )
         {
             return 0;
