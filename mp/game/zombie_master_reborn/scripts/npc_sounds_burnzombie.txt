@@ -1,0 +1,55 @@
+"NPC_BurnZombie.Pain"
+{
+	"channel"		"CHAN_BODY"
+	"volume"		"0.600"
+	"pitch"			"95, 105"
+
+	"soundlevel"		"SNDLVL_NORM"
+
+	"wave"			"npc/barnacle/neck_snap1.wav"
+}
+
+"NPC_BurnZombie.Die"
+{
+	"channel"		"CHAN_BODY"
+	"volume"		"0.600"
+	"pitch"			"95, 105"
+
+	"soundlevel"		"SNDLVL_NORM"
+
+	"wave"			"npc/barnacle/neck_snap2.wav"
+}
+
+"NPC_BurnZombie.Alert"
+{
+	"channel"		"CHAN_ITEM"
+	"volume"		"VOL_NORM"
+	"pitch"			"PITCH_NORM"
+
+	"soundlevel"	"SNDLVL_NORM"
+
+	"wave"			"npc/stalker/go_alert2.wav"
+}
+
+"NPC_BurnZombie.Idle"
+{
+	"channel"		"CHAN_BODY"
+	"volume"		"VOL_NORM"
+	"pitch"			"PITCH_NORM"
+
+	"soundlevel"	"SNDLVL_NORM"
+
+	"wave"			"npc/stalker/breathing3.wav"
+}
+
+"NPC_BurnZombie.Scream"
+{
+	"channel"		"CHAN_ITEM"
+	"volume"		"VOL_NORM"
+	"pitch"			"PITCH_NORM"
+
+	"soundlevel"	"SNDLVL_NORM"
+
+	"wave"			"npc/stalker/go_alert2a.wav"
+}
+

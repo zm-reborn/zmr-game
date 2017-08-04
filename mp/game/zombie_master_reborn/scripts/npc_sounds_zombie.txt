@@ -1,0 +1,250 @@
+"NPC_BaseZombie.PoundDoor"
+{
+	"channel"		"CHAN_BODY"
+	"volume"		"0.95"
+	"pitch"			"PITCH_NORM"
+
+	"soundlevel"	"SNDLVL_NORM"
+
+	"wave"			"npc/shamblie/zombie_pound_door.wav"
+}
+
+"NPC_BaseZombie.Swat"
+{
+	"channel"		"CHAN_BODY"
+	"volume"		"0.95"
+	"pitch"			"PITCH_NORM"
+
+	"soundlevel"	"SNDLVL_NORM"
+
+	"wave"			"npc/shamblie/zombie_hit.wav"
+}
+
+"Zombie.FootstepRight"
+{
+	"channel"		"CHAN_BODY"
+	"volume"		"0.95"
+	"pitch"			"PITCH_NORM"
+
+	"soundlevel"	"SNDLVL_65db"
+
+	"rndwave"
+	{
+		"wave"	"npc/shamblie/foot1.wav"
+		"wave"	"npc/shamblie/foot2.wav"
+		"wave"	"npc/shamblie/foot3.wav"
+	}
+}
+
+"Zombie.FootstepLeft"
+{
+	"channel"		"CHAN_BODY"
+	"volume"		"0.95"
+	"pitch"			"PITCH_NORM"
+
+	"soundlevel"	"SNDLVL_65db"
+
+	"rndwave"
+	{
+		"wave"	"npc/shamblie/foot1.wav"
+		"wave"	"npc/shamblie/foot2.wav"
+		"wave"	"npc/shamblie/foot3.wav"
+	}
+}
+
+"Zombie.ScuffRight"
+{
+	"channel"		"CHAN_BODY"
+	"volume"		"0.95"
+	"pitch"			"PITCH_NORM"
+
+	"soundlevel"	"SNDLVL_65db"
+
+	"rndwave"
+	{
+		"wave"	"npc/shamblie/foot_slide1.wav"
+		"wave"	"npc/shamblie/foot_slide2.wav"
+		"wave"	"npc/shamblie/foot_slide3.wav"
+	}
+}
+
+"Zombie.ScuffLeft"
+{
+	"channel"		"CHAN_BODY"
+	"volume"		"0.95"
+	"pitch"			"PITCH_NORM"
+
+	"soundlevel"	"SNDLVL_65db"
+
+	"rndwave"
+	{
+		"wave"	"npc/shamblie/foot_slide1.wav"
+		"wave"	"npc/shamblie/foot_slide2.wav"
+		"wave"	"npc/shamblie/foot_slide3.wav"
+	}
+}
+
+"Zombie.AttackHit"
+{
+	"channel"		"CHAN_WEAPON"
+	"volume"		"0.95"
+	"pitch"			"95, 105"
+
+	"soundlevel"	"SNDLVL_NORM"
+
+	"rndwave"
+	{
+		"wave"	"npc/shamblie/claw_strike1.wav"
+		"wave"	"npc/shamblie/claw_strike2.wav"
+		"wave"	"npc/shamblie/claw_strike3.wav"
+	}
+}
+
+"Zombie.AttackMiss"
+{
+	"channel"		"CHAN_WEAPON"
+	"volume"		"0.95"
+	"pitch"			"95, 105"
+
+	"soundlevel"	"SNDLVL_NORM"
+
+	"rndwave"
+	{
+		"wave"	"npc/shamblie/claw_miss1.wav"
+		"wave"	"npc/shamblie/claw_miss2.wav"
+	}
+}
+
+"Zombie.Pain"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.95"
+	"pitch"			"95, 104"
+
+	"soundlevel"	"SNDLVL_NORM"
+
+	"rndwave"
+	{
+		"wave"	"npc/shamblie/Hit_0.wav"
+		"wave"	"npc/shamblie/Hit_1.wav"
+		"wave"	"npc/shamblie/Hit_2.wav"
+		"wave"	"npc/shamblie/Hit_3.wav"
+		"wave"	"npc/shamblie/Hit_4.wav"
+		"wave"	"npc/shamblie/Hit_5.wav"
+		"wave"	"npc/shamblie/Hit_6.wav"
+		"wave"	"npc/shamblie/Hit_7.wav"
+	}
+}
+
+"Zombie.Alert"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.95"
+	"pitch"			"95, 104"
+
+	"soundlevel"	"SNDLVL_NORM"
+
+	"rndwave"
+	{
+		"wave"	"npc/shamblie/zombie_alert1.wav"
+		"wave"	"npc/shamblie/zombie_alert2.wav"
+		"wave"	"npc/shamblie/zombie_alert3.wav"
+	}
+}
+
+"Zombie.Idle"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.75"
+	"pitch"		"92, 105"
+
+	"soundlevel"	"SNDLVL_65db"
+
+	"rndwave"
+	{
+
+		"wave"	"npc/shamblie/growl_0.wav"
+		"wave"	"npc/shamblie/growl_1.wav"
+		"wave"	"npc/shamblie/growl_2.wav"
+		"wave"	"npc/shamblie/growl_3.wav"
+		"wave"	"npc/shamblie/growl_4.wav"
+		"wave"	"npc/shamblie/growl_5.wav"
+		"wave"	"npc/shamblie/growl_6.wav"
+		"wave"	"npc/shamblie/growl_7.wav"
+		"wave"	"npc/shamblie/growl_8.wav"
+	}
+}
+
+"Zombie.Die"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.95"
+	"pitch"			"95, 105"
+
+	"soundlevel"	"SNDLVL_NORM"
+	"rndwave"
+	{
+		"wave"	"npc/shamblie/zombie_die1.wav"
+		"wave"	"npc/shamblie/zombie_die2.wav"
+		"wave"	"npc/shamblie/zombie_die3.wav"
+	}
+}
+
+"Zombie.Attack"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600"
+	"pitch"			"95, 105"
+
+	"soundlevel"	"SNDLVL_NORM"
+
+	"rndwave"
+	{
+		"wave"	"npc/shamblie/zo_attack1.wav"
+		"wave"	"npc/shamblie/zo_attack2.wav"
+	}
+}
+ 
+ "NPC_BaseZombie.Moan1"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.95"
+	"pitch"			"PITCH_NORM"
+
+	"soundlevel"	"SNDLVL_NORM"
+
+	"wave"			"npc/shamblie/moan_loop1.wav"
+}
+
+ "NPC_BaseZombie.Moan2"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.95"
+	"pitch"			"PITCH_NORM"
+
+	"soundlevel"	"SNDLVL_NORM"
+
+	"wave"			"npc/shamblie/moan_loop2.wav"
+}
+
+ "NPC_BaseZombie.Moan3"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.95"
+	"pitch"			"PITCH_NORM"
+
+	"soundlevel"	"SNDLVL_NORM"
+
+	"wave"			"npc/shamblie/moan_loop3.wav"
+}
+
+ "NPC_BaseZombie.Moan4"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.95"
+	"pitch"			"PITCH_NORM"
+
+	"soundlevel"	"SNDLVL_NORM"
+
+	"wave"			"npc/shamblie/moan_loop4.wav"
+}
