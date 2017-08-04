@@ -1,6 +1,5 @@
 #include "cbase.h"
 
-#include "triggers.h"
 #include "team.h"
 #include "items.h"
 
@@ -9,6 +8,7 @@
 #include "zmr/zmr_player.h"
 #include "zmr/zmr_shareddefs.h"
 #include "zmr/npcs/zmr_zombiebase.h"
+#include "zmr/zmr_global_shared.h"
 #include "zmr/weapons/zmr_base.h"
 
 #include "zmr_entities.h"
@@ -1182,3 +1182,50 @@ public:
 };
 
 LINK_ENTITY_TO_CLASS( item_ammo_revolver, CZMItemRevolverAmmo );
+
+
+/*
+    Block hidden trigger
+*/
+BEGIN_DATADESC( CZMEntTriggerBlockHidden )
+    DEFINE_KEYFIELD( m_bActive, FIELD_BOOLEAN, "Active" ),
+
+    DEFINE_INPUTFUNC( FIELD_VOID, "Toggle", InputToggle ),
+    DEFINE_INPUTFUNC( FIELD_VOID, "Disable", InputDisable ),
+    DEFINE_INPUTFUNC( FIELD_VOID, "Enabled", InputEnable ),
+END_DATADESC()
+
+LINK_ENTITY_TO_CLASS( trigger_blockspotcreate, CZMEntTriggerBlockHidden );
+
+
+CZMEntTriggerBlockHidden::CZMEntTriggerBlockHidden()
+{
+    g_pBlockHidden->AddToTail( this );
+}
+
+CZMEntTriggerBlockHidden::~CZMEntTriggerBlockHidden()
+{
+    g_pBlockHidden->FindAndRemove( this );
+}
+
+void CZMEntTriggerBlockHidden::Spawn( void )
+{
+    BaseClass::Spawn();
+
+    InitTrigger();
+}
+
+void CZMEntTriggerBlockHidden::InputToggle( inputdata_t &inputData )
+{
+    m_bActive = !m_bActive;
+}
+
+void CZMEntTriggerBlockHidden::InputEnable( inputdata_t &inputData )
+{
+    m_bActive = true;
+}
+
+void CZMEntTriggerBlockHidden::InputDisable( inputdata_t &inputData )
+{
+    m_bActive = false;
+}

@@ -6,6 +6,8 @@ class CZMEntSpawnNode;
 class CZMPlayer;
 class CZMBaseZombie;
 
+#include "triggers.h"
+
 #include "zmr_player.h"
 #include "npcs/zmr_zombiebase.h"
 #include "zmr/zmr_shareddefs.h"
@@ -216,6 +218,10 @@ private:
     CUtlVector<CZMEntManipulateTrigger*> m_vTriggers;
 };
 
+
+/*
+    Loadout ent
+*/
 class CZMEntLoadout : public CPointEntity
 {
 public:
@@ -276,4 +282,31 @@ private:
 
     int m_iCurRandom[LO_MAX];
     CUtlVector<int> m_vCurCat[LOCAT_MAX];
+};
+
+/*
+    Block hidden create
+*/
+class CZMEntTriggerBlockHidden : public CBaseTrigger
+{
+public:
+    DECLARE_CLASS( CZMEntTriggerBlockHidden, CBaseTrigger );
+    DECLARE_DATADESC();
+
+
+    CZMEntTriggerBlockHidden();
+    ~CZMEntTriggerBlockHidden();
+
+    void Spawn( void ) OVERRIDE;
+
+
+    inline bool IsActive() { return m_bActive; };
+
+
+    void InputToggle( inputdata_t &inputdata );
+    void InputEnable( inputdata_t &inputdata );
+    void InputDisable( inputdata_t &inputdata );
+
+private:
+    bool m_bActive;
 };
