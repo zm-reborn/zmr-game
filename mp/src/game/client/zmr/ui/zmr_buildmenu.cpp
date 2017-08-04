@@ -166,6 +166,11 @@ CZMBuildMenu::CZMBuildMenu( IViewPort *pViewPort ) : Frame( g_pClientMode->GetVi
 		Q_strncpy(saved, temp, strlen(temp) + 1);
 		zombiedescriptions[ZMCLASS_IMMOLATOR] = saved;
 	}
+    else
+    {
+        Warning( "No zombiedesc.res exist!\n" );
+    }
+
 	//will delete its child keys as well
 	kv->deleteThis();
 
