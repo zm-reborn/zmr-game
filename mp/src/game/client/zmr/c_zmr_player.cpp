@@ -25,13 +25,4 @@ void C_ZMPlayer::TeamChange( int iNewTeam )
 
     if ( g_pZMView )
         g_pZMView->SetVisible( iNewTeam == ZMTEAM_ZM );
-
-
-    if ( iNewTeam != ZMTEAM_ZM )
-    {
-        engine->ClientCmd( "-left" );
-        engine->ClientCmd( "-right" );
-        engine->ClientCmd( "-lookup" );
-        engine->ClientCmd( "-lookdown" );
-    }
 }

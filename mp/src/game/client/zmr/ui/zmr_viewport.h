@@ -37,6 +37,7 @@ public:
     bool ShouldDraw() OVERRIDE { return IsVisible(); };
     virtual void OnThink() OVERRIDE;
     virtual void Paint() OVERRIDE {};
+    virtual void SetVisible( bool ) OVERRIDE;
 
     virtual void OnCommand( const char* ) OVERRIDE;
     //virtual void ShowPanel( const char* name ) OVERRIDE;

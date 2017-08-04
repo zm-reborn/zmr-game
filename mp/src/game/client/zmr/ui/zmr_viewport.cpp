@@ -115,6 +115,16 @@ void CZMFrame::Init()
     
 }
 
+void CZMFrame::SetVisible( bool state )
+{
+    BaseClass::SetVisible( state );
+
+    engine->ClientCmd( "-left" );
+    engine->ClientCmd( "-right" );
+    engine->ClientCmd( "-lookup" );
+    engine->ClientCmd( "-lookdown" );
+}
+
 void CZMFrame::SetClickMode( ZMClickMode_t mode, bool print )
 {
     if ( mode == m_iClickMode ) return;
