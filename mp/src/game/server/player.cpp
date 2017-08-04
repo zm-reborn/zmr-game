@@ -2117,12 +2117,12 @@ void CBasePlayer::PlayerDeathThink(void)
 		m_lifeState = LIFE_DEAD;
 		m_flDeathAnimTime = gpGlobals->curtime;
 	}
-#ifndef ZMR // ZMRCHANGE: This was blocking players from going into spectator mode for some reason.
+	
 	StopAnimation();
 
 	IncrementInterpolationFrame();
 	m_flPlaybackRate = 0.0;
-	
+#ifndef ZMR // ZMRCHANGE: This was blocking players from going into spectator mode for some reason.
 	int fAnyButtonDown = (m_nButtons & ~IN_SCORE);
 	
 	// Strip out the duck key from this check if it's toggled
