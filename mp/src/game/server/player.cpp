@@ -2117,7 +2117,7 @@ void CBasePlayer::PlayerDeathThink(void)
 		m_lifeState = LIFE_DEAD;
 		m_flDeathAnimTime = gpGlobals->curtime;
 	}
-	
+#ifndef ZMR // ZMRCHANGE: This was blocking players from going into spectator mode for some reason.
 	StopAnimation();
 
 	IncrementInterpolationFrame();
@@ -2158,7 +2158,7 @@ void CBasePlayer::PlayerDeathThink(void)
 	if (!fAnyButtonDown 
 		&& !( g_pGameRules->IsMultiplayer() && forcerespawn.GetInt() > 0 && (gpGlobals->curtime > (m_flDeathTime + 5))) )
 		return;
-
+#endif
 	m_nButtons = 0;
 	m_iRespawnFrames = 0;
 
