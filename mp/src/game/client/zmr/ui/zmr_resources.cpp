@@ -152,7 +152,9 @@ void CZMResourceHud::OnThink()
 
     int newres = pPlayer->GetResources();
 
-    m_nResCountDif = newres - m_nResCount; 
+    if ( (newres - m_nResCount) > 0 )
+        m_nResCountDif = newres - m_nResCount; 
+
     m_nResCount = newres;
 }
 
