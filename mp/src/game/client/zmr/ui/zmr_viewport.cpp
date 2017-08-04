@@ -234,6 +234,9 @@ void CZMFrame::OnThink()
         return;
     }
 
+    if ( !IsMouseInputEnabled() )
+        SetMouseInputEnabled( true );
+
 #define SCRL_BORDER     10
 
 	int mx, my;
