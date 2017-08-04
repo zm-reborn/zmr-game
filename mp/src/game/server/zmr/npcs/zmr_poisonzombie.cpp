@@ -133,11 +133,10 @@ static const char *pMoanSounds[] =
 	"NPC_PoisonZombie.Moan1",
 };
 
-//-----------------------------------------------------------------------------
-// Skill settings.
-//-----------------------------------------------------------------------------
-extern ConVar sk_zombie_poison_health;
-extern ConVar sk_zombie_poison_dmg_spit;
+
+extern ConVar zm_sk_hulk_health;
+extern ConVar zm_sk_hulk_dmg;
+
 
 class CNPC_PoisonZombie : public CAI_BlendingHost<CZMBaseZombie>
 {
@@ -284,7 +283,7 @@ void CNPC_PoisonZombie::Spawn( void )
 	SetBloodColor( BLOOD_COLOR_YELLOW );
 #endif // HL2_EPISODIC
 
-	m_iHealth = sk_zombie_poison_health.GetFloat();
+	m_iHealth = zm_sk_hulk_health.GetFloat();
 	m_flFieldOfView = 0.2;
 
 	CapabilitiesClear();
@@ -415,13 +414,16 @@ void CNPC_PoisonZombie::BreatheOffShort( void )
 //-----------------------------------------------------------------------------
 void CNPC_PoisonZombie::HandleAnimEvent( animevent_t *pEvent )
 {
-	if ( pEvent->event == AE_ZOMBIE_POISON_SPIT )
+    // Hulk uses AE_ZOMBIE_ATTACK_RIGHT specifically.
+	if ( pEvent->event == AE_ZOMBIE_ATTACK_RIGHT )
 	{
-		Vector forward;
-		QAngle qaPunch( 45, random->RandomInt(-5, 5), random->RandomInt(-5, 5) );
-		AngleVectors( GetLocalAngles(), &forward );
+		Vector forward, right;
+
+		AngleVectors( GetLocalAngles(), &forward, &right, nullptr );
+
+		right = right * 200;
 		forward = forward * 200;
-		ClawAttack( GetClawAttackRange(), sk_zombie_poison_dmg_spit.GetFloat(), qaPunch, forward, ZOMBIE_BLOOD_BITE );
+		ClawAttack( GetClawAttackRange(), zm_sk_hulk_dmg.GetFloat(), QAngle( -15, -20, -10 ), right + forward, ZOMBIE_BLOOD_BITE );
 		return;
 	}
 

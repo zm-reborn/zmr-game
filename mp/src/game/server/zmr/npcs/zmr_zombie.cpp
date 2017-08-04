@@ -17,6 +17,7 @@
 #include "soundenvelope.h"
 #include "engine/IEngineSound.h"
 #include "ammodef.h"
+#include "npcevent.h"
 
 
 #include "zmr/zmr_gamerules.h"
@@ -27,9 +28,6 @@
 #include "tier0/memdbgon.h"
 
 // ACT_FLINCH_PHYSICS
-
-
-extern ConVar sk_zombie_health;
 
 envelopePoint_t envZombieMoanVolumeFast[] =
 {
@@ -84,6 +82,10 @@ envelopePoint_t envZombieMoanIgnited[] =
 //=============================================================================
 //=============================================================================
 
+extern ConVar zm_sk_shambler_dmg_oneslash;
+extern ConVar zm_sk_shambler_dmg_bothslash;
+extern ConVar zm_sk_shambler_health;
+
 class CZMZombie : public CAI_BlendingHost<CZMBaseZombie>
 {
 public:
@@ -106,6 +108,8 @@ public:
 	void MoanSound( envelopePoint_t *pEnvelope, int iEnvelopeSize );
 
 	void GatherConditions( void );
+
+    void HandleAnimEvent( animevent_t* ) OVERRIDE;
 
 	int SelectFailSchedule( int failedSchedule, int failedTask, AI_TaskFailureCode_t taskFailCode );
 	int TranslateSchedule( int scheduleType );
@@ -272,7 +276,7 @@ void CZMZombie::Spawn( void )
 {
 	Precache();
 
-	m_iHealth			= sk_zombie_health.GetFloat();
+	m_iHealth			= zm_sk_shambler_health.GetFloat();
 	m_flFieldOfView		= 0.5f; // 0.2f
 
 	CapabilitiesClear();
@@ -485,6 +489,45 @@ void CZMZombie::MoanSound( envelopePoint_t *pEnvelope, int iEnvelopeSize )
 	{
 		BaseClass::MoanSound( pEnvelope, iEnvelopeSize );
 	}
+}
+
+void CZMZombie::HandleAnimEvent( animevent_t* pEvent )
+{
+	if ( pEvent->event == AE_ZOMBIE_ATTACK_RIGHT )
+	{
+		Vector right, forward;
+		AngleVectors( GetLocalAngles(), &forward, &right, NULL );
+		
+		right = right * 100;
+		forward = forward * 200;
+
+		ClawAttack( GetClawAttackRange(), zm_sk_shambler_dmg_oneslash.GetFloat(), QAngle( -15, -20, -10 ), right + forward, ZOMBIE_BLOOD_RIGHT_HAND );
+		return;
+	}
+
+	if ( pEvent->event == AE_ZOMBIE_ATTACK_LEFT )
+	{
+		Vector right, forward;
+		AngleVectors( GetLocalAngles(), &forward, &right, NULL );
+
+		right = right * -100;
+		forward = forward * 200;
+
+		ClawAttack( GetClawAttackRange(), zm_sk_shambler_dmg_oneslash.GetFloat(), QAngle( -15, 20, -10 ), right + forward, ZOMBIE_BLOOD_LEFT_HAND );
+		return;
+	}
+
+	if ( pEvent->event == AE_ZOMBIE_ATTACK_BOTH )
+	{
+		Vector forward;
+		QAngle qaPunch( 45, random->RandomInt(-5,5), random->RandomInt(-5,5) );
+		AngleVectors( GetLocalAngles(), &forward );
+		forward = forward * 200;
+		ClawAttack( GetClawAttackRange(), zm_sk_shambler_dmg_bothslash.GetFloat(), qaPunch, forward, ZOMBIE_BLOOD_BOTH_HANDS );
+		return;
+	}
+
+    BaseClass::HandleAnimEvent( pEvent );
 }
 
 void CZMZombie::GatherConditions( void )
