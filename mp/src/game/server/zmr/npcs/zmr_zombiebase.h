@@ -97,6 +97,8 @@ public:
     ~CZMBaseZombie();
     
 
+    virtual void Spawn() OVERRIDE;
+
     virtual void HandleAnimEvent( animevent_t* ) OVERRIDE;
     
     virtual bool IsValidEnemy( CBaseEntity* ) OVERRIDE;
@@ -104,7 +106,6 @@ public:
     virtual bool CanBecomeLiveTorso() OVERRIDE;
 	virtual bool ShouldBecomeTorso( const CTakeDamageInfo &info, float flDamageThreshold ) OVERRIDE;
     virtual HeadcrabRelease_t ShouldReleaseHeadcrab( const CTakeDamageInfo &info, float flDamageThreshold ) OVERRIDE;
-    virtual void Spawn() OVERRIDE;
 
     virtual const char *GetLegsModel( void ) OVERRIDE { return ""; };
 	virtual const char *GetTorsoModel( void ) OVERRIDE { return ""; };
