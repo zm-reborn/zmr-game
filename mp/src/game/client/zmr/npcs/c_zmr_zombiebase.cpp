@@ -11,6 +11,7 @@
 
 IMPLEMENT_CLIENTCLASS_DT( C_ZMBaseZombie, DT_ZM_BaseZombie, CZMBaseZombie )
 	RecvPropInt( RECVINFO( m_iSelectorIndex ) ),
+	RecvPropFloat( RECVINFO( m_flHealthRatio ) ),
 END_RECV_TABLE()
 
 BEGIN_DATADESC( C_ZMBaseZombie )
@@ -22,72 +23,13 @@ END_DATADESC()
 #define MAT_INNERCIRCLE     "effects/zombie_select"
 
 
-CLIENTEFFECT_REGISTER_BEGIN( PrecacheZombieEffect )
+CLIENTEFFECT_REGISTER_BEGIN( PrecacheZMSelectEffect )
 //CLIENTEFFECT_MATERIAL( "effects/spark" )
 //CLIENTEFFECT_MATERIAL( "effects/gunshiptracer" )
 CLIENTEFFECT_MATERIAL( MAT_HPCIRCLE )
 CLIENTEFFECT_MATERIAL( MAT_INNERCIRCLE )
 CLIENTEFFECT_REGISTER_END()
 
-
-void CZMEasyQuad::Draw()
-{
-    float color[4];
-
-    color[0] = m_QuadData.m_Color[0];
-    color[1] = m_QuadData.m_Color[1];
-    color[2] = m_QuadData.m_Color[2];
-    color[3] = m_QuadData.m_flStartAlpha;
-
-    Vector pos;
-
-
-    CMatRenderContextPtr pRenderContext( materials );
-    //true, NULL, NULL, m_QuadData.m_pMaterial
-	IMesh* pMesh = pRenderContext->GetDynamicMesh( true, nullptr, nullptr, m_QuadData.m_pMaterial );
-	CMeshBuilder meshBuilder;
-
-    meshBuilder.Begin( pMesh, MATERIAL_QUADS, 1 );
-
-    pos = m_QuadData.m_vecOrigin - Vector( -16.0f, -16.0f, 0.0f );
-
-	meshBuilder.Position3fv( pos.Base() );
-	meshBuilder.Normal3fv( m_QuadData.m_vecNormal.Base() );
-	meshBuilder.TexCoord2f( 0.0f, 1.0f, 1.0f );
-	meshBuilder.Color4fv( color );
-	meshBuilder.AdvanceVertex();
-
-
-    pos = m_QuadData.m_vecOrigin - Vector( -16, 16, 0 );
-
-	meshBuilder.Position3fv( pos.Base() );
-	meshBuilder.Normal3fv( m_QuadData.m_vecNormal.Base() );
-	meshBuilder.TexCoord2f( 0.0f, 0.0f, 1.0f );
-	meshBuilder.Color4fv( color );
-	meshBuilder.AdvanceVertex();
-
-
-    pos = m_QuadData.m_vecOrigin - Vector( 16, 16, 0 );
-
-	meshBuilder.Position3fv( pos.Base() );
-	meshBuilder.Normal3fv( m_QuadData.m_vecNormal.Base() );
-	meshBuilder.TexCoord2f( 0.0f, 0.0f, 0.0f );
-	meshBuilder.Color4fv( color );
-	meshBuilder.AdvanceVertex();
-
-
-    pos = m_QuadData.m_vecOrigin - Vector( 16, -16, 0 );
-
-	meshBuilder.Position3fv( pos.Base() );
-	meshBuilder.Normal3fv( m_QuadData.m_vecNormal.Base() );
-	meshBuilder.TexCoord2f( 0.0f, 1.0f, 0.0f );
-	meshBuilder.Color4fv( color );
-	meshBuilder.AdvanceVertex();
-
-
-	meshBuilder.End();
-	pMesh->Draw();
-}
 
 C_ZMBaseZombie::C_ZMBaseZombie()
 {
@@ -99,15 +41,23 @@ C_ZMBaseZombie::C_ZMBaseZombie()
     
 
     // Always create FX.
-    CreateHealthFX();
-    CreateInnerFX();
+    m_fxHealth = new CZMCharCircle();
+    m_fxHealth->SetYaw( 0.0f );
+    m_fxHealth->SetMaterial( MAT_HPCIRCLE );
+    m_fxHealth->SetSize( 16.0f );
+
+    m_fxInner = new CZMCharCircle();
+    m_fxInner->SetYaw( 0.0f );
+    m_fxInner->SetMaterial( MAT_INNERCIRCLE );
+    m_fxInner->SetSize( 16.0f );
 }
 
 C_ZMBaseZombie::~C_ZMBaseZombie()
 {
     g_pZombies->FindAndRemove( this );
 
-    RemoveFXs();
+    delete m_fxHealth;
+    delete m_fxInner;
 }
 
 void C_ZMBaseZombie::Spawn( void )
@@ -119,58 +69,27 @@ void C_ZMBaseZombie::Spawn( void )
     m_takedamage = DAMAGE_YES;
 }
 
-void C_ZMBaseZombie::CreateHealthFX()
-{
-    FXQuadData_t data;
-
-    data.SetAlpha( 1.0f, 1.0f );
-    data.SetScale( 4 * 10.0f, 0 );
-    data.SetMaterial( MAT_HPCIRCLE );
-    data.SetNormal( Vector(0,0,1) );
-    data.SetOrigin( vec3_origin );
-    data.SetColor( 0.0f, 1.0f, 0.0f );
-    data.SetScaleBias( 0 );
-    data.SetAlphaBias( 0 );
-    data.SetYaw( 0, 0 );
-
-    m_fxHealth = new CZMEasyQuad( &data );
-}
-
-void C_ZMBaseZombie::RemoveFXs()
-{
-    delete m_fxHealth;
-    delete m_fxInner;
-}
-
-void C_ZMBaseZombie::CreateInnerFX()
-{
-    FXQuadData_t data;
-
-    data.SetAlpha( 1.0, 0 );
-    data.SetScale( 4 * 10.0f, 0 );
-    data.SetMaterial( MAT_INNERCIRCLE );
-    data.SetNormal( Vector(0,0,1) );
-    data.SetOrigin( vec3_origin );
-    data.SetColor( 1.0f, 1.0f, 1.0f );
-    data.SetScaleBias( 0 );
-    data.SetAlphaBias( 0 );
-    data.SetYaw( 0, 0 );
-
-    m_fxInner = new CZMEasyQuad( &data );
-}
-
 int C_ZMBaseZombie::DrawModel( int flags )
 {
     CZMPlayer* pPlayer = ToZMPlayer( C_BasePlayer::GetLocalPlayer() );
 
-    if ( !pPlayer || pPlayer->IsHuman() )
+    if ( !pPlayer || !pPlayer->IsZM() )
+    {
         return BaseClass::DrawModel( flags );
+    }
+        
 
+    float ratio = m_flHealthRatio > 1.0f ? 1.0f : m_flHealthRatio;
+    if ( ratio < 0.0f ) ratio = 0.0f;
+
+    float g = ratio;
+    float r = 1.0f - g;
 
     float alpha = (m_iSelectorIndex > 0 && m_iSelectorIndex == GetLocalPlayerIndex()) ? 0.8f : 0.1f;
 
     if ( m_fxInner )
     {
+        m_fxInner->SetColor( r, g, 0 );
         m_fxInner->SetAlpha( alpha );
         m_fxInner->SetPos( GetAbsOrigin() + Vector( 0.0f, 0.0f, 3.0f ) );
         m_fxInner->Draw();
@@ -179,15 +98,7 @@ int C_ZMBaseZombie::DrawModel( int flags )
 
     if ( m_fxHealth )
     {
-        /*float hp = GetHealth() > 0 ? (float)GetHealth() : 1.0f;
-        float maxhp = GetMaxHealth() > 0 ? (float)GetMaxHealth() : 1.0f;
-
-        float g = maxhp / hp;
-        float r = 1.0f - g;
-
         m_fxHealth->SetColor( r, g, 0 );
-        */
-
         m_fxHealth->SetAlpha( alpha );
         m_fxHealth->SetPos( GetAbsOrigin() + Vector( 0.0f, 0.0f, 3.0f ) );
         m_fxHealth->Draw();

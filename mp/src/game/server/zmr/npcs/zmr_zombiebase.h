@@ -99,6 +99,7 @@ public:
 
     virtual void Spawn() OVERRIDE;
 
+    virtual int OnTakeDamage_Alive( const CTakeDamageInfo& ) OVERRIDE;
     virtual void HandleAnimEvent( animevent_t* ) OVERRIDE;
     
     virtual bool IsValidEnemy( CBaseEntity* ) OVERRIDE;
@@ -130,7 +131,7 @@ public:
     int GetCost() { return CZMBaseZombie::GetCost( GetZombieClass() ); };
     ZombieClass_t GetZombieClass() { return m_iZombieClass; };
 
-
+    
 
     virtual void Command( const Vector& );
     virtual bool Swat( CBaseEntity* );
@@ -161,6 +162,7 @@ protected:
 
 
     CNetworkVar( int, m_iSelectorIndex );
+    CNetworkVar( float, m_flHealthRatio ); // For humans we can use health/maxhealth
 
 
 
