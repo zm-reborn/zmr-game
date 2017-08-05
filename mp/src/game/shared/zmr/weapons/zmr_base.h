@@ -74,6 +74,14 @@ public:
     virtual void Equip( CBaseCombatCharacter* ) OVERRIDE;
 
 
+    // Viewmodel/misc stuff
+    float CalcViewmodelBob( void );
+    void AddViewmodelBob( CBaseViewModel*, Vector&, QAngle& );
+    Vector GetBulletSpread( WeaponProficiency_t );
+    float GetSpreadBias( WeaponProficiency_t );
+    const WeaponProficiencyInfo_t* GetProficiencyValues();
+    const WeaponProficiencyInfo_t* GetDefaultProficiencyValues();
+
     // Our stuff
     CZMPlayer* GetPlayerOwner();
     virtual bool CanBeDropped() { return true; };
