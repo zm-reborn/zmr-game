@@ -15,6 +15,7 @@
 
 IMPLEMENT_SERVERCLASS_ST( CZMBaseZombie, DT_ZM_BaseZombie )
     SendPropInt( SENDINFO( m_iSelectorIndex ) ),
+    SendPropFloat( SENDINFO( m_flHealthRatio ) ),
 END_SEND_TABLE()
 
 BEGIN_DATADESC( CZMBaseZombie )
@@ -32,8 +33,7 @@ CZMBaseZombie::CZMBaseZombie()
 
 
     m_iSelectorIndex = 0;
-
-
+    m_flHealthRatio = 1.0f;
 }
 
 CZMBaseZombie::~CZMBaseZombie()
@@ -144,6 +144,18 @@ void CZMBaseZombie::HandleAnimEvent( animevent_t* pEvent )
 #endif
 
     return BaseClass::HandleAnimEvent( pEvent );
+}
+
+int CZMBaseZombie::OnTakeDamage_Alive( const CTakeDamageInfo& info )
+{
+    int ret = BaseClass::OnTakeDamage_Alive( info );
+
+    if ( ret )
+    {
+        m_flHealthRatio = m_iHealth / (float)(m_iMaxHealth > 0 ? m_iMaxHealth : 1);
+    }
+
+    return ret;
 }
 
 static ConVar zm_sv_swatlift( "zm_sv_swatlift", "20000", FCVAR_NOTIFY );

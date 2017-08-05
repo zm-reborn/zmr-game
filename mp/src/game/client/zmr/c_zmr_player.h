@@ -4,6 +4,7 @@
 #include "hl2mp/c_hl2mp_player.h"
 
 
+#include "zmr/c_zmr_charcircle.h"
 #include "zmr/zmr_shareddefs.h"
 
 #include "zmr/zmr_player_shared.h"
@@ -17,8 +18,14 @@ public:
     //DECLARE_PREDICTABLE(); 
     DECLARE_INTERPOLATION();
 
+
+    C_ZMPlayer();
+    ~C_ZMPlayer();
+
     
     virtual void TeamChange( int ) OVERRIDE;
+
+    virtual int DrawModel( int ) OVERRIDE;
 
     // Custom...
     inline bool IsZM() { return GetTeamNumber() == ZMTEAM_ZM; };
@@ -31,6 +38,10 @@ public:
     bool HasEnoughRes( int );
     int GetResources();
     void SetResources( int );
+
+protected:
+    CZMCharCircle* m_fxInner;
+    CZMCharCircle* m_fxHealth;
 
 private:
     CNetworkVar( int, m_nResources );

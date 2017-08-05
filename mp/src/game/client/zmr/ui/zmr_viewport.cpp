@@ -6,6 +6,8 @@
 #include "in_buttons.h"
 #include "hud_basechat.h"
 #include "clientmode_shared.h"
+#include "clientsideeffects.h"
+#include "fx_quad.h"
 
 
 #include "zmr/zmr_player_shared.h"
