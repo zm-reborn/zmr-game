@@ -502,4 +502,19 @@
 		"visible"		"0"
 		"enabled"		"0"
 	}
+	
+	// ZMR
+	// Just here to stop the warnings.
+	"ZMFrame"
+	{
+		"fieldName"		"ZMFrame"
+	}
+	"ZMResourceHud"
+	{
+		"fieldName"		"ZMResourceHud"
+	}
+	"ZMBoxSelect"
+	{
+		"fieldName"		"ZMBoxSelect"
+	}
 }
