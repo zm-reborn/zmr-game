@@ -400,14 +400,10 @@ void CZMRules::PlayerKilled( CBasePlayer* pVictim, const CTakeDamageInfo& info )
 {
     CZMPlayer* pPlayer = ToZMPlayer( pVictim );
 
-    if ( !IsInRoundEnd() && pPlayer && pPlayer->IsHuman() )
+    // Don't use team player count since we haven't been switched to spectator yet.
+    if ( !IsInRoundEnd() && pPlayer && pPlayer->IsHuman() && GetNumAliveHumans() <= 1 )
     {
-        CTeam* team = GetGlobalTeam( ZMTEAM_HUMAN );
-
-        if ( team && team->GetNumPlayers() <= 1 )
-        {
-            EndRound( ZMROUND_HUMANDEAD );
-        }
+        EndRound( ZMROUND_HUMANDEAD );
     }
 
     // Don't call HL2MP...
@@ -828,5 +824,24 @@ bool CZMRules::IsSpawnPointValid( CBaseEntity *pSpot, CBasePlayer *pPlayer )
 
 	return true;
     */
+}
+
+
+int CZMRules::GetNumAliveHumans()
+{
+    int num = 0;
+
+    CZMPlayer* pPlayer;
+    for ( int i = 1; i <= gpGlobals->maxClients; i++ )
+    {
+        pPlayer = ToZMPlayer( UTIL_PlayerByIndex( i ) );
+
+        if ( pPlayer && pPlayer->IsHuman() && pPlayer->IsAlive() )
+        {
+            ++num;
+        }
+    }
+    
+    return num;
 }
 #endif

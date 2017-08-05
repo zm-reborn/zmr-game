@@ -107,6 +107,8 @@ public:
     inline bool IsInRoundEnd() { return m_bInRoundEnd; };
 
 
+    static int GetNumAliveHumans();
+
 
     inline void SetZombiePop( int n ) { m_nZombiePop = n; };
 
