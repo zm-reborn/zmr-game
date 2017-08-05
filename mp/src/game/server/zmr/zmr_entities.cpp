@@ -2,6 +2,8 @@
 
 #include "team.h"
 #include "items.h"
+#include "props.h"
+#include "physobj.h"
 
 
 #include "zmr/zmr_gamerules.h"
@@ -798,6 +800,9 @@ void CZMEntManipulate::RemoveTriggers()
 }
 
 
+/*
+    Player count trigger
+*/
 class CZMEntTriggerPlayerCount : public CBaseTrigger
 {
 public:
@@ -825,9 +830,6 @@ private:
     bool m_bActive;
 };
 
-/*
-    Player count trigger
-*/
 BEGIN_DATADESC( CZMEntTriggerPlayerCount )
     DEFINE_KEYFIELD( m_iPercentageToFire, FIELD_INTEGER, "percentagetofire" ), // It just has to be an integer...
     DEFINE_KEYFIELD( m_bActive, FIELD_BOOLEAN, "Active" ),
@@ -934,6 +936,164 @@ void CZMEntTriggerPlayerCount::CountThink( void )
     }
 
     SetNextThink( gpGlobals->curtime + 1.0f );
+}
+
+/*
+    Entity count trigger
+*/
+class CZMEntTriggerEntityCount : public CBaseTrigger
+{
+public:
+    DECLARE_CLASS( CZMEntTriggerEntityCount, CBaseTrigger )
+    DECLARE_DATADESC()
+
+
+    void Spawn( void );
+
+    void InputCount( inputdata_t &inputData );
+    void InputToggle( inputdata_t &inputData );
+    void InputDisable( inputdata_t &inputData );
+    void InputEnable( inputdata_t &inputData );
+
+
+    COutputEvent m_OnCount;
+    COutputEvent m_OnNotCount;
+
+
+    void UpdateState( bool );
+    inline bool IsActive() { return m_bActive; };
+
+private:
+    int m_iCountToFire;
+    int m_iTriggerFlags;
+    bool m_bActive;
+};
+
+#define SF_ENTCOUNT_PLAYERS     1 // Humans, in our case.
+#define SF_ENTCOUNT_NPCS        2
+#define SF_ENTCOUNT_PROPS       3
+
+BEGIN_DATADESC( CZMEntTriggerEntityCount )
+    DEFINE_KEYFIELD( m_iCountToFire, FIELD_INTEGER, "counttofire" ), // It just has to be an integer...
+    DEFINE_KEYFIELD( m_iTriggerFlags, FIELD_INTEGER, "triggerflags" ),
+    DEFINE_KEYFIELD( m_bActive, FIELD_BOOLEAN, "Active" ),
+
+    DEFINE_INPUTFUNC( FIELD_VOID, "Toggle", InputToggle ),
+    DEFINE_INPUTFUNC( FIELD_VOID, "Disable", InputDisable ),
+    DEFINE_INPUTFUNC( FIELD_VOID, "Enabled", InputEnable ),
+
+    DEFINE_INPUTFUNC( FIELD_VOID, "Count", InputCount ),
+
+    DEFINE_OUTPUT( m_OnCount, "OnCount" ),
+    DEFINE_OUTPUT( m_OnNotCount, "OnNotCount" ),
+END_DATADESC()
+
+LINK_ENTITY_TO_CLASS( trigger_entitycount, CZMEntTriggerEntityCount );
+
+
+void CZMEntTriggerEntityCount::Spawn( void )
+{
+    BaseClass::Spawn();
+
+    if ( m_iTriggerFlags < SF_ENTCOUNT_PLAYERS || m_iTriggerFlags > SF_ENTCOUNT_PROPS )
+    {
+        Warning( "trigger_entitycount has an invalid trigger flag %i!\n", m_iTriggerFlags );
+    }
+
+    InitTrigger();
+}
+
+void CZMEntTriggerEntityCount::InputToggle( inputdata_t &inputData )
+{
+    m_bActive = !m_bActive;
+}
+
+void CZMEntTriggerEntityCount::InputEnable( inputdata_t &inputData )
+{
+    m_bActive = true;
+}
+
+void CZMEntTriggerEntityCount::InputDisable( inputdata_t &inputData )
+{
+    m_bActive = false;
+}
+
+void CZMEntTriggerEntityCount::InputCount( inputdata_t &inputData )
+{
+    if ( !IsActive() ) return;
+
+
+    int count = 0;
+
+    touchlink_t* root = static_cast<touchlink_t*>( GetDataObject( TOUCHLINK ) );
+
+    if ( !root )
+    {
+        DevMsg( "No root found for trigger_entitycount!\n" );
+        return;
+    }
+
+
+    for ( touchlink_t* link = root->nextLink; link != root; link = link->nextLink )
+    {
+        CBaseEntity* pEnt = link->entityTouched.Get();
+
+        if ( !pEnt ) continue;
+
+        
+        switch ( m_iTriggerFlags )
+        {
+        case SF_ENTCOUNT_PLAYERS :
+        {
+            CZMPlayer* pPlayer = ToZMPlayer( pEnt );
+
+            if ( pPlayer && pPlayer->IsHuman() )
+            {
+                ++count;
+            }
+
+            break;
+        }
+        case SF_ENTCOUNT_NPCS :
+        {
+            CAI_BaseNPC* pNPC = dynamic_cast<CAI_BaseNPC*>( pEnt );
+
+            if ( pNPC && pNPC->IsAlive() )
+            {
+                ++count;
+            }
+
+            break;
+        }
+        case SF_ENTCOUNT_PROPS :
+        {
+            CPhysicsProp* pProp = dynamic_cast<CPhysicsProp*>( pEnt );
+
+            if ( pProp )
+            {
+                ++count;
+                break;
+            }
+
+            CPhysBox* pBrush = dynamic_cast<CPhysBox*>( pEnt );
+
+            if ( pBrush ) ++count;
+
+            break;
+        }
+        default : break;
+        }
+    }
+
+
+    if ( count >= m_iCountToFire )
+    {
+        m_OnCount.FireOutput( inputData.pActivator, this );
+    }
+    else
+    {
+        m_OnNotCount.FireOutput( inputData.pActivator, this );
+    }
 }
 
 /*
