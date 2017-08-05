@@ -233,10 +233,10 @@ public:
         LO_SHOTGUN,
         LO_RIFLE,
         LO_MAC10,
-        //LO_MOLOTOV,
-        //LO_SLEDGE,
-        //LO_IMPROVISED,
-        //LO_REVOLVER,
+        LO_MOLOTOV,
+        LO_SLEDGE,
+        LO_IMPROVISED,
+        LO_REVOLVER,
 
         LO_MAX
     };
@@ -249,10 +249,10 @@ public:
 
     enum
     {
-        //LOCAT_MELEE = 0,
-        LOCAT_PISTOL = 0,
+        LOCAT_MELEE = 0,
+        LOCAT_PISTOL,
         LOCAT_LARGE,
-        //LOCAT_EQUIPMENT,
+        LOCAT_EQUIPMENT,
 
         LOCAT_MAX
     };
