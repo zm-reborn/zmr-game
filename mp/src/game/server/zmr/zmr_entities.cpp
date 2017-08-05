@@ -1105,10 +1105,10 @@ BEGIN_DATADESC( CZMEntLoadout )
     DEFINE_KEYFIELD( m_iCounts[CZMEntLoadout::LO_SHOTGUN], FIELD_INTEGER, "Shotguns" ),
     DEFINE_KEYFIELD( m_iCounts[CZMEntLoadout::LO_RIFLE], FIELD_INTEGER, "Rifles" ),
     DEFINE_KEYFIELD( m_iCounts[CZMEntLoadout::LO_MAC10], FIELD_INTEGER, "Mac10s" ),
-    //DEFINE_KEYFIELD( m_iCounts[CZMEntLoadout::LO_MOLOTOV], FIELD_INTEGER, "Molotovs" ),
-    //DEFINE_KEYFIELD( m_iCounts[CZMEntLoadout::LO_SLEDGE], FIELD_INTEGER, "Sledgehammers" ),
-    //DEFINE_KEYFIELD( m_iCounts[CZMEntLoadout::LO_IMPROVISED], FIELD_INTEGER, "Improvised" ),
-    //DEFINE_KEYFIELD( m_iCounts[CZMEntLoadout::LO_REVOLVER], FIELD_INTEGER, "Revolvers" ),
+    DEFINE_KEYFIELD( m_iCounts[CZMEntLoadout::LO_MOLOTOV], FIELD_INTEGER, "Molotovs" ),
+    DEFINE_KEYFIELD( m_iCounts[CZMEntLoadout::LO_SLEDGE], FIELD_INTEGER, "Sledgehammers" ),
+    DEFINE_KEYFIELD( m_iCounts[CZMEntLoadout::LO_IMPROVISED], FIELD_INTEGER, "Improvised" ),
+    DEFINE_KEYFIELD( m_iCounts[CZMEntLoadout::LO_REVOLVER], FIELD_INTEGER, "Revolvers" ),
 END_DATADESC()
 
 LINK_ENTITY_TO_CLASS( info_loadout, CZMEntLoadout );
@@ -1163,19 +1163,19 @@ void CZMEntLoadout::Reset()
             m_vCurCat[i].Purge();
         }
 
-        //for ( int i = 0; i < m_iCounts[LO_IMPROVISED]; i++)
-        //    m_vCurCat[LOCAT_MELEE].AddToTail( LO_IMPROVISED );
+        for ( int i = 0; i < m_iCounts[LO_IMPROVISED]; i++)
+            m_vCurCat[LOCAT_MELEE].AddToTail( LO_IMPROVISED );
 
-        //for ( int i = 0; i < m_iCounts[LO_SLEDGE]; i++)
-        //    m_vCurCat[LOCAT_MELEE].AddToTail( LO_SLEDGE );
+        for ( int i = 0; i < m_iCounts[LO_SLEDGE]; i++)
+            m_vCurCat[LOCAT_MELEE].AddToTail( LO_SLEDGE );
 
 
         
         for ( int i = 0; i < m_iCounts[LO_PISTOL]; i++)
-            m_vCurCat[LOCAT_LARGE].AddToTail( LO_PISTOL );
+            m_vCurCat[LOCAT_PISTOL].AddToTail( LO_PISTOL );
 
-        //for ( int i = 0; i < m_iCounts[LO_REVOLVER]; i++)
-        //    m_vCurCat[LOCAT_LARGE].AddToTail( LO_REVOLVER );
+        for ( int i = 0; i < m_iCounts[LO_REVOLVER]; i++)
+            m_vCurCat[LOCAT_PISTOL].AddToTail( LO_REVOLVER );
 
 
 
@@ -1190,8 +1190,8 @@ void CZMEntLoadout::Reset()
 
 
 
-        //for ( int i = 0; i < m_iCounts[LO_MOLOTOV]; i++)
-        //    m_vCurCat[LOCAT_EQUIPMENT].AddToTail( LO_MOLOTOV );
+        for ( int i = 0; i < m_iCounts[LO_MOLOTOV]; i++)
+            m_vCurCat[LOCAT_EQUIPMENT].AddToTail( LO_MOLOTOV );
 
         break;
 
@@ -1287,6 +1287,8 @@ void CZMEntLoadout::GiveWeapon( CZMPlayer* pPlayer, int loadout_wep )
 
     switch ( loadout_wep )
     {
+    case LO_PISTOL:
+    case LO_REVOLVER:
     case LO_RIFLE:
     case LO_SHOTGUN:
     case LO_MAC10:
