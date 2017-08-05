@@ -96,7 +96,7 @@ C_ZMBaseZombie::C_ZMBaseZombie()
 
     m_fxHealth = nullptr;
     m_fxInner = nullptr;
-
+    
 
     // Always create FX.
     CreateHealthFX();
@@ -108,6 +108,15 @@ C_ZMBaseZombie::~C_ZMBaseZombie()
     g_pZombies->FindAndRemove( this );
 
     RemoveFXs();
+}
+
+void C_ZMBaseZombie::Spawn( void )
+{
+    BaseClass::Spawn();
+
+    // This allows the client to make us bleed and spawn blood decals.
+    // Possibly add option to turn off?
+    m_takedamage = DAMAGE_YES;
 }
 
 void C_ZMBaseZombie::CreateHealthFX()
@@ -186,3 +195,8 @@ int C_ZMBaseZombie::DrawModel( int flags )
 
     return BaseClass::DrawModel( flags );
 }
+
+/*void C_ZMBaseZombie::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr, CDmgAccumulator *pAccumulator )
+{
+    BaseClass::TraceAttack( info, vecDir, ptr, pAccumulator );
+}*/

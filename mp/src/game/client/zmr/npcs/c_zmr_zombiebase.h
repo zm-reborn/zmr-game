@@ -37,8 +37,11 @@ public:
     C_ZMBaseZombie();
     ~C_ZMBaseZombie();
 
-    virtual int DrawModel( int ) OVERRIDE;
+    virtual void Spawn( void ) OVERRIDE;
 
+    virtual int DrawModel( int ) OVERRIDE;
+    
+    //virtual void TraceAttack( const CTakeDamageInfo&, const Vector&, trace_t*,CDmgAccumulator* ) OVERRIDE;
     
     // Implemented in zmr_zombiebase_shared
     static bool IsValidClass( ZombieClass_t );
