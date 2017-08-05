@@ -18,6 +18,11 @@ END_RECV_TABLE()
 //BEGIN_PREDICTION_DATA( C_ZMPlayer )
 //END_PREDICTION_DATA();
 
+C_ZMPlayer* C_ZMPlayer::GetLocalPlayer()
+{
+    return static_cast<C_ZMPlayer*>( C_BasePlayer::GetLocalPlayer() );
+}
+
 void C_ZMPlayer::TeamChange( int iNewTeam )
 {
     BaseClass::TeamChange( iNewTeam );

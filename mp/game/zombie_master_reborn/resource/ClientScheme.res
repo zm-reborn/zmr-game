@@ -889,13 +889,13 @@ Scheme
 				"dropshadow"	"1"
 			}
 		}
-		"TargetID"
+		"TargetID" // ZMR
 		{
 			"1"
 			{
-				"name"		"Trebuchet MS"
-				"tall"		"24"
-				"weight"	"900"
+				"name"		"Verdana"
+				"tall"		"16"
+				"weight"	"2000"
 				"range"		"0x0000 0x007F"	//	Basic Latin
 				"antialias" "1"
 				"additive"	"0"

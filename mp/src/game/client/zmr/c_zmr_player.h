@@ -24,6 +24,7 @@ public:
     inline bool IsZM() { return GetTeamNumber() == ZMTEAM_ZM; };
     inline bool IsHuman() { return GetTeamNumber() == ZMTEAM_HUMAN; };
 
+    static C_ZMPlayer* GetLocalPlayer();
 
     // Implemented in zm_player_shared
     bool HasEnoughResToSpawn( ZombieClass_t );
