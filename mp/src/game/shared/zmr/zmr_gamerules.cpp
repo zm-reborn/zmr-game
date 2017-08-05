@@ -772,22 +772,27 @@ void CZMRules::RestoreMap()
 	MapEntity_ParseAllEntities( engine->GetMapEntitiesString(), &filter, true );
 }
 
-static ConVar zm_sv_resource_rate( "zm_sv_resource_rate", "3", FCVAR_NOTIFY );
+static ConVar zm_sv_resource_rate( "zm_sv_resource_rate", "5", FCVAR_NOTIFY );
 static ConVar zm_sv_resource_max( "zm_sv_resource_max", "5000", FCVAR_NOTIFY );
-static ConVar zm_sv_resource_inc( "zm_sv_resource_inc", "50", FCVAR_NOTIFY );
+static ConVar zm_sv_resource_refill_min( "zm_sv_resource_refill_min", "25", FCVAR_NOTIFY );
+static ConVar zm_sv_resource_refill_max( "zm_sv_resource_refill_max", "75", FCVAR_NOTIFY );
 
 void CZMRules::PlayerThink( CBasePlayer* pPlayer )
 {
     CZMPlayer* pZMPlayer = ToZMPlayer( pPlayer );
-    Assert( pZMPlayer );
 
-    if ( pZMPlayer->IsZM() && pZMPlayer->m_flNextResourceInc < gpGlobals->curtime )
+    if ( pZMPlayer && pZMPlayer->IsZM() && pZMPlayer->m_flNextResourceInc < gpGlobals->curtime )
     {
         int limit = zm_sv_resource_max.GetInt();
 
         if ( pZMPlayer->GetResources() < limit )
         {
-            int newres = pZMPlayer->GetResources() + zm_sv_resource_inc.GetInt();
+            int newres = pZMPlayer->GetResources() +
+                (int)SimpleSplineRemapVal(
+                    GetNumAliveHumans(),
+                    1, gpGlobals->maxClients - 1,
+                    zm_sv_resource_refill_min.GetFloat(),
+                    zm_sv_resource_refill_max.GetFloat() );
 
             if ( newres > limit )
                 newres = limit;
