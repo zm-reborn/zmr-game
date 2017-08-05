@@ -13,7 +13,9 @@
 		"test_hardware"		1
 	}
 	supportsvr	1
-
+	
+	"developer"		"Zombie Master: Reborn Team"
+	"developer_url"	"http://steamcommunity.com/groups/zmreborn"
 
 	FileSystem
 	{
