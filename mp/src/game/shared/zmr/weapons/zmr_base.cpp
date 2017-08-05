@@ -368,7 +368,7 @@ void CZMBaseWeapon::DoMachineGunKick( float dampEasy, float maxVerticleKickAngle
     pPlayer->ViewPunch( vecScratch * 0.5 );
 }
 
-bool CZMBaseWeapon::CanBeSelected()
+bool CZMBaseWeapon::CanBeSelected( void )
 {
 	if ( !VisibleInWeaponSelection() )
 		return false;

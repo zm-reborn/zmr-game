@@ -38,6 +38,7 @@ public:
     bool HasEnoughRes( int );
     int GetResources();
     void SetResources( int );
+    bool Weapon_CanSwitchTo( C_BaseCombatWeapon* ) OVERRIDE;
 
 protected:
     CZMCharCircle* m_fxInner;

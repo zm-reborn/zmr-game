@@ -107,6 +107,7 @@ public:
     bool HasEnoughRes( int );
     int GetResources();
     void SetResources( int );
+    bool Weapon_CanSwitchTo( CBaseCombatWeapon* ) OVERRIDE;
 
     
     int GetWeaponSlotFlags() { return m_iWeaponSlotFlags; };

@@ -64,9 +64,10 @@ public:
     // Override this so our guns don't disappear.
     virtual void SetPickupTouch( void ) OVERRIDE;
 
+    virtual bool CanBeSelected( void ) OVERRIDE;
+    // Never let anybody tell you're not beautiful even without any ammo, alright?
     // Let us always select this weapon even when we don't have any ammo for it.
-    virtual bool CanBeSelected() OVERRIDE;
-
+    virtual bool AllowsAutoSwitchFrom( void ) const OVERRIDE { return false; };
     virtual void Drop( const Vector& ) OVERRIDE;
 
     // Add weapon slot flag.
