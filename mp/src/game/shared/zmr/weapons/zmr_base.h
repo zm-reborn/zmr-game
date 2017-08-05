@@ -75,12 +75,12 @@ public:
 
 
     // Viewmodel/misc stuff
-    float CalcViewmodelBob( void );
-    void AddViewmodelBob( CBaseViewModel*, Vector&, QAngle& );
-    Vector GetBulletSpread( WeaponProficiency_t );
-    float GetSpreadBias( WeaponProficiency_t );
-    const WeaponProficiencyInfo_t* GetProficiencyValues();
-    const WeaponProficiencyInfo_t* GetDefaultProficiencyValues();
+    float CalcViewmodelBob( void ) OVERRIDE;
+    void AddViewmodelBob( CBaseViewModel*, Vector&, QAngle& ) OVERRIDE;
+    Vector GetBulletSpread( WeaponProficiency_t ) OVERRIDE;
+    float GetSpreadBias( WeaponProficiency_t ) OVERRIDE;
+    const WeaponProficiencyInfo_t* GetProficiencyValues() OVERRIDE;
+    static const WeaponProficiencyInfo_t* GetDefaultProficiencyValues();
 
     // Our stuff
     CZMPlayer* GetPlayerOwner();
