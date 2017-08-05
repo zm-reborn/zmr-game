@@ -22,11 +22,21 @@ void Pickup_ForcePlayerToDropThisObject( CBaseEntity *pTarget )
 	if ( pPhysics == NULL )
 		return;
 
+#ifdef ZMR // ZMRCHANGE: Crash fix.
+	if ( pPhysics->GetGameFlags() & FVPHYSICS_PLAYER_HELD )
+	{
+		CBasePlayer* pPlayer = ToBasePlayer( pTarget->GetOwnerEntity() );
+        
+        if ( pPlayer )
+		    pPlayer->ForceDropOfCarriedPhysObjects( pTarget );
+	}
+#else
 	if ( pPhysics->GetGameFlags() & FVPHYSICS_PLAYER_HELD )
 	{
 		CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
 		pPlayer->ForceDropOfCarriedPhysObjects( pTarget );
 	}
+#endif
 }
 
 
