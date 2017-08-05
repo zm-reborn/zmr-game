@@ -61,6 +61,9 @@ public:
     // Makes our weapons not cry about spawning.
     virtual void FallInit( void );
 
+    // Override this so our guns don't disappear.
+    virtual void SetPickupTouch( void ) OVERRIDE;
+
     // Let us always select this weapon even when we don't have any ammo for it.
     virtual bool CanBeSelected() OVERRIDE;
 

@@ -314,6 +314,13 @@ void CZMBaseWeapon::FallInit( void )
 #endif
 }
 
+void CZMBaseWeapon::SetPickupTouch( void )
+{
+#ifndef CLIENT_DLL
+    SetTouch( &CBaseCombatWeapon::DefaultTouch );
+#endif
+}
+
 void CZMBaseWeapon::DoMachineGunKick( float dampEasy, float maxVerticleKickAngle, float fireDurationTime, float slideLimitTime )
 {
     //Get the view kick
