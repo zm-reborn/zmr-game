@@ -225,6 +225,12 @@ void CItem_ItemCrate::OnBreak( const Vector &vecVelocity, const AngularImpulse &
 		AngularImpulseToQAngle( angImpulse, angVel );
 		pSpawn->SetLocalAngularVelocity( angVel );
 
+#ifdef ZMR // ZMRCHANGE: Fixes not being able to pickup items from item_item_crate.
+        CItem* pItem = dynamic_cast<CItem*>( pSpawn );
+
+        if ( pItem ) pItem->Spawn();
+        else pSpawn->Spawn();
+#else
 		// If we're creating an item, it can't be picked up until it comes to rest
 		// But only if it wasn't broken by a vehicle
 		CItem *pItem = dynamic_cast<CItem*>(pSpawn);
@@ -234,6 +240,7 @@ void CItem_ItemCrate::OnBreak( const Vector &vecVelocity, const AngularImpulse &
 		}
 
 		pSpawn->Spawn();
+#endif
 
 		// Avoid missing items drops by a dynamic resupply because they don't think immediately
 		if ( FClassnameIs( pSpawn, "item_dynamic_resupply" ) )
