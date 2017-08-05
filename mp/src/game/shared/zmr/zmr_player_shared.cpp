@@ -41,3 +41,22 @@ void CZMPlayer::SetResources( int res )
     m_nResources = res;
 #endif
 }
+
+// This + AllowsAutoSwitchFrom was causing problems with switching to an empty weapon.
+bool CZMPlayer::Weapon_CanSwitchTo( CBaseCombatWeapon *pWeapon )
+{
+    if ( !IsAlive() )
+        return false;
+
+    if ( !pWeapon->CanDeploy() )
+        return false;
+    
+
+    CBaseCombatWeapon* pActive = GetActiveWeapon();
+    if ( pActive && !pActive->CanHolster() )
+    {
+        return false;
+    }
+
+    return true;
+}
