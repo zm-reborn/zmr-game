@@ -421,20 +421,30 @@ void CZMRules::OnClientFinishedPutInServer( CZMPlayer* pPlayer )
     if ( IsInRoundEnd() ) return;
 
 
+    bool latespawn = false;
+
+    // Should we late-spawn?
+    if (pPlayer->GetTeamNumber() <= ZMTEAM_SPECTATOR && !pPlayer->IsAlive()
+    &&  gpGlobals->curtime < (GetRoundStartTime() + zm_sv_joingrace.GetFloat()) )
+    {
+        latespawn = true;
+    }
+
     CTeam* teamhuman = GetGlobalTeam( ZMTEAM_HUMAN );
     CTeam* teamzm = GetGlobalTeam( ZMTEAM_ZM );
 
-    // ZMRTODO: Stop using team_manager?...
-    if ( teamhuman && teamzm && teamhuman->GetNumPlayers() < 1 && teamzm->GetNumPlayers() < 1 )
+    int numhuman = teamhuman ? teamhuman->GetNumPlayers() : 0;
+    int numzm = teamzm ? teamzm->GetNumPlayers() : 0;
+
+    
+    if ( numzm < 1 || (numhuman < 1 && !latespawn) )
     {
-        EndRound( ZMROUND_NOTHING );
+        EndRound( ZMROUND_GAMEBEGIN );
         return;
     }
 
 
-    // Should we late-spawn?
-    if (pPlayer->GetTeamNumber() <= ZMTEAM_SPECTATOR
-    &&  gpGlobals->curtime < (GetRoundStartTime() + zm_sv_joingrace.GetFloat()) )
+    if ( latespawn )
     {
         pPlayer->ChangeTeam( ZMTEAM_HUMAN );
         pPlayer->Spawn();
@@ -568,6 +578,9 @@ void CZMRules::PrintRoundEndMessage( ZMRoundEndReason_t reason )
         break;
     case ZMROUND_ZMSUBMIT :
         UTIL_ClientPrintAll( HUD_PRINTTALK, "The Zombie Master has submitted...\n" );
+        break;
+    case ZMROUND_GAMEBEGIN :
+        UTIL_ClientPrintAll( HUD_PRINTTALK, "The game will begin...\n" );
         break;
     default :
         break;
