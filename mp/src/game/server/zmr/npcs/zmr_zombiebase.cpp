@@ -57,6 +57,19 @@ CZMBaseZombie::~CZMBaseZombie()
     pRules->SetZombiePop( pRules->GetZombiePop() - GetPopCost() );
 }
 
+void CZMBaseZombie::Spawn( void )
+{
+    m_fIsHeadless = false;
+    m_fIsTorso = false;
+
+    AddSpawnFlags( SF_NPC_FADE_CORPSE );
+
+    SetBloodColor( BLOOD_COLOR_RED );
+
+
+    BaseClass::Spawn();
+}
+
 void CZMBaseZombie::HandleAnimEvent( animevent_t* pEvent )
 {
     // Override swatting.
@@ -210,14 +223,6 @@ bool CZMBaseZombie::IsChopped( const CTakeDamageInfo &info )
 void CZMBaseZombie::SetZombieModel( void )
 {
     
-}
-
-void CZMBaseZombie::Spawn()
-{
-    m_fIsHeadless = false;
-    m_fIsTorso = false;
-
-    BaseClass::Spawn();
 }
 
 void CZMBaseZombie::Command( const Vector& pos )
