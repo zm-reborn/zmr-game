@@ -781,7 +781,7 @@ Scheme
 		{
 			"1"
 			{
-				"name"  "HL2MP"
+				"name"  "Trebuchet MS" // ZMR: was HL2MP
 				"tall"  "46"
 				"weight" "0"
 				"additive" "0"
