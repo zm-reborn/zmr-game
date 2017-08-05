@@ -623,6 +623,8 @@ CZMPlayer* CZMRules::ChooseZM()
     return vBackupZMs[i];
 }
 
+static ConVar zm_sv_resource_init( "zm_sv_resource_init", "100", FCVAR_NOTIFY, "The initial resource amount the ZM has at the start." );
+
 void CZMRules::BeginRound( CZMPlayer* pZM )
 {
     CZMPlayer* pPlayer;
@@ -642,6 +644,8 @@ void CZMRules::BeginRound( CZMPlayer* pZM )
         {
             pPlayer->ChangeTeam( ZMTEAM_ZM );
         }
+
+        pPlayer->SetResources( zm_sv_resource_init.GetInt() );
 
         pPlayer->Spawn();
     }
