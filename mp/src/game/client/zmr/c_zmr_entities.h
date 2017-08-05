@@ -3,7 +3,7 @@
 #include "cbase.h"
 
 
-class C_ZMEntBaseUsable : public C_BaseAnimating
+abstract_class C_ZMEntBaseUsable : public C_BaseAnimating
 {
 public:
 	DECLARE_CLASS( C_ZMEntBaseUsable, C_BaseAnimating )
@@ -11,10 +11,18 @@ public:
     DECLARE_DATADESC()
 
 
+    C_ZMEntBaseUsable();
+
+
     // ZMRTODO: Should draw doesn't seem to work?
     //virtual bool ShouldDraw() OVERRIDE;
     virtual ShadowType_t ShadowCastType() OVERRIDE { return SHADOWS_NONE; };
     virtual int DrawModel( int ) OVERRIDE;
+
+protected:
+    virtual void InitSpriteMat() {};
+
+    CMaterialReference m_SpriteMat;
 };
 
 class C_ZMEntBaseSimple : public C_BaseAnimating
@@ -37,7 +45,16 @@ public:
     DECLARE_DATADESC()
     
 
+    C_ZMEntZombieSpawn();
+
+
+    void Precache() OVERRIDE;
+
     int GetZombieFlags() { return m_fZombieFlags; };
+
+protected:
+    virtual void InitSpriteMat() OVERRIDE;
+
 private:
     CNetworkVar( int, m_fZombieFlags );
 };
@@ -52,8 +69,14 @@ public:
     C_ZMEntManipulate();
 
 
+    void Precache() OVERRIDE;
+
     inline int GetCost() { return m_nCost; };
     inline int GetTrapCost() { return m_nTrapCost; };
+
+protected:
+    virtual void InitSpriteMat() OVERRIDE;
+
 private:
     CNetworkVar( int, m_nCost );
     CNetworkVar( int, m_nTrapCost );
