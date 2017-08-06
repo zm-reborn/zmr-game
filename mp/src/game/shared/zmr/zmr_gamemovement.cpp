@@ -1117,6 +1117,190 @@ bool CZMGameMovement::ContinueForcedMove()
 	return lm->m_bForceLadderMove;
 }
 
+void CZMGameMovement::FullLadderMove()
+{
+#if !defined( CLIENT_DLL )
+    CFuncLadder *ladder = GetLadder();
+    Assert( ladder );
+    if ( !ladder )
+    {
+        return;
+    }
+
+    CheckWater();
+
+    // Was jump button pressed?  If so, don't do anything here
+    if ( mv->m_nButtons & IN_JUMP )
+    {
+        CheckJumpButton();
+        return;
+    }
+    else
+    {
+        mv->m_nOldButtons &= ~IN_JUMP;
+    }
+
+    player->SetGroundEntity( NULL );
+
+    // Remember old positions in case we cancel this movement
+    Vector oldVelocity	= mv->m_vecVelocity;
+    Vector oldOrigin	= mv->GetAbsOrigin();
+
+    Vector topPosition;
+    Vector bottomPosition;
+
+    ladder->GetTopPosition( topPosition );
+    ladder->GetBottomPosition( bottomPosition );
+
+    // Compute parametric distance along ladder vector...
+    float oldt;
+    CalcDistanceSqrToLine( mv->GetAbsOrigin(), topPosition, bottomPosition, &oldt );
+    
+    // Perform the move accounting for any base velocity.
+    VectorAdd (mv->m_vecVelocity, player->GetBaseVelocity(), mv->m_vecVelocity);
+    TryPlayerMove();
+    VectorSubtract (mv->m_vecVelocity, player->GetBaseVelocity(), mv->m_vecVelocity);
+
+    // Pressed buttons are "changed(xor)" and'ed with the mask of currently held buttons
+    int buttonsChanged	= ( mv->m_nOldButtons ^ mv->m_nButtons );	// These buttons have changed this frame
+    int buttonsPressed = buttonsChanged & mv->m_nButtons;
+    bool pressed_use = ( buttonsPressed & IN_USE ) ? true : false;
+    bool pressing_forward_or_side = mv->m_flForwardMove != 0.0f || mv->m_flSideMove != 0.0f;
+
+    Vector ladderVec = topPosition - bottomPosition;
+    float LadderLength = VectorNormalize( ladderVec );
+    // This test is not perfect by any means, but should help a bit
+    bool moving_along_ladder = false;
+    if ( pressing_forward_or_side )
+    {
+        float fwdDot = m_vecForward.Dot( ladderVec );
+        if ( fabs( fwdDot ) > 0.9f )
+        {
+            moving_along_ladder = true;
+        }
+    }
+
+    // Compute parametric distance along ladder vector...
+    float newt;
+    CalcDistanceSqrToLine( mv->GetAbsOrigin(), topPosition, bottomPosition, &newt );
+
+    // Fudge of 2 units
+    float tolerance = 1.0f / LadderLength;
+
+    bool wouldleaveladder = false;
+    // Moving pPast top or bottom?
+    if ( newt < -tolerance )
+    {
+        wouldleaveladder = newt < oldt;
+    }
+    else if ( newt > ( 1.0f + tolerance ) )
+    {
+        wouldleaveladder = newt > oldt;
+    }
+
+    // See if we are near the top or bottom but not moving
+    float dist1sqr, dist2sqr;
+
+    dist1sqr = ( topPosition - mv->GetAbsOrigin() ).LengthSqr();
+    dist2sqr = ( bottomPosition - mv->GetAbsOrigin() ).LengthSqr();
+
+    float dist = min( dist1sqr, dist2sqr );
+    bool neardismountnode = ( dist < 16.0f * 16.0f ) ? true : false;
+    float ladderUnitsPerTick = ( MAX_CLIMB_SPEED * gpGlobals->interval_per_tick );
+    bool neardismountnode2 = ( dist < ladderUnitsPerTick * ladderUnitsPerTick ) ? true : false;
+
+    // Really close to node, cvar is set, and pressing a key, then simulate a +USE
+    bool auto_dismount_use = ( neardismountnode2 && 
+                                sv_autoladderdismount.GetBool() && 
+                                pressing_forward_or_side && 
+                                !moving_along_ladder );
+
+    bool fully_underwater = ( player->GetWaterLevel() == WL_Eyes ) ? true : false;
+
+    // If the user manually pressed use or we're simulating it, then use_dismount will occur
+    bool use_dismount = pressed_use || auto_dismount_use;
+
+    if ( fully_underwater && !use_dismount )
+    {
+        // If fully underwater, we require looking directly at a dismount node 
+        ///  to "float off" a ladder mid way...
+        if ( ExitLadderViaDismountNode( ladder, true ) )
+        {
+            // See if they +used a dismount point mid-span..
+            return;
+        }
+    }
+
+    // If the movement would leave the ladder and they're not automated or pressing use, disallow the movement
+    if ( !use_dismount )
+    {
+        if ( wouldleaveladder )
+        {
+            // Don't let them leave the ladder if they were on it
+            mv->m_vecVelocity = oldVelocity;
+            mv->SetAbsOrigin( oldOrigin );
+        }
+        return;
+    }
+
+    // If the move would not leave the ladder and we're near close to the end, then just accept the move
+    if ( !wouldleaveladder && !neardismountnode )
+    {
+        // Otherwise, if the move would leave the ladder, disallow it.
+        if ( pressed_use )
+        {
+            if ( ExitLadderViaDismountNode( ladder, false, IsXbox() ) )
+            {
+                // See if they +used a dismount point mid-span..
+                return;
+            }
+
+            player->SetMoveType( MOVETYPE_WALK );
+            player->SetMoveCollide( MOVECOLLIDE_DEFAULT );
+            SetLadder( NULL );
+            //GetHL2Player()->m_bPlayUseDenySound = false;
+
+            // Dismount with a bit of velocity in facing direction
+            VectorScale( m_vecForward, USE_DISMOUNT_SPEED, mv->m_vecVelocity );
+            mv->m_vecVelocity.z = 50;
+        }
+        return;
+    }
+
+    // Debounce the use key
+    if ( pressed_use )
+    {
+        SwallowUseKey();
+    }
+
+    // Try auto exit, if possible
+    if ( ExitLadderViaDismountNode( ladder, false, pressed_use ) )
+    {
+        return;
+    }
+
+    if ( wouldleaveladder )
+    {
+        // Otherwise, if the move would leave the ladder, disallow it.
+        if ( pressed_use )
+        {
+            player->SetMoveType( MOVETYPE_WALK );
+            player->SetMoveCollide( MOVECOLLIDE_DEFAULT );
+            SetLadder( NULL );
+
+            // Dismount with a bit of velocity in facing direction
+            VectorScale( m_vecForward, USE_DISMOUNT_SPEED, mv->m_vecVelocity );
+            mv->m_vecVelocity.z = 50;
+        }
+        else
+        {
+            mv->m_vecVelocity = oldVelocity;
+            mv->SetAbsOrigin( oldOrigin );
+        }
+    }
+#endif
+}
+
 /*
     NOTE: Remove this same shit from hl2/hl_gamemovement.cpp
 */
