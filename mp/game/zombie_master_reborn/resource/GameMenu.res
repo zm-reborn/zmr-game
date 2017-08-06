@@ -57,6 +57,11 @@
 	}
 	"11"
 	{
+		"label" "ZM OPTIONS"
+		"command" "engine ToggleZMOptions"
+	}
+	"12"
+	{
 		"label" "#GameUI_GameMenu_Quit"
 		"command" "Quit"
 	}
