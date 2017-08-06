@@ -32,6 +32,10 @@
 #include "tf_gamerules.h"
 #endif
 
+#ifdef ZMR
+#include "zmr/ui/zmr_options.h"
+#endif
+
 using namespace vgui;
 
 void MP3Player_Create( vgui::VPANEL parent );
@@ -220,10 +224,20 @@ void VGui_CreateGlobalPanels( void )
 #ifdef SIXENSE
 	g_pSixenseInput->CreateGUI( gameToolParent );
 #endif
+
+#ifdef ZMR
+    VPANEL parent = enginevgui->GetPanel( PANEL_GAMEUIDLL );
+
+    g_pZMOptionsMenu->Create( parent );
+#endif
 }
 
 void VGui_Shutdown()
 {
+#ifdef ZMR
+    g_pZMOptionsMenu->Destroy();
+#endif
+
 	VGUI_DestroyClientDLLRootPanel();
 
 #ifndef _X360

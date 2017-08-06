@@ -40,6 +40,8 @@ public:
     void SetResources( int );
     bool Weapon_CanSwitchTo( C_BaseCombatWeapon* ) OVERRIDE;
     Participation_t GetParticipation();
+    static Participation_t GetLocalParticipation();
+    static void SetLocalParticipation( Participation_t );
 
 protected:
     CZMCharCircle* m_fxInner;

@@ -75,3 +75,21 @@ Participation_t CZMPlayer::GetParticipation()
 
     return part;
 }
+
+#ifdef CLIENT_DLL
+Participation_t CZMPlayer::GetLocalParticipation()
+{
+    extern ConVar zm_cl_participation;
+    Participation_t part = (Participation_t)zm_cl_participation.GetInt();
+
+    if ( part <= ZMPART_INVALID || part >= ZMPART_MAX ) part = ZMPART_ALLOWZM;
+
+    return part;
+}
+
+void CZMPlayer::SetLocalParticipation( Participation_t part )
+{
+    extern ConVar zm_cl_participation;
+    zm_cl_participation.SetValue( (int)part );
+}
+#endif
