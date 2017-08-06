@@ -370,9 +370,13 @@ bool UTIL_ItemCanBeTouchedByPlayer( CBaseEntity *pItem, CBasePlayer *pPlayer )
 
 	// Trace between to see if we're occluded
 	trace_t tr;
+#ifdef ZMR // ZMRCHANGE: Fixes not being able to pickup items in certain spots. (eg. zm_deathball ammo from the back.)
+    CTraceFilterSkipTwoEntities filter( pPlayer, pItem, COLLISION_GROUP_NONE );
+    UTIL_TraceLine( vecStartPos, vecEndPos, MASK_OPAQUE, &filter, &tr );
+#else
 	CTraceFilterSkipTwoEntities filter( pPlayer, pItem, COLLISION_GROUP_PLAYER_MOVEMENT );
 	UTIL_TraceLine( vecStartPos, vecEndPos, MASK_SOLID, &filter, &tr );
-
+#endif
 	// Occluded
 	// FIXME: For now, we exclude starting in solid because there are cases where this doesn't matter
 	if ( tr.fraction < 1.0f )
