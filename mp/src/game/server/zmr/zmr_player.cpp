@@ -386,10 +386,51 @@ void CZMPlayer::PickupObject( CBaseEntity *pObject, bool bLimitMassAndSize )
 
 bool CZMPlayer::BumpWeapon( CBaseCombatWeapon *pWeapon )
 {
+    // The visibility check was causing problems. (probably due to shitty collision boxes for the weapons...)
+    // Had the same problem as the items.
+
     if ( !IsHuman() ) return false;
 
+    // How would this even be possible?
+    if ( pWeapon->GetOwner() ) return false;
 
-    return BaseClass::BumpWeapon( pWeapon );
+
+    if ( !IsAllowedToPickupWeapons() )
+        return false;
+
+    
+    if ( /*!Weapon_CanUse( pWeapon ) ||*/ !g_pGameRules->CanHavePlayerItem( this, pWeapon ) )
+    {
+        return false;
+    }
+    
+    // Don't do any check at all since it seems to fail with rifle and shotgun. (again, probably due to shitty collisionboxes or something)
+    // This is not needed anyway since we're close enough.
+    /*
+    QAngle ang;
+    Vector end;
+    IPhysicsObject* pPhys = pWeapon->VPhysicsGetObject();
+
+    if ( pPhys ) pPhys->GetPosition( &end, &ang );
+    else end = pWeapon->CollisionProp()->WorldSpaceCenter();
+
+	trace_t tr;
+    CTraceFilterSkipTwoEntities filter( this, pWeapon, COLLISION_GROUP_NONE );
+    UTIL_TraceLine( EyePosition(), end, MASK_OPAQUE, &filter, &tr );
+
+    if ( tr.fraction < 1.0f ) return false;
+    */
+
+    if ( Weapon_OwnsThisType( pWeapon->GetClassname(), pWeapon->GetSubType() ) ) 
+    {
+        return false;
+    }
+
+    pWeapon->CheckRespawn();
+
+    Weapon_Equip( pWeapon );
+
+    return true;
 }
 
 CBaseEntity* CZMPlayer::EntSelectSpawnPoint( void )
