@@ -28,6 +28,7 @@ protected:
     virtual void PlayerMove( void ) OVERRIDE;
     virtual bool LadderMove( void ) OVERRIDE;
 
+    virtual void FullLadderMove() OVERRIDE;
     void FullZMMove( float factor, float maxacceleration );
 
 
