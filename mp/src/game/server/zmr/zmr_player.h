@@ -108,21 +108,20 @@ public:
     int GetResources();
     void SetResources( int );
     bool Weapon_CanSwitchTo( CBaseCombatWeapon* ) OVERRIDE;
+    Participation_t GetParticipation();
 
     
-    int GetWeaponSlotFlags() { return m_iWeaponSlotFlags; };
-    void SetWeaponSlotFlags( int flags ) { m_iWeaponSlotFlags = flags; };
-    void AddWeaponSlotFlag( int flag ) { m_iWeaponSlotFlags |= flag; };
-    void RemoveWeaponSlotFlag( int flag ) { m_iWeaponSlotFlags &= ~flag; };
+    int GetWeaponSlotFlags() { return m_fWeaponSlotFlags; };
+    void SetWeaponSlotFlags( int flags ) { m_fWeaponSlotFlags = flags; };
+    void AddWeaponSlotFlag( int flag ) { m_fWeaponSlotFlags |= flag; };
+    void RemoveWeaponSlotFlag( int flag ) { m_fWeaponSlotFlags &= ~flag; };
 
 private:
     CNetworkVar( int, m_nResources );
 
-    // To update build menu.
-    int m_iBuildSpawnIndex;
-
-
-    int m_iWeaponSlotFlags;
+    int m_iBuildSpawnIndex; // To update build menu.
+    //Participation_t m_iParticipation;
+    int m_fWeaponSlotFlags;
 };
 
 inline CZMPlayer* ToZMPlayer( CBaseEntity* pEntity )

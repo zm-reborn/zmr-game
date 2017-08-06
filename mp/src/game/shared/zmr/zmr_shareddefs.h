@@ -54,6 +54,28 @@ enum ZombieClass_t
     ZMCLASS_MAX
 };
 
+enum Participation_t
+{
+    ZMPART_INVALID = -1,
+
+    ZMPART_ALLOWZM,
+    ZMPART_ONLYHUMAN,
+    ZMPART_ONLYSPEC,
+
+    ZMPART_MAX
+};
+
+enum ServerParticipation_t
+{
+    ZMSERVPART_NOLIMIT = 0,
+    ZMSERVPART_NOHUMANSONLY,
+    ZMSERVPART_NOSPECONLY,
+    ZMSERVPART_NOHUMANSPECONLY
+};
+
+#define ZMPARTFLAG_NOHUMANSONLY         ( 1 << 0 )
+#define ZMPARTFLAG_NOSPECONLY           ( 1 << 1 )
+
 /*
 #define TEAMNAME_SPECTATOR          "#TeamName_Spec"
 #define TEAMNAME_SURVIVOR           "#TeamName_Survivor"

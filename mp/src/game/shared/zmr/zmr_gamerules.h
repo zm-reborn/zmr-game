@@ -109,7 +109,6 @@ public:
 
     static int GetNumAliveHumans();
 
-
     inline void SetZombiePop( int n ) { m_nZombiePop = n; };
 
     inline CZMEntLoadout* GetLoadoutEnt() { return m_pLoadoutEnt; };
@@ -118,6 +117,8 @@ public:
 
     inline int GetZombiePop() { return m_nZombiePop; };
 
+
+    static int GetServerParticipationFlags();
 
 #ifndef CLIENT_DLL
     virtual void CZMRules::InitDefaultAIRelationships( void );

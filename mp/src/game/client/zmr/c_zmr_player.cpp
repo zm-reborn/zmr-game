@@ -22,6 +22,9 @@ CLIENTEFFECT_MATERIAL( MAT_INNERFLARE )
 CLIENTEFFECT_REGISTER_END()
 
 
+ConVar zm_cl_participation( "zm_cl_participation", "0", FCVAR_USERINFO | FCVAR_ARCHIVE, "Your participation setting. 0 = Want to be ZM, 1 = Only human, 2 = Only spectator" );
+
+
 IMPLEMENT_CLIENTCLASS_DT( C_ZMPlayer, DT_ZM_Player, CZMPlayer )
     RecvPropInt( RECVINFO( m_nResources ) ),
 END_RECV_TABLE()
