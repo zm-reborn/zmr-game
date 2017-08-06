@@ -38,6 +38,8 @@ ConVar zm_sv_cost_hulk( "zm_sv_cost_hulk", "75", FCVAR_REPLICATED | FCVAR_NOTIFY
 ConVar zm_sv_cost_drifter( "zm_sv_cost_drifter", "40", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE );
 ConVar zm_sv_cost_immolator( "zm_sv_cost_immolator", "100", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE );
 
+static ConVar zm_sv_participation( "zm_sv_participation", "0", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE, "0 = No limit, 1 = Don't allow only human, 2 = Don't allow only spec, 3 = Don't allow only spec/human" );
+
 
 #ifndef CLIENT_DLL
 static const char* g_PreserveEnts[] =
@@ -596,6 +598,8 @@ CZMPlayer* CZMRules::ChooseZM()
     vZMs.Purge();
 
 
+    int partflags = GetServerParticipationFlags();
+
     for ( i = 0; i < gpGlobals->maxClients; i++ )
     {
         pPlayer = ToZMPlayer( UTIL_PlayerByIndex( i ) );
@@ -603,7 +607,27 @@ CZMPlayer* CZMRules::ChooseZM()
         if ( !pPlayer ) continue;
 
 
-        vZMs.AddToHead( pPlayer );
+        switch ( pPlayer->GetParticipation() )
+        {
+        case ZMPART_ONLYHUMAN :
+        {
+            if ( partflags & ZMPARTFLAG_NOHUMANSONLY )
+                vZMs.AddToHead( pPlayer );
+            break;
+        }
+        case ZMPART_ONLYSPEC :
+        {
+            if ( partflags & ZMPARTFLAG_NOSPECONLY )
+                vZMs.AddToHead( pPlayer );
+            break;
+        }
+        default :
+        case ZMPART_ALLOWZM :
+            vZMs.AddToHead( pPlayer );
+            break;
+        }
+
+        
         vBackupZMs.AddToHead( pPlayer );
     }
 
@@ -629,6 +653,10 @@ void CZMRules::BeginRound( CZMPlayer* pZM )
 {
     CZMPlayer* pPlayer;
 
+
+    int partflags = GetServerParticipationFlags();
+
+
     for ( int i = 0; i < gpGlobals->maxClients; i++ )
     {
         pPlayer = ToZMPlayer( UTIL_PlayerByIndex( i ) );
@@ -636,24 +664,40 @@ void CZMRules::BeginRound( CZMPlayer* pZM )
         if ( !pPlayer ) continue;
 
 
+        int team = ZMTEAM_HUMAN;
+
         if ( pPlayer != pZM )
         {
-            pPlayer->ChangeTeam( ZMTEAM_HUMAN );
+            switch ( pPlayer->GetParticipation() )
+            {
+            case ZMPART_ONLYSPEC :
+                if ( !(partflags & ZMPARTFLAG_NOSPECONLY) ) // Can our participation be spec only?
+                    team = ZMTEAM_SPECTATOR;
+                break;
+            default : break;
+            }
         }
         else
         {
-            pPlayer->ChangeTeam( ZMTEAM_ZM );
+            team = ZMTEAM_ZM;
         }
+
 
         pPlayer->SetResources( zm_sv_resource_init.GetInt() );
 
-        pPlayer->Spawn();
+
+        // Don't change team if we're already a spectator.
+        if ( team != ZMTEAM_SPECTATOR || !pPlayer->IsObserver() )
+        {
+            pPlayer->ChangeTeam( team );
+            pPlayer->Spawn();
+        }
     }
 
 
     if ( pZM )
     {
-        UTIL_SayTextAll( UTIL_VarArgs( "\x03%s\x01 is now the Zombie Master!\n", pZM->GetPlayerName() ), pZM, true );
+        UTIL_ClientPrintAll( HUD_PRINTTALK, "%s is now the Zombie Master!\n", pZM->GetPlayerName() );
     }
 }
 
@@ -854,3 +898,19 @@ int CZMRules::GetNumAliveHumans()
     return num;
 }
 #endif
+
+
+int CZMRules::GetServerParticipationFlags()
+{
+    int flags = 0;
+
+    switch ( zm_sv_participation.GetInt() )
+    {
+    case ZMSERVPART_NOHUMANSONLY : flags |= ZMPARTFLAG_NOHUMANSONLY; break;
+    case ZMSERVPART_NOSPECONLY : flags |= ZMPARTFLAG_NOSPECONLY; break;
+    case ZMSERVPART_NOHUMANSPECONLY : flags |= ZMPARTFLAG_NOHUMANSONLY | ZMPARTFLAG_NOSPECONLY; break;
+    default : break;
+    }
+
+    return flags;
+}
