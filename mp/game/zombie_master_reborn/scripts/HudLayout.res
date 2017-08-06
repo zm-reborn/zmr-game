@@ -1,5 +1,20 @@
 "Resource/HudLayout.res"
 {
+	ZMHudHPBar
+	{
+		"fieldName"		"ZMHudHPBar"
+		"xpos"	"16"
+		"ypos"	"420"
+		"wide"	"100"
+		"tall"  "40"
+		
+		"BarX"	"0"
+		"BarY"	"0"
+		"BarSize"	"40"
+		//"HealthBarFont"	"ZMHudFont"
+		"HealthX"	"55"
+		"HealthY"	"2"
+	}
 	HudHealth
 	{
 		"fieldName"		"HudHealth"
