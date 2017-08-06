@@ -85,12 +85,12 @@ int C_ZMBaseZombie::DrawModel( int flags )
     float g = ratio;
     float r = 1.0f - g;
 
-    float alpha = (m_iSelectorIndex > 0 && m_iSelectorIndex == GetLocalPlayerIndex()) ? 0.8f : 0.1f;
+    bool bSelected = m_iSelectorIndex > 0 && m_iSelectorIndex == GetLocalPlayerIndex();
 
     if ( m_fxInner )
     {
         m_fxInner->SetColor( r, g, 0 );
-        m_fxInner->SetAlpha( alpha );
+        m_fxInner->SetAlpha( bSelected ? 0.8f : 0.01f ); // Decrease alpha a bit.
         m_fxInner->SetPos( GetAbsOrigin() + Vector( 0.0f, 0.0f, 3.0f ) );
         m_fxInner->Draw();
     }
@@ -99,7 +99,7 @@ int C_ZMBaseZombie::DrawModel( int flags )
     if ( m_fxHealth )
     {
         m_fxHealth->SetColor( r, g, 0 );
-        m_fxHealth->SetAlpha( alpha );
+        m_fxHealth->SetAlpha( bSelected ? 0.8f : 0.1f );
         m_fxHealth->SetPos( GetAbsOrigin() + Vector( 0.0f, 0.0f, 3.0f ) );
         m_fxHealth->Draw();
     }
