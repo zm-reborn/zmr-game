@@ -36,10 +36,12 @@ Scheme
 	// controls use these to determine their settings
 	BaseSettings
 	{
-		"FgColor"			"255 220 0 100"
+		//"FgColor"			"255 220 0 100"
+		"FgColor"			"255 255 255 100"
 		"BgColor"			"0 0 0 76"
 
-		"Panel.FgColor"			"255 220 0 100"
+		//"Panel.FgColor"			"255 220 0 100"
+		"Panel.FgColor"			"255 255 255 100"
 		"Panel.BgColor"			"0 0 0 76"
 		
 		"BrightFg"		"255 220 0 255"
@@ -49,8 +51,10 @@ Scheme
 		"BrightDamagedFg"		"255 0 0 255"
 
 		// weapon selection colors
-		"SelectionNumberFg"		"255 220 0 255"
-		"SelectionTextFg"		"255 220 0 255"
+		//"SelectionNumberFg"		"255 220 0 255"
+		"SelectionNumberFg"		"255 255 255 255"
+		//"SelectionTextFg"		"255 220 0 255"
+		"SelectionTextFg"		"255 255 255 255"
 		"SelectionEmptyBoxBg" 	"0 0 0 80"
 		"SelectionBoxBg" 		"0 0 0 80"
 		"SelectionSelectedBoxBg" "0 0 0 80"
