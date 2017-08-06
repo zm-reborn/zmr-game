@@ -63,7 +63,8 @@ Scheme
 
 		// HL1-style HUD colors
 		"Yellowish"			"255 160 0 255"
-		"Normal"			"255 208 64 255"
+		//"Normal"			"255 208 64 255"
+		"Normal"			"255 255 255 255"
 		"Caution"			"255 48 0 255"
 
 		// Top-left corner of the "Half-Life 2" on the main screen
