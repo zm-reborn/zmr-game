@@ -25,12 +25,7 @@ END_DATADESC()
 CZMBaseZombie::CZMBaseZombie()
 {
     // We have to increment our population in derived classes since we don't know our class yet.
-
-
     g_pZombies->AddToTail( this );
-
-    m_LagTrack = new CUtlFixedLinkedList<LagRecordNPC>();
-
 
     m_iSelectorIndex = 0;
     m_flHealthRatio = 1.0f;
@@ -39,9 +34,6 @@ CZMBaseZombie::CZMBaseZombie()
 CZMBaseZombie::~CZMBaseZombie()
 {
     g_pZombies->FindAndRemove( this );
-
-    m_LagTrack->Purge();
-    delete m_LagTrack;
 
 
 
