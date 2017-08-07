@@ -346,7 +346,7 @@ void ZM_Cmd_SelectAll( const CCommand &args )
     }
 }
 
-static ConCommand zm_cmd_selectall( "zm_cmd_selectall", ZM_Cmd_SelectAll, "Select all da zombies!", FCVAR_HIDDEN );
+static ConCommand zm_cmd_selectall( "zm_cmd_selectall", ZM_Cmd_SelectAll, "Select all da zombies!" );
 
 
 void ZM_Cmd_UnSelectAll( const CCommand &args )
@@ -483,7 +483,7 @@ void ZM_Cmd_DeleteZombies( const CCommand &args )
     }
 }
 
-static ConCommand zm_cmd_delete( "zm_cmd_delete", ZM_Cmd_DeleteZombies, "Delete selected zombies.", FCVAR_HIDDEN );
+static ConCommand zm_cmd_delete( "zm_cmd_delete", ZM_Cmd_DeleteZombies, "Delete selected zombies." );
 
 /*
     Trigger a trap.
