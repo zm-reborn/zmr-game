@@ -138,6 +138,7 @@ void CZMWeaponRevolver::ItemPostFrame()
     BaseClass::ItemPostFrame();
 }
 
+// ZMRTODO: Use base class for this shit.
 void CZMWeaponRevolver::Shoot()
 {
 	// If my clip is empty (and I use clips) start reload
@@ -155,10 +156,13 @@ void CZMWeaponRevolver::Shoot()
 		return;
 	}
 
+
 	pPlayer->DoMuzzleFlash();
+    WeaponSound( SPECIAL1 );
 
 	// player "shoot" animation
 	pPlayer->SetAnimation( PLAYER_ATTACK1 );
+    
 
 	FireBulletsInfo_t info;
 	info.m_vecSrc = pPlayer->Weapon_ShootPosition( );
