@@ -42,10 +42,10 @@ CON_COMMAND( zm_observermode, "" )
 }
 
 
-class C_TraceFilterNoNPCs : public CTraceFilterSimple
+class CTraceFilterNoNPCs : public CTraceFilterSimple
 {
 public:
-	C_TraceFilterNoNPCs( const IHandleEntity *passentity, int collisionGroup )
+	CTraceFilterNoNPCs( const IHandleEntity *passentity, int collisionGroup )
 	: CTraceFilterSimple( passentity, collisionGroup )
 	{
 	}
@@ -295,7 +295,7 @@ void CZMFrame::OnThink()
     }
 }
 
-void CZMFrame::TraceScreenToWorld( int mx, int my, trace_t* res, CTraceFilterSimple* filter )
+void CZMFrame::TraceScreenToWorld( int mx, int my, trace_t* res, CTraceFilterSimple* filter, int mask )
 {
     CBasePlayer* pPlayer = C_BasePlayer::GetLocalPlayer();
 
@@ -327,17 +327,14 @@ void CZMFrame::TraceScreenToWorld( int mx, int my, trace_t* res, CTraceFilterSim
 
     VectorNormalize( ray );
 
-    // ZMRTODO: See if this works properly.
-    // This seems to work the best. It hits non-solid func_brush, npc clip, etc.
-#define MASK_ZMVIEW     ( CONTENTS_SOLID | CONTENTS_MOVEABLE | CONTENTS_MONSTERCLIP | CONTENTS_OPAQUE | CONTENTS_GRATE | CONTENTS_WINDOW )
     
     if ( filter )
     {
-        UTIL_TraceLine( MainViewOrigin(), MainViewOrigin() + ray * MAX_TRACE_LENGTH, MASK_ZMVIEW, filter, res );
+        UTIL_TraceLine( MainViewOrigin(), MainViewOrigin() + ray * MAX_TRACE_LENGTH, mask, filter, res );
     }
     else
     {
-        UTIL_TraceLine( MainViewOrigin(), MainViewOrigin() + ray * MAX_TRACE_LENGTH, MASK_ZMVIEW, pPlayer, COLLISION_GROUP_NONE, res );
+        UTIL_TraceLine( MainViewOrigin(), MainViewOrigin() + ray * MAX_TRACE_LENGTH, mask, pPlayer, COLLISION_GROUP_NONE, res );
     }
 }
 
@@ -362,7 +359,8 @@ void CZMFrame::OnLeftClick()
     if ( GetClickMode() == ZMCLICKMODE_NORMAL ) return;
 
     trace_t trace;
-    TraceScreenToWorld( mx, my, &trace, nullptr );
+    CTraceFilterNoNPCsOrPlayer filter( nullptr, COLLISION_GROUP_NONE );
+    TraceScreenToWorld( mx, my, &trace, &filter, MASK_SOLID );
 
     if ( trace.fraction != 1.0f )
     {
@@ -460,10 +458,8 @@ void CZMFrame::OnRightClick()
     ::input->GetFullscreenMousePos( &mx, &my );
     
     trace_t trace;
-
-
-    C_TraceFilterNoNPCs filter( nullptr, COLLISION_GROUP_NONE );
-    TraceScreenToWorld( mx, my, &trace, &filter );
+    CTraceFilterNoNPCs filter( nullptr, COLLISION_GROUP_NONE );
+    TraceScreenToWorld( mx, my, &trace, &filter, MASK_ZMTARGET );
 
 
     Vector end = trace.endpos;
