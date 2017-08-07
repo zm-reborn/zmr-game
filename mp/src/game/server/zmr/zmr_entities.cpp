@@ -544,8 +544,8 @@ bool CZMEntZombieSpawn::FindSpawnPoint( CZMBaseZombie* pZombie, Vector& outpos, 
     for ( int i = 0; i < 25; i++ )
     {
         pos = GetAbsOrigin();
-        pos.x += random->RandomInt( -radius, radius );
-        pos.y += random->RandomInt( -radius, radius );
+        pos.x += random->RandomFloat( -radius, radius );
+        pos.y += random->RandomFloat( -radius, radius );
 
         if ( pZombie->CanSpawn( pos ) )
         {
