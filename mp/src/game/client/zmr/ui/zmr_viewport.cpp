@@ -328,7 +328,8 @@ void CZMFrame::TraceScreenToWorld( int mx, int my, trace_t* res, CTraceFilterSim
     VectorNormalize( ray );
 
     // ZMRTODO: See if this works properly.
-#define MASK_ZMVIEW     ( CONTENTS_SOLID | CONTENTS_MOVEABLE | CONTENTS_MONSTER )
+    // This seems to work the best. It hits non-solid func_brush, npc clip, etc.
+#define MASK_ZMVIEW     ( CONTENTS_SOLID | CONTENTS_MOVEABLE | CONTENTS_MONSTERCLIP | CONTENTS_OPAQUE | CONTENTS_GRATE | CONTENTS_WINDOW )
     
     if ( filter )
     {
