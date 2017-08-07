@@ -41,6 +41,8 @@ public:
 	    pPlayer->ViewPunch( QAngle( random->RandomFloat( 0.5f, 1.0f ), random->RandomFloat( -1.0f, -0.5f ), 0.0f ) );
     };
 
+    float GetDamageForActivity( Activity act ) OVERRIDE { return 5.0f; };
+
 
 #ifndef CLIENT_DLL
     bool CanBeDropped() OVERRIDE { return false; };
