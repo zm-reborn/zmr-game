@@ -285,6 +285,7 @@ void CZMEntZombieSpawn::SetNextSpawnThink()
     if ( GetNextThink() == TICK_NEVER_THINK || (GetNextThink() - gpGlobals->curtime) > zm_sv_spawndelay.GetFloat() )
     {
         SetNextThink( gpGlobals->curtime + zm_sv_spawndelay.GetFloat() );
+        Msg( "Set next think\n" );
     }
 }
 
@@ -425,7 +426,8 @@ bool CZMEntZombieSpawn::CreateZombie( ZombieClass_t zclass )
 
     pZombie->Teleport( &spawnpos, &ang, &vec3_origin );
 
-    UTIL_DropToFloor( pZombie, MASK_NPCSOLID );
+    // Don't drop to floor since npcs seem to get stuck on displacements.
+    //UTIL_DropToFloor( pZombie, MASK_NPCSOLID );
 
 
     // We can be marked for deletion...
@@ -506,7 +508,7 @@ bool CZMEntZombieSpawn::FindSpawnPoint( CZMBaseZombie* pZombie, Vector& outpos, 
         }
     }
 
-    
+
     if ( m_vSpawnNodes.Count() )
     {
         CZMEntSpawnNode* pNode = nullptr;
