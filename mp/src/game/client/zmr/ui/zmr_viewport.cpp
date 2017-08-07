@@ -459,7 +459,7 @@ void CZMFrame::OnRightClick()
     
     trace_t trace;
     CTraceFilterNoNPCs filter( nullptr, COLLISION_GROUP_NONE );
-    TraceScreenToWorld( mx, my, &trace, &filter, MASK_ZMTARGET );
+    TraceScreenToWorld( mx, my, &trace, &filter, MASK_SOLID );
 
 
     Vector end = trace.endpos;
@@ -469,22 +469,40 @@ void CZMFrame::OnRightClick()
     // We hit an entity, let's see if we can target it.
     if ( trace.DidHitNonWorldEntity() && pTarget )
     {
-        bool bTarget = false;
+        bool bPlayer = false;
+        bool bObj = false;
 
         if ( pTarget->IsPlayer() )
         {
-            bTarget = true;
+            bPlayer = true; // ZMRTODO: Target player.
         }
         else
         {
             IPhysicsObject* phys = pTarget->VPhysicsGetObject();
 
-            bTarget = (phys && phys->IsMoveable()) || !pTarget->IsBaseTrain();
+            bObj = (phys && phys->IsMoveable()) || !pTarget->IsBaseTrain();
         }
 
-        if ( bTarget )
+        if ( bObj )
         {
             engine->ClientCmd( VarArgs( "zm_cmd_target %i %.1f %.1f %.1f", pTarget->entindex(), end[0], end[1], end[2] ) );
+
+
+            FX_AddQuad( end + trace.plane.normal * 2.0f,
+                        trace.plane.normal,
+                        8.0f,
+                        24.0f,
+                        0, 
+                        0.2f,
+                        0.8f,
+                        0.4f,
+                        random->RandomInt( 0, 360 ), 
+                        0,
+                        Vector( 1.0f, 1.0f, 1.0f ), 
+                        0.2f, 
+                        "zmr_effects/target_break",
+                        (FXQUAD_BIAS_ALPHA) );
+
             return;
         }
     }
@@ -587,7 +605,7 @@ void CZMFrame::FindZMObject( int x, int y, bool bSticky )
     C_ZMBaseZombie* pZombie;
 
     
-    TraceScreenToWorld( x, y, &trace, nullptr );
+    TraceScreenToWorld( x, y, &trace, nullptr, MASK_SOLID );
 
 
     ray.Init( MainViewOrigin(), trace.endpos,
