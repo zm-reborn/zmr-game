@@ -124,12 +124,19 @@ void CZMPlayer::SetTeamSpecificProps()
     State_Transition( STATE_ACTIVE );
 
 
+    RemoveFlag( FL_NOTARGET );
+
+
     switch ( GetTeamNumber() )
     {
     case ZMTEAM_ZM :
         m_Local.m_iHideHUD |= HIDEHUD_HEALTH;
     case ZMTEAM_SPECTATOR :
         RemoveAllItems( true );
+
+        // HACK: UpdatePlayerSound will make NPCs hear our "footsteps" even as a ZM when we're "on the ground".
+        RemoveFlag( FL_ONGROUND );
+        AddFlag( FL_NOTARGET );
 
         if ( IsZM() )
         {
@@ -334,7 +341,10 @@ void CZMPlayer::Spawn()
 	m_nRenderFX = kRenderNormal;
 
 
-	AddFlag( FL_ONGROUND ); // set the player on the ground at the start of the round.
+    if ( IsHuman() )
+	    AddFlag( FL_ONGROUND );
+    else
+        RemoveFlag( FL_ONGROUND );
 
 	/*if ( HL2MPRules()->IsIntermission() )
 	{
