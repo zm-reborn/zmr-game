@@ -510,6 +510,18 @@ bool CZMEntZombieSpawn::FindSpawnPoint( CZMBaseZombie* pZombie, Vector& outpos, 
     if ( m_vSpawnNodes.Count() )
     {
         CZMEntSpawnNode* pNode = nullptr;
+
+        // Try random node.
+        pNode = m_vSpawnNodes.Element( random->RandomInt( 0, m_vSpawnNodes.Count() - 1 ) );
+
+        if ( pZombie->CanSpawn( pNode->GetAbsOrigin() ) )
+        {
+            outpos = pNode->GetAbsOrigin();
+            outang = pNode->GetAbsAngles();
+            return true;
+        }
+
+        // Try any node.
         for ( int i = 0; i < m_vSpawnNodes.Count(); i++ )
         {
             pNode = m_vSpawnNodes.Element( i );
@@ -523,15 +535,24 @@ bool CZMEntZombieSpawn::FindSpawnPoint( CZMBaseZombie* pZombie, Vector& outpos, 
         }
     }
 
+    // Isn't working, spawn in a radius.
+    // Have to do this since some maps designed their spawning around it.
+    Vector pos;
 
-    Vector pos = GetAbsOrigin();
+    float radius = 128.0f;
 
-    if ( pZombie->CanSpawn( pos ) )
+    for ( int i = 0; i < 25; i++ )
     {
-        outpos = pos;
-        return true;
-    }
+        pos = GetAbsOrigin();
+        pos.x += random->RandomInt( -radius, radius );
+        pos.y += random->RandomInt( -radius, radius );
 
+        if ( pZombie->CanSpawn( pos ) )
+        {
+            outpos = pos;
+            return true;
+        }
+    }
 
     return false;
 }
