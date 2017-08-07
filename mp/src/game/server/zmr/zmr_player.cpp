@@ -27,10 +27,32 @@ LINK_ENTITY_TO_CLASS( player, CZMPlayer );
 PRECACHE_REGISTER( player );
 
 
-
 //LINK_ENTITY_TO_CLASS( info_player_deathmatch, CPointEntity ); // Is already defined in subs.cpp
 LINK_ENTITY_TO_CLASS( info_player_survivor, CPointEntity );
 LINK_ENTITY_TO_CLASS( info_player_zombiemaster, CPointEntity );
+
+
+// ZMRTODO: Add support for loading models from file.
+const char* g_ZMPlayerModels[] = 
+{
+    "models/humans/group02/male_01.mdl",
+    "models/humans/group02/male_02.mdl",
+    "models/humans/group02/female_01.mdl",
+    "models/humans/group02/male_03.mdl",
+    "models/humans/group02/female_02.mdl",
+    "models/humans/group02/male_04.mdl",
+    "models/humans/group02/female_03.mdl",
+    "models/humans/group02/male_05.mdl",
+    "models/humans/group02/female_04.mdl",
+    "models/humans/group02/male_06.mdl",
+    "models/humans/group02/female_06.mdl",
+    "models/humans/group02/male_07.mdl",
+    "models/humans/group02/female_07.mdl",
+    "models/humans/group02/male_08.mdl",
+    "models/humans/group02/male_09.mdl",
+    "models/male_lawyer.mdl",
+    "models/male_pi.mdl",
+};
 
 
 CZMPlayer::CZMPlayer()
@@ -54,9 +76,6 @@ void CZMPlayer::Precache( void )
     BaseClass::Precache();
     //CBasePlayer::Precache();
 
-
-#define DEF_PLAYER_MODEL    "models/male_pi.mdl"
-
     //PrecacheModel ( "sprites/glow01.vmt" );
 
 #ifndef CLIENT_DLL
@@ -68,7 +87,18 @@ void CZMPlayer::Precache( void )
     UTIL_PrecacheOther( "npc_burnzombie" );
 #endif
 
+
+
+#define DEF_PLAYER_MODEL    "models/male_pi.mdl"
+
+
     PrecacheModel( DEF_PLAYER_MODEL );
+
+    for ( int i = 0 ; i < ARRAYSIZE( g_ZMPlayerModels ); i++ )
+    {
+        PrecacheModel( g_ZMPlayerModels[i] );
+    }
+
 
     //PrecacheFootStepSounds();
 
@@ -209,49 +239,61 @@ void CZMPlayer::FlashlightTurnOn()
 
 void CZMPlayer::SetPlayerModel( void )
 {
-    const char *szModelName = nullptr;
-    const char *pszCurrentModelName = modelinfo->GetModelName( GetModel() );
+    const char* pszFallback = DEF_PLAYER_MODEL;
+
+    const char* szModelName = nullptr;
+    const char* pszCurrentModelName = modelinfo->GetModelName( GetModel() );
+
 
     szModelName = engine->GetClientConVarValue( engine->IndexOfEdict( edict() ), "cl_playermodel" );
 
-    if ( !ValidatePlayerModel( szModelName ) )
-    {
-        char szReturnString[512];
+    
 
-        if ( !ValidatePlayerModel( pszCurrentModelName ) )
+    int modelIndexCurrent = modelinfo->GetModelIndex( pszCurrentModelName );
+    int modelIndex = modelinfo->GetModelIndex( szModelName );
+
+
+    if ( modelIndex == -1 || !ValidatePlayerModel( szModelName ) )
+    {
+        if ( modelIndexCurrent == -1 || !ValidatePlayerModel( pszCurrentModelName ) )
         {
-            pszCurrentModelName = DEF_PLAYER_MODEL;
+            pszCurrentModelName = pszFallback;
+            modelIndexCurrent = -1;
         }
 
+        char szReturnString[512];
         Q_snprintf( szReturnString, sizeof (szReturnString ), "cl_playermodel %s\n", pszCurrentModelName );
-        engine->ClientCommand ( edict(), szReturnString );
+        engine->ClientCommand( edict(), szReturnString );
 
-        szModelName = pszCurrentModelName;
+        modelIndex = -1;
     }
-
-    int modelIndex = modelinfo->GetModelIndex( szModelName );
 
     if ( modelIndex == -1 )
     {
-        szModelName = DEF_PLAYER_MODEL;
-
-        char szReturnString[512];
-
-        Q_snprintf( szReturnString, sizeof (szReturnString ), "cl_playermodel %s\n", szModelName );
-        engine->ClientCommand ( edict(), szReturnString );
+        szModelName = modelIndexCurrent != -1 ? pszCurrentModelName : pszFallback;
     }
 
-    SetModel( szModelName );
+    if ( modelIndexCurrent == -1 || modelIndex != modelIndexCurrent )
+    {
+        SetModel( szModelName );
 
-    //SetupPlayerSoundsByModel( szModelName );
-    m_iPlayerSoundType = PLAYER_SOUNDS_CITIZEN;
+        //SetupPlayerSoundsByModel( szModelName );
+        m_iPlayerSoundType = PLAYER_SOUNDS_CITIZEN;
 
-    //m_flNextModelChangeTime = gpGlobals->curtime + MODEL_CHANGE_INTERVAL;
+        m_flNextModelChangeTime = gpGlobals->curtime + 10.0f;
+    }
 }
 
 bool CZMPlayer::ValidatePlayerModel( const char* szModelName )
 {
-    // ZMRTODO: Implement all player models.
+    for ( int i = 0; i < ARRAYSIZE( g_ZMPlayerModels ); ++i )
+    {
+        if ( Q_stricmp( g_ZMPlayerModels[i], szModelName ) == 0 )
+        {
+            return true;
+        }
+    }
+
     return false;
 }
 
