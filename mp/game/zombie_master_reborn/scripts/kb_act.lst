@@ -17,6 +17,8 @@
 "+moveup"				"Go Up (ZM)"
 "+movedown"				"Go Down (ZM)"
 "zm_observermode"		"Toggle RTS Mode (ZM)"
+"zm_cmd_selectall"		"Select All Zombies (ZM)"
+"zm_cmd_delete"			"Delete Select Zombies (ZM)"
 "toggleconsole"			"Toggle Console"
 "blank"			"=========================="
 "blank"			"#Valve_Combat_Title"
