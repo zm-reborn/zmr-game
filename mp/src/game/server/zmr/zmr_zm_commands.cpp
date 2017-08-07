@@ -104,9 +104,9 @@ void ZM_Cmd_Target( const CCommand &args )
         if ( pZombie->GetSelector() != pPlayer ) continue;
 
 
-        if ( pZombie->CanSwatPhysicsObjects() && (bSwat || bBreakable) )
+        if ( (pZombie->CanSwatPhysicsObjects() && bSwat) || bBreakable )
         {
-            pZombie->Swat( pTarget );
+            pZombie->Swat( pTarget, bBreakable );
         }
         else
         {

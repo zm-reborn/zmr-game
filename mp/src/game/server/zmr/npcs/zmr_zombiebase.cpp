@@ -11,6 +11,7 @@
 
 //ZombieList_t g_Zombies;
 
+#define ZOMBIE_PHYSOBJ_SWATDIST         80
 
 
 IMPLEMENT_SERVERCLASS_ST( CZMBaseZombie, DT_ZM_BaseZombie )
@@ -150,6 +151,142 @@ int CZMBaseZombie::OnTakeDamage_Alive( const CTakeDamageInfo& info )
     return ret;
 }
 
+int CZMBaseZombie::GetSwatActivity( void )
+{
+    if ( m_bSwatBreakable || !CanSwatPhysicsObjects() )
+    {
+        return ACT_MELEE_ATTACK1;
+    }
+
+    // Hafta figure out whether to swat with left or right arm.
+    // Also hafta figure out whether to swat high or low. (later)
+    float		flDot;
+    Vector		vecRight, vecDirToObj;
+
+    AngleVectors( GetLocalAngles(), NULL, &vecRight, NULL );
+    
+    vecDirToObj = m_hPhysicsEnt->GetLocalOrigin() - GetLocalOrigin();
+    VectorNormalize(vecDirToObj);
+
+    // compare in 2D.
+    vecRight.z = 0.0;
+    vecDirToObj.z = 0.0;
+
+    flDot = DotProduct( vecRight, vecDirToObj );
+
+    Vector vecMyCenter;
+    Vector vecObjCenter;
+
+    vecMyCenter = WorldSpaceCenter();
+    vecObjCenter = m_hPhysicsEnt->WorldSpaceCenter();
+    float flZDiff;
+
+    flZDiff = vecMyCenter.z - vecObjCenter.z;
+
+    if( flDot >= 0 )
+    {
+        // Right
+        if( flZDiff < 0 )
+        {
+            return CNPC_BaseZombie::ACT_ZOM_SWATRIGHTMID;
+        }
+
+        return CNPC_BaseZombie::ACT_ZOM_SWATRIGHTLOW;
+    }
+    else
+    {
+        // Left
+        if( flZDiff < 0 )
+        {
+            return CNPC_BaseZombie::ACT_ZOM_SWATLEFTMID;
+        }
+
+        return CNPC_BaseZombie::ACT_ZOM_SWATLEFTLOW;
+    }
+}
+
+void CZMBaseZombie::StartTask( const Task_t* pTask )
+{
+    switch( pTask->iTask )
+    {
+    case TASK_ZOMBIE_DIE :
+        // Go to ragdoll
+        KillMe();
+        TaskComplete();
+        break;
+
+    case TASK_ZOMBIE_GET_PATH_TO_PHYSOBJ :
+    {
+        Vector vecGoalPos;
+        Vector vecDir;
+
+        vecDir = GetLocalOrigin() - m_hPhysicsEnt->GetLocalOrigin();
+        VectorNormalize(vecDir);
+        vecDir.z = 0;
+
+        AI_NavGoal_t goal( m_hPhysicsEnt->WorldSpaceCenter() );
+        goal.pTarget = m_hPhysicsEnt;
+        GetNavigator()->SetGoal( goal );
+
+        TaskComplete();
+    }
+    break;
+
+    case TASK_ZOMBIE_SWAT_ITEM :
+    {
+        if( m_hPhysicsEnt == NULL )
+        {
+            // Physics Object is gone! Probably was an explosive 
+            // or something else broke it.
+            TaskFail("Physics ent NULL");
+        }
+        else if ( DistToPhysicsEnt() > ZOMBIE_PHYSOBJ_SWATDIST )
+        {
+            // Physics ent is no longer in range! Probably another zombie swatted it or it moved
+            // for some other reason.
+            TaskFail( "Physics swat item has moved" );
+        }
+        else
+        {
+            SetIdealActivity( (Activity)GetSwatActivity() );
+        }
+        break;
+    }
+    break;
+
+    case TASK_ZOMBIE_DELAY_SWAT :
+        m_flNextSwat = gpGlobals->curtime + pTask->flTaskData;
+        TaskComplete();
+        break;
+
+    case TASK_ZOMBIE_RELEASE_HEADCRAB : // Not used.
+        TaskComplete();
+        break;
+
+    case TASK_ZOMBIE_WAIT_POST_MELEE :
+    {
+#ifndef HL2_EPISODIC
+        TaskComplete();
+        return;
+#endif
+
+        // Don't wait when attacking the player
+        if ( GetEnemy() && GetEnemy()->IsPlayer() )
+        {
+            TaskComplete();
+            return;
+        }
+
+        // Wait a single think
+        SetWait( 0.1 );
+    }
+    break;
+
+    default:
+        BaseClass::StartTask( pTask );
+    }
+}
+
 static ConVar zm_sv_swatlift( "zm_sv_swatlift", "20000", FCVAR_NOTIFY );
 static ConVar zm_sv_swatforcemin( "zm_sv_swatforcemin", "20000", FCVAR_NOTIFY );
 static ConVar zm_sv_swatforcemax( "zm_sv_swatforcemax", "70000", FCVAR_NOTIFY );
@@ -245,14 +382,17 @@ void CZMBaseZombie::Command( const Vector& pos )
     SetSchedule( SCHED_FORCED_GO );
 }
 
-bool CZMBaseZombie::Swat( CBaseEntity* pTarget )
+bool CZMBaseZombie::Swat( CBaseEntity* pTarget, bool bBreakable )
 {
     if ( !pTarget ) return false;
 
-    if ( !CanSwatPhysicsObjects() ) return false;
+    if ( !CanSwatPhysicsObjects() && !bBreakable ) return false;
 
 
     m_hPhysicsEnt = pTarget;
+
+    m_bSwatBreakable = bBreakable;
+
     
     SetSchedule( SCHED_ZOMBIE_SWATITEM );
 
