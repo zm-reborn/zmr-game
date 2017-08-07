@@ -27,6 +27,7 @@ public:
     
 
     virtual void Spawn() OVERRIDE;
+    virtual void Precache() OVERRIDE;
 
     virtual int OnTakeDamage_Alive( const CTakeDamageInfo& ) OVERRIDE;
     virtual void HandleAnimEvent( animevent_t* ) OVERRIDE;
@@ -36,7 +37,8 @@ public:
     virtual bool CanBecomeLiveTorso() OVERRIDE;
 	virtual bool ShouldBecomeTorso( const CTakeDamageInfo &info, float flDamageThreshold ) OVERRIDE;
     virtual HeadcrabRelease_t ShouldReleaseHeadcrab( const CTakeDamageInfo &info, float flDamageThreshold ) OVERRIDE;
-
+    virtual bool CorpseGib( const CTakeDamageInfo &info ) OVERRIDE;
+    
     virtual const char *GetLegsModel( void ) OVERRIDE { return ""; };
 	virtual const char *GetTorsoModel( void ) OVERRIDE { return ""; };
 	virtual const char *GetHeadcrabClassname( void ) OVERRIDE { return ""; };
@@ -46,6 +48,7 @@ public:
 
     virtual bool ShouldGib( const CTakeDamageInfo& ) OVERRIDE;
 
+    
     int GetSwatActivity( void );
     virtual void StartTask( const Task_t* pTask ) OVERRIDE;
 
