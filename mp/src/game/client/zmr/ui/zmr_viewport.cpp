@@ -105,6 +105,10 @@ CZMFrame::CZMFrame( const char* pElementName ) : CHudElement( pElementName ), Ba
 	m_pZMControl = new CZMControlPanel( this ); 
 	m_pZMControl->PositionButtons();
 	m_pZMControl->PositionComboBox();
+
+
+	m_pManiMenu = new CZMManiMenu( this ); 
+	m_pBuildMenu = new CZMBuildMenu( this ); 
 }
 
 CZMFrame::~CZMFrame()
@@ -197,6 +201,9 @@ void CZMFrame::OnCommand( const char* command )
 
 void CZMFrame::OnMousePressed( MouseCode code )
 {
+    CloseChildMenus();
+
+
     switch ( code )
     {
     case MOUSE_RIGHT :
@@ -212,7 +219,8 @@ void CZMFrame::OnMousePressed( MouseCode code )
     m_MouseDragStatus = code;
 }
 
-void CZMFrame::OnMouseDoublePressed( MouseCode code )
+// Too OP.
+/*void CZMFrame::OnMouseDoublePressed( MouseCode code )
 {
     if ( code != MOUSE_LEFT ) return;
 
@@ -227,7 +235,7 @@ void CZMFrame::OnMouseDoublePressed( MouseCode code )
     Vector end = trace.endpos;
 
     engine->ClientCmd( VarArgs( "zm_cmd_createhidden %.1f %.1f %.1f", end[0], end[1], end[2] ) );
-}
+}*/
 
 void CZMFrame::OnThink()
 {
@@ -362,9 +370,9 @@ void CZMFrame::OnLeftClick()
         switch ( GetClickMode() )
         {
         case ZMCLICKMODE_TRAP :
-            if ( g_pManiMenu )
+            if ( m_pManiMenu )
                 engine->ClientCmd( VarArgs( "zm_cmd_createtrigger %i %.1f %.1f %.1f",
-                    g_pManiMenu->GetTrapIndex(),
+                    m_pManiMenu->GetTrapIndex(),
                     pos[0],
                     pos[1],
                     pos[2] ) );
@@ -372,12 +380,17 @@ void CZMFrame::OnLeftClick()
 
 
         case ZMCLICKMODE_RALLYPOINT :
-            if ( g_pBuildMenu )
+            if ( m_pBuildMenu )
+            {
                 engine->ClientCmd( VarArgs( "zm_cmd_setrally %i %.1f %.1f %.1f",
-                    g_pBuildMenu->GetLastSpawnIndex(),
+                    m_pBuildMenu->GetLastSpawnIndex(),
                     pos[0],
                     pos[1],
                     pos[2] ) );
+
+
+                m_pBuildMenu->ShowPanel( true );
+            }
             break;
 
 
@@ -506,10 +519,10 @@ void CZMFrame::OnRightRelease()
 
 void CZMFrame::FindZombiesInBox( int start_x, int start_y, int end_x, int end_y, bool bSticky )
 {
-    int scrw, scrh;
     C_ZMBaseZombie* pZombie;
     Vector screen;
     int i;
+    int x, y;
 
     CUtlVector<int> vZombieIndices;
     vZombieIndices.Purge();
@@ -528,20 +541,13 @@ void CZMFrame::FindZombiesInBox( int start_x, int start_y, int end_x, int end_y,
         end_y = i;
     }
 
-    scrw = ScreenWidth();
-    scrh = ScreenHeight();
-
     for ( i = 0; i < g_pZombies->Count(); i++ )
     {
         pZombie = g_pZombies->Element( i );
 
 
-        ScreenTransform( pZombie->GetAbsOrigin(), screen );
-        
-        int x =  0.5 * screen[0] * scrw;
-        int y = -0.5 * screen[1] * scrh;
-        x += 0.5 * scrw;
-        y += 0.5 *	scrh;
+        if ( !WorldToScreen( pZombie->GetAbsOrigin(), screen, x, y ) )
+            continue;
 
         if ( x > start_x && x < end_x && y > start_y && y < end_y )
         {
@@ -607,20 +613,11 @@ void CZMFrame::FindZMObject( int x, int y, bool bSticky )
 
             if ( pSpawn )
             {
-                if ( !g_pBuildMenu )
+                if ( m_pBuildMenu )
                 {
-                    g_pBuildMenu = new CZMBuildMenu( gViewPortInterface );
-                }
-
-                if ( g_pBuildMenu )
-                {
-                    g_pBuildMenu->SetSpawnIndex( pSpawn->entindex() );
-                    g_pBuildMenu->SetZombieFlags( pSpawn->GetZombieFlags() );
-                    g_pBuildMenu->ShowPanel( true );
-                    //gViewPortInterface->ShowPanel( panel, true );
-
-                    // Notify the server we've opened this menu.
-                    engine->ClientCmd( VarArgs( "zm_cmd_openbuildmenu %i", pSpawn->entindex() ) );
+                    m_pBuildMenu->SetSpawnIndex( pSpawn->entindex() );
+                    m_pBuildMenu->SetZombieFlags( pSpawn->GetZombieFlags() );
+                    m_pBuildMenu->ShowPanel( true );
                 }
 
                 bHit = true;
@@ -633,21 +630,15 @@ void CZMFrame::FindZMObject( int x, int y, bool bSticky )
 
             if ( pTrap )
             {
-                if ( !g_pManiMenu )
+                if ( m_pManiMenu )
                 {
-                    g_pManiMenu = new CZMManiMenu( gViewPortInterface );
+                    m_pManiMenu->SetTrapIndex( pTrap->entindex() );
+                    m_pManiMenu->SetDescription( "Activate trap." );
+                    m_pManiMenu->SetCost( pTrap->GetCost() );
+                    m_pManiMenu->SetTrapCost( pTrap->GetTrapCost() );
+                    m_pManiMenu->SetTrapPos( pTrap->GetAbsOrigin() );
+                    m_pManiMenu->ShowPanel( true );
                 }
-
-                if ( g_pManiMenu )
-                {
-                    g_pManiMenu->SetTrapIndex( pTrap->entindex() );
-                    g_pManiMenu->SetDescription( "Activate trap." );
-                    g_pManiMenu->SetCost( pTrap->GetCost() );
-                    g_pManiMenu->SetTrapCost( pTrap->GetTrapCost() );
-                    g_pManiMenu->ShowPanel( true );
-                }
-
-                engine->ClientCmd( VarArgs( "zm_cmd_openmanimenu %i", pTrap->entindex() ) );
 
                 bHit = true;
                 return;
@@ -676,4 +667,34 @@ void CZMFrame::FindZMObject( int x, int y, bool bSticky )
     // If we didn't hit anything special then just unselect everything.
     if ( !bHit && !bSticky )
         engine->ClientCmd( "zm_cmd_unselectall" );
+}
+
+void CZMFrame::CloseChildMenus()
+{
+    if ( m_pBuildMenu )
+    {
+        m_pBuildMenu->Close();
+    }
+
+    if ( m_pManiMenu )
+    {
+        m_pManiMenu->Close();
+    }
+}
+
+bool CZMFrame::WorldToScreen( const Vector& pos, Vector& screen, int& x, int& y )
+{
+    int behind = ScreenTransform( pos, screen );
+
+    if ( !behind )
+    {
+        int w = ScreenWidth();
+        int h = ScreenHeight();
+        x =  0.5 * screen[0] * w;
+        y = -0.5 * screen[1] * h;
+        x += 0.5 * w;
+        y += 0.5 *	h;
+    }
+
+    return !behind ? true : false;
 }

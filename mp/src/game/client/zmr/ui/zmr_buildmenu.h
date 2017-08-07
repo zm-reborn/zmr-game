@@ -24,30 +24,27 @@ public:
     DECLARE_CLASS_SIMPLE( CZMBuildMenu, vgui::Frame );
 
 
-    CZMBuildMenu( IViewPort* pViewPort );
+    CZMBuildMenu( vgui::Panel* pParent );
     ~CZMBuildMenu();
 
-    virtual const char* GetName() OVERRIDE { return "ZMBuildMenu"; };
-    void SetData( KeyValues *data ) OVERRIDE {};
-    void Reset() OVERRIDE {};
-    void Update() OVERRIDE {};
-    bool NeedsUpdate( void ) OVERRIDE { return false; }
-    bool HasInputElements( void ) OVERRIDE { return true; }
-    //void Close() OVERRIDE;
-    void ShowPanel( bool state ) OVERRIDE;
 	void OnThink( void );
 	void OnClose();
 
-    vgui::VPANEL GetVPanel( void ) OVERRIDE { return BaseClass::GetVPanel(); }
-    bool IsVisible() OVERRIDE { return BaseClass::IsVisible(); }
-    void SetParent( vgui::VPANEL parent ) OVERRIDE { BaseClass::SetParent( parent ); }
+
+    virtual const char* GetName() OVERRIDE { return "ZMBuildMenu"; };
+
+
+    virtual void ShowPanel( bool state ) OVERRIDE;
+    virtual void SetData( KeyValues *data ) OVERRIDE {};
+    virtual void Reset() OVERRIDE {};
+    virtual void Update() OVERRIDE {};
+    virtual bool NeedsUpdate( void ) OVERRIDE { return false; };
+    virtual bool HasInputElements( void ) OVERRIDE { return true; };
+    virtual vgui::VPANEL GetVPanel( void ) OVERRIDE { return BaseClass::GetVPanel(); };
+    virtual bool IsVisible() OVERRIDE { return BaseClass::IsVisible(); };
+    virtual void SetParent( vgui::VPANEL parent ) OVERRIDE { BaseClass::SetParent( parent ); };
 
     void OnCommand( const char *command ) OVERRIDE;
-
-    //void OnFrameFocusChanged( bool ) OVERRIDE;
-
-
-    IViewPort* m_pViewPort;
 
 
     inline int GetLastSpawnIndex() { return m_iLastSpawnIndex; };
@@ -63,20 +60,19 @@ private:
     int m_fSpawnZombieFlags;
 
 
-public:
 	vgui::HFont m_hMediumFont;
 	vgui::HFont m_hLargeFont;
     vgui::HScheme scheme;
 
-	//virtual void Paint();
+
+public:
+
 	void CalculateButtonState();
 
 	void AutoAssign();
 	int m_iLastFlags;
 	
 	void UpdateQueue(const int q[], int size = BM_QUEUE_SIZE);
-
-	void OnKeyCodePressed(vgui::KeyCode code);
 
 protected:
 
