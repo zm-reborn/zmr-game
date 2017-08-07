@@ -46,6 +46,8 @@ public:
 
     virtual bool ShouldGib( const CTakeDamageInfo& ) OVERRIDE;
 
+    int GetSwatActivity( void );
+    virtual void StartTask( const Task_t* pTask ) OVERRIDE;
 
     // By default don't swat objects.
     virtual bool CanSwatPhysicsObjects() OVERRIDE { return false; };
@@ -63,7 +65,7 @@ public:
     
 
     virtual void Command( const Vector& );
-    virtual bool Swat( CBaseEntity* );
+    virtual bool Swat( CBaseEntity*, bool );
     void SwatObject( IPhysicsObject*, Vector& );
     virtual bool TargetEnemy( CBaseEntity* );
 
@@ -85,6 +87,9 @@ public:
 
 private:
     ZombieClass_t m_iZombieClass;
+
+    
+    bool m_bSwatBreakable;
     
 protected:
     inline void SetZombieClass( ZombieClass_t zclass ) { m_iZombieClass = zclass; };
