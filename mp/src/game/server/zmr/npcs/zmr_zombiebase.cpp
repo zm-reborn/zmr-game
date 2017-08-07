@@ -1,5 +1,6 @@
 #include "cbase.h"
 #include "NPCevent.h"
+#include "gib.h"
 
 
 #include "zmr/zmr_gamerules.h"
@@ -58,9 +59,18 @@ void CZMBaseZombie::Spawn( void )
     AddSpawnFlags( SF_NPC_FADE_CORPSE );
 
     SetBloodColor( BLOOD_COLOR_RED );
-
-
+    
+    //CAI_Senses* pSenses = GetSenses();
     BaseClass::Spawn();
+}
+
+void CZMBaseZombie::Precache()
+{
+    BaseClass::Precache();
+
+
+    PrecacheScriptSound( "BaseCombatCharacter.CorpseGib" );
+    PrecacheScriptSound( "NPC_Antlion.RunOverByVehicle" );
 }
 
 void CZMBaseZombie::HandleAnimEvent( animevent_t* pEvent )
@@ -332,6 +342,18 @@ bool CZMBaseZombie::ShouldBecomeTorso( const CTakeDamageInfo &info, float flDama
 HeadcrabRelease_t CZMBaseZombie::ShouldReleaseHeadcrab( const CTakeDamageInfo &info, float flDamageThreshold )
 {
     return RELEASE_NO;
+}
+
+bool CZMBaseZombie::CorpseGib( const CTakeDamageInfo &info )
+{
+    EmitSound( "BaseCombatCharacter.CorpseGib" );
+    EmitSound( "NPC_Antlion.RunOverByVehicle" );
+
+    // ZMRTODO: Better gibbing.
+    CGib::SpawnHeadGib( this );
+
+
+    return true;
 }
 
 bool CZMBaseZombie::IsValidEnemy( CBaseEntity* pEnt )
