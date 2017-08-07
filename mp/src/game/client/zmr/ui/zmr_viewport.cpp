@@ -23,6 +23,17 @@
 #include "zmr_viewport.h"
 
 
+
+// ZMRTODO: See if these works properly.
+#define MASK_ZMVIEW             ( CONTENTS_SOLID | CONTENTS_MOVEABLE ) // When testing box select.
+#define MASK_ZMSELECTUSABLE     MASK_SOLID // When left clicking (not setting rallypoint, etc.)
+#define MASK_ZMTARGET           MASK_SOLID // When right clicking.
+#define MASK_ZMCREATE           MASK_SOLID // When left clicking.
+
+ConVar zm_cl_poweruser_boxselect( "zm_cl_poweruser_boxselect", "0", FCVAR_ARCHIVE, "Select zombies through walls with box select." );
+ConVar zm_cl_poweruser( "zm_cl_poweruser", "0", FCVAR_ARCHIVE, "Select spawns/traps/zombies through walls." );
+
+
 DECLARE_HUDELEMENT( CZMFrame );
 
 
@@ -360,7 +371,7 @@ void CZMFrame::OnLeftClick()
 
     trace_t trace;
     CTraceFilterNoNPCsOrPlayer filter( nullptr, COLLISION_GROUP_NONE );
-    TraceScreenToWorld( mx, my, &trace, &filter, MASK_SOLID );
+    TraceScreenToWorld( mx, my, &trace, &filter, MASK_ZMCREATE );
 
     if ( trace.fraction != 1.0f )
     {
@@ -459,7 +470,7 @@ void CZMFrame::OnRightClick()
     
     trace_t trace;
     CTraceFilterNoNPCs filter( nullptr, COLLISION_GROUP_NONE );
-    TraceScreenToWorld( mx, my, &trace, &filter, MASK_SOLID );
+    TraceScreenToWorld( mx, my, &trace, &filter, MASK_ZMTARGET );
 
 
     Vector end = trace.endpos;
@@ -538,6 +549,8 @@ void CZMFrame::FindZombiesInBox( int start_x, int start_y, int end_x, int end_y,
     Vector screen;
     int i;
     int x, y;
+    trace_t trace;
+    CTraceFilterNoNPCsOrPlayer filter( nullptr, COLLISION_GROUP_NONE );
 
     CUtlVector<int> vZombieIndices;
     vZombieIndices.Purge();
@@ -560,6 +573,13 @@ void CZMFrame::FindZombiesInBox( int start_x, int start_y, int end_x, int end_y,
     {
         pZombie = g_pZombies->Element( i );
 
+        // Do we see the mad man?
+        if ( !zm_cl_poweruser_boxselect.GetBool() )
+        {
+            UTIL_TraceLine( MainViewOrigin(), pZombie->GetAbsOrigin() + Vector( 0, 0, 8 ), MASK_ZMVIEW, &filter, &trace );
+
+            if ( trace.fraction != 1.0f ) continue;
+        }
 
         if ( !WorldToScreen( pZombie->GetAbsOrigin(), screen, x, y ) )
             continue;
@@ -603,9 +623,9 @@ void CZMFrame::FindZMObject( int x, int y, bool bSticky )
     int i;
     C_ZMEntBaseUsable* pUsable;
     C_ZMBaseZombie* pZombie;
-
     
-    TraceScreenToWorld( x, y, &trace, nullptr, MASK_SOLID );
+    
+    TraceScreenToWorld( x, y, &trace, nullptr, zm_cl_poweruser.GetBool() ? 0 : MASK_ZMSELECTUSABLE );
 
 
     ray.Init( MainViewOrigin(), trace.endpos,

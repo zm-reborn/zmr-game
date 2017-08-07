@@ -8,11 +8,6 @@
 #include "zmr_manimenu.h"
 
 
-// ZMRTODO: See if this works properly.
-// This seems to work the best. It hits non-solid func_brush, npc clip, etc.
-#define MASK_ZMVIEW     ( CONTENTS_SOLID | CONTENTS_MOVEABLE | CONTENTS_MONSTERCLIP | CONTENTS_OPAQUE | CONTENTS_GRATE | CONTENTS_WINDOW )
-
-
 enum ZMClickMode_t
 {
     ZMCLICKMODE_NORMAL = 0,
@@ -58,7 +53,7 @@ public:
     static bool WorldToScreen( const Vector&, Vector&, int&, int& );
 
 private:
-    void TraceScreenToWorld( int, int, trace_t*, CTraceFilterSimple*, int = MASK_ZMVIEW );
+    void TraceScreenToWorld( int, int, trace_t*, CTraceFilterSimple*, int );
     
     void OnLeftClick();
     void OnRightClick();
