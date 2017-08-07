@@ -625,7 +625,6 @@ void CZMFrame::FindZMObject( int x, int y, bool bSticky )
             }
 
 
-            // Testing cmd...
             C_ZMEntManipulate* pTrap = dynamic_cast<C_ZMEntManipulate*> ( pUsable );
 
             if ( pTrap )
@@ -671,12 +670,12 @@ void CZMFrame::FindZMObject( int x, int y, bool bSticky )
 
 void CZMFrame::CloseChildMenus()
 {
-    if ( m_pBuildMenu )
+    if ( m_pBuildMenu && m_pBuildMenu->IsVisible() )
     {
         m_pBuildMenu->Close();
     }
 
-    if ( m_pManiMenu )
+    if ( m_pManiMenu && m_pManiMenu->IsVisible() )
     {
         m_pManiMenu->Close();
     }
