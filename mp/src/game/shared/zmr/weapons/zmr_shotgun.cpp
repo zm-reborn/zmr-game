@@ -49,7 +49,7 @@ public:
 	    pPlayer->ViewPunch( QAngle( random->RandomFloat( -2, -1 ), random->RandomFloat( -2, 2 ), 0 ) );
     }
     
-    virtual float GetFireRate( void ) OVERRIDE { return 0.7f; };
+    virtual float GetFireRate( void ) OVERRIDE { return 0.55f; };
 
 
 
@@ -162,6 +162,9 @@ void CZMWeaponShotgun::PrimaryAttack( void )
 		// HEV suit - indicate out of ammo condition
 		pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0); 
 	}
+
+
+    m_flNextPrimaryAttack = gpGlobals->curtime + GetFireRate();
 }
 
 void CZMWeaponShotgun::ItemPostFrame( void )

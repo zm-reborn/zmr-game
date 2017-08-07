@@ -55,7 +55,7 @@ public:
 	    pPlayer->ViewPunch( QAngle( random->RandomFloat( -5, -2 ), random->RandomFloat( -3.5, 3.5 ), 0 ) );
     }
     
-    virtual float GetFireRate( void ) OVERRIDE { return 1.0f; };
+    virtual float GetFireRate( void ) OVERRIDE { return 0.9f; };
 
 
 
