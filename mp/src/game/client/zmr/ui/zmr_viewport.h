@@ -4,6 +4,8 @@
 
 #include "zmr_boxselect.h"
 #include "zmr_cntrlpanel.h"
+#include "zmr_buildmenu.h"
+#include "zmr_manimenu.h"
 
 
 enum ZMClickMode_t
@@ -33,7 +35,7 @@ public:
     //virtual void OnMouseMoved( MouseCode code ) OVERRIDE;
     virtual void OnCursorMoved( int, int ) OVERRIDE;
     virtual void OnMousePressed( MouseCode code ) OVERRIDE;
-    virtual void OnMouseDoublePressed( MouseCode code ) OVERRIDE;
+    //virtual void OnMouseDoublePressed( MouseCode code ) OVERRIDE;
     bool ShouldDraw() OVERRIDE { return IsVisible(); };
     virtual void OnThink() OVERRIDE;
     virtual void Paint() OVERRIDE {};
@@ -48,6 +50,8 @@ public:
     inline ZMClickMode_t GetClickMode() { return m_iClickMode; };
     void SetClickMode( ZMClickMode_t, bool = false );
 
+    static bool WorldToScreen( const Vector&, Vector&, int&, int& );
+
 private:
     void TraceScreenToWorld( int, int, trace_t*, CTraceFilterSimple* );
     
@@ -60,9 +64,12 @@ private:
     void FindZombiesInBox( int, int, int, int, bool );
     void FindZMObject( int, int, bool );
 
+    void CloseChildMenus();
 
     CZMBoxSelect* m_BoxSelect;
     CZMControlPanel* m_pZMControl;
+    CZMManiMenu* m_pManiMenu;
+    CZMBuildMenu* m_pBuildMenu;
 
     MouseCode m_MouseDragStatus;
 

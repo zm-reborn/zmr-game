@@ -24,7 +24,7 @@ public:
     DECLARE_CLASS_SIMPLE( CZMManiMenu, vgui::Frame );
 
 
-    CZMManiMenu( IViewPort* pViewPort );
+    CZMManiMenu( vgui::Panel* pParent );
     ~CZMManiMenu();
 
     virtual const char* GetName() OVERRIDE { return "ZMManiMenu"; };
@@ -33,19 +33,14 @@ public:
     void Update() OVERRIDE {};
     bool NeedsUpdate( void ) OVERRIDE { return false; }
     bool HasInputElements( void ) OVERRIDE { return true; }
-    //void Close() OVERRIDE;
     void ShowPanel( bool state ) OVERRIDE;
 	void OnThink( void );
-	//void OnClose();
 
     vgui::VPANEL GetVPanel( void ) OVERRIDE { return BaseClass::GetVPanel(); }
     bool IsVisible() OVERRIDE { return BaseClass::IsVisible(); }
     void SetParent( vgui::VPANEL parent ) OVERRIDE { BaseClass::SetParent( parent ); }
 
     void OnCommand( const char *command ) OVERRIDE;
-
-
-    IViewPort* m_pViewPort;
 
 
     inline int GetTrapIndex() { return m_iTrapIndex; };
@@ -57,15 +52,19 @@ public:
     inline int GetCost() { return m_nCost; };
     void SetCost( int );
 
+    Vector GetTrapPos() { return m_vecTrapPos; };
+    void SetTrapPos( const Vector& pos ) { m_vecTrapPos = pos; };
+
 private:
     int m_iTrapIndex;
     int m_nCost;
     int m_nTrapCost;
+    Vector m_vecTrapPos;
 
 
     vgui::HFont m_hMediumFont;
 	vgui::HFont m_hLargeFont;
-	vgui::HScheme	scheme;
+	vgui::HScheme scheme;
 };
 
 extern CZMManiMenu* g_pManiMenu;

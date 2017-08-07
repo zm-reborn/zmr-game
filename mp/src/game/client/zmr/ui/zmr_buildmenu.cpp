@@ -71,20 +71,24 @@ const char *TypeToQueueImage[ZMCLASS_MAX] = {
 #define FASTIE_FLAG 2
 #define SHAMBLIE_FLAG 1
 
-CZMBuildMenu::CZMBuildMenu( IViewPort *pViewPort ) : Frame( g_pClientMode->GetViewport(), "ZMBuildMenu" )
+CON_COMMAND( testbuildmenu, "" )
+{
+    if ( !g_pBuildMenu ) return;
+
+
+    Msg( "Moveable: %i\n", g_pBuildMenu->IsMoveable() );
+}
+
+CZMBuildMenu::CZMBuildMenu( Panel* pParent ) : Frame( g_pClientMode->GetViewport(), "ZMBuildMenu" )
 {
 	g_pBuildMenu = this;
 
-	m_pViewPort = pViewPort;
 
+    SetParent( pParent->GetVPanel() );
 
-    if ( g_pZMView )
-    {
-        SetParent( g_pZMView->GetVPanel() );
-    }
 
     // NOTE: You have to set these before invalidating layout(?)
-    SetSizeable( true );
+    SetSizeable( false );
 	SetProportional( false );
 	SetMoveable( true );
     SetKeyBoardInputEnabled( false );
@@ -180,29 +184,6 @@ CZMBuildMenu::CZMBuildMenu( IViewPort *pViewPort ) : Frame( g_pClientMode->GetVi
 		Q_snprintf(buffer, sizeof(buffer), "queue%02d", i);
 		queueimages[i] = dynamic_cast<vgui::ImagePanel*>(FindChildByName(buffer));
 	}
-
-
-
-    // Clip to view.
-    int w, h;
-    GetSize( w, h );
-
-    int x, y;
-    GetPos( x, y );
-
-    int newx, newy;
-
-    newx = x;
-    newy = y;
-
-    if ( x < 0 ) newx = 0;
-    if ( y < 0 ) newy = 0;
-
-    if ( (x + w) > ScreenWidth() ) newx = ScreenWidth() - w;
-    if ( (y + h) > ScreenHeight() ) newy = ScreenHeight() - h;
-
-
-    SetPos( newx, newy );
 }
 
 //-----------------------------------------------------------------------------
@@ -225,11 +206,8 @@ void CZMBuildMenu::ShowPanel( bool state )
     
     if ( state )
     {
-        // We have to hide the other or otherwise it will cause focus fighting.
-        if ( g_pManiMenu )
-        {
-            g_pManiMenu->ShowPanel( false );
-        }
+        // Notify the server we've opened this menu.
+        engine->ClientCmd( VarArgs( "zm_cmd_openbuildmenu %i", GetSpawnIndex() ) );
     }
 
 
@@ -423,23 +401,6 @@ void CZMBuildMenu::OnClose()
 
 
 	BaseClass::OnClose();
-}
-
-//--------------------------------------------------------------
-// TGB: we have this so that when keyboard grabbing is disabled for this menu we still have a close-menu-shortcut
-//--------------------------------------------------------------
-
-void CZMBuildMenu::OnKeyCodePressed(vgui::KeyCode code)
-{
-	//int lastPressedEngineKey = engine->GetLastPressedEngineKey();
-
-	/*if( m_iJumpKey >= 0 && m_iJumpKey == code )
-	{
-		Close();
-        return;
-	}*/
-
-    BaseClass::OnKeyCodePressed( code );
 }
 
 //--------------------------------------------------------------

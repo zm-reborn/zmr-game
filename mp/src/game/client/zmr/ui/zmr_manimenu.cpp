@@ -2,36 +2,18 @@
 
 #include <vgui/IVGui.h>
 #include <vgui/IScheme.h>
-#include <KeyValues.h>
 #include <vgui_controls/ImagePanel.h>
-
-#include "filesystem.h"
-
 #include <vgui_controls/Label.h>
 #include <vgui_controls/Button.h>
 #include <vgui_controls/Image.h>
 
-#include "vgui_bitmapbutton.h"
-
-#include "IGameUIFuncs.h" // for key bindings
-#include <igameresources.h>
-
 #include "c_user_message_register.h"
-
-
-extern IGameUIFuncs *gameuifuncs; // for key binding details
-
-//#include <iviewport.h>
-/*
-#include <stdlib.h> // MAX_PATH define
-#include <stdio.h>*/
 
 #include "iclientmode.h"
 
 
 #include "zmr/c_zmr_entities.h"
 #include "zmr_manimenu.h"
-#include "zmr_buildmenu.h"
 #include "zmr/zmr_gamerules.h"
 #include "zmr/zmr_player_shared.h"
 #include "zmr/npcs/c_zmr_zombiebase.h"
@@ -47,23 +29,22 @@ using namespace vgui;
 
 CZMManiMenu *g_pManiMenu = nullptr;
 
-CZMManiMenu::CZMManiMenu( IViewPort *pViewPort ) : Frame( g_pClientMode->GetViewport(), "ZMManiMenu" )
+CZMManiMenu::CZMManiMenu( Panel* pParent ) : Frame( g_pClientMode->GetViewport(), "ZMManiMenu" )
 {
 	g_pManiMenu = this;
 
-	m_pViewPort = pViewPort;
+	//m_pViewPort = pViewPort;
 
-
-    if ( g_pZMView )
-    {
-        SetParent( g_pZMView->GetVPanel() );
-    }
+    SetParent( pParent->GetVPanel() );
 
 
     SetTrapIndex( 0 );
 
     // NOTE: You have to set these before invalidating layout(?)
-    SetSizeable( true );
+    SetPaintBackgroundEnabled( false );
+    SetSizeable( false );
+    SetKeyBoardInputEnabled( false );
+    SetMouseInputEnabled( true );
     SetProportional( false );
     SetMoveable( true );
     
@@ -78,7 +59,7 @@ CZMManiMenu::CZMManiMenu( IViewPort *pViewPort ) : Frame( g_pClientMode->GetView
 
 	
 
-	LoadControlSettings( "resource/ui/zmmanimenu.res" );
+	LoadControlSettings( "resource/ui/zmmanimenunew.res" );
     InvalidateLayout();
 
 	vgui::ivgui()->AddTickSignal( GetVPanel(), 150 );
@@ -86,30 +67,6 @@ CZMManiMenu::CZMManiMenu( IViewPort *pViewPort ) : Frame( g_pClientMode->GetView
 
     Button* button = dynamic_cast<Button*>( FindChildByName( "Description" ) );
     if ( button ) button->SetAsDefaultButton( 1 );
-
-
-    
-
-    // Clip to view.
-    int w, h;
-    GetSize( w, h );
-
-    int x, y;
-    GetPos( x, y );
-
-    int newx, newy;
-
-    newx = x;
-    newy = y;
-
-    if ( x < 0 ) newx = 0;
-    if ( y < 0 ) newy = 0;
-
-    if ( (x + w) > ScreenWidth() ) newx = ScreenWidth() - w;
-    if ( (y + h) > ScreenHeight() ) newy = ScreenHeight() - h;
-
-
-    SetPos( newx, newy );
 }
 
 CZMManiMenu::~CZMManiMenu()
@@ -121,16 +78,12 @@ void CZMManiMenu::ShowPanel( bool state )
 {
     if ( IsVisible() == state ) return;
 
-    
+
     if ( state )
     {
-        // We have to hide the other or otherwise it will cause focus fighting.
-        if ( g_pBuildMenu )
-        {
-            g_pBuildMenu->ShowPanel( false );
-        }
+        // Tell server we've opened this menu.
+        engine->ClientCmd( VarArgs( "zm_cmd_openmanimenu %i", GetTrapIndex() ) );
     }
-
 
     SetVisible( state );
 }
@@ -148,7 +101,7 @@ void CZMManiMenu::SetDescription( const char* desc )
 void CZMManiMenu::SetCost( int cost )
 {
     char buffer[128];
-    Q_snprintf( buffer, sizeof( buffer ), "Activate for %i resources.",  cost );
+    Q_snprintf( buffer, sizeof( buffer ), "Activate %i.",  cost );
 
     Label* entry = dynamic_cast<Label*>( FindChildByName( "Activate" ) );
     
@@ -166,12 +119,12 @@ void CZMManiMenu::SetTrapCost( int cost )
 
     if ( cost > 0 )
     {
-        Q_snprintf( buffer, sizeof( buffer ), "Create trap for %i resources.",  cost );
+        Q_snprintf( buffer, sizeof( buffer ), "Trap for %i.",  cost );
     }
     else
     {
         // Are traps gay?
-        Q_snprintf( buffer, sizeof( buffer ), "Traps not allowed.",  cost );
+        Q_snprintf( buffer, sizeof( buffer ), "Trap disabled.",  cost );
     }
     
 
@@ -219,6 +172,26 @@ void CZMManiMenu::OnThink()
 
     SetControlEnabled( "Activate", ( pPlayer->GetResources() >= m_nCost ) );
     SetControlEnabled( "Trap", ( m_nTrapCost > 0 && pPlayer->GetResources() >= m_nTrapCost ) );
+
+    Vector screen;
+    int x, y;
+    if ( CZMFrame::WorldToScreen( GetTrapPos(), screen, x, y ) )
+    {
+        int w, h;
+        GetSize( w, h );
+
+
+        x -= w / 2.0f;
+        y -= h / 1.5f;
+
+
+        if ( x < 0 ) x = 0;
+        if ( y < 0 ) y = 0;
+        if ( (x+w) >= ScreenWidth() ) x = ScreenWidth() - w;
+        if ( (y+h) >= ScreenHeight() ) y = ScreenHeight() - h;
+
+        SetPos( x, y );
+    }
 }
 
 void __MsgFunc_ZMManiMenuUpdate( bf_read &msg )
