@@ -397,7 +397,7 @@ void CZMBuildMenu::OnClose()
 
 
     m_iLastSpawnIndex = GetSpawnIndex();
-	SetSpawnIndex( 0 );
+	//SetSpawnIndex( 0 );
 
 
 	BaseClass::OnClose();
