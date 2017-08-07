@@ -1,0 +1,6 @@
+UnlitGeneric
+{
+	$basetexture zmr_effects\target_break
+	$alphatest 1
+	$ignorez 1
+}
