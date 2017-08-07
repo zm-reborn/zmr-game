@@ -5,7 +5,7 @@
 		"ControlName"		"CZMBuildMenu"
 		"fieldName"		"ZMBuildMenu"
 		"xpos"		"60"
-		"ypos"		"200"
+		"ypos"		"60"
 		"wide"		"400"
 		"tall"		"350"
 		"autoResize"		"0"
