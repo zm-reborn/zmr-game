@@ -262,7 +262,7 @@ void CZMRules::ClientSettingsChanged( CBasePlayer* pPlayer )
 
 		const char *pszCurrentModelName = modelinfo->GetModelName( pZMPlayer->GetModel() );
 
-		char szReturnString[128];
+		char szReturnString[192];
 		Q_snprintf( szReturnString, sizeof( szReturnString ), "Your player model is: %s\n", pszCurrentModelName );
 
 		ClientPrint( pZMPlayer, HUD_PRINTTALK, szReturnString );
