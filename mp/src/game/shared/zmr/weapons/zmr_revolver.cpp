@@ -52,7 +52,7 @@ public:
 
     void ItemPostFrame() OVERRIDE;
 
-    void HandleAnimEventRevolver( CBaseCombatCharacter* );
+    void HandleAnimEventRevolver();
 
 #ifndef CLIENT_DLL
     void Operator_HandleAnimEvent( animevent_t*, CBaseCombatCharacter* ) OVERRIDE;
@@ -158,7 +158,10 @@ void CZMWeaponRevolver::Shoot()
 
 
 	pPlayer->DoMuzzleFlash();
-    WeaponSound( SPECIAL1 );
+
+#ifndef CLIENT_DLL // Client already fires this sound.
+    WeaponSound( SINGLE );
+#endif
 
 	// player "shoot" animation
 	pPlayer->SetAnimation( PLAYER_ATTACK1 );
@@ -208,7 +211,7 @@ void CZMWeaponRevolver::Shoot()
 	AddViewKick();
 }
 
-void CZMWeaponRevolver::HandleAnimEventRevolver( CBaseCombatCharacter* pOperator )
+void CZMWeaponRevolver::HandleAnimEventRevolver()
 {
     Shoot();
 }
@@ -219,7 +222,7 @@ void CZMWeaponRevolver::Operator_HandleAnimEvent( animevent_t *pEvent, CBaseComb
 	switch( pEvent->event )
 	{
 	case AE_ZM_REVOLVERSHOOT:
-		HandleAnimEventRevolver( pOperator );
+		HandleAnimEventRevolver();
 		break;
 
 	default:
@@ -232,7 +235,7 @@ bool CZMWeaponRevolver::OnFireEvent( C_BaseViewModel* pViewModel, const Vector& 
 {
     if ( event == AE_ZM_REVOLVERSHOOT )
     {
-        HandleAnimEventRevolver( GetOwner() );
+        HandleAnimEventRevolver();
         return true;
     }
 
