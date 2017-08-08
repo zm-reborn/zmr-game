@@ -1,6 +1,8 @@
 #include "cbase.h"
 #include <vgui_controls/Frame.h>
 #include <vgui_controls/ComboBox.h>
+#include <vgui_controls/CheckButton.h>
+#include <vgui_controls/Slider.h>
 #include <vgui/ivgui.h>
 #include "filesystem.h"
 #include <vgui_controls/AnimationController.h>
@@ -9,6 +11,12 @@
 #include "zmr/c_zmr_player.h"
 #include "zmr_options.h"
 
+
+extern ConVar zm_cl_poweruser;
+extern ConVar zm_cl_poweruser_boxselect;
+
+extern ConVar cl_yawspeed;
+extern ConVar cl_pitchspeed;
 
 
 using namespace vgui;
@@ -28,8 +36,29 @@ public:
     virtual void OnCommand( const char* ) OVERRIDE;
 
 
+    inline bool FailedLoad() { return m_bFailedLoad; };
+
 protected:
+    bool m_bFailedLoad;
+
+    template <typename Type>
+    void LoadItem( Type** dest, const char* name )
+    {
+        *dest = dynamic_cast<Type*>( FindChildByName( name ) );
+
+        if ( !*dest )
+        {
+            Warning( "Couldn't load item %s.\n", name );
+
+            m_bFailedLoad = true;
+        }
+    }
+
     ComboBox* m_pPartBox;
+    CheckButton* m_pCheck_PowerUser;
+    CheckButton* m_pCheck_BoxPowerUser;
+    Slider* m_pSlider_Pitch;
+    Slider* m_pSlider_Yaw;
 
     void UpdateMenu();
     void ApplySettings();
@@ -73,6 +102,8 @@ CON_COMMAND( ToggleZMOptions, "" )
 
 CZMOptionsMenu::CZMOptionsMenu( VPANEL parent ) : BaseClass( nullptr, "ZMOptionsMenu" )
 {
+    m_bFailedLoad = false;
+
     SetParent( parent );
 
     SetMouseInputEnabled( true );
@@ -88,13 +119,18 @@ CZMOptionsMenu::CZMOptionsMenu( VPANEL parent ) : BaseClass( nullptr, "ZMOptions
 
     LoadControlSettings( "resource/ui/zmoptions.res" );
 
-    m_pPartBox = dynamic_cast<ComboBox*>( FindChildByName( "part_type" ) );
+    LoadItem( &m_pPartBox, "part_type" );
+    LoadItem( &m_pCheck_PowerUser, "check_poweruser" );
+    LoadItem( &m_pCheck_BoxPowerUser, "check_poweruser_box" );
+    LoadItem( &m_pSlider_Yaw, "scrollhor_slider" );
+    LoadItem( &m_pSlider_Pitch, "scrollver_slider" );
 
-    if ( !m_pPartBox )
-    {
-        Warning( "Failed to load zmoptions.res!\n" );
-        return;
-    }
+    if ( FailedLoad() ) return;
+
+
+    m_pSlider_Yaw->SetRange( 10, 500 );
+    m_pSlider_Pitch->SetRange( 10, 500 );
+
 
     KeyValues* kv = new KeyValues( "participation" );
 
@@ -167,12 +203,34 @@ void CZMOptionsMenu::OnCommand( const char* command )
 
 void CZMOptionsMenu::UpdateMenu()
 {
+    if ( FailedLoad() ) return;
+
+
     Participation_t part = C_ZMPlayer::GetLocalParticipation();
 
     m_pPartBox->ActivateItem( part );
+
+
+    m_pCheck_PowerUser->SetSelected( zm_cl_poweruser.GetBool() );
+    m_pCheck_BoxPowerUser->SetSelected( zm_cl_poweruser_boxselect.GetBool() );
+
+
+    m_pSlider_Yaw->SetValue( (int)cl_yawspeed.GetFloat() );
+    m_pSlider_Pitch->SetValue( (int)cl_pitchspeed.GetFloat() );
 }
 
 void CZMOptionsMenu::ApplySettings()
 {
+    if ( FailedLoad() ) return;
+
+
     C_ZMPlayer::SetLocalParticipation( (Participation_t)m_pPartBox->GetActiveItem() );
+
+    zm_cl_poweruser.SetValue( m_pCheck_PowerUser->IsSelected() ? 1 : 0 );
+
+    zm_cl_poweruser_boxselect.SetValue( m_pCheck_BoxPowerUser->IsSelected() ? 1 : 0 );
+
+
+    cl_yawspeed.SetValue( m_pSlider_Yaw->GetValue() );
+    cl_pitchspeed.SetValue( m_pSlider_Pitch->GetValue() );
 }
