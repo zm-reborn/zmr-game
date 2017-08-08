@@ -1,5 +1,5 @@
 #include "cbase.h"
-#include "NPCevent.h"
+#include "npcevent.h"
 #include "gib.h"
 
 

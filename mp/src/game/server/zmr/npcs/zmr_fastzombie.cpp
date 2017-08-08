@@ -713,6 +713,7 @@ int CFastZombie::MeleeAttack1Conditions( float flDot, float flDist )
         return COND_NONE;
     }
     
+    
     int baseResult = BaseClass::MeleeAttack1Conditions( flDot, flDist );
 
     // @TODO (toml 07-21-04): follow up with Steve to find out why fz was explicitly not using these conditions
@@ -968,8 +969,9 @@ void CFastZombie::HandleAnimEvent( animevent_t *pEvent )
         Vector right;
         AngleVectors( GetLocalAngles(), NULL, &right, NULL );
         right = right * -50;
+        Qangle viewpunch = QAngle( -3, -5, -3 );
 
-        ClawAttack( GetClawAttackRange(), zm_sk_banshee_dmg_claw.GetFloat(), QAngle( -3, -5, -3 ), right,
+        ClawAttack( GetClawAttackRange(), zm_sk_banshee_dmg_claw.GetInt(), viewpunch, right,
             pEvent->event == AE_ZOMBIE_ATTACK_RIGHT ? ZOMBIE_BLOOD_RIGHT_HAND : ZOMBIE_BLOOD_LEFT_HAND );
         return;
     }
@@ -1459,8 +1461,10 @@ void CFastZombie::LeapAttackTouch( CBaseEntity *pOther )
 
         m_flClingLeapStart = 0; //to make sure it only happens once
     }	
+    
+    Vector punchvel = forward * 500;
 
-    ClawAttack( GetClawAttackRange(), damage, qaPunch, forward * 500, ZOMBIE_BLOOD_BOTH_HANDS );
+    ClawAttack( GetClawAttackRange(), (int)damage, qaPunch, punchvel, ZOMBIE_BLOOD_BOTH_HANDS );
 
     SetTouch( NULL );
 }

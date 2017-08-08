@@ -3,7 +3,7 @@
 #include <vgui_controls/ComboBox.h>
 #include <vgui_controls/CheckButton.h>
 #include <vgui_controls/Slider.h>
-#include <vgui/ivgui.h>
+#include <vgui/IVGui.h>
 #include "filesystem.h"
 #include <vgui_controls/AnimationController.h>
 

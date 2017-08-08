@@ -118,7 +118,7 @@ void CZMManiMenu::SetTrapCost( int cost )
     else
     {
         // Are traps gay?
-        Q_snprintf( buffer, sizeof( buffer ), "Trap disabled.",  cost );
+        Q_snprintf( buffer, sizeof( buffer ), "Trap disabled." );
     }
     
 

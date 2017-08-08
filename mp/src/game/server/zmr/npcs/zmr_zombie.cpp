@@ -501,7 +501,7 @@ void CZMZombie::HandleAnimEvent( animevent_t* pEvent )
 		right = right * 100;
 		forward = forward * 200;
 
-		ClawAttack( GetClawAttackRange(), zm_sk_shambler_dmg_oneslash.GetFloat(), QAngle( -15, -20, -10 ), right + forward, ZOMBIE_BLOOD_RIGHT_HAND );
+		ClawAttack( GetClawAttackRange(), zm_sk_shambler_dmg_oneslash.GetInt(), QAngle( -15, -20, -10 ), right + forward, ZOMBIE_BLOOD_RIGHT_HAND );
 		return;
 	}
 
@@ -513,7 +513,7 @@ void CZMZombie::HandleAnimEvent( animevent_t* pEvent )
 		right = right * -100;
 		forward = forward * 200;
 
-		ClawAttack( GetClawAttackRange(), zm_sk_shambler_dmg_oneslash.GetFloat(), QAngle( -15, 20, -10 ), right + forward, ZOMBIE_BLOOD_LEFT_HAND );
+		ClawAttack( GetClawAttackRange(), zm_sk_shambler_dmg_oneslash.GetInt(), QAngle( -15, 20, -10 ), right + forward, ZOMBIE_BLOOD_LEFT_HAND );
 		return;
 	}
 
@@ -523,7 +523,7 @@ void CZMZombie::HandleAnimEvent( animevent_t* pEvent )
 		QAngle qaPunch( 45, random->RandomInt(-5,5), random->RandomInt(-5,5) );
 		AngleVectors( GetLocalAngles(), &forward );
 		forward = forward * 200;
-		ClawAttack( GetClawAttackRange(), zm_sk_shambler_dmg_bothslash.GetFloat(), qaPunch, forward, ZOMBIE_BLOOD_BOTH_HANDS );
+		ClawAttack( GetClawAttackRange(), zm_sk_shambler_dmg_bothslash.GetInt(), qaPunch, forward, ZOMBIE_BLOOD_BOTH_HANDS );
 		return;
 	}
 

@@ -606,7 +606,7 @@ void CZMFrame::FindZombiesInBox( int start_x, int start_y, int end_x, int end_y,
 
     for ( int i = 0; i < vZombieIndices.Count(); i++ )
     {
-        sprintf_s( cmdbuffer, sizeof( cmdbuffer ), "%s%i ", cmdbuffer, vZombieIndices.Element( i ) );
+        Q_snprintf( cmdbuffer, sizeof( cmdbuffer ), "%s%i ", cmdbuffer, vZombieIndices.Element( i ) );
     }
 
     if ( cmdbuffer[0] )
