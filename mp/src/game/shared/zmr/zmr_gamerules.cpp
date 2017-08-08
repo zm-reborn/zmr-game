@@ -2,7 +2,7 @@
 
 #ifndef CLIENT_DLL
 #include "basecombatcharacter.h"
-#include "team.h"
+#include "zmr/zmr_team.h"
 #include "mapentities.h"
 #include "gameinterface.h"
 #include "teamplayroundbased_gamerules.h"
@@ -188,7 +188,7 @@ CZMRules::CZMRules()
 	// Create the team managers
 	for ( i = 0; i < ARRAYSIZE( g_sTeamNames ); i++ )
 	{
-		CTeam *pTeam = static_cast<CTeam*>( CreateEntityByName( "team_manager" ) );
+		CZMTeam* pTeam = static_cast<CZMTeam*>( CreateEntityByName( "team_manager" ) );
 		pTeam->Init( g_sTeamNames[i], i );
 
         g_Teams.AddToTail( pTeam );

@@ -51,9 +51,9 @@ IMPLEMENT_SERVERCLASS_ST_NOBASE(CTeam, DT_Team)
 		"player_array"
 		)
 END_SEND_TABLE()
-
+#ifndef ZMR // ZMRCHANGE: Use our own teams.
 LINK_ENTITY_TO_CLASS( team_manager, CTeam );
-
+#endif
 //-----------------------------------------------------------------------------
 // Purpose: Get a pointer to the specified team manager
 //-----------------------------------------------------------------------------
