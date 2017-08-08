@@ -19,31 +19,26 @@ C_ZMEntBaseUsable::C_ZMEntBaseUsable()
 {
 }
 
-/*bool C_ZMEntBaseUsable::ShouldDraw()
+bool C_ZMEntBaseUsable::ShouldDraw()
 {
-    C_ZMPlayer* pPlayer = ToZMPlayer( C_BasePlayer::GetLocalPlayer() );
+    C_ZMPlayer* pPlayer = C_ZMPlayer::GetLocalPlayer();
 
-    if ( pPlayer && pPlayer->IsHuman() ) return false;
+    if ( !pPlayer ) return false;
 
+    if ( !pPlayer->IsZM() )
+    {
+        return false;
+    }
 
     return BaseClass::ShouldDraw();
-}*/
+}
 
 int C_ZMEntBaseUsable::DrawModel( int flags )
 {
-    C_ZMPlayer* pPlayer = ToZMPlayer( C_BasePlayer::GetLocalPlayer() );
-
-    if ( !pPlayer || pPlayer->IsHuman() ) return 0;
-
-
     InitSpriteMat();
 
     
-    static color32 clr;
-    clr.r = 255;
-    clr.g = 255;
-    clr.b = 255;
-    clr.a = 0;
+    static color32 clr = { 255, 255, 255, 255 };
 
 	CMatRenderContextPtr pRenderContext( materials );
 	pRenderContext->Bind( m_SpriteMat, this );
@@ -64,16 +59,19 @@ END_RECV_TABLE()
 BEGIN_DATADESC( C_ZMEntBaseSimple )
 END_DATADESC()
 
-int C_ZMEntBaseSimple::DrawModel( int flags )
+bool C_ZMEntBaseSimple::ShouldDraw()
 {
-    C_ZMPlayer* pPlayer = ToZMPlayer( C_BasePlayer::GetLocalPlayer() );
+    C_ZMPlayer* pPlayer = C_ZMPlayer::GetLocalPlayer();
 
-    if ( !pPlayer || pPlayer->IsHuman() ) return 0;
+    if ( !pPlayer ) return false;
 
+    if ( !pPlayer->IsZM() )
+    {
+        return false;
+    }
 
-    return BaseClass::DrawModel( flags );
+    return BaseClass::ShouldDraw();
 }
-
 
 /*
     Zombie spawn
