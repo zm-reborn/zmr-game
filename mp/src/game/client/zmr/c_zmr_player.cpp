@@ -8,6 +8,7 @@
 
 #include "npcs/c_zmr_zombiebase.h"
 #include "zmr/zmr_global_shared.h"
+#include "zmr/c_zmr_entities.h"
 
 #include "c_zmr_player.h"
 
@@ -62,7 +63,42 @@ C_ZMPlayer* C_ZMPlayer::GetLocalPlayer()
 
 void C_ZMPlayer::TeamChange( int iNewTeam )
 {
+    // ZMRTODO: Test if there are any cases when TeamChange isn't fired!!!
     BaseClass::TeamChange( iNewTeam );
+
+
+    // Update ZM entities' visibility.
+    // How visibility works is when player enters a leaf that can see given entity, ShouldDraw is fired.
+    // However, if the player changes their team and they remain in the same leaf, the previous ShouldDraw is "active".
+    // This makes sure we get updated on our ZM entities when changing teams, so orbs get drawn when changing to ZM and not drawn when changing to human/spec.
+    DevMsg( "Updating ZM entity visibility...\n" );
+
+    // The team number hasn't been updated yet.
+    int iOldTeam = GetTeamNumber();
+    C_BaseEntity::ChangeTeam( iNewTeam );
+
+    C_ZMEntBaseUsable* pUsable;
+    C_ZMEntBaseSimple* pSimple;
+    for ( C_BaseEntity* pEnt = ClientEntityList().FirstBaseEntity(); pEnt; pEnt = ClientEntityList().NextBaseEntity( pEnt ) )
+    {
+        // ZMRTODO: Just derive from BaseSimple since it isn't used for anything really...
+        pUsable = dynamic_cast<C_ZMEntBaseUsable*>( pEnt );
+        if ( pUsable )
+        {
+            pUsable->UpdateVisibility();
+        }
+        else
+        {
+            pSimple = dynamic_cast<C_ZMEntBaseSimple*>( pEnt );
+
+            if ( pSimple )
+                pSimple->UpdateVisibility();
+        }
+    }
+
+    // Reset back to old team just in case something uses it.
+    C_BaseEntity::ChangeTeam( iOldTeam );
+    
 
 
     if ( g_pZMView )

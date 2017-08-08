@@ -15,7 +15,7 @@ public:
 
 
     // ZMRTODO: Should draw doesn't seem to work?
-    //virtual bool ShouldDraw() OVERRIDE;
+    virtual bool ShouldDraw() OVERRIDE;
     virtual ShadowType_t ShadowCastType() OVERRIDE { return SHADOWS_NONE; };
     virtual int DrawModel( int ) OVERRIDE;
 
@@ -32,9 +32,10 @@ public:
     DECLARE_CLIENTCLASS()
     DECLARE_DATADESC()
 
-    
+
+    virtual bool ShouldDraw() OVERRIDE;
     virtual ShadowType_t ShadowCastType() OVERRIDE { return SHADOWS_NONE; };
-    virtual int DrawModel( int ) OVERRIDE;
+    //virtual int DrawModel( int ) OVERRIDE;
 };
 
 class C_ZMEntZombieSpawn : public C_ZMEntBaseUsable
