@@ -118,6 +118,8 @@ C_ZMEntManipulate::C_ZMEntManipulate()
 {
     m_nCost = 10;
     m_nTrapCost = 15;
+
+    szDescription[0] = 0;
 }
 
 void C_ZMEntManipulate::Precache()

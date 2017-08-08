@@ -79,12 +79,6 @@ void CZMManiMenu::ShowPanel( bool state )
     if ( IsVisible() == state ) return;
 
 
-    if ( state )
-    {
-        // Tell server we've opened this menu.
-        engine->ClientCmd( VarArgs( "zm_cmd_openmanimenu %i", GetTrapIndex() ) );
-    }
-
     SetVisible( state );
 }
 
@@ -203,8 +197,25 @@ void __MsgFunc_ZMManiMenuUpdate( bf_read &msg )
     char desc[256];
     msg.ReadString( desc, sizeof( desc ), true );
 
+    int index = g_pManiMenu->GetTrapIndex();
+
+    if ( index > 0 )
+    {
+        // ZMRTODO: See if this is even the right way to do it, lol. I mean, the edict index is usually the same, so in that department it's passable but is there an easier method?
+        IHandleEntity* pHandle = cl_entitylist->LookupEntityByNetworkIndex( index );
+
+        if ( pHandle )
+        {
+            C_ZMEntManipulate* pMani = dynamic_cast<C_ZMEntManipulate*>( EntityFromEntityHandle( pHandle ) );
+
+            if ( pMani )
+                pMani->SetDescription( desc );
+        }
+    }
+
 
     g_pManiMenu->SetDescription( desc );
+    
 }
 
 USER_MESSAGE_REGISTER( ZMManiMenuUpdate );
