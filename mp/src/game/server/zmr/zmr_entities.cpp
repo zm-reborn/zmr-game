@@ -208,7 +208,7 @@ void CZMEntZombieSpawn::InputUnhide( inputdata_t &inputdata )
 
 bool CZMEntZombieSpawn::CanSpawn( ZombieClass_t zclass )
 {
-    return (GetZombieFlags() == 0 || (GetZombieFlags() & (1 < zclass)) );
+    return (GetZombieFlags() == 0 || (GetZombieFlags() & (1 << zclass)) );
 }
 
 bool CZMEntZombieSpawn::QueueUnit( CZMPlayer* pPlayer, ZombieClass_t zclass, int amount )
