@@ -13,6 +13,11 @@ void UTIL_ClipPunchAngleOffset( QAngle &in, const QAngle &punch, const QAngle &c
 #endif
 
 
+#ifndef CLIENT_DLL
+static ConVar zm_sv_weaponreserveammo( "zm_sv_weaponreserveammo", "1", FCVAR_NOTIFY | FCVAR_ARCHIVE, "When player drops their weapon, their ammo gets dropped with the weapon as well." );
+#endif
+
+
 BEGIN_NETWORK_TABLE( CZMBaseWeapon, DT_ZM_BaseWeapon )
 END_NETWORK_TABLE()
 
@@ -41,6 +46,8 @@ CZMBaseWeapon::~CZMBaseWeapon()
 {
 #ifndef CLIENT_DLL
     FreeWeaponSlot();
+
+    SetReserveAmmo( 0 );
 #endif
 }
 
@@ -380,6 +387,9 @@ void CZMBaseWeapon::Drop( const Vector& vecVelocity )
 {
 #ifndef CLIENT_DLL
     FreeWeaponSlot();
+
+
+    SaveReserveAmmo( GetOwner() );
 #endif
 
     BaseClass::Drop( vecVelocity );
@@ -407,6 +417,8 @@ void CZMBaseWeapon::Equip( CBaseCombatCharacter* pCharacter )
             pPlayer->AddWeaponSlotFlag( GetSlotFlag() );
         }
     }
+
+    TransferReserveAmmo( pCharacter );
 #endif
 
     BaseClass::Equip( pCharacter );
@@ -579,4 +591,49 @@ const WeaponProficiencyInfo_t* CZMBaseWeapon::GetDefaultProficiencyValues()
     return g_BaseWeaponProficiencyTable;
 }
 
+#endif
+
+
+
+
+#ifndef CLIENT_DLL
+void CZMBaseWeapon::SaveReserveAmmo( CBaseCombatCharacter* pOwner )
+{
+    if ( !pOwner ) return;
+
+    if ( !zm_sv_weaponreserveammo.GetBool() ) return;
+
+
+    // Add player's ammo to me.
+    int type = GetPrimaryAmmoType();
+
+    int ammo = pOwner->GetAmmoCount( type );
+
+    if ( ammo > 0 )
+    {
+        pOwner->SetAmmoCount( 0, type );
+        SetReserveAmmo( ammo );
+    }
+    else
+    {
+        SetReserveAmmo( 0 );
+    }
+}
+
+void CZMBaseWeapon::TransferReserveAmmo( CBaseCombatCharacter* pOwner )
+{
+    if ( !pOwner ) return;
+
+    if ( !zm_sv_weaponreserveammo.GetBool() ) return;
+
+
+    // Give player our reserve ammo.
+    if ( GetReserveAmmo() > 0 )
+    {
+        int type = GetPrimaryAmmoType();
+
+        pOwner->SetAmmoCount( pOwner->GetAmmoCount( type ) + GetReserveAmmo(), type );
+        SetReserveAmmo( 0 );
+    }
+}
 #endif
