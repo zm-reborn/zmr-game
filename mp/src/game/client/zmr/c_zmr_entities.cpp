@@ -4,15 +4,36 @@
 #include "zmr/zmr_player_shared.h"
 
 
+/*
+    Base simple
+*/
+IMPLEMENT_CLIENTCLASS_DT( C_ZMEntBaseSimple, DT_ZM_EntBaseSimple, CZMEntBaseSimple )
+END_RECV_TABLE()
+
+bool C_ZMEntBaseSimple::ShouldDraw()
+{
+    C_ZMPlayer* pPlayer = C_ZMPlayer::GetLocalPlayer();
+
+    if ( !pPlayer ) return false;
+
+    if ( !pPlayer->IsZM() )
+    {
+        return false;
+    }
+
+    return BaseClass::ShouldDraw();
+}
+
+
+/*
+    Base usable
+*/
 #define MAT_SPAWNSPRITE         "zmr_effects/orb_red"
 #define MAT_MANISPRITE          "zmr_effects/orb_orange"
 
 
 IMPLEMENT_CLIENTCLASS_DT( C_ZMEntBaseUsable, DT_ZM_EntBaseUsable, CZMEntBaseUsable )
 END_RECV_TABLE()
-
-BEGIN_DATADESC( C_ZMEntBaseUsable )
-END_DATADESC()
 
 
 C_ZMEntBaseUsable::C_ZMEntBaseUsable()
@@ -47,30 +68,6 @@ int C_ZMEntBaseUsable::DrawModel( int flags )
 
 
     return BaseClass::DrawModel( flags );
-}
-
-
-/*
-    Base simple
-*/
-IMPLEMENT_CLIENTCLASS_DT( C_ZMEntBaseSimple, DT_ZM_EntBaseSimple, CZMEntBaseSimple )
-END_RECV_TABLE()
-
-BEGIN_DATADESC( C_ZMEntBaseSimple )
-END_DATADESC()
-
-bool C_ZMEntBaseSimple::ShouldDraw()
-{
-    C_ZMPlayer* pPlayer = C_ZMPlayer::GetLocalPlayer();
-
-    if ( !pPlayer ) return false;
-
-    if ( !pPlayer->IsZM() )
-    {
-        return false;
-    }
-
-    return BaseClass::ShouldDraw();
 }
 
 /*

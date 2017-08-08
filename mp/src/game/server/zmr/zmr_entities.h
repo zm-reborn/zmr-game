@@ -12,13 +12,27 @@ class CZMBaseZombie;
 #include "npcs/zmr_zombiebase.h"
 #include "zmr/zmr_shareddefs.h"
 
+
+/*
+    ZMRTODO: Make networking these ents lighter?
+
+    Base Simple
+*/
+abstract_class CZMEntBaseSimple : public CBaseAnimating
+{
+public:
+	DECLARE_CLASS( CZMEntBaseSimple, CBaseAnimating )
+    DECLARE_SERVERCLASS()
+};
+
+
 /*
     BaseUsable
 */
-abstract_class CZMEntBaseUsable : public CBaseAnimating
+abstract_class CZMEntBaseUsable : public CZMEntBaseSimple
 {
 public:
-	DECLARE_CLASS( CZMEntBaseUsable, CBaseAnimating )
+	DECLARE_CLASS( CZMEntBaseUsable, CZMEntBaseSimple )
     DECLARE_SERVERCLASS()
     DECLARE_DATADESC()
 
@@ -37,20 +51,6 @@ public:
 
 private:
     bool m_bActive;
-};
-
-
-/*
-    ZMRTODO: Make networking these ents lighter?
-
-    Base Simple
-*/
-abstract_class CZMEntBaseSimple : public CBaseAnimating
-{
-public:
-	DECLARE_CLASS( CZMEntBaseSimple, CBaseAnimating )
-    DECLARE_SERVERCLASS()
-    DECLARE_DATADESC()
 };
 
 
