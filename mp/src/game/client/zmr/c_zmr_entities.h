@@ -12,6 +12,9 @@ public:
 
     virtual bool ShouldDraw() OVERRIDE;
     virtual ShadowType_t ShadowCastType() OVERRIDE { return SHADOWS_NONE; };
+
+    // Never go dormant, so we can render it even outside the world.
+    virtual bool IsDormant() OVERRIDE { return false; };
 };
 
 abstract_class C_ZMEntBaseUsable : public C_ZMEntBaseSimple
