@@ -121,7 +121,7 @@ public:
     static int GetServerParticipationFlags();
 
 #ifndef CLIENT_DLL
-    virtual void CZMRules::InitDefaultAIRelationships( void );
+    virtual void InitDefaultAIRelationships( void );
 #endif
 
 private:

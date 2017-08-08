@@ -4,7 +4,7 @@
 #include "hudelement.h"
 
 #include <vgui/KeyCode.h>
-#include <UtlVector.h>
+#include <utlvector.h>
 
 
 #include <vgui_controls/EditablePanel.h>

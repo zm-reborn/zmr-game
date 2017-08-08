@@ -248,7 +248,7 @@ void CNPC_BurnZombie::HandleAnimEvent( animevent_t* pEvent )
         right = right * -100;
         forward = forward * 200;
 
-        ClawAttack( GetClawAttackRange(), zm_sk_burnzombie_dmg.GetFloat(), QAngle( -15, 20, -10 ), right + forward, ZOMBIE_BLOOD_LEFT_HAND );
+        ClawAttack( GetClawAttackRange(), zm_sk_burnzombie_dmg.GetInt(), QAngle( -15, 20, -10 ), right + forward, ZOMBIE_BLOOD_LEFT_HAND );
         return;
     }
 
@@ -261,7 +261,7 @@ void CNPC_BurnZombie::Spawn( void )
 {
 	Precache();
 
-	m_iHealth			= zm_sk_burnzombie_health.GetFloat();
+	m_iHealth			= zm_sk_burnzombie_health.GetInt();
 	//TGB: 0.2 is about 80 degrees to either side
 //	m_flFieldOfView		= 0.2;
 	//TGB: try bigger

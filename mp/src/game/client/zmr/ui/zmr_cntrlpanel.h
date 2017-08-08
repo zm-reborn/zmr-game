@@ -1,6 +1,6 @@
 #include "baseviewport.h"
 
-#include "vgui_BitmapButton.h"
+#include "vgui_bitmapbutton.h"
 
 
 class CZMControlPanel

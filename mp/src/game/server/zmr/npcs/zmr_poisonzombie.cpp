@@ -423,7 +423,11 @@ void CNPC_PoisonZombie::HandleAnimEvent( animevent_t *pEvent )
 
 		right = right * 200;
 		forward = forward * 200;
-		ClawAttack( GetClawAttackRange(), zm_sk_hulk_dmg.GetFloat(), QAngle( -15, -20, -10 ), right + forward, ZOMBIE_BLOOD_BITE );
+
+        QAngle viewpunch( -15, -20, -10 );
+        Vector punchvel = right + forward;
+
+		ClawAttack( GetClawAttackRange(), zm_sk_hulk_dmg.GetInt(), viewpunch, punchvel, ZOMBIE_BLOOD_BITE );
 		return;
 	}
 
