@@ -73,8 +73,13 @@ public:
     inline int GetCost() { return m_nCost; };
     inline int GetTrapCost() { return m_nTrapCost; };
 
+    inline const char* GetDescription() { return szDescription; };
+    inline void SetDescription( const char* pSrc ) { Q_strncpy( szDescription, pSrc, sizeof( szDescription ) ); };
+
 protected:
     virtual void InitSpriteMat() OVERRIDE;
+
+    char szDescription[256];
 
 private:
     CNetworkVar( int, m_nCost );

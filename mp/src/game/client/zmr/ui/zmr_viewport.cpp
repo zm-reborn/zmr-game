@@ -578,7 +578,7 @@ void CZMFrame::FindZombiesInBox( int start_x, int start_y, int end_x, int end_y,
         {
             UTIL_TraceLine( MainViewOrigin(), pZombie->GetAbsOrigin() + Vector( 0, 0, 8 ), MASK_ZMVIEW, &filter, &trace );
 
-            if ( trace.fraction != 1.0f ) continue;
+            if ( trace.fraction != 1.0f && !trace.startsolid ) continue;
         }
 
         if ( !WorldToScreen( pZombie->GetAbsOrigin(), screen, x, y ) )
@@ -667,11 +667,15 @@ void CZMFrame::FindZMObject( int x, int y, bool bSticky )
                 if ( m_pManiMenu )
                 {
                     m_pManiMenu->SetTrapIndex( pTrap->entindex() );
-                    m_pManiMenu->SetDescription( "Activate trap." );
+                    m_pManiMenu->SetDescription( *pTrap->GetDescription() ? pTrap->GetDescription() : "Activate trap." );
                     m_pManiMenu->SetCost( pTrap->GetCost() );
                     m_pManiMenu->SetTrapCost( pTrap->GetTrapCost() );
                     m_pManiMenu->SetTrapPos( pTrap->GetAbsOrigin() );
                     m_pManiMenu->ShowPanel( true );
+
+                    // Tell server we've opened this menu to get the real trap description.
+                    if ( !*pTrap->GetDescription() )
+                        engine->ClientCmd( VarArgs( "zm_cmd_openmanimenu %i", pTrap->entindex() ) );
                 }
 
                 bHit = true;
