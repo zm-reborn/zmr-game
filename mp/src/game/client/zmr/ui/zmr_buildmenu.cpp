@@ -71,14 +71,6 @@ const char *TypeToQueueImage[ZMCLASS_MAX] = {
 #define FASTIE_FLAG 2
 #define SHAMBLIE_FLAG 1
 
-CON_COMMAND( testbuildmenu, "" )
-{
-    if ( !g_pBuildMenu ) return;
-
-
-    Msg( "Moveable: %i\n", g_pBuildMenu->IsMoveable() );
-}
-
 CZMBuildMenu::CZMBuildMenu( Panel* pParent ) : Frame( g_pClientMode->GetViewport(), "ZMBuildMenu" )
 {
 	g_pBuildMenu = this;
