@@ -876,8 +876,9 @@ void CZMEntTriggerPlayerCount::Spawn( void )
 
     InitTrigger();
 
+    // Don't think instantly since Active-keyvalue still isn't set for some reason.
     SetThink( &CZMEntTriggerPlayerCount::CountThink );
-    SetNextThink( gpGlobals->curtime );
+    SetNextThink( gpGlobals->curtime + 1.0f );
 }
 
 void CZMEntTriggerPlayerCount::InputToggle( inputdata_t &inputData )
