@@ -77,22 +77,13 @@ void C_ZMPlayer::TeamChange( int iNewTeam )
     int iOldTeam = GetTeamNumber();
     C_BaseEntity::ChangeTeam( iNewTeam );
 
-    C_ZMEntBaseUsable* pUsable;
-    C_ZMEntBaseSimple* pSimple;
+    C_ZMEntBaseSimple* pZMEnt;
     for ( C_BaseEntity* pEnt = ClientEntityList().FirstBaseEntity(); pEnt; pEnt = ClientEntityList().NextBaseEntity( pEnt ) )
     {
-        // ZMRTODO: Just derive from BaseSimple since it isn't used for anything really...
-        pUsable = dynamic_cast<C_ZMEntBaseUsable*>( pEnt );
-        if ( pUsable )
+        pZMEnt = dynamic_cast<C_ZMEntBaseSimple*>( pEnt );
+        if ( pZMEnt )
         {
-            pUsable->UpdateVisibility();
-        }
-        else
-        {
-            pSimple = dynamic_cast<C_ZMEntBaseSimple*>( pEnt );
-
-            if ( pSimple )
-                pSimple->UpdateVisibility();
+            pZMEnt->UpdateVisibility();
         }
     }
 
