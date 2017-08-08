@@ -94,12 +94,22 @@ public:
     int GetSlotFlag() { return m_iSlotFlag; };
 
     void FreeWeaponSlot();
-#endif
 
+    inline int GetReserveAmmo( ) { return m_nReserveAmmo; };
+    inline void SetReserveAmmo( int ammo ) { m_nReserveAmmo = ammo; };
+#endif
+    
 protected:
 #ifndef CLIENT_DLL
-    inline void SetSlotFlag( int flags ) { m_iSlotFlag = flags; };
+    void SaveReserveAmmo( CBaseCombatCharacter* );
+    void TransferReserveAmmo( CBaseCombatCharacter* );
+    // No support for secondary ammo since we'll never use it anyway, RIGHT?
+    int m_nReserveAmmo;
 
+
+    inline void SetSlotFlag( int flags ) { m_iSlotFlag = flags; };
     int m_iSlotFlag;
+
+
 #endif
 };
