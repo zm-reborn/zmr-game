@@ -969,7 +969,7 @@ void CFastZombie::HandleAnimEvent( animevent_t *pEvent )
         Vector right;
         AngleVectors( GetLocalAngles(), NULL, &right, NULL );
         right = right * -50;
-        Qangle viewpunch = QAngle( -3, -5, -3 );
+        QAngle viewpunch( -3, -5, -3 );
 
         ClawAttack( GetClawAttackRange(), zm_sk_banshee_dmg_claw.GetInt(), viewpunch, right,
             pEvent->event == AE_ZOMBIE_ATTACK_RIGHT ? ZOMBIE_BLOOD_RIGHT_HAND : ZOMBIE_BLOOD_LEFT_HAND );
