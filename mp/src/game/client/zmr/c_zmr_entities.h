@@ -3,39 +3,34 @@
 #include "cbase.h"
 
 
-abstract_class C_ZMEntBaseUsable : public C_BaseAnimating
+abstract_class C_ZMEntBaseSimple : public C_BaseAnimating
 {
 public:
-	DECLARE_CLASS( C_ZMEntBaseUsable, C_BaseAnimating )
+	DECLARE_CLASS( C_ZMEntBaseSimple, C_BaseAnimating )
     DECLARE_CLIENTCLASS()
-    DECLARE_DATADESC()
+
+
+    virtual bool ShouldDraw() OVERRIDE;
+    virtual ShadowType_t ShadowCastType() OVERRIDE { return SHADOWS_NONE; };
+};
+
+abstract_class C_ZMEntBaseUsable : public C_ZMEntBaseSimple
+{
+public:
+	DECLARE_CLASS( C_ZMEntBaseUsable, C_ZMEntBaseSimple )
+    DECLARE_CLIENTCLASS()
 
 
     C_ZMEntBaseUsable();
 
 
-    // ZMRTODO: Should draw doesn't seem to work?
     virtual bool ShouldDraw() OVERRIDE;
-    virtual ShadowType_t ShadowCastType() OVERRIDE { return SHADOWS_NONE; };
     virtual int DrawModel( int ) OVERRIDE;
 
 protected:
     virtual void InitSpriteMat() {};
 
     CMaterialReference m_SpriteMat;
-};
-
-class C_ZMEntBaseSimple : public C_BaseAnimating
-{
-public:
-	DECLARE_CLASS( C_ZMEntBaseSimple, C_BaseAnimating )
-    DECLARE_CLIENTCLASS()
-    DECLARE_DATADESC()
-
-
-    virtual bool ShouldDraw() OVERRIDE;
-    virtual ShadowType_t ShadowCastType() OVERRIDE { return SHADOWS_NONE; };
-    //virtual int DrawModel( int ) OVERRIDE;
 };
 
 class C_ZMEntZombieSpawn : public C_ZMEntBaseUsable

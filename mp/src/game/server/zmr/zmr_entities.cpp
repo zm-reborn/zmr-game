@@ -120,9 +120,6 @@ void CZMEntBaseUsable::UpdateUsable()
 IMPLEMENT_SERVERCLASS_ST( CZMEntBaseSimple, DT_ZM_EntBaseSimple )
 END_SEND_TABLE()
 
-BEGIN_DATADESC( CZMEntBaseSimple )
-END_DATADESC()
-
 /*
     Zombie spawn
 */
