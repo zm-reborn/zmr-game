@@ -14,6 +14,9 @@
 #include "zmr_player.h"
 
 
+static ConVar zm_sv_randomplayermodel( "zm_sv_randomplayermodel", "1", FCVAR_NOTIFY | FCVAR_ARCHIVE, "If player has an invalid model, use a random one. Temporary 'fix' for model choosing not working." );
+
+
 IMPLEMENT_SERVERCLASS_ST( CZMPlayer, DT_ZM_Player )
     SendPropInt( SENDINFO( m_nResources ) ),
 END_SEND_TABLE()
@@ -246,7 +249,9 @@ void CZMPlayer::FlashlightTurnOn()
 
 void CZMPlayer::SetPlayerModel( void )
 {
-    const char* pszFallback = DEF_PLAYER_MODEL;
+    const char* pszFallback = zm_sv_randomplayermodel.GetBool() ?
+        g_ZMPlayerModels[random->RandomInt( 0, ARRAYSIZE( g_ZMPlayerModels ) - 1 )] :
+        DEF_PLAYER_MODEL;
 
     const char* szModelName = nullptr;
     const char* pszCurrentModelName = modelinfo->GetModelName( GetModel() );
@@ -254,7 +259,6 @@ void CZMPlayer::SetPlayerModel( void )
 
     szModelName = engine->GetClientConVarValue( engine->IndexOfEdict( edict() ), "cl_playermodel" );
 
-    
 
     int modelIndexCurrent = modelinfo->GetModelIndex( pszCurrentModelName );
     int modelIndex = modelinfo->GetModelIndex( szModelName );
@@ -262,11 +266,14 @@ void CZMPlayer::SetPlayerModel( void )
 
     if ( modelIndex == -1 || !ValidatePlayerModel( szModelName ) )
     {
-        if ( modelIndexCurrent == -1 || !ValidatePlayerModel( pszCurrentModelName ) )
+        if (modelIndexCurrent == -1
+        ||  !ValidatePlayerModel( pszCurrentModelName )
+        ||  zm_sv_randomplayermodel.GetBool() )
         {
             pszCurrentModelName = pszFallback;
             modelIndexCurrent = -1;
         }
+
 
         char szReturnString[512];
         Q_snprintf( szReturnString, sizeof (szReturnString ), "cl_playermodel %s\n", pszCurrentModelName );
