@@ -13,6 +13,7 @@
 //ZombieList_t g_Zombies;
 
 #define ZOMBIE_PHYSOBJ_SWATDIST         80
+#define ZOMBIE_MAX_PHYSOBJ_MASS         60
 
 
 IMPLEMENT_SERVERCLASS_ST( CZMBaseZombie, DT_ZM_BaseZombie )
@@ -227,6 +228,7 @@ void CZMBaseZombie::StartTask( const Task_t* pTask )
 
     case TASK_ZOMBIE_GET_PATH_TO_PHYSOBJ :
     {
+        if ( !m_hPhysicsEnt ) { TaskFail( "No physics ent!\n" ); return; }
         Vector vecGoalPos;
         Vector vecDir;
 
@@ -295,6 +297,58 @@ void CZMBaseZombie::StartTask( const Task_t* pTask )
     default:
         BaseClass::StartTask( pTask );
     }
+}
+
+void CZMBaseZombie::GatherConditions( void )
+{
+    ClearCondition( COND_ZOMBIE_LOCAL_MELEE_OBSTRUCTION );
+
+    CAI_BaseNPC::GatherConditions();
+
+    if( m_NPCState == NPC_STATE_COMBAT )
+    {
+        // This check for !m_pPhysicsEnt prevents a crashing bug, but also
+        // eliminates the zombie picking a better physics object if one happens to fall
+        // between him and the object he's heading for already. 
+        if( !m_hPhysicsEnt && gpGlobals->curtime >= m_flNextSwatScan )
+        {
+            FindNearestPhysicsObject( ZOMBIE_MAX_PHYSOBJ_MASS );
+            m_flNextSwatScan = gpGlobals->curtime + 2.0;
+        }
+    }
+
+    if( m_hPhysicsEnt && gpGlobals->curtime >= m_flNextSwat )
+    {
+        SetCondition( COND_ZOMBIE_CAN_SWAT_ATTACK );
+    }
+    else
+    {
+        ClearCondition( COND_ZOMBIE_CAN_SWAT_ATTACK );
+    }
+}
+
+int CZMBaseZombie::TranslateSchedule( int schedule )
+{
+    switch ( schedule )
+    {
+        // Always chase the enemy. This was causing problems with fast zombies not wanting to chase us, and instead trying to "shoot" us.
+    case SCHED_MOVE_TO_WEAPON_RANGE : return SCHED_CHASE_ENEMY;
+
+    case SCHED_ZOMBIE_SWATITEM:
+        // If the object is far away, move and swat it. If it's close, just swat it.
+        if( DistToPhysicsEnt() > ZOMBIE_PHYSOBJ_SWATDIST )
+        {
+            return SCHED_ZOMBIE_MOVE_SWATITEM;
+        }
+        else
+        {
+            return SCHED_ZOMBIE_SWATITEM;
+        }
+    case SCHED_STANDOFF: return SCHED_ZOMBIE_WANDER_STANDOFF;
+    case SCHED_MELEE_ATTACK1: return SCHED_ZOMBIE_MELEE_ATTACK1;
+    }
+
+    return CAI_BaseNPC::TranslateSchedule( schedule );
 }
 
 static ConVar zm_sv_swatlift( "zm_sv_swatlift", "20000", FCVAR_NOTIFY );

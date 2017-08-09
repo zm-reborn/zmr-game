@@ -167,7 +167,6 @@ public:
 	virtual void BuildScheduleTestBits( void );
 	virtual int SelectSchedule( void );
 	//virtual int SelectFailSchedule( int nFailedSchedule, int nFailedTask, AI_TaskFailureCode_t eTaskFailCode );
-	virtual int TranslateSchedule( int scheduleType );
 
 	virtual bool ShouldPlayIdleSound( void );
 
@@ -215,8 +214,8 @@ private:
 	//int RandomThrowCrab( void );
 	//void EvacuateNest( bool bExplosion, float flDamage, CBaseEntity *pAttacker );
 
-	CSoundPatch *m_pFastBreathSound;
-	CSoundPatch *m_pSlowBreathSound;
+	//CSoundPatch *m_pFastBreathSound;
+	//CSoundPatch *m_pSlowBreathSound;
 
 	float m_flNextPainSoundTime;
 
@@ -228,8 +227,8 @@ LINK_ENTITY_TO_CLASS( npc_poisonzombie, CNPC_PoisonZombie );
 
 BEGIN_DATADESC( CNPC_PoisonZombie )
 
-	DEFINE_SOUNDPATCH( m_pFastBreathSound ),
-	DEFINE_SOUNDPATCH( m_pSlowBreathSound ),
+	//DEFINE_SOUNDPATCH( m_pFastBreathSound ),
+	//DEFINE_SOUNDPATCH( m_pSlowBreathSound ),
 
 	DEFINE_FIELD( m_flNextPainSoundTime, FIELD_TIME ),
 
@@ -291,13 +290,13 @@ void CNPC_PoisonZombie::Spawn( void )
 
 	BaseClass::Spawn();
 
-	CPASAttenuationFilter filter( this, ATTN_IDLE );
+	/*CPASAttenuationFilter filter( this, ATTN_IDLE );
 	m_pFastBreathSound = ENVELOPE_CONTROLLER.SoundCreate( filter, entindex(), CHAN_ITEM, "NPC_PoisonZombie.FastBreath", ATTN_IDLE );
 	ENVELOPE_CONTROLLER.Play( m_pFastBreathSound, 0.0f, 100 );
 
 	CPASAttenuationFilter filter2( this );
 	m_pSlowBreathSound = ENVELOPE_CONTROLLER.SoundCreate( filter2, entindex(), CHAN_ITEM, "NPC_PoisonZombie.Moan1", ATTN_NORM );
-	ENVELOPE_CONTROLLER.Play( m_pSlowBreathSound, BREATH_VOL_MAX, 100 );
+	ENVELOPE_CONTROLLER.Play( m_pSlowBreathSound, BREATH_VOL_MAX, 100 );*/
 }
 
 
@@ -314,11 +313,11 @@ const char *CNPC_PoisonZombie::GetMoanSound( int nSound )
 //-----------------------------------------------------------------------------
 void CNPC_PoisonZombie::StopLoopingSounds( void )
 {
-	ENVELOPE_CONTROLLER.SoundDestroy( m_pFastBreathSound );
+	/*ENVELOPE_CONTROLLER.SoundDestroy( m_pFastBreathSound );
 	m_pFastBreathSound = NULL;
 
 	ENVELOPE_CONTROLLER.SoundDestroy( m_pSlowBreathSound );
-	m_pSlowBreathSound = NULL;
+	m_pSlowBreathSound = NULL;*/
 
 	BaseClass::StopLoopingSounds();
 }
@@ -396,14 +395,14 @@ Vector CNPC_PoisonZombie::HeadTarget( const Vector &posSrc )
 //-----------------------------------------------------------------------------
 void CNPC_PoisonZombie::BreatheOffShort( void )
 {
-	if ( m_bNearEnemy )
+	/*if ( m_bNearEnemy )
 	{
 		ENVELOPE_CONTROLLER.SoundPlayEnvelope( m_pFastBreathSound, SOUNDCTRL_CHANGE_VOLUME, envPoisonZombieBreatheVolumeOffShort, ARRAYSIZE(envPoisonZombieBreatheVolumeOffShort) );
 	}
 	else
 	{
 		ENVELOPE_CONTROLLER.SoundPlayEnvelope( m_pSlowBreathSound, SOUNDCTRL_CHANGE_VOLUME, envPoisonZombieBreatheVolumeOffShort, ARRAYSIZE(envPoisonZombieBreatheVolumeOffShort) );
-	}
+	}*/
 }
 
 
@@ -454,11 +453,11 @@ void CNPC_PoisonZombie::PrescheduleThink( void )
 		if ( !m_bNearEnemy )
 		{
 			// Our enemy is nearby. Breathe faster.
-			float duration = random->RandomFloat( 1.0f, 2.0f );
-			ENVELOPE_CONTROLLER.SoundChangeVolume( m_pFastBreathSound, BREATH_VOL_MAX, duration );
-			ENVELOPE_CONTROLLER.SoundChangePitch( m_pFastBreathSound, random->RandomInt( 100, 120 ), random->RandomFloat( 1.0f, 2.0f ) );
+			//float duration = random->RandomFloat( 1.0f, 2.0f );
+			//ENVELOPE_CONTROLLER.SoundChangeVolume( m_pFastBreathSound, BREATH_VOL_MAX, duration );
+			//ENVELOPE_CONTROLLER.SoundChangePitch( m_pFastBreathSound, random->RandomInt( 100, 120 ), random->RandomFloat( 1.0f, 2.0f ) );
 
-			ENVELOPE_CONTROLLER.SoundChangeVolume( m_pSlowBreathSound, 0.0f, duration );
+			//ENVELOPE_CONTROLLER.SoundChangeVolume( m_pSlowBreathSound, 0.0f, duration );
 
 			m_bNearEnemy = true;
 		}
@@ -466,9 +465,9 @@ void CNPC_PoisonZombie::PrescheduleThink( void )
 	else if ( m_bNearEnemy )
 	{
 		// Our enemy is far away. Slow our breathing down.
-		float duration = random->RandomFloat( 2.0f, 4.0f );
-		ENVELOPE_CONTROLLER.SoundChangeVolume( m_pFastBreathSound, BREATH_VOL_MAX, duration );
-		ENVELOPE_CONTROLLER.SoundChangeVolume( m_pSlowBreathSound, 0.0f, duration );
+		//float duration = random->RandomFloat( 2.0f, 4.0f );
+		//ENVELOPE_CONTROLLER.SoundChangeVolume( m_pFastBreathSound, BREATH_VOL_MAX, duration );
+		//ENVELOPE_CONTROLLER.SoundChangeVolume( m_pSlowBreathSound, 0.0f, duration );
 //		ENVELOPE_CONTROLLER.SoundChangePitch( m_pBreathSound, random->RandomInt( 80, 100 ), duration );
 
 		m_bNearEnemy = false;
@@ -514,35 +513,6 @@ int CNPC_PoisonZombie::SelectSchedule( void )
 	return nSchedule;
 }
 
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : scheduleType - 
-// Output : int
-//-----------------------------------------------------------------------------
-int CNPC_PoisonZombie::TranslateSchedule( int scheduleType )
-{
-	/*if ( scheduleType == SCHED_RANGE_ATTACK2 )
-	{
-		return SCHED_ZOMBIE_POISON_RANGE_ATTACK2;
-	}
-
-	if ( scheduleType == SCHED_RANGE_ATTACK1 )
-	{
-		return SCHED_ZOMBIE_POISON_RANGE_ATTACK1;
-	}*/
-
-	if ( scheduleType == SCHED_COMBAT_FACE && IsUnreachable( GetEnemy() ) )
-		return SCHED_TAKE_COVER_FROM_ENEMY;
-
-	// We'd simply like to shamble towards our enemy
-	if ( scheduleType == SCHED_MOVE_TO_WEAPON_RANGE )
-		return SCHED_CHASE_ENEMY;
-
-	return BaseClass::TranslateSchedule( scheduleType );
-}
-
-
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -584,7 +554,7 @@ void CNPC_PoisonZombie::IdleSound( void )
 	// HACK: base zombie code calls IdleSound even when not idle!
 	if ( m_NPCState != NPC_STATE_COMBAT )
 	{
-		BreatheOffShort();
+		//BreatheOffShort();
 		EmitSound( "NPC_PoisonZombie.Idle" );
 		MakeAISpookySound( 360.0f );
 	}
@@ -598,7 +568,7 @@ void CNPC_PoisonZombie::PainSound( const CTakeDamageInfo &info )
 	// Don't make pain sounds too often.
 	if ( m_flNextPainSoundTime <= gpGlobals->curtime )
 	{	
-		BreatheOffShort();
+		//BreatheOffShort();
 		EmitSound( "NPC_PoisonZombie.Pain" );
 		m_flNextPainSoundTime = gpGlobals->curtime + random->RandomFloat( 4.0, 7.0 );
 	}
@@ -609,7 +579,7 @@ void CNPC_PoisonZombie::PainSound( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 void CNPC_PoisonZombie::AlertSound( void )
 {
-	BreatheOffShort();
+	//BreatheOffShort();
 
 	EmitSound( "NPC_PoisonZombie.Alert" );
 }
