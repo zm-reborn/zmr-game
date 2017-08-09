@@ -1,7 +1,6 @@
 #include "cbase.h"
 
-#include "npcevent.h"
-#include "eventlist.h"
+#include "in_buttons.h"
 
 
 #include "zmr/zmr_shareddefs.h"
@@ -26,23 +25,19 @@ public:
 
     CZMWeaponImprovised();
 
+
+    void ItemPostFrame( void ) OVERRIDE;
+
     float GetRange() OVERRIDE { return 50.0f; };
     float GetFireRate() OVERRIDE { return 1.0f; };
-    float GetDamageForActivity( Activity hitActivity ) { return 20.0f; };
+    float GetDamageForActivity( Activity hitActivity ) OVERRIDE { return 20.0f; };
 
     void AddViewKick() OVERRIDE
     {
         CZMPlayer* pPlayer = GetPlayerOwner();
         if ( !pPlayer ) return;
 	    pPlayer->ViewPunch( QAngle( random->RandomFloat( 1.0f, 2.0f ), random->RandomFloat( -2.0f, -1.0f ), 0.0f ) );
-    };
-
-
-#ifndef CLIENT_DLL
-    void Operator_HandleAnimEvent( animevent_t*, CBaseCombatCharacter* ) OVERRIDE;
-#else
-    bool OnFireEvent( C_BaseViewModel*, const Vector&, const QAngle&, int event, const char* ) OVERRIDE;
-#endif
+    }
 };
 
 IMPLEMENT_NETWORKCLASS_ALIASED( ZMWeaponImprovised, DT_ZM_WeaponImprovised )
@@ -80,31 +75,19 @@ CZMWeaponImprovised::CZMWeaponImprovised()
 #endif
 }
 
-// ZMRTODO: FIX THISS
-#ifndef CLIENT_DLL
-void CZMWeaponImprovised::Operator_HandleAnimEvent( animevent_t* pEvent, CBaseCombatCharacter* pOperator )
+void CZMWeaponImprovised::ItemPostFrame()
 {
-    Msg( "Handling event: %i\n", pEvent->event );
-	switch( pEvent->event )
-	{
-	case EVENT_WEAPON_MELEE_HIT:
-		HandleAnimEventMeleeHit( GetPlayerOwner() );
-		break;
+    CZMPlayer* pPlayer = GetPlayerOwner();
+    if ( !pPlayer ) return;
 
-	default:
-		BaseClass::HandleAnimEvent( pEvent );
-		break;
-	}
-}
-#else
-bool CZMWeaponImprovised::OnFireEvent( C_BaseViewModel* pViewModel, const Vector& origin, const QAngle& angles, int event, const char* options )
-{
-    if ( event == EVENT_WEAPON_MELEE_HIT )
+
+    if ( pPlayer->m_nButtons & IN_ATTACK && m_flNextPrimaryAttack <= gpGlobals->curtime )
     {
-        HandleAnimEventMeleeHit( GetOwner() );
-        return true;
+        // You fucking idiots. The crowbar doesn't fire any animation events. Thanks.
+        Swing( false, false );
     }
-
-    return false;
+    else
+    {
+        WeaponIdle();
+    }
 }
-#endif

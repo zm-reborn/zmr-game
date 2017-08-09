@@ -27,11 +27,13 @@ public:
 	virtual Activity GetSecondaryAttackActivity( void ) OVERRIDE { return ACT_VM_HITCENTER2; };
 
 protected:
-    //void Swing( bool );
-    //Activity ChooseIntersectionPointAndActivity( trace_t&, const Vector&, const Vector&, CBasePlayer* );
-
+    virtual void Swing( bool bSecondary, const bool bUseAnimationEvent = true );
+    virtual void HandleAnimEventMeleeHit();
     virtual void Hit( trace_t&, Activity );
-    virtual void HandleAnimEventMeleeHit( CBaseCombatCharacter* );
+
+    void ChooseIntersectionPoint( trace_t&, const Vector&, const Vector&, CBasePlayer* );
+
+    virtual void TraceMeleeAttack( trace_t& );
 
     void ImpactEffect( trace_t& );
     bool ImpactWater( const Vector&, const Vector& );
