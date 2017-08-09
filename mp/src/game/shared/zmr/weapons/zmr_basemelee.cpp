@@ -59,11 +59,11 @@ void CZMBaseMeleeWeapon::ItemPostFrame()
     // We have to go around the ammo requirement.
     if ( pPlayer->m_nButtons & IN_ATTACK && m_flNextPrimaryAttack <= gpGlobals->curtime )
     {
-        PrimaryAttack();
+        Swing( false );
     }
     else if ( pPlayer->m_nButtons & IN_ATTACK2 && m_flNextSecondaryAttack <= gpGlobals->curtime )
     {
-        SecondaryAttack();
+        Swing( true );
     }
     else
     {
@@ -71,25 +71,18 @@ void CZMBaseMeleeWeapon::ItemPostFrame()
     }
 }
 
-void CZMBaseMeleeWeapon::HandleAnimEventMeleeHit( CBaseCombatCharacter* )
+void CZMBaseMeleeWeapon::HandleAnimEventMeleeHit()
 {
     CZMPlayer* pPlayer = GetPlayerOwner();
     if ( !pPlayer ) return;
 
 
-    trace_t traceHit;
-    Vector forward;
-    Vector swingStart = pPlayer->Weapon_ShootPosition();
-
-    pPlayer->EyeVectors( &forward, nullptr, nullptr );
-
-    Vector swingEnd = swingStart + forward * GetRange();
-
-    UTIL_TraceLine( swingStart, swingEnd, MASK_SHOT_HULL, pPlayer, COLLISION_GROUP_NONE, &traceHit );
-
 #ifndef CLIENT_DLL
     lagcompensation->StartLagCompensation( pPlayer, pPlayer->GetCurrentCommand() );
 #endif
+
+    trace_t traceHit;
+    TraceMeleeAttack( traceHit );
 
     Hit( traceHit, ACT_VM_HITCENTER );
 
@@ -98,54 +91,17 @@ void CZMBaseMeleeWeapon::HandleAnimEventMeleeHit( CBaseCombatCharacter* )
 #endif
 }
 
-void CZMBaseMeleeWeapon::Hit( trace_t& traceHit, Activity nHitActivity )
+void CZMBaseMeleeWeapon::TraceMeleeAttack( trace_t& traceHit )
 {
-	CZMPlayer* pPlayer = GetPlayerOwner();
+    traceHit.fraction = 0.0f;
+    traceHit.m_pEnt = nullptr;
 
 
-	CBaseEntity* pHitEntity = traceHit.m_pEnt;
+    CZMPlayer* pOwner = GetPlayerOwner();
+    if ( !pOwner ) return;
 
 
-	if ( pHitEntity )
-	{
-		Vector hitDirection;
-		pPlayer->EyeVectors( &hitDirection, NULL, NULL );
-		VectorNormalize( hitDirection );
-
-#ifndef CLIENT_DLL
-		CTakeDamageInfo info( GetOwner(), GetOwner(), this, GetDamageForActivity( nHitActivity ), DMG_CLUB, 0 );
-
-		if( pPlayer && pHitEntity->IsNPC() )
-		{
-			// If bonking an NPC, adjust damage.
-			info.AdjustPlayerDamageInflictedForSkillLevel();
-		}
-
-		CalculateMeleeDamageForce( &info, hitDirection, traceHit.endpos );
-
-		pHitEntity->DispatchTraceAttack( info, hitDirection, &traceHit ); 
-		ApplyMultiDamage();
-
-
-		// Now hit all triggers along the ray that... 
-		TraceAttackToTriggers( info, traceHit.startpos, traceHit.endpos, hitDirection );
-#endif
-
-		WeaponSound( MELEE_HIT );
-	}
-
-	// Apply an impact effect
-	ImpactEffect( traceHit );
-}
-
-/*void CZMBaseMeleeWeapon::Swing( bool bSecondary )
-{
-    trace_t traceHit;
-
-    // Try a ray
-    CZMPlayer *pOwner = GetPlayerOwner();
-    if ( !pOwner )
-        return;
+    
 
     Vector swingStart = pOwner->Weapon_ShootPosition();
     Vector forward;
@@ -154,13 +110,6 @@ void CZMBaseMeleeWeapon::Hit( trace_t& traceHit, Activity nHitActivity )
 
     Vector swingEnd = swingStart + forward * GetRange();
     UTIL_TraceLine( swingStart, swingEnd, MASK_SHOT_HULL, pOwner, COLLISION_GROUP_NONE, &traceHit );
-    Activity nHitActivity = ACT_VM_HITCENTER;
-
-#ifndef CLIENT_DLL
-    // Like bullets, bludgeon traces have to trace against triggers.
-    CTakeDamageInfo triggerInfo( GetOwner(), GetOwner(), GetDamageForActivity( nHitActivity ), DMG_CLUB );
-    TraceAttackToTriggers( triggerInfo, traceHit.startpos, traceHit.endpos, vec3_origin );
-#endif
 
     if ( traceHit.fraction == 1.0f )
     {
@@ -185,56 +134,105 @@ void CZMBaseMeleeWeapon::Hit( trace_t& traceHit, Activity nHitActivity )
             }
             else
             {
-                nHitActivity = ChooseIntersectionPointAndActivity( traceHit, g_bludgeonMins, g_bludgeonMaxs, pOwner );
+                ChooseIntersectionPoint( traceHit, g_bludgeonMins, g_bludgeonMaxs, pOwner );
             }
         }
     }
+}
 
-    WeaponSound( SINGLE );
+void CZMBaseMeleeWeapon::Hit( trace_t& traceHit, Activity nHitActivity )
+{
+    CZMPlayer* pPlayer = GetPlayerOwner();
+    if ( !pPlayer ) return;
 
-    // -------------------------
-    //	Miss
-    // -------------------------
-    if ( traceHit.fraction == 1.0f )
+    CBaseEntity* pHitEntity = traceHit.m_pEnt;
+
+
+    if ( pHitEntity )
     {
-        nHitActivity = bSecondary ? ACT_VM_MISSCENTER2 : ACT_VM_MISSCENTER;
+        Vector hitDirection;
+        pPlayer->EyeVectors( &hitDirection, NULL, NULL );
+        VectorNormalize( hitDirection );
 
-        // We want to test the first swing again
-        Vector testEnd = swingStart + forward * GetRange();
-        
-        // See if we happened to hit water
-        ImpactWater( swingStart, testEnd );
+#ifndef CLIENT_DLL
+        CTakeDamageInfo info( GetOwner(), GetOwner(), this, GetDamageForActivity( nHitActivity ), DMG_CLUB, 0 );
+
+        if( pHitEntity->IsNPC() )
+        {
+            // If bonking an NPC, adjust damage.
+            info.AdjustPlayerDamageInflictedForSkillLevel();
+        }
+
+        CalculateMeleeDamageForce( &info, hitDirection, traceHit.endpos );
+
+        pHitEntity->DispatchTraceAttack( info, hitDirection, &traceHit ); 
+        ApplyMultiDamage();
+
+
+        // Now hit all triggers along the ray that... 
+        TraceAttackToTriggers( info, traceHit.startpos, traceHit.endpos, hitDirection );
+#endif
+
+        WeaponSound( MELEE_HIT );
     }
-    else
+
+    // Apply an impact effect
+    ImpactEffect( traceHit );
+}
+
+void CZMBaseMeleeWeapon::Swing( bool bSecondary, const bool bUseAnimationEvent )
+{
+    CZMPlayer* pOwner = GetPlayerOwner();
+    if ( !pOwner ) return;
+
+
+    Activity nHitActivity = ACT_VM_HITCENTER;
+
+    if ( !bUseAnimationEvent )
     {
+#ifndef CLIENT_DLL
+        lagcompensation->StartLagCompensation( pOwner, pOwner->GetCurrentCommand() );
+#endif
+        trace_t traceHit;
+        TraceMeleeAttack( traceHit );
+
         Hit( traceHit, nHitActivity );
-    }
 
+#ifndef CLIENT_DLL
+        lagcompensation->FinishLagCompensation( pOwner );
+#endif
+
+        if ( traceHit.fraction == 1.0f ) nHitActivity = bSecondary ? ACT_VM_MISSCENTER2 : ACT_VM_MISSCENTER;
+    }
+    
     // Send the anim
     SendWeaponAnim( nHitActivity );
 
+    WeaponSound( SINGLE );
     pOwner->SetAnimation( PLAYER_ATTACK1 );
 
     //Setup our next attack times
     m_flNextPrimaryAttack = gpGlobals->curtime + GetFireRate();
     m_flNextSecondaryAttack = gpGlobals->curtime + SequenceDuration();
+
+    AddViewKick();
 }
 
-Activity CZMBaseMeleeWeapon::ChooseIntersectionPointAndActivity( trace_t &hitTrace, const Vector &mins, const Vector &maxs, CBasePlayer *pOwner )
+void CZMBaseMeleeWeapon::ChooseIntersectionPoint( trace_t &hitTrace, const Vector &mins, const Vector &maxs, CBasePlayer *pOwner )
 {
-    int			i, j, k;
-    float		distance;
-    const float	*minmaxs[2] = {mins.Base(), maxs.Base()};
-    trace_t		tmpTrace;
-    Vector		vecHullEnd = hitTrace.endpos;
-    Vector		vecEnd;
+    int         i, j, k;
+    float       distance;
+    const float *minmaxs[2] = {mins.Base(), maxs.Base()};
+    trace_t     tmpTrace;
+    Vector      vecHullEnd = hitTrace.endpos;
+    Vector      vecEnd;
 
     distance = 1e6f;
     Vector vecSrc = hitTrace.startpos;
 
     vecHullEnd = vecSrc + ((vecHullEnd - vecSrc)*2);
     UTIL_TraceLine( vecSrc, vecHullEnd, MASK_SHOT_HULL, pOwner, COLLISION_GROUP_NONE, &tmpTrace );
-    if ( tmpTrace.fraction == 1.0 )
+    if ( tmpTrace.fraction == 1.0f )
     {
         for ( i = 0; i < 2; i++ )
         {
@@ -264,10 +262,7 @@ Activity CZMBaseMeleeWeapon::ChooseIntersectionPointAndActivity( trace_t &hitTra
     {
         hitTrace = tmpTrace;
     }
-
-
-    return ACT_VM_HITCENTER;
-}*/
+}
 
 bool CZMBaseMeleeWeapon::ImpactWater( const Vector& start, const Vector& end )
 {

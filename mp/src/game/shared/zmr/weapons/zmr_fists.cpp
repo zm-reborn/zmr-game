@@ -95,7 +95,7 @@ void CZMWeaponFists::Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatC
 	switch( pEvent->event )
 	{
 	case AE_ZM_MELEEHIT:
-		HandleAnimEventMeleeHit( pOperator );
+		HandleAnimEventMeleeHit();
 		break;
 
 	default:
@@ -108,7 +108,7 @@ bool CZMWeaponFists::OnFireEvent( C_BaseViewModel* pViewModel, const Vector& ori
 {
     if ( event == AE_ZM_MELEEHIT )
     {
-        HandleAnimEventMeleeHit( GetOwner() );
+        HandleAnimEventMeleeHit();
         return true;
     }
 

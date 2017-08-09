@@ -26,8 +26,6 @@ public:
 
     CZMWeaponSledge();
 
-    void PrimaryAttack() OVERRIDE;
-    void SecondaryAttack() OVERRIDE;
 
     float GetRange() OVERRIDE { return 60.0f; };
     float GetFireRate() OVERRIDE { return 2.9f; };
@@ -39,7 +37,6 @@ public:
         if ( act == ACT_VM_HITCENTER2 )
         {
             damage *= random->RandomFloat( 0.99f, 2.5f );
-            
         }
         else
         {
@@ -50,13 +47,14 @@ public:
     };
 
     void Hit( trace_t&, Activity ) OVERRIDE;
+    void Swing( bool bSecondary, const bool bUseAnimationEvent = true ) OVERRIDE;
 
 
     void AddViewKick() OVERRIDE
     {
         CZMPlayer* pPlayer = GetPlayerOwner();
         if ( !pPlayer ) return;
-	    pPlayer->ViewPunch( QAngle( random->RandomFloat( 1.0f, 2.0f ), random->RandomFloat( -2.0f, -1.0f ), 0.0f ) );
+	    pPlayer->ViewPunch( QAngle( random->RandomFloat( 5.0f, 10.0f ), random->RandomFloat( -2.0f, -1.0f ), 0.0f ) );
     };
 
 
@@ -120,6 +118,32 @@ void CZMWeaponSledge::Hit( trace_t& traceHit, Activity nHitActivity )
     Activity act = GetActivity();
 
     BaseClass::Hit( traceHit, act );
+
+
+    AddViewKick();
+}
+
+void CZMWeaponSledge::Swing( bool bSecondary, const bool bUseAnimationEvent )
+{
+    CZMPlayer* pPlayer = GetPlayerOwner();
+    if ( !pPlayer ) return;
+
+
+    SendWeaponAnim( bSecondary ? ACT_VM_HITCENTER2 : ACT_VM_HITCENTER );
+    WeaponSound( SPECIAL1 );
+
+    pPlayer->SetAnimation( PLAYER_ATTACK1 );
+
+    if ( bSecondary )
+    {
+        m_flNextPrimaryAttack = gpGlobals->curtime + GetFireRate() * 1.5f;
+        m_flNextSecondaryAttack = gpGlobals->curtime + GetFireRate() * 1.8f;
+    }
+    else
+    {
+        m_flNextPrimaryAttack = gpGlobals->curtime + GetFireRate();
+        m_flNextSecondaryAttack = gpGlobals->curtime + GetFireRate() * 1.1f;
+    }
 }
 
 #ifndef CLIENT_DLL
@@ -128,7 +152,7 @@ void CZMWeaponSledge::Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombat
 	switch( pEvent->event )
 	{
 	case AE_ZM_MELEEHIT:
-		HandleAnimEventMeleeHit( pOperator );
+		HandleAnimEventMeleeHit();
 		break;
 
 	default:
@@ -141,40 +165,10 @@ bool CZMWeaponSledge::OnFireEvent( C_BaseViewModel* pViewModel, const Vector& or
 {
     if ( event == AE_ZM_MELEEHIT )
     {
-        HandleAnimEventMeleeHit( GetOwner() );
+        HandleAnimEventMeleeHit();
         return true;
     }
 
     return false;
 }
 #endif
-
-void CZMWeaponSledge::PrimaryAttack()
-{
-    CZMPlayer* pPlayer = GetPlayerOwner();
-    if ( !pPlayer ) return;
-
-
-    SendWeaponAnim( ACT_VM_HITCENTER2 );
-    WeaponSound( SPECIAL1 );
-
-    pPlayer->SetAnimation( PLAYER_ATTACK1 );
-
-    m_flNextPrimaryAttack = gpGlobals->curtime + GetFireRate();
-    m_flNextSecondaryAttack = gpGlobals->curtime + GetFireRate() * 1.1f;
-}
-
-void CZMWeaponSledge::SecondaryAttack()
-{
-    CZMPlayer* pPlayer = GetPlayerOwner();
-    if ( !pPlayer ) return;
-
-
-    SendWeaponAnim( ACT_VM_HITCENTER2 );
-    WeaponSound( SPECIAL1 );
-
-    pPlayer->SetAnimation( PLAYER_ATTACK1 );
-
-    m_flNextPrimaryAttack = gpGlobals->curtime + GetFireRate() * 1.5f;
-    m_flNextSecondaryAttack = gpGlobals->curtime + GetFireRate() * 1.8f;
-}
