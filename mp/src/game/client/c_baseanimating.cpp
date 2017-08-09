@@ -3452,13 +3452,14 @@ void C_BaseAnimating::DoAnimationEvents( CStudioHdr *pStudioHdr )
 	}
 
 	int nSeqNum = GetSequence();
+#ifndef ZMR // ZMRCHANGE: Don't spam this in the console. Seems to be another Steampipe-related issue, doesn't actually affect anything. (See the comment about TF2 below? Yeah, thanks Valve.)
 	if ( nSeqNum >= nStudioNumSeq )
 	{
 		// This can happen e.g. while reloading Heavy's shotgun, switch to the minigun.
 		Warning( "%s[%d]: Playing sequence %d but there's only %d in total?\n", GetDebugName(), entindex(), nSeqNum, nStudioNumSeq );
 		return;
 	}
-
+#endif
 	mstudioseqdesc_t &seqdesc = pStudioHdr->pSeqdesc( nSeqNum );
 
 	if (seqdesc.numevents == 0)
