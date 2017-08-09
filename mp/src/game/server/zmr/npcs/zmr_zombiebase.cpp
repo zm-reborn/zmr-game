@@ -229,20 +229,25 @@ void CZMBaseZombie::StartTask( const Task_t* pTask )
     case TASK_FACE_ENEMY :
         // ALWAYS face the entity if it's a not a normal prop (eg. breakable)
         // Example where you'd want this: zm_ship, to break the masts but the zombies keep facing the enemy even though you're forcing them to attack it.
-        if ( m_hPhysicsEnt && (!GetEnemy() || !m_hPhysicsEnt->VPhysicsGetObject()) )
+        if ( m_hPhysicsEnt )
         {
-            CAI_Motor* motor = GetMotor();
+            IPhysicsObject* pPhys = m_hPhysicsEnt->VPhysicsGetObject();
 
-            if ( !motor ) return;
+            if ( !GetEnemy() || !pPhys || !pPhys->IsMoveable() )
+            {
+                CAI_Motor* motor = GetMotor();
+
+                if ( !motor ) return;
 
 
-            motor->SetIdealYawToTarget( m_hPhysicsEnt->WorldSpaceCenter() );
-            motor->SetIdealYaw( CalcReasonableFacing( true ) );
-            motor->SnapYaw();
+                motor->SetIdealYawToTarget( m_hPhysicsEnt->WorldSpaceCenter() );
+                motor->SetIdealYaw( CalcReasonableFacing( true ) );
+                motor->SnapYaw();
 
-            TaskComplete();
+                TaskComplete();
 
-            break;
+                break;
+            }
         }
 
         CAI_BaseNPC::StartTask( pTask );
