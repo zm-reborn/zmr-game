@@ -1,6 +1,7 @@
 #include "cbase.h"
 #include "npcevent.h"
 #include "gib.h"
+#include "func_break.h"
 
 
 #include "zmr/zmr_gamerules.h"
@@ -10,10 +11,15 @@
 
 
 
-//ZombieList_t g_Zombies;
-
 #define ZOMBIE_PHYSOBJ_SWATDIST         80
-#define ZOMBIE_MAX_PHYSOBJ_MASS         60
+
+#define ZOMBIE_MAX_PHYSOBJ_MASS         200
+
+#define ZOMBIE_PLAYER_MAX_SWAT_DIST     1000
+
+#define ZOMBIE_PHYSICS_SEARCH_DEPTH     32
+#define ZOMBIE_FARTHEST_PHYSICS_OBJECT  128
+
 
 
 IMPLEMENT_SERVERCLASS_ST( CZMBaseZombie, DT_ZM_BaseZombie )
@@ -125,7 +131,7 @@ void CZMBaseZombie::HandleAnimEvent( animevent_t* pEvent )
 		// will re-select the object he just hit as it is flying away from him.
 		// It will likely always be the nearest object because the zombie moved
 		// close enough to it to hit it.
-		m_hPhysicsEnt = NULL;
+		m_hPhysicsEnt = nullptr;
 
 		m_flNextSwatScan = gpGlobals->curtime + 2.0f;
 
@@ -220,6 +226,28 @@ void CZMBaseZombie::StartTask( const Task_t* pTask )
 {
     switch( pTask->iTask )
     {
+    case TASK_FACE_ENEMY :
+        // ALWAYS face the entity if it's a not a normal prop (eg. breakable)
+        // Example where you'd want this: zm_ship, to break the masts but the zombies keep facing the enemy even though you're forcing them to attack it.
+        if ( m_hPhysicsEnt && (!GetEnemy() || !m_hPhysicsEnt->VPhysicsGetObject()) )
+        {
+            CAI_Motor* motor = GetMotor();
+
+            if ( !motor ) return;
+
+
+            motor->SetIdealYawToTarget( m_hPhysicsEnt->WorldSpaceCenter() );
+            motor->SetIdealYaw( CalcReasonableFacing( true ) );
+            motor->SnapYaw();
+
+            TaskComplete();
+
+            break;
+        }
+
+        CAI_BaseNPC::StartTask( pTask );
+        break;
+
     case TASK_ZOMBIE_DIE :
         // Go to ragdoll
         KillMe();
@@ -351,6 +379,96 @@ int CZMBaseZombie::TranslateSchedule( int schedule )
     return CAI_BaseNPC::TranslateSchedule( schedule );
 }
 
+int CZMBaseZombie::SelectSchedule( void )
+{
+    if ( BehaviorSelectSchedule() )
+    {
+        return BaseClass::SelectSchedule();
+    }
+
+    switch ( m_NPCState )
+    {
+    case NPC_STATE_COMBAT:
+        /*if ( HasCondition( COND_NEW_ENEMY ) && GetEnemy() )
+        {
+            float flDist;
+
+            flDist = ( GetLocalOrigin() - GetEnemy()->GetLocalOrigin() ).Length();
+
+            // If this is a new enemy that's far away, ambush!!
+            if (flDist >= zombie_ambushdist.GetFloat() && MustCloseToAttack() )
+            {
+                return SCHED_ZOMBIE_MOVE_TO_AMBUSH;
+            }
+        }*/
+
+        if ( HasCondition( COND_LOST_ENEMY ) )
+        {
+            return SCHED_ZOMBIE_WANDER_MEDIUM;
+        }
+
+        // Try to swat before thinking the enemy is unreachable.
+        if( HasCondition( COND_ZOMBIE_CAN_SWAT_ATTACK ) )
+        {
+            return SCHED_ZOMBIE_SWATITEM;
+        }
+
+        if ( HasCondition( COND_ENEMY_UNREACHABLE ) && MustCloseToAttack() )
+        {
+            return SCHED_ZOMBIE_WANDER_MEDIUM;
+        }
+
+        break;
+
+    case NPC_STATE_ALERT:
+        if ( HasCondition( COND_LOST_ENEMY ) || HasCondition( COND_ENEMY_DEAD ) || ( HasCondition( COND_ENEMY_UNREACHABLE ) && MustCloseToAttack() ) )
+        {
+            ClearCondition( COND_LOST_ENEMY );
+            ClearCondition( COND_ENEMY_UNREACHABLE );
+
+            // Just lost track of our enemy. 
+            // Wander around a bit so we don't look like a dingus.
+            return SCHED_ZOMBIE_WANDER_MEDIUM;
+        }
+        break;
+    }
+
+    return CAI_BaseNPC::SelectSchedule();
+}
+
+bool CZMBaseZombie::OnInsufficientStopDist( AILocalMoveGoal_t* pMoveGoal, float distClear, AIMoveResult_t* pResult )
+{
+    if ( !CanSwatPhysicsObjects() ) return false;
+
+
+    // Keep trying to go this way if the obstructor is a prop/breakable.
+    if ( pMoveGoal->directTrace.fStatus == AIMR_BLOCKED_ENTITY )
+    {
+        CBaseEntity* pEnt = pMoveGoal->directTrace.pObstruction;
+
+        if ( pEnt )
+        {
+            IPhysicsObject* pPhys = pEnt->VPhysicsGetObject();
+            CBreakable* pBreak = dynamic_cast<CBreakable*>( pEnt );
+            
+            if ((pPhys && pPhys->IsMoveable())
+            ||  (pBreak && pBreak->IsBreakable()))
+            {
+                
+                SetSchedule( SCHED_ZOMBIE_SWATITEM );
+                
+                m_hPhysicsEnt = pEnt;
+                m_bSwatBreakable = pBreak ? true : false;
+                //m_hObstructor = pEnt;
+
+                return true;
+            }
+        }
+    }
+    
+    return false;
+}
+
 static ConVar zm_sv_swatlift( "zm_sv_swatlift", "20000", FCVAR_NOTIFY );
 static ConVar zm_sv_swatforcemin( "zm_sv_swatforcemin", "20000", FCVAR_NOTIFY );
 static ConVar zm_sv_swatforcemax( "zm_sv_swatforcemax", "70000", FCVAR_NOTIFY );
@@ -381,6 +499,228 @@ void CZMBaseZombie::SwatObject( IPhysicsObject* pPhys, Vector& dir )
 
         pPhys->AddVelocity( nullptr, &angvel );
     }
+}
+
+bool CZMBaseZombie::FindNearestPhysicsObject( int iMaxMass )
+{
+    m_hPhysicsEnt = nullptr;
+    m_bSwatBreakable = false;
+
+
+    if ( !CanSwatPhysicsObjects() )
+    {
+        return false;
+    }
+
+
+    CBaseEntity* pList[ZOMBIE_PHYSICS_SEARCH_DEPTH];
+    CBaseEntity* pNearest = nullptr;
+    float flDist;
+    IPhysicsObject* pPhysObj;
+    int i;
+    Vector vecDirToGoal;
+    Vector vecDirToObject;
+    Vector vecTarget;
+
+    if ( GetEnemy() )
+    {
+        vecTarget = GetEnemy()->GetAbsOrigin();
+    }
+    else
+    {
+        vecTarget = GetNavigator()->GetGoalPos();
+    }
+
+
+    vecDirToGoal = vecTarget - GetAbsOrigin();
+    vecDirToGoal.z = 0;
+    VectorNormalize( vecDirToGoal );
+
+
+    if( vecDirToGoal.Length2D() > ZOMBIE_PLAYER_MAX_SWAT_DIST )
+    {
+        return false;
+    }
+
+
+    // If the enemy is closer than prop then don't bother.
+    float flNearestDist = GetEnemy() ? GetAbsOrigin().DistTo( vecTarget ) : ZOMBIE_FARTHEST_PHYSICS_OBJECT;
+
+    Vector vecDelta( flNearestDist, flNearestDist, GetHullHeight() * 2.0 );
+
+    class CZombieSwatEntitiesEnum : public CFlaggedEntitiesEnum
+    {
+    public:
+        CZombieSwatEntitiesEnum( CBaseEntity **pList, int listMax, int iMaxMass )
+         :	CFlaggedEntitiesEnum( pList, listMax, 0 ),
+            m_iMaxMass( iMaxMass )
+        {
+        }
+
+        virtual IterationRetval_t EnumElement( IHandleEntity *pHandleEntity )
+        {
+            CBaseEntity *pEntity = gEntList.GetBaseEntity( pHandleEntity->GetRefEHandle() );
+            if ( pEntity && 
+                 pEntity->VPhysicsGetObject() && 
+                 pEntity->VPhysicsGetObject()->GetMass() <= m_iMaxMass && 
+                 //pEntity->VPhysicsGetObject()->IsAsleep() && 
+                 pEntity->VPhysicsGetObject()->IsMoveable() )
+            {
+                return CFlaggedEntitiesEnum::EnumElement( pHandleEntity );
+            }
+            return ITERATION_CONTINUE;
+        }
+
+        int m_iMaxMass;
+    };
+
+    CZombieSwatEntitiesEnum swatEnum( pList, ZOMBIE_PHYSICS_SEARCH_DEPTH, iMaxMass );
+
+    int count = UTIL_EntitiesInBox( GetAbsOrigin() - vecDelta, GetAbsOrigin() + vecDelta, &swatEnum );
+
+    // magically know where they are
+    Vector vecZombieKnees;
+    CollisionProp()->NormalizedToWorldSpace( Vector( 0.5f, 0.5f, 0.20f ), &vecZombieKnees );
+
+    for( i = 0 ; i < count ; i++ )
+    {
+        pPhysObj = pList[ i ]->VPhysicsGetObject();
+
+        Assert( !( !pPhysObj || pPhysObj->GetMass() > iMaxMass ) );
+
+        Vector center = pList[ i ]->WorldSpaceCenter();
+        flDist = UTIL_DistApprox2D( GetAbsOrigin(), center );
+
+        if( flDist >= flNearestDist )
+            continue;
+        
+
+        // This object is closer... but is it between the player and the zombie?
+        vecDirToObject = pList[ i ]->WorldSpaceCenter() - GetAbsOrigin();
+        vecDirToObject.z = 0;
+        VectorNormalize(vecDirToObject);
+
+        if( DotProduct( vecDirToGoal, vecDirToObject ) < 0.8 )
+            continue;
+
+        if( flDist >= UTIL_DistApprox2D( center, vecTarget ) )
+            continue;
+
+        // don't swat things where the highest point is under my knees
+        // NOTE: This is a rough test; a more exact test is going to occur below
+        if ( (center.z + pList[i]->BoundingRadius()) < vecZombieKnees.z )
+            continue;
+
+        // don't swat things that are over my head.
+        if( center.z > EyePosition().z )
+            continue;
+
+        vcollide_t *pCollide = modelinfo->GetVCollide( pList[i]->GetModelIndex() );
+        
+        Vector objMins, objMaxs;
+        physcollision->CollideGetAABB( &objMins, &objMaxs, pCollide->solids[0], pList[i]->GetAbsOrigin(), pList[i]->GetAbsAngles() );
+
+        if ( objMaxs.z < vecZombieKnees.z )
+            continue;
+
+        if ( !FVisible( pList[i] ) )
+            continue;
+
+        // Make this the last check, since it makes a string.
+        // Don't swat server ragdolls!
+        if ( FClassnameIs( pList[ i ], "physics_prop_ragdoll" ) )
+            continue;
+            
+        if ( FClassnameIs( pList[ i ], "prop_ragdoll" ) )
+            continue;
+
+        // The object must also be closer to the zombie than it is to the enemy
+        pNearest = pList[ i ];
+        flNearestDist = flDist;
+    }
+
+    m_hPhysicsEnt = pNearest;
+
+
+    return m_hPhysicsEnt != nullptr;
+}
+
+int CZMBaseZombie::MeleeAttack1Conditions( float flDot, float flDist )
+{
+    if (flDist > GetClawAttackRange() )
+    {
+        return COND_TOO_FAR_TO_ATTACK;
+    }
+
+    if ( flDot < 0.7 )
+    {
+        return COND_NOT_FACING_ATTACK;
+    }
+
+    // Build a cube-shaped hull, the same hull that ClawAttack() is going to use.
+    Vector vecMins = GetHullMins();
+    Vector vecMaxs = GetHullMaxs();
+    vecMins.z = vecMins.x;
+    vecMaxs.z = vecMaxs.x;
+
+    Vector forward;
+    GetVectors( &forward, NULL, NULL );
+
+    trace_t	tr;
+    CTraceFilterNav traceFilter( this, false, this, COLLISION_GROUP_NONE );
+    AI_TraceHull( WorldSpaceCenter(), WorldSpaceCenter() + forward * GetClawAttackRange(), vecMins, vecMaxs, MASK_NPCSOLID, &traceFilter, &tr );
+
+    CBaseEntity* pEnt = tr.m_pEnt;
+
+    if( tr.fraction == 1.0f || !pEnt )
+    {
+        // This attack would miss completely. Trick the zombie into moving around some more.
+        return COND_TOO_FAR_TO_ATTACK;
+    }
+    
+
+    bool bBreakable = dynamic_cast<CBreakable*>( pEnt ) || dynamic_cast<CBreakableProp*>( pEnt );
+
+    if( pEnt == GetEnemy() || 
+        pEnt->IsPlayer() || 
+        ( pEnt->m_takedamage == DAMAGE_YES && bBreakable ) )
+    {
+        // -Let the zombie swipe at his enemy if he's going to hit them.
+        // -Also let him swipe at NPC's that happen to be between the zombie and the enemy. 
+        //  This makes mobs of zombies seem more rowdy since it doesn't leave guys in the back row standing around.
+        // -Also let him swipe at things that takedamage, under the assumptions that they can be broken.
+        return COND_CAN_MELEE_ATTACK1;
+    }
+
+
+    /*Vector vecTrace = tr.endpos - tr.startpos;
+    float lenTraceSq = vecTrace.Length2DSqr();
+
+    if( tr.m_pEnt->IsBSPModel() )
+    {
+        // The trace hit something solid, but it's not the enemy. If this item is closer to the zombie than
+        // the enemy is, treat this as an obstruction.
+        Vector vecToEnemy = GetEnemy()->WorldSpaceCenter() - WorldSpaceCenter();
+
+        if( lenTraceSq < vecToEnemy.Length2DSqr() )
+        {
+            return COND_ZOMBIE_LOCAL_MELEE_OBSTRUCTION;
+        }
+    }
+
+    if ( pEnt->IsWorld() && GetEnemy() && GetEnemy()->GetGroundEntity() == tr.m_pEnt )
+    {
+        //Try to swat whatever the player is standing on instead of acting like a dill.
+        return COND_CAN_MELEE_ATTACK1;
+    }*/
+
+    // Bullseyes are given some grace on if they can be hit
+    if ( GetEnemy() && GetEnemy()->Classify() == CLASS_BULLSEYE )
+        return COND_CAN_MELEE_ATTACK1;
+
+
+    // Move around some more
+    return COND_TOO_FAR_TO_ATTACK;
 }
 
 bool CZMBaseZombie::CanBecomeLiveTorso()
@@ -445,6 +785,11 @@ void CZMBaseZombie::SetZombieModel( void )
 void CZMBaseZombie::Command( const Vector& pos )
 {
     m_vecLastPosition = pos;
+
+    //AI_NavGoal_t goal;
+    //goal.dest = pos;
+    
+    //GetNavigator()->SetGoal( goal );
     //SetCommandGoal( pos );
 
     //GetNavigator()->SetGoalTolerance( 128.0f );
