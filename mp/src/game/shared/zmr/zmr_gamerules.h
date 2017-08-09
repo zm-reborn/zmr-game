@@ -73,7 +73,7 @@ public:
 
     // Yes, always teamplay.
     virtual bool IsTeamplay( void ) OVERRIDE { return true; };
-
+    virtual int GetAutoAimMode() OVERRIDE { return AUTOAIM_NONE; };
 
     virtual int ItemShouldRespawn( CItem* ) OVERRIDE;
 
