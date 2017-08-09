@@ -85,8 +85,7 @@ void ZM_Cmd_Target( const CCommand &args )
         bBreakable = pBreak && pBreak->GetHealth() > 0 && pBreak->IsBreakable() && pBreak->m_takedamage == DAMAGE_YES;
     }
 
-    Msg( "Breakable: %i | Swat: %i | Target: %i\n", bBreakable, bSwat, bTarget );
-    
+
     Vector pos;
     pos.x = atof( args.Arg( 2 ) );
     pos.y = atof( args.Arg( 3 ) );
