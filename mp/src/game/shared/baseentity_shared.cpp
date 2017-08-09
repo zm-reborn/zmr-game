@@ -53,6 +53,11 @@ ConVar hl2_episodic( "hl2_episodic", "0", FCVAR_REPLICATED );
 #include "tf_weaponbase.h"
 #endif // TF_DLL
 
+
+#if defined( ZMR ) && !defined( CLIENT_DLL )
+static ConVar sv_removeunreasonablevphysics( "sv_removeunreasonablevphysics", "1" );
+#endif
+
 #include "rumble_shared.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -1170,6 +1175,14 @@ void CBaseEntity::VPhysicsUpdate( IPhysicsObject *pPhysics )
 			{
 				if ( CheckEmitReasonablePhysicsSpew() )
 				{
+#if defined( ZMR ) && !defined( CLIENT_DLL ) // ZMRCHANGE: This would get spammed in the console. Searching around the interwebs, it has been said to cause crashes eventually.
+                    if ( sv_removeunreasonablevphysics.GetBool() )
+                    {
+                        Warning( "Removing vphysics entity with unreasonable position (%f,%f,%f) (entity %s)", origin.x, origin.y, origin.z, GetDebugName() );
+                        UTIL_Remove( this );
+                        return;
+                    }
+#endif
 					Warning( "Ignoring unreasonable position (%f,%f,%f) from vphysics! (entity %s)\n", origin.x, origin.y, origin.z, GetDebugName() );
 				}
 			}
