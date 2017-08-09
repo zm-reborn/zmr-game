@@ -342,12 +342,21 @@ bool CZMRules::CanHaveAmmo( CBaseCombatCharacter* pPlayer, int iAmmoIndex )
 
 
     // Do we have a weapon to use the ammo with?
-    if ( !pZMPlayer->Weapon_GetWpnForAmmo( iAmmoIndex ) )
+    // Using dynamic cast until hl2mp weapons are removed.
+    CZMBaseWeapon* pWep = dynamic_cast<CZMBaseWeapon*>( pZMPlayer->Weapon_GetWpnForAmmo( iAmmoIndex ) );
+    if ( !pWep )
     {
         return false;
     }
 
-    return CGameRules::CanHaveAmmo( pPlayer, iAmmoIndex );
+    // Do we have enough room?
+    int room = GetAmmoDef()->MaxCarry( iAmmoIndex ) - pPlayer->GetAmmoCount( iAmmoIndex );
+    if ( room > 0 && room > (pWep->GetDropAmmoAmount() * 0.5f) )
+    {
+        return true;
+    }
+    
+    return false;
 }
 
 bool CZMRules::CanHaveAmmo( CBaseCombatCharacter* pPlayer, const char* szName )
