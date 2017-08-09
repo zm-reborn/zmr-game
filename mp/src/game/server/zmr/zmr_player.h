@@ -52,6 +52,7 @@ public:
 
     virtual void FlashlightTurnOn() OVERRIDE;
 
+    virtual bool Weapon_Lower() OVERRIDE { return false };
     
     virtual void PickupObject( CBaseEntity *pObject, bool bLimitMassAndSize ) OVERRIDE;
     virtual bool BumpWeapon( CBaseCombatWeapon *pWeapon ) OVERRIDE;
