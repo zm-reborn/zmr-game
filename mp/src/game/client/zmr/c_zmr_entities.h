@@ -14,7 +14,8 @@ public:
     virtual ShadowType_t ShadowCastType() OVERRIDE { return SHADOWS_NONE; };
 
     // Never go dormant, so we can render it even outside the world.
-    virtual bool IsDormant() OVERRIDE { return false; };
+    // For now use dormant until we get this rolling. Disabled spawns/traps would show.
+    //virtual bool IsDormant() OVERRIDE { return false; };
 };
 
 abstract_class C_ZMEntBaseUsable : public C_ZMEntBaseSimple
