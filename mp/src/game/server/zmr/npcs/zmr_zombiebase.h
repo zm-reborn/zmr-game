@@ -51,12 +51,15 @@ public:
     
     int GetSwatActivity( void );
     virtual void StartTask( const Task_t* pTask ) OVERRIDE;
+    virtual void GatherConditions( void ) OVERRIDE;
+    virtual int TranslateSchedule( int ) OVERRIDE;
 
     // By default don't swat objects.
     virtual bool CanSwatPhysicsObjects() OVERRIDE { return false; };
 
     // Always classify as a zombie. The AI relationships depend on it.
     virtual Class_T Classify( void ) OVERRIDE { return CLASS_ZOMBIE; };
+    Disposition_t IRelationType( CBaseEntity* pTarget ) OVERRIDE { return CAI_BaseNPC::IRelationType( pTarget ); };
 
     virtual bool MustCloseToAttack() OVERRIDE { return true; };
 

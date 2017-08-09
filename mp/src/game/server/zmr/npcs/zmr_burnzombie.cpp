@@ -67,7 +67,6 @@ public:
 	void GatherConditions( void );
 
 	int SelectFailSchedule( int failedSchedule, int failedTask, AI_TaskFailureCode_t taskFailCode );
-	int TranslateSchedule( int scheduleType );
 
 
 	void PostscheduleThink( void );
@@ -622,20 +621,6 @@ int CNPC_BurnZombie::SelectFailSchedule( int failedSchedule, int failedTask, AI_
 	*/
 
 	return BaseClass::SelectFailSchedule( failedSchedule, failedTask, taskFailCode );
-}
-
-//---------------------------------------------------------
-//---------------------------------------------------------
-
-int CNPC_BurnZombie::TranslateSchedule( int scheduleType )
-{
-	if ( scheduleType == SCHED_COMBAT_FACE && IsUnreachable( GetEnemy() ) )
-		return SCHED_TAKE_COVER_FROM_ENEMY;
-
-	if ( !m_fIsTorso && scheduleType == SCHED_FAIL )
-		return SCHED_ZOMBIE_FAIL;
-
-	return BaseClass::TranslateSchedule( scheduleType );
 }
 
 //---------------------------------------------------------

@@ -112,7 +112,6 @@ public:
     void HandleAnimEvent( animevent_t* ) OVERRIDE;
 
 	int SelectFailSchedule( int failedSchedule, int failedTask, AI_TaskFailureCode_t taskFailCode );
-	int TranslateSchedule( int scheduleType );
 
 #ifndef HL2_EPISODIC
 	void CheckFlinches() {} // Zombie has custom flinch code
@@ -597,17 +596,6 @@ int CZMZombie::SelectFailSchedule( int failedSchedule, int failedTask, AI_TaskFa
 	}
 
 	return BaseClass::SelectFailSchedule( failedSchedule, failedTask, taskFailCode );
-}
-
-int CZMZombie::TranslateSchedule( int scheduleType )
-{
-	if ( scheduleType == SCHED_COMBAT_FACE && IsUnreachable( GetEnemy() ) )
-		return SCHED_TAKE_COVER_FROM_ENEMY;
-
-	if ( !m_fIsTorso && scheduleType == SCHED_FAIL )
-		return SCHED_ZOMBIE_FAIL;
-
-	return BaseClass::TranslateSchedule( scheduleType );
 }
 
 Activity CZMZombie::NPC_TranslateActivity( Activity newActivity )

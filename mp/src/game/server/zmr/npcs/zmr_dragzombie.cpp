@@ -94,7 +94,6 @@ public:
     virtual void BuildScheduleTestBits( void );
     virtual int SelectSchedule( void );
     virtual int SelectFailSchedule( int nFailedSchedule, int nFailedTask, AI_TaskFailureCode_t eTaskFailCode );
-    virtual int TranslateSchedule( int scheduleType );
 
     virtual bool ShouldPlayIdleSound( void );
 
@@ -790,21 +789,6 @@ int CNPC_DragZombie::SelectSchedule( void )
 
     return nSchedule;
 }
-
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : scheduleType - 
-// Output : int
-//-----------------------------------------------------------------------------
-int CNPC_DragZombie::TranslateSchedule( int scheduleType )
-{
-    if ( scheduleType == SCHED_COMBAT_FACE && IsUnreachable( GetEnemy() ) )
-        return SCHED_TAKE_COVER_FROM_ENEMY;
-
-    return BaseClass::TranslateSchedule( scheduleType );
-}
-
 
 //-----------------------------------------------------------------------------
 // Purpose: 

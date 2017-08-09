@@ -548,7 +548,6 @@ void CFastZombie::Spawn( void )
 
     m_fJustJumped = false;
 
-    m_fIsTorso = m_fIsHeadless = false;
 
     SetBloodColor( BLOOD_COLOR_RED );
     m_iHealth			= zm_sk_banshee_health.GetInt();
@@ -643,16 +642,9 @@ void CFastZombie::SetZombieModel( void )
 {
     Hull_t lastHull = GetHullType();
 
-    if ( m_fIsTorso )
-    {
-        SetModel( "models/gibs/fast_zombie_torso.mdl" );
-        SetHullType(HULL_TINY);
-    }
-    else
-    {
-        SetModel( "models/zombie/zm_fast.mdl" );
-        SetHullType(HULL_HUMAN);
-    }
+
+    SetModel( "models/zombie/zm_fast.mdl" );
+    SetHullType( HULL_HUMAN );
 
 //	SetBodygroup( ZOMBIE_BODYGROUP_HEADCRAB, !m_fIsHeadless );
 
@@ -675,54 +667,15 @@ void CFastZombie::SetZombieModel( void )
     }
 }
 
-
-//-----------------------------------------------------------------------------
-// Purpose: Returns the model to use for our legs ragdoll when we are blown in twain.
-//-----------------------------------------------------------------------------
-//const char *CFastZombie::GetLegsModel( void )
-//{
-//	return s_pLegsModel;
-//}
-//
-//const char *CFastZombie::GetTorsoModel( void )
-//{
-//	return "models/gibs/fast_zombie_torso.mdl";
-//}
-
-
-//-----------------------------------------------------------------------------
-// Purpose: See if I can swat the player
-//
-//
-//-----------------------------------------------------------------------------
 int CFastZombie::MeleeAttack1Conditions( float flDot, float flDist )
 {
-    if ( !GetEnemy() )
-    {
-        return COND_NONE;
-    }
-
     if( !(GetFlags() & FL_ONGROUND) )
     {
         // Have to be on the ground!
         return COND_NONE;
     }
 
-    if( gpGlobals->curtime < m_flNextMeleeAttack )
-    {
-        return COND_NONE;
-    }
-    
-    
-    int baseResult = BaseClass::MeleeAttack1Conditions( flDot, flDist );
-
-    // @TODO (toml 07-21-04): follow up with Steve to find out why fz was explicitly not using these conditions
-    if ( baseResult == COND_TOO_FAR_TO_ATTACK || baseResult == COND_NOT_FACING_ATTACK )
-    {
-        return COND_NONE;
-    }
-
-    return baseResult;
+    return BaseClass::MeleeAttack1Conditions( flDot, flDist );
 }
 
 //-----------------------------------------------------------------------------
@@ -1203,7 +1156,7 @@ void CFastZombie::StartTask( const Task_t *pTask )
     case TASK_RANGE_ATTACK1:
 
         // Make melee attacks impossible until we land!
-        m_flNextMeleeAttack = gpGlobals->curtime + 60;
+        m_flNextMeleeAttack = gpGlobals->curtime + 2;
 
         SetTouch( &CFastZombie::LeapAttackTouch );
         break;
