@@ -172,6 +172,7 @@ int CZMBaseZombie::GetSwatActivity( void )
 {
     if ( m_bSwatBreakable || !CanSwatPhysicsObjects() )
     {
+        m_hPhysicsEnt = nullptr; // Don't try to swat this again after the melee attack.
         return ACT_MELEE_ATTACK1;
     }
 
