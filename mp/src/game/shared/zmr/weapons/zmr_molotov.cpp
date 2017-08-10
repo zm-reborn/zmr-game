@@ -533,12 +533,11 @@ void CZMWeaponMolotov::HandleAnimEventLight()
         SendWeaponAnim( ACT_VM_PRIMARYATTACK_4 );
     }
 
-    Msg( "Set throw state to: %i\n", m_iThrowState );
+    DevMsg( "Set throw state to: %i\n", m_iThrowState );
 }
 
 void CZMWeaponMolotov::HandleAnimEventThrow()
 {
-    Msg( "Actually throwing...\n" );
     Throw( GetPlayerOwner() );
 }
 
