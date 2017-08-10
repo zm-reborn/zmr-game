@@ -284,8 +284,10 @@ void CZMGrenadeMolotov::CreateFlyingChunk( const Vector& pos )
 #define MOLOTOV_RADIUS      4.0f
 
 
+#define MOLOTOVSTATE_THROWN         -1
 #define MOLOTOVSTATE_IDLE           0
-#define MOLOTOVSTATE_READYTOTHROW   4
+#define MOLOTOVSTATE_DRAWBACK       4
+#define MOLOTOVSTATE_READYTOTHROW   5
 
 #define MOLOTOV_FIRE_SPRITE         "sprites/fire_vm_grey.vmt"
 
@@ -328,6 +330,8 @@ public:
     void PrimaryAttack() OVERRIDE;
     void Equip( CBaseCombatCharacter* ) OVERRIDE;
     bool Deploy() OVERRIDE;
+    bool CanHolster( void ) const OVERRIDE { return m_iThrowState == MOLOTOVSTATE_IDLE; };
+    bool CanBeDropped() OVERRIDE { return m_iThrowState == MOLOTOVSTATE_IDLE; };
     
 #ifndef CLIENT_DLL
     void Drop( const Vector& ) OVERRIDE;
@@ -337,6 +341,7 @@ public:
 
     void HandleAnimEventLight();
     void HandleAnimEventThrow();
+    
 
     void Throw( CZMPlayer* pPlayer );
     void GetThrowPos( CZMPlayer* pPlayer, Vector& );
@@ -401,18 +406,22 @@ void CZMWeaponMolotov::Precache( void )
 
 bool CZMWeaponMolotov::Deploy()
 {
-    m_iThrowState = 0;
+    bool ret = BaseClass::Deploy();
 
-
-    // Remove lighter flame.
-    CZMPlayer* pPlayer = GetPlayerOwner();
-    if ( pPlayer && pPlayer->GetViewModel() )
+    if ( ret )
     {
-        pPlayer->GetViewModel()->SetBodygroup( 1, 0 );
+        m_iThrowState = MOLOTOVSTATE_IDLE;
+
+
+        // Remove lighter flame.
+        CZMPlayer* pPlayer = GetPlayerOwner();
+        if ( pPlayer && pPlayer->GetViewModel() )
+        {
+            pPlayer->GetViewModel()->SetBodygroup( 1, 0 );
+        }
     }
 
-
-    return BaseClass::Deploy();
+    return ret;
 }
 
 void CZMWeaponMolotov::Equip( CBaseCombatCharacter* pCharacter )
@@ -447,6 +456,18 @@ void CZMWeaponMolotov::ItemPostFrame()
     if ( !pPlayer ) return;
 
 
+    // We've thrown the grenade, remove our weapon.
+#ifndef CLIENT_DLL
+    if ( m_iThrowState == MOLOTOVSTATE_THROWN && IsViewModelSequenceFinished() )
+    {
+        pPlayer->Weapon_Drop( this );
+
+        UTIL_Remove( this );
+        return;
+    }
+#endif
+
+
     if ( pPlayer->m_nButtons & IN_ATTACK && m_flNextPrimaryAttack <= gpGlobals->curtime && m_iThrowState == MOLOTOVSTATE_IDLE )
     {
         PrimaryAttack();
@@ -456,6 +477,7 @@ void CZMWeaponMolotov::ItemPostFrame()
     if ( m_iThrowState >= MOLOTOVSTATE_READYTOTHROW && !(pPlayer->m_nButtons & IN_ATTACK) )
     {
         SendWeaponAnim( ACT_VM_THROW );
+        m_iThrowState = MOLOTOVSTATE_THROWN; // Reset our state so we don't keep trying to send the throw animation each frame.
     }
 }
 
@@ -477,22 +499,38 @@ void CZMWeaponMolotov::PrimaryAttack()
 
 void CZMWeaponMolotov::HandleAnimEventLight()
 {
+    if ( m_iThrowState >= MOLOTOVSTATE_DRAWBACK )
+    {
+        // We've finished our drawback animation, now we're ready to throw.
+        if ( m_iThrowState == MOLOTOVSTATE_DRAWBACK )
+        {
+            m_iThrowState = MOLOTOVSTATE_READYTOTHROW;
+        }
+
+        return;
+    }
+
+
     CZMPlayer* pPlayer = GetPlayerOwner();
 
     if ( !pPlayer ) return;
 
-
     switch ( ++m_iThrowState )
     {
+    case 1 :
     case 2 : SendWeaponAnim( ACT_VM_PRIMARYATTACK_2 ); break;
     case 3 : SendWeaponAnim( ACT_VM_PRIMARYATTACK_3 ); break;
-    default : SendWeaponAnim( ACT_VM_PRIMARYATTACK_4 ); break;
+    default : break;
     }
 
 
-    if ( random->RandomFloat( 0.0f, 100.0f ) < min( pPlayer->GetHealth(), 100 ) )
+    if (m_iThrowState >= MOLOTOVSTATE_DRAWBACK ||
+        (m_iThrowState < MOLOTOVSTATE_DRAWBACK
+    &&  random->RandomInt( 0, 100 ) < min( pPlayer->GetHealth(), 100 )) )
     {
-        m_iThrowState = MOLOTOVSTATE_READYTOTHROW;
+        m_iThrowState = MOLOTOVSTATE_DRAWBACK;
+
+        SendWeaponAnim( ACT_VM_PRIMARYATTACK_4 );
     }
 
     Msg( "Set throw state to: %i\n", m_iThrowState );
@@ -500,6 +538,7 @@ void CZMWeaponMolotov::HandleAnimEventLight()
 
 void CZMWeaponMolotov::HandleAnimEventThrow()
 {
+    Msg( "Actually throwing...\n" );
     Throw( GetPlayerOwner() );
 }
 
@@ -533,10 +572,6 @@ void CZMWeaponMolotov::Throw( CZMPlayer* pPlayer )
     pMolotov->SetAbsVelocity( vel );
     pMolotov->m_takedamage = DAMAGE_EVENTS_ONLY;
     pMolotov->SetLocalAngularVelocity( QAngle( 0, 0, random->RandomFloat( -100, -500 ) ) );
-
-
-    pPlayer->Weapon_Drop( this );
-    UTIL_Remove( this );
 #endif
 
     pPlayer->SetAnimation( PLAYER_ATTACK1 );
