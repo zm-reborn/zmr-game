@@ -252,7 +252,7 @@ void CZMRules::ClientSettingsChanged( CBasePlayer* pPlayer )
 			Q_snprintf( szReturnString, sizeof (szReturnString ), "cl_playermodel %s\n", pCurrentModel );
 			engine->ClientCommand ( pZMPlayer->edict(), szReturnString );
 
-			Q_snprintf( szReturnString, sizeof( szReturnString ), "Please wait %d more seconds before trying to switch.\n", (int)(pZMPlayer->GetNextModelChangeTime() - gpGlobals->curtime) );
+			Q_snprintf( szReturnString, sizeof( szReturnString ), "Please wait %.1f more seconds before trying to switch player models.\n", (pZMPlayer->GetNextModelChangeTime() - gpGlobals->curtime) );
 			ClientPrint( pZMPlayer, HUD_PRINTTALK, szReturnString );
 			return;
 		}
@@ -260,12 +260,15 @@ void CZMRules::ClientSettingsChanged( CBasePlayer* pPlayer )
 
 		pZMPlayer->SetPlayerModel();
 
-		const char *pszCurrentModelName = modelinfo->GetModelName( pZMPlayer->GetModel() );
+		const char *pszNewModel = modelinfo->GetModelName( pZMPlayer->GetModel() );
 
-		char szReturnString[192];
-		Q_snprintf( szReturnString, sizeof( szReturnString ), "Your player model is: %s\n", pszCurrentModelName );
+        if ( pCurrentModel != pszNewModel )
+        {
+		    char szReturnString[192];
+		    Q_snprintf( szReturnString, sizeof( szReturnString ), "Your player model is: %s\n", pszNewModel );
 
-		ClientPrint( pZMPlayer, HUD_PRINTTALK, szReturnString );
+		    ClientPrint( pZMPlayer, HUD_PRINTTALK, szReturnString );
+        }
 	}
 
     // Don't use HL2DM rules, it'll change player's team.
