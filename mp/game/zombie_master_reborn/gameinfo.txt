@@ -14,6 +14,7 @@
 	}
 	supportsvr	1
 	
+	icon 			"resource/icon"
 	"developer"		"Zombie Master: Reborn Team"
 	"developer_url"	"http://steamcommunity.com/groups/zmreborn"
 
