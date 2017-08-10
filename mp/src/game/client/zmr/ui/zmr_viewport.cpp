@@ -48,7 +48,12 @@ CON_COMMAND( zm_observermode, "" )
 {
     if ( g_pZMView )
     {
-        g_pZMView->SetVisible( !g_pZMView->IsVisible() );
+        bool state = !g_pZMView->IsVisible();
+
+        if ( args.ArgC() > 1 ) state = atoi( args.Arg( 1 ) ) ? true : false;
+
+
+        g_pZMView->SetVisible( state );
     }
 }
 
@@ -114,9 +119,6 @@ CZMFrame::CZMFrame( const char* pElementName ) : CHudElement( pElementName ), Ba
 
 
 	m_pZMControl = new CZMControlPanel( this ); 
-	m_pZMControl->PositionButtons();
-	m_pZMControl->PositionComboBox();
-
 
 	m_pManiMenu = new CZMManiMenu( this ); 
 	m_pBuildMenu = new CZMBuildMenu( this ); 
@@ -129,7 +131,21 @@ CZMFrame::~CZMFrame()
 
 void CZMFrame::Init()
 {
-    
+    Reset();
+}
+
+void CZMFrame::VidInit()
+{
+    Reset();
+}
+
+void CZMFrame::Reset()
+{
+    if ( m_pZMControl )
+    {
+        m_pZMControl->PositionButtons();
+        m_pZMControl->PositionComboBox();
+    }
 }
 
 void CZMFrame::SetVisible( bool state )
@@ -250,9 +266,12 @@ void CZMFrame::OnMousePressed( MouseCode code )
 
 void CZMFrame::OnThink()
 {
-    CZMPlayer* pPlayer = ToZMPlayer( C_BasePlayer::GetLocalPlayer() );
+    C_ZMPlayer* pPlayer = C_ZMPlayer::GetLocalPlayer();
 
-    if ( pPlayer && !pPlayer->IsZM() && IsVisible() )
+    if ( !pPlayer ) return;
+
+
+    if ( !pPlayer->IsZM() && IsVisible() )
     {
         SetVisible( false );
     }
@@ -267,6 +286,7 @@ void CZMFrame::OnThink()
 
     if ( !IsMouseInputEnabled() )
         SetMouseInputEnabled( true );
+
 
 #define SCRL_BORDER     10
 
