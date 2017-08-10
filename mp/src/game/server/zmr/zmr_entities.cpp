@@ -283,7 +283,6 @@ void CZMEntZombieSpawn::SetNextSpawnThink()
     if ( GetNextThink() == TICK_NEVER_THINK || (GetNextThink() - gpGlobals->curtime) > zm_sv_spawndelay.GetFloat() )
     {
         SetNextThink( gpGlobals->curtime + zm_sv_spawndelay.GetFloat() );
-        Msg( "Set next think\n" );
     }
 }
 
@@ -440,7 +439,7 @@ bool CZMEntZombieSpawn::CreateZombie( ZombieClass_t zclass )
 
     if ( m_pRallyPoint )
     {
-        Msg( "Commanding zombie to rallypoint...\n" );
+        DevMsg( "Commanding zombie to rallypoint...\n" );
         pZombie->Command( m_pRallyPoint->GetAbsOrigin() );
     }
     
