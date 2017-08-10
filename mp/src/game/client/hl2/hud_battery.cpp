@@ -92,9 +92,13 @@ void CHudBattery::VidInit( void )
 //-----------------------------------------------------------------------------
 bool CHudBattery::ShouldDraw( void )
 {
+#ifdef ZMR // ZMRCHANGE: Never draw suit.
+    return false;
+#else
 	bool bNeedsDraw = ( m_iBat != m_iNewBat ) || ( GetAlpha() > 0 );
 
 	return ( bNeedsDraw && CHudElement::ShouldDraw() );
+#endif
 }
 
 //-----------------------------------------------------------------------------
