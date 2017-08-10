@@ -1178,7 +1178,7 @@ void CBaseEntity::VPhysicsUpdate( IPhysicsObject *pPhysics )
 #if defined( ZMR ) && !defined( CLIENT_DLL ) // ZMRCHANGE: This would get spammed in the console. Searching around the interwebs, it has been said to cause crashes eventually.
                     if ( sv_removeunreasonablevphysics.GetBool() )
                     {
-                        Warning( "Removing vphysics entity with unreasonable position (%f,%f,%f) (entity %s)", origin.x, origin.y, origin.z, GetDebugName() );
+                        Warning( "Removing vphysics entity with unreasonable position (%f,%f,%f) (entity %s)\n", origin.x, origin.y, origin.z, GetDebugName() );
                         UTIL_Remove( this );
                         return;
                     }
