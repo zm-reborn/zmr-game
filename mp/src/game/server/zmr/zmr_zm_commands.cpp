@@ -516,6 +516,8 @@ static ConCommand zm_cmd_trigger( "zm_cmd_trigger", ZM_Cmd_Trigger, "Trigger a t
 /*
     Create trap trigger
 */
+static ConVar zm_sv_maxtraptriggers( "zm_sv_maxtraptriggers", "3", FCVAR_NOTIFY | FCVAR_ARCHIVE, "How many triggers can the ZM create for one trap?" );
+
 void ZM_Cmd_CreateTrigger( const CCommand &args )
 {
     CZMPlayer* pPlayer = ToZMPlayer( UTIL_GetCommandClient() );
@@ -545,6 +547,12 @@ void ZM_Cmd_CreateTrigger( const CCommand &args )
         if ( !pPlayer->HasEnoughRes( pTrap->GetTrapCost() ) )
         {
             ClientPrint( pPlayer, HUD_PRINTTALK, "You do not have enough resources for that!" );
+            return;
+        }
+
+        if ( pTrap->GetTriggerCount() >= zm_sv_maxtraptriggers.GetInt() )
+        {
+            ClientPrint( pPlayer, HUD_PRINTTALK, "You cannot create any more triggers!" );
             return;
         }
 
