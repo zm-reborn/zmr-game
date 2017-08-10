@@ -28,8 +28,9 @@ public:
     CZMFrame( const char* pElementName );
     ~CZMFrame();
 
-
     virtual void Init() OVERRIDE;
+    virtual void VidInit() OVERRIDE;
+    virtual void Reset() OVERRIDE;
     //virtual bool ShouldDraw() OVERRIDE;
     virtual void OnMouseReleased( MouseCode code ) OVERRIDE;
     //virtual void OnMouseMoved( MouseCode code ) OVERRIDE;
