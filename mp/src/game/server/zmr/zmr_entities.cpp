@@ -3,7 +3,8 @@
 #include "team.h"
 #include "items.h"
 #include "props.h"
-#include "physobj.h"
+#include "IEffects.h"
+#include "envspark.h"
 
 
 #include "zmr/zmr_gamerules.h"
@@ -1423,4 +1424,109 @@ void CZMEntTriggerBlockHidden::InputEnable( inputdata_t &inputData )
 void CZMEntTriggerBlockHidden::InputDisable( inputdata_t &inputData )
 {
     m_bActive = false;
+}
+
+
+/*
+    Phys explosion
+*/
+BEGIN_DATADESC( CZMPhysExplosion )
+    DEFINE_THINKFUNC( DelayThink ),
+END_DATADESC()
+
+LINK_ENTITY_TO_CLASS( env_delayed_physexplosion, CZMPhysExplosion );
+
+CZMPhysExplosion::CZMPhysExplosion()
+{
+    m_hSpark = nullptr;
+}
+
+CZMPhysExplosion::~CZMPhysExplosion()
+{
+    if ( m_hSpark.Get() )
+    {
+        UTIL_Remove( m_hSpark );
+    }
+}
+
+void CZMPhysExplosion::Spawn( void )
+{
+    BaseClass::Spawn();
+
+    Precache();
+}
+
+void CZMPhysExplosion::Precache( void )
+{
+    PrecacheScriptSound( "ZMPower.PhysExplode_Buildup" );
+    PrecacheScriptSound( "ZMPower.PhysExplode_Boom" );
+}
+
+void CZMPhysExplosion::DelayThink()
+{
+    CPASAttenuationFilter filter( this, 1.0f );
+    
+    EmitSound_t snd;
+    snd.m_pSoundName = "ZMPower.PhysExplode_Boom";
+    snd.m_pOrigin = &GetAbsOrigin();
+    EmitSound( filter, entindex(), snd );
+
+    g_pEffects->Sparks( GetAbsOrigin(), 10, 5 );
+    g_pEffects->Sparks( GetAbsOrigin(), 15, 3 );
+
+
+    
+    Explode( nullptr, this );
+
+    UTIL_Remove( this );
+}
+
+void CZMPhysExplosion::CreateEffects( float delay )
+{
+    CPASAttenuationFilter filter( this, 1.0f );
+
+    EmitSound_t snd;
+    snd.m_pSoundName = "ZMPower.PhysExplode_Buildup";
+    snd.m_pOrigin = &GetAbsOrigin();
+    EmitSound( filter, entindex(), snd );
+
+
+
+    m_hSpark = dynamic_cast<CEnvSpark*>( CreateEntityByName( "env_spark" ) );
+
+    if ( !m_hSpark ) return;
+
+
+    const int SF_SPARK_START_ON = 64;
+    const int SF_SPARK_GLOW = 128;
+    const int SF_SPARK_SILENT = 256;
+
+    m_hSpark->AddSpawnFlags( SF_SPARK_START_ON );
+    m_hSpark->AddSpawnFlags( SF_SPARK_GLOW );
+    m_hSpark->AddSpawnFlags( SF_SPARK_SILENT );
+
+    m_hSpark->KeyValue( "MaxDelay" , 0.0f );
+    m_hSpark->KeyValue( "Magnitude" , 2 );
+    m_hSpark->KeyValue( "TrailLength" , 1.5 );
+    //m_pSparker->KeyValue( "DeathTime" , (gpGlobals->curtime + delay) );
+
+    if ( DispatchSpawn( m_hSpark ) != 0 )
+    {
+        return;
+    }
+
+
+    m_hSpark->Teleport( &GetAbsOrigin(), nullptr, nullptr );
+}
+
+void CZMPhysExplosion::DelayedExplode( float delay )
+{
+    if ( delay < 0.0f ) delay = 0.0f;
+
+    if ( delay > 0.0f )
+        CreateEffects( delay );
+
+
+    SetThink( &CZMPhysExplosion::DelayThink );
+    SetNextThink( gpGlobals->curtime + delay );
 }

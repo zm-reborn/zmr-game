@@ -1,0 +1,20 @@
+"ZMPower.PhysExplode_Buildup"
+{
+	"channel"	"CHAN_STATIC"
+	"volume"	"1.0"
+	"attenuation"	"1.0"
+	"soundlevel"  "SNDLVL_130dB"
+
+	"wave"	"^powers/explosion_3.wav"
+}
+
+"ZMPower.PhysExplode_Boom"
+{
+	"channel"	"CHAN_STATIC"
+	"volume"	"1.0"
+	"attenuation"	"0.6"
+	"soundlevel"	"SNDLVL_140dB"
+	
+	"wave"	"^powers/explosion_3_boom.wav"
+
+}

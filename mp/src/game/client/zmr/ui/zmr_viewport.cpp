@@ -221,6 +221,10 @@ void CZMFrame::OnCommand( const char* command )
     {
         SetClickMode( ZMCLICKMODE_HIDDEN );
     }
+    else if ( Q_stricmp( command, "MODE_POWER_PHYSEXP" ) == 0 )
+    {
+        SetClickMode( ZMCLICKMODE_PHYSEXP );
+    }
     
 
     BaseClass::OnCommand( command );
@@ -426,6 +430,14 @@ void CZMFrame::OnLeftClick()
 
         case ZMCLICKMODE_HIDDEN :
             engine->ClientCmd( VarArgs( "zm_cmd_createhidden %.1f %.1f %.1f",
+                pos[0],
+                pos[1],
+                pos[2] ) );
+            break;
+
+        case ZMCLICKMODE_PHYSEXP :
+            pos = pos + trace.plane.normal * 1.0f;
+            engine->ClientCmd( VarArgs( "zm_cmd_physexp %.1f %.1f %.1f",
                 pos[0],
                 pos[1],
                 pos[2] ) );
