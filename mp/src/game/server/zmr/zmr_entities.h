@@ -7,6 +7,7 @@ class CZMPlayer;
 class CZMBaseZombie;
 
 #include "triggers.h"
+#include "physobj.h"
 
 #include "zmr_player.h"
 #include "npcs/zmr_zombiebase.h"
@@ -311,4 +312,29 @@ public:
 
 private:
     bool m_bActive;
+};
+
+/*
+    Phys explosion
+*/
+class CZMPhysExplosion : public CPhysExplosion
+{
+public:
+    DECLARE_CLASS( CZMPhysExplosion, CPhysExplosion );
+    DECLARE_DATADESC();
+
+
+    CZMPhysExplosion();
+    ~CZMPhysExplosion();
+
+    void Spawn( void ) OVERRIDE;
+    void Precache( void ) OVERRIDE;
+    
+    void DelayedExplode( float );
+
+private:
+    void DelayThink();
+    void CreateEffects( float );
+
+    EHANDLE m_hSpark;
 };

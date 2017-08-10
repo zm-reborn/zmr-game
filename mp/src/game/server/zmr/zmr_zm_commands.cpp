@@ -3,6 +3,8 @@
 //#include "hl2/npc_BaseZombie.h"
 
 #include "func_break.h"
+#include "IEffects.h"
+#include "envspark.h"
 
 
 #include "npcs/zmr_zombiebase.h"
@@ -690,4 +692,72 @@ void ZM_Cmd_OpenManiMenu( const CCommand &args )
 }
 
 static ConCommand zm_cmd_openmanimenu( "zm_cmd_openmanimenu", ZM_Cmd_OpenManiMenu, "", FCVAR_HIDDEN );
+
+
+/*
+    Open manipulate menu
+*/
+static ConVar zm_sv_physexp_cost( "zm_sv_physexp_cost", "400", FCVAR_NOTIFY | FCVAR_ARCHIVE );
+static ConVar zm_sv_physexp_radius( "zm_sv_physexp_radius", "222", FCVAR_NOTIFY | FCVAR_ARCHIVE );
+static ConVar zm_sv_physexp_magnitude( "zm_sv_physexp_magnitude", "17500", FCVAR_NOTIFY | FCVAR_ARCHIVE );
+static ConVar zm_sv_physexp_delay( "zm_sv_physexp_delay", "7.4", FCVAR_NOTIFY | FCVAR_ARCHIVE );
+
+void ZM_Cmd_PhysExp( const CCommand &args )
+{
+    CZMPlayer* pPlayer = ToZMPlayer( UTIL_GetCommandClient() );
+
+    if ( !pPlayer ) return;
+    
+    if ( !pPlayer->IsZM() ) return;
+
+    if ( args.ArgC() < 4 ) return;
+
+    if ( !pPlayer->HasEnoughRes( zm_sv_physexp_cost.GetInt() ) )
+    {
+        ClientPrint( pPlayer, HUD_PRINTTALK, "You do not have enough resources!" );
+        return;
+    }
+
+    Vector pos;
+    pos.x = atof( args.Arg( 1 ) );
+    pos.y = atof( args.Arg( 2 ) );
+    pos.z = atof( args.Arg( 3 ) ) + 1.0f;
+
+    if ( UTIL_PointContents( pos ) & CONTENTS_SOLID )
+    {
+        ClientPrint( pPlayer, HUD_PRINTTALK, "You cannot create a physics explosion there!" );
+        return;
+    }
+
+
+    CZMPhysExplosion* pExp = dynamic_cast<CZMPhysExplosion*>( CreateEntityByName( "env_delayed_physexplosion" ) );
+
+    if ( !pExp ) return;
+
+
+    pExp->KeyValue( "magnitude", zm_sv_physexp_magnitude.GetString() );
+    pExp->KeyValue( "radius", zm_sv_physexp_radius.GetString() );
+
+
+#define SF_PHYSEXPLOSION_NODAMAGE           0x0001
+#define SF_PHYSEXPLOSION_DISORIENT_PLAYER   0x0010
+
+    pExp->AddSpawnFlags( SF_PHYSEXPLOSION_NODAMAGE );
+    pExp->AddSpawnFlags( SF_PHYSEXPLOSION_DISORIENT_PLAYER );
+
+
+    if ( DispatchSpawn( pExp ) != 0 )
+        return;
+
+    pExp->Teleport( &pos, nullptr, nullptr );
+    pExp->Activate();
+    pExp->DelayedExplode( zm_sv_physexp_delay.GetFloat() );
+
+
+    pPlayer->SetResources( pPlayer->GetResources() - zm_sv_physexp_cost.GetInt() );
+
+    ClientPrint( pPlayer, HUD_PRINTTALK, "Created a physics explosion!" );
+}
+
+static ConCommand zm_cmd_physexp( "zm_cmd_physexp", ZM_Cmd_PhysExp, "", FCVAR_HIDDEN );
 
