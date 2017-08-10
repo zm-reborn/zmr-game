@@ -400,3 +400,22 @@
 
 	"wave"			"weapons/sledge_zm/sledge_swingalt.wav"
 }
+
+"Weapon_Revolver_ZM.Single"
+{
+	"channel"		"CHAN_WEAPON"
+	"volume"		"0.93"
+	"soundlevel"		"SNDLVL_GUNFIRE"
+	"pitch"			"88,93"	
+
+	"wave"			"^weapons/revolver_zm/revolver_fire.wav"
+}
+
+"Weapon_Revolver_ZM.Reload"
+{
+	"channel"		"CHAN_ITEM"
+	"volume"		"0.7"
+	"soundlevel"		"SNDLVL_NORM"
+
+	"wave"			")weapons/revolver_zm/revolver_reload.wav"
+}

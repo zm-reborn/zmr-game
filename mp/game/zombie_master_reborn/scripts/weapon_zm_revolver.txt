@@ -22,12 +22,11 @@ WeaponData
 	// Sounds for the weapon. There is a max of 16 sounds per category (i.e. max 16 "single_shot" sounds)
 	SoundData
 	{
-
 		//"reload"		"Weapon_pistol_zm.Reload"
-		"reload_npc"	"Weapon_357.Reload"
+		"reload_npc"	"Weapon_Revolver_ZM.Reload" // TODO: Fix these.
 		"empty"			"Weapon_pistol_zm.Empty"
-		"single_shot"	"Weapon_357.Single"
-		"single_shot_npc"	"Weapon_357.Single"
+		"single_shot"	"Weapon_Revolver_ZM.Single"
+		"single_shot_npc"	"Weapon_Revolver_ZM.Single"
 	}
 
 	// Weapon Sprite data is loaded by the Client DLL.
