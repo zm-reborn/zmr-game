@@ -638,3 +638,19 @@ event PoisonLoop
 {
 	RunEvent PoisonPulse 0.0
 }
+
+event ZMHealthDamaged
+{
+	Animate ZMHudHPBar		Blur		"3"				Linear		0.0		0.1
+	Animate ZMHudHPBar		Blur		"0"				Deaccel		0.1		2.0
+}
+
+event ZMHealthLow
+{
+	Animate ZMHudHPBar		FgColor		"DamagedFg"		Linear		0.2		1.2
+}
+
+event ZMHealthNormal
+{
+	Animate ZMHudHPBar		FgColor		"FgColor"		Linear		0.2		1.2
+}
