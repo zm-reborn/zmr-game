@@ -317,7 +317,9 @@ void CZMPlayer::Spawn()
     
     // Must set player model before calling base class spawn...
     SetPlayerModel();
-    
+    // Collision group must be set before base class spawn.
+    // Spawnpoint look-up depend on the fact that player's are solid which is done before setting player's collision group...
+    SetCollisionGroup( COLLISION_GROUP_PLAYER );
 
 	//BaseClass::Spawn();
     BaseClass::BaseClass::Spawn();
