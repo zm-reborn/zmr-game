@@ -30,6 +30,7 @@ END_SEND_TABLE()
 BEGIN_DATADESC( CZMBaseZombie )
 END_DATADESC()
 
+//LINK_ENTITY_TO_CLASS( zmbase_zombie, CZMBaseZombie );
 
 CZMBaseZombie::CZMBaseZombie()
 {
@@ -339,6 +340,7 @@ void CZMBaseZombie::GatherConditions( void )
 
     CAI_BaseNPC::GatherConditions();
 
+
     if( m_NPCState == NPC_STATE_COMBAT )
     {
         // This check for !m_pPhysicsEnt prevents a crashing bug, but also
@@ -366,7 +368,8 @@ int CZMBaseZombie::TranslateSchedule( int schedule )
     switch ( schedule )
     {
         // Always chase the enemy. This was causing problems with fast zombies not wanting to chase us, and instead trying to "shoot" us.
-    case SCHED_MOVE_TO_WEAPON_RANGE : return SCHED_CHASE_ENEMY;
+    case SCHED_CHASE_ENEMY :
+    case SCHED_MOVE_TO_WEAPON_RANGE : return SCHED_ZOMBIE_CHASE_ENEMY;
 
     case SCHED_ZOMBIE_SWATITEM:
         // If the object is far away, move and swat it. If it's close, just swat it.
@@ -806,7 +809,9 @@ void CZMBaseZombie::Command( const Vector& pos )
         SetState( NPC_STATE_ALERT );
     }
     
-    SetSchedule( SCHED_FORCED_GO );
+
+    SetCondition( COND_RECEIVED_ORDERS );
+    SetSchedule( SCHED_ZM_GO );
 }
 
 bool CZMBaseZombie::Swat( CBaseEntity* pTarget, bool bBreakable )
@@ -849,3 +854,29 @@ bool CZMBaseZombie::CanSpawn( const Vector& pos )
 
     return trace.fraction == 1.0f;
 }
+
+
+AI_BEGIN_CUSTOM_NPC( zmbase_zombie, CZMBaseZombie )
+
+    DEFINE_SCHEDULE
+    (
+	    SCHED_ZM_GO,
+
+	    "	Tasks"
+	    "		TASK_SET_TOLERANCE_DISTANCE		48"
+	    "		TASK_SET_ROUTE_SEARCH_TIME		3"
+	    "		TASK_GET_PATH_TO_LASTPOSITION	0"
+	    "		TASK_WALK_PATH					0"
+	    "		TASK_WAIT_FOR_MOVEMENT			0"
+	    ""
+	    "	Interrupts"
+        "		COND_NEW_ENEMY"
+        "		COND_CAN_RANGE_ATTACK1"
+        "		COND_CAN_MELEE_ATTACK1"
+        "		COND_CAN_RANGE_ATTACK2"
+        "		COND_CAN_MELEE_ATTACK2"
+        "		COND_LIGHT_DAMAGE"
+        "		COND_HEAVY_DAMAGE"
+    )
+
+AI_END_CUSTOM_NPC()

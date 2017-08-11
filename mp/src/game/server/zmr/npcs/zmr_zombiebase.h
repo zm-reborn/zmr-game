@@ -15,12 +15,19 @@
     npc_PoisonZombie.cpp
 */
 
+enum
+{
+    SCHED_ZM_GO = LAST_BASE_ZOMBIE_CONDITION + 5, // HACK
+    SCHED_ZM_FORCED_GO
+};
+
 class CZMBaseZombie : public CNPC_BaseZombie, public CZMNPCLagCompensation
 {
 public:
     DECLARE_CLASS( CZMBaseZombie, CNPC_BaseZombie )
     DECLARE_SERVERCLASS()
     DECLARE_DATADESC()
+    DEFINE_CUSTOM_AI;
 
     CZMBaseZombie();
     ~CZMBaseZombie();
