@@ -886,9 +886,10 @@ void CZMRules::PlayerThink( CBasePlayer* pPlayer )
 
 bool CZMRules::IsSpawnPointValid( CBaseEntity *pSpot, CBasePlayer *pPlayer )
 {
+    // Start off the ground since some maps have the spawns touching the floor.
 	trace_t trace;
-    UTIL_TraceHull( pSpot->GetAbsOrigin(),
-                    pSpot->GetAbsOrigin() + Vector( 0.0f, 0.0f, 1.0f ),
+    UTIL_TraceHull( pSpot->GetAbsOrigin() + Vector( 0.0f, 0.0f, 1.0f ),
+                    pSpot->GetAbsOrigin() + Vector( 0.0f, 0.0f, 2.0f ),
                     pPlayer->GetPlayerMins(),
                     pPlayer->GetPlayerMaxs(),
                     MASK_PLAYERSOLID,
