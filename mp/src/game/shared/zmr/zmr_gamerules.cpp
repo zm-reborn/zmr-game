@@ -627,14 +627,15 @@ CZMPlayer* CZMRules::ChooseZM()
     CZMPlayer* pPlayer;
 
 
-    CZMPlayer* pFirstChoice = nullptr;
     int nHighestPriority = -1;
 
     CUtlVector<CZMPlayer*> vBackupZMs;
     CUtlVector<CZMPlayer*> vZMs;
+    CUtlVector<CZMPlayer*> vZMFirstChoices;
 
     vBackupZMs.Purge();
     vZMs.Purge();
+    vZMFirstChoices.Purge();
 
 
     int partflags = GetServerParticipationFlags();
@@ -664,9 +665,9 @@ CZMPlayer* CZMRules::ChooseZM()
         case ZMPART_ALLOWZM :
             vZMs.AddToHead( pPlayer );
 
-            if ( pPlayer->GetPickPriority() > nHighestPriority )
+            if ( pPlayer->GetPickPriority() >= nHighestPriority )
             {
-                pFirstChoice = pPlayer;
+                vZMFirstChoices.AddToTail( pPlayer );
                 nHighestPriority = pPlayer->GetPickPriority();
             }
 
@@ -677,9 +678,9 @@ CZMPlayer* CZMRules::ChooseZM()
     }
 
 
-    if ( pFirstChoice )
+    if ( vZMFirstChoices.Count() > 0 )
     {
-        return pFirstChoice;
+        return vZMFirstChoices[random->RandomInt( 0, vZMFirstChoices.Count() - 1 )];
     }
 
     // Nothing to pick from...
