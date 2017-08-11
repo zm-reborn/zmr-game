@@ -57,6 +57,8 @@ public:
 
     virtual void Precache( void ) OVERRIDE;
 
+    virtual bool ShouldCollide( int, int ) OVERRIDE;
+
 #ifndef CLIENT_DLL
     virtual void CreateStandardEntities() OVERRIDE;
 
