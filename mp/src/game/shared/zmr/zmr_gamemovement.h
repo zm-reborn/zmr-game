@@ -31,6 +31,8 @@ protected:
     virtual void FullLadderMove() OVERRIDE;
     void FullZMMove( float factor, float maxacceleration );
 
+    // Lets dead players accelerate or otherwise spectators can't move in roaming mode. Thanks Valve.
+    virtual bool CanAccelerate() OVERRIDE { return !(player->GetWaterJumpTime()); };
 
 
     /*
