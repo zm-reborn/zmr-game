@@ -76,9 +76,9 @@ public:
     virtual int GetAutoAimMode() OVERRIDE { return AUTOAIM_NONE; };
 
     virtual int ItemShouldRespawn( CItem* ) OVERRIDE;
-
 	virtual bool CanHaveAmmo( CBaseCombatCharacter*, int ) OVERRIDE; // can this player take more of this ammo?
 	virtual bool CanHaveAmmo( CBaseCombatCharacter*, const char* ) OVERRIDE;
+    virtual bool CanHavePlayerItem( CBasePlayer*, CBaseCombatWeapon* ) OVERRIDE;
 
     virtual const char* SetDefaultPlayerTeam( CBasePlayer* ) OVERRIDE;
 
@@ -89,8 +89,8 @@ public:
     virtual void ClientDisconnected( edict_t* ) OVERRIDE;
     virtual void PlayerKilled( CBasePlayer*, const CTakeDamageInfo& ) OVERRIDE;
 
-    virtual bool CanHavePlayerItem( CBasePlayer*, CBaseCombatWeapon* ) OVERRIDE;
     virtual bool UseSuicidePenalty() OVERRIDE { return false; };
+    virtual bool FlPlayerFallDeathDoesScreenFade( CBasePlayer* pPlayer ) OVERRIDE { return false; }; // Don't fade to eternal darkness when getting killed.
 
     static void IncPopCount( ZombieClass_t );
 
