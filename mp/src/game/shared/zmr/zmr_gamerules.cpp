@@ -603,6 +603,9 @@ CZMPlayer* CZMRules::ChooseZM()
     CZMPlayer* pPlayer;
 
 
+    CZMPlayer* pFirstChoice = nullptr;
+    int nHighestPriority = -1;
+
     CUtlVector<CZMPlayer*> vBackupZMs;
     CUtlVector<CZMPlayer*> vZMs;
 
@@ -636,11 +639,23 @@ CZMPlayer* CZMRules::ChooseZM()
         default :
         case ZMPART_ALLOWZM :
             vZMs.AddToHead( pPlayer );
+
+            if ( pPlayer->GetPickPriority() > nHighestPriority )
+            {
+                pFirstChoice = pPlayer;
+                nHighestPriority = pPlayer->GetPickPriority();
+            }
+
             break;
         }
-
         
         vBackupZMs.AddToHead( pPlayer );
+    }
+
+
+    if ( pFirstChoice )
+    {
+        return pFirstChoice;
     }
 
     // Nothing to pick from...
@@ -675,6 +690,9 @@ void CZMRules::BeginRound( CZMPlayer* pZM )
 
         if ( !pPlayer ) continue;
 
+        // Always increase the priority.
+        pPlayer->SetPickPriority( pPlayer->GetPickPriority() + 1 );
+
 
         int team = ZMTEAM_HUMAN;
 
@@ -692,6 +710,9 @@ void CZMRules::BeginRound( CZMPlayer* pZM )
         else
         {
             team = ZMTEAM_ZM;
+
+            // Reset priority once we're the ZM.
+            pPlayer->SetPickPriority( 0 );
         }
 
 

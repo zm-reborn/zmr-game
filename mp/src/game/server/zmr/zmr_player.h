@@ -117,12 +117,16 @@ public:
     void AddWeaponSlotFlag( int flag ) { m_fWeaponSlotFlags |= flag; };
     void RemoveWeaponSlotFlag( int flag ) { m_fWeaponSlotFlags &= ~flag; };
 
+    inline int GetPickPriority() { return m_nPickPriority; };
+    inline void SetPickPriority( int i ) { m_nPickPriority = i; };
+
 private:
     CNetworkVar( int, m_nResources );
 
     int m_iBuildSpawnIndex; // To update build menu.
     //Participation_t m_iParticipation;
     int m_fWeaponSlotFlags;
+    int m_nPickPriority;
 };
 
 inline CZMPlayer* ToZMPlayer( CBaseEntity* pEntity )
