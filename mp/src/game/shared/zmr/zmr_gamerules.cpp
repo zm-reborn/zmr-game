@@ -55,7 +55,7 @@ static const char* g_PreserveEnts[] =
 	"env_sun",
 	"env_wind",
 	"env_fog_controller",
-	"func_brush", // ZMRTODO: According to ZM1, this caused problems in docksofthedead.
+	//"func_brush", // Yup, this causes problems (eg. zebra)
 	"func_wall",
 	"func_buyzone",
 	"func_illusionary",
