@@ -34,6 +34,7 @@ void ClientPutInServer( edict_t *pEdict, const char *playername )
     CZMPlayer *pPlayer = CZMPlayer::CreatePlayer( "player", pEdict );
 
     pPlayer->SetPlayerName( playername );
+    pPlayer->SetPickPriority( 0 );
 }
 
 void FinishClientPutInServer( CZMPlayer* pPlayer )
