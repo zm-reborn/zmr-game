@@ -55,7 +55,7 @@ static const char* g_PreserveEnts[] =
 	"env_sun",
 	"env_wind",
 	"env_fog_controller",
-	"func_brush",
+	"func_brush", // ZMRTODO: According to ZM1, this caused problems in docksofthedead.
 	"func_wall",
 	"func_buyzone",
 	"func_illusionary",
@@ -68,8 +68,8 @@ static const char* g_PreserveEnts[] =
 	"info_player_combine",
 	"info_player_rebel",
 	"info_map_parameters",
-	"keyframe_rope",
-	"move_rope",
+	//"keyframe_rope", // Will fuck up maps that parent ropes to objects.
+	//"move_rope",
 	"info_ladder",
 	"player",
 	"point_viewcontrol",
