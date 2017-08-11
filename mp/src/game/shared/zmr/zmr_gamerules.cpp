@@ -924,17 +924,41 @@ void CZMRules::PlayerThink( CBasePlayer* pPlayer )
     BaseClass::PlayerThink( pPlayer );
 }
 
-bool CZMRules::IsSpawnPointValid( CBaseEntity *pSpot, CBasePlayer *pPlayer )
+bool CZMRules::IsSpawnPointValid( CBaseEntity* pSpot, CBasePlayer* pPlayer )
 {
+    // Use our own filter since if the player collisions are off, all players will bunch up together.
+    class CZMTraceFilterSpawnPoint : public CTraceFilterSimple
+    {
+    public:
+        CZMTraceFilterSpawnPoint( const IHandleEntity* passentity, int collisionGroup )
+            : CTraceFilterSimple( passentity, collisionGroup )
+        {
+        }
+
+        virtual bool ShouldHitEntity( IHandleEntity* pHandleEntity, int contentsMask )
+        {
+            CBaseEntity* pEntity = EntityFromEntityHandle( pHandleEntity );
+            const CBaseEntity* pPass = EntityFromEntityHandle( GetPassEntity() );
+
+            if ( pEntity == pPass )
+                return false;
+
+            if ( pEntity && pEntity->IsPlayer() )
+                return true;
+
+            return CTraceFilterSimple::ShouldHitEntity( pHandleEntity, contentsMask );
+        }
+    };
+
     // Start off the ground since some maps have the spawns touching the floor.
+    CZMTraceFilterSpawnPoint filter( pPlayer, COLLISION_GROUP_PLAYER );
 	trace_t trace;
     UTIL_TraceHull( pSpot->GetAbsOrigin() + Vector( 0.0f, 0.0f, 1.0f ),
                     pSpot->GetAbsOrigin() + Vector( 0.0f, 0.0f, 2.0f ),
                     pPlayer->GetPlayerMins(),
                     pPlayer->GetPlayerMaxs(),
                     MASK_PLAYERSOLID,
-                    pPlayer,
-                    COLLISION_GROUP_PLAYER,
+                    &filter,
                     &trace );
 
     return trace.fraction == 1.0f;
