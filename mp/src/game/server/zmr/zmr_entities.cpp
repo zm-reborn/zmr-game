@@ -923,6 +923,8 @@ void CZMEntTriggerPlayerCount::CountThink( void )
     if ( !root )
     {
         DevMsg( "No root found for trigger_playercount!\n" );
+
+        SetNextThink( gpGlobals->curtime + 1.0f );
         return;
     }
 
@@ -940,6 +942,8 @@ void CZMEntTriggerPlayerCount::CountThink( void )
     if ( !team )
     {
         DevMsg( "No human team found! Can't count players! (trigger_playercount)\n" );
+
+        SetNextThink( gpGlobals->curtime + 1.0f );
         return;
     }
 
