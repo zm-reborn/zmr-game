@@ -15,6 +15,9 @@
 #ifdef CLIENT_DLL
 //#define CZMPlayer C_ZMPlayer
 #define CZMBaseZombie C_ZMBaseZombie
+
+
+extern ConVar zm_cl_participation;
 #endif
 
 
@@ -65,7 +68,6 @@ Participation_t CZMPlayer::GetParticipation()
 {
     Participation_t part;
 #ifdef CLIENT_DLL
-    extern ConVar zm_cl_participation;
     part = (Participation_t)zm_cl_participation.GetInt();
 #else
     part =  (Participation_t)atoi( engine->GetClientConVarValue( entindex(), "zm_cl_participation" ) );
@@ -79,7 +81,6 @@ Participation_t CZMPlayer::GetParticipation()
 #ifdef CLIENT_DLL
 Participation_t CZMPlayer::GetLocalParticipation()
 {
-    extern ConVar zm_cl_participation;
     Participation_t part = (Participation_t)zm_cl_participation.GetInt();
 
     if ( part <= ZMPART_INVALID || part >= ZMPART_MAX ) part = ZMPART_ALLOWZM;
@@ -89,7 +90,6 @@ Participation_t CZMPlayer::GetLocalParticipation()
 
 void CZMPlayer::SetLocalParticipation( Participation_t part )
 {
-    extern ConVar zm_cl_participation;
     zm_cl_participation.SetValue( (int)part );
 }
 #endif
