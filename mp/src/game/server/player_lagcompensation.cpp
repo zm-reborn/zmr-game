@@ -463,6 +463,15 @@ void CLagCompensationManager::StartLagCompensation( CBasePlayer *player, CUserCm
 	}
 
 #ifdef ZMR
+    if (!player->m_bLagCompensation // We don't want lag compensation.
+    ||  (gpGlobals->maxClients <= 1)
+    ||  !sv_unlag.GetBool()
+    ||  player->IsBot()
+    ||  player->IsObserver()
+    ||  !player->IsAlive())
+		return;
+
+
     int nAIs = g_pZombies->Count();
     for (int i=0; i<nAIs; i++)
 	    g_pZombies->Element( i )->FlagForLagCompensation(false);
@@ -473,7 +482,7 @@ void CLagCompensationManager::StartLagCompensation( CBasePlayer *player, CUserCm
 	m_bNeedToRestore = false;
 
 	m_pCurrentPlayer = player;
-	
+#ifndef ZMR // Why isn't this at the top before setting m_pCurrentPlayer? -_-
 	if ( !player->m_bLagCompensation		// Player not wanting lag compensation
 		 || (gpGlobals->maxClients <= 1)	// no lag compensation in single player
 		 || !sv_unlag.GetBool()				// disabled by server admin
@@ -481,7 +490,7 @@ void CLagCompensationManager::StartLagCompensation( CBasePlayer *player, CUserCm
 		 || player->IsObserver()			// not for spectators
 		)
 		return;
-
+#endif
 	// NOTE: Put this here so that it won't show up in single player mode.
 	VPROF_BUDGET( "StartLagCompensation", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 	Q_memset( m_RestoreData, 0, sizeof( m_RestoreData ) );
