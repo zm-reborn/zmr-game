@@ -414,6 +414,12 @@ void CZMRules::PlayerKilled( CBasePlayer* pVictim, const CTakeDamageInfo& info )
 {
     CZMPlayer* pPlayer = ToZMPlayer( pVictim );
 
+
+    if ( info.GetAttacker() && info.GetAttacker()->IsNPC() )
+    {
+        RewardPointsKill();
+    }
+
     // Don't use team player count since we haven't been switched to spectator yet.
     if ( !IsInRoundEnd() && pPlayer && pPlayer->IsHuman() && GetNumAliveHumans() <= 1 )
     {
@@ -539,6 +545,24 @@ void CZMRules::EndRound( ZMRoundEndReason_t reason )
     if ( zm_mp_roundlimit.GetInt() && m_nRounds > zm_mp_roundlimit.GetInt() )
     {
         GoToIntermission();
+    }
+}
+
+static ConVar zm_sv_reward_zombiekill( "zm_sv_reward_zombiekill", "100", FCVAR_NOTIFY | FCVAR_ARCHIVE, "How many points ZM gets for killing a human with a zombie." );
+
+void CZMRules::RewardPointsKill()
+{
+    CZMPlayer* pPlayer;
+    for ( int i = 1; i <= gpGlobals->maxClients; i++ )
+    {
+        pPlayer = ToZMPlayer( UTIL_PlayerByIndex( i ) );
+
+        if ( !pPlayer ) continue;
+
+        if ( pPlayer->IsZM() )
+        {
+            pPlayer->SetResources( pPlayer->GetResources() + zm_sv_reward_zombiekill.GetInt() );
+        }
     }
 }
 

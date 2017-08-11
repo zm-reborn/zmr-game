@@ -131,6 +131,8 @@ private:
     
 
 #ifndef CLIENT_DLL
+    void RewardPointsKill();
+
     void RewardPoints( ZMRoundEndReason_t );
     void PrintRoundEndMessage( ZMRoundEndReason_t );
 
