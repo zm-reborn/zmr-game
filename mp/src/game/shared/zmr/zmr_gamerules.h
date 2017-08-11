@@ -90,8 +90,8 @@ public:
     virtual void PlayerKilled( CBasePlayer*, const CTakeDamageInfo& ) OVERRIDE;
 
     virtual bool CanHavePlayerItem( CBasePlayer*, CBaseCombatWeapon* ) OVERRIDE;
+    virtual bool UseSuicidePenalty() OVERRIDE { return false; };
 
-    
     static void IncPopCount( ZombieClass_t );
 
     void OnClientFinishedPutInServer( CZMPlayer* );
