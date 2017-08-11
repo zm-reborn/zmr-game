@@ -1613,6 +1613,10 @@ public:
 typedef CTraceFilterSimpleList CBulletsTraceFilter;
 #endif
 
+#ifdef ZMR
+static ConVar zm_sv_bulletspassplayers( "zm_sv_bulletspassplayers", "1", FCVAR_NOTIFY | FCVAR_ARCHIVE | FCVAR_REPLICATED, "Do bullets players shoot pass through other players?" );
+#endif
+
 void CBaseEntity::FireBullets( const FireBulletsInfo_t &info )
 {
 	static int	tracerCount;
@@ -1673,11 +1677,57 @@ void CBaseEntity::FireBullets( const FireBulletsInfo_t &info )
 
 	Vector vecDir;
 	Vector vecEnd;
+
+#ifdef ZMR // ZMRCHANGE: Use our own bullet trace filter.
+    class CZMBulletsTraceFilter : public CTraceFilter
+    {
+    public:
+        CZMBulletsTraceFilter( CBaseEntity* pEnt, CBaseEntity* pAdd, int collisionGroup ) : CTraceFilter()
+        {
+            m_pShooter = pEnt;
+            m_pAdditional = pAdd;
+        }
+
+        bool ShouldHitEntity( IHandleEntity* pHandleEntity, int contentsMask )
+        {
+            CBaseEntity* pEntity = EntityFromEntityHandle( pHandleEntity );
+
+            if ( !pEntity ) return false;
+            if ( pEntity == m_pShooter ) return false;
+            if ( pEntity == m_pAdditional ) return false;
+
+
+            if ( m_pShooter )
+            {
+                // It's a bone follower of the entity to ignore (toml 8/3/2007)
+                if ( pEntity->GetOwnerEntity() == m_pShooter )
+                    return false;
+
+                if (m_pShooter->IsPlayer()
+                &&  pEntity->IsPlayer()
+                &&  pEntity->GetTeamNumber() == m_pShooter->GetTeamNumber()
+                &&  zm_sv_bulletspassplayers.GetBool())
+                    return false;
+            }
+
+            return true;
+        }
+
+    private:
+        CBaseEntity* m_pShooter;
+        CBaseEntity* m_pAdditional;
+    };
+#endif
 	
 	// Skip multiple entities when tracing
+#ifdef ZMR
+    CZMBulletsTraceFilter traceFilter( this, info.m_pAdditionalIgnoreEnt, COLLISION_GROUP_NONE );
+#else
 	CBulletsTraceFilter traceFilter( COLLISION_GROUP_NONE );
+
 	traceFilter.SetPassEntity( this ); // Standard pass entity for THIS so that it can be easily removed from the list after passing through a portal
 	traceFilter.AddEntityToIgnore( info.m_pAdditionalIgnoreEnt );
+#endif
 
 #if defined( HL2_EPISODIC ) && defined( GAME_DLL )
 	// FIXME: We need to emulate this same behavior on the client as well -- jdw
