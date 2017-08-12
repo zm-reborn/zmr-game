@@ -1431,6 +1431,97 @@ void CZMEntTriggerBlockHidden::InputDisable( inputdata_t &inputData )
 
 
 /*
+    Give resources
+*/
+class CZMEntGiveResources : public CPointEntity
+{
+public:
+    DECLARE_CLASS( CZMEntGiveResources, CPointEntity )
+    DECLARE_DATADESC()
+
+
+    void Spawn( void );
+
+    void InputGiveResources( inputdata_t &inputData );
+};
+
+BEGIN_DATADESC( CZMEntGiveResources )
+    DEFINE_INPUTFUNC( FIELD_VOID, "GiveResources", InputGiveResources ),
+END_DATADESC()
+
+LINK_ENTITY_TO_CLASS( func_giveresources, CZMEntGiveResources );
+
+
+void CZMEntGiveResources::Spawn( void )
+{
+    SetSolid( SOLID_NONE );
+    AddEffects( EF_NODRAW );
+    SetMoveType( MOVETYPE_NONE );
+}
+
+void CZMEntGiveResources::InputGiveResources( inputdata_t& inputData )
+{
+    CZMRules::RewardResources( inputData.value.Int() );
+}
+
+
+/*
+    Trigger give points
+*/
+class CZMEntTriggerGivePoints : public CBaseTrigger
+{
+public:
+    DECLARE_CLASS( CZMEntTriggerGivePoints, CBaseTrigger )
+    DECLARE_DATADESC()
+
+
+    void Spawn( void );
+
+    void InputAward( inputdata_t &inputData );
+};
+
+BEGIN_DATADESC( CZMEntTriggerGivePoints )
+    DEFINE_INPUTFUNC( FIELD_VOID, "Award", InputAward ),
+END_DATADESC()
+
+LINK_ENTITY_TO_CLASS( trigger_givepoints, CZMEntTriggerGivePoints );
+
+
+void CZMEntTriggerGivePoints::Spawn( void )
+{
+    BaseClass::Spawn();
+
+    InitTrigger();
+}
+
+void CZMEntTriggerGivePoints::InputAward( inputdata_t &inputData )
+{
+    touchlink_t* root = static_cast<touchlink_t*>( GetDataObject( TOUCHLINK ) );
+
+    if ( !root )
+    {
+        DevMsg( "No touch link found for trigger_givepoints!\n" );
+        return;
+    }
+
+
+    int award = inputData.value.Int();
+
+    for ( touchlink_t* link = root->nextLink; link != root; link = link->nextLink )
+    {
+        CZMPlayer* pPlayer = ToZMPlayer( link->entityTouched.Get() );
+
+        if ( !pPlayer ) continue;
+
+
+        if ( pPlayer->IsHuman() && pPlayer->IsAlive() )
+        {
+            pPlayer->IncrementFragCount( award );
+        }
+    }
+}
+
+/*
     Phys explosion
 */
 BEGIN_DATADESC( CZMPhysExplosion )
