@@ -124,6 +124,9 @@ public:
 
 #ifndef CLIENT_DLL
     virtual void InitDefaultAIRelationships( void );
+
+
+    static void RewardResources( int );
 #endif
 
 private:
@@ -133,8 +136,6 @@ private:
     
 
 #ifndef CLIENT_DLL
-    void RewardPointsKill();
-
     void RewardPoints( ZMRoundEndReason_t );
     void PrintRoundEndMessage( ZMRoundEndReason_t );
 
