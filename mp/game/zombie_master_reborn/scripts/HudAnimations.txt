@@ -639,18 +639,80 @@ event PoisonLoop
 	RunEvent PoisonPulse 0.0
 }
 
+// ZMR Stuff...
+event ZMHealthPulse
+{
+	Animate ZMHudHPBar		Blur		"0.4"		Linear		0.0		0.1
+	Animate ZMHudHPBar		Blur		"0"		Deaccel		0.1		0.2
+	
+	RunEvent ZMHealthPulseLoop	0.0
+}
+
+event ZMHealthPulseLoop
+{
+	RunEvent ZMHealthPulse	0.9
+}
+
 event ZMHealthDamaged
 {
-	Animate ZMHudHPBar		Blur		"3"				Linear		0.0		0.1
-	Animate ZMHudHPBar		Blur		"0"				Deaccel		0.1		2.0
+	Animate ZMHudHPBar		Blur		"0.4"			Linear		0.0		0.1
+	Animate ZMHudHPBar		Blur		"0"				Deaccel		0.1		0.2
 }
 
 event ZMHealthLow
 {
-	Animate ZMHudHPBar		FgColor		"DamagedFg"		Linear		0.2		1.2
+	StopEvent ZMHealthNormal 0.0
+	
+	Animate ZMHudHPBar		HealthColor		"ZMFgColorCrit"		Linear		0.0		0.5
+	
+	RunEvent ZMHealthPulse	1.0
 }
 
 event ZMHealthNormal
 {
-	Animate ZMHudHPBar		FgColor		"FgColor"		Linear		0.2		1.2
+	StopEvent ZMHealthPulse 0.0
+	StopEvent ZMHealthPulseLoop 0.0
+	StopEvent ZMHealthLow 0.0
+
+	Animate ZMHudHPBar		HealthColor		"ZMFgColor"			Linear		0.0		0.5
+}
+
+event ZMClipChanged
+{
+	Animate ZMHudAmmo		ClipBlur		"0.6"		Linear		0.0		0.1
+	Animate ZMHudAmmo		ClipBlur		"0"		Deaccel		0.1		0.5
+}
+
+event ZMClipCritical
+{
+	StopEvent ZMClipOk 0.0
+	
+	Animate ZMHudAmmo		ClipColor		"ZMFgColorCrit"		Linear		0.0		0.15
+}
+
+event ZMClipOk
+{
+	StopEvent ZMClipCritical 0.0
+
+	Animate ZMHudAmmo		ClipColor		"ZMFgColor"		Linear		0.0		0.15
+}
+
+event ZMResChanged
+{
+	Animate ZMHudAmmo		ResBlur		"0.6"		Linear		0.0		0.1
+	Animate ZMHudAmmo		ResBlur		"0"		Deaccel		0.1		0.5
+}
+
+event ZMResCritical
+{
+	StopEvent ZMResOk 0.0
+	
+	Animate ZMHudAmmo		ResColor		"ZMFgColorCrit"		Linear		0.0		0.3
+}
+
+event ZMResOk
+{
+	StopEvent ZMResCritical 0.0
+
+	Animate ZMHudAmmo		ResColor		"ZMFgColor"		Linear		0.0		0.15
 }

@@ -36,6 +36,9 @@ Scheme
 	// controls use these to determine their settings
 	BaseSettings
 	{
+		"ZMFgColor"			"255 255 255 255" // ZMR - Used by ammo and health.
+		"ZMFgColorCrit"		"200 0 0 255" // ZMR - When something is low.
+		
 		//"FgColor"			"255 220 0 100"
 		"FgColor"			"255 255 255 100"
 		"BgColor"			"0 0 0 76"
@@ -544,6 +547,32 @@ Scheme
 			{
 				"name"		"HalfLife2"
 				"tall"		"32"
+				"weight"	"0"
+				"blur"		"4"
+				"scanlines" "2"
+				"antialias" "1"
+				"additive"	"1"
+				"custom"	"1"
+			}
+		}
+		ZMHudNumbers
+		{
+			"1"
+			{
+				"name"		"Monofonto"
+				"tall"		"48"
+				"weight"	"0"
+				"antialias" "1"
+				"additive"	"0"
+				"custom"	"1"
+			}
+		}
+		ZMHudNumbersGlow
+		{
+			"1"
+			{
+				"name"		"Monofonto"
+				"tall"		"48"
 				"weight"	"0"
 				"blur"		"4"
 				"scanlines" "2"
@@ -1608,6 +1637,7 @@ Scheme
 		"1"		"resource/HL2MP.ttf"
 		"2"		"resource/HL2crosshairs.ttf"
 		"1"		"resource/ZM.ttf" // ZMR
+		"1"		"resource/MONOFONT.ttf" // ZMR
 	}
 
 }

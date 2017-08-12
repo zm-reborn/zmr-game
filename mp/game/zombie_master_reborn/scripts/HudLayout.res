@@ -5,16 +5,39 @@
 		"fieldName"		"ZMHudHPBar"
 		"xpos"	"16"
 		"ypos"	"420"
-		"wide"	"100"
-		"tall"  "40"
+		"wide"	"150"
+		"tall"  "50"
 		
 		"BarX"	"0"
-		"BarY"	"0"
-		"BarSize"	"40"
-		//"HealthBarFont"	"ZMHudFont"
-		"HealthX"	"55"
-		"HealthY"	"2"
+		"BarY"	"16"
+		"BarSize"	"30"
+		"HealthBarFont"	"ZMHudNumbers"
+		"HealthBarGlowFont"	"ZMHudNumbersGlow"
+		"HealthX"	"40"
+		"HealthY"	"5"
 	}
+	
+	ZMHudAmmo
+	{
+		"fieldName"		"ZMHudAmmo"
+		"xpos"	"r120"
+		"ypos"	"420"
+		"wide"	"120"
+		"tall"  "50"
+		
+		"ClipX"	"40"
+		"ClipY"	"2"
+		"MidX"	"50"
+		"MidY"	"10"
+		"ResX"	"65"
+		"ResY"	"2"
+		"AmmoBarFont"	"ZMHudNumbers"
+		"AmmoBarGlowFont"	"ZMHudNumbersGlow"
+		
+		"MidWidth"	"6"
+		"MidHeight"	"32"
+	}
+	
 	HudHealth
 	{
 		"fieldName"		"HudHealth"
