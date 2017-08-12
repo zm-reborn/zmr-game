@@ -440,7 +440,7 @@ bool CZMEntZombieSpawn::CreateZombie( ZombieClass_t zclass )
     if ( m_pRallyPoint )
     {
         DevMsg( "Commanding zombie to rallypoint...\n" );
-        pZombie->Command( m_pRallyPoint->GetAbsOrigin() );
+        pZombie->Command( m_pRallyPoint->GetAbsOrigin(), false );
     }
     
 
