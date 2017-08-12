@@ -38,7 +38,10 @@ ConVar zm_sv_cost_hulk( "zm_sv_cost_hulk", "75", FCVAR_REPLICATED | FCVAR_NOTIFY
 ConVar zm_sv_cost_drifter( "zm_sv_cost_drifter", "40", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE );
 ConVar zm_sv_cost_immolator( "zm_sv_cost_immolator", "100", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE );
 
+
 static ConVar zm_sv_participation( "zm_sv_participation", "0", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE, "0 = No limit, 1 = Don't allow only human, 2 = Don't allow only spec, 3 = Don't allow only spec/human" );
+
+static ConVar zm_sv_reward_zombiekill( "zm_sv_reward_zombiekill", "100", FCVAR_NOTIFY | FCVAR_ARCHIVE, "How many points ZM gets for killing a human with a zombie." );
 
 
 #ifndef CLIENT_DLL
@@ -432,7 +435,7 @@ void CZMRules::PlayerKilled( CBasePlayer* pVictim, const CTakeDamageInfo& info )
 
     if ( info.GetAttacker() && info.GetAttacker()->IsNPC() )
     {
-        RewardPointsKill();
+        RewardResources( zm_sv_reward_zombiekill.GetInt() );
     }
 
     // Don't use team player count since we haven't been switched to spectator yet.
@@ -563,9 +566,7 @@ void CZMRules::EndRound( ZMRoundEndReason_t reason )
     }
 }
 
-static ConVar zm_sv_reward_zombiekill( "zm_sv_reward_zombiekill", "100", FCVAR_NOTIFY | FCVAR_ARCHIVE, "How many points ZM gets for killing a human with a zombie." );
-
-void CZMRules::RewardPointsKill()
+void CZMRules::RewardResources( int res )
 {
     CZMPlayer* pPlayer;
     for ( int i = 1; i <= gpGlobals->maxClients; i++ )
@@ -576,7 +577,7 @@ void CZMRules::RewardPointsKill()
 
         if ( pPlayer->IsZM() )
         {
-            pPlayer->SetResources( pPlayer->GetResources() + zm_sv_reward_zombiekill.GetInt() );
+            pPlayer->SetResources( pPlayer->GetResources() + res );
         }
     }
 }
@@ -682,7 +683,14 @@ CZMPlayer* CZMRules::ChooseZM()
 
             if ( pPlayer->GetPickPriority() >= nHighestPriority )
             {
-                vZMFirstChoices.AddToTail( pPlayer );
+                // Remove the people who had lower priority.
+                if ( pPlayer->GetPickPriority() > nHighestPriority )
+                {
+                    vZMFirstChoices.Purge();
+                }
+
+
+                vZMFirstChoices.AddToHead( pPlayer );
                 nHighestPriority = pPlayer->GetPickPriority();
             }
 
