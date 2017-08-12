@@ -45,9 +45,11 @@ private:
     int m_nTexFgId;
 
 
-    void PaintString( HFont, int, int, const Color&, const wchar_t* );
+    void PaintString( HFont, const wchar_t* );
     void PaintBar();
 
+
+    CPanelAnimationVar( Color, m_HealthColor, "HealthColor", "ZMFgColor" );
 
     CPanelAnimationVarAliasType( float, m_flBarX, "BarX", "0", "proportional_float" );
     CPanelAnimationVarAliasType( float, m_flBarY, "BarY", "0", "proportional_float" );
@@ -130,37 +132,24 @@ void CZMHudHPBar::Paint()
     V_snwprintf( szHp, ARRAYSIZE( szHp ), L"%i", hp );
 
 
-    Color clr = GetFgColor();
-
-    surface()->DrawSetTextColor( clr );
-    surface()->DrawSetTextPos( m_flHealthX, m_flHealthY );
-    surface()->DrawSetTextFont( m_hFont );
-    surface()->DrawUnicodeString( szHp );
-
 
     // Draw glow.
-    
-    for ( float fl = m_flBlur; fl > 0.0f; fl -= 1.0f )
+    for ( float fl = min( 1.0f, m_flBlur ); fl > 0.0f; fl -= 0.1f )
     {
-        if (fl >= 1.0f)
-        {
-            PaintString( m_hGlowFont, m_flHealthX, m_flHealthY, clr, szHp );
-        }
-        else
-        {
-            Color col = clr;
-            col[3] *= fl;
-            
-            PaintString( m_hGlowFont, m_flHealthX, m_flHealthY, col, szHp );
-        }
+        Color col = m_HealthColor;
+        col[3] = 20 * fl;
+
+        PaintString( m_hGlowFont, szHp );
     }
+
+    PaintString( m_hFont, szHp );
 }
 
-void CZMHudHPBar::PaintString( HFont font, int x, int y, const Color& clr, const wchar_t* txt )
+void CZMHudHPBar::PaintString( HFont font, const wchar_t* txt )
 {
-    surface()->DrawSetTextColor( clr );
+    surface()->DrawSetTextColor( m_HealthColor );
     surface()->DrawSetTextPos( m_flHealthX, m_flHealthY );
-    surface()->DrawSetTextFont( m_hGlowFont );
+    surface()->DrawSetTextFont( font );
     surface()->DrawUnicodeString( txt );
 }
 
