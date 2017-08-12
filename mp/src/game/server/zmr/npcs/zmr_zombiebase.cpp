@@ -21,6 +21,9 @@
 #define ZOMBIE_FARTHEST_PHYSICS_OBJECT  128
 
 
+// The time zombies will ignore enemies when ZM commands them.
+#define COMMANDED_SEE_ENEMY_GRACE       1.0f
+
 
 IMPLEMENT_SERVERCLASS_ST( CZMBaseZombie, DT_ZM_BaseZombie )
     SendPropInt( SENDINFO( m_iSelectorIndex ) ),
@@ -37,6 +40,7 @@ CZMBaseZombie::CZMBaseZombie()
     // We have to increment our population in derived classes since we don't know our class yet.
     g_pZombies->AddToTail( this );
 
+    m_flLastCommand = 0.0f;
     m_iSelectorIndex = 0;
     m_flHealthRatio = 1.0f;
 }
@@ -339,6 +343,17 @@ void CZMBaseZombie::GatherConditions( void )
     ClearCondition( COND_ZOMBIE_LOCAL_MELEE_OBSTRUCTION );
 
     CAI_BaseNPC::GatherConditions();
+    
+
+    if ((gpGlobals->curtime - m_flLastCommand) > COMMANDED_SEE_ENEMY_GRACE
+    &&  (HasCondition( COND_SEE_HATE ) || HasCondition( COND_SEE_DISLIKE ) || HasCondition( COND_SEE_NEMESIS )))
+    {
+        SetCondition( COND_ZM_SEE_ENEMY );
+    }
+    else
+    {
+        ClearCondition( COND_ZM_SEE_ENEMY );
+    }
 
 
     if( m_NPCState == NPC_STATE_COMBAT )
@@ -791,7 +806,7 @@ void CZMBaseZombie::SetZombieModel( void )
     
 }
 
-void CZMBaseZombie::Command( const Vector& pos )
+void CZMBaseZombie::Command( const Vector& pos, bool bPlayerCommanded )
 {
     m_vecLastPosition = pos;
 
@@ -810,8 +825,18 @@ void CZMBaseZombie::Command( const Vector& pos )
     }
     
 
-    SetCondition( COND_RECEIVED_ORDERS );
-    SetSchedule( SCHED_ZM_GO );
+    if ( bPlayerCommanded )
+    {
+        SetCondition( COND_RECEIVED_ORDERS );
+        SetSchedule( SCHED_ZM_FORCED_GO );
+    }
+    else
+    {
+        ClearCondition( COND_RECEIVED_ORDERS );
+        SetSchedule( SCHED_ZM_GO );
+    }
+
+    m_flLastCommand = gpGlobals->curtime;
 }
 
 bool CZMBaseZombie::Swat( CBaseEntity* pTarget, bool bBreakable )
@@ -857,10 +882,12 @@ bool CZMBaseZombie::CanSpawn( const Vector& pos )
 
 
 AI_BEGIN_CUSTOM_NPC( zmbase_zombie, CZMBaseZombie )
+    
+    DECLARE_CONDITION( COND_ZM_SEE_ENEMY ) // Used to interrupt ZM command.
 
     DEFINE_SCHEDULE
     (
-	    SCHED_ZM_GO,
+	    SCHED_ZM_GO, // Used for rallypoints, etc. when going after the enemy is the priority instead of literally getting to your destination.
 
 	    "	Tasks"
 	    "		TASK_SET_TOLERANCE_DISTANCE		48"
@@ -875,8 +902,26 @@ AI_BEGIN_CUSTOM_NPC( zmbase_zombie, CZMBaseZombie )
         "		COND_CAN_MELEE_ATTACK1"
         "		COND_CAN_RANGE_ATTACK2"
         "		COND_CAN_MELEE_ATTACK2"
-        "		COND_LIGHT_DAMAGE"
-        "		COND_HEAVY_DAMAGE"
+        "		COND_NOT_FACING_ATTACK" // If we're in attack distance but just not facing
+    )
+
+    DEFINE_SCHEDULE
+    (
+	    SCHED_ZM_FORCED_GO, // Used by ZM to command a zombie. Will ignore enemies for a while.
+
+	    "	Tasks"
+	    "		TASK_SET_TOLERANCE_DISTANCE		48"
+	    "		TASK_SET_ROUTE_SEARCH_TIME		3"
+	    "		TASK_GET_PATH_TO_LASTPOSITION	0"
+	    "		TASK_WALK_PATH					0"
+	    "		TASK_WAIT_FOR_MOVEMENT			0"
+	    ""
+	    "	Interrupts"
+        "		COND_ZM_SEE_ENEMY"
+        "		COND_CAN_RANGE_ATTACK1"
+        "		COND_CAN_MELEE_ATTACK1"
+        "		COND_CAN_RANGE_ATTACK2"
+        "		COND_CAN_MELEE_ATTACK2"
     )
 
 AI_END_CUSTOM_NPC()

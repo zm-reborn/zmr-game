@@ -42,7 +42,7 @@ void ZM_Cmd_Move( const CCommand &args )
 
         if ( pZombie && pZombie->GetSelector() == pPlayer )
         {
-            pZombie->Command( pos );
+            pZombie->Command( pos, true );
         }
     }
 }

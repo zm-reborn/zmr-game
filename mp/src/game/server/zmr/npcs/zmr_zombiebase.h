@@ -21,6 +21,11 @@ enum
     SCHED_ZM_FORCED_GO
 };
 
+enum
+{
+    COND_ZM_SEE_ENEMY = LAST_BASE_ZOMBIE_CONDITION + 15, // HACK
+};
+
 class CZMBaseZombie : public CNPC_BaseZombie, public CZMNPCLagCompensation
 {
 public:
@@ -80,8 +85,8 @@ public:
     ZombieClass_t GetZombieClass() { return m_iZombieClass; };
 
     
-
-    virtual void Command( const Vector& );
+    // Player commanded means the zombie will ignore new enemies for a short period of time.
+    virtual void Command( const Vector&, bool bPlayerCommanded = true );
     virtual bool Swat( CBaseEntity*, bool );
     void SwatObject( IPhysicsObject*, Vector& );
     virtual bool TargetEnemy( CBaseEntity* );
@@ -106,6 +111,8 @@ private:
     ZombieClass_t m_iZombieClass;
 
     
+    float m_flLastCommand;
+
     bool m_bSwatBreakable;
     
 protected:
