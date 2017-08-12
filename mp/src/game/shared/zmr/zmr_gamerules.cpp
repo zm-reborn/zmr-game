@@ -93,6 +93,8 @@ static const char* g_PreserveEnts[] =
     "info_player_survivor",
     "info_loadout",
 
+    "zm_objectives",
+
 	"", // END Marker
 };
 #endif
@@ -209,18 +211,22 @@ CZMRules::~CZMRules( void )
 #ifndef CLIENT_DLL
 void CZMRules::CreateStandardEntities()
 {
-    //CreateCustomNetworkStringTables
+    DevMsg( "Creating standard entities...\n" );
+
 
     // NOTE: DO NOT CALL HL2MP RULES.
 	CGameRules::CreateStandardEntities();
 
 
-	// Create the entity that will send our data to the client.
-#ifdef DBGFLAG_ASSERT
-	CBaseEntity *pEnt = 
-#endif
-	CBaseEntity::Create( "zm_gamerules", vec3_origin, vec3_angle );
+	
+    CBaseEntity* pEnt;
+
+    // Create the entity that will send our data to the client.
+	pEnt = CBaseEntity::Create( "zm_gamerules", vec3_origin, vec3_angle );
 	Assert( pEnt );
+
+    //pEnt = CBaseEntity::Create( "zm_objectives", vec3_origin, vec3_angle );
+	//Assert( pEnt );
 }
 #endif
 
@@ -656,7 +662,7 @@ CZMPlayer* CZMRules::ChooseZM()
 
     int partflags = GetServerParticipationFlags();
 
-    for ( i = 0; i < gpGlobals->maxClients; i++ )
+    for ( i = 1; i <= gpGlobals->maxClients; i++ )
     {
         pPlayer = ToZMPlayer( UTIL_PlayerByIndex( i ) );
 
@@ -732,7 +738,7 @@ void CZMRules::BeginRound( CZMPlayer* pZM )
     int partflags = GetServerParticipationFlags();
 
 
-    for ( int i = 0; i < gpGlobals->maxClients; i++ )
+    for ( int i = 1; i <= gpGlobals->maxClients; i++ )
     {
         pPlayer = ToZMPlayer( UTIL_PlayerByIndex( i ) );
 
