@@ -71,3 +71,5 @@ server_blacklist.txt
 *.jpg
 *.png
 *.db
+*.prt
+*.vmx
