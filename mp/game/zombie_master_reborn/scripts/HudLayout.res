@@ -4,12 +4,12 @@
 	{
 		"fieldName"		"ZMHudHPBar"
 		"xpos"	"16"
-		"ypos"	"420"
+		"ypos"	"425"
 		"wide"	"150"
 		"tall"  "50"
 		
 		"BarX"	"0"
-		"BarY"	"16"
+		"BarY"	"12"
 		"BarSize"	"30"
 		"HealthBarFont"	"ZMHudNumbers"
 		"HealthBarGlowFont"	"ZMHudNumbersGlow"
@@ -21,21 +21,21 @@
 	{
 		"fieldName"		"ZMHudAmmo"
 		"xpos"	"r120"
-		"ypos"	"420"
+		"ypos"	"425"
 		"wide"	"120"
 		"tall"  "50"
 		
 		"ClipX"	"40"
 		"ClipY"	"2"
-		"MidX"	"50"
-		"MidY"	"10"
+		"MidX"	"51"
+		"MidY"	"11"
 		"ResX"	"65"
 		"ResY"	"2"
 		"AmmoBarFont"	"ZMHudNumbers"
 		"AmmoBarGlowFont"	"ZMHudNumbersGlow"
 		
 		"MidWidth"	"6"
-		"MidHeight"	"32"
+		"MidHeight"	"25"
 	}
 	
 	ZMHudObjectives

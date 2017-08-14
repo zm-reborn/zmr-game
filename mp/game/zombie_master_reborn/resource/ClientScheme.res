@@ -560,7 +560,7 @@ Scheme
 			"1"
 			{
 				"name"		"Monofonto"
-				"tall"		"48"
+				"tall"		"42"
 				"weight"	"0"
 				"antialias" "1"
 				"additive"	"0"
@@ -572,7 +572,7 @@ Scheme
 			"1"
 			{
 				"name"		"Monofonto"
-				"tall"		"48"
+				"tall"		"42"
 				"weight"	"0"
 				"blur"		"4"
 				"scanlines" "2"
