@@ -14,4 +14,8 @@ void RegisterZMUserMessages( void )
 {
     usermessages->Register( "ZMBuildMenuUpdate", -1 ); // 1 * spawn ehandle, 5 * queue bytes
     usermessages->Register( "ZMManiMenuUpdate", -1 );
+
+
+    usermessages->Register( "ZMObjDisplay", -1 );
+    usermessages->Register( "ZMObjUpdate", -1 );
 }

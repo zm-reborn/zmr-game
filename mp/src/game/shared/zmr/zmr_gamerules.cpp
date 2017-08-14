@@ -93,7 +93,7 @@ static const char* g_PreserveEnts[] =
     "info_player_survivor",
     "info_loadout",
 
-    "zm_objectives",
+    "zm_objectives_manager",
 
 	"", // END Marker
 };
@@ -169,6 +169,7 @@ CZMRules::CZMRules()
     SetZombiePop( 0 );
 
     m_pLoadoutEnt = nullptr;
+    m_pObjManager = nullptr;
 
     // Remove old HL2MP teams.
     // This proobabbllyy isn't the best way of doing this...
@@ -225,8 +226,14 @@ void CZMRules::CreateStandardEntities()
 	pEnt = CBaseEntity::Create( "zm_gamerules", vec3_origin, vec3_angle );
 	Assert( pEnt );
 
-    //pEnt = CBaseEntity::Create( "zm_objectives", vec3_origin, vec3_angle );
-	//Assert( pEnt );
+
+	pEnt = CBaseEntity::Create( "zm_objectives_manager", vec3_origin, vec3_angle );
+	Assert( pEnt );
+}
+
+void CZMRules::LevelInitPostEntity()
+{
+    BaseClass::LevelInitPostEntity();
 }
 #endif
 
@@ -563,6 +570,9 @@ void CZMRules::EndRound( ZMRoundEndReason_t reason )
     m_bInRoundEnd = true;
 
 
+    // Tell clients we don't want to show objectives anymore.
+    CZMEntObjectivesManager::ResetObjectives();
+
     // Check round limit.
     ++m_nRounds;
 
@@ -792,7 +802,9 @@ void CZMRules::ResetWorld()
 {
     Msg( "The round is restarting...\n" );
 
+
     RestoreMap();
+
 
     // Reset our loadout distribution.
     if ( GetLoadoutEnt() )
@@ -800,10 +812,17 @@ void CZMRules::ResetWorld()
         GetLoadoutEnt()->Reset();
     }
 
-
+    // Choose ZM and begin the round!
     CZMPlayer* pZM = ChooseZM();
 
     BeginRound( pZM );
+
+
+
+    if ( GetObjManager() ) // Has to be done after restoring, preferably after changing teams.
+    {
+        GetObjManager()->RoundStart();
+    }
 
 
     m_flRoundStartTime = gpGlobals->curtime;

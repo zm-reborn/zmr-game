@@ -187,3 +187,43 @@
 	input ApplyScoreSurvivors(void) : "Add score to human survivors."
 	input ApplyScoreZM(void) : "Add score to ZM."
 ]
+
+@PointClass base(Targetname) size(-8 -8 -8, 8 8 8) = info_objectives : 
+	"Show objectives on the screen." 
+[
+	Recipient(choices) : "Display To" : 0 =
+	[
+		0: "Humans"
+		1: "Zombie Master"
+		2: "Activator"
+		3: "All"
+	]
+	
+	input Reset(void) : "Resets all texts to empty."
+	input Update(void) : "Update number/complete status to all players."
+	input Display(void) : "Displays text for all players."
+	
+	input SetMainText(string) : "Set main objective text."
+	input SetChild1Text(string) : "Set child 1 objective text."
+	input SetChild2Text(string) : "Set child 2 objective text."
+	input SetChild3Text(string) : "Set child 3 objective text."
+	input SetChild4Text(string) : "Set child 4 objective text."
+	
+	input SetMainTextArg(string) : "Set main text argument."
+	input SetChild1TextArg(string) : "Set child 1 text argument."
+	input SetChild2TextArg(string) : "Set child 2 text argument."
+	input SetChild3TextArg(string) : "Set child 3 text argument."
+	input SetChild4TextArg(string) : "Set child 4 text argument."
+	
+	input IncMainTextArg(string) : "Increase main text argument."
+	input IncChild1TextArg(string) : "Increase child 1 text argument."
+	input IncChild2TextArg(string) : "Increase child 2 text argument."
+	input IncChild3TextArg(string) : "Increase child 3 text argument."
+	input IncChild4TextArg(string) : "Increase child 4 text argument."
+	
+	input CompleteMain(string) : "Sets main as completed. Use Update to display this to players."
+	input CompleteChild1(string) : "Sets child 1 as completed. Use Update to display this to players."
+	input CompleteChild2(string) : "Sets child 2 as completed. Use Update to display this to players."
+	input CompleteChild3(string) : "Sets child 3 as completed. Use Update to display this to players."
+	input CompleteChild4(string) : "Sets child 4 as completed. Use Update to display this to players."
+]

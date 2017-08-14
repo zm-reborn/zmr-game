@@ -38,6 +38,18 @@
 		"MidHeight"	"32"
 	}
 	
+	ZMHudObjectives
+	{
+		"fieldName"		"ZMHudObjectives"
+		"xpos"	"5"
+		"ypos"	"0"
+		"wide"	"640"
+		"tall"  "100"
+		
+		"CurPosX"	"0"
+		"CurPosY"	"2"
+	}
+	
 	HudHealth
 	{
 		"fieldName"		"HudHealth"
