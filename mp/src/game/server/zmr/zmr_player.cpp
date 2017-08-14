@@ -112,11 +112,25 @@ void CZMPlayer::Precache( void )
 
 void CZMPlayer::ChangeTeam( int iTeam )
 {
+    int oldteam = GetTeamNumber();
+
     // Change the team silently...
 	CBasePlayer::ChangeTeam( iTeam, true, true );
 
 
     SetTeamSpecificProps();
+
+
+    CZMRules* pRules = ZMRules();
+    Assert( pRules );
+    
+    if ( iTeam != oldteam && !pRules->IsInRoundEnd() && !(oldteam == ZMTEAM_HUMAN && iTeam != ZMTEAM_SPECTATOR) )
+    {
+        if ( pRules->GetObjManager() )
+        {
+            pRules->GetObjManager()->ChangeDisplay( this );
+        }
+    }
 }
 
 

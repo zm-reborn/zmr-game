@@ -91,3 +91,31 @@ enum ServerParticipation_t
 
 // IN_RUN
 #define IN_ZM_OBSERVERMODE          ( 1 << 12 )
+
+
+
+
+#define NUM_OBJ_LINES           5
+#define MAX_OBJ_LINESIZE        128
+
+enum ObjArgType_t
+{
+    OBJARGTYPE_NONE = 0,
+
+    OBJARGTYPE_INT,
+    OBJARGTYPE_FLOAT,
+    OBJARGTYPE_TIMER,
+    OBJARGTYPE_STRING
+};
+
+enum ObjRecipient_t
+{
+    OBJRECIPIENT_INVALID = -1,
+
+    OBJRECIPIENT_HUMANS,
+    OBJRECIPIENT_ZM,
+    OBJRECIPIENT_ACTIVATOR,
+    OBJRECIPIENT_ALL,
+
+    OBJRECIPIENT_MAX
+};

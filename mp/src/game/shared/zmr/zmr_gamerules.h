@@ -9,6 +9,7 @@
 #ifndef CLIENT_DLL
 #include "zmr/npcs/zmr_zombiebase.h"
 #include "zmr/zmr_entities.h"
+#include "zmr/zmr_obj_manager.h"
 #endif
 
 
@@ -61,6 +62,7 @@ public:
 
 #ifndef CLIENT_DLL
     virtual void CreateStandardEntities() OVERRIDE;
+    virtual void LevelInitPostEntity() OVERRIDE;
 
     void ClientSettingsChanged( CBasePlayer* ) OVERRIDE;
 
@@ -115,6 +117,9 @@ public:
 
     inline CZMEntLoadout* GetLoadoutEnt() { return m_pLoadoutEnt; };
     inline void SetLoadoutEnt( CZMEntLoadout* pEnt ) { m_pLoadoutEnt = pEnt; }
+
+    inline CZMEntObjectivesManager* GetObjManager() { return m_pObjManager; };
+    inline void SetObjManager( CZMEntObjectivesManager* pEnt ) { m_pObjManager = pEnt; }
 #endif
 
     inline int GetZombiePop() { return m_nZombiePop; };
@@ -148,7 +153,9 @@ private:
     bool m_bInRoundEnd;
     int m_nRounds;
 
+
     CZMEntLoadout* m_pLoadoutEnt;
+    CZMEntObjectivesManager* m_pObjManager;
 #endif
 };
 
