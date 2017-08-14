@@ -581,6 +581,30 @@ Scheme
 				"custom"	"1"
 			}
 		}
+		ZMHudObjectives
+		{
+			"1"
+			{
+				"name"		"Monofonto"
+				"tall"		"26"
+				"weight"	"0"
+				"antialias" "1"
+				"additive"	"1"
+				"custom"	"1"
+			}
+		}
+		ZMHudObjectivesSmall
+		{
+			"1"
+			{
+				"name"		"Monofonto"
+				"tall"		"22"
+				"weight"	"0"
+				"antialias" "1"
+				"additive"	"1"
+				"custom"	"1"
+			}
+		}
 		HudNumbersSmall
 		{
 			"1"
