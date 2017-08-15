@@ -144,7 +144,8 @@ void CZMEntObjectivesManager::ChangeDisplay( CZMPlayer* pPlayer )
 
     if ( pObj )
     {
-        Display( pObj, pPlayer, OBJRECIPIENT_ACTIVATOR );
+        // Add a bit of delay so the client knows its team.
+        g_EventQueue.AddEvent( pObj, "DisplayActivator", 0.1f, pPlayer, this );
     }
 }
 

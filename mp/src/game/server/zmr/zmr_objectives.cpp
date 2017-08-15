@@ -75,6 +75,7 @@ LINK_ENTITY_TO_CLASS( info_objectives, CZMEntObjectives );
 
 BEGIN_DATADESC( CZMEntObjectives )
     DEFINE_INPUTFUNC( FIELD_VOID, "Display", InputDisplay ),
+    DEFINE_INPUTFUNC( FIELD_VOID, "DisplayActivator", InputDisplayActivator ),
     DEFINE_INPUTFUNC( FIELD_VOID, "Update", InputUpdate ),
     DEFINE_INPUTFUNC( FIELD_VOID, "Reset", InputReset ),
 
@@ -174,6 +175,11 @@ void CZMEntObjectives::InputCompleteChild4( inputdata_t& inputData ) { m_Lines[4
 void CZMEntObjectives::InputDisplay( inputdata_t& inputData )
 {
     CZMEntObjectivesManager::Display( this, inputData.pActivator );
+}
+
+void CZMEntObjectives::InputDisplayActivator( inputdata_t& inputData )
+{
+    CZMEntObjectivesManager::Display( this, inputData.pActivator, OBJRECIPIENT_ACTIVATOR );
 }
 
 void CZMEntObjectives::InputUpdate( inputdata_t& inputData )
