@@ -11,6 +11,7 @@
 #include "zmr_entities.h"
 #include "zmr/zmr_gamerules.h"
 #include "zmr/zmr_global_shared.h"
+#include "weapons/zmr_carry.h"
 #include "zmr_player.h"
 
 
@@ -124,6 +125,7 @@ void CZMPlayer::ChangeTeam( int iTeam )
     CZMRules* pRules = ZMRules();
     Assert( pRules );
     
+    // If we changed teams in the middle of the round (late-joining, etc.) send objectives. 
     if ( iTeam != oldteam && !pRules->IsInRoundEnd() && !(oldteam == ZMTEAM_HUMAN && iTeam != ZMTEAM_SPECTATOR) )
     {
         if ( pRules->GetObjManager() )
@@ -451,12 +453,14 @@ void CZMPlayer::CommitSuicide( const Vector &vecForce, bool bExplode, bool bForc
     BaseClass::CommitSuicide( vecForce, bExplode, bForce );
 }
 
+extern ConVar physcannon_maxmass;
+
 void CZMPlayer::PickupObject( CBaseEntity *pObject, bool bLimitMassAndSize )
 {
-    if ( !IsHuman() ) return;
+    if ( !IsHuman() || !IsAlive() ) return;
 
 
-    BaseClass::PickupObject( pObject, bLimitMassAndSize );
+    PlayerAttemptPickup( this, pObject );
 }
 
 bool CZMPlayer::BumpWeapon( CBaseCombatWeapon *pWeapon )
