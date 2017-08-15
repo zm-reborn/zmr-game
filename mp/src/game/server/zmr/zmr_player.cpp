@@ -17,6 +17,8 @@
 
 static ConVar zm_sv_randomplayermodel( "zm_sv_randomplayermodel", "1", FCVAR_NOTIFY | FCVAR_ARCHIVE, "If player has an invalid model, use a random one. Temporary 'fix' for model choosing not working." );
 
+ConVar zm_sv_antiafk( "zm_sv_antiafk", "90", FCVAR_NOTIFY | FCVAR_ARCHIVE, "If the player is AFK for this many seconds, put them into spectator mode. 0 = disable" );
+
 
 IMPLEMENT_SERVERCLASS_ST( CZMPlayer, DT_ZM_Player )
     SendPropInt( SENDINFO( m_nResources ) ),
@@ -62,6 +64,9 @@ const char* g_ZMPlayerModels[] =
 CZMPlayer::CZMPlayer()
 {
     SetResources( 0 );
+
+    m_flLastActivity = gpGlobals->curtime;
+    m_flLastActivityWarning = 0.0f;
 
     m_flNextResourceInc = 0.0f;
 
@@ -109,6 +114,33 @@ void CZMPlayer::Precache( void )
     //PrecacheScriptSound( "NPC_MetroPolice.Die" );
     //PrecacheScriptSound( "NPC_CombineS.Die" );
     //PrecacheScriptSound( "NPC_Citizen.die" );
+}
+
+extern ConVar zm_sv_antiafk_punish;
+
+void CZMPlayer::PreThink( void )
+{
+    if ( m_afButtonLast != m_nButtons )
+    {
+        m_flLastActivity = gpGlobals->curtime;
+    }
+
+
+    if ( IsCloseToAFK() && ZMRules()->CanInactivityPunish( this ) )
+    {
+        if ( IsAFK() )
+        {
+            ZMRules()->PunishInactivity( this );
+        }
+        else if ( (m_flLastActivityWarning + 1.0f) < gpGlobals->curtime )
+        {
+            ClientPrint( this, HUD_PRINTCENTER, "You are about to get punished for being AFK!" );
+
+            m_flLastActivityWarning = gpGlobals->curtime;
+        }
+    }
+
+    BaseClass::PreThink();
 }
 
 void CZMPlayer::ChangeTeam( int iTeam )

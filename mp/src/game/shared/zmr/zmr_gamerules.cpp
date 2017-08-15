@@ -498,6 +498,121 @@ void CZMRules::OnClientFinishedPutInServer( CZMPlayer* pPlayer )
     }
 }
 
+
+ConVar zm_sv_antiafk_replacezm( "zm_sv_antiafk_replacezm", "1", FCVAR_NOTIFY | FCVAR_ARCHIVE, "If the player afking is the only ZM, replace them." );
+ConVar zm_sv_antiafk_punish( "zm_sv_antiafk_punish", "1", FCVAR_NOTIFY | FCVAR_ARCHIVE, "0 = Don't do anything. 1 = Transfer to spectator team, 2 = Kick." );
+
+
+bool CZMRules::CanInactivityPunish( CZMPlayer* pPlayer )
+{
+    if ( pPlayer->IsZM() && zm_sv_antiafk_replacezm.GetBool() )
+    {
+        return true;
+    }
+
+
+    switch ( zm_sv_antiafk_punish.GetInt() )
+    {
+    case AFK_PUNISH_SPECTATE :
+        if ( pPlayer->IsObserver() ) return false;
+        break;
+    case AFK_PUNISH_NOTHING : return false;
+    default : break;
+    }
+
+    return true;
+}
+
+void CZMRules::PunishInactivity( CZMPlayer* pPlayer )
+{
+    if (zm_sv_antiafk_replacezm.GetBool()
+    &&  pPlayer->IsZM()
+    &&  !IsInRoundEnd()
+    &&  GetGlobalTeam( ZMTEAM_ZM )->GetNumPlayers() <= 1
+    )
+    {
+        ReplaceZM( pPlayer );
+    }
+
+
+    switch ( zm_sv_antiafk_punish.GetInt() )
+    {
+    case AFK_PUNISH_SPECTATE :
+    {
+        if ( !pPlayer->IsObserver() )
+        {
+            pPlayer->ChangeTeam( ZMTEAM_SPECTATOR );
+        }
+
+        break;
+    }
+    case AFK_PUNISH_KICK :
+        engine->ServerCommand( UTIL_VarArgs( "kickid %d\n", pPlayer->GetUserID() ) );
+        break;
+    default : break;
+    }
+}
+
+bool CZMRules::ReplaceZM( CZMPlayer* pZM )
+{
+    // Find the best candidate to replace the ZM.
+    CZMPlayer* pChoice = nullptr;
+
+    CUtlVector<CZMPlayer*> vFirstChoice;
+    CUtlVector<CZMPlayer*> vOther;
+    vFirstChoice.Purge();
+    vOther.Purge();
+
+
+    CZMPlayer* pPlayer;
+    for ( int i = 1; i <= gpGlobals->maxClients; i++ )
+    {
+        pPlayer = ToZMPlayer( UTIL_PlayerByIndex( i ) );
+
+        if ( !pPlayer ) continue;
+
+        if ( pPlayer == pZM ) continue;
+
+        if ( pPlayer->IsZM() ) continue;
+
+
+        switch( pPlayer->GetParticipation() )
+        {
+        case ZMPART_ALLOWZM :
+        {
+            if ( pPlayer->IsObserver() || !pPlayer->IsAlive() )
+            {
+                vFirstChoice.AddToTail( pPlayer );
+            }
+
+            vOther.AddToTail( pPlayer );
+        }
+        }
+    }
+
+
+    if ( vFirstChoice.Count() > 0 )
+    {
+        pChoice = vFirstChoice[random->RandomInt( 0, vFirstChoice.Count() - 1 )];
+    }
+    else if ( vOther.Count() > 0 )
+    {
+        pChoice = vOther[random->RandomInt( 0, vOther.Count() - 1 )];
+    }
+
+    if ( pChoice )
+    {
+        pChoice->ChangeTeam( ZMTEAM_ZM );
+        pChoice->Spawn();
+    }
+
+
+    pZM->ChangeTeam( ZMTEAM_SPECTATOR );
+
+
+    return pChoice != nullptr;
+}
+
 CBaseEntity* CZMRules::GetPlayerSpawnSpot( CBasePlayer* pPlayer )
 {
 	CBaseEntity* pSpawn = pPlayer->EntSelectSpawnPoint();

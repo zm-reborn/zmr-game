@@ -33,6 +33,14 @@ extern ConVar zm_sv_cost_drifter;
 extern ConVar zm_sv_cost_immolator;
 
 
+enum
+{
+    AFK_PUNISH_NOTHING = 0,
+    AFK_PUNISH_SPECTATE,
+    AFK_PUNISH_KICK
+};
+
+
 class CZMGameRulesProxy : public CGameRulesProxy // CGameRulesProxy CHL2MPGameRulesProxy
 {
 public:
@@ -100,6 +108,9 @@ public:
 
     void OnClientFinishedPutInServer( CZMPlayer* );
 
+    bool CanInactivityPunish( CZMPlayer* );
+    void PunishInactivity( CZMPlayer* );
+    bool ReplaceZM( CZMPlayer* );
 
     //bool RoundCleanupShouldIgnore( CBaseEntity* ) OVERRIDE;
     void EndRound( ZMRoundEndReason_t );
@@ -124,7 +135,7 @@ public:
 
     inline int GetZombiePop() { return m_nZombiePop; };
 
-
+    
     static int GetServerParticipationFlags();
 
 #ifndef CLIENT_DLL
