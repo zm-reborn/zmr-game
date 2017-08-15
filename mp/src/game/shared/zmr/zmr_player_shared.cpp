@@ -93,3 +93,10 @@ void CZMPlayer::SetLocalParticipation( Participation_t part )
     zm_cl_participation.SetValue( (int)part );
 }
 #endif
+
+
+// Play normal footsteps instead of HL2DM ones.
+void CZMPlayer::PlayStepSound( Vector& vecOrigin, surfacedata_t* psurface, float fvol, bool force )
+{
+    CBasePlayer::PlayStepSound( vecOrigin, psurface, fvol, force );
+}

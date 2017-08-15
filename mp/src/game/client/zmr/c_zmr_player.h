@@ -42,6 +42,7 @@ public:
     Participation_t GetParticipation();
     static Participation_t GetLocalParticipation();
     static void SetLocalParticipation( Participation_t );
+    virtual void PlayStepSound( Vector& vecOrigin, surfacedata_t* psurface, float fvol, bool force ) OVERRIDE;
 
 protected:
     CZMCharCircle* m_fxInner;

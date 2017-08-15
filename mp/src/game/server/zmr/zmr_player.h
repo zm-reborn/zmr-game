@@ -111,6 +111,7 @@ public:
     void SetResources( int );
     bool Weapon_CanSwitchTo( CBaseCombatWeapon* ) OVERRIDE;
     Participation_t GetParticipation();
+    virtual void PlayStepSound( Vector& vecOrigin, surfacedata_t* psurface, float fvol, bool force ) OVERRIDE;
 
     
     int GetWeaponSlotFlags() { return m_fWeaponSlotFlags; };
