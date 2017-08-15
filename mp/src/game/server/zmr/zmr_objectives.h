@@ -49,6 +49,7 @@ public:
     
 
     void InputDisplay( inputdata_t &inputData );
+    void InputDisplayActivator( inputdata_t &inputData );
     void InputUpdate( inputdata_t &inputData );
     void InputReset( inputdata_t &inputData );
 
