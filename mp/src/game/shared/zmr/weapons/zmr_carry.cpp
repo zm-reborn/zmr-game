@@ -2355,9 +2355,13 @@ bool CZMWeaponCarry::CanPickupObject( CBaseEntity *pTarget )
     if ( pTarget->IsEFlagSet( EFL_NO_PHYSCANNON_INTERACTION ) )
         return false;
 
+
     CBasePlayer *pOwner = ToBasePlayer( GetOwner() );
     
-    if ( pOwner && pOwner->GetGroundEntity() == pTarget )
+    if ( !pOwner )
+        return false;
+
+    if ( pOwner->GetGroundEntity() == pTarget )
         return false;
 
     if ( pTarget->VPhysicsIsFlesh( ) )
@@ -2368,10 +2372,26 @@ bool CZMWeaponCarry::CanPickupObject( CBaseEntity *pTarget )
     if ( pObj && pObj->GetGameFlags() & FVPHYSICS_PLAYER_HELD )
         return false;
 
-    /*if ( UTIL_IsCombineBall( pTarget ) )
+    // ZMRCHANGE
+    // Can't be picked up if there are npcs/players on it.
+    // However, do allow if our targetname is something.
+    // This should stop players from standing on top of objective items.
+    if ( STRING( pTarget->GetEntityName() )[0] == NULL )
     {
-        return CBasePlayer::CanPickupObject( pTarget, 0, 0 );
-    }*/
+        groundlink_t *link;
+        groundlink_t *root = (groundlink_t*)GetDataObject( GROUNDLINK );
+        if ( root )
+        {
+            for ( link = root->nextLink; link != root; link = link->nextLink )
+            {
+                if ( link->entity && (link->entity->IsNPC() || link->entity->IsPlayer()) )
+                {
+                    return false;
+                }
+            }
+        }
+    }
+    
 
     return CBasePlayer::CanPickupObject( pTarget, physcannon_maxmass.GetFloat(), 0 );
 #else
