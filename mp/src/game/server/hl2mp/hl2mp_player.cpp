@@ -34,9 +34,9 @@ CBaseEntity	 *g_pLastRebelSpawn = NULL;
 extern CBaseEntity				*g_pLastSpawn;
 
 #define HL2MP_COMMAND_MAX_RATE 0.3
-
+#ifndef ZMR // ZMRCHANGE: Useless shit.
 void DropPrimedFragGrenade( CHL2MP_Player *pPlayer, CBaseCombatWeapon *pGrenade );
-
+#endif
 #ifndef ZMR
 LINK_ENTITY_TO_CLASS( player, CHL2MP_Player );
 #endif
@@ -1185,6 +1185,7 @@ void CHL2MP_Player::FlashlightTurnOff( void )
 
 void CHL2MP_Player::Weapon_Drop( CBaseCombatWeapon *pWeapon, const Vector *pvecTarget, const Vector *pVelocity )
 {
+#ifndef ZMR // ZMRCHANGE: Useless shit.
 	//Drop a grenade if it's primed.
 	if ( GetActiveWeapon() )
 	{
@@ -1199,6 +1200,7 @@ void CHL2MP_Player::Weapon_Drop( CBaseCombatWeapon *pWeapon, const Vector *pvecT
 			}
 		}
 	}
+#endif
 
 	BaseClass::Weapon_Drop( pWeapon, pvecTarget, pVelocity );
 }
