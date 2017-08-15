@@ -1808,7 +1808,7 @@ CZMWeaponCarry::FindObjectResult_t CZMWeaponCarry::FindObject( void )
 
     // Setup our positions
     Vector	start = pPlayer->Weapon_ShootPosition();
-    float	testLength = TraceLength() * 4.0f;
+    float	testLength = TraceLength();// * 4.0f; // Thanks Valve.
     Vector	end = start + forward * testLength;
 
     // Try to find an object by looking straight ahead
