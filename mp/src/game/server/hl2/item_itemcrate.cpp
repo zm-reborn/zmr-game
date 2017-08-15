@@ -263,7 +263,7 @@ void CItem_ItemCrate::OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_
 	BaseClass::OnPhysGunPickup( pPhysGunUser, reason );
 
 	m_OnCacheInteraction.FireOutput( pPhysGunUser, this );
-
+#ifndef ZMR // ZMRCHANGE: Don't take damage when being punted and don't add any additional velocity.
 	if ( reason == PUNTED_BY_CANNON && m_CrateAppearance != CRATE_APPEARANCE_RADAR_BEACON )
 	{
 		Vector vForward;
@@ -280,4 +280,5 @@ void CItem_ItemCrate::OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_
 
 		TakeDamage( CTakeDamageInfo( pPhysGunUser, pPhysGunUser, GetHealth(), DMG_GENERIC ) );
 	}
+#endif
 }
