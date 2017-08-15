@@ -19,6 +19,8 @@
 
 */
 
+extern ConVar zm_sv_antiafk;
+
 
 class CZMBaseZombie;
 class CZMBaseWeapon;
@@ -44,6 +46,7 @@ public:
 
     virtual void Precache( void ) OVERRIDE;
     virtual void Spawn() OVERRIDE;
+    virtual void PreThink( void ) OVERRIDE;
     void PickDefaultSpawnTeam();
     virtual void ChangeTeam( int iTeam ) OVERRIDE;
 
@@ -121,6 +124,10 @@ public:
 
     inline int GetPickPriority() { return m_nPickPriority; };
     inline void SetPickPriority( int i ) { m_nPickPriority = i; };
+    
+    inline float GetLastActivity() { return m_flLastActivity; };
+    inline bool IsCloseToAFK() { return zm_sv_antiafk.GetInt() > 0 && (gpGlobals->curtime - GetLastActivity()) > (zm_sv_antiafk.GetFloat() * 0.8f); };
+    inline bool IsAFK() { return zm_sv_antiafk.GetInt() > 0 && (gpGlobals->curtime - GetLastActivity()) > zm_sv_antiafk.GetFloat(); };
 
 private:
     CNetworkVar( int, m_nResources );
@@ -129,6 +136,8 @@ private:
     //Participation_t m_iParticipation;
     int m_fWeaponSlotFlags;
     int m_nPickPriority;
+    float m_flLastActivity;
+    float m_flLastActivityWarning;
 };
 
 inline CZMPlayer* ToZMPlayer( CBaseEntity* pEntity )
