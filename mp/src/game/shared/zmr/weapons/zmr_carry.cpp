@@ -1865,28 +1865,35 @@ CZMWeaponCarry::FindObjectResult_t CZMWeaponCarry::FindObject( void )
         return AttachObject( pEntity, tr.endpos ) ? OBJECT_FOUND : OBJECT_NOT_FOUND;
     }
 
+    // If we're too far, simply start to pull the object towards us.
 
-    //if ( !bPull )
-    //    return OBJECT_NOT_FOUND;
 
     // FIXME: This needs to be run through the CanPickupObject logic
     IPhysicsObject *pObj = pEntity->VPhysicsGetObject();
-    if ( !pObj )
-        return OBJECT_NOT_FOUND;
+    if ( !pObj ) return OBJECT_NOT_FOUND;
 
-    // If we're too far, simply start to pull the object towards us
-    Vector	pullDir = start - pEntity->WorldSpaceCenter();
-    VectorNormalize( pullDir );
-    pullDir *= physcannon_pullforce.GetFloat();
+
+    Vector vel;
+    AngularImpulse temp;
+    pObj->GetVelocity( &vel, &temp );
+
+
+    Vector pull = start - pEntity->WorldSpaceCenter();
+    VectorNormalize( pull );
+    // ZMRCHANGE
+    // Don't accelerate too far.
+    // *= physcannon_pullforce.GetFloat()
+    pull *= SimpleSplineRemapVal( vel.Length(), 0, 125.0f, physcannon_pullforce.GetFloat(), 1.0f );
     
+    // tf is this?
     float mass = PhysGetEntityMass( pEntity );
     if ( mass < 50.0f )
     {
-        pullDir *= (mass + 0.5) * (1/50.0f);
+        pull *= (mass + 0.5) * (1/50.0f);
     }
 
     // Nudge it towards us
-    pObj->ApplyForceCenter( pullDir );
+    pObj->ApplyForceCenter( pull );
     return OBJECT_NOT_FOUND;
 }
 
