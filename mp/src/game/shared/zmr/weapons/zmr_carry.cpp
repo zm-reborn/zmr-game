@@ -971,6 +971,9 @@ public:
     virtual void SetViewModel( void );
     //virtual const char *GetShootSound( int iIndex ) const;
     
+    // Move this to public.
+    bool	CanPickupObject( CBaseEntity *pTarget );
+
 #ifndef CLIENT_DLL
     CNetworkQAngle	( m_attachedAnglesPlayerSpace );
 #else
@@ -992,7 +995,6 @@ protected:
     };
 
     // Pickup and throw objects.
-    bool	CanPickupObject( CBaseEntity *pTarget );
     void	CheckForTarget( void );
     
 #ifndef CLIENT_DLL
@@ -2466,3 +2468,22 @@ void CallbackPhyscannonImpact( const CEffectData &data )
 DECLARE_CLIENT_EFFECT( "PhyscannonImpact", CallbackPhyscannonImpact );
 */
 #endif
+
+void PlayerAttemptPickup( CBasePlayer* pPlayer, CBaseEntity* pEntity )
+{
+    CZMWeaponCarry* pWeapon = static_cast<CZMWeaponCarry*>( pPlayer->Weapon_OwnsThisType( "weapon_zm_carry" ) );
+    if ( !pWeapon ) return;
+
+
+    // Don't even switch to the weapon if we can't pick it up.
+    if ( !pWeapon->CanPickupObject( pEntity ) )
+        return;
+
+    if ( pPlayer->GetActiveWeapon() != pWeapon )
+    {
+        if ( !pPlayer->Weapon_Switch( pWeapon ) )
+            return;
+    }
+
+    pWeapon->SecondaryAttack();
+}

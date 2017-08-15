@@ -22,3 +22,5 @@ float PlayerPickupGetHeldObjectMass( CBaseEntity *pPickupControllerEntity, IPhys
 float PhysCannonGetHeldObjectMass( CBaseCombatWeapon *pActiveWeapon, IPhysicsObject *pHeldObject );
 
 CBaseEntity *PhysCannonGetHeldEntity( CBaseCombatWeapon *pActiveWeapon );
+
+void PlayerAttemptPickup( CBasePlayer*, CBaseEntity* );
