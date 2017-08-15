@@ -32,6 +32,7 @@ public:
 
     virtual void Init() OVERRIDE;
     virtual void VidInit() OVERRIDE;
+    virtual void Reset() OVERRIDE;
 
     virtual void OnThink() OVERRIDE;
     virtual void Paint() OVERRIDE;
@@ -87,12 +88,18 @@ void CZMHudHPBar::Init()
 {
     HOOK_HUD_MESSAGE( CZMHudHPBar, Damage );
 
-    m_nHealth = -1;
+    Reset();
 }
 
 void CZMHudHPBar::VidInit()
 {
+    Reset();
+}
+
+void CZMHudHPBar::Reset()
+{
     m_nHealth = -1;
+    m_flBlur = 0;
 }
 
 void CZMHudHPBar::OnThink()
