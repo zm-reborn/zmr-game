@@ -6347,6 +6347,7 @@ bool CBasePlayer::ClientCommand( const CCommand &args )
 	}
 	else
 #endif // _DEBUG
+#ifndef ZMR // ZMRCHANGE: Remove useless commands.
 	if( stricmp( cmd, "vehicleRole" ) == 0 )
 	{
 		// Get the vehicle role value.
@@ -6371,10 +6372,14 @@ bool CBasePlayer::ClientCommand( const CCommand &args )
 			return true;
 		}
 	}
-	else if ( HandleVoteCommands( args ) )
+    else if ( HandleVoteCommands( args ) )
+#else
+	if ( HandleVoteCommands( args ) )
+#endif
 	{
 		return true;
 	}
+#ifndef ZMR // ZMRCHANGE: You shouldn't be allowed to use this.
 	else if ( stricmp( cmd, "spectate" ) == 0 ) // join spectator team & start observer mode
 	{
 		if ( GetTeamNumber() == TEAM_SPECTATOR )
@@ -6402,6 +6407,7 @@ bool CBasePlayer::ClientCommand( const CCommand &args )
 		StartObserverMode( OBS_MODE_ROAMING );
 		return true;
 	}
+#endif
 	else if ( stricmp( cmd, "spec_mode" ) == 0 ) // new observer mode
 	{
 		int mode;
