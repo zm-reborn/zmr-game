@@ -330,8 +330,8 @@ public:
     void PrimaryAttack() OVERRIDE;
     void Equip( CBaseCombatCharacter* ) OVERRIDE;
     bool Deploy() OVERRIDE;
-    bool CanHolster( void ) const OVERRIDE { return m_iThrowState == MOLOTOVSTATE_IDLE; };
-    bool CanBeDropped() OVERRIDE { return m_iThrowState == MOLOTOVSTATE_IDLE; };
+    bool CanHolster( void ) const OVERRIDE { return m_iThrowState < MOLOTOVSTATE_DRAWBACK; };
+    bool CanBeDropped() OVERRIDE { return m_iThrowState < MOLOTOVSTATE_DRAWBACK; };
     
 #ifndef CLIENT_DLL
     void Drop( const Vector& ) OVERRIDE;
