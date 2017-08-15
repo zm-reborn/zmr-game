@@ -254,6 +254,18 @@ void CZMPlayer::EquipSuit( bool bPlayEffects )
     m_HL2Local.m_bDisplayReticle = true;
 }
 
+void CZMPlayer::RemoveAllItems( bool removeSuit )
+{
+    BaseClass::RemoveAllItems( removeSuit );
+
+    // ZMRTODO: See if this has any side-effects.
+    // HACK: To stop ZM having a viewmodel. Just hide our viewmodel.
+    if ( GetViewModel() )
+    {
+        GetViewModel()->AddEffects( EF_NODRAW );
+    }
+}
+
 void CZMPlayer::FlashlightTurnOn()
 {
     if ( IsHuman() && IsAlive() )
