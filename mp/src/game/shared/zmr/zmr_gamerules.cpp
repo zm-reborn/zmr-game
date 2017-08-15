@@ -48,44 +48,44 @@ static ConVar zm_sv_reward_kill( "zm_sv_reward_kill", "100", FCVAR_NOTIFY | FCVA
 #ifndef CLIENT_DLL
 static const char* g_PreserveEnts[] =
 {
-	"ai_network",
-	"ai_hint",
-	"hl2mp_gamerules", // Not used.
-	"team_manager",
-	"player_manager",
-	"env_soundscape",
-	"env_soundscape_proxy",
-	"env_soundscape_triggerable",
-	"env_sun",
-	"env_wind",
-	"env_fog_controller",
-	//"func_brush", // Yup, this causes problems (eg. zebra)
-	"func_wall",
-	"func_buyzone",
-	"func_illusionary",
-	"infodecal",
-	"info_projecteddecal",
-	"info_node",
-	"info_target",
-	"info_node_hint",
-	"info_player_deathmatch",
-	"info_player_combine",
-	"info_player_rebel",
-	"info_map_parameters",
-	//"keyframe_rope", // Will fuck up maps that parent ropes to objects.
-	//"move_rope",
-	"info_ladder",
-	"player",
-	"point_viewcontrol",
-	"scene_manager",
-	"shadow_control",
-	"sky_camera",
-	"soundent",
-	"trigger_soundscape",
-	"viewmodel",
-	"predicted_viewmodel",
-	"worldspawn",
-	"point_devshot_camera",
+    "ai_network",
+    "ai_hint",
+    "hl2mp_gamerules", // Not used.
+    "team_manager",
+    "player_manager",
+    "env_soundscape",
+    "env_soundscape_proxy",
+    "env_soundscape_triggerable",
+    "env_sun",
+    "env_wind",
+    "env_fog_controller",
+    //"func_brush", // Yup, this causes problems (eg. zebra)
+    "func_wall",
+    "func_buyzone",
+    "func_illusionary",
+    "infodecal",
+    "info_projecteddecal",
+    "info_node",
+    "info_target",
+    "info_node_hint",
+    "info_player_deathmatch",
+    "info_player_combine",
+    "info_player_rebel",
+    "info_map_parameters",
+    //"keyframe_rope", // Will fuck up maps that parent ropes to objects.
+    //"move_rope",
+    "info_ladder",
+    "player",
+    "point_viewcontrol",
+    "scene_manager",
+    "shadow_control",
+    "sky_camera",
+    "soundent",
+    "trigger_soundscape",
+    "viewmodel",
+    "predicted_viewmodel",
+    "worldspawn",
+    "point_devshot_camera",
 
     // Our preserved ents...
     "zm_gamerules",
@@ -96,7 +96,7 @@ static const char* g_PreserveEnts[] =
 
     "zm_objectives_manager",
 
-	"", // END Marker
+    "", // END Marker
 };
 #endif
 
@@ -106,9 +106,9 @@ REGISTER_GAMERULES_CLASS( CZMRules );
 BEGIN_NETWORK_TABLE_NOBASE( CZMRules, DT_ZM_Rules )
 
     #ifdef CLIENT_DLL
-	    RecvPropInt( RECVINFO( m_nZombiePop ) ),
+        RecvPropInt( RECVINFO( m_nZombiePop ) ),
     #else
-	    SendPropInt( SENDINFO( m_nZombiePop ) ),
+        SendPropInt( SENDINFO( m_nZombiePop ) ),
     #endif
 
 END_NETWORK_TABLE()
@@ -122,24 +122,24 @@ IMPLEMENT_NETWORKCLASS_ALIASED( ZMGameRulesProxy, DT_ZM_GameRulesProxy )
 #ifdef CLIENT_DLL
     void RecvProxy_ZMRules( const RecvProp *pProp, void **pOut, void *pData, int objectID )
     {
-	    CZMRules *pRules = ZMRules();
-	    Assert( pRules );
-	    *pOut = pRules;
+        CZMRules *pRules = ZMRules();
+        Assert( pRules );
+        *pOut = pRules;
     }
 
     BEGIN_RECV_TABLE( CZMGameRulesProxy, DT_ZM_GameRulesProxy )
-	    RecvPropDataTable( "zm_gamerules_data", 0, 0, &REFERENCE_RECV_TABLE( DT_ZM_Rules ), RecvProxy_ZMRules )
+        RecvPropDataTable( "zm_gamerules_data", 0, 0, &REFERENCE_RECV_TABLE( DT_ZM_Rules ), RecvProxy_ZMRules )
     END_RECV_TABLE()
 #else
     void* SendProxy_ZMRules( const SendProp *pProp, const void *pStructBase, const void *pData, CSendProxyRecipients *pRecipients, int objectID )
     {
-	    CZMRules *pRules = ZMRules();
-	    Assert( pRules );
-	    return pRules;
+        CZMRules *pRules = ZMRules();
+        Assert( pRules );
+        return pRules;
     }
 
     BEGIN_SEND_TABLE( CZMGameRulesProxy, DT_ZM_GameRulesProxy )
-	    SendPropDataTable( "zm_gamerules_data", 0, &REFERENCE_SEND_TABLE( DT_ZM_Rules ), SendProxy_ZMRules )
+        SendPropDataTable( "zm_gamerules_data", 0, &REFERENCE_SEND_TABLE( DT_ZM_Rules ), SendProxy_ZMRules )
     END_SEND_TABLE()
 #endif
 
@@ -148,10 +148,10 @@ IMPLEMENT_NETWORKCLASS_ALIASED( ZMGameRulesProxy, DT_ZM_GameRulesProxy )
 // NOTE: the indices here must match TEAM_TERRORIST, TEAM_CT, TEAM_SPECTATOR, etc.
 const char* g_sTeamNames[] =
 {
-	"Unassigned",
-	"Spectator",
-	"Survivors",
-	"Zombie Master",
+    "Unassigned",
+    "Spectator",
+    "Survivors",
+    "Zombie Master",
 };
 
 
@@ -192,14 +192,14 @@ CZMRules::CZMRules()
         --i;
     }
 
-	// Create the team managers
-	for ( i = 0; i < ARRAYSIZE( g_sTeamNames ); i++ )
-	{
-		CZMTeam* pTeam = static_cast<CZMTeam*>( CreateEntityByName( "team_manager" ) );
-		pTeam->Init( g_sTeamNames[i], i );
+    // Create the team managers
+    for ( i = 0; i < ARRAYSIZE( g_sTeamNames ); i++ )
+    {
+        CZMTeam* pTeam = static_cast<CZMTeam*>( CreateEntityByName( "team_manager" ) );
+        pTeam->Init( g_sTeamNames[i], i );
 
         g_Teams.AddToTail( pTeam );
-	}
+    }
 #endif
 }
 
@@ -217,19 +217,19 @@ void CZMRules::CreateStandardEntities()
 
 
     // NOTE: DO NOT CALL HL2MP RULES.
-	CGameRules::CreateStandardEntities();
+    CGameRules::CreateStandardEntities();
 
 
-	
+    
     CBaseEntity* pEnt;
 
     // Create the entity that will send our data to the client.
-	pEnt = CBaseEntity::Create( "zm_gamerules", vec3_origin, vec3_angle );
-	Assert( pEnt );
+    pEnt = CBaseEntity::Create( "zm_gamerules", vec3_origin, vec3_angle );
+    Assert( pEnt );
 
 
-	pEnt = CBaseEntity::Create( "zm_objectives_manager", vec3_origin, vec3_angle );
-	Assert( pEnt );
+    pEnt = CBaseEntity::Create( "zm_objectives_manager", vec3_origin, vec3_angle );
+    Assert( pEnt );
 }
 
 void CZMRules::LevelInitPostEntity()
@@ -262,49 +262,49 @@ bool CZMRules::ShouldCollide( int collisionGroup0, int collisionGroup1 )
 
 void CZMRules::ClientSettingsChanged( CBasePlayer* pPlayer )
 {
-	CZMPlayer* pZMPlayer = ToZMPlayer( pPlayer );
+    CZMPlayer* pZMPlayer = ToZMPlayer( pPlayer );
 
-	if ( !pZMPlayer ) return;
-
-
-
-	const char *pCurrentModel = modelinfo->GetModelName( pPlayer->GetModel() );
-	const char *szModelName = engine->GetClientConVarValue( engine->IndexOfEdict( pPlayer->edict() ), "cl_playermodel" );
-
-	//If we're different.
-	if ( stricmp( szModelName, pCurrentModel ) )
-	{
-		//Too soon, set the cvar back to what it was.
-		//Note: this will make this function be called again
-		//but since our models will match it'll just skip this whole dealio.
-		if ( pZMPlayer->GetNextModelChangeTime() >= gpGlobals->curtime )
-		{
-			char szReturnString[512];
-
-			Q_snprintf( szReturnString, sizeof (szReturnString ), "cl_playermodel %s\n", pCurrentModel );
-			engine->ClientCommand ( pZMPlayer->edict(), szReturnString );
-
-			Q_snprintf( szReturnString, sizeof( szReturnString ), "Please wait %.1f more seconds before trying to switch player models.\n", (pZMPlayer->GetNextModelChangeTime() - gpGlobals->curtime) );
-			ClientPrint( pZMPlayer, HUD_PRINTTALK, szReturnString );
-			return;
-		}
+    if ( !pZMPlayer ) return;
 
 
-		pZMPlayer->SetPlayerModel();
 
-		const char *pszNewModel = modelinfo->GetModelName( pZMPlayer->GetModel() );
+    const char *pCurrentModel = modelinfo->GetModelName( pPlayer->GetModel() );
+    const char *szModelName = engine->GetClientConVarValue( engine->IndexOfEdict( pPlayer->edict() ), "cl_playermodel" );
+
+    //If we're different.
+    if ( stricmp( szModelName, pCurrentModel ) )
+    {
+        //Too soon, set the cvar back to what it was.
+        //Note: this will make this function be called again
+        //but since our models will match it'll just skip this whole dealio.
+        if ( pZMPlayer->GetNextModelChangeTime() >= gpGlobals->curtime )
+        {
+            char szReturnString[512];
+
+            Q_snprintf( szReturnString, sizeof (szReturnString ), "cl_playermodel %s\n", pCurrentModel );
+            engine->ClientCommand ( pZMPlayer->edict(), szReturnString );
+
+            Q_snprintf( szReturnString, sizeof( szReturnString ), "Please wait %.1f more seconds before trying to switch player models.\n", (pZMPlayer->GetNextModelChangeTime() - gpGlobals->curtime) );
+            ClientPrint( pZMPlayer, HUD_PRINTTALK, szReturnString );
+            return;
+        }
+
+
+        pZMPlayer->SetPlayerModel();
+
+        const char *pszNewModel = modelinfo->GetModelName( pZMPlayer->GetModel() );
 
         if ( pCurrentModel != pszNewModel )
         {
-		    char szReturnString[192];
-		    Q_snprintf( szReturnString, sizeof( szReturnString ), "Your player model is: %s\n", pszNewModel );
+            char szReturnString[192];
+            Q_snprintf( szReturnString, sizeof( szReturnString ), "Your player model is: %s\n", pszNewModel );
 
-		    ClientPrint( pZMPlayer, HUD_PRINTTALK, szReturnString );
+            ClientPrint( pZMPlayer, HUD_PRINTTALK, szReturnString );
         }
-	}
+    }
 
     // Don't use HL2DM rules, it'll change player's team.
-	CTeamplayRules::ClientSettingsChanged( pPlayer );
+    CTeamplayRules::ClientSettingsChanged( pPlayer );
 }
 
 
@@ -339,10 +339,10 @@ void CZMRules::Think()
     }
 
     if ( GetMapRemainingTime() < 0 )
-	{
-		GoToIntermission();
-		return;
-	}
+    {
+        GoToIntermission();
+        return;
+    }
 }
 
 
@@ -618,17 +618,17 @@ bool CZMRules::ReplaceZM( CZMPlayer* pZM )
 
 CBaseEntity* CZMRules::GetPlayerSpawnSpot( CBasePlayer* pPlayer )
 {
-	CBaseEntity* pSpawn = pPlayer->EntSelectSpawnPoint();
-	Assert( pSpawn );
+    CBaseEntity* pSpawn = pPlayer->EntSelectSpawnPoint();
+    Assert( pSpawn );
 
-	pPlayer->SetLocalOrigin( pSpawn->GetAbsOrigin() + Vector( 0, 0, 1 ) );
-	pPlayer->SetAbsVelocity( vec3_origin );
-	pPlayer->SetLocalAngles( pSpawn->GetLocalAngles() );
-	pPlayer->m_Local.m_vecPunchAngle = vec3_angle;
-	pPlayer->m_Local.m_vecPunchAngleVel = vec3_angle;
-	pPlayer->SnapEyeAngles( pSpawn->GetLocalAngles() );
+    pPlayer->SetLocalOrigin( pSpawn->GetAbsOrigin() + Vector( 0, 0, 1 ) );
+    pPlayer->SetAbsVelocity( vec3_origin );
+    pPlayer->SetLocalAngles( pSpawn->GetLocalAngles() );
+    pPlayer->m_Local.m_vecPunchAngle = vec3_angle;
+    pPlayer->m_Local.m_vecPunchAngleVel = vec3_angle;
+    pPlayer->SnapEyeAngles( pSpawn->GetLocalAngles() );
 
-	return pSpawn;
+    return pSpawn;
 }
 
 const char* CZMRules::SetDefaultPlayerTeam( CBasePlayer* pPlayer )
@@ -649,20 +649,20 @@ void CZMRules::IncPopCount( ZombieClass_t zclass )
 
 void CZMRules::InitDefaultAIRelationships( void )
 {
-	int i, j;
+    int i, j;
 
-	//  Allocate memory for default relationships
-	CBaseCombatCharacter::AllocateDefaultRelationships();
+    //  Allocate memory for default relationships
+    CBaseCombatCharacter::AllocateDefaultRelationships();
 
-	// First initialize table so we can report missing relationships
-	for ( i = 0; i < NUM_AI_CLASSES; i++ )
-	{
-		for ( j = 0; j < NUM_AI_CLASSES; j++ )
-		{
-			// By default all relationships are neutral of priority zero
-			CBaseCombatCharacter::SetDefaultRelationship( (Class_T)i, (Class_T)j, D_NU, 0 );
-		}
-	}
+    // First initialize table so we can report missing relationships
+    for ( i = 0; i < NUM_AI_CLASSES; i++ )
+    {
+        for ( j = 0; j < NUM_AI_CLASSES; j++ )
+        {
+            // By default all relationships are neutral of priority zero
+            CBaseCombatCharacter::SetDefaultRelationship( (Class_T)i, (Class_T)j, D_NU, 0 );
+        }
+    }
     
 
     CBaseCombatCharacter::SetDefaultRelationship( CLASS_ZOMBIE, CLASS_NONE,         D_NU, 0 );
@@ -953,91 +953,91 @@ void CZMRules::RestoreMap()
 {
     DevMsg( "Restoring map...\n" );
 
-	// Recreate all the map entities from the map data (preserving their indices),
-	// then remove everything else except the players.
+    // Recreate all the map entities from the map data (preserving their indices),
+    // then remove everything else except the players.
 
-	// Get rid of all entities except players.
-	CBaseEntity *pCur = gEntList.FirstEnt();
-	while ( pCur )
-	{
-		// remove entities that has to be restored on roundrestart (breakables etc)
-		if ( !FindInList( g_PreserveEnts, pCur->GetClassname() ) )
-		{
-			UTIL_Remove( pCur );
-		}
+    // Get rid of all entities except players.
+    CBaseEntity *pCur = gEntList.FirstEnt();
+    while ( pCur )
+    {
+        // remove entities that has to be restored on roundrestart (breakables etc)
+        if ( !FindInList( g_PreserveEnts, pCur->GetClassname() ) )
+        {
+            UTIL_Remove( pCur );
+        }
 
-		pCur = gEntList.NextEnt( pCur );
-	}
+        pCur = gEntList.NextEnt( pCur );
+    }
 
-	// Really remove the entities so we can have access to their slots below.
-	gEntList.CleanupDeleteList();
+    // Really remove the entities so we can have access to their slots below.
+    gEntList.CleanupDeleteList();
 
-	// Cancel all queued events, in case a func_bomb_target fired some delayed outputs that
-	// could kill respawning CTs
-	g_EventQueue.Clear();
+    // Cancel all queued events, in case a func_bomb_target fired some delayed outputs that
+    // could kill respawning CTs
+    g_EventQueue.Clear();
 
-	// Now reload the map entities.
-	class CZMEntFilter : public IMapEntityFilter
-	{
-	public:
-		virtual bool ShouldCreateEntity( const char *pClassname )
-		{
-			// Don't recreate the preserved entities.
-			if ( !FindInList( g_PreserveEnts, pClassname ) )
-			{
-				return true;
-			}
-			else
-			{
-				// Increment our iterator since it's not going to call CreateNextEntity for this ent.
-				if ( m_iIterator != g_MapEntityRefs.InvalidIndex() )
-					m_iIterator = g_MapEntityRefs.Next( m_iIterator );
+    // Now reload the map entities.
+    class CZMEntFilter : public IMapEntityFilter
+    {
+    public:
+        virtual bool ShouldCreateEntity( const char *pClassname )
+        {
+            // Don't recreate the preserved entities.
+            if ( !FindInList( g_PreserveEnts, pClassname ) )
+            {
+                return true;
+            }
+            else
+            {
+                // Increment our iterator since it's not going to call CreateNextEntity for this ent.
+                if ( m_iIterator != g_MapEntityRefs.InvalidIndex() )
+                    m_iIterator = g_MapEntityRefs.Next( m_iIterator );
 
-				return false;
-			}
-		}
+                return false;
+            }
+        }
 
 
-		virtual CBaseEntity* CreateNextEntity( const char *pClassname )
-		{
-			if ( m_iIterator == g_MapEntityRefs.InvalidIndex() )
-			{
-				// This shouldn't be possible. When we loaded the map, it should have used 
-				// CCSMapLoadEntityFilter, which should have built the g_MapEntityRefs list
-				// with the same list of entities we're referring to here.
-				Assert( false );
-				return NULL;
-			}
-			else
-			{
-				CMapEntityRef &ref = g_MapEntityRefs[m_iIterator];
-				m_iIterator = g_MapEntityRefs.Next( m_iIterator );	// Seek to the next entity.
+        virtual CBaseEntity* CreateNextEntity( const char *pClassname )
+        {
+            if ( m_iIterator == g_MapEntityRefs.InvalidIndex() )
+            {
+                // This shouldn't be possible. When we loaded the map, it should have used 
+                // CCSMapLoadEntityFilter, which should have built the g_MapEntityRefs list
+                // with the same list of entities we're referring to here.
+                Assert( false );
+                return NULL;
+            }
+            else
+            {
+                CMapEntityRef &ref = g_MapEntityRefs[m_iIterator];
+                m_iIterator = g_MapEntityRefs.Next( m_iIterator );	// Seek to the next entity.
 
-				if ( ref.m_iEdict == -1 || engine->PEntityOfEntIndex( ref.m_iEdict ) )
-				{
-					// Doh! The entity was delete and its slot was reused.
-					// Just use any old edict slot. This case sucks because we lose the baseline.
-					return CreateEntityByName( pClassname );
-				}
-				else
-				{
-					// Cool, the slot where this entity was is free again (most likely, the entity was 
-					// freed above). Now create an entity with this specific index.
-					return CreateEntityByName( pClassname, ref.m_iEdict );
-				}
-			}
-		}
+                if ( ref.m_iEdict == -1 || engine->PEntityOfEntIndex( ref.m_iEdict ) )
+                {
+                    // Doh! The entity was delete and its slot was reused.
+                    // Just use any old edict slot. This case sucks because we lose the baseline.
+                    return CreateEntityByName( pClassname );
+                }
+                else
+                {
+                    // Cool, the slot where this entity was is free again (most likely, the entity was 
+                    // freed above). Now create an entity with this specific index.
+                    return CreateEntityByName( pClassname, ref.m_iEdict );
+                }
+            }
+        }
 
-	public:
-		int m_iIterator; // Iterator into g_MapEntityRefs.
-	};
+    public:
+        int m_iIterator; // Iterator into g_MapEntityRefs.
+    };
 
-	CZMEntFilter filter;
-	filter.m_iIterator = g_MapEntityRefs.Head();
+    CZMEntFilter filter;
+    filter.m_iIterator = g_MapEntityRefs.Head();
 
-	// DO NOT CALL SPAWN ON info_node ENTITIES!
+    // DO NOT CALL SPAWN ON info_node ENTITIES!
 
-	MapEntity_ParseAllEntities( engine->GetMapEntitiesString(), &filter, true );
+    MapEntity_ParseAllEntities( engine->GetMapEntitiesString(), &filter, true );
 }
 
 static ConVar zm_sv_resource_rate( "zm_sv_resource_rate", "5", FCVAR_NOTIFY );
@@ -1103,7 +1103,7 @@ bool CZMRules::IsSpawnPointValid( CBaseEntity* pSpot, CBasePlayer* pPlayer )
 
     // Start off the ground since some maps have the spawns touching the floor.
     CZMTraceFilterSpawnPoint filter( pPlayer, COLLISION_GROUP_PLAYER );
-	trace_t trace;
+    trace_t trace;
     UTIL_TraceHull( pSpot->GetAbsOrigin() + Vector( 0.0f, 0.0f, 1.0f ),
                     pSpot->GetAbsOrigin() + Vector( 0.0f, 0.0f, 2.0f ),
                     pPlayer->GetPlayerMins(),
@@ -1114,17 +1114,17 @@ bool CZMRules::IsSpawnPointValid( CBaseEntity* pSpot, CBasePlayer* pPlayer )
 
     return trace.fraction == 1.0f;
 
-	/*
+    /*
     CBaseEntity *pEnt = NULL;
 
     for ( CEntitySphereQuery sphere( pSpot->GetAbsOrigin(), 128 ); (pEnt = sphere.GetCurrentEntity()) != NULL; sphere.NextEntity() )
-	{
-		// if ent is a client, don't spawn on 'em
-		if ( pEnt->IsPlayer() && pEnt != pPlayer )
-			return false;
-	}
+    {
+        // if ent is a client, don't spawn on 'em
+        if ( pEnt->IsPlayer() && pEnt != pPlayer )
+            return false;
+    }
 
-	return true;
+    return true;
     */
 }
 
