@@ -104,7 +104,7 @@ Color CHudChat::GetClientColor( int clientIndex )
         {
         case ZMTEAM_HUMAN :     return g_ColorRed;
         case ZMTEAM_ZM :        return g_ColorGreen;
-        default	:               return g_ColorYellow;
+        default	:               return g_ColorGrey;
         }
     }
 
