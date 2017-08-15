@@ -68,7 +68,8 @@ public:
 
     void GiveDefaultItems( void );
     virtual void EquipSuit( bool = false ) OVERRIDE;
-    
+    virtual void RemoveAllItems( bool removeSuit ) OVERRIDE;
+
     virtual void PlayerUse( void ) OVERRIDE;
     //virtual void PlayUseDenySound() OVERRIDE;
 
