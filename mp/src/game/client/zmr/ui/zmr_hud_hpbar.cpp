@@ -43,6 +43,7 @@ private:
     int m_nHealth;
 
     int m_nTexBgId;
+    int m_nTexFgCriticalId;
     int m_nTexFgId;
 
 
@@ -79,6 +80,9 @@ CZMHudHPBar::CZMHudHPBar( const char *pElementName ) : CHudElement( pElementName
 
     m_nTexBgId = surface()->CreateNewTextureID();
     surface()->DrawSetTextureFile( m_nTexBgId, "zmr_effects/hpbar_bg", true, false );
+
+    m_nTexFgCriticalId = surface()->CreateNewTextureID();
+    surface()->DrawSetTextureFile( m_nTexFgCriticalId, "zmr_effects/hpbar_fg_critical", true, false );
 
     m_nTexFgId = surface()->CreateNewTextureID();
     surface()->DrawSetTextureFile( m_nTexFgId, "zmr_effects/hpbar_fg", true, false );
@@ -170,6 +174,7 @@ void CZMHudHPBar::PaintBar()
     int offset_x = m_flBarX;
     int offset_y = m_flBarY;
 
+    
     surface()->DrawSetTexture( m_nTexBgId );
     surface()->DrawTexturedRect( offset_x, offset_y, offset_x + size_x, offset_y + size_y );
 
@@ -184,7 +189,7 @@ void CZMHudHPBar::PaintBar()
 
     int fill_y = (int)(m_flBarSize * frac);
 
-    surface()->DrawSetTexture( m_nTexFgId );
+    surface()->DrawSetTexture( ( m_nHealth < CRITICAL_HEALTH ) ? m_nTexFgCriticalId : m_nTexFgId );
     surface()->DrawTexturedSubRect( offset_x, offset_y + fill_y, offset_x + size_x, offset_y + size_y, 0.0f, frac, 1.0f, 1.0f );
 }
 

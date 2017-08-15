@@ -1,0 +1,6 @@
+UnlitGeneric
+{
+	$basetexture zmr_effects\hpbar_fg_critical
+	$ignorez 1
+	$translucent 1
+}
