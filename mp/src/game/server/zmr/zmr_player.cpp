@@ -165,6 +165,20 @@ void CZMPlayer::ChangeTeam( int iTeam )
             pRules->GetObjManager()->ChangeDisplay( this );
         }
     }
+
+    // See if we need to restart the round.
+    // HACK: Don't check for it if our new team isn't spectator.
+    // This makes sure we can test stuff while being the only survivor.
+    if (!pRules->IsInRoundEnd()
+    &&  oldteam > ZMTEAM_SPECTATOR
+    &&  iTeam <= ZMTEAM_SPECTATOR)
+    {
+        CTeam* team = GetGlobalTeam( oldteam );
+        if ( team && team->GetNumPlayers() <= 0 )
+        {
+            pRules->EndRound( ZMROUND_GAMEBEGIN );
+        }
+    }
 }
 
 
