@@ -41,7 +41,8 @@ ConVar zm_sv_cost_immolator( "zm_sv_cost_immolator", "100", FCVAR_REPLICATED | F
 
 static ConVar zm_sv_participation( "zm_sv_participation", "0", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE, "0 = No limit, 1 = Don't allow only human, 2 = Don't allow only spec, 3 = Don't allow only spec/human" );
 
-static ConVar zm_sv_reward_zombiekill( "zm_sv_reward_zombiekill", "100", FCVAR_NOTIFY | FCVAR_ARCHIVE, "How many points ZM gets for killing a human with a zombie." );
+static ConVar zm_sv_reward_zombiekill( "zm_sv_reward_zombiekill", "200", FCVAR_NOTIFY | FCVAR_ARCHIVE, "How many points ZM gets for killing a human with a zombie." );
+static ConVar zm_sv_reward_kill( "zm_sv_reward_kill", "100", FCVAR_NOTIFY | FCVAR_ARCHIVE, "How many points ZM gets when a human dies." );
 
 
 #ifndef CLIENT_DLL
@@ -446,9 +447,11 @@ void CZMRules::PlayerKilled( CBasePlayer* pVictim, const CTakeDamageInfo& info )
     CZMPlayer* pPlayer = ToZMPlayer( pVictim );
 
 
-    if ( info.GetAttacker() && info.GetAttacker()->IsNPC() )
+    if ( pPlayer->IsHuman() )
     {
-        RewardResources( zm_sv_reward_zombiekill.GetInt() );
+        RewardResources( ( info.GetAttacker() && info.GetAttacker()->IsNPC() ) ?
+            zm_sv_reward_zombiekill.GetInt() :
+            zm_sv_reward_kill.GetInt() );
     }
 
     // Don't use team player count since we haven't been switched to spectator yet.
