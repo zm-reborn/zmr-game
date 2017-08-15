@@ -444,6 +444,10 @@ void CZMPlayer::Spawn()
     // Set in BasePlayer
 	//m_Local.m_bDucked = false;
 	//SetPlayerUnderwater( false );
+
+
+    // Reset activity. Makes sure we don't get insta-punished when spawning after spectating somebody, etc.
+    m_flLastActivity = gpGlobals->curtime;
 }
 
 void CZMPlayer::FireBullets( const FireBulletsInfo_t& info )
