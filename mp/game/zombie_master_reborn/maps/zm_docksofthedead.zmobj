@@ -1,0 +1,63 @@
+"Objectives"
+{
+	"@RoundStart,@DeleteGameText" // Do this at the start of the round, delete game_texts.
+	{
+		"SetMainText"			"COLLECT TRUCK PARTS"
+		
+		"SetChild1Text"			"TIRES: %i/2"
+		"SetChild1TextArg"		"0"
+		"SetChild2Text"			"GAS CANS: %i/2"
+		"SetChild2TextArg"		"0"
+		
+		"SetChild3Text"			"BATTERY: %i/1"
+		"SetChild3TextArg"		"0"
+		
+		"Display"				""
+	}
+	"battery_trigger_1,OnStartTouch,0,-1" // Tire
+	{
+		"IncChild1TextArg"		"1"
+		"Update"				""
+	}
+	"battery_trigger_2,OnStartTouch,0,-1" // Tire
+	{
+		"IncChild1TextArg"		"1"
+		"Update"				""
+	}
+	"battery_trigger_3,OnStartTouch,0,-1" // Battery
+	{
+		"IncChild3TextArg"		"1"
+		"Update"				""
+	}
+	"battery_trigger_4,OnStartTouch,0,-1" // Gas
+	{
+		"IncChild2TextArg"		"1"
+		"Update"				""
+	}
+	"battery_trigger_5,OnStartTouch,0,-1" // Gas
+	{
+		"IncChild2TextArg"		"1"
+		"Update"				""
+	}
+	"battery_counter,OnHitMax,0,-1"
+	{
+		"CompleteMain"			""
+		"CompleteChild1"		""
+		"CompleteChild2"		""
+		"CompleteChild3"		""
+		"Update"				""
+	}
+	"armageddon,OnTrigger,0,-1"
+	{
+		"SetMainText"			"SURVIVE FOR 3 MINUTES"
+		"SetChild1Text"			""
+		"SetChild2Text"			""
+		"SetChild3Text"			""
+		"Display"				""
+	}
+	"armageddon,OnTrigger,180,-1"
+	{
+		"CompleteMain"			"1"
+		"Update"				""
+	}
+}
