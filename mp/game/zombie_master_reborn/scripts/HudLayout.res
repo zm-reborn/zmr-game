@@ -54,8 +54,8 @@
 	{
 		"fieldName"		"ZMHudVote"
 		"wide"	"640"
-		"tall"  "200"
-		"ypos"	"280"
+		"tall"  "130"
+		"ypos"	"350"
 	}
 	
 	HudHealth
