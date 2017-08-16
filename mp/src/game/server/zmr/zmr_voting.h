@@ -12,7 +12,7 @@ class CZMVoteRoundRestart : public CBaseIssue
 public:
     CZMVoteRoundRestart() : CBaseIssue( "ZMVoteRoundRestart" ) {}
 
-    virtual bool IsEnabled() OVERRIDE { return true; };
+    virtual bool IsEnabled() OVERRIDE { return !ZMRules()->IsInRoundEnd(); };
     virtual bool IsTeamRestrictedVote() OVERRIDE { return true; };
     virtual const char* GetDisplayString( void ) OVERRIDE { return "#ZMVoteRoundRestart"; };
     virtual bool IsYesNoVote() OVERRIDE { return true; };
@@ -24,5 +24,13 @@ public:
     virtual void ExecuteCommand( void ) OVERRIDE
     {
         ZMRules()->EndRound( ZMROUND_VOTERESTART );
+    }
+
+    virtual bool CanCallVote( int nEntIndex, const char *pszDetails, vote_create_failed_t &nFailCode, int &nTime ) OVERRIDE
+    {
+        if ( ZMRules()->IsInRoundEnd() )
+            return false;
+
+        return CBaseIssue::CanCallVote( nEntIndex, pszDetails, nFailCode, nTime );
     }
 };

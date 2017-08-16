@@ -29,6 +29,7 @@ public:
 
 
     virtual void Init( void ) OVERRIDE;
+    virtual void VidInit( void ) OVERRIDE;
     virtual void Reset() OVERRIDE;
     virtual void OnThink() OVERRIDE;
     virtual void Paint() OVERRIDE;
@@ -41,6 +42,9 @@ public:
     void MsgFunc_VoteSetup( bf_read &msg );
 
 private:
+    void InitVoting();
+    void PaintString( const HFont, const Color&, int x, int y, const wchar_t* );
+
     bool m_bDrawVote;
     float m_flVoteDraw;
 
@@ -102,11 +106,22 @@ void CZMHudVote::Init( void )
 
     ListenForGameEvent( "vote_cast" );
     ListenForGameEvent( "vote_changed" );
+
+    InitVoting();
+}
+
+void CZMHudVote::VidInit( void )
+{
+    InitVoting();
 }
 
 void CZMHudVote::Reset()
 {
-    // ZMRTODO: Move me somewhere else.
+    InitVoting();
+}
+
+void CZMHudVote::InitVoting()
+{
     wchar_t szYes[16];
     wchar_t szNo[16];
 
@@ -122,6 +137,11 @@ void CZMHudVote::Reset()
 
     m_pszPass = g_pVGuiLocalize->Find( "#ZMVotePassed" );
     m_pszFail = g_pVGuiLocalize->Find( "#ZMVoteFailed" );
+
+    if ( !m_bDrawVote )
+    {
+        m_VoteColor[3] = 0;
+    }
 }
 
 void CZMHudVote::FireGameEvent( IGameEvent* event )
@@ -168,6 +188,14 @@ void CZMHudVote::OnThink()
     }
 }
 
+void CZMHudVote::PaintString( const HFont font, const Color& clr, int x, int y, const wchar_t* txt )
+{
+	surface()->DrawSetTextFont( font );
+    surface()->DrawSetTextColor( clr );
+	surface()->DrawSetTextPos( x, y );
+	surface()->DrawUnicodeString( txt );
+}
+
 void CZMHudVote::Paint()
 {
     if ( m_VoteColor[3] <= 0 ) return;
@@ -179,11 +207,7 @@ void CZMHudVote::Paint()
     {
         surface()->GetTextSize( m_hReasonFont, m_pszReason, w, h );
 
-
-	    surface()->DrawSetTextFont( m_hReasonFont );
-        surface()->DrawSetTextColor( m_ReasonColor );
-	    surface()->DrawSetTextPos( ScreenWidth() / 2.0f - w / 2.0f, 10 );
-	    surface()->DrawUnicodeString( m_pszReason );
+        PaintString( m_hReasonFont, m_ReasonColor, ScreenWidth() / 2.0f - w / 2.0f, 10, m_pszReason );
     }
 
 
@@ -191,11 +215,7 @@ void CZMHudVote::Paint()
     {
         surface()->GetTextSize( m_hVoteFont, m_szDisplay, w, h );
 
-
-	    surface()->DrawSetTextFont( m_hVoteFont );
-        surface()->DrawSetTextColor( m_VoteColor );
-	    surface()->DrawSetTextPos( ScreenWidth() / 2.0f - w / 2.0f, 40 );
-	    surface()->DrawUnicodeString( m_szDisplay );
+        PaintString( m_hVoteFont, m_VoteColor, ScreenWidth() / 2.0f - w / 2.0f, 40, m_szDisplay );
     }
 
 
@@ -203,20 +223,15 @@ void CZMHudVote::Paint()
     {
         surface()->GetTextSize( m_hTextFont, m_szHowto, w, h );
 
-	    surface()->DrawSetTextFont( m_hTextFont );
-        surface()->DrawSetTextColor( m_VoteColor );
-	    surface()->DrawSetTextPos( ScreenWidth() / 2.0f - w / 2.0f, 70 );
-	    surface()->DrawUnicodeString( m_szHowto );
+        PaintString( m_hTextFont, m_VoteColor, ScreenWidth() / 2.0f - w / 2.0f, 70, m_szHowto );
     }
+
 
     if ( m_szVote[0] != NULL )
     {
         surface()->GetTextSize( m_hTextFont, m_szVote, w, h );
 
-	    surface()->DrawSetTextFont( m_hTextFont );
-        surface()->DrawSetTextColor( m_VoteColor );
-	    surface()->DrawSetTextPos( ScreenWidth() / 2.0f - w / 2.0f, 100 );
-	    surface()->DrawUnicodeString( m_szVote );
+        PaintString( m_hTextFont, m_VoteColor, ScreenWidth() / 2.0f - w / 2.0f, 100, m_szVote );
     }
 }
 
