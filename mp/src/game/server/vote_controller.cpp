@@ -48,7 +48,11 @@ ConVar sv_vote_failure_timer_mvm( "sv_vote_failure_timer_mvm", "120", FCVAR_NONE
 #endif // TF_DLL
 ConVar sv_vote_creation_timer( "sv_vote_creation_timer", "150", FCVAR_NONE, "How long before a player can attempt to call another vote (in seconds)." );
 ConVar sv_vote_quorum_ratio( "sv_vote_quorum_ratio", "0.6", FCVAR_NOTIFY, "The minimum ratio of eligible players needed to pass a vote.  Min 0.5, Max 1.0.", true, 0.1f, true, 1.0f );
+#ifdef ZMR // ZMRCHANGE: Allow spectator voting by default.
+ConVar sv_vote_allow_spectators( "sv_vote_allow_spectators", "1", FCVAR_NONE, "Allow spectators to vote?" );
+#else
 ConVar sv_vote_allow_spectators( "sv_vote_allow_spectators", "0", FCVAR_NONE, "Allow spectators to vote?" );
+#endif
 ConVar sv_vote_ui_hide_disabled_issues( "sv_vote_ui_hide_disabled_issues", "1", FCVAR_NONE, "Suppress listing of disabled issues in the vote setup screen." );
 
 static const int k_nKickWatchListMaxDuration = 300;
