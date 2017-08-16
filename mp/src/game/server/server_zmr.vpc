@@ -343,6 +343,7 @@ $Project "Server (ZMR)"
 			$File	"zmr\zmr_sk_cvars.cpp"
 			$File	"zmr\zmr_team.cpp"
 			$File	"zmr\zmr_team.h"
+			$File	"zmr\zmr_voting.h"
 			$File	"zmr\zmr_zm_commands.cpp"
 			
 			// Shared
