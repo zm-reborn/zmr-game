@@ -18,4 +18,12 @@ void RegisterZMUserMessages( void )
 
     usermessages->Register( "ZMObjDisplay", -1 );
     usermessages->Register( "ZMObjUpdate", -1 );
+
+
+    // From vote_manager
+    usermessages->Register( "CallVoteFailed", -1 );
+    usermessages->Register( "VoteStart", -1 );
+    usermessages->Register( "VotePass", -1 );
+    usermessages->Register( "VoteFailed", -1 );
+    usermessages->Register( "VoteSetup", -1 );
 }

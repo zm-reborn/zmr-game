@@ -12,6 +12,7 @@
 #ifndef CLIENT_DLL
 #include "ammodef.h"
 
+#include "zmr/zmr_voting.h"
 
 #include "zmr/zmr_player.h"
 #else
@@ -95,6 +96,8 @@ static const char* g_PreserveEnts[] =
     "info_loadout",
 
     "zm_objectives_manager",
+
+    "vote_controller",
 
     "", // END Marker
 };
@@ -230,6 +233,15 @@ void CZMRules::CreateStandardEntities()
 
     pEnt = CBaseEntity::Create( "zm_objectives_manager", vec3_origin, vec3_angle );
     Assert( pEnt );
+
+
+    pEnt = CBaseEntity::Create( "vote_controller", vec3_origin, vec3_angle );
+    Assert( pEnt );
+
+    if ( pEnt )
+    {
+        new CZMVoteRoundRestart();
+    }
 }
 
 void CZMRules::LevelInitPostEntity()

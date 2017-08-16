@@ -581,6 +581,38 @@ Scheme
 				"custom"	"1"
 			}
 		}
+		ZMHudVote
+		{
+			"1"
+			{
+				"name"		"Trebuchet MS"
+				"tall"		"32"
+				"weight"	"2000"
+				"antialias" "1"
+				"custom"	"1"
+			}
+		}
+		ZMHudVoteReason
+		{
+			"1"
+			{
+				"name"		"Trebuchet MS"
+				"tall"		"24"
+				"weight"	"2000"
+				"antialias" "1"
+				"custom"	"1"
+			}
+		}
+		ZMHudVoteText
+		{
+			"1"
+			{
+				"name"		"Trebuchet MS"
+				"tall"		"18"
+				"weight"	"900"
+				"antialias" "1"
+			}
+		}
 		ZMHudObjectives
 		{
 			"1"

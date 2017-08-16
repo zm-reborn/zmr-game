@@ -716,3 +716,31 @@ event ZMResOk
 
 	Animate ZMHudAmmo		ResColor		"ZMFgColor"		Linear		0.0		0.15
 }
+
+event ZMVoteStart
+{
+	StopEvent ZMVoteEnd 0.0
+	
+	Animate ZMHudVote		VoteColor			"ZMFgColor"		Linear		0.0		0.3
+}
+
+event ZMVoteEnd
+{
+	StopEvent ZMVoteStart 0.0
+
+	Animate ZMHudVote		VoteColor			"0 0 0 0"		Deaccel		0.0		0.3
+}
+
+event ZMVoteReasonStart
+{
+	StopEvent ZMVoteReasonEnd 0.0
+	
+	Animate ZMHudVote		ReasonColor			"ZMFgColor"		Linear		0.0		0.2
+}
+
+event ZMVoteReasonEnd
+{
+	StopEvent ZMVoteReasonStart 0.0
+
+	Animate ZMHudVote		ReasonColor			"0 0 0 0"		Deaccel		0.0		0.2
+}

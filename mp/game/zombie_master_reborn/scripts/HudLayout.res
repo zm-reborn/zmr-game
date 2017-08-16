@@ -50,6 +50,14 @@
 		"CurPosY"	"2"
 	}
 	
+	ZMHudVote
+	{
+		"fieldName"		"ZMHudVote"
+		"wide"	"640"
+		"tall"  "200"
+		"ypos"	"280"
+	}
+	
 	HudHealth
 	{
 		"fieldName"		"HudHealth"
