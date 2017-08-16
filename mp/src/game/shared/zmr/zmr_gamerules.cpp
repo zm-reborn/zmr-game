@@ -778,6 +778,9 @@ void CZMRules::PrintRoundEndMessage( ZMRoundEndReason_t reason )
     case ZMROUND_GAMEBEGIN :
         UTIL_ClientPrintAll( HUD_PRINTTALK, "The game will begin...\n" );
         break;
+    case ZMROUND_VOTERESTART :
+        UTIL_ClientPrintAll( HUD_PRINTTALK, "Vote has finished to restart the round!\n" );
+        break;
     default :
         break;
     }
