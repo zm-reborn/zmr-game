@@ -3,6 +3,7 @@
 #include "cbase.h"
 #include "vote_controller.h"
 
+#include "zmr/zmr_gamerules.h"
 #include "zmr/zmr_shareddefs.h"
 
 
@@ -18,15 +19,10 @@ public:
     virtual const char* GetDetailsString( void ) OVERRIDE { return ""; };
     virtual bool CanTeamCallVote( int iTeam ) const OVERRIDE { return iTeam != ZMTEAM_ZM; };
 
+    virtual void ListIssueDetails( CBasePlayer* pForWhom ) OVERRIDE {}
+
     virtual void ExecuteCommand( void ) OVERRIDE
     {
-        Msg( "Executing round restart, WOAH\n" );
-    }
-
-    virtual void ListIssueDetails( CBasePlayer* pForWhom ) OVERRIDE
-    {
-        if ( !pForWhom ) return;
-
-        Msg( "Restart the mothafucking round!\n" );
+        ZMRules()->EndRound( ZMROUND_VOTERESTART );
     }
 };

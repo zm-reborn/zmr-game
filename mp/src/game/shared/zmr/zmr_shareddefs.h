@@ -24,6 +24,8 @@ enum ZMRoundEndReason_t
     ZMROUND_GAMEBEGIN,
 
     ZMROUND_NOTHING, // Use when you don't want any message.
+
+    ZMROUND_VOTERESTART,
 };
 
 enum
