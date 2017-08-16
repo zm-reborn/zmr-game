@@ -39,6 +39,7 @@ CAmmoDef* GetAmmoDef()
 
 
         // ZMRTODO: Remove these when removing the HL2DM stuff.
+        /*
         ADD_ZM_AMMOTYPE( def, "AR2", DMG_BULLET, TRACER_LINE_AND_WHIZ, 60, BULLET_IMPULSE( 200, 1225 ) );
         ADD_ZM_AMMOTYPE( def, "AR2AltFire", DMG_DISSOLVE, TRACER_NONE, 3, 0 );
         ADD_ZM_AMMOTYPE( def, "XBowBolt", DMG_BULLET, TRACER_LINE, 10, BULLET_IMPULSE( 800, 8000 ) );
@@ -46,6 +47,7 @@ CAmmoDef* GetAmmoDef()
         ADD_ZM_AMMOTYPE( def, "SMG1_Grenade", DMG_BURN, TRACER_NONE, 3, 0 );
         ADD_ZM_AMMOTYPE( def, "Grenade", DMG_BURN, TRACER_NONE, 5, 0 );
         ADD_ZM_AMMOTYPE( def, "slam", DMG_BURN, TRACER_NONE, 5, 0 );
+        */
     }
 
     return &def;
