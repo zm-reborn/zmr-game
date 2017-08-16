@@ -84,6 +84,7 @@ CZMHudVote::CZMHudVote( const char *pElementName ) : CHudElement( pElementName )
     m_pszFail = nullptr;
 
     SetPaintBackgroundEnabled( false );
+    SetProportional( false );
 }
 
 CZMHudVote::~CZMHudVote()
@@ -181,7 +182,7 @@ void CZMHudVote::Paint()
 
 	    surface()->DrawSetTextFont( m_hReasonFont );
         surface()->DrawSetTextColor( m_ReasonColor );
-	    surface()->DrawSetTextPos( ScreenWidth() / 2.0f - w / 2.0f, 70 );
+	    surface()->DrawSetTextPos( ScreenWidth() / 2.0f - w / 2.0f, 10 );
 	    surface()->DrawUnicodeString( m_pszReason );
     }
 
@@ -193,7 +194,7 @@ void CZMHudVote::Paint()
 
 	    surface()->DrawSetTextFont( m_hVoteFont );
         surface()->DrawSetTextColor( m_VoteColor );
-	    surface()->DrawSetTextPos( ScreenWidth() / 2.0f - w / 2.0f, 100 );
+	    surface()->DrawSetTextPos( ScreenWidth() / 2.0f - w / 2.0f, 40 );
 	    surface()->DrawUnicodeString( m_szDisplay );
     }
 
@@ -204,7 +205,7 @@ void CZMHudVote::Paint()
 
 	    surface()->DrawSetTextFont( m_hTextFont );
         surface()->DrawSetTextColor( m_VoteColor );
-	    surface()->DrawSetTextPos( ScreenWidth() / 2.0f - w / 2.0f, 130 );
+	    surface()->DrawSetTextPos( ScreenWidth() / 2.0f - w / 2.0f, 70 );
 	    surface()->DrawUnicodeString( m_szHowto );
     }
 
@@ -214,7 +215,7 @@ void CZMHudVote::Paint()
 
 	    surface()->DrawSetTextFont( m_hTextFont );
         surface()->DrawSetTextColor( m_VoteColor );
-	    surface()->DrawSetTextPos( ScreenWidth() / 2.0f - w / 2.0f, 160 );
+	    surface()->DrawSetTextPos( ScreenWidth() / 2.0f - w / 2.0f, 100 );
 	    surface()->DrawUnicodeString( m_szVote );
     }
 }
