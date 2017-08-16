@@ -586,7 +586,7 @@ Scheme
 			"1"
 			{
 				"name"		"Trebuchet MS"
-				"tall"		"32"
+				"tall"		"38"
 				"weight"	"2000"
 				"antialias" "1"
 				"custom"	"1"
@@ -597,7 +597,7 @@ Scheme
 			"1"
 			{
 				"name"		"Trebuchet MS"
-				"tall"		"24"
+				"tall"		"32"
 				"weight"	"2000"
 				"antialias" "1"
 				"custom"	"1"
@@ -608,7 +608,7 @@ Scheme
 			"1"
 			{
 				"name"		"Trebuchet MS"
-				"tall"		"18"
+				"tall"		"24"
 				"weight"	"900"
 				"antialias" "1"
 			}
