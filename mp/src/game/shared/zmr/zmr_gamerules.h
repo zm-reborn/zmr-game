@@ -80,7 +80,10 @@ public:
 
     virtual void PlayerThink( CBasePlayer* ) OVERRIDE;
 
-    
+    virtual const char* GetChatFormat( bool bTeamOnly, CBasePlayer* ) OVERRIDE;
+    virtual const char* GetChatPrefix( bool bTeamOnly, CBasePlayer* ) OVERRIDE { return ""; };
+    virtual const char* GetChatLocation( bool bTeamOnly, CBasePlayer* ) OVERRIDE { return nullptr; };
+
     virtual int WeaponShouldRespawn( CBaseCombatWeapon* ) OVERRIDE;
 
     // Yes, always teamplay.

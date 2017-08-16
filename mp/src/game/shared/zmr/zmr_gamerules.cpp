@@ -320,6 +320,33 @@ void CZMRules::ClientSettingsChanged( CBasePlayer* pPlayer )
 }
 
 
+const char* CZMRules::GetChatFormat( bool bTeamOnly, CBasePlayer* pPlayer )
+{
+    if ( !pPlayer ) return nullptr;
+
+
+    const char* pszFormat = nullptr;
+
+    // team only
+    if ( bTeamOnly )
+    {
+        if ( pPlayer->IsObserver() )
+        {
+            pszFormat = "ZM_Chat_Team_Spec";
+        }
+        else
+        {
+            pszFormat = "ZM_Chat_Team";
+        }
+    }
+    // everyone
+    else
+    {
+        pszFormat = "ZM_Chat_All";
+    }
+
+    return pszFormat;
+}
 
 static ConVar zm_sv_norestartround( "zm_sv_norestartround", "0" );
 
