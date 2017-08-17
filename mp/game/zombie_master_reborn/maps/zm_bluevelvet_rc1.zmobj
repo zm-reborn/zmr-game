@@ -1,0 +1,70 @@
+"Objectives"
+{
+	"@RoundStart" // Do this at the start of the round, delete game_texts.
+	{
+		"SetMainText"			"GET TO THE SUBWAY"
+		"Display"				""
+	}
+	"trigger_tellsubclosedgate,OnStartTouch,0,-1"
+	{
+		"UpdateChild1Text"		"CALL HELP ON THE PHONE"
+	}
+	"button-phone,OnPressed,0,-1"
+	{
+		"UpdateChild1Text"		"WAIT 2 MINUTES FOR THE HACK TO FINISH"
+	}
+	"button-phone,OnPressed,60,-1"
+	{
+		"UpdateChild1Text"		"HOLD ON FOR ONE MORE MINUTE"
+	}
+	"button-phone,OnPressed,119,-1"
+	{
+		"CompleteChild1"		""
+	}
+	"door-subway,OnFullyOpen,0,-1"
+	{
+		"CompleteMain"			""
+	}
+	"door-subway,OnFullyOpen,1,-1"
+	{
+		"InCompleteMain"		""
+		"InCompleteChild1"		""
+		"SetMainText"			"GET TO THE TRAIN PLATFORMS"
+		"SetChild1Text"			"HACK COMPUTER IN CONTROL ROOM TO OPEN FIRE DOORS"
+		"Display"				""
+	}
+	"camera_button,OnPressed,0,-1"
+	{
+		"UpdateChild1Text"		"WAIT FOR THE HACK TO FINISH"
+	}
+	"camera_path03,OnPass,0,-1"
+	{
+		"UpdateChild1Text"		"HACK FINISHED - HEAD TO THE PLATFORMS"
+	}
+	"metaldr_texttrigger,OnTrigger,0,-1"
+	{
+		"SetMainText"			"USE A BLOWTORCH TO OPEN THE DOOR"
+		"SetChild1Text"			""
+		"Display"				""
+	}
+	"metaldr_path4,OnPass,0,-1"
+	{
+		"CompleteMain"			""
+	}
+	"metaldr_path4,OnPass,2,-1"
+	{
+		"InCompleteMain"		""
+		"SetMainText"			"FIND THE INFECTION SOURCE"
+		"Display"				""
+	}
+	"machine_counter,OnHitMax,0,-1"
+	{
+		"SetMainText"			"GET AWAY FROM THE MACHINE"
+		"Display"				""
+	}
+	"button_boom,OnBreak,20,-1"
+	{
+		"CompleteMain"			""
+		"Display"				""
+	}
+}

@@ -50,6 +50,7 @@ public:
 
     static void Display( CZMEntObjectives* pObj, CBaseEntity* pActivator = nullptr, ObjRecipient_t rec = OBJRECIPIENT_INVALID );
     static void Update( CZMEntObjectives* pObj, CBaseEntity* pActivator = nullptr, ObjRecipient_t rec = OBJRECIPIENT_INVALID );
+    static void UpdateLine( CZMEntObjectives* pObj, int line, CBaseEntity* pActivator = nullptr, ObjRecipient_t rec = OBJRECIPIENT_INVALID );
     void ChangeDisplay( CZMPlayer* );
 
 

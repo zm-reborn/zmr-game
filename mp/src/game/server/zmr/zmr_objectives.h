@@ -83,6 +83,23 @@ public:
     void InputCompleteChild3( inputdata_t &inputData );
     void InputCompleteChild4( inputdata_t &inputData );
 
+    void InputInCompleteMain( inputdata_t &inputData );
+    void InputInCompleteChild1( inputdata_t &inputData );
+    void InputInCompleteChild2( inputdata_t &inputData );
+    void InputInCompleteChild3( inputdata_t &inputData );
+    void InputInCompleteChild4( inputdata_t &inputData );
+
+    void InputResetMain( inputdata_t &inputData );
+    void InputResetChild1( inputdata_t &inputData );
+    void InputResetChild2( inputdata_t &inputData );
+    void InputResetChild3( inputdata_t &inputData );
+    void InputResetChild4( inputdata_t &inputData );
+
+    void InputUpdateMainText( inputdata_t &inputData );
+    void InputUpdateChild1Text( inputdata_t &inputData );
+    void InputUpdateChild2Text( inputdata_t &inputData );
+    void InputUpdateChild3Text( inputdata_t &inputData );
+    void InputUpdateChild4Text( inputdata_t &inputData );
 
     void Reset();
 
