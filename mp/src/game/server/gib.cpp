@@ -594,6 +594,9 @@ void CGib::Spawn( const char *szGibModel )
 	// hopefully this will fix the VELOCITY TOO LOW crap
 	m_takedamage = DAMAGE_EVENTS_ONLY;
 	SetSolid( SOLID_BBOX );
+#ifdef ZMR // ZMRCHANGE: Don't let gibs collide with stuff.
+    AddSolidFlags( FSOLID_NOT_SOLID );
+#endif
 	AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 
