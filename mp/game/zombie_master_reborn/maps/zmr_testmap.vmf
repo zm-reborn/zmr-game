@@ -2,7 +2,7 @@ versioninfo
 {
 	"editorversion" "400"
 	"editorbuild" "7538"
-	"mapversion" "17"
+	"mapversion" "27"
 	"formatversion" "100"
 	"prefab" "0"
 }
@@ -20,7 +20,7 @@ viewsettings
 world
 {
 	"id" "1"
-	"mapversion" "17"
+	"mapversion" "27"
 	"classname" "worldspawn"
 	"detailmaterial" "detail/detailsprites"
 	"detailvbsp" "detail.vbsp"
@@ -1082,7 +1082,7 @@ entity
 {
 	"id" "114"
 	"classname" "info_player_zombiemaster"
-	"angles" "0 180 0"
+	"angles" "15 180 0"
 	"origin" "128 0 192"
 	editor
 	{
@@ -2039,7 +2039,7 @@ entity
 	"targetname" "gt4"
 	"x" "-1"
 	"y" "-1"
-	"origin" "-144 796 8"
+	"origin" "-144 796 16"
 	editor
 	{
 		"color" "220 30 220"
@@ -2140,6 +2140,75 @@ entity
 		"visgroupshown" "1"
 		"visgroupautoshown" "1"
 		"logicalpos" "[0 0]"
+	}
+}
+entity
+{
+	"id" "840"
+	"classname" "weapon_zm_rifle"
+	"angles" "0 0 0"
+	"spawnflags" "0"
+	"origin" "-928 -320 16"
+	editor
+	{
+		"color" "0 0 200"
+		"visgroupshown" "1"
+		"visgroupautoshown" "1"
+		"logicalpos" "[0 0]"
+	}
+}
+entity
+{
+	"id" "853"
+	"classname" "info_objectives"
+	"targetname" "objectives_human"
+	"origin" "-112 16 16"
+	editor
+	{
+		"color" "220 30 220"
+		"visgroupshown" "1"
+		"visgroupautoshown" "1"
+		"logicalpos" "[0 0]"
+	}
+}
+entity
+{
+	"id" "865"
+	"classname" "info_objectives"
+	"Recipient" "1"
+	"targetname" "objectives_zm"
+	"origin" "-96 16 16"
+	editor
+	{
+		"color" "220 30 220"
+		"visgroupshown" "1"
+		"visgroupautoshown" "1"
+		"logicalpos" "[0 0]"
+	}
+}
+entity
+{
+	"id" "940"
+	"classname" "logic_auto"
+	"spawnflags" "1"
+	connections
+	{
+		"OnMapSpawn" "objectives_human,SetMainText,THIS IS A HUMAN OBJECTIVE,0,-1"
+		"OnMapSpawn" "objectives_human,Display,,0.01,-1"
+		"OnMapSpawn" "objectives_zm,Display,,0.01,-1"
+		"OnMapSpawn" "objectives_zm,SetMainText,THIS IS A ZM OBJECTIVE,0,-1"
+		"OnMapSpawn" "objectives_human,SetChild1Text,THIS IS A HUMAN TIMER %s,0,-1"
+		"OnMapSpawn" "objectives_human,SetChild1TextArg,t60,0,-1"
+		"OnMapSpawn" "objectives_zm,SetChild1Text,THIS IS A ZM CHILD 1 TEXT %i!,0,-1"
+		"OnMapSpawn" "objectives_zm,SetChild1TextArg,1337,0,-1"
+	}
+	"origin" "-80 16 16"
+	editor
+	{
+		"color" "220 30 220"
+		"visgroupshown" "1"
+		"visgroupautoshown" "1"
+		"logicalpos" "[0 1500]"
 	}
 }
 cameras
