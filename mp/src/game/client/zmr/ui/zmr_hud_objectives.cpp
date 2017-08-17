@@ -1,7 +1,7 @@
 #include "cbase.h"
 //#include "hud.h"
 #include "hudelement.h"
-//#include "hud_macros.h"
+#include "hud_macros.h"
 #include "iclientmode.h"
 #include <vgui_controls/AnimationController.h>
 #include <vgui/ILocalize.h>
@@ -194,7 +194,12 @@ public:
     virtual void Reset() OVERRIDE;
     virtual void OnThink() OVERRIDE;
     virtual void Paint( void ) OVERRIDE;
+
+
+    void MsgFunc_ZMObjDisplay( bf_read& msg );
+    void MsgFunc_ZMObjUpdate( bf_read& msg );
     
+
     void InitTexts();
     void SetNextText( int i, const char* format, ObjArgType_t, float num, const char* psz );
     void Update( int i, float num, const char* psz, bool bComplete );
@@ -249,15 +254,11 @@ private:
 };
 
 DECLARE_HUDELEMENT( CZMHudObjectives );
-
-
-CZMHudObjectives* g_pHudObjectives = nullptr;
+DECLARE_HUD_MESSAGE( CZMHudObjectives, ZMObjDisplay );
+DECLARE_HUD_MESSAGE( CZMHudObjectives, ZMObjUpdate );
 
 CZMHudObjectives::CZMHudObjectives( const char *pElementName ) : CHudElement( pElementName ), BaseClass( g_pClientMode->GetViewport(), "ZMHudObjectives" )
 {
-    g_pHudObjectives = this;
-
-
     InitTexts();
 
     m_flLastShow = 0.0f;
@@ -266,11 +267,14 @@ CZMHudObjectives::CZMHudObjectives( const char *pElementName ) : CHudElement( pE
 
 CZMHudObjectives::~CZMHudObjectives()
 {
-    g_pHudObjectives = nullptr;
 }
 
 void CZMHudObjectives::Init( void )
 {
+    HOOK_HUD_MESSAGE( CZMHudObjectives, ZMObjDisplay );
+    HOOK_HUD_MESSAGE( CZMHudObjectives, ZMObjUpdate );
+
+
     SetPaintBackgroundEnabled( false );
 }
 
@@ -463,16 +467,13 @@ void CZMHudObjectives::Paint()
     }
 }
 
-void __MsgFunc_ZMObjDisplay( bf_read& msg )
+void CZMHudObjectives::MsgFunc_ZMObjDisplay( bf_read& msg )
 {
-    if ( g_pHudObjectives == nullptr ) return;
-
-
     char arg[32];
     char format[256];
 
 
-    g_pHudObjectives->SetRecipients( (ObjRecipient_t)msg.ReadByte() );
+    SetRecipients( (ObjRecipient_t)msg.ReadByte() );
 
 
     for ( int i = 0; i < NUM_OBJ_LINES; i++ )
@@ -503,20 +504,14 @@ void __MsgFunc_ZMObjDisplay( bf_read& msg )
             format[0] = 0;
 
 
-        g_pHudObjectives->SetNextText( i, format, argtype, num, arg );
+        SetNextText( i, format, argtype, num, arg );
     }
 
-    g_pHudObjectives->Transition();
+    Transition();
 }
 
-USER_MESSAGE_REGISTER( ZMObjDisplay )
-
-
-void __MsgFunc_ZMObjUpdate( bf_read& msg )
+void CZMHudObjectives::MsgFunc_ZMObjUpdate( bf_read& msg )
 {
-    if ( g_pHudObjectives == nullptr ) return;
-
-
     char buffer[32];
 
     for ( int i = 0; i < NUM_OBJ_LINES; i++ )
@@ -537,10 +532,8 @@ void __MsgFunc_ZMObjUpdate( bf_read& msg )
             num = msg.ReadFloat();
         }
 
-        g_pHudObjectives->Update( i, num, buffer, bComplete );
+        Update( i, num, buffer, bComplete );
     }
 
-    g_pHudObjectives->AutoDraw( false );
+    AutoDraw( false );
 }
-
-USER_MESSAGE_REGISTER( ZMObjUpdate )
