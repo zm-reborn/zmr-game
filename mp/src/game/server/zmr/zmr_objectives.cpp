@@ -58,10 +58,24 @@ void CObjLine::ParseArg( const char* psz )
     }
     
 
-    m_iTextArgType = ( isdigit( psz[0] ) ) ? OBJARGTYPE_INT : OBJARGTYPE_STRING;
+    if ( isdigit( psz[0] ) )
+    {
+        m_iTextArgType = OBJARGTYPE_INT;
+    }
+    else
+    {
+        if ( psz[0] == 't' && isdigit( psz[1] ) )
+        {
+            m_iTextArgType = OBJARGTYPE_TIMER;
+        }
+        else
+        {
+            m_iTextArgType = OBJARGTYPE_STRING;
+        }
+    }
 
 
-    m_flTextArgNum = atof( psz );
+    m_flTextArgNum = (m_iTextArgType == OBJARGTYPE_TIMER) ? atof( &psz[1] ) : atof( psz );
     Q_strncpy( m_szTextArg, psz, sizeof( m_szTextArg ) );
 }
 
