@@ -791,7 +791,7 @@ void CZMRules::PrintRoundEndMessage( ZMRoundEndReason_t reason )
     switch ( reason )
     {
     case ZMROUND_HUMANDEAD :
-        UTIL_ClientPrintAll( HUD_PRINTTALK, "The Zombie Master has slaying the living!\n" );
+        UTIL_ClientPrintAll( HUD_PRINTTALK, "The Zombie Master has slain the living!\n" );
         break;
     case ZMROUND_HUMANLOSE :
         UTIL_ClientPrintAll( HUD_PRINTTALK, "The living have failed their objectives!\n" );
