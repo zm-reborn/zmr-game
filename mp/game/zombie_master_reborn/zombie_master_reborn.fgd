@@ -199,9 +199,10 @@
 		3: "All"
 	]
 	
-	input Reset(void) : "Resets all texts to empty."
+	input Reset(void) : "Resets all objectives."
 	input Update(void) : "Update number/complete status to all players."
 	input Display(void) : "Displays text for all players."
+	input DisplayActivator(void) : "Displays text to activator."
 	
 	input SetMainText(string) : "Set main objective text."
 	input SetChild1Text(string) : "Set child 1 objective text."
@@ -209,21 +210,39 @@
 	input SetChild3Text(string) : "Set child 3 objective text."
 	input SetChild4Text(string) : "Set child 4 objective text."
 	
+	input UpdateMainText(string) : "Update main objective status to all players. If non-empty, also set text."
+	input UpdateChild1Text(string) : "Update child 1 objective status to all players. If non-empty, also set text."
+	input UpdateChild2Text(string) : "Update child 2 objective status to all players. If non-empty, also set text."
+	input UpdateChild3Text(string) : "Update child 3 objective status to all players. If non-empty, also set text."
+	input UpdateChild4Text(string) : "Update child 4 objective status to all players. If non-empty, also set text."
+	
 	input SetMainTextArg(string) : "Set main text argument."
 	input SetChild1TextArg(string) : "Set child 1 text argument."
 	input SetChild2TextArg(string) : "Set child 2 text argument."
 	input SetChild3TextArg(string) : "Set child 3 text argument."
 	input SetChild4TextArg(string) : "Set child 4 text argument."
 	
-	input IncMainTextArg(string) : "Increase main text argument."
-	input IncChild1TextArg(string) : "Increase child 1 text argument."
-	input IncChild2TextArg(string) : "Increase child 2 text argument."
-	input IncChild3TextArg(string) : "Increase child 3 text argument."
-	input IncChild4TextArg(string) : "Increase child 4 text argument."
+	input IncMainTextArg(float) : "Increase main text argument."
+	input IncChild1TextArg(float) : "Increase child 1 text argument."
+	input IncChild2TextArg(float) : "Increase child 2 text argument."
+	input IncChild3TextArg(float) : "Increase child 3 text argument."
+	input IncChild4TextArg(float) : "Increase child 4 text argument."
 	
-	input CompleteMain(string) : "Sets main as completed. Use Update to display this to players."
-	input CompleteChild1(string) : "Sets child 1 as completed. Use Update to display this to players."
-	input CompleteChild2(string) : "Sets child 2 as completed. Use Update to display this to players."
-	input CompleteChild3(string) : "Sets child 3 as completed. Use Update to display this to players."
-	input CompleteChild4(string) : "Sets child 4 as completed. Use Update to display this to players."
+	input CompleteMain(void) : "Sets main as completed. Use Update to display this to players."
+	input CompleteChild1(void) : "Sets child 1 as completed. Use Update to display this to players."
+	input CompleteChild2(void) : "Sets child 2 as completed. Use Update to display this to players."
+	input CompleteChild3(void) : "Sets child 3 as completed. Use Update to display this to players."
+	input CompleteChild4(void) : "Sets child 4 as completed. Use Update to display this to players."
+	
+	input InCompleteMain(void) : "Sets main as incompleted. Use Update to display this to players."
+	input InCompleteChild1(void) : "Sets child 1 as incompleted. Use Update to display this to players."
+	input InCompleteChild2(void) : "Sets child 2 as incompleted. Use Update to display this to players."
+	input InCompleteChild3(void) : "Sets child 3 as incompleted. Use Update to display this to players."
+	input InCompleteChild4(void) : "Sets child 4 as incompleted. Use Update to display this to players."
+	
+	input ResetMain(void) : "Resets main objective. (text, completion, etc.)"
+	input ResetChild1(void) : "Resets child 1 objective. (text, completion, etc.)"
+	input ResetChild2(void) : "Resets child 2 objective. (text, completion, etc.)"
+	input ResetChild3(void) : "Resets child 3 objective. (text, completion, etc.)"
+	input ResetChild4(void) : "Resets child 4 objective. (text, completion, etc.)"
 ]
