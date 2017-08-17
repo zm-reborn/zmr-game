@@ -1,0 +1,199 @@
+"docks.util_windgusts"
+{
+	"playrandom"
+	{
+		"volume"	"0.2,0.4"
+		"pitch"		"100"
+		"time"		"10.0, 30.0"
+		"pitch"		"90,130"
+		"position"	"random"
+		"soundlevel"	"SNDLVL_140db"
+		"rndwave"
+		{
+			"wave" "ambient/wind/wind_hit1.wav"
+			"wave" "ambient/wind/wind_hit2.wav"
+			"wave" "ambient/wind/wind_snippet3.wav"
+			"wave" "ambient/wind/wind_snippet4.wav"
+			"wave" "ambient/wind/wind_snippet5.wav"
+		}
+	}
+}
+
+
+"docks.util_drips"
+{
+	"playrandom"
+	{
+		"volume"	"0.2,0.5"
+		"pitch"		"100"
+		"time"		"0.5, 5.0"
+		"position"	"random"
+		"soundlevel"	"SNDLVL_140db"
+		"rndwave"
+		{
+			"wave"	"ambient/levels/canals/drip1.wav"
+			"wave"	"ambient/levels/canals/drip2.wav"
+			"wave"	"ambient/levels/canals/drip3.wav"
+			"wave"	"ambient/levels/canals/drip4.wav"
+			"wave"	"ambient/water/rain_drip1.wav"
+			"wave"	"ambient/water/rain_drip2.wav"
+			"wave"	"ambient/water/rain_drip3.wav"
+			"wave"	"ambient/water/rain_drip4.wav"
+		}
+	}
+}
+
+"docks.util_fardrips"
+{
+	"playrandom"
+	{
+		"volume"	"0.2,0.5"
+		"pitch"		"90,120"
+		"time"		"0.5, 5.0"
+		"position"	"random"
+		"soundlevel"	"SNDLVL_140db"
+		"rndwave"
+		{
+			"wave"	"ambient/water/distant_drip1.wav"
+			"wave"	"ambient/water/distant_drip2.wav"
+			"wave"	"ambient/water/distant_drip3.wav"
+			"wave"	"ambient/water/distant_drip4.wav"
+		}
+	}
+}
+
+"docks_warehouse"
+{
+	// The ambient sounds of the warehouse
+	"playlooping"
+	{
+		"volume"	"0.25"
+		"pitch"		"100"
+		"soundlevel" "SNDLVL_80dB"
+		"wave"		"ambient/atmosphere/ambience_base.wav"
+	}
+
+	"playsoundscape"
+	{
+		"name"		"docks.util_windgusts"
+		"volume"	"0.5"
+	}
+
+	"playrandom"
+	{
+		"time"		"9,16"
+		"volume"	"0.1,0.3"
+		"pitch"		"95,105"
+		"position"	"random"
+		"soundlevel"	"SNDLVL_90db"
+
+		"rndwave"
+		{
+			"wave"	"ambient/materials/wood_creak1.wav"
+			"wave"	"ambient/materials/wood_creak2.wav"
+			"wave"	"ambient/materials/wood_creak3.wav"
+			"wave"	"ambient/materials/wood_creak4.wav"
+			"wave"	"ambient/materials/wood_creak5.wav"
+			"wave"	"ambient/materials/wood_creak6.wav"
+		}
+	}
+
+}
+
+
+
+
+"docks_sewer"
+{
+	"dsp"	"1"
+
+	// This is the sound of the tunnel
+	"playlooping"
+	{
+		"volume"	"0.2"
+		"pitch"		"100"
+		"wave"		"ambient/atmosphere/ambience5.wav"
+	}
+
+	"playlooping"
+	{
+		"volume"	"0.05"
+		"pitch"		"100"
+		"wave"		"ambient/levels/canals/waterleak_loop1.wav"
+	}
+
+	// This is a dripping noise somewhere inside the tunnel
+	"playsoundscape"
+	{
+		"name"		"docks.util_fardrips"
+		"position"	"0"
+		"volume"	"0.4"
+	}
+
+	// This is a dripping noise somewhere inside the tunnel
+	"playsoundscape"
+	{
+		"name"		"docks.util_drips"
+		"position"	"1"
+		"volume"	"0.2"
+	}
+}
+
+"docks_outdoors"
+{
+	
+	"playlooping"
+	{
+		"volume"	"0.25"
+		"pitch"		"100"
+		"soundlevel" "SNDLVL_90dB"
+		"wave"		"ambient/atmosphere/ambience_base.wav"
+	}
+
+	"playsoundscape"
+	{
+		"name"		"d1_canals.util_windgusts"
+		"volume"	"1.0"
+	}
+
+	"playrandom"
+	{
+		"time"		"9,16"
+		"volume"	"0.1,0.3"
+		"pitch"		"95,105"
+		"position"	"random"
+		"soundlevel"	"SNDLVL_140db"
+		//A bit of thunder...
+		"rndwave"
+		{
+			"wave"	"ambient/atmosphere/thunder1.wav"
+			"wave"	"ambient/atmosphere/thunder2.wav"
+			"wave"	"ambient/atmosphere/thunder3.wav"
+			"wave"	"ambient/atmosphere/thunder4.wav"
+			
+		}
+	}
+
+}
+
+"docks_indoors"
+{
+	"playlooping"
+	{
+		"volume"	"0.25"
+		"pitch"		"100"
+		"soundlevel" "SNDLVL_80dB"
+		"wave"		"ambient/atmosphere/ambience_base.wav"
+	}
+
+	"playsoundscape"
+	{
+		"name"		"docks.util_windgusts"
+		"volume"	"0.5"
+	}
+
+	
+
+}
+
+
