@@ -1624,3 +1624,112 @@ void CZMPhysExplosion::DelayedExplode( float delay )
     SetThink( &CZMPhysExplosion::DelayThink );
     SetNextThink( gpGlobals->curtime + delay );
 }
+
+/*
+    Score Entity
+*/
+#define SF_SCORE_NEGATIVE       0x0001
+#define SF_SCORE_TEAM           0x0002
+
+class CZMEntTeamScore : public CServerOnlyPointEntity
+{
+public:
+    DECLARE_CLASS( CZMEntTeamScore, CServerOnlyPointEntity )
+    DECLARE_DATADESC()
+
+
+    void Spawn( void ) OVERRIDE;
+
+
+    void InputApplyScore( inputdata_t& inputData );
+    void InputApplyScoreZM( inputdata_t& inputData );
+    void InputApplyScoreSurvivors( inputdata_t& inputData );
+
+
+    inline bool AllowNegative() { return ( m_spawnflags & SF_SCORE_NEGATIVE ) ? true : false; };
+    inline bool ApplyToTeam() { return ( m_spawnflags & SF_SCORE_TEAM ) ? true : false; };
+
+private:
+    void ApplyScore( CTeam* team );
+    void ApplyScoreActivator( CBaseEntity* pEnt );
+
+
+    int m_nPoints;
+};
+
+BEGIN_DATADESC( CZMEntTeamScore )
+    DEFINE_KEYFIELD( m_nPoints, FIELD_INTEGER, "points" ),
+
+    DEFINE_INPUTFUNC( FIELD_VOID, "ApplyScore", InputApplyScore ),
+    DEFINE_INPUTFUNC( FIELD_VOID, "ApplyScoreZM", InputApplyScoreZM ),
+    DEFINE_INPUTFUNC( FIELD_VOID, "ApplyScoreSurvivors", InputApplyScoreSurvivors ),
+END_DATADESC()
+
+LINK_ENTITY_TO_CLASS( game_score_team, CZMEntTeamScore );
+
+void CZMEntTeamScore::Spawn( void )
+{
+}
+
+void CZMEntTeamScore::ApplyScore( CTeam* team )
+{
+    if ( !team ) return;
+
+
+    CZMPlayer* pPlayer;
+    for ( int i = 1; i <= gpGlobals->maxClients; i++ )
+    {
+        pPlayer = ToZMPlayer( UTIL_PlayerByIndex( i ) );
+
+        if ( !pPlayer ) continue;
+
+
+        if ( pPlayer->GetTeam() == team )
+        {
+            pPlayer->AddPoints( m_nPoints, AllowNegative() );
+        }
+    }
+}
+
+void CZMEntTeamScore::ApplyScoreActivator( CBaseEntity* pEnt )
+{
+    if ( !pEnt ) return;
+
+
+    if ( !pEnt->IsPlayer() )
+    {
+        IPhysicsObject* pObj = pEnt->VPhysicsGetObject();
+
+        if ( !pObj || !(pObj->GetGameFlags() & FVPHYSICS_PLAYER_HELD) ) return;
+
+        if ( !pEnt->GetOwnerEntity() ) return;
+
+
+        pEnt = pEnt->GetOwnerEntity();
+    }
+
+    if ( ApplyToTeam() )
+    {
+        ApplyScore( pEnt->GetTeam() );
+    }
+    else
+    {
+        pEnt->AddPoints( m_nPoints, AllowNegative() );
+    }
+    
+}
+
+void CZMEntTeamScore::InputApplyScore( inputdata_t& inputData )
+{
+    ApplyScoreActivator( inputData.pActivator );
+}
+
+void CZMEntTeamScore::InputApplyScoreZM( inputdata_t& inputData )
+{
+    ApplyScore( GetGlobalTeam( ZMTEAM_ZM ) );
+}
+
+void CZMEntTeamScore::InputApplyScoreSurvivors( inputdata_t& inputData )
+{
+    ApplyScore( GetGlobalTeam( ZMTEAM_HUMAN ) );
+}
