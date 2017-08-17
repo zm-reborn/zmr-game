@@ -109,6 +109,24 @@ BEGIN_DATADESC( CZMEntObjectives )
     DEFINE_INPUTFUNC( FIELD_VOID, "CompleteChild3", InputCompleteChild3 ),
     DEFINE_INPUTFUNC( FIELD_VOID, "CompleteChild4", InputCompleteChild4 ),
 
+    DEFINE_INPUTFUNC( FIELD_VOID, "InCompleteMain", InputInCompleteMain ),
+    DEFINE_INPUTFUNC( FIELD_VOID, "InCompleteChild1", InputInCompleteChild1 ),
+    DEFINE_INPUTFUNC( FIELD_VOID, "InCompleteChild2", InputInCompleteChild2 ),
+    DEFINE_INPUTFUNC( FIELD_VOID, "InCompleteChild3", InputInCompleteChild3 ),
+    DEFINE_INPUTFUNC( FIELD_VOID, "InCompleteChild4", InputInCompleteChild4 ),
+
+    DEFINE_INPUTFUNC( FIELD_VOID, "ResetMain", InputResetMain ),
+    DEFINE_INPUTFUNC( FIELD_VOID, "ResetChild1", InputResetChild1 ),
+    DEFINE_INPUTFUNC( FIELD_VOID, "ResetChild2", InputResetChild2 ),
+    DEFINE_INPUTFUNC( FIELD_VOID, "ResetChild3", InputResetChild3 ),
+    DEFINE_INPUTFUNC( FIELD_VOID, "ResetChild4", InputResetChild4 ),
+
+    DEFINE_INPUTFUNC( FIELD_STRING, "UpdateMainText", InputUpdateMainText ),
+    DEFINE_INPUTFUNC( FIELD_STRING, "UpdateChild1Text", InputUpdateChild1Text ),
+    DEFINE_INPUTFUNC( FIELD_STRING, "UpdateChild2Text", InputUpdateChild2Text ),
+    DEFINE_INPUTFUNC( FIELD_STRING, "UpdateChild3Text", InputUpdateChild3Text ),
+    DEFINE_INPUTFUNC( FIELD_STRING, "UpdateChild4Text", InputUpdateChild4Text ),
+
      DEFINE_KEYFIELD( m_iRecipient, FIELD_INTEGER, "Recipient" ),
 END_DATADESC()
 
@@ -151,26 +169,66 @@ void CZMEntObjectives::InputSetMainText( inputdata_t& inputData ) { m_Lines[0].S
 void CZMEntObjectives::InputSetMainTextArg( inputdata_t& inputData ) { m_Lines[0].ParseArg( inputData.value.String() ); }
 void CZMEntObjectives::InputIncMainTextArg( inputdata_t& inputData ) { m_Lines[0].m_flTextArgNum += inputData.value.Float(); }
 void CZMEntObjectives::InputCompleteMain( inputdata_t& inputData ) { m_Lines[0].m_bComplete = true; }
+void CZMEntObjectives::InputInCompleteMain( inputdata_t& inputData ) { m_Lines[0].m_bComplete = false; }
+void CZMEntObjectives::InputResetMain( inputdata_t& inputData ) { m_Lines[0].Reset(); }
+void CZMEntObjectives::InputUpdateMainText( inputdata_t& inputData )
+{
+    const char* psz = inputData.value.String();
+    if ( psz && *psz ) m_Lines[0].SetText( psz );
+    CZMEntObjectivesManager::UpdateLine( this, 0, inputData.pActivator );
+}
 
 void CZMEntObjectives::InputSetChild1Text( inputdata_t& inputData ) { m_Lines[1].SetText( inputData.value.String() ); }
 void CZMEntObjectives::InputSetChild1TextArg( inputdata_t& inputData ) { m_Lines[1].ParseArg( inputData.value.String() ); }
 void CZMEntObjectives::InputIncChild1TextArg( inputdata_t& inputData ) { m_Lines[1].m_flTextArgNum += inputData.value.Float(); }
 void CZMEntObjectives::InputCompleteChild1( inputdata_t& inputData ) { m_Lines[1].m_bComplete = true; }
+void CZMEntObjectives::InputInCompleteChild1( inputdata_t& inputData ) { m_Lines[1].m_bComplete = false; }
+void CZMEntObjectives::InputResetChild1( inputdata_t& inputData ) { m_Lines[1].Reset(); }
+void CZMEntObjectives::InputUpdateChild1Text( inputdata_t& inputData )
+{
+    const char* psz = inputData.value.String();
+    if ( psz && *psz ) m_Lines[1].SetText( psz );
+    CZMEntObjectivesManager::UpdateLine( this, 1, inputData.pActivator );
+}
 
 void CZMEntObjectives::InputSetChild2Text( inputdata_t& inputData ) { m_Lines[2].SetText( inputData.value.String() ); }
 void CZMEntObjectives::InputSetChild2TextArg( inputdata_t& inputData ) { m_Lines[2].ParseArg( inputData.value.String() ); }
 void CZMEntObjectives::InputIncChild2TextArg( inputdata_t& inputData ) { m_Lines[2].m_flTextArgNum += inputData.value.Float(); }
 void CZMEntObjectives::InputCompleteChild2( inputdata_t& inputData ) { m_Lines[2].m_bComplete = true; }
+void CZMEntObjectives::InputInCompleteChild2( inputdata_t& inputData ) { m_Lines[2].m_bComplete = false; }
+void CZMEntObjectives::InputResetChild2( inputdata_t& inputData ) { m_Lines[2].Reset(); }
+void CZMEntObjectives::InputUpdateChild2Text( inputdata_t& inputData )
+{
+    const char* psz = inputData.value.String();
+    if ( psz && *psz ) m_Lines[2].SetText( psz );
+    CZMEntObjectivesManager::UpdateLine( this, 2, inputData.pActivator );
+}
 
 void CZMEntObjectives::InputSetChild3Text( inputdata_t& inputData ) { m_Lines[3].SetText( inputData.value.String() ); }
 void CZMEntObjectives::InputSetChild3TextArg( inputdata_t& inputData ) { m_Lines[3].ParseArg( inputData.value.String() ); }
 void CZMEntObjectives::InputIncChild3TextArg( inputdata_t& inputData ) { m_Lines[3].m_flTextArgNum += inputData.value.Float(); }
 void CZMEntObjectives::InputCompleteChild3( inputdata_t& inputData ) { m_Lines[3].m_bComplete = true; }
+void CZMEntObjectives::InputInCompleteChild3( inputdata_t& inputData ) { m_Lines[3].m_bComplete = false; }
+void CZMEntObjectives::InputResetChild3( inputdata_t& inputData ) { m_Lines[3].Reset(); }
+void CZMEntObjectives::InputUpdateChild3Text( inputdata_t& inputData )
+{
+    const char* psz = inputData.value.String();
+    if ( psz && *psz ) m_Lines[3].SetText( psz );
+    CZMEntObjectivesManager::UpdateLine( this, 3, inputData.pActivator );
+}
 
 void CZMEntObjectives::InputSetChild4Text( inputdata_t& inputData ) { m_Lines[4].SetText( inputData.value.String() ); }
 void CZMEntObjectives::InputSetChild4TextArg( inputdata_t& inputData ) { m_Lines[4].ParseArg( inputData.value.String() ); }
 void CZMEntObjectives::InputIncChild4TextArg( inputdata_t& inputData ) { m_Lines[4].m_flTextArgNum += inputData.value.Float(); }
 void CZMEntObjectives::InputCompleteChild4( inputdata_t& inputData ) { m_Lines[4].m_bComplete = true; }
+void CZMEntObjectives::InputInCompleteChild4( inputdata_t& inputData ) { m_Lines[4].m_bComplete = false; }
+void CZMEntObjectives::InputResetChild4( inputdata_t& inputData ) { m_Lines[4].Reset(); }
+void CZMEntObjectives::InputUpdateChild4Text( inputdata_t& inputData )
+{
+    const char* psz = inputData.value.String();
+    if ( psz && *psz ) m_Lines[4].SetText( psz );
+    CZMEntObjectivesManager::UpdateLine( this, 4, inputData.pActivator );
+}
 
 void CZMEntObjectives::InputDisplay( inputdata_t& inputData )
 {

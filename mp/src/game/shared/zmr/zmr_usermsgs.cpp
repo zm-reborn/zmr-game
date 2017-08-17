@@ -18,6 +18,7 @@ void RegisterZMUserMessages( void )
 
     usermessages->Register( "ZMObjDisplay", -1 );
     usermessages->Register( "ZMObjUpdate", -1 );
+    usermessages->Register( "ZMObjUpdateLine", -1 );
 
 
     // From vote_manager

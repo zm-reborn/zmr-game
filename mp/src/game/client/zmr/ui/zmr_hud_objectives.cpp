@@ -53,6 +53,9 @@ public:
 
         m_flWantedPosY = 0.0f;
         m_flAbsPosY = 0.0f;
+
+        m_fTransition = TRANSITION_NONE;
+        m_nAlpha = 0;
     }
 
     void UpdateComplete()
@@ -132,18 +135,90 @@ public:
         Q_strncpy( m_szTexts, szBuffer, sizeof( m_szTexts ) );
     }
 
-    bool Paint( HFont font, int x, int &y, int alpha )
+    void Hide()
+    {
+        m_fTransition |= TRANSITION_HIDE;
+    }
+
+    void Show()
+    {
+        m_fTransition |= TRANSITION_SHOW;
+    }
+
+    bool IsInTransition()
+    {
+        return m_fTransition & (TRANSITION_HIDE | TRANSITION_CHANGETEXT | TRANSITION_SHOW) ? true : false;
+    }
+
+    void SetTransition( bool bShow )
+    {
+        m_fTransition = TRANSITION_HIDE | TRANSITION_CHANGETEXT;
+
+        if ( bShow )
+        {
+            m_fTransition |= TRANSITION_SHOW;
+        }
+    }
+
+    void DoTransition()
+    {
+        if ( m_fTransition == TRANSITION_NONE && IsEmpty() && HasNextText() )
+        {
+            SetTransition( true );
+        }
+
+
+        int rate = 0;
+
+        if ( m_fTransition & (TRANSITION_HIDE | TRANSITION_CHANGETEXT) )
+        {
+            rate = -OBJ_FADE_RATE * gpGlobals->frametime;
+            if ( rate == 0 ) rate = -1;
+        }
+        else if ( m_fTransition & TRANSITION_SHOW )
+        {
+            rate = OBJ_FADE_RATE * gpGlobals->frametime;
+            if ( rate == 0 ) rate = 1;
+        }
+
+
+        m_nAlpha = clamp( m_nAlpha + rate, 0, 255 );
+
+
+        if ( m_nAlpha <= 0 )
+        {
+            m_fTransition &= ~TRANSITION_HIDE;
+
+
+            if ( m_fTransition & TRANSITION_CHANGETEXT )
+            {
+                UpdateComplete();
+                m_fTransition &= ~TRANSITION_CHANGETEXT;
+
+                if ( IsEmpty() )
+                    m_fTransition &= ~TRANSITION_SHOW;
+            }
+        }
+        else if ( m_nAlpha >= 255 )
+        {
+            m_fTransition &= ~TRANSITION_SHOW;
+        }
+    }
+
+    bool Paint( HFont font, int x, int &y )
     {
         if ( m_szRenderText[0] == NULL )
             return false;
 
+        if ( m_nAlpha > 0 )
+        {
+            m_Color[3] = m_nAlpha;
 
-        m_Color[3] = alpha;
-
-	    surface()->DrawSetTextFont( font );
-        surface()->DrawSetTextColor( m_Color );
-	    surface()->DrawSetTextPos( x, y + m_flAbsPosY );
-	    surface()->DrawUnicodeString( m_szRenderText );
+	        surface()->DrawSetTextFont( font );
+            surface()->DrawSetTextColor( m_Color );
+	        surface()->DrawSetTextPos( x, y + m_flAbsPosY );
+	        surface()->DrawUnicodeString( m_szRenderText );
+        }
 
         int w, h;
         surface()->GetTextSize( font, L"O", w, h );
@@ -155,6 +230,11 @@ public:
     bool IsEmpty()
     {
         return m_szRenderText[0] == NULL;
+    }
+
+    bool IsHidden()
+    {
+        return m_nAlpha <= 0;
     }
 
     bool HasNextText()
@@ -175,6 +255,10 @@ private:
 
     float m_flAbsPosY;
     float m_flWantedPosY;
+
+
+    int m_fTransition;
+    int m_nAlpha;
 };
 
 
@@ -198,18 +282,26 @@ public:
 
     void MsgFunc_ZMObjDisplay( bf_read& msg );
     void MsgFunc_ZMObjUpdate( bf_read& msg );
+    void MsgFunc_ZMObjUpdateLine( bf_read& msg );
     
 
     void InitTexts();
     void SetNextText( int i, const char* format, ObjArgType_t, float num, const char* psz );
     void Update( int i, float num, const char* psz, bool bComplete );
-    void Transition();
+    void Transition( int i = -1 );
     void SetRecipients( ObjRecipient_t );
 
     void AutoDraw( bool bNewObjective );
     bool ShouldAutoDraw();
 
-    bool IsHidden() { return m_nAlpha <= 0; };
+    bool IsHidden()
+    {
+        for ( int i = 0; i < NUM_OBJ_LINES; i++ )
+            if ( !m_Line[i].IsHidden() )
+                return false;
+        
+        return true;
+    };
 
     bool IsEmpty()
     {
@@ -230,8 +322,6 @@ public:
     }
 
 private:
-    void DoTransition();
-
     void Hide();
     void Show();
     void SetTransition( bool bShow = true );
@@ -248,14 +338,14 @@ private:
 
     float m_flLastShow;
     ObjRecipient_t m_iRecipient;
-    int m_nAlpha;
     CObjLine m_Line[NUM_OBJ_LINES];
-    int m_iTransition;
 };
 
 DECLARE_HUDELEMENT( CZMHudObjectives );
 DECLARE_HUD_MESSAGE( CZMHudObjectives, ZMObjDisplay );
 DECLARE_HUD_MESSAGE( CZMHudObjectives, ZMObjUpdate );
+DECLARE_HUD_MESSAGE( CZMHudObjectives, ZMObjUpdateLine );
+
 
 CZMHudObjectives::CZMHudObjectives( const char *pElementName ) : CHudElement( pElementName ), BaseClass( g_pClientMode->GetViewport(), "ZMHudObjectives" )
 {
@@ -273,6 +363,7 @@ void CZMHudObjectives::Init( void )
 {
     HOOK_HUD_MESSAGE( CZMHudObjectives, ZMObjDisplay );
     HOOK_HUD_MESSAGE( CZMHudObjectives, ZMObjUpdate );
+    HOOK_HUD_MESSAGE( CZMHudObjectives, ZMObjUpdateLine );
 
 
     SetPaintBackgroundEnabled( false );
@@ -300,7 +391,8 @@ void CZMHudObjectives::OnThink()
     if ( !pPlayer ) return;
 
 
-    DoTransition();
+    for ( int i = 0; i < NUM_OBJ_LINES; i++ )
+        m_Line[i].DoTransition();
 
 
     if ( pPlayer->m_nButtons & IN_SCORE && !(pPlayer->m_afButtonLast & IN_SCORE) )
@@ -320,10 +412,6 @@ void CZMHudObjectives::InitTexts()
     {
         m_Line[i].Reset();
     }
-
-
-    m_iTransition = TRANSITION_NONE;
-    m_nAlpha = 0;
 }
 
 void CZMHudObjectives::SetNextText( int i, const char* format, ObjArgType_t type, float num, const char* psz )
@@ -371,55 +459,18 @@ void CZMHudObjectives::AutoDraw( bool bNewObjective )
         Show();
 }
 
-void CZMHudObjectives::Transition()
+void CZMHudObjectives::Transition( int i )
 {
-    SetTransition( ShouldAutoDraw() );
+    if ( IsHidden() || i == -1 )
+    {
+        SetTransition( ShouldAutoDraw() );
+    }
+    else
+    {
+        m_Line[i].SetTransition( ShouldAutoDraw() );
+    }
+
     m_flLastShow = gpGlobals->curtime;
-}
-
-void CZMHudObjectives::DoTransition()
-{
-    if ( m_iTransition == TRANSITION_NONE && IsEmpty() && HasNextText() )
-    {
-        SetTransition( true );
-    }
-
-
-    int rate = 0;
-
-    if ( m_iTransition & (TRANSITION_HIDE | TRANSITION_CHANGETEXT) )
-    {
-        rate = -OBJ_FADE_RATE * gpGlobals->frametime;
-        if ( rate == 0 ) rate = -1;
-    }
-    else if ( m_iTransition & TRANSITION_SHOW )
-    {
-        rate = OBJ_FADE_RATE * gpGlobals->frametime;
-        if ( rate == 0 ) rate = 1;
-    }
-
-
-    m_nAlpha = clamp( m_nAlpha + rate, 0, 255 );
-
-
-    if ( m_nAlpha <= 0 )
-    {
-        m_iTransition &= ~TRANSITION_HIDE;
-
-
-        if ( m_iTransition & TRANSITION_CHANGETEXT )
-        {
-            UpdateComplete();
-            m_iTransition &= ~TRANSITION_CHANGETEXT;
-
-            if ( IsEmpty() )
-                m_iTransition &= ~TRANSITION_SHOW;
-        }
-    }
-    else if ( m_nAlpha >= 255 )
-    {
-        m_iTransition &= ~TRANSITION_SHOW;
-    }
 }
 
 void CZMHudObjectives::SetRecipients( ObjRecipient_t rec )
@@ -429,23 +480,24 @@ void CZMHudObjectives::SetRecipients( ObjRecipient_t rec )
 
 void CZMHudObjectives::Hide()
 {
-    m_iTransition = TRANSITION_HIDE;
+    for ( int i = 0; i < NUM_OBJ_LINES; i++ )
+        m_Line[i].Hide();
 }
+
 void CZMHudObjectives::Show()
 {
-    m_iTransition = TRANSITION_SHOW;
+    for ( int i = 0; i < NUM_OBJ_LINES; i++ )
+        m_Line[i].Show();
 
     m_flLastShow = gpGlobals->curtime;
 }
+
 void CZMHudObjectives::SetTransition( bool bShow )
 {
-    m_iTransition = TRANSITION_HIDE | TRANSITION_CHANGETEXT;
-
-    if ( bShow )
-    {
-        m_iTransition |= TRANSITION_SHOW;
-    }
+    for ( int i = 0; i < NUM_OBJ_LINES; i++ )
+        m_Line[i].SetTransition( bShow );
 }
+
 void CZMHudObjectives::UpdateComplete()
 {
     for ( int i = 0; i < NUM_OBJ_LINES; i++ )
@@ -454,15 +506,12 @@ void CZMHudObjectives::UpdateComplete()
 
 void CZMHudObjectives::Paint()
 {
-    if ( m_nAlpha <= 0 ) return;
-
-
     int y = m_MainPosY;
-    m_Line[0].Paint( m_hMainFont, m_MainPosX, y, m_nAlpha );
+    m_Line[0].Paint( m_hMainFont, m_MainPosX, y );
 
     for ( int i = 1; i < NUM_OBJ_LINES; i++ )
     {
-        if ( m_Line[i].Paint( m_hChildFont, m_MainPosX, y, m_nAlpha ) )
+        if ( m_Line[i].Paint( m_hChildFont, m_MainPosX, y ) )
             y -= 6;
     }
 }
@@ -536,4 +585,49 @@ void CZMHudObjectives::MsgFunc_ZMObjUpdate( bf_read& msg )
     }
 
     AutoDraw( false );
+}
+
+void CZMHudObjectives::MsgFunc_ZMObjUpdateLine( bf_read& msg )
+{
+    char arg[32];
+    char format[256];
+
+
+    int i = msg.ReadByte();
+
+    if ( i < 0 || i >= NUM_OBJ_LINES ) return;
+
+
+    SetRecipients( (ObjRecipient_t)msg.ReadByte() );
+
+
+    ObjArgType_t argtype = OBJARGTYPE_NONE;
+    float num = 0.0f;
+    arg[0] = NULL;
+
+
+    bool bString = msg.ReadByte() == 1 ? true : false;
+
+    argtype = (ObjArgType_t)msg.ReadByte();
+
+
+    switch ( argtype )
+    {
+    case OBJARGTYPE_STRING : msg.ReadString( arg, sizeof( arg ), false ); break;
+    case OBJARGTYPE_TIMER :
+    case OBJARGTYPE_INT :
+    case OBJARGTYPE_FLOAT : num = msg.ReadFloat(); break;
+    default : break;
+    }
+
+        
+    if ( bString )
+        msg.ReadString( format, sizeof( format ), false );
+    else
+        format[0] = 0;
+
+
+    SetNextText( i, format, argtype, num, arg );
+
+    Transition( i );
 }
