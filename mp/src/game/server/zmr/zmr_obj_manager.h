@@ -34,10 +34,10 @@ public:
     char m_szValue[128];
 };
 
-class CZMEntObjectivesManager : public CPointEntity
+class CZMEntObjectivesManager : public CServerOnlyPointEntity
 {
 public:
-    DECLARE_CLASS( CZMEntObjectivesManager, CPointEntity )
+    DECLARE_CLASS( CZMEntObjectivesManager, CServerOnlyPointEntity )
     DECLARE_DATADESC()
 
 
