@@ -23,10 +23,10 @@ static ConVar zm_sv_spawndelay( "zm_sv_spawndelay", "0.6", FCVAR_NOTIFY );
 /*
     func_win
 */
-class CZMEntWin : public CPointEntity
+class CZMEntWin : public CServerOnlyPointEntity
 {
 public:
-	DECLARE_CLASS( CZMEntWin, CPointEntity )
+	DECLARE_CLASS( CZMEntWin, CServerOnlyPointEntity )
     DECLARE_DATADESC()
 
     void Spawn( void ) OVERRIDE;
@@ -1433,10 +1433,10 @@ void CZMEntTriggerBlockHidden::InputDisable( inputdata_t &inputData )
 /*
     Give resources
 */
-class CZMEntGiveResources : public CPointEntity
+class CZMEntGiveResources : public CServerOnlyPointEntity
 {
 public:
-    DECLARE_CLASS( CZMEntGiveResources, CPointEntity )
+    DECLARE_CLASS( CZMEntGiveResources, CServerOnlyPointEntity )
     DECLARE_DATADESC()
 
 

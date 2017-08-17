@@ -35,10 +35,10 @@ public:
     bool m_bComplete;
 };
 
-class CZMEntObjectives : public CPointEntity
+class CZMEntObjectives : public CServerOnlyPointEntity
 {
 public:
-    DECLARE_CLASS( CZMEntObjectives, CPointEntity )
+    DECLARE_CLASS( CZMEntObjectives, CServerOnlyPointEntity )
     DECLARE_DATADESC()
 
 
