@@ -1,0 +1,9 @@
+"Objectives"
+{
+	"@RoundStart" // Do this at the start of the round.
+	{
+		"SetMainText"			"SURVIVE FOR %s MINUTES"
+		"SetMainTextArg"			"t600"
+		"Display"				""
+	}
+}
