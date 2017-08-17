@@ -49,6 +49,7 @@ public:
         m_iArgType = OBJARGTYPE_NONE;
         m_szArg[0] = NULL;
         m_flArg = 0.0f;
+        m_flTimerEnd = 0.0f;
         m_Color = COLOR_WHITE;
 
         m_flWantedPosY = 0.0f;
@@ -88,6 +89,11 @@ public:
     {
         m_flArg = num;
         Q_strncpy( m_szArg, ( str && *str ) ? str : "", sizeof( m_szArg ) );
+
+        if ( m_iArgType == OBJARGTYPE_TIMER )
+        {
+            m_flTimerEnd = gpGlobals->curtime + m_flArg;
+        }
     }
 
     void SetComplete( bool state )
@@ -119,7 +125,6 @@ public:
             case OBJARGTYPE_STRING :
                 Q_snprintf( szBuffer, sizeof( szBuffer ), m_szFormat, m_szArg );
                 break;
-            case OBJARGTYPE_TIMER :
             case OBJARGTYPE_INT :
                 Q_snprintf( szBuffer, sizeof( szBuffer ), m_szFormat, (int)m_flArg );
                 break;
@@ -160,7 +165,7 @@ public:
         }
     }
 
-    void DoTransition()
+    void Think()
     {
         if ( m_fTransition == TRANSITION_NONE && IsEmpty() && HasNextText() )
         {
@@ -202,6 +207,24 @@ public:
         else if ( m_nAlpha >= 255 )
         {
             m_fTransition &= ~TRANSITION_SHOW;
+        }
+
+
+        if ( m_nAlpha > 0 && m_iArgType == OBJARGTYPE_TIMER )
+        {
+            char buffertime[32];
+            char buffer[128];
+
+            float f = m_flTimerEnd - gpGlobals->curtime;
+            if ( f < 0.0f ) f = 0.0f;
+
+            float min = floor( f / 60.0f );
+            float secs = Floor2Int( f ) % 60;
+
+            Q_snprintf( buffertime, sizeof( buffertime ), "%.0f:%02.0f", min, secs );
+            Q_snprintf( buffer, sizeof( buffer ), m_szFormat, buffertime );
+
+            vgui::ILocalize::ConvertANSIToUnicode( buffer, m_szRenderText, sizeof( m_szRenderText ) );
         }
     }
 
@@ -252,6 +275,7 @@ private:
     Color m_Color;
 
     bool m_bComplete;
+    float m_flTimerEnd;
 
     float m_flAbsPosY;
     float m_flWantedPosY;
@@ -392,7 +416,7 @@ void CZMHudObjectives::OnThink()
 
 
     for ( int i = 0; i < NUM_OBJ_LINES; i++ )
-        m_Line[i].DoTransition();
+        m_Line[i].Think();
 
 
     if ( pPlayer->m_nButtons & IN_SCORE && !(pPlayer->m_afButtonLast & IN_SCORE) )
