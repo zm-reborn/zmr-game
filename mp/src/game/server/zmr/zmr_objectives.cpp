@@ -12,21 +12,25 @@ void CObjLine::WriteEmptyDisplayUserMsg()
     WRITE_BYTE( 0 );
 }
 
+void CObjLine::WriteArg()
+{
+    switch ( m_iTextArgType )
+    {
+    case OBJARGTYPE_STRING : WRITE_STRING( m_szTextArg ); break;
+    case OBJARGTYPE_TIMER : WRITE_FLOAT( m_flTimerEnd - gpGlobals->curtime ); break;
+    case OBJARGTYPE_INT :
+    case OBJARGTYPE_FLOAT : WRITE_FLOAT( m_flTextArgNum ); break;
+    default : break;
+    }
+}
+
 void CObjLine::WriteDisplayUserMsg()
 {
     WRITE_BYTE( ( m_szTexts[0] != NULL ) ? 1 : 0 );
 
     WRITE_BYTE( m_iTextArgType );
 
-    switch ( m_iTextArgType )
-    {
-    case OBJARGTYPE_STRING : WRITE_STRING( m_szTextArg ); break;
-    case OBJARGTYPE_TIMER :
-    case OBJARGTYPE_INT :
-    case OBJARGTYPE_FLOAT : WRITE_FLOAT( m_flTextArgNum ); break;
-    default : break;
-    }
-
+    WriteArg();
 
     if ( m_szTexts[0] != NULL )
         WRITE_STRING( m_szTexts );
@@ -37,14 +41,7 @@ void CObjLine::WriteUpdateUserMsg()
     WRITE_BYTE( m_bComplete ? 1 : 0 );
 
     WRITE_BYTE( m_iTextArgType );
-    if ( m_iTextArgType == OBJARGTYPE_STRING )
-    {
-        WRITE_STRING( m_szTextArg );
-    }
-    else
-    {
-        WRITE_FLOAT( m_flTextArgNum );
-    }
+    WriteArg();
 }
 
 void CObjLine::ParseArg( const char* psz )
@@ -74,8 +71,17 @@ void CObjLine::ParseArg( const char* psz )
         }
     }
 
+    if ( m_iTextArgType == OBJARGTYPE_TIMER )
+    {
+        m_flTextArgNum = atof( &psz[1] );
 
-    m_flTextArgNum = (m_iTextArgType == OBJARGTYPE_TIMER) ? atof( &psz[1] ) : atof( psz );
+        m_flTimerEnd = gpGlobals->curtime + m_flTextArgNum;
+    }
+    else
+    {
+        m_flTextArgNum = atof( psz );
+    }
+
     Q_strncpy( m_szTextArg, psz, sizeof( m_szTextArg ) );
 }
 
