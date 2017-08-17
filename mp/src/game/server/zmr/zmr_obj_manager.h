@@ -64,7 +64,7 @@ public:
 
 private:
     bool LoadFromFile();
-    void ReadInput( bool start, KeyValues* pKey, const char* format, const char* entname, const char* name, bool allowempty = false );
+    void ReadInput( bool start, KeyValues* pValue, const char* format, const char* entname );
 
     void CreateInputs();
 

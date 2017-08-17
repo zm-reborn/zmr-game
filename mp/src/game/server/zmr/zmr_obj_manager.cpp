@@ -354,51 +354,20 @@ bool CZMEntObjectivesManager::LoadFromFile()
             Q_snprintf( format, sizeof( format ), "%s info_objectives:%s:%s:%.2f:%i", pOutput, "%s", "%s", delay, once );
         }
 
-        // It's ugly but it works ALRIGHT.
-        // Alright, this is getting way too ugly now...
-        ReadInput( start, pKey, format, pEntName, "Reset", true );
-        ReadInput( start, pKey, format, pEntName, "ResetMain" );
-        ReadInput( start, pKey, format, pEntName, "ResetChild1" );
-        ReadInput( start, pKey, format, pEntName, "ResetChild2" );
-        ReadInput( start, pKey, format, pEntName, "ResetChild3" );
-        ReadInput( start, pKey, format, pEntName, "ResetChild4" );
-        ReadInput( start, pKey, format, pEntName, "SetMainText" );
-        ReadInput( start, pKey, format, pEntName, "SetChild1Text" );
-        ReadInput( start, pKey, format, pEntName, "SetChild2Text" );
-        ReadInput( start, pKey, format, pEntName, "SetChild3Text" );
-        ReadInput( start, pKey, format, pEntName, "SetChild4Text" );
-        ReadInput( start, pKey, format, pEntName, "SetMainTextArg" );
-        ReadInput( start, pKey, format, pEntName, "SetChild1TextArg" );
-        ReadInput( start, pKey, format, pEntName, "SetChild2TextArg" );
-        ReadInput( start, pKey, format, pEntName, "SetChild3TextArg" );
-        ReadInput( start, pKey, format, pEntName, "SetChild4TextArg" );
-        //ReadInput( start, pKey, format, pEntName, "SetMainTextArgType" );
-        //ReadInput( start, pKey, format, pEntName, "SetChild1TextArgType" );
-        //ReadInput( start, pKey, format, pEntName, "SetChild2TextArgType" );
-        //ReadInput( start, pKey, format, pEntName, "SetChild3TextArgType" );
-        //ReadInput( start, pKey, format, pEntName, "SetChild4TextArgType" );
-        ReadInput( start, pKey, format, pEntName, "IncMainTextArg" );
-        ReadInput( start, pKey, format, pEntName, "IncChild1TextArg" );
-        ReadInput( start, pKey, format, pEntName, "IncChild2TextArg" );
-        ReadInput( start, pKey, format, pEntName, "IncChild3TextArg" );
-        ReadInput( start, pKey, format, pEntName, "IncChild4TextArg" );
-        ReadInput( start, pKey, format, pEntName, "UpdateMainText" );
-        ReadInput( start, pKey, format, pEntName, "UpdateChild1Text" );
-        ReadInput( start, pKey, format, pEntName, "UpdateChild2Text" );
-        ReadInput( start, pKey, format, pEntName, "UpdateChild3Text" );
-        ReadInput( start, pKey, format, pEntName, "UpdateChild4Text" );
-        ReadInput( start, pKey, format, pEntName, "CompleteMain", true );
-        ReadInput( start, pKey, format, pEntName, "CompleteChild1", true );
-        ReadInput( start, pKey, format, pEntName, "CompleteChild2", true );
-        ReadInput( start, pKey, format, pEntName, "CompleteChild3", true );
-        ReadInput( start, pKey, format, pEntName, "CompleteChild4", true );
-        ReadInput( start, pKey, format, pEntName, "InCompleteMain", true );
-        ReadInput( start, pKey, format, pEntName, "InCompleteChild1", true );
-        ReadInput( start, pKey, format, pEntName, "InCompleteChild2", true );
-        ReadInput( start, pKey, format, pEntName, "InCompleteChild3", true );
-        ReadInput( start, pKey, format, pEntName, "InCompleteChild4", true );
-        ReadInput( start, pKey, format, pEntName, "Update", true );
-        ReadInput( start, pKey, format, pEntName, "Display", true );
+
+        // Go through the values and create inputs.
+        KeyValues* pValue = pKey->GetFirstValue();
+
+        if ( !pValue )
+        {
+            continue;
+        }
+
+        do
+        {
+            ReadInput( start, pValue, format, pEntName );
+        }
+        while ( (pValue = pValue->GetNextValue()) != nullptr );
     }
     while ( (pKey = pKey->GetNextKey()) != nullptr );
 
@@ -409,14 +378,15 @@ bool CZMEntObjectivesManager::LoadFromFile()
     return true;
 }
 
-void CZMEntObjectivesManager::ReadInput( bool start, KeyValues* pKey, const char* format, const char* entname, const char* name, bool empty )
+void CZMEntObjectivesManager::ReadInput( bool start, KeyValues* pValue, const char* format, const char* entname )
 {
-    const char* value = pKey->GetString( name, nullptr );
+    const char* name = pValue->GetName();
+    const char* value = pValue->GetString();
     if ( value )
     {
         if ( start )
         {
-            m_vStartInputs.AddToTail( new ObjStartInputData_t( name, empty ? "" : value ) );
+            m_vStartInputs.AddToTail( new ObjStartInputData_t( name, value ) );
         }
         else
         {
@@ -433,7 +403,7 @@ void CZMEntObjectivesManager::ReadInput( bool start, KeyValues* pKey, const char
                 ++c;
             }
 
-            Q_snprintf( szOutput, sizeof( szOutput ), format, name, empty ? "" : szVar );
+            Q_snprintf( szOutput, sizeof( szOutput ), format, name, szVar );
 
             m_vInputs.AddToTail( new ObjInputData_t( entname, szOutput ) );
         }
