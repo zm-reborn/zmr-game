@@ -15,11 +15,13 @@ public:
         m_flTextArgNum = 0.0f;
         m_szTextArg[0] = NULL;
         m_bComplete = false;
+        m_flTimerEnd = 0.0f;
     }
 
 
     static void WriteEmptyDisplayUserMsg();
 
+    void WriteArg();
     void WriteDisplayUserMsg();
     void WriteUpdateUserMsg();
     void ParseArg( const char* psz );
@@ -29,6 +31,7 @@ public:
     char m_szTexts[MAX_OBJ_LINESIZE];
     ObjArgType_t m_iTextArgType;
 
+    float m_flTimerEnd;
     float m_flTextArgNum;
     char m_szTextArg[32];
 
