@@ -176,7 +176,19 @@ void CGameScore::InputApplyScore( inputdata_t &inputdata )
 
 	if ( pActivator == NULL )
 		 return;
+#ifdef ZMR // ZMRCHANGE: Allow points from carrying stuff...
+    if ( !pActivator->IsPlayer() )
+    {
+        IPhysicsObject* pObj = pActivator->VPhysicsGetObject();
 
+        if ( !pObj || !(pObj->GetGameFlags() & FVPHYSICS_PLAYER_HELD) ) return;
+
+        if ( !pActivator->GetOwnerEntity() ) return;
+
+
+        pActivator = pActivator->GetOwnerEntity();
+    }
+#endif
 	if ( CanFireForActivator( pActivator ) == false )
 		return;
 
