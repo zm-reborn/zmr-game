@@ -922,7 +922,7 @@ void CZMEntTriggerPlayerCount::CountThink( void )
 
     if ( !root )
     {
-        DevMsg( "No root found for trigger_playercount!\n" );
+        //DevMsg( "No touch link found for trigger_playercount!\n" );
 
         SetNextThink( gpGlobals->curtime + 1.0f );
         return;
@@ -1054,7 +1054,7 @@ void CZMEntTriggerEntityCount::InputCount( inputdata_t &inputData )
 
     if ( !root )
     {
-        DevMsg( "No root found for trigger_entitycount!\n" );
+        DevMsg( "No touch link found for trigger_entitycount!\n" );
         return;
     }
 
