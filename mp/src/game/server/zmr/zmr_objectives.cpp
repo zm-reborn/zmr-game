@@ -19,8 +19,8 @@ void CObjLine::WriteArg()
     case OBJARGTYPE_STRING : WRITE_STRING( m_szTextArg ); break;
     case OBJARGTYPE_TIMER : WRITE_FLOAT( m_flTimerEnd - gpGlobals->curtime ); break;
     case OBJARGTYPE_INT :
-    case OBJARGTYPE_FLOAT : WRITE_FLOAT( m_flTextArgNum ); break;
-    default : break;
+    case OBJARGTYPE_FLOAT : 
+    default : WRITE_FLOAT( m_flTextArgNum ); break;
     }
 }
 

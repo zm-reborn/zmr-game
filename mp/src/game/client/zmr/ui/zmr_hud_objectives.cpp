@@ -566,8 +566,8 @@ void CZMHudObjectives::MsgFunc_ZMObjDisplay( bf_read& msg )
         case OBJARGTYPE_STRING : msg.ReadString( arg, sizeof( arg ), false ); break;
         case OBJARGTYPE_TIMER :
         case OBJARGTYPE_INT :
-        case OBJARGTYPE_FLOAT : num = msg.ReadFloat(); break;
-        default : break;
+        case OBJARGTYPE_FLOAT : 
+        default : num = msg.ReadFloat(); break;
         }
 
         
@@ -640,8 +640,8 @@ void CZMHudObjectives::MsgFunc_ZMObjUpdateLine( bf_read& msg )
     case OBJARGTYPE_STRING : msg.ReadString( arg, sizeof( arg ), false ); break;
     case OBJARGTYPE_TIMER :
     case OBJARGTYPE_INT :
-    case OBJARGTYPE_FLOAT : num = msg.ReadFloat(); break;
-    default : break;
+    case OBJARGTYPE_FLOAT : 
+    default : num = msg.ReadFloat(); break;
     }
 
         
