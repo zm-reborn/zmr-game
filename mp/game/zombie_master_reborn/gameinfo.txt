@@ -13,7 +13,7 @@
 		"test_hardware"		1
 		"zmr_testmap"		1
 	}
-	supportsvr	1
+	supportsvr	0
 	
 	icon 			"resource/icon"
 	"developer"		"Zombie Master: Reborn Team"
