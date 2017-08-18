@@ -50,6 +50,7 @@ private:
 
     const wchar_t* m_pszPass;
     const wchar_t* m_pszFail;
+    const wchar_t* m_pszMyVote;
     wchar_t m_szHowto[128];
     wchar_t m_szDisplay[128];
     wchar_t m_szVote[32];
@@ -83,6 +84,7 @@ CZMHudVote::CZMHudVote( const char *pElementName ) : CHudElement( pElementName )
     m_szHowto[0] = NULL;
     m_szVote[0] = NULL;
 
+    m_pszMyVote = nullptr;
     m_pszReason = nullptr;
     m_pszPass = nullptr;
     m_pszFail = nullptr;
@@ -151,10 +153,13 @@ void CZMHudVote::FireGameEvent( IGameEvent* event )
     if ( FStrEq( name, "vote_cast" ) )
     {
         int option = event->GetInt( "vote_option" );
-        int team = event->GetInt( "team" );
+        //int team = event->GetInt( "team" );
         int ent = event->GetInt( "entityid" );
 
-        DevMsg( "vote_cast | Option: %i | Team: %i | Ent: %i\n", option, team, ent );
+        if ( GetLocalPlayerIndex() == ent )
+        {
+            m_pszMyVote = g_pVGuiLocalize->Find( ( option == 1 ) ?  "#ZMMyVoteYes" : "#ZMMyVoteNo" );
+        }
     }
     else if ( FStrEq( name, "vote_changed" ) )
     {
@@ -233,6 +238,13 @@ void CZMHudVote::Paint()
 
         PaintString( m_hTextFont, m_VoteColor, ScreenWidth() / 2.0f - w / 2.0f, 100, m_szVote );
     }
+
+    if ( m_pszMyVote && *m_pszMyVote )
+    {
+        surface()->GetTextSize( m_hTextFont, m_pszMyVote, w, h );
+
+        PaintString( m_hTextFont, m_VoteColor, ScreenWidth() / 2.0f - w / 2.0f, 100 + 1 + h * 2, m_pszMyVote );
+    }
 }
 
 void CZMHudVote::MsgFunc_VoteSetup( bf_read& msg )
@@ -288,6 +300,7 @@ void CZMHudVote::MsgFunc_VoteStart( bf_read& msg )
     g_pClientMode->GetViewportAnimationController()->StartAnimationSequence( "ZMVoteStart" );
 
     m_szVote[0] = NULL;
+    m_pszMyVote = nullptr;
     m_pszReason = nullptr;
     m_bDrawVote = true;
     m_flVoteDraw = gpGlobals->curtime + 60.0f;
