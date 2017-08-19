@@ -21,10 +21,11 @@ enum
     SCHED_ZM_FORCED_GO
 };
 
-enum
+// Moved to npc_BaseZombie for now.
+/*enum
 {
-    COND_ZM_SEE_ENEMY = LAST_BASE_ZOMBIE_CONDITION + 15, // HACK
-};
+    COND_ZM_SEE_ENEMY = LAST_BASE_ZOMBIE_CONDITION + 1, // HACK
+};*/
 
 class CZMBaseZombie : public CNPC_BaseZombie, public CZMNPCLagCompensation
 {

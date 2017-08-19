@@ -100,6 +100,9 @@ enum Zombie_Conds
 	COND_ZOMBIE_CAN_SWAT_ATTACK = LAST_SHARED_CONDITION,
 	COND_ZOMBIE_RELEASECRAB,
 	COND_ZOMBIE_LOCAL_MELEE_OBSTRUCTION,
+#ifdef ZMR // ZMRCHANGE: We need to put this here. It was causing major problems with scheduling. Apparently you can't "skip" conditions(?)
+    COND_ZM_SEE_ENEMY,
+#endif
 
 	LAST_BASE_ZOMBIE_CONDITION,
 };
