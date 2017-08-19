@@ -350,6 +350,7 @@ int CPropData::ParsePropFromKV( CBaseEntity *pProp, KeyValues *pSection, KeyValu
 		pBreakableInterface->SetExplosiveDamage( pSection->GetFloat( "explosive_damage", pBreakableInterface->GetExplosiveDamage() ) );
 		pBreakableInterface->SetExplosiveRadius( pSection->GetFloat( "explosive_radius", pBreakableInterface->GetExplosiveRadius() ) );
 
+#ifndef ZMR // ZMRCHANGE: Keep the spawnflag. Why would we even want to remove it? The mapper specifically wanted the prop to NOT TAKE PHYSICS DAMAGE. Thanks Valve. 
 #ifdef GAME_DLL
 		// If we now have health, we're not allowed to ignore physics damage
 		if ( pProp->GetHealth() )
@@ -357,6 +358,7 @@ int CPropData::ParsePropFromKV( CBaseEntity *pProp, KeyValues *pSection, KeyValu
 			pProp->RemoveSpawnFlags( SF_PHYSPROP_DONT_TAKE_PHYSICS_DAMAGE );
 		}
 #endif
+#endif // ZMR
 	}
 
 	const char *pszBreakableModel;
