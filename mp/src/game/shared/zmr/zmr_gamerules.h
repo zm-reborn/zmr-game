@@ -74,7 +74,7 @@ public:
 
     void ClientSettingsChanged( CBasePlayer* ) OVERRIDE;
 
-    virtual const char* GetGameDescription( void ) OVERRIDE { return "Zombie Master Reborn"; } //
+    virtual const char* GetGameDescription( void ) OVERRIDE { return ZMR_NAME; };
 
     virtual void Think() OVERRIDE;
 

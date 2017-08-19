@@ -133,7 +133,7 @@ void ClientGamePrecache( void )
 
 const char *GetGameDescription()
 {
-    return ( g_pGameRules ) ? g_pGameRules->GetGameDescription() : "Zombie Master Reborn";
+    return ( g_pGameRules ) ? g_pGameRules->GetGameDescription() : ZMR_NAME;
 }
 
 void InstallGameRules()
