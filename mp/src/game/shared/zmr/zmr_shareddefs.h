@@ -1,5 +1,10 @@
 #pragma once
 
+
+#define ZMR_NAME        "Zombie Master: Reborn"
+#define ZMR_VERSION     "a2"
+
+
 enum
 {
     ZMTEAM_INVALID = -1,
