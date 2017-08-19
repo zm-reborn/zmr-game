@@ -3061,11 +3061,13 @@ void CPhysicsProp::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 		float damage = CalculateDefaultPhysicsDamage( index, pEvent, m_impactEnergyScale, true, damageType, pBreakableInterface->GetPhysicsDamageTable() );
 		if ( damage > 0 )
 		{
+#ifndef ZMR // ZMRCHANGE: Don't take extra damage.
 			// Take extra damage after we're punted by the physcannon
 			if ( m_bFirstCollisionAfterLaunch && !m_bThrownByPlayer )
 			{
 				damage *= 10;
 			}
+#endif
 
 			CBaseEntity *pHitEntity = pEvent->pEntities[!index];
 			if ( !pHitEntity )
