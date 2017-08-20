@@ -50,17 +50,17 @@
 		"OnlyWhenVREnabled" "1"
 		"OnlyWhenVRActive" "1"
 	}
-	"10"
+	"9"
 	{
 		"label" "#GameUI_GameMenu_Options"
 		"command" "OpenOptionsDialog"
 	}
-	"11"
+	"10"
 	{
 		"label" "ZM OPTIONS"
 		"command" "engine ToggleZMOptions"
 	}
-	"12"
+	"11"
 	{
 		"label" "#GameUI_GameMenu_Quit"
 		"command" "Quit"
