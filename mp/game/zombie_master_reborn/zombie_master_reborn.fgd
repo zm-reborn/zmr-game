@@ -53,7 +53,17 @@
 @PointClass base(Targetname, Parentname, Origin, Angles, Activeable, InputActiveable)  = info_zombiespawn :
 	"Where Zombies come out of"
 [
-	zombieflags(integer) : "Zombieflags" : 0 : "Zombies that can be spawned here.  Refer to documentation."
+	spawnflags(flags) =
+	[
+		1: "Spawn Shamblers" : 1
+		2: "Spawn Banshees" : 1
+		4: "Spawn Hulks" : 1
+		8: "Spawn Drifters" : 1
+		16: "Spawn Immolators" : 1
+	]
+	
+	
+	zombieflags(integer) : "Zombieflags" : 0 : "DEPRECATED. Use flags instead. Zombies that can be spawned here.  Refer to documentation."
 
 	rallyname(target_destination) : "Rallyname" : "" : "Targetname of the rallypoint this aims at."
 	nodename(target_destination) : "Nodename" : "" : "Targetname of the first spawn node, if any, in the chain of spawn nodes."
