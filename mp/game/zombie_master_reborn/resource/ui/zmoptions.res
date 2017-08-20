@@ -17,7 +17,7 @@
 		"enabled"		"1"
 		"tabPosition"		"0"
 		"settitlebarvisible"		"1"
-		"title"		"#Frame_Untitled"
+		"title"		"Options"
 	}
 	"frame_topGrip"
 	{
