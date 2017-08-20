@@ -169,6 +169,15 @@ void CZMEntZombieSpawn::Spawn( void )
     //if ( m_nSpawnQueueCapacity < 1 )
     //    m_nSpawnQueueCapacity = 10;
 
+    // Spawn flags to zombie flags.
+    for ( int i = 0; i < ZMCLASS_MAX; i++ )
+    {
+        if ( HasSpawnFlags( 1 << i ) )
+        {
+            m_fZombieFlags |= ( 1 << i );
+        }
+    }
+
 
     m_vSpawnQueue.EnsureCapacity( 10 );
 
