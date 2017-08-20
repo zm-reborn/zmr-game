@@ -2,7 +2,7 @@ versioninfo
 {
 	"editorversion" "400"
 	"editorbuild" "7538"
-	"mapversion" "27"
+	"mapversion" "28"
 	"formatversion" "100"
 	"prefab" "0"
 }
@@ -20,7 +20,7 @@ viewsettings
 world
 {
 	"id" "1"
-	"mapversion" "27"
+	"mapversion" "28"
 	"classname" "worldspawn"
 	"detailmaterial" "detail/detailsprites"
 	"detailvbsp" "detail.vbsp"
@@ -1625,6 +1625,7 @@ entity
 	"nodename" "spawn1_node1"
 	"origin" "-800 800 192"
 	"rallyname" "spawn1_rally"
+	"spawnflags" "13"
 	"zombieflags" "0"
 	editor
 	{
