@@ -34,6 +34,7 @@
 
 #ifdef ZMR
 #include "zmr/ui/zmr_options.h"
+#include "zmr/ui/zmr_newversion.h"
 #endif
 
 using namespace vgui;
@@ -229,6 +230,7 @@ void VGui_CreateGlobalPanels( void )
     VPANEL parent = enginevgui->GetPanel( PANEL_GAMEUIDLL );
 
     g_pZMOptionsMenu->Create( parent );
+    g_pZMNewVerMenuInt->Create( parent );
 #endif
 }
 
@@ -236,6 +238,7 @@ void VGui_Shutdown()
 {
 #ifdef ZMR
     g_pZMOptionsMenu->Destroy();
+    g_pZMNewVerMenuInt->Destroy();
 #endif
 
 	VGUI_DestroyClientDLLRootPanel();

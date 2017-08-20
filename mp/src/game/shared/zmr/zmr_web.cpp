@@ -3,6 +3,10 @@
 #include "zmr/zmr_shareddefs.h"
 #include "zmr/zmr_web.h"
 
+#ifdef CLIENT_DLL
+#include "zmr/ui/zmr_newversion.h"
+#endif
+
 
 #define VERSION_URL     "https://raw.githubusercontent.com/zm-reborn/zmr-game/master/version.txt"
 
@@ -86,7 +90,13 @@ void CZMWeb::ParseVersion( const char* data )
 
         if ( !FStrEq( &(strs[i][1]), ZMR_VERSION ) )
         {
+#ifdef CLIENT_DLL
+            if ( g_pZMNewVerMenu )
+                g_pZMNewVerMenu->Activate();
+#endif
+
             Msg( "New version of %s is available!\n", ZMR_NAME );
+
             return;
         }
     }
