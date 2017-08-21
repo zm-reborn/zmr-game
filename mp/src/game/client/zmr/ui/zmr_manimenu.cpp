@@ -18,6 +18,7 @@
 #include "zmr/zmr_player_shared.h"
 #include "zmr/npcs/c_zmr_zombiebase.h"
 #include "zmr_viewport.h"
+#include "zmr/zmr_util.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -169,7 +170,7 @@ void CZMManiMenu::OnThink()
 
     Vector screen;
     int x, y;
-    if ( CZMFrame::WorldToScreen( GetTrapPos(), screen, x, y ) )
+    if ( ZMClientUtil::WorldToScreen( GetTrapPos(), screen, x, y ) )
     {
         int w, h;
         GetSize( w, h );

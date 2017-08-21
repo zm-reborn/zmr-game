@@ -52,8 +52,6 @@ public:
     inline ZMClickMode_t GetClickMode() { return m_iClickMode; };
     void SetClickMode( ZMClickMode_t, bool = false );
 
-    static bool WorldToScreen( const Vector&, Vector&, int&, int& );
-
 private:
     void TraceScreenToWorld( int, int, trace_t*, CTraceFilterSimple*, int );
     
