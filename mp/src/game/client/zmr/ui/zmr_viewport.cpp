@@ -15,10 +15,10 @@
 #include "zmr/zmr_global_shared.h"
 #include "zmr/c_zmr_entities.h"
 #include "zmr/npcs/c_zmr_zombiebase.h"
+#include "zmr/zmr_util.h"
 
 
-#include "zmr_buildmenu.h"
-#include "zmr_manimenu.h"
+
 
 #include "zmr_viewport.h"
 
@@ -613,7 +613,7 @@ void CZMFrame::FindZombiesInBox( int start_x, int start_y, int end_x, int end_y,
             if ( trace.fraction != 1.0f && !trace.startsolid ) continue;
         }
 
-        if ( !WorldToScreen( pZombie->GetAbsOrigin(), screen, x, y ) )
+        if ( !ZMClientUtil::WorldToScreen( pZombie->GetAbsOrigin(), screen, x, y ) )
             continue;
 
         if ( x > start_x && x < end_x && y > start_y && y < end_y )
@@ -750,21 +750,4 @@ void CZMFrame::CloseChildMenus()
     {
         m_pManiMenu->Close();
     }
-}
-
-bool CZMFrame::WorldToScreen( const Vector& pos, Vector& screen, int& x, int& y )
-{
-    int behind = ScreenTransform( pos, screen );
-
-    if ( !behind )
-    {
-        int w = ScreenWidth();
-        int h = ScreenHeight();
-        x =  0.5 * screen[0] * w;
-        y = -0.5 * screen[1] * h;
-        x += 0.5 * w;
-        y += 0.5 *	h;
-    }
-
-    return !behind ? true : false;
 }
