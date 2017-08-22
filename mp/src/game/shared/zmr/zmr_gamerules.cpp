@@ -709,8 +709,8 @@ void CZMRules::InitDefaultAIRelationships( void )
     CBaseCombatCharacter::SetDefaultRelationship( CLASS_ZOMBIE, CLASS_ZOMBIE,       D_NU, 0 );
 }
 
-ConVar zm_mp_roundlimit( "zm_mp_roundlimit", "10", FCVAR_NOTIFY, "How many round do we play before going into intermission." );
-ConVar zm_sv_roundintermissiontime( "zm_sv_roundintermissiontime", "5", FCVAR_NOTIFY, "How many seconds of time there is before another round begins." );
+ConVar zm_mp_roundlimit( "zm_mp_roundlimit", "0", FCVAR_NOTIFY, "How many rounds do we play before going into intermission. 0 = Disable" );
+ConVar zm_sv_roundintermissiontime( "zm_sv_roundintermissiontime", "5", FCVAR_NOTIFY, "How many seconds of wait there is before another round begins." );
 
 void CZMRules::EndRound( ZMRoundEndReason_t reason )
 {
@@ -733,7 +733,7 @@ void CZMRules::EndRound( ZMRoundEndReason_t reason )
     // Check round limit.
     ++m_nRounds;
 
-    if ( zm_mp_roundlimit.GetInt() && m_nRounds > zm_mp_roundlimit.GetInt() )
+    if ( zm_mp_roundlimit.GetInt() > 0 && m_nRounds > zm_mp_roundlimit.GetInt() )
     {
         GoToIntermission();
     }
