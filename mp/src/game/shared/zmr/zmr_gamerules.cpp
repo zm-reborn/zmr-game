@@ -737,6 +737,16 @@ void CZMRules::EndRound( ZMRoundEndReason_t reason )
     {
         GoToIntermission();
     }
+
+
+    // Will be used by clients in the future.
+    IGameEvent* pEvent = gameeventmanager->CreateEvent( "round_end_post", true );
+    if ( pEvent )
+    {
+        pEvent->SetInt( "reason", reason );
+
+        gameeventmanager->FireEvent( pEvent, false );
+    }
 }
 
 void CZMRules::RewardResources( int res )
@@ -962,6 +972,15 @@ void CZMRules::ResetWorld()
 {
     Msg( "The round is restarting...\n" );
 
+    IGameEvent* pEvent;
+    
+    // Send restart event for plugins.
+    pEvent = gameeventmanager->CreateEvent( "round_restart_pre", true );
+    if ( pEvent )
+    {
+        gameeventmanager->FireEvent( pEvent, true );
+    }
+
 
     RestoreMap();
 
@@ -989,6 +1008,14 @@ void CZMRules::ResetWorld()
 
     m_flRoundRestartTime = 0.0f;
     m_bInRoundEnd = false;
+
+
+    // This will be used for clients in the future.
+    pEvent = gameeventmanager->CreateEvent( "round_restart_post", true );
+    if ( pEvent )
+    {
+        gameeventmanager->FireEvent( pEvent, false );
+    }
 }
 
 void CZMRules::RestoreMap()
