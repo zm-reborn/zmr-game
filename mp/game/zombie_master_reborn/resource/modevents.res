@@ -27,6 +27,29 @@
 
 "modevents"
 {
+	// ZMR
+	
+	// When round has ended and we are waiting for the round intermission to end to restart the round. See below.
+	"round_end_post"
+	{
+		// Reason id. See ZMRoundEndReason_t, github.com/zm-reborn/zmr-game/blob/master/mp/src/game/shared/zmr/zmr_shareddefs.h
+		"reason"	"short"
+	}
+	
+	// Right before round will get restarted. (still technically previous round)
+	// Not broadcasted to clients.
+	"round_restart_pre"
+	{
+	}
+	
+	// Right after round has been restarted. (players have been spawned, etc.)
+	"round_restart_post"
+	{
+	}
+	
+	
+	
+
 	"player_death"				// a game event, name may be 32 charaters long
 	{
 		"userid"	"short"   	// user ID who died				
@@ -34,15 +57,12 @@
 		"weapon"	"string" 	// weapon name killed used 
 	}
 	
-	"teamplay_round_start"			// round restart
-	{
-		"full_reset"	"bool"		// is this a full reset of the map
-	}
-	
+	// Unused(?)
 	"spec_target_updated"
 	{
 	}
 	
+	// Unused(?)
 	"achievement_earned"
 	{
 		"player"	"byte"		// entindex of the player
