@@ -141,7 +141,7 @@ CZMOptionsMenu::CZMOptionsMenu( VPANEL parent ) : BaseClass( nullptr, "ZMOptions
 
     kv = new KeyValues( "participation" );
 
-    if ( kv->LoadFromFile( filesystem, "resource/zmoptions_participation.res", "MOD" ) )
+    if ( kv->LoadFromFile( filesystem, "resource/zmoptions_participation.txt", "MOD" ) )
     {
         KeyValues* pKey = kv->GetFirstSubKey();
 
