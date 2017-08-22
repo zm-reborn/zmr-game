@@ -1,0 +1,71 @@
+"Models"
+{
+	"Female #1"
+	{
+		"model"		"models/humans/group02/female_01.mdl"
+	}
+	"Female #2"
+	{
+		"model"		"models/humans/group02/female_02.mdl"
+	}
+	"Female #3"
+	{
+		"model"		"models/humans/group02/female_03.mdl"
+	}
+	"Female #4"
+	{
+		"model"		"models/humans/group02/female_04.mdl"
+	}
+	"Female #5"
+	{
+		"model"		"models/humans/group02/female_06.mdl"
+	}
+	"Female #6"
+	{
+		"model"		"models/humans/group02/female_07.mdl"
+	}
+	"Male #1"
+	{
+		"model"		"models/humans/group02/male_01.mdl"
+	}
+	"Male #2"
+	{
+		"model"		"models/humans/group02/male_02.mdl"
+	}
+	"Male #3"
+	{
+		"model"		"models/humans/group02/male_03.mdl"
+	}
+	"Male #4"
+	{
+		"model"		"models/humans/group02/male_04.mdl"
+	}
+	"Male #5"
+	{
+		"model"		"models/humans/group02/male_05.mdl"
+	}
+	"Male #6"
+	{
+		"model"		"models/humans/group02/male_06.mdl"
+	}
+	"Male #7"
+	{
+		"model"		"models/humans/group02/male_07.mdl"
+	}
+	"Male #8"
+	{
+		"model"		"models/humans/group02/male_08.mdl"
+	}
+	"Male #9"
+	{
+		"model"		"models/humans/group02/male_09.mdl"
+	}
+	"Pi"
+	{
+		"model"		"models/male_pi.mdl"
+	}
+	"Lawyer"
+	{
+		"model"		"models/male_lawyer.mdl"
+	}
+}
