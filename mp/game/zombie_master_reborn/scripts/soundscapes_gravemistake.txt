@@ -1,0 +1,50 @@
+// *******************************************************************************
+// ***************** GraveMistake *****************
+
+
+"grave.general"
+{
+	"dsp"	"1"
+	"dsp_volume" "1.0"
+	
+	"playlooping"
+	{
+		"volume"	"0.55"
+		"wave"		"ambient/atmosphere/town_ambience.wav"
+		"pitch"		"100"
+		"attenuation"	"0"
+	}
+
+	"playrandom"
+	{
+		"time"		"7, 16"
+		"volume"	"0.4,0.7"
+		"pitch"		"95,110"
+		"position"	"random"
+		"soundlevel"	"SNDLVL_140db"
+		"rndwave"
+		{
+			"wave"	"ambient/wind/wind_moan1.wav"
+			"wave"	"ambient/wind/wind_moan2.wav"
+			"wave"	"ambient/wind/wind_snippet1.wav"
+			"wave"	"ambient/wind/wind_snippet2.wav"
+			"wave"	"ambient/wind/wind_moan4.wav"
+			"wave"	"ambient/atmosphere/hole_hit1.wav"
+			"wave"	"ambient/atmosphere/hole_hit5.wav"
+			"wave"	"ambient/creatures/town_zombie_call1.wav"
+			"wave"	"ambient/creatures/town_moan1.wav"
+		}
+		
+	}
+}
+
+
+
+// in concrete buildings
+
+"grave.crypt"
+{
+	"dsp"	"9"
+	"dsp_volume" "1.0"
+}
+
