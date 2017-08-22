@@ -184,6 +184,9 @@ public:
 	MESSAGE_FUNC_PARAMS( OnAddAnimation, "AddAnimation", data );
 	MESSAGE_FUNC_PARAMS( OnSetAnimation, "SetAnimation", data );
 
+#ifdef ZMR // ZMRCHANGE: Let our own panel get the default anim.
+    inline int GetDefaultAnimation() { return m_iDefaultAnimation; };
+#endif
 	void	SetDefaultAnimation( const char *pszName );
 	void	SwapModel( const char *pszName, const char *pszAttached = NULL );
 

@@ -7,7 +7,7 @@
 #include "filesystem.h"
 #include <vgui_controls/AnimationController.h>
 
-
+#include "zmr_panel_modelpanel.h"
 #include "zmr/c_zmr_player.h"
 #include "zmr_options.h"
 
@@ -28,11 +28,11 @@ public:
 
     CZMOptionsMenu( VPANEL parent );
     ~CZMOptionsMenu();
-
-
+    
+    MESSAGE_FUNC_PARAMS( OnComboChanged, "TextChanged", data );
     virtual void OnTick() OVERRIDE;
     virtual void OnThink() OVERRIDE;
-
+    
     virtual void OnCommand( const char* ) OVERRIDE;
 
 
@@ -54,6 +54,8 @@ protected:
         }
     }
 
+    CZMModelPanel* m_pModelPanel;
+    ComboBox* m_pModelCombo;
     ComboBox* m_pPartBox;
     CheckButton* m_pCheck_PowerUser;
     CheckButton* m_pCheck_BoxPowerUser;
@@ -62,6 +64,8 @@ protected:
 
     void UpdateMenu();
     void ApplySettings();
+    
+    const char* GetCurrentPlayerModel();
 };
 
 class CZMOptionsMenuInterface : public IZMUi
@@ -99,7 +103,6 @@ CON_COMMAND( ToggleZMOptions, "" )
     g_bZMOptionsShow = !g_bZMOptionsShow;
 }
 
-
 CZMOptionsMenu::CZMOptionsMenu( VPANEL parent ) : BaseClass( nullptr, "ZMOptionsMenu" )
 {
     m_bFailedLoad = false;
@@ -124,6 +127,8 @@ CZMOptionsMenu::CZMOptionsMenu( VPANEL parent ) : BaseClass( nullptr, "ZMOptions
     LoadItem( &m_pCheck_BoxPowerUser, "check_poweruser_box" );
     LoadItem( &m_pSlider_Yaw, "scrollhor_slider" );
     LoadItem( &m_pSlider_Pitch, "scrollver_slider" );
+    LoadItem( &m_pModelPanel, "CZMModelPanel1" );
+    LoadItem( &m_pModelCombo, "ModelComboBox" );
 
     if ( FailedLoad() ) return;
 
@@ -132,7 +137,9 @@ CZMOptionsMenu::CZMOptionsMenu( VPANEL parent ) : BaseClass( nullptr, "ZMOptions
     m_pSlider_Pitch->SetRange( 10, 500 );
 
 
-    KeyValues* kv = new KeyValues( "participation" );
+    KeyValues* kv;
+
+    kv = new KeyValues( "participation" );
 
     if ( kv->LoadFromFile( filesystem, "resource/zmoptions_participation.res", "MOD" ) )
     {
@@ -153,6 +160,34 @@ CZMOptionsMenu::CZMOptionsMenu( VPANEL parent ) : BaseClass( nullptr, "ZMOptions
     kv->deleteThis();
 
     m_pPartBox->ActivateItemByRow( 0 );
+
+
+
+
+    m_pModelPanel->SetPanelDirty();
+    m_pModelCombo->ActivateItemByRow( 0 );
+
+    kv = new KeyValues( "Models" );
+
+    if ( kv->LoadFromFile( filesystem, "resource/zmoptions_playermodels.txt", "MOD" ) )
+    {
+        KeyValues* pKey = kv->GetFirstSubKey();
+
+        while ( pKey )
+        {
+            m_pModelCombo->AddItem( pKey->GetName(), pKey );
+
+            pKey = pKey->GetNextKey();
+        }
+    }
+    else
+    {
+        Warning( "Couldn't load player models from file!\n" );
+    }
+
+    
+
+    kv->deleteThis();
 
 
     vgui::ivgui()->AddTickSignal( GetVPanel(), 100 );
@@ -217,6 +252,28 @@ void CZMOptionsMenu::UpdateMenu()
 
     m_pSlider_Yaw->SetValue( (int)cl_yawspeed.GetFloat() );
     m_pSlider_Pitch->SetValue( (int)cl_pitchspeed.GetFloat() );
+
+
+    bool bValidModel = false;
+
+    ConVar* cl_playermodel = cvar->FindVar( "cl_playermodel" );
+    const char* model = cl_playermodel->GetString();
+
+    for ( int i = 0; i < m_pModelCombo->GetItemCount(); i++ )
+    {
+        KeyValues* kv = m_pModelCombo->GetItemUserData( i );
+
+        if ( Q_stricmp( model, kv->GetString( "model" ) ) == 0 )
+        {
+            m_pModelCombo->ActivateItem( i );
+            bValidModel = true;
+        }
+    }
+
+    if ( !bValidModel )
+    {
+        m_pModelCombo->ActivateItemByRow( 0 );
+    }
 }
 
 void CZMOptionsMenu::ApplySettings()
@@ -233,4 +290,22 @@ void CZMOptionsMenu::ApplySettings()
 
     cl_yawspeed.SetValue( m_pSlider_Yaw->GetValue() );
     cl_pitchspeed.SetValue( m_pSlider_Pitch->GetValue() );
+
+    ConVar* cl_playermodel = cvar->FindVar( "cl_playermodel" );
+    cl_playermodel->SetValue( GetCurrentPlayerModel() );
+}
+
+const char* CZMOptionsMenu::GetCurrentPlayerModel()
+{
+    KeyValues* kv = m_pModelCombo->GetActiveItemUserData();
+
+    return kv->GetString( "model" );
+}
+
+void CZMOptionsMenu::OnComboChanged( KeyValues* kv )
+{
+    if ( !FailedLoad() )
+    {
+        m_pModelPanel->SwapModel( GetCurrentPlayerModel() );
+    }
 }
