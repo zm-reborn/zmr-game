@@ -636,6 +636,8 @@ bool CZMBaseZombie::FindNearestPhysicsObject( int iMaxMass )
         {
             CBaseEntity *pEntity = gEntList.GetBaseEntity( pHandleEntity->GetRefEHandle() );
             if ( pEntity && 
+                 pEntity->IsSolid() &&
+                 pEntity->GetCollisionGroup() != COLLISION_GROUP_WEAPON && // Don't bother trying to swat ammo/weapons.
                  pEntity->VPhysicsGetObject() && 
                  pEntity->VPhysicsGetObject()->GetMass() <= m_iMaxMass && 
                  //pEntity->VPhysicsGetObject()->IsAsleep() && 
