@@ -7,6 +7,7 @@
 #include "zmr/c_zmr_charcircle.h"
 #include "zmr/zmr_shareddefs.h"
 
+#include "zmr/zmr_playerlocaldata.h"
 #include "zmr/zmr_player_shared.h"
 
 
@@ -38,6 +39,8 @@ public:
     bool HasEnoughRes( int );
     int GetResources();
     void SetResources( int );
+    float GetFlashlightBattery();
+    void SetFlashlightBattery( float );
     bool Weapon_CanSwitchTo( C_BaseCombatWeapon* ) OVERRIDE;
     Participation_t GetParticipation();
     static Participation_t GetLocalParticipation();
@@ -49,8 +52,7 @@ protected:
     CZMCharCircle* m_fxHealth;
 
 private:
-    CNetworkVar( int, m_nResources );
-    CNetworkVar( float, m_flFlashlightBattery );
+    CNetworkVarEmbedded( CZMPlayerLocalData, m_ZMLocal );
 };
 
 inline CZMPlayer* ToZMPlayer( CBaseEntity* pEntity )

@@ -7,6 +7,7 @@
 #include "zmr/zmr_entities.h"
 #include "zmr/weapons/zmr_base.h"
 #include "zmr/zmr_shareddefs.h"
+#include "zmr/zmr_playerlocaldata.h"
 
 
 /*
@@ -112,6 +113,8 @@ public:
     bool HasEnoughRes( int );
     int GetResources();
     void SetResources( int );
+    float GetFlashlightBattery();
+    void SetFlashlightBattery( float );
     bool Weapon_CanSwitchTo( CBaseCombatWeapon* ) OVERRIDE;
     Participation_t GetParticipation();
     virtual void PlayStepSound( Vector& vecOrigin, surfacedata_t* psurface, float fvol, bool force ) OVERRIDE;
@@ -130,8 +133,8 @@ public:
     inline bool IsAFK() { return zm_sv_antiafk.GetInt() > 0 && (gpGlobals->curtime - GetLastActivity()) > zm_sv_antiafk.GetFloat(); };
 
 private:
-    CNetworkVar( int, m_nResources );
-    CNetworkVar( float, m_flFlashlightBattery );
+    // Since I didn't get this at first either, this is only sent to THIS player.
+    CNetworkVarEmbedded( CZMPlayerLocalData, m_ZMLocal );
 
     int m_iBuildSpawnIndex; // To update build menu.
     //Participation_t m_iParticipation;
