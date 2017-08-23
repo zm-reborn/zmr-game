@@ -211,11 +211,19 @@ void CZMFrame::OnCommand( const char* command )
     }
     else if ( Q_stricmp( command, "MODE_SELECT_ALL" ) == 0 )
     {
-        engine->ClientCmd( VarArgs( "zm_cmd_selectall" ) );
+        engine->ClientCmd( "zm_cmd_selectall" );
+    }
+    else if ( Q_stricmp( command, "MODE_DEFENSIVE" ) == 0 )
+    {
+        engine->ClientCmd( VarArgs( "zm_cmd_zombiemode %i", ZOMBIEMODE_DEFEND ) );
+    }
+    else if ( Q_stricmp( command, "MODE_OFFENSIVE" ) == 0 )
+    {
+        engine->ClientCmd( VarArgs( "zm_cmd_zombiemode %i", ZOMBIEMODE_OFFENSIVE ) );
     }
     else if ( Q_stricmp( command, "MODE_POWER_DELETEZOMBIES" ) == 0 )
     {
-        engine->ClientCmd( VarArgs( "zm_cmd_delete" ) );
+        engine->ClientCmd( "zm_cmd_delete" );
     }
     else if ( Q_stricmp( command, "MODE_POWER_SPOTCREATE" ) == 0 )
     {

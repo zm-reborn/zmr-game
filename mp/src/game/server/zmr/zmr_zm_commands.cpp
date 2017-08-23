@@ -761,3 +761,39 @@ void ZM_Cmd_PhysExp( const CCommand &args )
 
 static ConCommand zm_cmd_physexp( "zm_cmd_physexp", ZM_Cmd_PhysExp, "", FCVAR_HIDDEN );
 
+
+/*
+    Set selected zombies' mode
+*/
+void ZM_Cmd_SetZombieMode( const CCommand &args )
+{
+    CZMPlayer* pPlayer = ToZMPlayer( UTIL_GetCommandClient() );
+
+    if ( !pPlayer ) return;
+    
+    if ( !pPlayer->IsZM() ) return;
+
+    if ( args.ArgC() < 2 ) return;
+
+
+    ZombieMode_t mode = (ZombieMode_t)atoi( args.Arg( 1 ) );
+
+    if ( mode <= ZOMBIEMODE_INVALID || mode >= ZOMBIEMODE_MAX )
+        return;
+
+
+    CZMBaseZombie* pZombie;
+    for ( int i = 0; i < g_pZombies->Count(); i++ )
+    {
+        pZombie = g_pZombies->Element( i );
+
+        if ( pZombie && pZombie->GetSelector() == pPlayer )
+        {
+            pZombie->SetZombieMode( mode );
+        }
+    }
+
+    ClientPrint( pPlayer, HUD_PRINTTALK, "Set selected zombies' mode!" );
+}
+
+static ConCommand zm_cmd_zombiemode( "zm_cmd_zombiemode", ZM_Cmd_SetZombieMode, "" );

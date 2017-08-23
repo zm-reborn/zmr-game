@@ -61,6 +61,16 @@ enum ZombieClass_t
     ZMCLASS_MAX
 };
 
+enum ZombieMode_t
+{
+    ZOMBIEMODE_INVALID = -1,
+
+    ZOMBIEMODE_OFFENSIVE,
+    ZOMBIEMODE_DEFEND,
+
+    ZOMBIEMODE_MAX,
+};
+
 enum Participation_t
 {
     ZMPART_INVALID = -1,

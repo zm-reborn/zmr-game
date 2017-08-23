@@ -88,6 +88,10 @@ enum
 	TASK_ZOMBIE_RELEASE_HEADCRAB,
 	TASK_ZOMBIE_WAIT_POST_MELEE,
 
+#ifdef ZMR
+    TASK_ZM_DEFEND_PATH_TO_DEFPOS,
+#endif
+
 	LAST_BASE_ZOMBIE_TASK,
 };
 
@@ -102,6 +106,8 @@ enum Zombie_Conds
 	COND_ZOMBIE_LOCAL_MELEE_OBSTRUCTION,
 #ifdef ZMR // ZMRCHANGE: We need to put this here. It was causing major problems with scheduling. Apparently you can't "skip" conditions(?)
     COND_ZM_SEE_ENEMY,
+    COND_ZM_DEFEND_ENEMY_CLOSE,
+    COND_ZM_DEFEND_ENEMY_TOOFAR,
 #endif
 
 	LAST_BASE_ZOMBIE_CONDITION,
