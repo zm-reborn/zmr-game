@@ -50,6 +50,7 @@ protected:
 
 private:
     CNetworkVar( int, m_nResources );
+    CNetworkVar( float, m_flFlashlightBattery );
 };
 
 inline CZMPlayer* ToZMPlayer( CBaseEntity* pEntity )

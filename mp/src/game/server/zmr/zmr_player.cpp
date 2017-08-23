@@ -22,6 +22,7 @@ ConVar zm_sv_antiafk( "zm_sv_antiafk", "90", FCVAR_NOTIFY | FCVAR_ARCHIVE, "If t
 
 IMPLEMENT_SERVERCLASS_ST( CZMPlayer, DT_ZM_Player )
     SendPropInt( SENDINFO( m_nResources ) ),
+    SendPropFloat( SENDINFO( m_flFlashlightBattery ), 10, SPROP_UNSIGNED | SPROP_ROUNDUP, 0.0f, 100.0f ), // ZMRTODO: Use a similar method of m_HL2Local
 END_SEND_TABLE()
 
 
@@ -118,6 +119,9 @@ void CZMPlayer::Precache( void )
 
 extern ConVar zm_sv_antiafk_punish;
 
+ConVar zm_sv_flashlightdrainrate( "zm_sv_flashlightdrainrate", "0.15", 0, "How fast the flashlight battery drains per second. (out of 100)" );
+ConVar zm_sv_flashlightrechargerate( "zm_sv_flashlightrechargerate", "0", 0, "How fast the flashlight battery recharges per second. (out of 100)" );
+
 void CZMPlayer::PreThink( void )
 {
     if ( m_afButtonLast != m_nButtons )
@@ -139,6 +143,26 @@ void CZMPlayer::PreThink( void )
             m_flLastActivityWarning = gpGlobals->curtime;
         }
     }
+
+
+    if ( IsAlive() )
+    {
+        if ( FlashlightIsOn() )
+        {
+            m_flFlashlightBattery -= gpGlobals->frametime * zm_sv_flashlightdrainrate.GetFloat();
+
+            if ( m_flFlashlightBattery < 0.0f )
+            {
+                m_flFlashlightBattery = 0.0f;
+                FlashlightTurnOff();
+            }
+        }
+        else
+        {
+            m_flFlashlightBattery += gpGlobals->frametime * zm_sv_flashlightrechargerate.GetFloat();
+        }
+    }
+
 
     BaseClass::PreThink();
 }
@@ -314,7 +338,7 @@ void CZMPlayer::RemoveAllItems( bool removeSuit )
 
 void CZMPlayer::FlashlightTurnOn()
 {
-    if ( IsHuman() && IsAlive() )
+    if ( IsHuman() && IsAlive() && m_flFlashlightBattery > 0.0f )
     {
         AddEffects( EF_DIMLIGHT );
         EmitSound( "HL2Player.FlashlightOn" );
@@ -448,6 +472,8 @@ void CZMPlayer::Spawn()
 
     // Reset activity. Makes sure we don't get insta-punished when spawning after spectating somebody, etc.
     m_flLastActivity = gpGlobals->curtime;
+
+    m_flFlashlightBattery = 100.0f;
 }
 
 void CZMPlayer::FireBullets( const FireBulletsInfo_t& info )
