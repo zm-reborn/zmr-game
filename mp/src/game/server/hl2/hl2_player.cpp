@@ -1811,7 +1811,7 @@ void CHL2_Player::SuitPower_Update( void )
 				}
 			}
 		}
-
+#ifndef ZMR // ZMRCHANGE: Don't let flashlight drain "suit".
 		if( SuitPower_IsDeviceActive(SuitDeviceFlashlight) )
 		{
 			float factor;
@@ -1820,7 +1820,7 @@ void CHL2_Player::SuitPower_Update( void )
 
 			flPowerLoad -= ( SuitDeviceFlashlight.GetDeviceDrainRate() * (1.0f - factor) );
 		}
-
+#endif
 		if( !SuitPower_Drain( flPowerLoad * gpGlobals->frametime ) )
 		{
 			// TURN OFF ALL DEVICES!!

@@ -131,6 +131,7 @@ public:
 
 private:
     CNetworkVar( int, m_nResources );
+    CNetworkVar( float, m_flFlashlightBattery );
 
     int m_iBuildSpawnIndex; // To update build menu.
     //Participation_t m_iParticipation;
