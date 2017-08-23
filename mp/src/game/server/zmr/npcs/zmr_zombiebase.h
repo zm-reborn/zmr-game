@@ -18,7 +18,9 @@
 enum
 {
     SCHED_ZM_GO = LAST_BASE_ZOMBIE_SCHEDULE + 15, // HACK
-    SCHED_ZM_FORCED_GO
+    SCHED_ZM_FORCED_GO,
+    SCHED_ZM_DEFEND_GO_DEFPOS,
+    SCHED_ZM_DEFEND_WAIT,
 };
 
 // Moved to npc_BaseZombie for now.
@@ -26,6 +28,7 @@ enum
 {
     COND_ZM_SEE_ENEMY = LAST_BASE_ZOMBIE_CONDITION + 1, // HACK
 };*/
+
 
 class CZMBaseZombie : public CNPC_BaseZombie, public CZMNPCLagCompensation
 {
@@ -108,11 +111,19 @@ public:
     void SetSelector( CZMPlayer* );
     void SetSelector( int );
 
+
+    inline bool HasBeenCommanded() { return m_bCommanded; };
+    inline const Vector& GetLastCommandedPos() { return m_vecLastCommandPos; };
+    inline ZombieMode_t GetZombieMode() { return m_iMode; };
+    void SetZombieMode( ZombieMode_t mode );
 private:
     ZombieClass_t m_iZombieClass;
-
+    ZombieMode_t m_iMode;
     
+
     float m_flLastCommand;
+    Vector m_vecLastCommandPos;
+    bool m_bCommanded;
 
     bool m_bSwatBreakable;
     

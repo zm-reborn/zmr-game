@@ -2767,6 +2767,7 @@ AI_BEGIN_CUSTOM_NPC( base_zombie, CNPC_BaseZombie )
 		"		TASK_ZOMBIE_SWAT_ITEM			0"
 		"	"
 		"	Interrupts"
+        "		COND_ZM_DEFEND_ENEMY_TOOFAR" // ZMRCHANGE
 		"		COND_ZOMBIE_RELEASECRAB"
 		"		COND_ENEMY_DEAD"
 		"		COND_NEW_ENEMY"
@@ -2786,6 +2787,7 @@ AI_BEGIN_CUSTOM_NPC( base_zombie, CNPC_BaseZombie )
 		"		TASK_ZOMBIE_SWAT_ITEM			0"
 		"	"
 		"	Interrupts"
+        "		COND_ZM_DEFEND_ENEMY_TOOFAR" // ZMRCHANGE
 		"		COND_ZOMBIE_RELEASECRAB"
 		"		COND_ENEMY_DEAD"
 		"		COND_NEW_ENEMY"

@@ -25,6 +25,9 @@
 #define COMMANDED_SEE_ENEMY_GRACE       1.0f
 
 
+#define DEFEND_DIST_CHASENEMY_SQR       ( 333.0f * 333.0f )
+
+
 IMPLEMENT_SERVERCLASS_ST( CZMBaseZombie, DT_ZM_BaseZombie )
     SendPropInt( SENDINFO( m_iSelectorIndex ) ),
     SendPropFloat( SENDINFO( m_flHealthRatio ) ),
@@ -40,6 +43,10 @@ CZMBaseZombie::CZMBaseZombie()
     // We have to increment our population in derived classes since we don't know our class yet.
     g_pZombies->AddToTail( this );
 
+
+    m_iMode = ZOMBIEMODE_OFFENSIVE;
+    
+    m_bCommanded = false;
     m_flLastCommand = 0.0f;
     m_iSelectorIndex = 0;
     m_flHealthRatio = 1.0f;
@@ -265,6 +272,10 @@ void CZMBaseZombie::StartTask( const Task_t* pTask )
         TaskComplete();
         break;
 
+    case TASK_ZM_DEFEND_PATH_TO_DEFPOS :
+        GetNavigator()->SetGoal( AI_NavGoal_t( m_vecLastCommandPos ) );
+        break;
+
     case TASK_ZOMBIE_GET_PATH_TO_PHYSOBJ :
     {
         if ( !m_hPhysicsEnt ) { TaskFail( "No physics ent!\n" ); return; }
@@ -356,6 +367,30 @@ void CZMBaseZombie::GatherConditions( void )
     }
 
 
+    if ( GetZombieMode() == ZOMBIEMODE_DEFEND )
+    {
+        if (GetEnemy()
+        &&  GetAbsOrigin().DistToSqr( GetEnemy()->GetAbsOrigin() ) < DEFEND_DIST_CHASENEMY_SQR)
+        {
+            ClearCondition( COND_ZM_DEFEND_ENEMY_TOOFAR );
+            SetCondition( COND_ZM_DEFEND_ENEMY_CLOSE );
+        }
+        else
+        {
+            SetCondition( COND_ZM_DEFEND_ENEMY_TOOFAR );
+            ClearCondition( COND_ZM_DEFEND_ENEMY_CLOSE );
+
+            SetEnemy( nullptr, false );
+        }
+    }
+    else
+    {
+        ClearCondition( COND_ZM_DEFEND_ENEMY_TOOFAR );
+        ClearCondition( COND_ZM_DEFEND_ENEMY_CLOSE );
+    }
+
+
+
     if( m_NPCState == NPC_STATE_COMBAT )
     {
         // This check for !m_pPhysicsEnt prevents a crashing bug, but also
@@ -408,6 +443,22 @@ int CZMBaseZombie::SelectSchedule( void )
     if ( BehaviorSelectSchedule() )
     {
         return BaseClass::SelectSchedule();
+    }
+
+    if ( GetZombieMode() == ZOMBIEMODE_DEFEND )
+    {
+        if ( !HasCondition( COND_ZM_DEFEND_ENEMY_CLOSE ) )
+        {
+            if ( GetLastCommandedPos().DistToSqr( GetAbsOrigin() ) > (48.0f * 48.0f) )
+            {
+                return SCHED_ZM_DEFEND_GO_DEFPOS;
+            }
+            else
+            {
+                return SCHED_ZM_DEFEND_WAIT;
+            }
+            
+        }
     }
 
     switch ( m_NPCState )
@@ -806,6 +857,23 @@ void CZMBaseZombie::SetZombieModel( void )
     
 }
 
+void CZMBaseZombie::SetZombieMode( ZombieMode_t mode )
+{
+    if ( !HasBeenCommanded() )
+    {
+        m_vecLastCommandPos = GetAbsOrigin();
+        m_bCommanded = true;
+    }
+
+    /*switch ( mode )
+    {
+    case ZOMBIEMODE_DEFEND :
+        SetSchedule( SCHED_ZM_ )
+    }*/
+
+    m_iMode = mode;
+}
+
 void CZMBaseZombie::Command( const Vector& pos, bool bPlayerCommanded )
 {
     m_vecLastPosition = pos;
@@ -837,6 +905,8 @@ void CZMBaseZombie::Command( const Vector& pos, bool bPlayerCommanded )
     }
 
     m_flLastCommand = gpGlobals->curtime;
+    m_vecLastCommandPos = pos;
+    m_bCommanded = true;
 }
 
 bool CZMBaseZombie::Swat( CBaseEntity* pTarget, bool bBreakable )
@@ -883,7 +953,13 @@ bool CZMBaseZombie::CanSpawn( const Vector& pos )
 
 AI_BEGIN_CUSTOM_NPC( zmbase_zombie, CZMBaseZombie )
     
+    DECLARE_TASK( TASK_ZM_DEFEND_PATH_TO_DEFPOS );
+    
     DECLARE_CONDITION( COND_ZM_SEE_ENEMY ) // Used to interrupt ZM command.
+
+    DECLARE_CONDITION( COND_ZM_DEFEND_ENEMY_CLOSE )
+    DECLARE_CONDITION( COND_ZM_DEFEND_ENEMY_TOOFAR )
+    
 
     DEFINE_SCHEDULE
     (
@@ -918,6 +994,42 @@ AI_BEGIN_CUSTOM_NPC( zmbase_zombie, CZMBaseZombie )
 	    ""
 	    "	Interrupts"
         "		COND_ZM_SEE_ENEMY"
+        "		COND_CAN_RANGE_ATTACK1"
+        "		COND_CAN_MELEE_ATTACK1"
+        "		COND_CAN_RANGE_ATTACK2"
+        "		COND_CAN_MELEE_ATTACK2"
+    )
+
+    DEFINE_SCHEDULE
+    (
+	    SCHED_ZM_DEFEND_GO_DEFPOS,
+
+	    "	Tasks"
+	    "		TASK_SET_TOLERANCE_DISTANCE		48"
+	    "		TASK_SET_ROUTE_SEARCH_TIME		3"
+	    "		TASK_ZM_DEFEND_PATH_TO_DEFPOS	0"
+	    "		TASK_WALK_PATH					0"
+	    "		TASK_WAIT_FOR_MOVEMENT			0"
+	    ""
+	    "	Interrupts"
+        "		COND_ZM_DEFEND_ENEMY_CLOSE"
+        "		COND_CAN_RANGE_ATTACK1"
+        "		COND_CAN_MELEE_ATTACK1"
+        "		COND_CAN_RANGE_ATTACK2"
+        "		COND_CAN_MELEE_ATTACK2"
+    )
+
+    DEFINE_SCHEDULE
+    (
+	    SCHED_ZM_DEFEND_WAIT,
+
+	    "	Tasks"
+	    "		TASK_STOP_MOVING				0"
+	    "		TASK_SET_ACTIVITY				ACTIVITY:ACT_IDLE"
+	    "		TASK_WAIT_PVS					0"
+	    ""
+	    "	Interrupts"
+        "		COND_ZM_DEFEND_ENEMY_CLOSE"
         "		COND_CAN_RANGE_ATTACK1"
         "		COND_CAN_MELEE_ATTACK1"
         "		COND_CAN_RANGE_ATTACK2"
