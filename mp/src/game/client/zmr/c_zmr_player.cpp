@@ -27,8 +27,7 @@ ConVar zm_cl_participation( "zm_cl_participation", "0", FCVAR_USERINFO | FCVAR_A
 
 
 IMPLEMENT_CLIENTCLASS_DT( C_ZMPlayer, DT_ZM_Player, CZMPlayer )
-    RecvPropInt( RECVINFO( m_nResources ) ),
-    RecvPropFloat( RECVINFO( m_flFlashlightBattery ), SPROP_UNSIGNED | SPROP_ROUNDUP ),
+    RecvPropDataTable( RECVINFO_DT( m_ZMLocal ), 0, &REFERENCE_RECV_TABLE( DT_ZM_PlyLocal ) ),
 END_RECV_TABLE()
 
 //BEGIN_PREDICTION_DATA( C_ZMPlayer )

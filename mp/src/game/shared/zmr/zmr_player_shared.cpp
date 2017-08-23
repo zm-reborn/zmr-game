@@ -33,7 +33,7 @@ bool CZMPlayer::HasEnoughRes( int cost )
 
 int CZMPlayer::GetResources()
 {
-    return m_nResources;
+    return m_ZMLocal.m_nResources;
 }
 
 void CZMPlayer::SetResources( int res )
@@ -41,7 +41,21 @@ void CZMPlayer::SetResources( int res )
 #ifdef CLIENT_DLL
 
 #else
-    m_nResources = res;
+    m_ZMLocal.m_nResources = res;
+#endif
+}
+
+float CZMPlayer::GetFlashlightBattery()
+{
+    return m_ZMLocal.m_flFlashlightBattery;
+}
+
+void CZMPlayer::SetFlashlightBattery( float battery )
+{
+#ifdef CLIENT_DLL
+
+#else
+    m_ZMLocal.m_flFlashlightBattery = battery;
 #endif
 }
 

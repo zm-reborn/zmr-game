@@ -21,8 +21,7 @@ ConVar zm_sv_antiafk( "zm_sv_antiafk", "90", FCVAR_NOTIFY | FCVAR_ARCHIVE, "If t
 
 
 IMPLEMENT_SERVERCLASS_ST( CZMPlayer, DT_ZM_Player )
-    SendPropInt( SENDINFO( m_nResources ) ),
-    SendPropFloat( SENDINFO( m_flFlashlightBattery ), 10, SPROP_UNSIGNED | SPROP_ROUNDUP, 0.0f, 100.0f ), // ZMRTODO: Use a similar method of m_HL2Local
+    SendPropDataTable( SENDINFO_DT( m_ZMLocal ), &REFERENCE_SEND_TABLE( DT_ZM_PlyLocal ), SendProxy_SendLocalDataTable ),
 END_SEND_TABLE()
 
 
@@ -149,17 +148,17 @@ void CZMPlayer::PreThink( void )
     {
         if ( FlashlightIsOn() )
         {
-            m_flFlashlightBattery -= gpGlobals->frametime * zm_sv_flashlightdrainrate.GetFloat();
+            SetFlashlightBattery( GetFlashlightBattery() - gpGlobals->frametime * zm_sv_flashlightdrainrate.GetFloat() );
 
-            if ( m_flFlashlightBattery < 0.0f )
+            if ( GetFlashlightBattery() < 0.0f )
             {
-                m_flFlashlightBattery = 0.0f;
+                SetFlashlightBattery( 0.0f );
                 FlashlightTurnOff();
             }
         }
         else
         {
-            m_flFlashlightBattery += gpGlobals->frametime * zm_sv_flashlightrechargerate.GetFloat();
+            m_ZMLocal.m_flFlashlightBattery += gpGlobals->frametime * zm_sv_flashlightrechargerate.GetFloat();
         }
     }
 
@@ -338,7 +337,7 @@ void CZMPlayer::RemoveAllItems( bool removeSuit )
 
 void CZMPlayer::FlashlightTurnOn()
 {
-    if ( IsHuman() && IsAlive() && m_flFlashlightBattery > 0.0f )
+    if ( IsHuman() && IsAlive() && GetFlashlightBattery() > 0.0f )
     {
         AddEffects( EF_DIMLIGHT );
         EmitSound( "HL2Player.FlashlightOn" );
@@ -473,7 +472,7 @@ void CZMPlayer::Spawn()
     // Reset activity. Makes sure we don't get insta-punished when spawning after spectating somebody, etc.
     m_flLastActivity = gpGlobals->curtime;
 
-    m_flFlashlightBattery = 100.0f;
+    SetFlashlightBattery( 100.0f );
 }
 
 void CZMPlayer::FireBullets( const FireBulletsInfo_t& info )
