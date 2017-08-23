@@ -158,7 +158,12 @@ void CZMPlayer::PreThink( void )
         }
         else
         {
-            m_ZMLocal.m_flFlashlightBattery += gpGlobals->frametime * zm_sv_flashlightrechargerate.GetFloat();
+            SetFlashlightBattery( GetFlashlightBattery() + gpGlobals->frametime * zm_sv_flashlightrechargerate.GetFloat() );
+            
+            if ( GetFlashlightBattery() > 100.0f )
+            {
+                SetFlashlightBattery( 100.0f );
+            }
         }
     }
 
