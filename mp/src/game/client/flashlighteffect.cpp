@@ -25,6 +25,10 @@ extern ConVar r_flashlightdepthres;
 extern ConVar r_flashlightdepthres;
 #endif
 
+#ifdef ZMR
+#include "zmr/zmr_player_shared.h"
+#endif
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -264,6 +268,41 @@ void CFlashlightEffect::UpdateLightNew(const Vector &vecPos, const Vector &vecFo
 	state.m_fQuadraticAtten = r_flashlightquadratic.GetFloat();
 
 	bool bFlicker = false;
+
+#ifdef ZMR // ZMRCHANGE: Bring back flashlight flickering
+    C_ZMPlayer* pPlayer = C_ZMPlayer::GetLocalPlayer();
+    if ( pPlayer && pPlayer->GetFlashlightBattery() <= 15.0f )
+    {
+        float flScale = SimpleSplineRemapVal(  pPlayer->GetFlashlightBattery(), 10.0f, 4.8f, 1.0f, 0.0f );
+        flScale = clamp( flScale, 0.0f, 1.0f );
+
+        if ( flScale < 0.35f )
+        {
+            float flFlicker = cosf( gpGlobals->curtime * 6.0f ) * sinf( gpGlobals->curtime * 15.0f );
+            
+            if ( flFlicker > 0.25f && flFlicker < 0.75f )
+            {
+                // On
+                state.m_fLinearAtten = r_flashlightlinear.GetFloat() * flScale;
+            }
+            else
+            {
+                // Off
+                state.m_fLinearAtten = 0.0f;
+            }
+        }
+        else
+        {
+            float flNoise = cosf( gpGlobals->curtime * 7.0f ) * sinf( gpGlobals->curtime * 25.0f );
+            state.m_fLinearAtten = r_flashlightlinear.GetFloat() * flScale + 1.5f * flNoise;
+        }
+
+        state.m_fHorizontalFOVDegrees = r_flashlightfov.GetFloat() - ( 16.0f * (1.0f-flScale) );
+        state.m_fVerticalFOVDegrees = r_flashlightfov.GetFloat() - ( 16.0f * (1.0f-flScale) );
+        
+        bFlicker = true;
+    }
+#endif
 
 #ifdef HL2_EPISODIC
 	C_BaseHLPlayer *pPlayer = (C_BaseHLPlayer *)C_BasePlayer::GetLocalPlayer();
