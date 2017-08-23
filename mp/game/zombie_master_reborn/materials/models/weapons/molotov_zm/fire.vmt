@@ -1,11 +1,7 @@
 "UnlitGeneric"
  {
-	// ZMRTODO: NEED TO FIX DIS
 	"$baseTexture" "sprites/fire"
-	//"$vertexalpha" "1"
-	//"$vertexcolor" 1
-	//"$alphatest" "1"
-	//$additive 1
+	$additive 1
 	"$model" 1
 
 	"Proxies" 
