@@ -127,6 +127,8 @@ CZMFrame::CZMFrame( const char* pElementName ) : CHudElement( pElementName ), Ba
 CZMFrame::~CZMFrame()
 {
     delete m_pZMControl;
+    delete m_pManiMenu;
+    delete m_pBuildMenu;
 }
 
 void CZMFrame::Init()
