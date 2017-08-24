@@ -744,3 +744,31 @@ event ZMVoteReasonEnd
 
 	Animate ZMHudVote		ReasonColor			"0 0 0 0"		Deaccel		0.0		0.2
 }
+
+event ZMFlashlightLow
+{
+	StopEvent ZMFlashlightNormal 0.0
+
+	Animate ZMHudFlashlight		FlashlightColor			"ZMFgColorCrit"		Linear		0.0		0.2
+}
+
+event ZMFlashlightNormal
+{
+	StopEvent ZMFlashlightLow 0.0
+
+	Animate ZMHudFlashlight		FlashlightColor			"ZMFgColor"		Linear		0.0		0.2
+}
+
+event ZMFlashlightFadeOut
+{
+	StopEvent ZMFlashlightFadeIn 0.0
+	
+	Animate ZMHudFlashlight		FlashlightAlpha			"0"		Deaccel		0.0		0.5
+}
+
+event ZMFlashlightFadeIn
+{
+	StopEvent ZMFlashlightFadeOut 0.0
+	
+	Animate ZMHudFlashlight		FlashlightAlpha			"255"		Linear		0.0		0.2
+}

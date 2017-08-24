@@ -17,6 +17,18 @@
 		"HealthY"	"5"
 	}
 	
+	ZMHudFlashlight
+	{
+		"fieldName"		"ZMHudFlashlight"
+		"xpos"	"16"
+		"ypos"	"390"
+		"wide"	"150"
+		"tall"  "64"
+		
+		"FlashlightBgColor"	"64 64 64 255"
+		"FlashlightSize"	"40"
+	}
+	
 	ZMHudAmmo
 	{
 		"fieldName"		"ZMHudAmmo"
