@@ -35,8 +35,6 @@ public:
     virtual bool ShouldDraw() OVERRIDE;
     virtual void Paint() OVERRIDE;
 
-    void MsgFunc_Damage( bf_read &msg );
-
 private:
     float m_flBattery;
     bool m_bIsOn;
@@ -53,7 +51,7 @@ private:
 
     CPanelAnimationVar( Color, m_BgColor, "FlashlightBgColor", "64 64 64 255" );
     CPanelAnimationVar( Color, m_Color, "FlashlightColor", "ZMFgColor" );
-    CPanelAnimationVar( float, m_flAlpha, "FlashlightAlpha", "255" );
+    CPanelAnimationVar( float, m_flAlpha, "FlashlightAlpha", "0" );
     CPanelAnimationVarAliasType( float, m_flSize, "FlashlightSize", "64", "proportional_float" );
 };
 
