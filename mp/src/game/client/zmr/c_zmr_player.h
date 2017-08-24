@@ -25,7 +25,7 @@ public:
 
     
     virtual void TeamChange( int ) OVERRIDE;
-
+    virtual bool CreateMove( float delta, CUserCmd* cmd ) OVERRIDE;
     virtual int DrawModel( int ) OVERRIDE;
 
     // Custom...
@@ -47,12 +47,19 @@ public:
     static void SetLocalParticipation( Participation_t );
     virtual void PlayStepSound( Vector& vecOrigin, surfacedata_t* psurface, float fvol, bool force ) OVERRIDE;
 
+
+    void SetMouseWheelMove( float dir );
+
 protected:
     CZMCharCircle* m_fxInner;
     CZMCharCircle* m_fxHealth;
 
 private:
     CNetworkVarEmbedded( CZMPlayerLocalData, m_ZMLocal );
+
+    // Only used locally.
+    float m_flUpMove;
+    float m_flNextUpMove;
 };
 
 inline CZMPlayer* ToZMPlayer( CBaseEntity* pEntity )
