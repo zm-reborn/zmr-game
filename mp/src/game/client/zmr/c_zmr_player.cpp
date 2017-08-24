@@ -26,6 +26,12 @@ CLIENTEFFECT_REGISTER_END()
 ConVar zm_cl_participation( "zm_cl_participation", "0", FCVAR_USERINFO | FCVAR_ARCHIVE, "Your participation setting. 0 = Want to be ZM, 1 = Only human, 2 = Only spectator" );
 
 
+ConVar zm_cl_mwheelmove( "zm_cl_mwheelmove", "1", FCVAR_ARCHIVE, "As the ZM, can you move up/down with mousewheel?" );
+ConVar zm_cl_mwheelmovereverse( "zm_cl_mwheelmovereverse", "1", FCVAR_ARCHIVE, "Is mousewheel scrolling reversed?" );
+ConVar zm_cl_mwheelmovespd( "zm_cl_mwheelmovespd", "400", FCVAR_ARCHIVE );
+
+
+
 IMPLEMENT_CLIENTCLASS_DT( C_ZMPlayer, DT_ZM_Player, CZMPlayer )
     RecvPropDataTable( RECVINFO_DT( m_ZMLocal ), 0, &REFERENCE_RECV_TABLE( DT_ZM_PlyLocal ) ),
 END_RECV_TABLE()
@@ -36,6 +42,9 @@ END_RECV_TABLE()
 
 C_ZMPlayer::C_ZMPlayer()
 {
+    m_flNextUpMove = 0.0f;
+    m_flUpMove = 0.0f;
+
     m_fxHealth = new CZMCharCircle();
     m_fxHealth->SetYaw( 0.0f );
     m_fxHealth->SetMaterial( MAT_HPCIRCLE );
@@ -96,6 +105,19 @@ void C_ZMPlayer::TeamChange( int iNewTeam )
         g_pZMView->SetVisible( iNewTeam == ZMTEAM_ZM );
 }
 
+bool C_ZMPlayer::CreateMove( float delta, CUserCmd* cmd )
+{
+    bool bResult = BaseClass::CreateMove( delta, cmd );
+    
+
+    if ( m_flNextUpMove > gpGlobals->curtime )
+    {
+        cmd->upmove += m_flUpMove;
+    }
+
+    return bResult;
+}
+
 int C_ZMPlayer::DrawModel( int flags )
 {
     C_ZMPlayer* pPlayer = C_ZMPlayer::GetLocalPlayer();
@@ -128,4 +150,20 @@ int C_ZMPlayer::DrawModel( int flags )
     }
 
     return BaseClass::DrawModel( flags );
+}
+
+void C_ZMPlayer::SetMouseWheelMove( float dir )
+{
+    if ( !zm_cl_mwheelmove.GetBool() ) return;
+
+    if ( dir == 0.0f ) return;
+
+    if ( m_flNextUpMove > gpGlobals->curtime )
+        return;
+
+    if ( zm_cl_mwheelmovereverse.GetBool() )
+        dir *= -1.0f;
+
+    m_flNextUpMove = gpGlobals->curtime + 0.1f;
+    m_flUpMove = zm_cl_mwheelmovespd.GetFloat() * dir;
 }

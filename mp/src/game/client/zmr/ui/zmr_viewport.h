@@ -43,6 +43,7 @@ public:
     virtual void Paint() OVERRIDE {};
     virtual void SetVisible( bool ) OVERRIDE;
 
+    virtual void OnMouseWheeled( int ) OVERRIDE;
     virtual void OnCommand( const char* ) OVERRIDE;
     //virtual void ShowPanel( const char* name ) OVERRIDE;
     //virtual void ShowPanel( bool state ) OVERRIDE;

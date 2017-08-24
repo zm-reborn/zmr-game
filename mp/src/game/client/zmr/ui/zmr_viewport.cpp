@@ -197,6 +197,17 @@ void CZMFrame::OnMouseReleased( MouseCode code )
     m_MouseDragStatus = BUTTON_CODE_INVALID;
 }
 
+void CZMFrame::OnMouseWheeled( int delta )
+{
+    BaseClass::OnMouseWheeled( delta );
+
+
+    C_ZMPlayer* pPlayer = C_ZMPlayer::GetLocalPlayer();
+    
+    if ( pPlayer )
+        pPlayer->SetMouseWheelMove( (float)delta );
+}
+
 void CZMFrame::OnCommand( const char* command )
 {
     if ( Q_stricmp( command, "TAB_POWERS" ) == 0 )
