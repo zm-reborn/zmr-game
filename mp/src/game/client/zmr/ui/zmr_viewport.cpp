@@ -32,6 +32,7 @@
 
 ConVar zm_cl_poweruser_boxselect( "zm_cl_poweruser_boxselect", "0", FCVAR_ARCHIVE, "Select zombies through walls with box select." );
 ConVar zm_cl_poweruser( "zm_cl_poweruser", "0", FCVAR_ARCHIVE, "Select spawns/traps/zombies through walls." );
+ConVar zm_cl_hidemouseinscore( "zm_cl_hidemouseinscore", "1", FCVAR_ARCHIVE, "Is mouse input disabled while having scoreboard open?" );
 
 
 DECLARE_HUDELEMENT( CZMFrame );
@@ -309,45 +310,58 @@ void CZMFrame::OnThink()
         return;
     }
 
-    if ( !IsMouseInputEnabled() )
-        SetMouseInputEnabled( true );
+
+    if ( pPlayer->m_nButtons & IN_SCORE && zm_cl_hidemouseinscore.GetBool() )
+    {
+        if ( IsMouseInputEnabled() )
+            SetMouseInputEnabled( false );
+    }
+    else
+    {
+        if ( !IsMouseInputEnabled() )
+            SetMouseInputEnabled( true );
+    }
 
 
+
+    if ( IsMouseInputEnabled() )
+    {
 #define SCRL_BORDER     10
 
-	int mx, my;
-	::input->GetFullscreenMousePos( &mx, &my );
+	    int mx, my;
+	    ::input->GetFullscreenMousePos( &mx, &my );
 
-    if ( mx < SCRL_BORDER )
-    {
-        engine->ClientCmd( "+left" );
-        engine->ClientCmd( "-right" );
-    }
-    else if ( mx > (ScreenWidth() - SCRL_BORDER) )
-    {
-        engine->ClientCmd( "-left" );
-        engine->ClientCmd( "+right" );
-    }
-    else
-    {
-        engine->ClientCmd( "-left" );
-        engine->ClientCmd( "-right" );
-    }
+        if ( mx < SCRL_BORDER )
+        {
+            engine->ClientCmd( "+left" );
+            engine->ClientCmd( "-right" );
+        }
+        else if ( mx > (ScreenWidth() - SCRL_BORDER) )
+        {
+            engine->ClientCmd( "-left" );
+            engine->ClientCmd( "+right" );
+        }
+        else
+        {
+            engine->ClientCmd( "-left" );
+            engine->ClientCmd( "-right" );
+        }
 
-    if ( my < SCRL_BORDER )
-    {
-        engine->ClientCmd( "+lookup" );
-        engine->ClientCmd( "-lookdown" );
-    }
-    else if ( my > (ScreenHeight() - SCRL_BORDER) )
-    {
-        engine->ClientCmd( "-lookup" );
-        engine->ClientCmd( "+lookdown" );
-    }
-    else
-    {
-        engine->ClientCmd( "-lookup" );
-        engine->ClientCmd( "-lookdown" );
+        if ( my < SCRL_BORDER )
+        {
+            engine->ClientCmd( "+lookup" );
+            engine->ClientCmd( "-lookdown" );
+        }
+        else if ( my > (ScreenHeight() - SCRL_BORDER) )
+        {
+            engine->ClientCmd( "-lookup" );
+            engine->ClientCmd( "+lookdown" );
+        }
+        else
+        {
+            engine->ClientCmd( "-lookup" );
+            engine->ClientCmd( "-lookdown" );
+        }
     }
 }
 
