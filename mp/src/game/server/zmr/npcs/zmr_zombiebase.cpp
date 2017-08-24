@@ -100,22 +100,25 @@ void CZMBaseZombie::HandleAnimEvent( animevent_t* pEvent )
 	{
 		CBaseEntity* pEnemy = GetEnemy();
 
-		CBaseEntity *pPhysicsEntity = m_hPhysicsEnt;
+		CBaseEntity* pEnt = m_hPhysicsEnt;
 
 
-		if( !pPhysicsEntity )
+		if( !pEnt )
 		{
 			DevMsg( "**Zombie: Missing my physics ent!!" );
 			return;
 		}
 			
-		IPhysicsObject* pPhys = pPhysicsEntity->VPhysicsGetObject();
+		IPhysicsObject* pPhys = pEnt->VPhysicsGetObject();
 
 		if( !pPhys )
 		{
 			DevMsg( "**Zombie: No Physics Object for physics Ent!" );
 			return;
 		}
+
+        // Slap that shit out of their hands.
+        Pickup_ForcePlayerToDropThisObject( pEnt );
 
 
         Vector dir;
@@ -126,7 +129,7 @@ void CZMBaseZombie::HandleAnimEvent( animevent_t* pEvent )
         {
             PhysicsImpactSound( pEnemy, pPhys, CHAN_BODY, pPhys->GetMaterialIndex(), physprops->GetSurfaceIndex("flesh"), 0.5, 800 );
 
-            dir = pEnemy->WorldSpaceCenter() - pPhysicsEntity->WorldSpaceCenter();
+            dir = pEnemy->WorldSpaceCenter() - pEnt->WorldSpaceCenter();
             VectorNormalize( dir );
         }
         else
