@@ -12,8 +12,9 @@
 
 
 
-
-ConVar zm_checkversion( "zm_checkversion", "1" );
+#ifndef CLIENT_DLL
+ConVar zm_sv_checkversion( "zm_sv_checkversion", "1" );
+#endif
 
 void CZMWeb::Get( const char* url, HTTPCallback::func_t func )
 {
@@ -37,7 +38,9 @@ void CZMWeb::Get( const char* url, HTTPCallback::func_t func )
 
 void CZMWeb::QueryVersionNumber()
 {
-    if ( zm_checkversion.GetBool() )
+#ifndef CLIENT_DLL
+    if ( zm_sv_checkversion.GetBool() )
+#endif
     {
         Get( VERSION_URL, &CZMWeb::Callback_Version );
     }
