@@ -7,9 +7,23 @@
 #include "zmr/ui/zmr_newversion.h"
 #endif
 
+#ifndef CLIENT_DLL
+#include "steam/steam_gameserver.h"
+
+#define STEAM_API     steamgameserverapicontext
+#else
+#define STEAM_API     steamapicontext
+#endif
+
 
 #define VERSION_URL     "https://raw.githubusercontent.com/zm-reborn/zmr-game/master/version.txt"
 
+#ifndef CLIENT_DLL
+CON_COMMAND( zm_queryversion, "" )
+{
+    g_pZMWeb->QueryVersionNumber();
+}
+#endif
 
 
 #ifndef CLIENT_DLL
@@ -18,26 +32,28 @@ ConVar zm_sv_checkversion( "zm_sv_checkversion", "1" );
 
 void CZMWeb::Get( const char* url, HTTPCallback::func_t func )
 {
-    if ( !steamapicontext || !steamapicontext->SteamHTTP() ) return;
-
+    if ( !STEAM_API || !STEAM_API->SteamHTTP() ) return;
     
-    HTTPRequestHandle req = steamapicontext->SteamHTTP()->CreateHTTPRequest( k_EHTTPMethodGET, url );
+    
+    HTTPRequestHandle req = STEAM_API->SteamHTTP()->CreateHTTPRequest( k_EHTTPMethodGET, url );
 
 
     SteamAPICall_t call;
 
-    if ( steamapicontext->SteamHTTP()->SendHTTPRequest( req, &call ) )
+    if ( STEAM_API->SteamHTTP()->SendHTTPRequest( req, &call ) )
     {
         m_Callback.Set( call, this, func );
     }
     else
     {
-        steamapicontext->SteamHTTP()->ReleaseHTTPRequest( req );
+        STEAM_API->SteamHTTP()->ReleaseHTTPRequest( req );
     }
 }
 
 void CZMWeb::QueryVersionNumber()
 {
+    DevMsg( "Querying version...\n" );
+
 #ifndef CLIENT_DLL
     if ( zm_sv_checkversion.GetBool() )
 #endif
@@ -48,7 +64,7 @@ void CZMWeb::QueryVersionNumber()
 
 void CZMWeb::Callback_Version( HTTPRequestCompleted_t* pResult, bool bIOFailure )
 {
-    if ( !steamapicontext || !steamapicontext->SteamHTTP() ) return;
+    if ( !STEAM_API || !STEAM_API->SteamHTTP() ) return;
 
     if ( bIOFailure ) return;
 
@@ -58,19 +74,19 @@ void CZMWeb::Callback_Version( HTTPRequestCompleted_t* pResult, bool bIOFailure 
 
 
     uint32 size;
-    steamapicontext->SteamHTTP()->GetHTTPResponseBodySize( pResult->m_hRequest, &size );
+    STEAM_API->SteamHTTP()->GetHTTPResponseBodySize( pResult->m_hRequest, &size );
 
     if ( !size ) return;
 
 
     uint8* data = new uint8[size];
-    steamapicontext->SteamHTTP()->GetHTTPResponseBodyData( pResult->m_hRequest, data, size );
+    STEAM_API->SteamHTTP()->GetHTTPResponseBodyData( pResult->m_hRequest, data, size );
 
 
     ParseVersion( reinterpret_cast<char*>( data ) );
 
     delete[] data;
-    steamapicontext->SteamHTTP()->ReleaseHTTPRequest( pResult->m_hRequest );
+    STEAM_API->SteamHTTP()->ReleaseHTTPRequest( pResult->m_hRequest );
 }
 
 void CZMWeb::ParseVersion( const char* data )
@@ -96,9 +112,11 @@ void CZMWeb::ParseVersion( const char* data )
 #ifdef CLIENT_DLL
             if ( g_pZMNewVerMenu )
                 g_pZMNewVerMenu->Activate();
+#else
+            UTIL_LogPrintf( "New version of %s is available!\n", ZMR_NAME );
 #endif
 
-            Msg( "New version of %s is available!\n", ZMR_NAME );
+            Msg( "*\n*\n* New version of %s is available!\n*\n*\n", ZMR_NAME );
 
             return;
         }
