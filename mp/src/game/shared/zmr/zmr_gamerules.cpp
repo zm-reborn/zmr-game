@@ -752,7 +752,7 @@ void CZMRules::EndRound( ZMRoundEndReason_t reason )
     }
 }
 
-void CZMRules::RewardResources( int res, bool bLimit, bool bAllowNegative )
+void CZMRules::RewardResources( int res, bool bLimit )
 {
     CZMPlayer* pPlayer;
     for ( int i = 1; i <= gpGlobals->maxClients; i++ )
@@ -763,7 +763,7 @@ void CZMRules::RewardResources( int res, bool bLimit, bool bAllowNegative )
 
         if ( pPlayer->IsZM() )
         {
-            pPlayer->SetResources( pPlayer->GetResources() + res, bLimit, bAllowNegative );
+            pPlayer->IncResources( res, bLimit );
         }
     }
 }
@@ -953,7 +953,7 @@ void CZMRules::BeginRound( CZMPlayer* pZM )
         }
 
 
-        pPlayer->SetResources( zm_sv_resource_init.GetInt(), false );
+        pPlayer->SetResources( zm_sv_resource_init.GetInt() );
 
 
         // Don't change team if we're already a spectator.
@@ -1126,14 +1126,11 @@ void CZMRules::PlayerThink( CBasePlayer* pPlayer )
 
         if ( pZMPlayer->GetResources() < limit )
         {
-            int newres = pZMPlayer->GetResources() +
-                (int)SimpleSplineRemapVal(
+            pZMPlayer->IncResources( (int)SimpleSplineRemapVal(
                     GetNumAliveHumans(),
                     1, gpGlobals->maxClients - 1,
                     zm_sv_resource_refill_min.GetFloat(),
-                    zm_sv_resource_refill_max.GetFloat() );
-
-            pZMPlayer->SetResources( newres );
+                    zm_sv_resource_refill_max.GetFloat() ), true );
         }
 
         pZMPlayer->m_flNextResourceInc = gpGlobals->curtime + zm_sv_resource_rate.GetFloat();
