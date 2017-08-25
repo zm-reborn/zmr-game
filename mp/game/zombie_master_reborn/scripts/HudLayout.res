@@ -67,6 +67,7 @@
 		"fieldName"		"ZMHudVote"
 		"wide"	"640"
 		"tall"  "130"
+		"xpos"	"0"
 		"ypos"	"350"
 	}
 	

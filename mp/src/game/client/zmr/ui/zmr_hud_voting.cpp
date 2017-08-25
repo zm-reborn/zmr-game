@@ -124,6 +124,10 @@ void CZMHudVote::Reset()
 
 void CZMHudVote::InitVoting()
 {
+    // Have to set this here since we can't use proportional.
+    SetWide( ScreenWidth() );
+
+
     wchar_t szYes[16];
     wchar_t szNo[16];
 
@@ -205,14 +209,14 @@ void CZMHudVote::Paint()
 {
     if ( m_VoteColor[3] <= 0 ) return;
 
-
+    // Using GetWide instead of ScreenWidth since it's easier to notice if things mismatch.
     int w, h;
 
     if ( m_ReasonColor[3] > 0 && m_pszReason && *m_pszReason )
     {
         surface()->GetTextSize( m_hReasonFont, m_pszReason, w, h );
 
-        PaintString( m_hReasonFont, m_ReasonColor, ScreenWidth() / 2.0f - w / 2.0f, 10, m_pszReason );
+        PaintString( m_hReasonFont, m_ReasonColor, GetWide() / 2.0f - w / 2.0f, 10, m_pszReason );
     }
 
 
@@ -220,15 +224,14 @@ void CZMHudVote::Paint()
     {
         surface()->GetTextSize( m_hVoteFont, m_szDisplay, w, h );
 
-        PaintString( m_hVoteFont, m_VoteColor, ScreenWidth() / 2.0f - w / 2.0f, 40, m_szDisplay );
+        PaintString( m_hVoteFont, m_VoteColor, GetWide() / 2.0f - w / 2.0f, 40, m_szDisplay );
     }
 
 
     if ( m_szHowto[0] != NULL )
     {
         surface()->GetTextSize( m_hTextFont, m_szHowto, w, h );
-
-        PaintString( m_hTextFont, m_VoteColor, ScreenWidth() / 2.0f - w / 2.0f, 70, m_szHowto );
+        PaintString( m_hTextFont, m_VoteColor, GetWide() / 2.0f - w / 2.0f, 70, m_szHowto );
     }
 
 
@@ -236,14 +239,14 @@ void CZMHudVote::Paint()
     {
         surface()->GetTextSize( m_hTextFont, m_szVote, w, h );
 
-        PaintString( m_hTextFont, m_VoteColor, ScreenWidth() / 2.0f - w / 2.0f, 100, m_szVote );
+        PaintString( m_hTextFont, m_VoteColor, GetWide() / 2.0f - w / 2.0f, 100, m_szVote );
     }
 
     if ( m_pszMyVote && *m_pszMyVote )
     {
         surface()->GetTextSize( m_hTextFont, m_pszMyVote, w, h );
 
-        PaintString( m_hTextFont, m_VoteColor, ScreenWidth() / 2.0f - w / 2.0f, 100 + 1 + h * 2, m_pszMyVote );
+        PaintString( m_hTextFont, m_VoteColor, GetWide() / 2.0f - w / 2.0f, 100 + 1 + h * 2, m_pszMyVote );
     }
 }
 
