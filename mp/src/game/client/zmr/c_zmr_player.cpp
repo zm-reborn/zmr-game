@@ -103,6 +103,17 @@ void C_ZMPlayer::TeamChange( int iNewTeam )
 
     if ( g_pZMView )
         g_pZMView->SetVisible( iNewTeam == ZMTEAM_ZM );
+
+
+    // Execute team config.
+    if ( iNewTeam == ZMTEAM_ZM )
+    {
+        engine->ClientCmd( "exec zm.cfg" );
+    }
+    else if ( iNewTeam == ZMTEAM_HUMAN )
+    {
+        engine->ClientCmd( "exec survivor.cfg" );
+    }
 }
 
 bool C_ZMPlayer::CreateMove( float delta, CUserCmd* cmd )
