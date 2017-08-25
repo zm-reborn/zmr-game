@@ -129,13 +129,15 @@ void CZMHudFlashlight::OnThink()
 
 bool CZMHudFlashlight::ShouldDraw()
 {
-    if ( m_flAlpha <= 0.0f ) return false;
-
     return CHudElement::ShouldDraw();
 }
 
 void CZMHudFlashlight::Paint()
 {
+    // Moving this here since ShouldDraw is not called enough.
+    if ( m_flAlpha <= 0.0f ) return;
+
+
     int tex = m_bIsOn ? m_nTexOnId : m_nTexOffId;
 
     m_BgColor[3] = m_flAlpha;
