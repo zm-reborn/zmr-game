@@ -1455,7 +1455,7 @@ public:
 };
 
 BEGIN_DATADESC( CZMEntGiveResources )
-    DEFINE_INPUTFUNC( FIELD_VOID, "GiveResources", InputGiveResources ),
+    DEFINE_INPUTFUNC( FIELD_INTEGER, "GiveResources", InputGiveResources ),
 END_DATADESC()
 
 LINK_ENTITY_TO_CLASS( func_giveresources, CZMEntGiveResources );
