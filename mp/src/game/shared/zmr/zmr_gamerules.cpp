@@ -42,8 +42,10 @@ ConVar zm_sv_cost_immolator( "zm_sv_cost_immolator", "100", FCVAR_REPLICATED | F
 
 static ConVar zm_sv_participation( "zm_sv_participation", "0", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE, "0 = No limit, 1 = Don't allow only human, 2 = Don't allow only spec, 3 = Don't allow only spec/human" );
 
+#ifndef CLIENT_DLL
 static ConVar zm_sv_reward_zombiekill( "zm_sv_reward_zombiekill", "200", FCVAR_NOTIFY | FCVAR_ARCHIVE, "How many points ZM gets for killing a human with a zombie." );
 static ConVar zm_sv_reward_kill( "zm_sv_reward_kill", "100", FCVAR_NOTIFY | FCVAR_ARCHIVE, "How many points ZM gets when a human dies." );
+#endif
 
 
 #ifndef CLIENT_DLL
