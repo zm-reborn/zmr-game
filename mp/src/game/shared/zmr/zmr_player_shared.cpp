@@ -38,17 +38,34 @@ int CZMPlayer::GetResources()
     return m_ZMLocal.m_nResources;
 }
 
-void CZMPlayer::SetResources( int res, bool bLimit, bool bAllowNegative )
+void CZMPlayer::IncResources( int res, bool bLimit )
 {
 #ifdef CLIENT_DLL
 
 #else
-    if ( !bAllowNegative && res < 0 ) res = 0;
+    int oldres = GetResources();
+    int newres = oldres + res;
+    int max = zm_sv_resource_max.GetInt();
 
-    if ( bLimit && res > zm_sv_resource_max.GetInt() )
+
+    if ( bLimit && newres > max )
     {
-        res = zm_sv_resource_max.GetInt();
+        if ( oldres < max )
+            newres = max;
+        else
+            return;
     }
+
+    SetResources( newres );
+#endif
+}
+
+void CZMPlayer::SetResources( int res )
+{
+#ifdef CLIENT_DLL
+
+#else
+    if ( res < 0 ) res = 0;
 
     m_ZMLocal.m_nResources = res;
 #endif

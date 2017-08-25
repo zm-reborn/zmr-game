@@ -392,7 +392,7 @@ void CZMEntZombieSpawn::SpawnThink()
 
         if ( pPlayer )
         {
-            pPlayer->SetResources( pPlayer->GetResources() - cost );
+            pPlayer->IncResources( -cost );
         }
 
 
@@ -764,9 +764,9 @@ void CZMEntManipulate::Trigger( CBaseEntity* pActivator )
 
         if ( pPlayer )
         {
-            if ( pPlayer->GetResources() >= GetCost() )
+            if ( pPlayer->HasEnoughRes( GetCost() ) )
             {
-                pPlayer->SetResources( pPlayer->GetResources() - GetCost() );
+                pPlayer->IncResources( -GetCost() );
             }
             else // Not enough res!
             {
@@ -1442,6 +1442,8 @@ void CZMEntTriggerBlockHidden::InputDisable( inputdata_t &inputData )
 /*
     Give resources
 */
+#define SF_GIVERES_LIMIT            ( 1 << 0 )
+
 class CZMEntGiveResources : public CServerOnlyPointEntity
 {
 public:
@@ -1470,7 +1472,7 @@ void CZMEntGiveResources::Spawn( void )
 
 void CZMEntGiveResources::InputGiveResources( inputdata_t& inputData )
 {
-    CZMRules::RewardResources( inputData.value.Int() );
+    CZMRules::RewardResources( inputData.value.Int(), HasSpawnFlags( SF_GIVERES_LIMIT ) );
 }
 
 

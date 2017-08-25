@@ -252,7 +252,7 @@ void ZM_Cmd_CreateHidden( const CCommand &args )
     pZombie->Activate();
 
 
-    pPlayer->SetResources( pPlayer->GetResources() - zm_sv_cost_hiddenshambler.GetInt() );
+    pPlayer->IncResources( -zm_sv_cost_hiddenshambler.GetInt() );
 }
 
 static ConCommand zm_cmd_createhidden( "zm_cmd_createhidden", ZM_Cmd_CreateHidden, "Create da zombies!", FCVAR_HIDDEN );
@@ -562,7 +562,7 @@ void ZM_Cmd_CreateTrigger( const CCommand &args )
         pTrap->CreateTrigger( pos );
 
         
-        pPlayer->SetResources( pPlayer->GetResources() - pTrap->GetTrapCost() );
+        pPlayer->IncResources( -pTrap->GetTrapCost() );
 
         ClientPrint( pPlayer, HUD_PRINTTALK, "Created trap!" );
     }
@@ -754,7 +754,7 @@ void ZM_Cmd_PhysExp( const CCommand &args )
     pExp->DelayedExplode( zm_sv_physexp_delay.GetFloat() );
 
 
-    pPlayer->SetResources( pPlayer->GetResources() - zm_sv_physexp_cost.GetInt() );
+    pPlayer->IncResources( -zm_sv_physexp_cost.GetInt() );
 
     ClientPrint( pPlayer, HUD_PRINTTALK, "Created a physics explosion!" );
 }
