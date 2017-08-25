@@ -2750,7 +2750,7 @@ AI_BEGIN_CUSTOM_NPC( base_zombie, CNPC_BaseZombie )
 	DECLARE_ANIMEVENT( AE_ZOMBIE_POUND )
 	DECLARE_ANIMEVENT( AE_ZOMBIE_ALERTSOUND )
 	DECLARE_ANIMEVENT( AE_ZOMBIE_POPHEADCRAB )
-
+#ifndef ZMR // ZMRCHANGE: We have to define this in our own class.
 	DECLARE_INTERACTION( g_interactionZombieMeleeWarning )
 
 	DEFINE_SCHEDULE
@@ -2792,7 +2792,7 @@ AI_BEGIN_CUSTOM_NPC( base_zombie, CNPC_BaseZombie )
 		"		COND_ENEMY_DEAD"
 		"		COND_NEW_ENEMY"
 	)
-
+#endif
 	//=========================================================
 	//=========================================================
 	DEFINE_SCHEDULE

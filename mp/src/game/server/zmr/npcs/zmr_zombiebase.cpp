@@ -968,6 +968,44 @@ AI_BEGIN_CUSTOM_NPC( zmbase_zombie, CZMBaseZombie )
 
     DEFINE_SCHEDULE
     (
+        SCHED_ZOMBIE_MOVE_SWATITEM,
+
+        "	Tasks"
+        "		TASK_ZOMBIE_DELAY_SWAT			3"
+        "		TASK_SET_FAIL_SCHEDULE			SCHEDULE:SCHED_CHASE_ENEMY"
+        "		TASK_ZOMBIE_GET_PATH_TO_PHYSOBJ	0"
+        "		TASK_WALK_PATH					0"
+        "		TASK_WAIT_FOR_MOVEMENT			0"
+        "		TASK_FACE_ENEMY					0"
+        "		TASK_ZOMBIE_SWAT_ITEM			0"
+        "	"
+        "	Interrupts"
+        "		COND_ZM_DEFEND_ENEMY_TOOFAR" // ZMRCHANGE
+        "		COND_ENEMY_DEAD"
+        "		COND_NEW_ENEMY"
+    )
+
+    //=========================================================
+    // SwatItem
+    //=========================================================
+    DEFINE_SCHEDULE
+    (
+        SCHED_ZOMBIE_SWATITEM,
+
+        "	Tasks"
+        "		TASK_ZOMBIE_DELAY_SWAT			3"
+        "		TASK_SET_FAIL_SCHEDULE			SCHEDULE:SCHED_CHASE_ENEMY"
+        "		TASK_FACE_ENEMY					0"
+        "		TASK_ZOMBIE_SWAT_ITEM			0"
+        "	"
+        "	Interrupts"
+        "		COND_ZM_DEFEND_ENEMY_TOOFAR" // ZMRCHANGE
+        "		COND_ENEMY_DEAD"
+        "		COND_NEW_ENEMY"
+    )
+
+    DEFINE_SCHEDULE
+    (
 	    SCHED_ZM_GO, // Used for rallypoints, etc. when going after the enemy is the priority instead of literally getting to your destination.
 
 	    "	Tasks"
