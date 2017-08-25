@@ -20,6 +20,8 @@
 extern ConVar zm_cl_participation;
 #endif
 
+extern ConVar zm_sv_resource_max;
+
 
 bool CZMPlayer::HasEnoughResToSpawn( ZombieClass_t zclass )
 {
@@ -36,11 +38,18 @@ int CZMPlayer::GetResources()
     return m_ZMLocal.m_nResources;
 }
 
-void CZMPlayer::SetResources( int res )
+void CZMPlayer::SetResources( int res, bool bLimit, bool bAllowNegative )
 {
 #ifdef CLIENT_DLL
 
 #else
+    if ( !bAllowNegative && res < 0 ) res = 0;
+
+    if ( bLimit && res > zm_sv_resource_max.GetInt() )
+    {
+        res = zm_sv_resource_max.GetInt();
+    }
+
     m_ZMLocal.m_nResources = res;
 #endif
 }
