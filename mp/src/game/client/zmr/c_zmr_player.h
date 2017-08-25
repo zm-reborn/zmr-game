@@ -38,7 +38,7 @@ public:
     bool HasEnoughResToSpawn( ZombieClass_t );
     bool HasEnoughRes( int );
     int GetResources();
-    void SetResources( int );
+    void SetResources( int, bool bLimit = true, bool bAllowNegative = false );
     float GetFlashlightBattery();
     void SetFlashlightBattery( float );
     bool Weapon_CanSwitchTo( C_BaseCombatWeapon* ) OVERRIDE;

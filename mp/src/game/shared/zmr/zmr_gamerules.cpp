@@ -39,6 +39,7 @@ ConVar zm_sv_cost_hulk( "zm_sv_cost_hulk", "75", FCVAR_REPLICATED | FCVAR_NOTIFY
 ConVar zm_sv_cost_drifter( "zm_sv_cost_drifter", "40", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE );
 ConVar zm_sv_cost_immolator( "zm_sv_cost_immolator", "100", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE );
 
+ConVar zm_sv_resource_max( "zm_sv_resource_max", "5000", FCVAR_NOTIFY | FCVAR_REPLICATED );
 
 static ConVar zm_sv_participation( "zm_sv_participation", "0", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE, "0 = No limit, 1 = Don't allow only human, 2 = Don't allow only spec, 3 = Don't allow only spec/human" );
 
@@ -762,7 +763,7 @@ void CZMRules::RewardResources( int res )
 
         if ( pPlayer->IsZM() )
         {
-            pPlayer->SetResources( pPlayer->GetResources() + res );
+            pPlayer->SetResources( pPlayer->GetResources() + res, false );
         }
     }
 }
@@ -952,7 +953,7 @@ void CZMRules::BeginRound( CZMPlayer* pZM )
         }
 
 
-        pPlayer->SetResources( zm_sv_resource_init.GetInt() );
+        pPlayer->SetResources( zm_sv_resource_init.GetInt(), false );
 
 
         // Don't change team if we're already a spectator.
@@ -1112,7 +1113,6 @@ void CZMRules::RestoreMap()
 }
 
 static ConVar zm_sv_resource_rate( "zm_sv_resource_rate", "5", FCVAR_NOTIFY );
-static ConVar zm_sv_resource_max( "zm_sv_resource_max", "5000", FCVAR_NOTIFY );
 static ConVar zm_sv_resource_refill_min( "zm_sv_resource_refill_min", "25", FCVAR_NOTIFY );
 static ConVar zm_sv_resource_refill_max( "zm_sv_resource_refill_max", "75", FCVAR_NOTIFY );
 
@@ -1132,9 +1132,6 @@ void CZMRules::PlayerThink( CBasePlayer* pPlayer )
                     1, gpGlobals->maxClients - 1,
                     zm_sv_resource_refill_min.GetFloat(),
                     zm_sv_resource_refill_max.GetFloat() );
-
-            if ( newres > limit )
-                newres = limit;
 
             pZMPlayer->SetResources( newres );
         }
