@@ -146,6 +146,11 @@
 @PointClass base(Targetname, Parentname, Origin, Angles) = func_giveresources :
 	"Give or take resources from the ZM's stash"
 [
+	spawnflags(flags) =
+	[
+		1: "Limit To Max" : 0
+	]
+	
 	input GiveResources(integer) : "Give/Take x resources"
 ]
 
