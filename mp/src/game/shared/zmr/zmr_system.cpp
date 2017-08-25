@@ -12,6 +12,9 @@ public:
     }
 
     virtual void PostInit() OVERRIDE;
+#ifndef CLIENT_DLL
+    virtual void LevelInitPostEntity() OVERRIDE;
+#endif
 
 
     virtual void FireGameEvent( IGameEvent* pEvent ) OVERRIDE;
@@ -19,19 +22,31 @@ public:
 
 void CZMSystem::PostInit()
 {
-    // Only init once when running the game, since this is called on both client and server.
-#ifndef CLIENT_DLL
-    if ( !engine->IsDedicatedServer() )
-        return;
-#endif
-
-
 #ifdef CLIENT_DLL
     ListenForGameEvent( "round_restart_post" );
 #endif
 
+    // Server Steam API hasn't been initialized yet.
+#ifdef CLIENT_DLL
     g_pZMWeb->QueryVersionNumber();
+#endif
 }
+
+#ifndef CLIENT_DLL
+void CZMSystem::LevelInitPostEntity()
+{
+    if ( engine->IsDedicatedServer() )
+    {
+        // HACK!!! After the first map change, the api hasn't been initialized yet.
+        if ( steamgameserverapicontext && !steamgameserverapicontext->SteamHTTP() )
+        {
+            steamgameserverapicontext->Init();
+        }
+
+        g_pZMWeb->QueryVersionNumber();
+    }
+}
+#endif
 
 void CZMSystem::FireGameEvent( IGameEvent* pEvent )
 {
