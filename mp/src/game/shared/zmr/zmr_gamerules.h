@@ -145,7 +145,7 @@ public:
     virtual void InitDefaultAIRelationships( void );
 
 
-    static void RewardResources( int );
+    static void RewardResources( int, bool bLimit = false, bool bAllowNegative = false );
 #endif
 
 private:

@@ -752,7 +752,7 @@ void CZMRules::EndRound( ZMRoundEndReason_t reason )
     }
 }
 
-void CZMRules::RewardResources( int res )
+void CZMRules::RewardResources( int res, bool bLimit, bool bAllowNegative )
 {
     CZMPlayer* pPlayer;
     for ( int i = 1; i <= gpGlobals->maxClients; i++ )
@@ -763,7 +763,7 @@ void CZMRules::RewardResources( int res )
 
         if ( pPlayer->IsZM() )
         {
-            pPlayer->SetResources( pPlayer->GetResources() + res, false );
+            pPlayer->SetResources( pPlayer->GetResources() + res, bLimit, bAllowNegative );
         }
     }
 }
