@@ -116,8 +116,9 @@ CZMFrame::CZMFrame( const char* pElementName ) : CHudElement( pElementName ), Ba
     m_MouseDragStatus = BUTTON_CODE_INVALID;
     SetClickMode( ZMCLICKMODE_NORMAL );
 
-    m_BoxSelect = GET_HUDELEMENT( CZMBoxSelect );
 
+
+    m_BoxSelect = new CZMBoxSelect( this );
 
 	m_pZMControl = new CZMControlPanel( this ); 
 
@@ -414,16 +415,8 @@ void CZMFrame::OnLeftClick()
     ::input->GetFullscreenMousePos( &mx, &my );
 
 
-    m_BoxSelect = GET_HUDELEMENT( CZMBoxSelect );
-
-    if ( m_BoxSelect )
-    {
-        m_BoxSelect->SetEnabled( true );
-
-
-        ::input->GetFullscreenMousePos( &mx, &my );
-        m_BoxSelect->SetStart( mx, my );
-    }
+    m_BoxSelect->SetEnabled( true );
+    m_BoxSelect->SetStart( mx, my );
 
 
     if ( GetClickMode() == ZMCLICKMODE_NORMAL ) return;
@@ -488,48 +481,35 @@ void CZMFrame::OnLeftClick()
 
 void CZMFrame::OnLeftRelease()
 {
-    m_BoxSelect = GET_HUDELEMENT( CZMBoxSelect );
-
-    if ( m_BoxSelect )
-    {
-        m_BoxSelect->SetEnabled( false );
+    m_BoxSelect->SetEnabled( false );
 
 
-        int mx, my;
-        ::input->GetFullscreenMousePos( &mx, &my );
+    int mx, my;
+    ::input->GetFullscreenMousePos( &mx, &my );
 
-        m_BoxSelect->SetEnd( mx, my );
+    m_BoxSelect->SetEnd( mx, my );
     
 
-        C_BasePlayer* pPlayer = C_BasePlayer::GetLocalPlayer();
+    C_BasePlayer* pPlayer = C_BasePlayer::GetLocalPlayer();
 
-        // If our box is too small then don't use it.
-        if ( m_BoxSelect->ShouldSelect() )
-        {
-            int i, j, k, l;
-            m_BoxSelect->GetBox( &i, &j, &k, &l );
+    // If our box is too small then don't use it.
+    if ( m_BoxSelect->ShouldSelect() )
+    {
+        int i, j, k, l;
+        m_BoxSelect->GetBox( &i, &j, &k, &l );
 
         
-            FindZombiesInBox( i, j, k, l, (pPlayer && pPlayer->m_nButtons & IN_DUCK) ? true : false );
-        }
-        else
-        {
-            FindZMObject( mx, my, (pPlayer && pPlayer->m_nButtons & IN_DUCK) ? true : false );
-        }
+        FindZombiesInBox( i, j, k, l, (pPlayer && pPlayer->m_nButtons & IN_DUCK) ? true : false );
     }
-
+    else
+    {
+        FindZMObject( mx, my, (pPlayer && pPlayer->m_nButtons & IN_DUCK) ? true : false );
+    }
 }
 
 void CZMFrame::OnRightClick()
 {
-    // ZMRTODO: Fix this constant GET_HUDELEMENT shit.
-    m_BoxSelect = GET_HUDELEMENT( CZMBoxSelect );
-
-    if ( m_BoxSelect )
-    {
-        m_BoxSelect->SetEnabled( false );
-    }
-    
+    m_BoxSelect->SetEnabled( false );
 
 
     int mx, my;

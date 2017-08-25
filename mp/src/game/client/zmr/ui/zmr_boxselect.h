@@ -2,19 +2,19 @@
 #include "hudelement.h"
 
 
-class CZMBoxSelect : public CHudElement, public vgui::Panel
+class CZMBoxSelect : public vgui::Panel
 
 {
 public:
-    DECLARE_CLASS_SIMPLE( CZMBoxSelect, vgui::Frame );
+    DECLARE_CLASS_SIMPLE( CZMBoxSelect, vgui::Panel );
 
-    CZMBoxSelect( const char* pElementName );
+    CZMBoxSelect( vgui::Panel* pParent );
 
 
-    virtual bool ShouldDraw() OVERRIDE;
-    virtual void Init() OVERRIDE;
+    //virtual bool ShouldDraw() OVERRIDE;
+    //virtual void Init() OVERRIDE;
     virtual void Paint() OVERRIDE;
-
+    
     //inline void SetDraw( bool b ) { m_bDraw = b; };
 
     void SetStart( int, int );

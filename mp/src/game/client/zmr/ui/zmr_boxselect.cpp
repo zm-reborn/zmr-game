@@ -25,35 +25,25 @@
 using namespace vgui;
 
 
-DECLARE_HUDELEMENT( CZMBoxSelect );
-
-
-CZMBoxSelect::CZMBoxSelect( const char* pElementName ) : CHudElement( pElementName ), Panel( g_pClientMode->GetViewport(), "ZMBoxSelect" )
+CZMBoxSelect::CZMBoxSelect( Panel* pParent ) : Panel( g_pClientMode->GetViewport(), "ZMBoxSelect" )
 {
     //SetEnabled( false );
     
+    SetParent( pParent->GetVPanel() );
+
     SetPaintBackgroundEnabled( false );
+    SetMouseInputEnabled( false );
+    SetKeyBoardInputEnabled( false );
 
     SetPos( 0, 0 );
     SetSize( ScreenWidth(), ScreenHeight() );
 }
 
-void CZMBoxSelect::Init()
-{
-    
-}
-
-bool CZMBoxSelect::ShouldDraw()
-{
-    if ( !IsEnabled() ) return false;
-
-
-
-    return true;
-}
-
 void CZMBoxSelect::Paint()
 {
+    if ( !IsEnabled() ) return;
+
+
     int lefttop_x, lefttop_y;
     int rightbot_x, rightbot_y;
 
@@ -82,7 +72,7 @@ void CZMBoxSelect::Paint()
     }
 
 
-    surface()->DrawSetColor(  150, 0, 0, 40 );
+    surface()->DrawSetColor( 150, 0, 0, 40 );
     surface()->DrawFilledRect( lefttop_x, lefttop_y, rightbot_x, rightbot_y );
     surface()->DrawSetColor( 200, 0, 0, 150 );
     surface()->DrawOutlinedRect( lefttop_x, lefttop_y, rightbot_x, rightbot_y );
