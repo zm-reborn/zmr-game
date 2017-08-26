@@ -49,8 +49,9 @@
 			// folder.
 			//
 			// Note that this folder is scanned only when the game is booted.
-			game+mod			hl2mp/custom/*
-			game+mod			hl2/custom/*
+			//game+mod			hl2mp/custom/*
+			//game+mod			hl2/custom/*
+			game+mod			zombie_master_reborn/custom/*
 
 			// Now search loose files.  We'll set the directory containing the gameinfo.txt file
 			// as the first "mod" search path (after any user customizations).  This is also the one
@@ -78,7 +79,8 @@
 			game+game_write		hl2mp
 
 			// Where the game's binaries are
-			gamebin				hl2mp/bin
+			//gamebin				hl2mp/bin
+			gamebin				zombie_master_reborn/bin
 
 			// Last, mount in shared HL2 loose files
 			game				|all_source_engine_paths|hl2mp
