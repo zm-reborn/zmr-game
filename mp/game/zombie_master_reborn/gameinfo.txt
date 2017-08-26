@@ -86,6 +86,10 @@
 			game				|all_source_engine_paths|hl2mp
 			game				|all_source_engine_paths|hl2
 			platform			|all_source_engine_paths|platform
+			
+			// This is where downloaded files go.
+			// Do this last.
+			game+download		zombie_master_reborn/download
 		}
 	}
 }
