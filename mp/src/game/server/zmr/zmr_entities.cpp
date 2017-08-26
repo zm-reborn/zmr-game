@@ -1492,7 +1492,7 @@ public:
 };
 
 BEGIN_DATADESC( CZMEntTriggerGivePoints )
-    DEFINE_INPUTFUNC( FIELD_VOID, "Award", InputAward ),
+    DEFINE_INPUTFUNC( FIELD_INTEGER, "Award", InputAward ),
 END_DATADESC()
 
 LINK_ENTITY_TO_CLASS( trigger_givepoints, CZMEntTriggerGivePoints );
