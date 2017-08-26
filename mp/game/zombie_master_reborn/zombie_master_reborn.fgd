@@ -87,11 +87,16 @@
 ]
 
 @PointClass base(Item) studio("models/items/boxsrounds.mdl")= item_ammo_pistol : "Box of Pistol ammo" []
-@PointClass base(Item) studio("models/items/largeBoxSRounds.mdl")= item_ammo_pistol_large : "Large Box of Pistol ammo" []
+@PointClass base(Item) studio("models/items/boxsrounds.mdl")= item_ammo_pistol_large : "Large Box of Pistol ammo" []
 @PointClass base(Item) studio("models/items/357ammo.mdl")= item_ammo_357 : "Box of 357 ammo" []
 @PointClass base(Item) studio("models/items/357ammobox.mdl")= item_ammo_357_large : "Large Box of 357 ammo" []
-@PointClass base(Item) studio("models/items/BoxBuckshot.mdl")= item_box_buckshot : "Box Buckshot" []
+@PointClass base(Item) studio("models/items/boxbuckshot.mdl")= item_box_buckshot : "Box Buckshot" []
 @PointClass base(Item) studio("models/items/revolverammo.mdl")= item_ammo_revolver : "Box of Revolver ammo" []
+
+@PointClass base(Item) studio("models/items/boxmrounds.mdl")= item_ammo_smg1 : "Box of SMG1 ammo" []
+@PointClass base(Item) studio("models/items/boxmrounds.mdl")= item_ammo_smg1_large : "Large Box of SMG1 ammo" []
+@PointClass base(Item) studio("models/items/ar2_grenade.mdl")= item_ammo_smg1_grenade : "SMG1 Grenade" []
+
 
 @BaseClass color(0 0 200) base(Targetname, Angles) = Weapon
 [
@@ -109,7 +114,7 @@
 @PointClass base(Weapon) studio("models/weapons/w_crowbar.mdl") = weapon_zm_improvised : "Improvised weapon" []
 @PointClass base(Weapon) studio("models/weapons/pistol3rd_zm.mdl") = weapon_zm_pistol : "Pistol" []
 @PointClass base(Weapon) studio("models/weapons/rifle_zm_3rd.mdl") = weapon_zm_rifle : "Rifle" []
-@PointClass base(Weapon) studio("models/weapons/flashlight3rd_zm.mdl") = weapon_zm_flashlight : "Flashlight" []
+//@PointClass base(Weapon) studio("models/weapons/flashlight3rd_zm.mdl") = weapon_zm_flashlight : "Flashlight" []
 @PointClass base(Weapon) studio("models/weapons/molotov3rd_zm.mdl") = weapon_zm_molotov : "Molotov Cocktail" []
 @PointClass base(Weapon) studio("models/weapons/sledgehammer3rd_zm.mdl") = weapon_zm_sledge : "Sledgehammer" []
 @PointClass base(Weapon) studio("models/weapons/smg_zm_3rd.mdl") = weapon_zm_mac10 : "Mac 10" []
