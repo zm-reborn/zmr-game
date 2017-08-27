@@ -12,6 +12,7 @@ WeaponData
 	"bucket_position"	"0"
 
 	"clip_size"			"6"
+	"default_clip"		"0"
 	"primary_ammo"		"Revolver"
 	"secondary_ammo"	"None"
 
