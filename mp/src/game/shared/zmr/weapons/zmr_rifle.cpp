@@ -7,26 +7,21 @@
 #include "ai_activity.h"
 #include "in_buttons.h"
 
-
-#include "zmr/zmr_shareddefs.h"
-#include "zmr_base.h"
-
-
-#include "zmr/zmr_player_shared.h"
+#include "zmr_basepump.h"
 
 
 #ifdef CLIENT_DLL
 #define CZMWeaponRifle C_ZMWeaponRifle
 #endif
 
-class CZMWeaponRifle : public CZMBaseWeapon
+class CZMWeaponRifle : public CZMBasePumpWeapon
 {
 public:
-	DECLARE_CLASS( CZMWeaponRifle, CZMBaseWeapon );
-	DECLARE_NETWORKCLASS();
-	DECLARE_PREDICTABLE();
+    DECLARE_CLASS( CZMWeaponRifle, CZMBasePumpWeapon );
+    DECLARE_NETWORKCLASS();
+    DECLARE_PREDICTABLE();
 #ifndef CLIENT_DLL
-	DECLARE_ACTTABLE();
+    DECLARE_ACTTABLE();
 #endif
 
     CZMWeaponRifle();
@@ -52,21 +47,20 @@ public:
         if ( !pPlayer ) return;
 
 
-	    pPlayer->ViewPunch( QAngle( random->RandomFloat( -5, -2 ), random->RandomFloat( -3.5, 3.5 ), 0 ) );
+        pPlayer->ViewPunch( QAngle( random->RandomFloat( -5, -2 ), random->RandomFloat( -3.5, 3.5 ), 0 ) );
     }
     
     virtual float GetFireRate( void ) OVERRIDE { return 0.9f; };
 
 
-
-    virtual bool Reload( void ) OVERRIDE;
     virtual void PrimaryAttack( void ) OVERRIDE;
+    virtual bool Holster( CBaseCombatWeapon* pSwitchTo = nullptr ) OVERRIDE;
     virtual void ItemPostFrame( void ) OVERRIDE;
 
-    virtual bool Holster( CBaseCombatWeapon *pSwitchingTo = NULL );
 
-
-    virtual void Pump();
+    virtual Activity GetReloadStartAct() OVERRIDE { return ACT_RIFLE_RELOAD_START; };
+    virtual Activity GetReloadEndAct() OVERRIDE { return ACT_RIFLE_RELOAD_FINISH; };
+    virtual Activity GetPumpAct() OVERRIDE { return ACT_RIFLE_LEVER; };
 
     inline bool IsZoomed() { return m_bInZoom; };
     void CheckToggleZoom();
@@ -76,7 +70,6 @@ public:
     void UnZoom( CZMPlayer* );
 
 protected:
-    CNetworkVar( bool, m_bNeedPump ); // When emptied completely
     CNetworkVar( bool, m_bInZoom );
 };
 
@@ -85,17 +78,14 @@ IMPLEMENT_NETWORKCLASS_ALIASED( ZMWeaponRifle, DT_ZM_WeaponRifle )
 
 BEGIN_NETWORK_TABLE( CZMWeaponRifle, DT_ZM_WeaponRifle )
 #ifdef CLIENT_DLL
-    RecvPropBool( RECVINFO( m_bNeedPump ) ),
     RecvPropBool( RECVINFO( m_bInZoom ) ),
 #else
-    SendPropBool( SENDINFO( m_bNeedPump ) ),
     SendPropBool( SENDINFO( m_bInZoom ) ),
 #endif
 END_NETWORK_TABLE()
 
 #ifdef CLIENT_DLL
 BEGIN_PREDICTION_DATA( CZMWeaponRifle )
-    DEFINE_PRED_FIELD( m_bNeedPump, FIELD_BOOLEAN, FTYPEDESC_INSENDTABLE ),
     DEFINE_PRED_FIELD( m_bInZoom, FIELD_BOOLEAN, FTYPEDESC_INSENDTABLE ),
 END_PREDICTION_DATA()
 #endif
@@ -106,14 +96,14 @@ PRECACHE_WEAPON_REGISTER( weapon_zm_rifle );
 #ifndef CLIENT_DLL
 acttable_t	CZMWeaponRifle::m_acttable[] = 
 {
-	{ ACT_HL2MP_IDLE,					ACT_HL2MP_IDLE_AR2,					false },
-	{ ACT_HL2MP_RUN,					ACT_HL2MP_RUN_AR2,					false },
-	{ ACT_HL2MP_IDLE_CROUCH,			ACT_HL2MP_IDLE_CROUCH_AR2,			false },
-	{ ACT_HL2MP_WALK_CROUCH,			ACT_HL2MP_WALK_CROUCH_AR2,			false },
-	{ ACT_HL2MP_GESTURE_RANGE_ATTACK,	ACT_HL2MP_GESTURE_RANGE_ATTACK_AR2,	false },
-	{ ACT_HL2MP_GESTURE_RELOAD,			ACT_HL2MP_GESTURE_RELOAD_AR2,		false },
-	{ ACT_HL2MP_JUMP,					ACT_HL2MP_JUMP_AR2,					false },
-	{ ACT_RANGE_ATTACK1,				ACT_RANGE_ATTACK_AR2,				false },
+    { ACT_HL2MP_IDLE,					ACT_HL2MP_IDLE_AR2,					false },
+    { ACT_HL2MP_RUN,					ACT_HL2MP_RUN_AR2,					false },
+    { ACT_HL2MP_IDLE_CROUCH,			ACT_HL2MP_IDLE_CROUCH_AR2,			false },
+    { ACT_HL2MP_WALK_CROUCH,			ACT_HL2MP_WALK_CROUCH_AR2,			false },
+    { ACT_HL2MP_GESTURE_RANGE_ATTACK,	ACT_HL2MP_GESTURE_RANGE_ATTACK_AR2,	false },
+    { ACT_HL2MP_GESTURE_RELOAD,			ACT_HL2MP_GESTURE_RELOAD_AR2,		false },
+    { ACT_HL2MP_JUMP,					ACT_HL2MP_JUMP_AR2,					false },
+    { ACT_RANGE_ATTACK1,				ACT_RANGE_ATTACK_AR2,				false },
 };
 IMPLEMENT_ACTTABLE( CZMWeaponRifle );
 #endif
@@ -126,14 +116,10 @@ CZMWeaponRifle::CZMWeaponRifle()
     m_bFiresUnderwater = false;
 
 
-    m_bReloadsSingly = true;
-
 #ifndef CLIENT_DLL
     SetSlotFlag( ZMWEAPONSLOT_LARGE );
 #endif
 
-
-    m_bNeedPump = false;
     m_bInZoom = false;
 }
 
@@ -147,51 +133,14 @@ void CZMWeaponRifle::PrimaryAttack( void )
     m_bNeedPump = true;
 
 
-    return BaseClass::PrimaryAttack();
+    BaseClass::PrimaryAttack();
 }
 
 void CZMWeaponRifle::ItemPostFrame( void )
 {
-    if ( m_bNeedPump && (m_flNextPrimaryAttack <= gpGlobals->curtime) )
-    {
-        Pump();
-    }
-
-
     CheckToggleZoom();
 
     BaseClass::ItemPostFrame();
-}
-
-void CZMWeaponRifle::Pump()
-{
-    CZMPlayer* pOwner = GetPlayerOwner();
-    if ( !pOwner ) return;
-	
-    m_bNeedPump = false;
-
-    /*if ( m_bDelayedReload )
-    {
-	    m_bDelayedReload = false;
-	    StartReload();
-    }*/
-	
-    WeaponSound( SPECIAL1 );
-
-    // Finish reload animation
-    SendWeaponAnim( ACT_RIFLE_LEVER );
-    
-    //pOwner->m_flNextAttack = gpGlobals->curtime + SequenceDuration();
-    m_flNextPrimaryAttack = gpGlobals->curtime + GetFireRate();
-}
-
-bool CZMWeaponRifle::Reload( void )
-{
-    if ( m_bNeedPump ) return false;
-
-    if ( m_flNextPrimaryAttack > gpGlobals->curtime ) return false;
-
-    return BaseClass::Reload();
 }
 
 void CZMWeaponRifle::CheckToggleZoom()
@@ -241,9 +190,9 @@ void CZMWeaponRifle::CheckUnZoom()
     }
 }
 
-bool CZMWeaponRifle::Holster( CBaseCombatWeapon *pSwitchingTo )
+bool CZMWeaponRifle::Holster( CBaseCombatWeapon* pSwitchTo )
 {
     CheckUnZoom();
 
-    return BaseClass::Holster( pSwitchingTo );
+    return BaseClass::Holster( pSwitchTo );
 }
