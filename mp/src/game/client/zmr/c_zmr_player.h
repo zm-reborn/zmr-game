@@ -11,10 +11,10 @@
 #include "zmr/zmr_player_shared.h"
 
 
-class C_ZMPlayer : public CHL2MP_Player
+class C_ZMPlayer : public C_HL2MP_Player
 {
 public:
-    DECLARE_CLASS( C_ZMPlayer, CHL2MP_Player );
+    DECLARE_CLASS( C_ZMPlayer, C_HL2MP_Player );
     DECLARE_CLIENTCLASS();
     //DECLARE_PREDICTABLE(); 
     DECLARE_INTERPOLATION();
@@ -63,18 +63,15 @@ private:
     float m_flNextUpMove;
 };
 
-inline CZMPlayer* ToZMPlayer( CBaseEntity* pEntity )
+inline C_ZMPlayer* ToZMPlayer( C_BaseEntity* pEntity )
 {
 	if ( !pEntity || !pEntity->IsPlayer() )
-		return NULL;
+		return nullptr;
 
-	return dynamic_cast<CZMPlayer*>( pEntity );
+	return dynamic_cast<C_ZMPlayer*>( pEntity );
 }
 
-inline CZMPlayer* ToZMPlayer( CBasePlayer* pPlayer )
+inline C_ZMPlayer* ToZMPlayer( C_BasePlayer* pPlayer )
 {
-	if ( !pPlayer || !pPlayer->IsPlayer() )
-		return NULL;
-
-	return static_cast<CZMPlayer*>( pPlayer );
+	return static_cast<C_ZMPlayer*>( pPlayer );
 }

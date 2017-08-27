@@ -32,6 +32,7 @@ ConVar zm_cl_mwheelmovespd( "zm_cl_mwheelmovespd", "400", FCVAR_ARCHIVE );
 
 
 
+#undef CZMPlayer // We need to undefine it so we can get the server class.
 IMPLEMENT_CLIENTCLASS_DT( C_ZMPlayer, DT_ZM_Player, CZMPlayer )
     RecvPropDataTable( RECVINFO_DT( m_ZMLocal ), 0, &REFERENCE_RECV_TABLE( DT_ZM_PlyLocal ) ),
 END_RECV_TABLE()
