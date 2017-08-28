@@ -59,12 +59,6 @@ private:
     int m_iSpawnIndex;
     int m_fSpawnZombieFlags;
 
-
-	vgui::HFont m_hMediumFont;
-	vgui::HFont m_hLargeFont;
-    vgui::HScheme scheme;
-
-
 public:
 
 	void CalculateButtonState();
