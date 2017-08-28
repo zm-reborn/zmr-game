@@ -6,6 +6,7 @@
 #include "zmr_cntrlpanel.h"
 #include "zmr_buildmenu.h"
 #include "zmr_manimenu.h"
+#include "zmr_manimenu_new.h"
 
 
 enum ZMClickMode_t
@@ -53,6 +54,10 @@ public:
     inline ZMClickMode_t GetClickMode() { return m_iClickMode; };
     void SetClickMode( ZMClickMode_t, bool = false );
 
+
+    CZMBuildMenu* GetBuildMenu() { return m_pBuildMenu; }; // ZMRTODO: Do same thing as mani menu.
+    CZMManiMenuBase* GetManiMenu();
+
 private:
     void TraceScreenToWorld( int, int, trace_t*, CTraceFilterSimple*, int );
     
@@ -70,6 +75,7 @@ private:
     CZMBoxSelect* m_BoxSelect;
     CZMControlPanel* m_pZMControl;
     CZMManiMenu* m_pManiMenu;
+    CZMManiMenuNew* m_pManiMenuNew;
     CZMBuildMenu* m_pBuildMenu;
 
     MouseCode m_MouseDragStatus;

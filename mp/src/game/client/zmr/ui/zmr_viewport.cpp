@@ -35,6 +35,10 @@ ConVar zm_cl_poweruser( "zm_cl_poweruser", "0", FCVAR_ARCHIVE, "Select spawns/tr
 ConVar zm_cl_hidemouseinscore( "zm_cl_hidemouseinscore", "1", FCVAR_ARCHIVE, "Is mouse input disabled while having scoreboard open?" );
 
 
+ConVar zm_cl_usenewmenus( "zm_cl_usenewmenus", "1", FCVAR_ARCHIVE, "Use new ZM menus?" );
+
+
+
 DECLARE_HUDELEMENT( CZMFrame );
 
 
@@ -123,13 +127,18 @@ CZMFrame::CZMFrame( const char* pElementName ) : CHudElement( pElementName ), Ba
 	m_pZMControl = new CZMControlPanel( this ); 
 
 	m_pManiMenu = new CZMManiMenu( this ); 
+	m_pManiMenuNew = new CZMManiMenuNew( this ); 
 	m_pBuildMenu = new CZMBuildMenu( this ); 
 }
 
 CZMFrame::~CZMFrame()
 {
+    delete m_BoxSelect;
+
     delete m_pZMControl;
+
     delete m_pManiMenu;
+    delete m_pManiMenuNew;
     delete m_pBuildMenu;
 }
 
@@ -173,6 +182,19 @@ void CZMFrame::SetClickMode( ZMClickMode_t mode, bool print )
     default : break;
     }
     m_iClickMode = mode;
+}
+
+CZMManiMenuBase* CZMFrame::GetManiMenu()
+{
+    // Tertiary tries to make me cast... pshh, I'll just use good ol' if's. 
+    if ( zm_cl_usenewmenus.GetBool() )
+    {
+        return m_pManiMenuNew;
+    }
+    else
+    {
+        return m_pManiMenu;
+    }
 }
 
 void CZMFrame::OnCursorMoved( int x, int y )
@@ -432,9 +454,9 @@ void CZMFrame::OnLeftClick()
         switch ( GetClickMode() )
         {
         case ZMCLICKMODE_TRAP :
-            if ( m_pManiMenu )
+            if ( GetManiMenu() )
                 engine->ClientCmd( VarArgs( "zm_cmd_createtrigger %i %.1f %.1f %.1f",
-                    m_pManiMenu->GetTrapIndex(),
+                    GetManiMenu()->GetTrapIndex(),
                     pos[0],
                     pos[1],
                     pos[2] ) );
@@ -442,16 +464,16 @@ void CZMFrame::OnLeftClick()
 
 
         case ZMCLICKMODE_RALLYPOINT :
-            if ( m_pBuildMenu )
+            if ( GetBuildMenu() )
             {
                 engine->ClientCmd( VarArgs( "zm_cmd_setrally %i %.1f %.1f %.1f",
-                    m_pBuildMenu->GetLastSpawnIndex(),
+                    GetBuildMenu()->GetLastSpawnIndex(),
                     pos[0],
                     pos[1],
                     pos[2] ) );
 
 
-                m_pBuildMenu->ShowPanel( true );
+                GetBuildMenu()->ShowPanel( true );
             }
             break;
 
@@ -695,11 +717,9 @@ void CZMFrame::FindZMObject( int x, int y, bool bSticky )
 
             if ( pSpawn )
             {
-                if ( m_pBuildMenu )
+                if ( GetBuildMenu() )
                 {
-                    m_pBuildMenu->SetSpawnIndex( pSpawn->entindex() );
-                    m_pBuildMenu->SetZombieFlags( pSpawn->GetZombieFlags() );
-                    m_pBuildMenu->ShowPanel( true );
+                    GetBuildMenu()->ShowMenu( pSpawn );
                 }
 
                 bHit = true;
@@ -711,14 +731,9 @@ void CZMFrame::FindZMObject( int x, int y, bool bSticky )
 
             if ( pTrap )
             {
-                if ( m_pManiMenu )
+                if ( GetManiMenu() )
                 {
-                    m_pManiMenu->SetTrapIndex( pTrap->entindex() );
-                    m_pManiMenu->SetDescription( *pTrap->GetDescription() ? pTrap->GetDescription() : "Activate trap." );
-                    m_pManiMenu->SetCost( pTrap->GetCost() );
-                    m_pManiMenu->SetTrapCost( pTrap->GetTrapCost() );
-                    m_pManiMenu->SetTrapPos( pTrap->GetAbsOrigin() );
-                    m_pManiMenu->ShowPanel( true );
+                    GetManiMenu()->ShowMenu( pTrap );
 
                     // Tell server we've opened this menu to get the real trap description.
                     if ( !*pTrap->GetDescription() )
@@ -764,5 +779,10 @@ void CZMFrame::CloseChildMenus()
     if ( m_pManiMenu && m_pManiMenu->IsVisible() )
     {
         m_pManiMenu->Close();
+    }
+
+    if ( m_pManiMenuNew && m_pManiMenuNew->IsVisible() )
+    {
+        m_pManiMenuNew->Close();
     }
 }
