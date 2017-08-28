@@ -42,12 +42,6 @@ extern IGameUIFuncs *gameuifuncs; // for key binding details
 
 
 
-
-//using namespace vgui; //don't do this, causes problems with "filesystem" object
-
-CZMBuildMenu *g_pBuildMenu = nullptr;
-
-
 // ZMRTODO: Remove this old stuff...
 const char *TypeToImage[ZMCLASS_MAX] = {
 		"zombies/info_shambler",
@@ -73,9 +67,6 @@ const char *TypeToQueueImage[ZMCLASS_MAX] = {
 
 CZMBuildMenu::CZMBuildMenu( Panel* pParent ) : Frame( g_pClientMode->GetViewport(), "ZMBuildMenu" )
 {
-	g_pBuildMenu = this;
-
-
     SetParent( pParent->GetVPanel() );
 
 
@@ -391,14 +382,17 @@ void CZMBuildMenu::OnClose()
 //--------------------------------------------------------------
 void __MsgFunc_ZMBuildMenuUpdate( bf_read &msg )
 {
-    if ( !g_pBuildMenu ) return;
+    if ( !g_pZMView || g_pZMView->GetBuildMenu() ) return;
+
+
+    CZMBuildMenu* pMenu = g_pZMView->GetBuildMenu();
 
 
 	//read spawn entindex
 	int spawnidx = msg.ReadShort();
 
     // We don't care about this spawn since we don't have it open...
-    if ( spawnidx != g_pBuildMenu->GetSpawnIndex() ) return;
+    if ( spawnidx != pMenu->GetSpawnIndex() ) return;
 
 
 
@@ -415,12 +409,11 @@ void __MsgFunc_ZMBuildMenuUpdate( bf_read &msg )
 	if ( force_open )
 	{
 		//if we weren't visible, this is also an opening message
-		gViewPortInterface->ShowPanel( g_pBuildMenu, true );
+		gViewPortInterface->ShowPanel( pMenu, true );
 	}
 
-	//g_pBuildMenu->SetSpawnIndex( spawnidx );
-	g_pBuildMenu->UpdateQueue( queue );
 
+	pMenu->UpdateQueue( queue );
 }
 
 USER_MESSAGE_REGISTER( ZMBuildMenuUpdate );

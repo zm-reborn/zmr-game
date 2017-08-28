@@ -10,7 +10,7 @@
 #include "iclientmode.h"
 
 
-#include "zmr_manimenu.h"
+#include "zmr_manimenu_new.h"
 #include "zmr/zmr_gamerules.h"
 #include "zmr/zmr_player_shared.h"
 #include "zmr/npcs/c_zmr_zombiebase.h"
@@ -26,7 +26,7 @@
 using namespace vgui;
 
 
-CZMManiMenu::CZMManiMenu( Panel* pParent ) : CZMManiMenuBase( "ZMManiMenu" )
+CZMManiMenuNew::CZMManiMenuNew( Panel* pParent ) : CZMManiMenuBase( "ZMManiMenu" )
 {
     SetParent( pParent->GetVPanel() );
 
@@ -34,27 +34,28 @@ CZMManiMenu::CZMManiMenu( Panel* pParent ) : CZMManiMenuBase( "ZMManiMenu" )
     SetTrapIndex( 0 );
 
 
+    SetPaintBackgroundEnabled( false );
     SetSizeable( false );
     SetKeyBoardInputEnabled( false );
     SetMouseInputEnabled( true );
     SetProportional( false );
-    SetMoveable( true );
+    SetMoveable( false );
 
 
 	SetScheme( vgui::scheme()->LoadSchemeFromFile( "resource/ZombieMaster.res", "ZombieMaster" ) );
 
-	LoadControlSettings( "resource/ui/zmmanimenu.res" );
+	LoadControlSettings( "resource/ui/zmmanimenunew.res" );
 
 
     vgui::ivgui()->AddTickSignal( GetVPanel(), 150 );
 }
 
-CZMManiMenu::~CZMManiMenu()
+CZMManiMenuNew::~CZMManiMenuNew()
 {
 
 }
 
-void CZMManiMenu::ShowPanel( bool state )
+void CZMManiMenuNew::ShowPanel( bool state )
 {
     if ( IsVisible() == state ) return;
 
@@ -62,7 +63,7 @@ void CZMManiMenu::ShowPanel( bool state )
     SetVisible( state );
 }
 
-void CZMManiMenu::SetDescription( const char* desc )
+void CZMManiMenuNew::SetDescription( const char* desc )
 {
     Label* entry = dynamic_cast<Label*>( FindChildByName( "Description" ) );
     
@@ -72,7 +73,7 @@ void CZMManiMenu::SetDescription( const char* desc )
     }
 }
 
-void CZMManiMenu::SetCost( int cost )
+void CZMManiMenuNew::SetCost( int cost )
 {
     char buffer[128];
     Q_snprintf( buffer, sizeof( buffer ), "Activate for %i.",  cost );
@@ -87,7 +88,7 @@ void CZMManiMenu::SetCost( int cost )
     m_nCost = cost;
 }
 
-void CZMManiMenu::SetTrapCost( int cost )
+void CZMManiMenuNew::SetTrapCost( int cost )
 {
     char buffer[128];
 
@@ -112,7 +113,16 @@ void CZMManiMenu::SetTrapCost( int cost )
     m_nTrapCost = cost;
 }
 
-void CZMManiMenu::OnThink()
+void CZMManiMenuNew::ShowMenu( C_ZMEntManipulate* pMani )
+{
+    SetWorldPos( pMani->GetAbsOrigin() );
+    SetOffset( GetWide() / 2.0f, GetTall() - GetTall() / 3.0f );
+    SetLimits( 50, 30, GetWide() - 50, GetTall() - 15 );
+
+    BaseClass::ShowMenu( pMani );
+}
+
+void CZMManiMenuNew::OnThink()
 {
 	if ( !IsVisible() ) return;
 
@@ -129,4 +139,11 @@ void CZMManiMenu::OnThink()
 
     SetControlEnabled( "Activate", ( pPlayer->GetResources() >= m_nCost ) );
     SetControlEnabled( "Trap", ( m_nTrapCost > 0 && pPlayer->GetResources() >= m_nTrapCost ) );
+
+
+    int x, y;
+    GetPos( x, y );
+    GetScreenPos( x, y );
+
+    SetPos( x, y );
 }
