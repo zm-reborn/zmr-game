@@ -8,7 +8,7 @@
 #include "zmr/c_zmr_player.h"
 #include "zmr/zmr_gamerules.h"
 #include "zmr/npcs/c_zmr_zombiebase.h"
-#include "zmr/zmr_global_shared.h"
+#include "zmr/zmr_util.h"
 
 
 using namespace vgui;
@@ -130,24 +130,11 @@ void CZMResourceHud::OnThink()
     if ( !IsVisible() ) return;
 
 
-    m_nSelected = 0;
 
     C_ZMRules* pRules = ZMRules();
-    if ( pRules )
-    {
-        int myindex = pPlayer->entindex();
 
-        for ( int i = 0; i < g_pZombies->Count(); i++ )
-        {
-            if ( g_pZombies->Element( i )->GetSelectorIndex() == myindex )
-            {
-                ++m_nSelected;
-            }
-        }
-    }
-
-
-    m_nPopCount = pRules->GetZombiePop();
+    m_nSelected = ZMClientUtil::GetSelectedZombieCount();
+    m_nPopCount = pRules ? pRules->GetZombiePop() : 0;
     m_nPopMax = zm_sv_zombiemax.GetInt();
 
     int newres = pPlayer->GetResources();
