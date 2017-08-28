@@ -90,7 +90,7 @@ public:
 
     
     // Player commanded means the zombie will ignore new enemies for a short period of time.
-    virtual void Command( const Vector&, bool bPlayerCommanded = true );
+    virtual void Command( const Vector&, bool bPlayerCommanded = true, float tolerance = 0.0f );
     virtual bool Swat( CBaseEntity*, bool );
     void SwatObject( IPhysicsObject*, Vector& );
     virtual bool TargetEnemy( CBaseEntity* );
@@ -116,6 +116,8 @@ public:
     inline const Vector& GetLastCommandedPos() { return m_vecLastCommandPos; };
     inline ZombieMode_t GetZombieMode() { return m_iMode; };
     void SetZombieMode( ZombieMode_t mode );
+
+    inline void SetAddGoalTolerance( float tolerance ) { m_flAddGoalTolerance = tolerance; };
 private:
     ZombieClass_t m_iZombieClass;
     ZombieMode_t m_iMode;
@@ -126,6 +128,7 @@ private:
     bool m_bCommanded;
 
     bool m_bSwatBreakable;
+    float m_flAddGoalTolerance;
     
 protected:
     inline void SetZombieClass( ZombieClass_t zclass ) { m_iZombieClass = zclass; };

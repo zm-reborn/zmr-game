@@ -50,6 +50,7 @@ CZMBaseZombie::CZMBaseZombie()
     m_flLastCommand = 0.0f;
     m_iSelectorIndex = 0;
     m_flHealthRatio = 1.0f;
+    m_flAddGoalTolerance = 0.0f;
 }
 
 CZMBaseZombie::~CZMBaseZombie()
@@ -277,6 +278,11 @@ void CZMBaseZombie::StartTask( const Task_t* pTask )
 
     case TASK_ZM_DEFEND_PATH_TO_DEFPOS :
         GetNavigator()->SetGoal( AI_NavGoal_t( m_vecLastCommandPos ) );
+        break;
+
+    case TASK_ZM_SET_TOLERANCE_DISTANCE :
+        GetNavigator()->SetGoalTolerance( pTask->flTaskData + m_flAddGoalTolerance );
+        TaskComplete();
         break;
 
     case TASK_ZOMBIE_GET_PATH_TO_PHYSOBJ :
@@ -879,7 +885,7 @@ void CZMBaseZombie::SetZombieMode( ZombieMode_t mode )
     m_iMode = mode;
 }
 
-void CZMBaseZombie::Command( const Vector& pos, bool bPlayerCommanded )
+void CZMBaseZombie::Command( const Vector& pos, bool bPlayerCommanded, float tolerance )
 {
     m_vecLastPosition = pos;
 
@@ -912,6 +918,7 @@ void CZMBaseZombie::Command( const Vector& pos, bool bPlayerCommanded )
     m_flLastCommand = gpGlobals->curtime;
     m_vecLastCommandPos = pos;
     m_bCommanded = true;
+    m_flAddGoalTolerance = tolerance;
 }
 
 bool CZMBaseZombie::Swat( CBaseEntity* pTarget, bool bBreakable )
@@ -959,6 +966,7 @@ bool CZMBaseZombie::CanSpawn( const Vector& pos )
 AI_BEGIN_CUSTOM_NPC( zmbase_zombie, CZMBaseZombie )
     
     DECLARE_TASK( TASK_ZM_DEFEND_PATH_TO_DEFPOS );
+    DECLARE_TASK( TASK_ZM_SET_TOLERANCE_DISTANCE );
     
     DECLARE_CONDITION( COND_ZM_SEE_ENEMY ) // Used to interrupt ZM command.
 
@@ -1029,7 +1037,7 @@ AI_BEGIN_CUSTOM_NPC( zmbase_zombie, CZMBaseZombie )
 	    SCHED_ZM_FORCED_GO, // Used by ZM to command a zombie. Will ignore enemies for a while.
 
 	    "	Tasks"
-	    "		TASK_SET_TOLERANCE_DISTANCE		48"
+	    "		TASK_ZM_SET_TOLERANCE_DISTANCE  48"
 	    "		TASK_SET_ROUTE_SEARCH_TIME		3"
 	    "		TASK_GET_PATH_TO_LASTPOSITION	0"
 	    "		TASK_WALK_PATH					0"

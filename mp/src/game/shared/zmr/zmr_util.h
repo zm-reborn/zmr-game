@@ -4,9 +4,10 @@
 #include "cbase.h"
 
 
+#ifdef CLIENT_DLL
 namespace ZMClientUtil
 {
-#ifdef CLIENT_DLL
     bool WorldToScreen( const Vector& world, Vector& screen, int& x, int& y );
-#endif
+    int GetSelectedZombieCount();
 };
+#endif

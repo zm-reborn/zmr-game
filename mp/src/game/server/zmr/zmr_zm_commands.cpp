@@ -34,6 +34,9 @@ void ZM_Cmd_Move( const CCommand &args )
     pos.z = atof( args.Arg( 3 ) );
     
 
+    float tolerance = atof( args.Arg( 4 ) );
+
+
     CZMBaseZombie* pZombie;
 
     for ( int i = 0; i < g_pZombies->Count(); i++ )
@@ -42,7 +45,7 @@ void ZM_Cmd_Move( const CCommand &args )
 
         if ( pZombie && pZombie->GetSelector() == pPlayer )
         {
-            pZombie->Command( pos, true );
+            pZombie->Command( pos, true, tolerance );
         }
     }
 }

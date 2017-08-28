@@ -4,6 +4,7 @@
 #include "view_scene.h"
 #endif
 
+#include "zmr/zmr_global_shared.h"
 #include "zmr_util.h"
 
 #ifdef CLIENT_DLL
@@ -22,5 +23,25 @@ bool ZMClientUtil::WorldToScreen( const Vector& pos, Vector& screen, int& x, int
     }
 
     return !behind ? true : false;
+}
+
+int ZMClientUtil::GetSelectedZombieCount()
+{
+    int myindex = GetLocalPlayerIndex();
+
+    if ( !myindex ) return 0;
+
+
+    int num = 0;
+
+    for ( int i = 0; i < g_pZombies->Count(); i++ )
+    {
+        if ( g_pZombies->Element( i )->GetSelectorIndex() == myindex )
+        {
+            ++num;
+        }
+    }
+
+    return num;
 }
 #endif
