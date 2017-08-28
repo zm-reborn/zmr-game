@@ -587,6 +587,8 @@ int CZMZombie::SelectFailSchedule( int failedSchedule, int failedTask, AI_TaskFa
 		m_hBlockingDoor = NULL;
 	}
 
+    // We don't need this stuff...
+    /*
 	if ( failedSchedule != SCHED_ZOMBIE_CHARGE_ENEMY && 
 		 IsPathTaskFailure( taskFailCode ) &&
 		 random->RandomInt( 1, 100 ) < 50 )
@@ -600,7 +602,7 @@ int CZMZombie::SelectFailSchedule( int failedSchedule, int failedTask, AI_TaskFa
 	{
 		return SCHED_ZOMBIE_WANDER_ANGRILY;
 	}
-
+    */
 	return BaseClass::SelectFailSchedule( failedSchedule, failedTask, taskFailCode );
 }
 
