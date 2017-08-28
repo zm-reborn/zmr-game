@@ -79,7 +79,6 @@ CZMBuildMenu::CZMBuildMenu( Panel* pParent ) : Frame( g_pClientMode->GetViewport
     SetParent( pParent->GetVPanel() );
 
 
-    // NOTE: You have to set these before invalidating layout(?)
     SetSizeable( false );
 	SetProportional( false );
 	SetMoveable( true );
@@ -87,17 +86,9 @@ CZMBuildMenu::CZMBuildMenu( Panel* pParent ) : Frame( g_pClientMode->GetViewport
     SetMouseInputEnabled( true );
 
 
-	scheme = vgui::scheme()->LoadSchemeFromFile( "resource/ZombieMaster.res", "ZombieMaster" );
-	SetScheme( scheme );
-
-
-	m_hLargeFont = vgui::scheme()->GetIScheme( scheme )->GetFont( "Trebuchet18", true );
-	m_hMediumFont = vgui::scheme()->GetIScheme( scheme )->GetFont( "Trebuchet16", true );
-
-	
-
+	SetScheme( vgui::scheme()->LoadSchemeFromFile( "resource/ZombieMaster.res", "ZombieMaster" ) );
 	LoadControlSettings( "resource/ui/zmbuildmenu.res" );
-    InvalidateLayout();
+
 
 	vgui::ivgui()->AddTickSignal( GetVPanel(), 150 );
 
