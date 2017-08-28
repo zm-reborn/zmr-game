@@ -12,6 +12,7 @@
 #include "zmr_options.h"
 
 
+extern ConVar zm_cl_usenewmenus;
 extern ConVar zm_cl_poweruser;
 extern ConVar zm_cl_poweruser_boxselect;
 
@@ -57,6 +58,7 @@ protected:
     CZMModelPanel* m_pModelPanel;
     ComboBox* m_pModelCombo;
     ComboBox* m_pPartBox;
+    CheckButton* m_pCheck_NewMenus;
     CheckButton* m_pCheck_PowerUser;
     CheckButton* m_pCheck_BoxPowerUser;
     Slider* m_pSlider_Pitch;
@@ -123,6 +125,7 @@ CZMOptionsMenu::CZMOptionsMenu( VPANEL parent ) : BaseClass( nullptr, "ZMOptions
     LoadControlSettings( "resource/ui/zmoptions.res" );
 
     LoadItem( &m_pPartBox, "part_type" );
+    LoadItem( &m_pCheck_NewMenus, "check_newmenus" );
     LoadItem( &m_pCheck_PowerUser, "check_poweruser" );
     LoadItem( &m_pCheck_BoxPowerUser, "check_poweruser_box" );
     LoadItem( &m_pSlider_Yaw, "scrollhor_slider" );
@@ -246,6 +249,7 @@ void CZMOptionsMenu::UpdateMenu()
     m_pPartBox->ActivateItem( part );
 
 
+    m_pCheck_NewMenus->SetSelected( zm_cl_usenewmenus.GetBool() );
     m_pCheck_PowerUser->SetSelected( zm_cl_poweruser.GetBool() );
     m_pCheck_BoxPowerUser->SetSelected( zm_cl_poweruser_boxselect.GetBool() );
 
@@ -283,8 +287,10 @@ void CZMOptionsMenu::ApplySettings()
 
     C_ZMPlayer::SetLocalParticipation( (Participation_t)m_pPartBox->GetActiveItem() );
 
-    zm_cl_poweruser.SetValue( m_pCheck_PowerUser->IsSelected() ? 1 : 0 );
 
+    zm_cl_usenewmenus.SetValue( m_pCheck_NewMenus->IsSelected() ? 1 : 0 );
+
+    zm_cl_poweruser.SetValue( m_pCheck_PowerUser->IsSelected() ? 1 : 0 );
     zm_cl_poweruser_boxselect.SetValue( m_pCheck_BoxPowerUser->IsSelected() ? 1 : 0 );
 
 
