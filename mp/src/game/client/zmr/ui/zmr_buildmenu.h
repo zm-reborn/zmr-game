@@ -11,6 +11,7 @@
 #include <game/client/iviewport.h>
 
 
+#include "zmr/c_zmr_entities.h"
 #include "zmr/zmr_shareddefs.h"
 
 
@@ -46,6 +47,13 @@ public:
 
     void OnCommand( const char *command ) OVERRIDE;
 
+
+    virtual void ShowMenu( C_ZMEntZombieSpawn* pSpawn )
+    {
+        SetSpawnIndex( pSpawn->entindex() );
+        SetZombieFlags( pSpawn->GetZombieFlags() );
+        ShowPanel( true );
+    }
 
     inline int GetLastSpawnIndex() { return m_iLastSpawnIndex; };
     inline int GetSpawnIndex() { return m_iSpawnIndex; };
@@ -107,5 +115,3 @@ protected:
 	vgui::Button	*removelast;
 	vgui::Button	*clearqueue;
 };
-
-extern CZMBuildMenu* g_pBuildMenu;
