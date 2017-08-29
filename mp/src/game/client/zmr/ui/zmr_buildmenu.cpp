@@ -382,7 +382,7 @@ void CZMBuildMenu::OnClose()
 //--------------------------------------------------------------
 void __MsgFunc_ZMBuildMenuUpdate( bf_read &msg )
 {
-    if ( !g_pZMView || g_pZMView->GetBuildMenu() ) return;
+    if ( !g_pZMView || !g_pZMView->GetBuildMenu() ) return;
 
 
     CZMBuildMenu* pMenu = g_pZMView->GetBuildMenu();
