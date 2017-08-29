@@ -15,7 +15,7 @@
 
 #define ZOMBIE_MAX_PHYSOBJ_MASS         200
 
-#define ZOMBIE_PLAYER_MAX_SWAT_DIST     1000
+#define ZOMBIE_PLAYER_MAX_SWAT_DIST     512.0f
 
 #define ZOMBIE_PHYSICS_SEARCH_DEPTH     32
 #define ZOMBIE_FARTHEST_PHYSICS_OBJECT  128
@@ -646,8 +646,17 @@ bool CZMBaseZombie::FindNearestPhysicsObject( int iMaxMass )
     vecDirToGoal.z = 0;
     VectorNormalize( vecDirToGoal );
 
+    Vector vecDirToWaypoint = GetNavigator()->GetCurWaypointPos() - GetAbsOrigin();
+    vecDirToWaypoint.z = 0;
+    VectorNormalize( vecDirToWaypoint );
 
-    if( vecDirToGoal.Length2D() > ZOMBIE_PLAYER_MAX_SWAT_DIST )
+
+    // Don't bother swatting if we have to go the other way!
+    if ( DotProduct( vecDirToGoal, vecDirToWaypoint ) < -0.1f )
+        return false;
+
+
+    if( GetAbsOrigin().DistTo( vecTarget ) > ZOMBIE_PLAYER_MAX_SWAT_DIST )
     {
         return false;
     }
