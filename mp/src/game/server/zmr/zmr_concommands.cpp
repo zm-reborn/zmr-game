@@ -174,7 +174,14 @@ void ZM_ForceTeam( const CCommand &args )
 {
     CZMPlayer* pPlayer = ToZMPlayer( UTIL_GetCommandClient() );
 
-    if ( !pPlayer ) return;
+
+    if ( !UTIL_IsCommandIssuedByServerAdmin() )
+    {
+        if ( !pPlayer ) return;
+
+        if ( !sv_cheats->GetBool() ) return;
+    }
+    
     
     if ( args.ArgC() < 2 ) return;
 
@@ -215,4 +222,57 @@ void ZM_ForceTeam( const CCommand &args )
     pTarget->Spawn();
 }
 
-static ConCommand zm_forceteam( "zm_forceteam", ZM_ForceTeam, "Usage: zm_forceteam <name (optional)> <number> | 1 = Spec, 2 = Human, 3 = ZM", FCVAR_CHEAT );
+static ConCommand zm_forceteam( "zm_forceteam", ZM_ForceTeam, "Usage: zm_forceteam <number> <name (optional)> | 1 = Spec, 2 = Human, 3 = ZM" );
+
+/*
+    Set health (debugging)
+*/
+void ZM_SetHealth( const CCommand &args )
+{
+    CZMPlayer* pPlayer = ToZMPlayer( UTIL_GetCommandClient() );
+
+    if ( !UTIL_IsCommandIssuedByServerAdmin() )
+    {
+        if ( !pPlayer ) return;
+
+        if ( !sv_cheats->GetBool() ) return;
+    }
+    
+
+    if ( args.ArgC() < 2 ) return;
+
+
+    int health = atoi( args.Arg( 1 ) );
+
+    CZMPlayer* pTarget = nullptr;
+
+    if ( args.ArgC() < 3 )
+    {
+        pTarget = pPlayer;
+    }
+    else
+    {
+        const char* name = args.Arg( 2 );
+        int len = strlen( name );
+
+        CZMPlayer* pPlayer;
+        for ( int i = 1; i <= gpGlobals->maxClients; i++ )
+        {
+            pPlayer = ToZMPlayer( UTIL_PlayerByIndex( i ) );
+
+            if ( pPlayer && Q_strnicmp( name, pPlayer->GetPlayerName(), len ) == 0 )
+            {
+                pTarget = pPlayer;
+                break;
+            }
+        }
+    }
+
+
+    if ( !pTarget ) return;
+
+
+    pTarget->SetHealth( health );
+}
+
+static ConCommand zm_sethealth( "zm_sethealth", ZM_SetHealth, "Usage: zm_sethealth <number> <name (optional)>" );
