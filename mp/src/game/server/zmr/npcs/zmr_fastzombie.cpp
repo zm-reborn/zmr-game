@@ -1397,6 +1397,11 @@ void CFastZombie::LeapAttackTouch( CBaseEntity *pOther )
         return;
     }
 
+    // ZMRCHANGE: Don't bother with weapons/ammo.
+    if ( pOther->GetCollisionGroup() == COLLISION_GROUP_WEAPON )
+        return;
+
+
     // Stop the zombie and knock the player back
     Vector vecNewVelocity( 0, 0, GetAbsVelocity().z );
     SetAbsVelocity( vecNewVelocity );
