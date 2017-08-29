@@ -2792,7 +2792,7 @@ AI_BEGIN_CUSTOM_NPC( base_zombie, CNPC_BaseZombie )
 		"		COND_ENEMY_DEAD"
 		"		COND_NEW_ENEMY"
 	)
-#endif
+	
 	//=========================================================
 	//=========================================================
 	DEFINE_SCHEDULE
@@ -3017,7 +3017,7 @@ AI_BEGIN_CUSTOM_NPC( base_zombie, CNPC_BaseZombie )
 	DEFINE_SCHEDULE
 	(
 		SCHED_ZOMBIE_POST_MELEE_WAIT,
-
+#endif
 		"	Tasks"
 		"		TASK_ZOMBIE_WAIT_POST_MELEE		0"
 	)

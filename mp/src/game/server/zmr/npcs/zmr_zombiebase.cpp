@@ -1025,6 +1025,32 @@ AI_BEGIN_CUSTOM_NPC( zmbase_zombie, CZMBaseZombie )
 
     DEFINE_SCHEDULE
     (
+        SCHED_ZOMBIE_CHASE_ENEMY,
+
+        "	Tasks"
+        "		 TASK_SET_FAIL_SCHEDULE			SCHEDULE:SCHED_CHASE_ENEMY_FAILED"
+        "		 TASK_SET_TOLERANCE_DISTANCE	24"
+        "		 TASK_GET_CHASE_PATH_TO_ENEMY	600"
+        "		 TASK_RUN_PATH					0"
+        "		 TASK_WAIT_FOR_MOVEMENT			0"
+        "		 TASK_FACE_ENEMY				0"
+        "	"
+        "	Interrupts"
+        "		COND_NEW_ENEMY"
+        "		COND_ENEMY_DEAD"
+        "		COND_ENEMY_UNREACHABLE"
+        "		COND_CAN_RANGE_ATTACK1"
+        "		COND_CAN_MELEE_ATTACK1"
+        "		COND_CAN_RANGE_ATTACK2"
+        "		COND_CAN_MELEE_ATTACK2"
+        "		COND_TOO_CLOSE_TO_ATTACK"
+        "		COND_TASK_FAILED"
+        "		COND_ZOMBIE_CAN_SWAT_ATTACK"
+        "		COND_ZOMBIE_RELEASECRAB"
+    )
+
+    DEFINE_SCHEDULE
+    (
         SCHED_ZOMBIE_MOVE_SWATITEM,
 
         "	Tasks"
@@ -1059,6 +1085,151 @@ AI_BEGIN_CUSTOM_NPC( zmbase_zombie, CZMBaseZombie )
         "		COND_ZM_DEFEND_ENEMY_TOOFAR" // ZMRCHANGE
         "		COND_ENEMY_DEAD"
         "		COND_NEW_ENEMY"
+    )
+
+    DEFINE_SCHEDULE
+    (
+        SCHED_ZOMBIE_ATTACKITEM,
+
+        "	Tasks"
+        "		TASK_FACE_ENEMY					0"
+        "		TASK_MELEE_ATTACK1				0"
+        "	"
+        "	Interrupts"
+        "		COND_ZOMBIE_RELEASECRAB"
+        "		COND_ENEMY_DEAD"
+        "		COND_NEW_ENEMY"
+    )
+
+    DEFINE_SCHEDULE
+    (
+        SCHED_ZOMBIE_RELEASECRAB,
+
+        "	Tasks"
+        "		TASK_PLAY_PRIVATE_SEQUENCE_FACE_ENEMY		ACTIVITY:ACT_ZOM_RELEASECRAB"
+        "		TASK_ZOMBIE_RELEASE_HEADCRAB				0"
+        "		TASK_ZOMBIE_DIE								0"
+        "	"
+        "	Interrupts"
+        "		COND_TASK_FAILED"
+    )
+
+    DEFINE_SCHEDULE
+    (
+        SCHED_ZOMBIE_MOVE_TO_AMBUSH,
+
+        "	Tasks"
+        "		TASK_WAIT						1.0" // don't react as soon as you see the player.
+        "		TASK_FIND_COVER_FROM_ENEMY		0"
+        "		TASK_WALK_PATH					0"
+        "		TASK_WAIT_FOR_MOVEMENT			0"
+        "		TASK_STOP_MOVING				0"
+        "		TASK_TURN_LEFT					180"
+        "		TASK_SET_SCHEDULE				SCHEDULE:SCHED_ZOMBIE_WAIT_AMBUSH"
+        "	"
+        "	Interrupts"
+        "		COND_TASK_FAILED"
+        "		COND_NEW_ENEMY"
+    )
+
+    DEFINE_SCHEDULE
+    (
+        SCHED_ZOMBIE_WAIT_AMBUSH,
+
+        "	Tasks"
+        "		TASK_WAIT_FACE_ENEMY	99999"
+        "	"
+        "	Interrupts"
+        "		COND_NEW_ENEMY"
+        "		COND_SEE_ENEMY"
+    )
+
+    DEFINE_SCHEDULE
+    (
+        SCHED_ZOMBIE_WANDER_MEDIUM,
+
+        "	Tasks"
+        "		TASK_STOP_MOVING				0"
+        "		TASK_WANDER						480384" // 4 feet to 32 feet
+        "		TASK_WALK_PATH					0"
+        "		TASK_WAIT_FOR_MOVEMENT			0"
+        "		TASK_STOP_MOVING				0"
+        "		TASK_WAIT_PVS					0" // if the player left my PVS, just wait.
+        "		TASK_SET_SCHEDULE				SCHEDULE:SCHED_ZOMBIE_WANDER_MEDIUM" // keep doing it
+        "	"
+        "	Interrupts"
+        "		COND_NEW_ENEMY"
+        "		COND_SEE_ENEMY"
+        "		COND_LIGHT_DAMAGE"
+        "		COND_HEAVY_DAMAGE"
+    )
+
+    DEFINE_SCHEDULE
+    (
+        SCHED_ZOMBIE_WANDER_FAIL,
+
+        "	Tasks"
+        "		TASK_STOP_MOVING		0"
+        "		TASK_WAIT				1"
+        "		TASK_SET_SCHEDULE		SCHEDULE:SCHED_ZOMBIE_WANDER_MEDIUM"
+        "	Interrupts"
+        "		COND_NEW_ENEMY"
+        "		COND_LIGHT_DAMAGE"
+        "		COND_HEAVY_DAMAGE"
+        "		COND_ENEMY_DEAD"
+        "		COND_CAN_RANGE_ATTACK1"
+        "		COND_CAN_MELEE_ATTACK1"
+        "		COND_CAN_RANGE_ATTACK2"
+        "		COND_CAN_MELEE_ATTACK2"
+        "		COND_ZOMBIE_RELEASECRAB"
+    )
+
+    DEFINE_SCHEDULE
+    (
+        SCHED_ZOMBIE_WANDER_STANDOFF,
+
+        "	Tasks"
+        "		TASK_STOP_MOVING				0"
+        "		TASK_WANDER						480384" // 4 feet to 32 feet
+        "		TASK_WALK_PATH					0"
+        "		TASK_WAIT_FOR_MOVEMENT			0"
+        "		TASK_STOP_MOVING				0"
+        "		TASK_WAIT_PVS					0" // if the player left my PVS, just wait.
+        "	"
+        "	Interrupts"
+        "		COND_NEW_ENEMY"
+        "		COND_LIGHT_DAMAGE"
+        "		COND_HEAVY_DAMAGE"
+        "		COND_ENEMY_DEAD"
+        "		COND_CAN_RANGE_ATTACK1"
+        "		COND_CAN_MELEE_ATTACK1"
+        "		COND_CAN_RANGE_ATTACK2"
+        "		COND_CAN_MELEE_ATTACK2"
+        "		COND_ZOMBIE_RELEASECRAB"
+    )
+
+    DEFINE_SCHEDULE
+    (
+        SCHED_ZOMBIE_MELEE_ATTACK1,
+
+        "	Tasks"
+        "		TASK_STOP_MOVING		0"
+        "		TASK_FACE_ENEMY			0"
+        "		TASK_ANNOUNCE_ATTACK	1"	// 1 = primary attack
+        "		TASK_MELEE_ATTACK1		0"
+        "		TASK_SET_SCHEDULE		SCHEDULE:SCHED_ZOMBIE_POST_MELEE_WAIT"
+        ""
+        "	Interrupts"
+        "		COND_LIGHT_DAMAGE"
+        "		COND_HEAVY_DAMAGE"
+    )
+
+    DEFINE_SCHEDULE
+    (
+        SCHED_ZOMBIE_POST_MELEE_WAIT,
+
+        "	Tasks"
+        "		TASK_ZOMBIE_WAIT_POST_MELEE		0"
     )
 
     DEFINE_SCHEDULE
