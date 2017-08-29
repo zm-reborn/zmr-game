@@ -520,8 +520,34 @@ int CZMBaseZombie::SelectSchedule( void )
     return CAI_BaseNPC::SelectSchedule();
 }
 
+int CZMBaseZombie::SelectFailSchedule( int failedSched, int failedTask, AI_TaskFailureCode_t failCode )
+{
+    // Keep trying!
+    if ( ShouldTryScheduleAgain( failedSched, failedTask, failCode ) )
+    {
+        //ClearCondition( COND_ZM_FAILED_GOAL );
+        return failedSched;
+    }
+    else
+    {
+        //SetCondition( COND_ZM_FAILED_GOAL );
+    }
+
+    return CAI_BaseNPC::SelectFailSchedule( failedSched, failedTask, failCode );
+}
+
 bool CZMBaseZombie::OnInsufficientStopDist( AILocalMoveGoal_t* pMoveGoal, float distClear, AIMoveResult_t* pResult )
 {
+    /*
+    if ( pMoveGoal->directTrace.fStatus == AIMR_BLOCKED_NPC )
+    {
+        CAI_BaseNPC* pNPC = pMoveGoal->directTrace.pObstruction ? pMoveGoal->directTrace.pObstruction->MyNPCPointer() : nullptr;
+
+
+        return ( pNPC && pNPC->IsMoving() );
+    }
+    */
+
     if ( !CanSwatPhysicsObjects() ) return false;
 
 
@@ -962,6 +988,28 @@ bool CZMBaseZombie::CanSpawn( const Vector& pos )
     return trace.fraction == 1.0f;
 }
 
+bool CZMBaseZombie::ShouldTryScheduleAgain( int failedSched, int failedTask, AI_TaskFailureCode_t failCode )
+{
+    // We can't build path to position, definitely don't want to try again.
+    if ( failedTask == TASK_GET_PATH_TO_LASTPOSITION )
+        return false;
+
+    // If we have been commanded (incl. rally points), keep trying.
+    switch ( failedSched )
+    {
+    case SCHED_ZM_FORCED_GO :
+    case SCHED_ZM_GO :
+        if ( IsPathTaskFailure( failCode ) || failedTask == TASK_WAIT_FOR_MOVEMENT )
+        {
+            if ( m_vecLastCommandPos.DistToSqr( GetAbsOrigin() ) > max( 48.0f * 48.0f, Square( m_flAddGoalTolerance ) ) )
+                return true;
+        }
+        break;
+    default : break;
+    }
+
+    return false;
+}
 
 AI_BEGIN_CUSTOM_NPC( zmbase_zombie, CZMBaseZombie )
     
@@ -972,6 +1020,7 @@ AI_BEGIN_CUSTOM_NPC( zmbase_zombie, CZMBaseZombie )
 
     DECLARE_CONDITION( COND_ZM_DEFEND_ENEMY_CLOSE )
     DECLARE_CONDITION( COND_ZM_DEFEND_ENEMY_TOOFAR )
+    //DECLARE_CONDITION( COND_ZM_FAILED_GOAL )
     
 
     DEFINE_SCHEDULE
