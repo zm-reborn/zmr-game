@@ -70,6 +70,7 @@ public:
     virtual void GatherConditions( void ) OVERRIDE;
     virtual int TranslateSchedule( int ) OVERRIDE;
     virtual int SelectSchedule( void ) OVERRIDE;
+    virtual int SelectFailSchedule( int, int, AI_TaskFailureCode_t ) OVERRIDE;
     virtual bool OnInsufficientStopDist( AILocalMoveGoal_t*, float, AIMoveResult_t* ) OVERRIDE;
 
     // By default don't swat objects.
@@ -118,6 +119,7 @@ public:
     void SetZombieMode( ZombieMode_t mode );
 
     inline void SetAddGoalTolerance( float tolerance ) { m_flAddGoalTolerance = tolerance; };
+    bool ShouldTryScheduleAgain( int failedSched, int failedTask, AI_TaskFailureCode_t );
 private:
     ZombieClass_t m_iZombieClass;
     ZombieMode_t m_iMode;
