@@ -276,7 +276,7 @@ void CZMZombie::Spawn( void )
 	Precache();
 
 	m_iHealth			= zm_sk_shambler_health.GetFloat();
-	m_flFieldOfView		= 0.5f; // 0.2f
+	m_flFieldOfView		= 0.1f;
 
 	CapabilitiesClear();
 

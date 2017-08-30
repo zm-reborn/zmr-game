@@ -184,7 +184,7 @@ void CNPC_DragZombie::Spawn( void )
 
     SetBloodColor( BLOOD_COLOR_RED );
     m_iHealth = zm_sk_dragzombie_health.GetFloat();
-    m_flFieldOfView = 0.2;
+    m_flFieldOfView = 0.1f;
 
     CapabilitiesClear();
     CapabilitiesAdd( bits_CAP_MOVE_GROUND | bits_CAP_INNATE_MELEE_ATTACK1 );
