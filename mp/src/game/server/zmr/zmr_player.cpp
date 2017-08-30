@@ -118,8 +118,8 @@ void CZMPlayer::Precache( void )
 
 extern ConVar zm_sv_antiafk_punish;
 
-ConVar zm_sv_flashlightdrainrate( "zm_sv_flashlightdrainrate", "0.15", 0, "How fast the flashlight battery drains per second. (out of 100)" );
-ConVar zm_sv_flashlightrechargerate( "zm_sv_flashlightrechargerate", "0", 0, "How fast the flashlight battery recharges per second. (out of 100)" );
+ConVar zm_sv_flashlightdrainrate( "zm_sv_flashlightdrainrate", "0.4", 0, "How fast the flashlight battery drains per second. (out of 100)" );
+ConVar zm_sv_flashlightrechargerate( "zm_sv_flashlightrechargerate", "0.1", 0, "How fast the flashlight battery recharges per second. (out of 100)" );
 
 void CZMPlayer::PreThink( void )
 {
