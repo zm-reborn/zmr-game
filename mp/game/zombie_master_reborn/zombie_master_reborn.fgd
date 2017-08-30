@@ -110,7 +110,7 @@
 	output OnNPCPickup(void) : "Fires when an NPC picks up this weapon"
 ]
 
-@PointClass base(Weapon) studio("models/Weapons/shotgun_zm_3rd.mdl") = weapon_zm_shotgun : "Shotgun" []
+@PointClass base(Weapon) studio("models/Weapons/w_shotgun_zm.mdl") = weapon_zm_shotgun : "Shotgun" []
 @PointClass base(Weapon) studio("models/weapons/w_crowbar.mdl") = weapon_zm_improvised : "Improvised weapon" []
 @PointClass base(Weapon) studio("models/weapons/pistol3rd_zm.mdl") = weapon_zm_pistol : "Pistol" []
 @PointClass base(Weapon) studio("models/weapons/rifle_zm_3rd.mdl") = weapon_zm_rifle : "Rifle" []
