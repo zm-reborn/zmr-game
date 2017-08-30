@@ -246,6 +246,10 @@ void CZMPlayer::SetTeamSpecificProps()
 		    State_Transition( STATE_OBSERVER_MODE );
         }
 
+
+        if ( FlashlightIsOn() )
+            FlashlightTurnOff();
+
         break;
     default : break;
     }
