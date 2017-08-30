@@ -283,7 +283,7 @@ void CNPC_PoisonZombie::Spawn( void )
 #endif // HL2_EPISODIC
 
 	m_iHealth = zm_sk_hulk_health.GetFloat();
-	m_flFieldOfView = 0.2;
+	m_flFieldOfView = 0.1f;
 
 	CapabilitiesClear();
 	CapabilitiesAdd( bits_CAP_MOVE_GROUND | bits_CAP_INNATE_MELEE_ATTACK1/* | bits_CAP_INNATE_RANGE_ATTACK1 | bits_CAP_INNATE_RANGE_ATTACK2*/ );

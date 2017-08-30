@@ -551,7 +551,7 @@ void CFastZombie::Spawn( void )
 
     SetBloodColor( BLOOD_COLOR_RED );
     m_iHealth			= zm_sk_banshee_health.GetInt();
-    m_flFieldOfView		= 0.2;
+    m_flFieldOfView		= 0.1f;
 
     CapabilitiesClear();
     if (sv_climbing.GetBool() == 1)
