@@ -1045,6 +1045,7 @@ AI_BEGIN_CUSTOM_NPC( zmbase_zombie, CZMBaseZombie )
         "		 TASK_FACE_ENEMY				0"
         "	"
         "	Interrupts"
+        "		COND_ZM_DEFEND_ENEMY_TOOFAR" // ZMRCHANGE
         "		COND_NEW_ENEMY"
         "		COND_ENEMY_DEAD"
         "		COND_ENEMY_UNREACHABLE"
@@ -1055,7 +1056,7 @@ AI_BEGIN_CUSTOM_NPC( zmbase_zombie, CZMBaseZombie )
         "		COND_TOO_CLOSE_TO_ATTACK"
         "		COND_TASK_FAILED"
         "		COND_ZOMBIE_CAN_SWAT_ATTACK"
-        "		COND_ZOMBIE_RELEASECRAB"
+        //"		COND_ZOMBIE_RELEASECRAB"
     )
 
     DEFINE_SCHEDULE
