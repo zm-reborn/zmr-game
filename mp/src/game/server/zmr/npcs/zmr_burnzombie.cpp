@@ -3,7 +3,7 @@
 #include "doors.h"
 
 #include "simtimer.h"
-#include "npc_BaseZombie.h"
+//#include "npc_BaseZombie.h"
 #include "ai_hull.h"
 #include "ai_navigator.h"
 #include "ai_memory.h"
@@ -57,7 +57,7 @@ public:
 	
 	Disposition_t IRelationType( CBaseEntity *pTarget );
 
-	void SetZombieModel( void );
+	virtual void SetZombieModel( void ) OVERRIDE;
 
     // Fix
 	void TraceAttack( const CTakeDamageInfo&, const Vector&, trace_t*, CDmgAccumulator* ) OVERRIDE;
@@ -272,7 +272,7 @@ void CNPC_BurnZombie::Spawn( void )
 
 	BaseClass::Spawn();
 
-	m_flNextMoanSound = gpGlobals->curtime + random->RandomFloat( 1.0, 4.0 );
+	//m_flNextMoanSound = gpGlobals->curtime + random->RandomFloat( 1.0, 4.0 );
 
 	//TGB: make sure we start doing burn damage as soon as we're on fire
 	m_flNextBurnTime = 0.0f;
@@ -530,31 +530,7 @@ void CNPC_BurnZombie::AttackSound( void )
 //---------------------------------------------------------
 void CNPC_BurnZombie::SetZombieModel( void )
 {
-	Hull_t lastHull = GetHullType();
-
 	SetModel("models/zombie/burnzie.mdl");
-
-	SetHullType( HULL_HUMAN );
-
-	SetHullSizeNormal( true );
-	SetDefaultEyeOffset();
-	SetActivity( ACT_IDLE );
-
-	//set random skin, will have no effect if the model doesn't specify more than one (which it doesn't by def.)
-	m_nSkin = random->RandomInt( 0, 3 );
-	
-
-	// hull changed size, notify vphysics
-	// UNDONE: Solve this generally, systematically so other
-	// NPCs can change size
-	if ( lastHull != GetHullType() )
-	{
-		if ( VPhysicsGetObject() )
-		{
-			SetupVPhysicsHull();
-		}
-	}
-
 }
 
 
@@ -820,7 +796,7 @@ void CNPC_BurnZombie::BuildScheduleTestBits( void )
 {
 	BaseClass::BuildScheduleTestBits();
 
-	if( !m_fIsTorso && !IsCurSchedule( SCHED_FLINCH_PHYSICS ) )
+	if( !IsCurSchedule( SCHED_FLINCH_PHYSICS ) )
 	{
 		SetCustomInterruptCondition( COND_PHYSICS_DAMAGE );
 	}

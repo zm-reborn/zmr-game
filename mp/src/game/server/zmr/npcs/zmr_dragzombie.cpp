@@ -107,7 +107,7 @@ public:
     //
     virtual void Spawn( void );
     virtual void Precache( void );
-    virtual void SetZombieModel( void );
+    virtual void SetZombieModel( void ) OVERRIDE;
 
     virtual void Event_Killed( const CTakeDamageInfo &info );
     virtual int OnTakeDamage_Alive( const CTakeDamageInfo &inputInfo );
@@ -180,7 +180,6 @@ void CNPC_DragZombie::Spawn( void )
 {
     Precache();
 
-    m_fIsTorso = m_fIsHeadless = false;
 
     SetBloodColor( BLOOD_COLOR_RED );
     m_iHealth = zm_sk_dragzombie_health.GetFloat();
@@ -377,29 +376,7 @@ float CNPC_DragZombie::MaxYawSpeed( void )
 //-----------------------------------------------------------------------------
 void CNPC_DragZombie::SetZombieModel( void )
 {
-    Hull_t lastHull = GetHullType();
-        SetModel( "models/humans/zm_draggy.mdl" );
-        SetHullType(HULL_HUMAN);
-
-//	SetBodygroup( ZOMBIE_BODYGROUP_HEADCRAB, !m_fIsHeadless );
-
-    SetHullSizeNormal( true );
-    SetDefaultEyeOffset();
-    SetActivity( ACT_IDLE );
-
-    //set random skin, will have no effect if the model doesn't specify more than one (which it doesn't by def.)
-    m_nSkin = random->RandomInt( 0, 3 );
-
-    // hull changed size, notify vphysics
-    // UNDONE: Solve this generally, systematically so other
-    // NPCs can change size
-    if ( lastHull != GetHullType() )
-    {
-        if ( VPhysicsGetObject() )
-        {
-            SetupVPhysicsHull();
-        }
-    }
+    SetModel( "models/humans/zm_draggy.mdl" );
 }
 
 //-----------------------------------------------------------------------------
@@ -868,20 +845,7 @@ void CNPC_DragZombie::AlertSound( void )
 //-----------------------------------------------------------------------------
 void CNPC_DragZombie::FootstepSound( bool fRightFoot )
 {
-/*	if( fRightFoot )
-    {
-        EmitSound( "NPC_DragZombie.FootstepRight" );
-    }
-    else
-    {
-        EmitSound( "NPC_DragZombie.FootstepLeft" );
-    }
-*/
-    if( ShouldPlayFootstepMoan() )
-    {
-        m_flNextMoanSound = gpGlobals->curtime;
-//		MoanSound( envDragZombieMoanVolumeFast, ARRAYSIZE( envDragZombieMoanVolumeFast ) );
-    }
+
 }
 
 //-----------------------------------------------------------------------------

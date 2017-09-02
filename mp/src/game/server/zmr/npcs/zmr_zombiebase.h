@@ -1,7 +1,10 @@
 #pragma once
 
-#include "hl2/npc_BaseZombie.h"
-
+//#include "hl2/npc_BaseZombie.h"
+#include "ai_basenpc.h"
+#include "ai_blended_movement.h"
+#include "ai_behavior_actbusy.h"
+#include "soundenvelope.h"
 
 #include "zmr/zmr_player_shared.h"
 #include "zmr/zmr_shareddefs.h"
@@ -15,25 +18,90 @@
     npc_PoisonZombie.cpp
 */
 
+
+#define ZOMBIE_MELEE_REACH      55
+
+
+extern int AE_ZOMBIE_ATTACK_RIGHT;
+extern int AE_ZOMBIE_ATTACK_LEFT;
+extern int AE_ZOMBIE_ATTACK_BOTH;
+extern int AE_ZOMBIE_SWATITEM;
+extern int AE_ZOMBIE_STARTSWAT;
+extern int AE_ZOMBIE_STEP_LEFT;
+extern int AE_ZOMBIE_STEP_RIGHT;
+extern int AE_ZOMBIE_SCUFF_LEFT;
+extern int AE_ZOMBIE_SCUFF_RIGHT;
+extern int AE_ZOMBIE_ATTACK_SCREAM;
+extern int AE_ZOMBIE_GET_UP;
+extern int AE_ZOMBIE_POUND;
+
+
+// Pass these to claw attack so we know where to draw the blood.
+#define ZOMBIE_BLOOD_LEFT_HAND      0
+#define ZOMBIE_BLOOD_RIGHT_HAND     1
+#define ZOMBIE_BLOOD_BOTH_HANDS     2
+#define ZOMBIE_BLOOD_BITE           3
+
+
 enum
 {
-    SCHED_ZM_GO = LAST_BASE_ZOMBIE_SCHEDULE + 15, // HACK
+    SCHED_ZOMBIE_CHASE_ENEMY = LAST_SHARED_SCHEDULE,
+    SCHED_ZOMBIE_MOVE_SWATITEM,
+    SCHED_ZOMBIE_SWATITEM,
+    SCHED_ZOMBIE_ATTACKITEM,
+    //SCHED_ZOMBIE_RELEASECRAB,
+    SCHED_ZOMBIE_MOVE_TO_AMBUSH,
+    SCHED_ZOMBIE_WAIT_AMBUSH,
+    SCHED_ZOMBIE_WANDER_MEDIUM,	// medium range wandering behavior.
+    SCHED_ZOMBIE_WANDER_FAIL,
+    SCHED_ZOMBIE_WANDER_STANDOFF,
+    SCHED_ZOMBIE_MELEE_ATTACK1,
+    SCHED_ZOMBIE_POST_MELEE_WAIT,
+
+    SCHED_ZM_GO, // HACK
     SCHED_ZM_FORCED_GO,
     SCHED_ZM_DEFEND_GO_DEFPOS,
     SCHED_ZM_DEFEND_WAIT,
+
+    LAST_BASE_ZOMBIE_SCHEDULE,
 };
 
-// Moved to npc_BaseZombie for now.
-/*enum
+enum 
 {
-    COND_ZM_SEE_ENEMY = LAST_BASE_ZOMBIE_CONDITION + 1, // HACK
-};*/
+    TASK_ZOMBIE_DELAY_SWAT = LAST_SHARED_TASK,
+    TASK_ZOMBIE_GET_PATH_TO_PHYSOBJ,
+    TASK_ZOMBIE_SWAT_ITEM,
+    TASK_ZOMBIE_DIE,
+    //TASK_ZOMBIE_RELEASE_HEADCRAB,
+    TASK_ZOMBIE_WAIT_POST_MELEE,
+
+    TASK_ZM_DEFEND_PATH_TO_DEFPOS,
+    TASK_ZM_SET_TOLERANCE_DISTANCE,
+
+    LAST_BASE_ZOMBIE_TASK,
+};
+
+enum Zombie_Conds
+{
+    COND_ZOMBIE_CAN_SWAT_ATTACK = LAST_SHARED_CONDITION,
+    //COND_ZOMBIE_RELEASECRAB,
+    //COND_ZOMBIE_LOCAL_MELEE_OBSTRUCTION,
+
+    COND_ZM_SEE_ENEMY,
+    COND_ZM_DEFEND_ENEMY_CLOSE,
+    COND_ZM_DEFEND_ENEMY_TOOFAR,
+    //COND_ZM_FAILED_GOAL,
+
+    LAST_BASE_ZOMBIE_CONDITION,
+};
 
 
-class CZMBaseZombie : public CNPC_BaseZombie, public CZMNPCLagCompensation
+typedef CAI_BlendingHost<CAI_BehaviorHost<CAI_BaseNPC>> CAI_BaseZombieBase;
+
+class CZMBaseZombie : public CAI_BaseZombieBase, public CZMNPCLagCompensation
 {
 public:
-    DECLARE_CLASS( CZMBaseZombie, CNPC_BaseZombie )
+    DECLARE_CLASS( CZMBaseZombie, CAI_BaseZombieBase )
     DECLARE_SERVERCLASS()
     DECLARE_DATADESC()
     DEFINE_CUSTOM_AI;
@@ -48,41 +116,84 @@ public:
     virtual int OnTakeDamage_Alive( const CTakeDamageInfo& ) OVERRIDE;
     virtual void HandleAnimEvent( animevent_t* ) OVERRIDE;
     
-    virtual bool IsValidEnemy( CBaseEntity* ) OVERRIDE;
-    virtual bool IsChopped( const CTakeDamageInfo &info ) OVERRIDE;
-    virtual bool CanBecomeLiveTorso() OVERRIDE;
-	virtual bool ShouldBecomeTorso( const CTakeDamageInfo &info, float flDamageThreshold ) OVERRIDE;
-    virtual HeadcrabRelease_t ShouldReleaseHeadcrab( const CTakeDamageInfo &info, float flDamageThreshold ) OVERRIDE;
-    virtual bool CorpseGib( const CTakeDamageInfo &info ) OVERRIDE;
-    
-    virtual const char *GetLegsModel( void ) OVERRIDE { return ""; };
-	virtual const char *GetTorsoModel( void ) OVERRIDE { return ""; };
-	virtual const char *GetHeadcrabClassname( void ) OVERRIDE { return ""; };
-	virtual const char *GetHeadcrabModel( void ) OVERRIDE { return ""; };
-
-    virtual void SetZombieModel( void ) OVERRIDE;
+    virtual void SetModel( const char* ) OVERRIDE;
+    virtual void SetZombieModel( void ) = 0;
 
     virtual bool ShouldGib( const CTakeDamageInfo& ) OVERRIDE;
+    virtual bool CorpseGib( const CTakeDamageInfo &info ) OVERRIDE;
 
     
-    int GetSwatActivity( void );
+    virtual float MaxYawSpeed( void ) OVERRIDE;
+    virtual bool OverrideMoveFacing( const AILocalMoveGoal_t&, float ) OVERRIDE;
+
+    
     virtual void StartTask( const Task_t* ) OVERRIDE;
+    virtual void RunTask( const Task_t* ) OVERRIDE;
     virtual void GatherConditions( void ) OVERRIDE;
     virtual int TranslateSchedule( int ) OVERRIDE;
+    virtual void OnScheduleChange( void ) OVERRIDE;
     virtual int SelectSchedule( void ) OVERRIDE;
     virtual int SelectFailSchedule( int, int, AI_TaskFailureCode_t ) OVERRIDE;
+    virtual void PrescheduleThink( void ) OVERRIDE;
     virtual bool OnInsufficientStopDist( AILocalMoveGoal_t*, float, AIMoveResult_t* ) OVERRIDE;
 
+    int GetSwatActivity( void );
     // By default don't swat objects.
-    virtual bool CanSwatPhysicsObjects() OVERRIDE { return false; };
+    virtual bool CanSwatPhysicsObjects() { return false; };
     bool FindNearestPhysicsObject( int iMaxMass );
 
+    virtual float GetReactionDelay( CBaseEntity* pEnemy ) OVERRIDE { return 0.0; };
+    virtual bool IsValidEnemy( CBaseEntity* ) OVERRIDE;
     // Always classify as a zombie. The AI relationships depend on it.
     virtual Class_T Classify( void ) OVERRIDE { return CLASS_ZOMBIE; };
     Disposition_t IRelationType( CBaseEntity* pTarget ) OVERRIDE { return CAI_BaseNPC::IRelationType( pTarget ); };
 
+    virtual int RangeAttack1Conditions ( float flDot, float flDist ) OVERRIDE { return 0; };
     virtual int MeleeAttack1Conditions( float, float ) OVERRIDE;
-    virtual bool MustCloseToAttack() OVERRIDE { return true; };
+    virtual float GetClawAttackRange() const { return ZOMBIE_MELEE_REACH; };
+    virtual bool MustCloseToAttack() { return true; };
+    virtual CBaseEntity* ClawAttack( float flDist, int iDamage, const QAngle& qaViewPunch, const Vector& vecVelocityPunch, int BloodOrigin );
+
+    virtual float GetHitgroupDamageMultiplier( int, const CTakeDamageInfo& ) OVERRIDE;
+    virtual void TraceAttack( const CTakeDamageInfo&, const Vector&, trace_t*, CDmgAccumulator* ) OVERRIDE;
+
+
+
+    // Let derived classes set this.
+    bool ShouldPlayIdleSound( void ) { return false; };
+
+    virtual void PainSound( const CTakeDamageInfo &info ) = 0;
+    virtual void AlertSound( void ) = 0;
+    virtual void IdleSound( void ) = 0;
+    virtual void AttackSound( void ) = 0;
+    virtual void AttackHitSound( void ) = 0;
+    virtual void AttackMissSound( void ) = 0;
+    virtual void FootstepSound( bool fRightFoot ) = 0;
+    virtual void FootscuffSound( bool fRightFoot ) = 0;
+
+    void PoundSound();
+    void MakeAISpookySound( float = 0.0f ) {};
+
+
+    void KillMe( void )
+    {
+        m_iHealth = 5;
+        OnTakeDamage( CTakeDamageInfo( this, this, m_iHealth * 2, DMG_GENERIC ) );
+    }
+
+    float DistToPhysicsEnt( void );
+
+
+    virtual void BuildScheduleTestBits( void ) OVERRIDE;
+    virtual void OnStateChange( NPC_STATE oldState, NPC_STATE newState ) OVERRIDE;
+    virtual Activity NPC_TranslateActivity( Activity baseAct ) OVERRIDE;
+
+
+    virtual	bool AllowedToIgnite( void ) OVERRIDE { return true; };
+    bool ShouldIgnite( const CTakeDamageInfo& info );
+    virtual void Ignite( float, bool = true, float = 0.0f, bool = false ) OVERRIDE;
+
+
 
     // Our stuff...
     int GetPopCost() { return CZMBaseZombie::GetPopCost( GetZombieClass() ); };
@@ -120,17 +231,47 @@ public:
 
     inline void SetAddGoalTolerance( float tolerance ) { m_flAddGoalTolerance = tolerance; };
     bool ShouldTryScheduleAgain( int failedSched, int failedTask, AI_TaskFailureCode_t );
+
+public: // From base zombie...
+    static int              ACT_ZOM_SWATLEFTMID;
+    static int              ACT_ZOM_SWATRIGHTMID;
+    static int              ACT_ZOM_SWATLEFTLOW;
+    static int              ACT_ZOM_SWATRIGHTLOW;
+    static int              ACT_ZOM_RELEASECRAB;
+    static int              ACT_ZOM_FALL;
+
+
+    CAI_ActBusyBehavior     m_ActBusyBehavior;
+
 private:
-    ZombieClass_t m_iZombieClass;
-    ZombieMode_t m_iMode;
+    EHANDLE                 m_hPhysicsEnt;
+    float                   m_flNextSwatScan;
+    float                   m_flNextSwat;
+
+    float                   m_flBurnDamage;
+    float                   m_flBurnDamageResetTime;
+
+    float                   m_flNextFlinch;
+
+protected:
+    //CSoundPatch*            m_pMoanSound;
+    //float                   m_flNextIdleSound;
+    //float                   m_flMoanPitch;
+    //int                     m_iMoanSound;
+
+
+private: // Our stuff...
+    ZombieClass_t           m_iZombieClass;
+    ZombieMode_t            m_iMode;
     
 
-    float m_flLastCommand;
-    Vector m_vecLastCommandPos;
-    bool m_bCommanded;
+    float                   m_flLastCommand;
+    Vector                  m_vecLastCommandPos;
+    bool                    m_bCommanded;
 
-    bool m_bSwatBreakable;
-    float m_flAddGoalTolerance;
+    bool                    m_bSwatBreakable;
+    float                   m_flAddGoalTolerance;
+
     
 protected:
     inline void SetZombieClass( ZombieClass_t zclass ) { m_iZombieClass = zclass; };

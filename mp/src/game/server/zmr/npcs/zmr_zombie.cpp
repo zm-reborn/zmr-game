@@ -9,7 +9,6 @@
 #include "doors.h"
 
 #include "simtimer.h"
-#include "npc_BaseZombie.h"
 #include "ai_hull.h"
 #include "ai_navigator.h"
 #include "ai_memory.h"
@@ -141,6 +140,7 @@ public:
 	void PrescheduleThink( void );
 	int SelectSchedule ( void );
 
+    virtual bool ShouldPlayIdleSound( void ) OVERRIDE { return CAI_BaseNPC::ShouldPlayIdleSound(); };
 	void PainSound( const CTakeDamageInfo &info );
 	void DeathSound( const CTakeDamageInfo &info );
 	void AlertSound( void );
@@ -283,29 +283,12 @@ void CZMZombie::Spawn( void )
 	//GetNavigator()->SetRememberStaleNodes( false );
 
 	BaseClass::Spawn();
-
-	m_flNextMoanSound = gpGlobals->curtime + random->RandomFloat( 1.0, 4.0 );
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void CZMZombie::PrescheduleThink( void )
 {
-  	if( gpGlobals->curtime > m_flNextMoanSound )
-  	{
-  		if( CanPlayMoanSound() )
-  		{
-			// Classic guy idles instead of moans.
-			IdleSound();
-
-  			m_flNextMoanSound = gpGlobals->curtime + random->RandomFloat( 7.0, 15.0 );
-  		}
-  		else
- 		{
-  			m_flNextMoanSound = gpGlobals->curtime + random->RandomFloat( 10.0, 30.0 );
-  		}
-  	}
-
 	BaseClass::PrescheduleThink();
 }
 
@@ -395,9 +378,6 @@ void CZMZombie::DeathSound( const CTakeDamageInfo &info )
 void CZMZombie::AlertSound( void )
 {
 	EmitSound( "Zombie.Alert" );
-
-	// Don't let a moan sound cut off the alert sound.
-	m_flNextMoanSound += random->RandomFloat( 2.0, 4.0 );
 }
 
 //-----------------------------------------------------------------------------
@@ -419,12 +399,6 @@ void CZMZombie::IdleSound( void )
 		return;
 	}
 
-	if( IsSlumped() )
-	{
-		// Sleeping zombies are quiet.
-		return;
-	}
-
 	EmitSound( "Zombie.Idle" );
 	MakeAISpookySound( 360.0f );
 }
@@ -441,7 +415,7 @@ void CZMZombie::AttackSound( void )
 //---------------------------------------------------------
 void CZMZombie::SetZombieModel( void )
 {
-	char* modelname[] = {
+	const char* modelname[] = {
 		"models/zombie/zm_classic_01.mdl",
 		"models/zombie/zm_classic_01.mdl",
 		"models/zombie/zm_classic_02.mdl",
@@ -455,28 +429,7 @@ void CZMZombie::SetZombieModel( void )
 	};
 
 
-	Hull_t lastHull = GetHullType();
-
 	SetModel( modelname[random->RandomInt( 0, ARRAYSIZE( modelname ) - 1 )] );
-	SetHullType( HULL_HUMAN );
-
-    // No headcrab...
-	//SetBodygroup( ZOMBIE_BODYGROUP_HEADCRAB, 0 );
-
-	SetHullSizeNormal( true );
-	SetDefaultEyeOffset();
-	SetActivity( ACT_IDLE );
-
-	// hull changed size, notify vphysics
-	// UNDONE: Solve this generally, systematically so other
-	// NPCs can change size
-	if ( lastHull != GetHullType() )
-	{
-		if ( VPhysicsGetObject() )
-		{
-			SetupVPhysicsHull();
-		}
-	}
 }
 
 //---------------------------------------------------------
@@ -486,7 +439,7 @@ void CZMZombie::MoanSound( envelopePoint_t *pEnvelope, int iEnvelopeSize )
 {
 	if( IsOnFire() )
 	{
-		BaseClass::MoanSound( pEnvelope, iEnvelopeSize );
+		//BaseClass::MoanSound( pEnvelope, iEnvelopeSize );
 	}
 }
 
@@ -613,7 +566,7 @@ Activity CZMZombie::NPC_TranslateActivity( Activity newActivity )
 	if ( newActivity == ACT_RUN )
 		return ACT_WALK;
 		
-	if ( m_fIsTorso && ( newActivity == ACT_ZOMBIE_TANTRUM ) )
+	if ( newActivity == ACT_ZOMBIE_TANTRUM )
 		return ACT_IDLE;
 
 	return newActivity;
@@ -752,26 +705,19 @@ void CZMZombie::Ignite( float flFlameLifetime, bool bNPCOnly, float flSize, bool
 		{
 			RemoveSpawnFlags( SF_NPC_GAG );
 
-			MoanSound( envZombieMoanIgnited, ARRAYSIZE( envZombieMoanIgnited ) );
+			/*MoanSound( envZombieMoanIgnited, ARRAYSIZE( envZombieMoanIgnited ) );
 
 			if ( m_pMoanSound )
 			{
 				ENVELOPE_CONTROLLER.SoundChangePitch( m_pMoanSound, 120, 1.0 );
 				ENVELOPE_CONTROLLER.SoundChangeVolume( m_pMoanSound, 1, 1.0 );
-			}
+			}*/
 		}
 	}
 }
 
 void CZMZombie::Extinguish()
 {
-	if( m_pMoanSound )
-	{
-		ENVELOPE_CONTROLLER.SoundChangeVolume( m_pMoanSound, 0, 2.0 );
-		ENVELOPE_CONTROLLER.SoundChangePitch( m_pMoanSound, 100, 2.0 );
-		m_flNextMoanSound = gpGlobals->curtime + random->RandomFloat( 2.0, 4.0 );
-	}
-
 	BaseClass::Extinguish();
 }
 
@@ -780,7 +726,7 @@ int CZMZombie::OnTakeDamage_Alive( const CTakeDamageInfo &inputInfo )
 #ifndef HL2_EPISODIC
 	if ( inputInfo.GetDamageType() & DMG_BUCKSHOT )
 	{
-		if( !m_fIsTorso && inputInfo.GetDamage() > (m_iMaxHealth/3) )
+		if( inputInfo.GetDamage() > (m_iMaxHealth/3) )
 		{
 			// Always flinch if damaged a lot by buckshot, even if not shot in the head.
 			// The reason for making sure we did at least 1/3rd of the zombie's max health
@@ -857,7 +803,7 @@ void CZMZombie::BuildScheduleTestBits( void )
 {
 	BaseClass::BuildScheduleTestBits();
 
-	if( !m_fIsTorso && !IsCurSchedule( SCHED_FLINCH_PHYSICS ) && !m_ActBusyBehavior.IsActive() )
+	if( !IsCurSchedule( SCHED_FLINCH_PHYSICS ) && !m_ActBusyBehavior.IsActive() )
 	{
 		SetCustomInterruptCondition( COND_PHYSICS_DAMAGE );
 	}
@@ -892,7 +838,7 @@ AI_BEGIN_CUSTOM_NPC( npc_zombie, CZMZombie )
 		"		TASK_ZOMBIE_ATTACK_DOOR			0"
 		""
 		"	Interrupts"
-		"		COND_ZOMBIE_RELEASECRAB"
+		//"		COND_ZOMBIE_RELEASECRAB"
 		"		COND_ENEMY_DEAD"
 		"		COND_NEW_ENEMY"
 		"		COND_DOOR_OPENED"
@@ -908,7 +854,7 @@ AI_BEGIN_CUSTOM_NPC( npc_zombie, CZMZombie )
 		"		TASK_WAIT_FOR_MOVEMENT			4"
 		""
 		"	Interrupts"
-		"		COND_ZOMBIE_RELEASECRAB"
+		//"		COND_ZOMBIE_RELEASECRAB"
 		"		COND_ENEMY_DEAD"
 		"		COND_NEW_ENEMY"
 		"		COND_DOOR_OPENED"
@@ -926,7 +872,7 @@ AI_BEGIN_CUSTOM_NPC( npc_zombie, CZMZombie )
 		"		TASK_PLAY_SEQUENCE				ACTIVITY:ACT_ZOMBIE_TANTRUM" /* placeholder until frustration/rage/fence shake animation available */
 		""
 		"	Interrupts"
-		"		COND_ZOMBIE_RELEASECRAB"
+		//"		COND_ZOMBIE_RELEASECRAB"
 		"		COND_ENEMY_DEAD"
 		"		COND_NEW_ENEMY"
 		"		COND_DOOR_OPENED"
