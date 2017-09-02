@@ -1038,7 +1038,7 @@ int CZMBaseZombie::MeleeAttack1Conditions( float flDot, float flDist )
     {
         return COND_TOO_FAR_TO_ATTACK;
     }
-
+    
     if ( flDot < 0.7 )
     {
         return COND_NOT_FACING_ATTACK;
@@ -1047,8 +1047,9 @@ int CZMBaseZombie::MeleeAttack1Conditions( float flDot, float flDist )
     // Build a cube-shaped hull, the same hull that ClawAttack() is going to use.
     Vector vecMins = GetHullMins();
     Vector vecMaxs = GetHullMaxs();
-    vecMins.z = vecMins.x;
-    vecMaxs.z = vecMaxs.x;
+    // Let zombies attack higher than their head. (enemies right on top of them.)
+    //vecMins.z = vecMins.x;
+    //vecMaxs.z = vecMaxs.x;
 
     Vector forward;
     GetVectors( &forward, NULL, NULL );
@@ -1352,8 +1353,9 @@ CBaseEntity* CZMBaseZombie::ClawAttack( float flDist, int iDamage, const QAngle&
     //
     Vector vecMins = GetHullMins();
     Vector vecMaxs = GetHullMaxs();
-    vecMins.z = vecMins.x;
-    vecMaxs.z = vecMaxs.x;
+    // Let zombies attack higher than their head. (enemies right on top of them.)
+    //vecMins.z = vecMins.x;
+    //vecMaxs.z = vecMaxs.x;
 
     CBaseEntity *pHurt = NULL;
     if ( GetEnemy() && GetEnemy()->Classify() == CLASS_BULLSEYE )
