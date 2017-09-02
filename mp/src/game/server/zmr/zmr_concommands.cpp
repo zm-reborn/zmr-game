@@ -219,7 +219,6 @@ void ZM_ForceTeam( const CCommand &args )
 
 
     pTarget->ChangeTeam( iTeam );
-    pTarget->Spawn();
 }
 
 static ConCommand zm_forceteam( "zm_forceteam", ZM_ForceTeam, "Usage: zm_forceteam <number> <name (optional)> | 1 = Spec, 2 = Human, 3 = ZM" );

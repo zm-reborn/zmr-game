@@ -539,7 +539,6 @@ void CZMRules::OnClientFinishedPutInServer( CZMPlayer* pPlayer )
     if ( latespawn )
     {
         pPlayer->ChangeTeam( ZMTEAM_HUMAN );
-        pPlayer->Spawn();
     }
 }
 
@@ -648,7 +647,6 @@ bool CZMRules::ReplaceZM( CZMPlayer* pZM )
     if ( pChoice )
     {
         pChoice->ChangeTeam( ZMTEAM_ZM );
-        pChoice->Spawn();
     }
 
 
@@ -960,7 +958,6 @@ void CZMRules::BeginRound( CZMPlayer* pZM )
         if ( team != ZMTEAM_SPECTATOR || !pPlayer->IsObserver() )
         {
             pPlayer->ChangeTeam( team );
-            pPlayer->Spawn();
         }
     }
 
