@@ -242,6 +242,7 @@ void CItem_ItemCrate::OnBreak( const Vector &vecVelocity, const AngularImpulse &
 		pSpawn->Spawn();
 #endif
 
+#ifndef ZMR // ZMRCHANGE: Don't need this shit.
 		// Avoid missing items drops by a dynamic resupply because they don't think immediately
 		if ( FClassnameIs( pSpawn, "item_dynamic_resupply" ) )
 		{
@@ -255,6 +256,7 @@ void CItem_ItemCrate::OnBreak( const Vector &vecVelocity, const AngularImpulse &
 			}
 			pSpawn->SetNextThink( gpGlobals->curtime );
 		}
+#endif
 	}
 }
 
