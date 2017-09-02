@@ -16,13 +16,11 @@
 #include "ai_hull.h"
 #include "ai_motor.h"
 #include "game.h"
-#include "npc_headcrab.h"
 #include "npcevent.h"
 #include "entitylist.h"
 #include "ai_task.h"
 #include "activitylist.h"
 #include "engine/IEngineSound.h"
-#include "npc_BaseZombie.h"
 
 
 #include "zmr/zmr_gamerules.h"
@@ -273,8 +271,6 @@ void CNPC_PoisonZombie::Precache( void )
 void CNPC_PoisonZombie::Spawn( void )
 {
 	Precache();
-
-	m_fIsTorso = m_fIsHeadless = false;
 
 #ifdef HL2_EPISODIC
 	SetBloodColor( BLOOD_COLOR_ZOMBIE );
@@ -598,12 +594,6 @@ void CNPC_PoisonZombie::FootstepSound( bool fRightFoot )
 	{
 		EmitSound( "NPC_PoisonZombie.FootstepLeft" );
 	}
-
-	if( ShouldPlayFootstepMoan() )
-	{
-		m_flNextMoanSound = gpGlobals->curtime;
-		//MoanSound( envPoisonZombieMoanVolumeFast, ARRAYSIZE( envPoisonZombieMoanVolumeFast ) );
-	}
 }
 
 
@@ -622,7 +612,7 @@ bool CNPC_PoisonZombie::MustCloseToAttack(void)
 //-----------------------------------------------------------------------------
 void CNPC_PoisonZombie::MoanSound( envelopePoint_t *pEnvelope, int iEnvelopeSize )
 {
-	if( !m_pMoanSound )
+	/*if( !m_pMoanSound )
 	{
 		// Don't set this up until the code calls for it.
 		const char *pszSound = GetMoanSound( m_iMoanSound );
@@ -648,7 +638,7 @@ void CNPC_PoisonZombie::MoanSound( envelopePoint_t *pEnvelope, int iEnvelopeSize
 	float flPitchShift = random->RandomInt( -4, 4 );
 	ENVELOPE_CONTROLLER.SoundChangePitch( m_pMoanSound, m_flMoanPitch + flPitchShift, 0.3 );
 
-	m_flNextMoanSound = gpGlobals->curtime + duration + 9999;
+	m_flNextMoanSound = gpGlobals->curtime + duration + 9999;*/
 }
 
 int ACT_ZOMBIE_POISON_THREAT;

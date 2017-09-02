@@ -128,8 +128,7 @@ public:
     void Spawn( void );
     void Precache( void );
 
-    void SetZombieModel( void );
-    bool CanSwatPhysicsObjects( void ) { return false; }
+    virtual void SetZombieModel( void ) OVERRIDE;
 
     int	TranslateSchedule( int scheduleType );
 
@@ -173,8 +172,6 @@ public:
     void LeapAttack( void );
     void LeapAttackSound( void );
 
-    void BecomeTorso( const Vector &vecTorsoForce, const Vector &vecLegsForce );
-
     bool IsJumpLegal(const Vector &startPos, const Vector &apex, const Vector &endPos) const;
     bool MovementCost( int moveType, const Vector &vecStart, const Vector &vecEnd, float *pCost );
     bool ShouldFailNav( bool bMovementFailed );
@@ -186,7 +183,6 @@ public:
     void OnChangeActivity( Activity NewActivity );
     void OnStateChange( NPC_STATE OldState, NPC_STATE NewState );
     void Event_Killed( const CTakeDamageInfo &info );
-    bool ShouldBecomeTorso( const CTakeDamageInfo &info, float flDamageThreshold );
 
     void PainSound( const CTakeDamageInfo &info );
     void DeathSound( const CTakeDamageInfo &info ); 
@@ -517,11 +513,12 @@ void CFastZombie::SetIdleSoundState( void )
 //-----------------------------------------------------------------------------
 void CFastZombie::SetAngrySoundState( void )
 {
+    /*
     if (( !m_pMoanSound ) || ( !m_pLayer2 ))
     {
         return;
     }
-
+    */
     EmitSound( "NPC_FastZombie.LeapAttack" );
 
 /*	// Main looping sound
@@ -640,31 +637,7 @@ float CFastZombie::MaxYawSpeed( void )
 //-----------------------------------------------------------------------------
 void CFastZombie::SetZombieModel( void )
 {
-    Hull_t lastHull = GetHullType();
-
-
     SetModel( "models/zombie/zm_fast.mdl" );
-    SetHullType( HULL_HUMAN );
-
-//	SetBodygroup( ZOMBIE_BODYGROUP_HEADCRAB, !m_fIsHeadless );
-
-    //set random skin, will have no effect if the model doesn't specify more than one (which it doesn't by def.)
-    m_nSkin = random->RandomInt( 0, 3 );
-
-    SetHullSizeNormal( true );
-    SetDefaultEyeOffset();
-    SetActivity( ACT_IDLE );
-
-    // hull changed size, notify vphysics
-    // UNDONE: Solve this generally, systematically so other
-    // NPCs can change size
-    if ( lastHull != GetHullType() )
-    {
-        if ( VPhysicsGetObject() )
-        {
-            SetupVPhysicsHull();
-        }
-    }
 }
 
 int CFastZombie::MeleeAttack1Conditions( float flDot, float flDist )
@@ -1523,21 +1496,6 @@ void CFastZombie::StopLoopingSounds( void )
     BaseClass::StopLoopingSounds();
 }
 
-
-//-----------------------------------------------------------------------------
-// Purpose: Fast zombie cannot range attack when he's a torso!
-//-----------------------------------------------------------------------------
-void CFastZombie::BecomeTorso( const Vector &vecTorsoForce, const Vector &vecLegsForce )
-{
-    CapabilitiesRemove( bits_CAP_INNATE_RANGE_ATTACK1 );
-    CapabilitiesRemove( bits_CAP_MOVE_JUMP );
-    CapabilitiesRemove( bits_CAP_MOVE_CLIMB );
-
-//	ReleaseHeadcrab( EyePosition(), vecLegsForce * 0.5, true, true, true );
-
-    BaseClass::BecomeTorso( vecTorsoForce, vecLegsForce );
-}
-
 //-----------------------------------------------------------------------------
 // Purpose: Returns true if a reasonable jumping distance
 // Input  :
@@ -1768,7 +1726,7 @@ void CFastZombie::OnStateChange( NPC_STATE OldState, NPC_STATE NewState )
     {
         SetAngrySoundState();
     }
-    else if( (m_pMoanSound) && ( NewState == NPC_STATE_IDLE || NewState == NPC_STATE_ALERT ) ) ///!!!HACKHACK - sjb
+    else if( ( NewState == NPC_STATE_IDLE || NewState == NPC_STATE_ALERT ) ) ///!!!HACKHACK - sjb
     {
         // Set it up so that if the zombie goes into combat state sometime down the road
         // that he'll be able to scream.
@@ -1790,13 +1748,6 @@ void CFastZombie::Event_Killed( const CTakeDamageInfo &info )
     StopSound( entindex(), "NPC_FastZombie.LeapAttack");
 
     BaseClass::Event_Killed( info );
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-bool CFastZombie::ShouldBecomeTorso( const CTakeDamageInfo &info, float flDamageThreshold )
-{
-    return false; //LAWYER:  No splitting yet.
 }
 
 //--------------------------------------------------------------
