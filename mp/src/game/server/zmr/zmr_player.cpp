@@ -179,7 +179,14 @@ void CZMPlayer::ChangeTeam( int iTeam )
 	CBasePlayer::ChangeTeam( iTeam, true, true );
 
 
-    SetTeamSpecificProps();
+    if ( oldteam != ZMTEAM_UNASSIGNED && ShouldSpawn() )
+    {
+        Spawn();
+    }
+    else
+    {
+        SetTeamSpecificProps();
+    }
 
 
     CZMRules* pRules = ZMRules();
@@ -209,6 +216,16 @@ void CZMPlayer::ChangeTeam( int iTeam )
     }
 }
 
+bool CZMPlayer::ShouldSpawn()
+{
+    int team = GetTeamNumber();
+
+    if ( team == ZMTEAM_SPECTATOR )
+        return false;
+
+
+    return true;
+}
 
 void CZMPlayer::SetTeamSpecificProps()
 {
