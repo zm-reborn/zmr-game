@@ -758,7 +758,7 @@ int CZMBaseZombie::SelectSchedule( void )
 
 
         // Try to swat before thinking the enemy is unreachable.
-        if( HasCondition( COND_ENEMY_UNREACHABLE ) && HasCondition( COND_ZOMBIE_CAN_SWAT_ATTACK ) )
+        if( HasCondition( COND_ZOMBIE_CAN_SWAT_ATTACK ) )
         {
             return SCHED_ZOMBIE_SWATITEM;
         }
