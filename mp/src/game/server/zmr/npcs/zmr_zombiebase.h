@@ -153,6 +153,7 @@ public:
     virtual float GetClawAttackRange() const { return ZOMBIE_MELEE_REACH; };
     virtual bool MustCloseToAttack() { return true; };
     virtual CBaseEntity* ClawAttack( float flDist, int iDamage, const QAngle& qaViewPunch, const Vector& vecVelocityPunch, int BloodOrigin );
+    void GetAttackHull( Vector& mins, Vector& maxs );
 
     virtual float GetHitgroupDamageMultiplier( int, const CTakeDamageInfo& ) OVERRIDE;
     virtual void TraceAttack( const CTakeDamageInfo&, const Vector&, trace_t*, CDmgAccumulator* ) OVERRIDE;

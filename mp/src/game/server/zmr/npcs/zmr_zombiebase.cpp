@@ -1049,12 +1049,9 @@ int CZMBaseZombie::MeleeAttack1Conditions( float flDot, float flDist )
         return COND_NOT_FACING_ATTACK;
     }
 
-    // Build a cube-shaped hull, the same hull that ClawAttack() is going to use.
-    Vector vecMins = GetHullMins();
-    Vector vecMaxs = GetHullMaxs();
-    // Let zombies attack higher than their head. (enemies right on top of them.)
-    //vecMins.z = vecMins.x;
-    //vecMaxs.z = vecMaxs.x;
+
+    Vector vecMins, vecMaxs;
+    GetAttackHull( vecMins, vecMaxs );
 
     Vector forward;
     GetVectors( &forward, NULL, NULL );
@@ -1114,6 +1111,17 @@ int CZMBaseZombie::MeleeAttack1Conditions( float flDot, float flDist )
 
     // Move around some more
     return COND_TOO_FAR_TO_ATTACK;
+}
+
+void CZMBaseZombie::GetAttackHull( Vector& mins, Vector& maxs )
+{
+    // Build a cube-shaped hull, the same hull that ClawAttack() is going to use.
+    mins = GetHullMins();
+    maxs = GetHullMaxs();
+
+    mins.z = -(( EyePosition().z - GetAbsOrigin().z ) * 0.5f);
+    // Let zombies attack higher than their head. (enemies right on top of them.)
+    maxs.z *= 0.6f;
 }
 
 #define ZOMBIE_BUCKSHOT_TRIPLE_DAMAGE_DIST	96.0f // Triple damage from buckshot at 8 feet (headshot only)
@@ -1356,11 +1364,9 @@ CBaseEntity* CZMBaseZombie::ClawAttack( float flDist, int iDamage, const QAngle&
     //
     // Trace out a cubic section of our hull and see what we hit.
     //
-    Vector vecMins = GetHullMins();
-    Vector vecMaxs = GetHullMaxs();
-    // Let zombies attack higher than their head. (enemies right on top of them.)
-    //vecMins.z = vecMins.x;
-    //vecMaxs.z = vecMaxs.x;
+    Vector vecMins, vecMaxs;
+    GetAttackHull( vecMins, vecMaxs );
+
 
     CBaseEntity *pHurt = NULL;
     if ( GetEnemy() && GetEnemy()->Classify() == CLASS_BULLSEYE )
