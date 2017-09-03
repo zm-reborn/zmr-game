@@ -50,6 +50,7 @@ public:
     virtual void PreThink( void ) OVERRIDE;
     void PickDefaultSpawnTeam();
     virtual void ChangeTeam( int iTeam ) OVERRIDE;
+    bool ShouldSpawn();
 
     void SetPlayerModel( void );
     bool ValidatePlayerModel( const char* );
