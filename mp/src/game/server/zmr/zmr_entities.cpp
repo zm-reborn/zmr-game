@@ -1440,6 +1440,53 @@ void CZMEntTriggerBlockHidden::InputDisable( inputdata_t &inputData )
 
 
 /*
+    Block phys explosion
+*/
+BEGIN_DATADESC( CZMEntTriggerBlockPhysExp )
+    DEFINE_KEYFIELD( m_bActive, FIELD_BOOLEAN, "Active" ),
+
+    DEFINE_INPUTFUNC( FIELD_VOID, "Toggle", InputToggle ),
+    DEFINE_INPUTFUNC( FIELD_VOID, "Disable", InputDisable ),
+    DEFINE_INPUTFUNC( FIELD_VOID, "Enabled", InputEnable ),
+END_DATADESC()
+
+LINK_ENTITY_TO_CLASS( trigger_blockphysexplosion, CZMEntTriggerBlockPhysExp );
+
+
+CZMEntTriggerBlockPhysExp::CZMEntTriggerBlockPhysExp()
+{
+    g_pBlockPhysExp->AddToTail( this );
+}
+
+CZMEntTriggerBlockPhysExp::~CZMEntTriggerBlockPhysExp()
+{
+    g_pBlockPhysExp->FindAndRemove( this );
+}
+
+void CZMEntTriggerBlockPhysExp::Spawn( void )
+{
+    BaseClass::Spawn();
+
+    InitTrigger();
+}
+
+void CZMEntTriggerBlockPhysExp::InputToggle( inputdata_t &inputData )
+{
+    m_bActive = !m_bActive;
+}
+
+void CZMEntTriggerBlockPhysExp::InputEnable( inputdata_t &inputData )
+{
+    m_bActive = true;
+}
+
+void CZMEntTriggerBlockPhysExp::InputDisable( inputdata_t &inputData )
+{
+    m_bActive = false;
+}
+
+
+/*
     Give resources
 */
 #define SF_GIVERES_LIMIT            ( 1 << 0 )

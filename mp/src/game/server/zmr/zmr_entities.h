@@ -315,6 +315,33 @@ private:
 };
 
 /*
+    Block phys explosion
+*/
+class CZMEntTriggerBlockPhysExp : public CBaseTrigger
+{
+public:
+    DECLARE_CLASS( CZMEntTriggerBlockPhysExp, CBaseTrigger );
+    DECLARE_DATADESC();
+
+
+    CZMEntTriggerBlockPhysExp();
+    ~CZMEntTriggerBlockPhysExp();
+
+    void Spawn( void ) OVERRIDE;
+
+
+    inline bool IsActive() { return m_bActive; };
+
+
+    void InputToggle( inputdata_t &inputdata );
+    void InputEnable( inputdata_t &inputdata );
+    void InputDisable( inputdata_t &inputdata );
+
+private:
+    bool m_bActive;
+};
+
+/*
     Phys explosion
 */
 class CZMPhysExplosion : public CPhysExplosion

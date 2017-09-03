@@ -31,6 +31,7 @@ public:
 
 #ifndef CLIENT_DLL
     CUtlVector<CZMEntTriggerBlockHidden*> m_BlockHidden;
+    CUtlVector<CZMEntTriggerBlockPhysExp*> m_BlockPhysExp;
 #endif
 };
 
@@ -38,4 +39,5 @@ extern ZombieList_t* g_pZombies;
 
 #ifndef CLIENT_DLL
 extern CUtlVector<CZMEntTriggerBlockHidden*>* g_pBlockHidden;
+extern CUtlVector<CZMEntTriggerBlockPhysExp*>* g_pBlockPhysExp;
 #endif

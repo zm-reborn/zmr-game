@@ -733,6 +733,21 @@ void ZM_Cmd_PhysExp( const CCommand &args )
     }
 
 
+    CZMEntTriggerBlockPhysExp* pBlock;
+    for ( int i = 0; i < g_pBlockPhysExp->Count(); i++ )
+    {
+        pBlock = g_pBlockPhysExp->Element( i );
+
+        if (pBlock && pBlock->IsActive()
+        &&  pBlock->CollisionProp()
+        &&  pBlock->CollisionProp()->IsPointInBounds( pos ) )
+        {
+            ClientPrint( pPlayer, HUD_PRINTTALK, "No explosions may be created there!" );
+            return;
+        }
+    }
+
+
     CZMPhysExplosion* pExp = dynamic_cast<CZMPhysExplosion*>( CreateEntityByName( "env_delayed_physexplosion" ) );
 
     if ( !pExp ) return;
