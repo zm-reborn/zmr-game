@@ -103,7 +103,7 @@ CZMBaseZombie::CZMBaseZombie()
     m_flAddGoalTolerance = 0.0f;
 
 
-    m_hPhysicsEnt = nullptr;
+    m_hPhysicsEnt.Set( nullptr );
 
     m_flNextFlinch = 0.0f;
 }
@@ -350,7 +350,7 @@ void CZMBaseZombie::HandleAnimEvent( animevent_t* pEvent )
     {
         CBaseEntity* pEnemy = GetEnemy();
 
-        CBaseEntity* pEnt = m_hPhysicsEnt;
+        CBaseEntity* pEnt = m_hPhysicsEnt.Get();
 
 
         if( !pEnt )
@@ -396,7 +396,7 @@ void CZMBaseZombie::HandleAnimEvent( animevent_t* pEvent )
         // will re-select the object he just hit as it is flying away from him.
         // It will likely always be the nearest object because the zombie moved
         // close enough to it to hit it.
-        m_hPhysicsEnt = nullptr;
+        m_hPhysicsEnt.Set( nullptr );
 
         m_flNextSwatScan = gpGlobals->curtime + 2.0f;
 
@@ -425,7 +425,7 @@ int CZMBaseZombie::GetSwatActivity( void )
 {
     if ( m_bSwatBreakable || !CanSwatPhysicsObjects() )
     {
-        m_hPhysicsEnt = nullptr; // Don't try to swat this again after the melee attack.
+        m_hPhysicsEnt.Set( nullptr ); // Don't try to swat this again after the melee attack.
         return ACT_MELEE_ATTACK1;
     }
 
@@ -478,7 +478,7 @@ int CZMBaseZombie::GetSwatActivity( void )
 
 float CZMBaseZombie::DistToPhysicsEnt( void )
 {
-    if ( m_hPhysicsEnt != nullptr )
+    if ( m_hPhysicsEnt.Get() != nullptr )
         return UTIL_DistApprox2D( GetAbsOrigin(), m_hPhysicsEnt->WorldSpaceCenter() );
 
     return ZOMBIE_PHYSOBJ_SWATDIST + 1;
@@ -491,7 +491,7 @@ void CZMBaseZombie::StartTask( const Task_t* pTask )
     case TASK_FACE_ENEMY :
         // ALWAYS face the entity if it's a not a normal prop (eg. breakable)
         // Example where you'd want this: zm_ship, to break the masts but the zombies keep facing the enemy even though you're forcing them to attack it.
-        if ( m_hPhysicsEnt )
+        if ( m_hPhysicsEnt.Get() )
         {
             IPhysicsObject* pPhys = m_hPhysicsEnt->VPhysicsGetObject();
 
@@ -532,7 +532,12 @@ void CZMBaseZombie::StartTask( const Task_t* pTask )
 
     case TASK_ZOMBIE_GET_PATH_TO_PHYSOBJ :
     {
-        if ( !m_hPhysicsEnt ) { TaskFail( "No physics ent!\n" ); return; }
+        if ( m_hPhysicsEnt.Get() == nullptr )
+        {
+            TaskFail( "No physics ent!\n" );
+            return;
+        }
+
         Vector vecGoalPos;
         Vector vecDir;
 
@@ -541,7 +546,7 @@ void CZMBaseZombie::StartTask( const Task_t* pTask )
         vecDir.z = 0;
 
         AI_NavGoal_t goal( m_hPhysicsEnt->WorldSpaceCenter() );
-        goal.pTarget = m_hPhysicsEnt;
+        goal.pTarget = m_hPhysicsEnt.Get();
         GetNavigator()->SetGoal( goal );
 
         TaskComplete();
@@ -550,11 +555,11 @@ void CZMBaseZombie::StartTask( const Task_t* pTask )
 
     case TASK_ZOMBIE_SWAT_ITEM :
     {
-        if( m_hPhysicsEnt == NULL )
+        if( m_hPhysicsEnt.Get() == nullptr )
         {
             // Physics Object is gone! Probably was an explosive 
             // or something else broke it.
-            TaskFail("Physics ent NULL");
+            TaskFail( "Physics ent NULL" );
         }
         else if ( DistToPhysicsEnt() > ZOMBIE_PHYSOBJ_SWATDIST )
         {
@@ -675,14 +680,14 @@ void CZMBaseZombie::GatherConditions( void )
         // This check for !m_pPhysicsEnt prevents a crashing bug, but also
         // eliminates the zombie picking a better physics object if one happens to fall
         // between him and the object he's heading for already. 
-        if( !m_hPhysicsEnt && gpGlobals->curtime >= m_flNextSwatScan )
+        if( !m_hPhysicsEnt.Get() && gpGlobals->curtime >= m_flNextSwatScan )
         {
             FindNearestPhysicsObject( ZOMBIE_MAX_PHYSOBJ_MASS );
             m_flNextSwatScan = gpGlobals->curtime + 2.0;
         }
     }
 
-    if( m_hPhysicsEnt && gpGlobals->curtime >= m_flNextSwat )
+    if( m_hPhysicsEnt.Get() && gpGlobals->curtime >= m_flNextSwat )
     {
         SetCondition( COND_ZOMBIE_CAN_SWAT_ATTACK );
     }
@@ -833,7 +838,7 @@ bool CZMBaseZombie::OnInsufficientStopDist( AILocalMoveGoal_t* pMoveGoal, float 
                 
                 SetSchedule( SCHED_ZOMBIE_SWATITEM );
                 
-                m_hPhysicsEnt = pEnt;
+                m_hPhysicsEnt.Set( pEnt );
                 m_bSwatBreakable = pBreak ? true : false;
                 //m_hObstructor = pEnt;
 
@@ -879,7 +884,7 @@ void CZMBaseZombie::SwatObject( IPhysicsObject* pPhys, Vector& dir )
 
 bool CZMBaseZombie::FindNearestPhysicsObject( int iMaxMass )
 {
-    m_hPhysicsEnt = nullptr;
+    m_hPhysicsEnt.Set( nullptr );
     m_bSwatBreakable = false;
 
 
@@ -1026,10 +1031,10 @@ bool CZMBaseZombie::FindNearestPhysicsObject( int iMaxMass )
         flNearestDist = flDist;
     }
 
-    m_hPhysicsEnt = pNearest;
+    m_hPhysicsEnt.Set( pNearest );
 
 
-    return m_hPhysicsEnt != nullptr;
+    return m_hPhysicsEnt.Get() != nullptr;
 }
 
 int CZMBaseZombie::MeleeAttack1Conditions( float flDot, float flDist )
@@ -1376,9 +1381,9 @@ CBaseEntity* CZMBaseZombie::ClawAttack( float flDist, int iDamage, const QAngle&
         pHurt = pDriver;
     }
 
-    if ( !pHurt && m_hPhysicsEnt != NULL && IsCurSchedule( SCHED_ZOMBIE_ATTACKITEM ) )
+    if ( !pHurt && m_hPhysicsEnt.Get() && IsCurSchedule( SCHED_ZOMBIE_ATTACKITEM ) )
     {
-        pHurt = m_hPhysicsEnt;
+        pHurt = m_hPhysicsEnt.Get();
 
         Vector vForce = pHurt->WorldSpaceCenter() - WorldSpaceCenter(); 
         VectorNormalize( vForce );
@@ -1387,8 +1392,6 @@ CBaseEntity* CZMBaseZombie::ClawAttack( float flDist, int iDamage, const QAngle&
 
         CTakeDamageInfo info( this, this, vForce, GetAbsOrigin(), iDamage, DMG_SLASH );
         pHurt->TakeDamage( info );
-
-        pHurt = m_hPhysicsEnt;
     }
 
     if ( pHurt )
@@ -1439,9 +1442,9 @@ CBaseEntity* CZMBaseZombie::ClawAttack( float flDist, int iDamage, const QAngle&
         AttackMissSound();
     }
 
-    if ( pHurt == m_hPhysicsEnt && IsCurSchedule( SCHED_ZOMBIE_ATTACKITEM ) )
+    if ( pHurt == m_hPhysicsEnt.Get() && IsCurSchedule( SCHED_ZOMBIE_ATTACKITEM ) )
     {
-        m_hPhysicsEnt = NULL;
+        m_hPhysicsEnt.Set( nullptr );
         m_flNextSwat = gpGlobals->curtime + random->RandomFloat( 2, 4 );
     }
 
@@ -1669,7 +1672,7 @@ bool CZMBaseZombie::Swat( CBaseEntity* pTarget, bool bBreakable )
     if ( !CanSwatPhysicsObjects() && !bBreakable ) return false;
 
 
-    m_hPhysicsEnt = pTarget;
+    m_hPhysicsEnt.Set( pTarget );
 
     m_bSwatBreakable = bBreakable;
 
