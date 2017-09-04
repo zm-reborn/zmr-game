@@ -35,6 +35,8 @@ public:
     virtual void StartReload( void );
     virtual void Pump();
 
+    virtual bool IsInReload() OVERRIDE;
+    
 protected:
     CNetworkVar( bool, m_bNeedPump );
     CNetworkVar( int, m_iReloadState );

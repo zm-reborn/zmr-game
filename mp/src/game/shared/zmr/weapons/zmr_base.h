@@ -85,6 +85,7 @@ public:
     // Our stuff
     CZMPlayer* GetPlayerOwner();
     virtual bool CanBeDropped() { return true; };
+    virtual bool IsInReload() { return CanReload() && m_bInReload; };
 
 
 #ifndef CLIENT_DLL

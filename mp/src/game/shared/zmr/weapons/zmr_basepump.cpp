@@ -158,3 +158,11 @@ bool CZMBasePumpWeapon::Reload( void )
 
     return res;
 }
+
+bool CZMBasePumpWeapon::IsInReload()
+{
+    if ( m_iReloadState != RELOADSTATE_NONE )
+        return true;
+
+    return BaseClass::IsInReload();
+}
