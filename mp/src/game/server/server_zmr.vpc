@@ -331,6 +331,7 @@ $Project "Server (ZMR)"
 			
 			$File	"zmr\zmr_client.cpp"
 			$File	"zmr\zmr_concommands.cpp"
+			$File	"zmr\zmr_concommands_debug.cpp"
 			$File	"zmr\zmr_entities.cpp"
 			$File	"zmr\zmr_entities.h"
 			$File	"zmr\zmr_gameinterface.cpp"
