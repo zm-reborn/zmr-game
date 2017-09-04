@@ -425,6 +425,11 @@ bool CZMRules::CanHaveAmmo( CBaseCombatCharacter* pPlayer, int iAmmoIndex )
     {
         return false;
     }
+    
+    // Don't allow ammo pickup when reloading.
+    CZMBaseWeapon* pActive = dynamic_cast<CZMBaseWeapon*>( pZMPlayer->GetActiveWeapon() );
+    if ( pActive && pActive->IsInReload() )
+        return false;
 
     // Do we have enough room?
     int room = GetAmmoDef()->MaxCarry( iAmmoIndex ) - pPlayer->GetAmmoCount( iAmmoIndex );
