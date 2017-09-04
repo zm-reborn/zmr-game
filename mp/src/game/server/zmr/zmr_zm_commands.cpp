@@ -68,6 +68,10 @@ void ZM_Cmd_Target( const CCommand &args )
 
     CBaseEntity* pTarget = UTIL_EntityByIndex( atof( args.Arg( 1 ) ) );
 
+
+    if ( !pTarget ) return;
+
+
     bool bTarget = false;
     bool bSwat = false;
     bool bBreakable = false;
