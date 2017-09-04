@@ -275,3 +275,56 @@ void ZM_SetHealth( const CCommand &args )
 }
 
 static ConCommand zm_sethealth( "zm_sethealth", ZM_SetHealth, "Usage: zm_sethealth <number> <name (optional)>" );
+
+/*
+    Set health (debugging)
+*/
+void ZM_GiveResources( const CCommand &args )
+{
+    CZMPlayer* pPlayer = ToZMPlayer( UTIL_GetCommandClient() );
+
+    if ( !UTIL_IsCommandIssuedByServerAdmin() )
+    {
+        if ( !pPlayer ) return;
+
+        if ( !sv_cheats->GetBool() ) return;
+    }
+    
+
+    if ( args.ArgC() < 2 ) return;
+
+
+    int res = atoi( args.Arg( 1 ) );
+
+    CZMPlayer* pTarget = nullptr;
+
+    if ( args.ArgC() < 3 )
+    {
+        pTarget = pPlayer;
+    }
+    else
+    {
+        const char* name = args.Arg( 2 );
+        int len = strlen( name );
+
+        CZMPlayer* pPlayer;
+        for ( int i = 1; i <= gpGlobals->maxClients; i++ )
+        {
+            pPlayer = ToZMPlayer( UTIL_PlayerByIndex( i ) );
+
+            if ( pPlayer && Q_strnicmp( name, pPlayer->GetPlayerName(), len ) == 0 )
+            {
+                pTarget = pPlayer;
+                break;
+            }
+        }
+    }
+
+
+    if ( !pTarget ) return;
+
+
+    pTarget->IncResources( res );
+}
+
+static ConCommand zm_giveresources( "zm_giveresources", ZM_GiveResources, "Usage: zm_giveresources <number> <name (optional)>" );
