@@ -121,6 +121,7 @@ public:
     void RestoreMap();
 
 
+    bool ShouldLateSpawn( CZMPlayer* );
     inline float GetRoundStartTime() { return m_flRoundStartTime; };
     inline bool IsInRoundEnd() { return m_bInRoundEnd; };
 
@@ -138,7 +139,6 @@ public:
 
     inline int GetZombiePop() { return m_nZombiePop; };
 
-    
     static int GetServerParticipationFlags();
 
 #ifndef CLIENT_DLL
