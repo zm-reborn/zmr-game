@@ -13,7 +13,7 @@ public:
     CZMVoteRoundRestart() : CBaseIssue( "ZMVoteRoundRestart" ) {}
 
     virtual bool IsEnabled() OVERRIDE { return !ZMRules()->IsInRoundEnd(); };
-    virtual bool IsTeamRestrictedVote() OVERRIDE { return true; };
+    virtual bool IsTeamRestrictedVote() OVERRIDE { return false; }; // This will include the ZM, but otherwise it would be completely team restricted.
     virtual const char* GetDisplayString( void ) OVERRIDE { return "#ZMVoteRoundRestart"; };
     virtual bool IsYesNoVote() OVERRIDE { return true; };
     virtual const char* GetDetailsString( void ) OVERRIDE { return ""; };
