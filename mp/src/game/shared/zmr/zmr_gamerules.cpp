@@ -963,7 +963,7 @@ void CZMRules::BeginRound( CZMPlayer* pZM )
 
     if ( pZM )
     {
-        UTIL_ClientPrintAll( HUD_PRINTTALK, "%s is now the Zombie Master!\n", pZM->GetPlayerName() );
+        UTIL_ClientPrintAll( HUD_PRINTTALK, UTIL_VarArgs( "%s is now the Zombie Master!\n", pZM->GetPlayerName() ) );
     }
 }
 
