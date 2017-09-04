@@ -518,14 +518,8 @@ void CZMRules::OnClientFinishedPutInServer( CZMPlayer* pPlayer )
     if ( IsInRoundEnd() ) return;
 
 
-    bool latespawn = false;
+    bool latespawn = ShouldLateSpawn( pPlayer );
 
-    // Should we late-spawn?
-    if (pPlayer->GetTeamNumber() <= ZMTEAM_SPECTATOR && !pPlayer->IsAlive()
-    &&  gpGlobals->curtime < (GetRoundStartTime() + zm_sv_joingrace.GetFloat()) )
-    {
-        latespawn = true;
-    }
 
     CTeam* teamhuman = GetGlobalTeam( ZMTEAM_HUMAN );
     CTeam* teamzm = GetGlobalTeam( ZMTEAM_ZM );
@@ -1212,6 +1206,25 @@ int CZMRules::GetNumAliveHumans()
     }
     
     return num;
+}
+
+bool CZMRules::ShouldLateSpawn( CZMPlayer* pPlayer )
+{
+    if ( pPlayer->GetTeamNumber() > ZMTEAM_SPECTATOR && pPlayer->IsAlive() )
+        return false;
+
+
+    Participation_t part = pPlayer->GetParticipation();
+
+    if ( part == ZMPART_ONLYSPEC )
+    {
+        int flags = ZMRules()->GetServerParticipationFlags();
+
+        if ( flags & ZMPARTFLAG_NOSPECONLY )
+            return false;
+    }
+
+    return gpGlobals->curtime < (ZMRules()->GetRoundStartTime() + zm_sv_joingrace.GetFloat());
 }
 #endif
 
