@@ -328,3 +328,30 @@ void ZM_GiveResources( const CCommand &args )
 }
 
 static ConCommand zm_giveresources( "zm_giveresources", ZM_GiveResources, "Usage: zm_giveresources <number> <name (optional)>" );
+
+
+/*
+    Print pick priority (debugging)
+*/
+void ZM_PrintPriority( const CCommand &args )
+{
+    if ( !UTIL_IsCommandIssuedByServerAdmin() )
+    {
+        return;
+    }
+    
+
+    CZMPlayer* pPlayer;
+    for ( int i = 1; i <= gpGlobals->maxClients; i++ )
+    {
+        pPlayer = ToZMPlayer( UTIL_PlayerByIndex( i ) );
+
+        if ( pPlayer )
+        {
+            Msg( "%s: %i\n", pPlayer->GetPlayerName(), pPlayer->GetPickPriority() );
+        }
+    }
+
+}
+
+static ConCommand zm_printpriority( "zm_printpriority", ZM_PrintPriority );
