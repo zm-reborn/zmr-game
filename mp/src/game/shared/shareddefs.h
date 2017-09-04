@@ -363,6 +363,15 @@ enum PLAYER_ANIM
 	PLAYER_LEAVE_AIMING,
 };
 
+#ifdef ZMR // ZMRCHANGE: Use the old values.
+#define PLAYER_FATAL_FALL_SPEED         900.0f
+#define PLAYER_MAX_SAFE_FALL_SPEED      500.0f
+#define PLAYER_LAND_ON_FLOATING_OBJECT  173.0f
+#define PLAYER_MIN_BOUNCE_SPEED         150.0f
+#define PLAYER_FALL_PUNCH_THRESHOLD     300.0f
+
+#define DAMAGE_FOR_FALL_SPEED           150.0f / ( PLAYER_FATAL_FALL_SPEED - PLAYER_MAX_SAFE_FALL_SPEED )
+#else
 #ifdef HL2_DLL
 // HL2 has 600 gravity by default
 // NOTE: The discrete ticks can have quantization error, so these numbers are biased a little to
@@ -380,6 +389,7 @@ enum PLAYER_ANIM
 #define PLAYER_FALL_PUNCH_THRESHOLD (float)350 // won't punch player's screen/make scrape noise unless player falling at least this fast.
 #endif
 #define DAMAGE_FOR_FALL_SPEED		100.0f / ( PLAYER_FATAL_FALL_SPEED - PLAYER_MAX_SAFE_FALL_SPEED ) // damage per unit per second.
+#endif
 
 
 #define AUTOAIM_2DEGREES  0.0348994967025
