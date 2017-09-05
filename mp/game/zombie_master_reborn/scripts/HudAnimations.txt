@@ -772,3 +772,24 @@ event ZMFlashlightFadeIn
 	
 	Animate ZMHudFlashlight		FlashlightAlpha			"255"		Linear		0.0		0.2
 }
+
+event ZMBarsShow
+{
+	StopEvent ZMBarsHide 0.0
+	RunEvent ZMBarsHide 10.0 // Automatically hide after 10 seconds.
+	
+	Animate ZMHudBars		BarAlpha			"255"		Linear		0.0		0.5
+	
+	Animate ZMHudBars		TopBarY				"65"		Linear		0.0		0.5
+	Animate ZMHudBars		BottomBarY			"415"		Deaccel		0.0		0.5
+}
+
+event ZMBarsHide
+{
+	StopEvent ZMBarsShow 0.0
+	
+	Animate ZMHudBars		BarAlpha			"0"		Deaccel		0.0		0.5
+	
+	Animate ZMHudBars		TopBarY				"0"		Deaccel		0.0		0.5
+	Animate ZMHudBars		BottomBarY			"480"	Linear		0.0		0.5
+}

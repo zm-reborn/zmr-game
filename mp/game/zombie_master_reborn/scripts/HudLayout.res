@@ -71,6 +71,15 @@
 		"ypos"	"350"
 	}
 	
+	ZMHudBars
+	{
+		"fieldName"		"ZMHudBars"
+		"wide"	"640"
+		"tall"  "480"
+		"xpos"	"0"
+		"ypos"	"0"
+	}
+	
 	HudHealth
 	{
 		"fieldName"		"HudHealth"
