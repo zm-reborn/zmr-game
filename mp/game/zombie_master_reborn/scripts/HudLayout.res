@@ -13,6 +13,7 @@
 		"BarSize"	"30"
 		"HealthBarFont"	"ZMHudNumbers"
 		"HealthBarGlowFont"	"ZMHudNumbersGlow"
+		"HealthBarShadowFont"	"ZMHudNumbersShadow"
 		"HealthX"	"40"
 		"HealthY"	"5"
 	}
@@ -45,6 +46,7 @@
 		"ResY"	"2"
 		"AmmoBarFont"	"ZMHudNumbers"
 		"AmmoBarGlowFont"	"ZMHudNumbersGlow"
+		"AmmoBarShadowFont"	"ZMHudNumbersShadow"
 		
 		"MidWidth"	"6"
 		"MidHeight"	"25"
@@ -78,6 +80,18 @@
 		"tall"  "480"
 		"xpos"	"0"
 		"ypos"	"0"
+	}
+	
+	ZMHudCenterText
+	{
+		"fieldName"		"ZMHudCenterText"
+		"wide"	"640"
+		"tall"  "480"
+		"xpos"	"0"
+		"ypos"	"0"
+		
+		"BigPosY"		"100"
+		"SmallOffsetY"	"0"
 	}
 	
 	HudHealth
