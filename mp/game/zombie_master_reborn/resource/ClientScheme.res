@@ -574,10 +574,23 @@ Scheme
 				"name"		"Monofonto"
 				"tall"		"42"
 				"weight"	"0"
-				"blur"		"4"
+				"blur"		"2"
 				"scanlines" "2"
 				"antialias" "1"
 				"additive"	"1"
+				"custom"	"1"
+			}
+		}
+		ZMHudNumbersShadow
+		{
+			"1"
+			{
+				"name"		"Monofonto"
+				"tall"		"42"
+				"weight"	"0"
+				"blur"		"2"
+				"antialias" "0"
+				"additive"	"0"
 				"custom"	"1"
 			}
 		}
@@ -634,6 +647,56 @@ Scheme
 				"weight"	"0"
 				"antialias" "1"
 				"additive"	"1"
+				"custom"	"1"
+			}
+		}
+		ZMHudCenterBig
+		{
+			"1"
+			{
+				"name"		"Built Titling Rg"
+				"tall"		"64"
+				"weight"	"0"
+				"antialias" "1"
+				"additive"	"1"
+				"custom"	"1"
+			}
+		}
+		ZMHudCenterBigShadow
+		{
+			"1"
+			{
+				"name"		"Built Titling Rg"
+				"tall"		"64"
+				"weight"	"0"
+				"blur"		"8"
+				"antialias" "0"
+				"additive"	"0"
+				"custom"	"1"
+			}
+		}
+		ZMHudCenterSmall
+		{
+			"1"
+			{
+				"name"		"Built Titling Rg"
+				"tall"		"48"
+				"weight"	"0"
+				"antialias" "0"
+				"additive"	"1"
+				"custom"	"1"
+			}
+		}
+		ZMHudCenterSmallShadow
+		{
+			"1"
+			{
+				"name"		"Built Titling Rg"
+				"tall"		"48"
+				"weight"	"0"
+				"blur"		"8"
+				"antialias" "0"
+				"additive"	"0"
 				"custom"	"1"
 			}
 		}
@@ -1694,6 +1757,7 @@ Scheme
 		"2"		"resource/HL2crosshairs.ttf"
 		"1"		"resource/ZM.ttf" // ZMR
 		"1"		"resource/MONOFONT.ttf" // ZMR
+		"1"		"resource/built titling bd.ttf" // ZMR
 	}
 
 }
