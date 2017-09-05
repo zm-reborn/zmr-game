@@ -2096,12 +2096,14 @@ void CBaseEntity::FireBullets( const FireBulletsInfo_t &info )
 #ifdef GAME_DLL
 	ApplyMultiDamage();
 
+#ifndef ZMR // ZMRCHANGE: This was causing crashes. Commenting it out since we're not using stats.
 	if ( IsPlayer() && flCumulativeDamage > 0.0f )
 	{
 		CBasePlayer *pPlayer = static_cast< CBasePlayer * >( this );
 		CTakeDamageInfo dmgInfo( this, pAttacker, flCumulativeDamage, nDamageType );
 		gamestats->Event_WeaponHit( pPlayer, info.m_bPrimaryAttack, pPlayer->GetActiveWeapon()->GetClassname(), dmgInfo );
 	}
+#endif // ZMR
 #endif
 }
 
