@@ -5,7 +5,7 @@
 #include <vgui_controls/AnimationController.h>
 
 
-//#include "zmr_hud_bars.h"
+#include "zmr_hud_blackbars.h"
 
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -21,41 +21,29 @@ using namespace vgui;
 
 CON_COMMAND( zm_hudbars_show, "" )
 {
-    SHOW_BARS;
+    CZMHudBars* blackbars = GET_HUDELEMENT( CZMHudBars );
+    if ( blackbars )
+    {
+        blackbars->ShowBars( 9999.0f );
+    }
 }
 
 CON_COMMAND( zm_hudbars_hide, "" )
 {
-    HIDE_BARS;
+    CZMHudBars* blackbars = GET_HUDELEMENT( CZMHudBars );
+    if ( blackbars )
+    {
+        blackbars->HideBars();
+    }
 }
 
-
-class CZMHudBars : public CHudElement, public Panel
-{
-public:
-    DECLARE_CLASS_SIMPLE( CZMHudBars, Panel );
-
-    CZMHudBars( const char *pElementName );
-
-
-    virtual void Init() OVERRIDE;
-    virtual void VidInit() OVERRIDE;
-    virtual void LevelInit() OVERRIDE;
-
-    virtual void Paint() OVERRIDE;
-private:
-
-    CPanelAnimationVar( float, m_flAlpha, "BarAlpha", "255" );
-    CPanelAnimationVar( float, m_flTopBarY, "TopBarY", "0" );
-    CPanelAnimationVar( float, m_flBottomBarY, "BottomBarY", "480" );
-};
 
 DECLARE_HUDELEMENT( CZMHudBars );
 
 
 CZMHudBars::CZMHudBars( const char *pElementName ) : CHudElement( pElementName ), BaseClass( g_pClientMode->GetViewport(), "ZMHudBars" )
 {
-    SetPaintBackgroundEnabled( false );
+    SetPaintBackgroundEnabled( true );
     SetZPos( 9000 );
 }
 
@@ -67,11 +55,21 @@ void CZMHudBars::Init()
 void CZMHudBars::VidInit()
 {
     LevelInit();
+
+    SetSize( ScreenWidth(), ScreenHeight() );
 }
 
 void CZMHudBars::LevelInit()
 {
-    HIDE_BARS;
+    HideBars();
+}
+
+void CZMHudBars::OnThink()
+{
+    if ( m_flNextHide != 0.0f && m_flNextHide <= gpGlobals->curtime )
+    {
+        HideBars();
+    }
 }
 
 void CZMHudBars::Paint()
@@ -83,13 +81,32 @@ void CZMHudBars::Paint()
 
     surface()->DrawSetColor( clr );
 
+    int w = ScreenWidth();
+    int h = ScreenHeight();
+
     if ( m_flTopBarY > 0.0f )
     {
-        surface()->DrawFilledRect( 0, 0, ScreenWidth(), YRES( m_flTopBarY ) );
+        surface()->DrawFilledRect( 0, 0, w, YRES( m_flTopBarY ) );
     }
 
     if ( m_flBottomBarY < 480.0f )
     {
-        surface()->DrawFilledRect( 0, YRES( m_flBottomBarY ), ScreenWidth(), ScreenHeight() );
+        surface()->DrawFilledRect( 0, YRES( m_flBottomBarY ), w, h );
     }
+}
+
+void CZMHudBars::ShowBars( float displaytime )
+{
+    SHOW_BARS;
+
+    if ( displaytime > 0.0f )
+        m_flNextHide = gpGlobals->curtime + displaytime;
+    else
+        m_flNextHide = 0.0f;
+}
+
+void CZMHudBars::HideBars()
+{
+    HIDE_BARS;
+    m_flNextHide = 0.0f;
 }
