@@ -47,7 +47,7 @@ private:
     int m_nTexFgId;
 
 
-    void PaintString( HFont, const wchar_t* );
+    void PaintString( const HFont, const wchar_t*, const Color& );
     void PaintBar();
 
 
@@ -61,6 +61,7 @@ private:
 
     CPanelAnimationVar( HFont, m_hFont, "HealthBarFont", "HudNumbers" );
     CPanelAnimationVar( HFont, m_hGlowFont, "HealthBarGlowFont", "HudNumbersGlow" );
+    CPanelAnimationVar( HFont, m_hShadowFont, "HealthBarShadowFont", "HudNumbersShadow" );
 
     CPanelAnimationVarAliasType( float, m_flHealthX, "HealthX", "0", "proportional_float" );
     CPanelAnimationVarAliasType( float, m_flHealthY, "HealthY", "0", "proportional_float" );
@@ -144,21 +145,24 @@ void CZMHudHPBar::Paint()
 
 
 
+    // Draw shadow.
+    PaintString( m_hShadowFont, szHp, Color( 0, 0, 0, 255 ) );
+
     // Draw glow.
     for ( float fl = min( 1.0f, m_flBlur ); fl > 0.0f; fl -= 0.1f )
     {
         Color col = m_HealthColor;
         col[3] = 20 * fl;
 
-        PaintString( m_hGlowFont, szHp );
+        PaintString( m_hGlowFont, szHp, m_HealthColor );
     }
 
-    PaintString( m_hFont, szHp );
+    PaintString( m_hFont, szHp, m_HealthColor );
 }
 
-void CZMHudHPBar::PaintString( HFont font, const wchar_t* txt )
+void CZMHudHPBar::PaintString( HFont font, const wchar_t* txt, const Color& clr )
 {
-    surface()->DrawSetTextColor( m_HealthColor );
+    surface()->DrawSetTextColor( clr );
     surface()->DrawSetTextPos( m_flHealthX, m_flHealthY );
     surface()->DrawSetTextFont( font );
     surface()->DrawUnicodeString( txt );
