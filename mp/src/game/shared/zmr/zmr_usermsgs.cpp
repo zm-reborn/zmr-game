@@ -20,6 +20,8 @@ void RegisterZMUserMessages( void )
     usermessages->Register( "ZMObjUpdate", -1 );
     usermessages->Register( "ZMObjUpdateLine", -1 );
 
+    usermessages->Register( "ZMCenterText", -1 );
+
 
     // From vote_manager
     usermessages->Register( "CallVoteFailed", -1 );
