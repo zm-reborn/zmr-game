@@ -48,6 +48,7 @@ public:
     virtual void Precache( void ) OVERRIDE;
     virtual void Spawn() OVERRIDE;
     virtual void PreThink( void ) OVERRIDE;
+    virtual bool ClientCommand( const CCommand& args ) OVERRIDE;
     void PickDefaultSpawnTeam();
     virtual void ChangeTeam( int iTeam ) OVERRIDE;
     bool ShouldSpawn();

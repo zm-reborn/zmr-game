@@ -171,6 +171,11 @@ void CZMPlayer::PreThink( void )
     BaseClass::PreThink();
 }
 
+bool CZMPlayer::ClientCommand( const CCommand &args )
+{
+    return CBasePlayer::ClientCommand( args );
+}
+
 void CZMPlayer::ChangeTeam( int iTeam )
 {
     int oldteam = GetTeamNumber();
