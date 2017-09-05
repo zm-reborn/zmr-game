@@ -930,7 +930,7 @@ void CLagCompensationManager::BacktrackEntity( CZMBaseZombie *pEntity, float flT
 		}
  
 		Vector delta = record->m_vecOrigin - prevOrg;
-		if ( delta.LengthSqr() > sv_lagcompensation_teleport_dist.GetFloat() )
+		if ( delta.LengthSqr() > m_flTeleportDistanceSqr )
 		{
 			// lost track, moved too far (may have teleported)
 			return; 
@@ -1394,7 +1394,7 @@ void CLagCompensationManager::FinishLagCompensation( CBasePlayer *player )
 		    Vector delta = pNPC->GetLocalOrigin() - change->m_vecOrigin;
  
 		    // If it moved really far, just leave the player in the new spot!!!
-		    if ( delta.LengthSqr() < sv_lagcompensation_teleport_dist.GetFloat() )
+		    if ( delta.LengthSqr() < m_flTeleportDistanceSqr )
 		    {
 			    RestoreEntityTo( pNPC, restore->m_vecOrigin + delta );
 		    }
