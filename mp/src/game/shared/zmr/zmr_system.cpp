@@ -1,6 +1,15 @@
 #include "cbase.h"
 #include "GameEventListener.h"
 
+#ifdef CLIENT_DLL
+#include "physpropclientside.h"
+#include "c_te_legacytempents.h"
+#include "cdll_client_int.h"
+#include "c_soundscape.h"
+
+#include <engine/IEngineSound.h>
+#endif
+
 #include "zmr/zmr_web.h"
 
 
@@ -56,9 +65,20 @@ void CZMSystem::FireGameEvent( IGameEvent* pEvent )
         DevMsg( "Client received round restart event!\n" );
 
 
+        // Read client-side phys props from map and recreate em.
+        C_PhysPropClientside::RecreateAll();
+
+
+        tempents->Clear();
+        
+        // Stop sounds.
+        enginesound->StopAllSounds( true );
+        Soundscape_OnStopAllSounds();
+
+
         // Clear decals.
         engine->ClientCmd( "r_cleardecals" );
-
+        
 
         // Remove client ragdolls since they don't like getting removed.
         C_ClientRagdoll* pRagdoll;
