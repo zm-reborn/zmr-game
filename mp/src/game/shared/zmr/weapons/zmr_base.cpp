@@ -68,6 +68,14 @@ void CZMBaseWeapon::FreeWeaponSlot()
 }
 #endif
 
+bool CZMBaseWeapon::Reload()
+{
+    if ( !CanAct() ) return false;
+
+
+    return BaseClass::Reload();
+}
+
 const CZMWeaponInfo& CZMBaseWeapon::GetWpnData() const
 {
     const FileWeaponInfo_t *pBase = &CBaseCombatWeapon::GetWpnData();
@@ -100,6 +108,9 @@ void CZMBaseWeapon::FireBullets( const FireBulletsInfo_t &info )
 
 void CZMBaseWeapon::PrimaryAttack( void )
 {
+    if ( !CanAct() ) return;
+
+
     // If my clip is empty (and I use clips) start reload
     if ( UsesClipsForAmmo1() && !m_iClip1 ) 
     {
@@ -180,6 +191,14 @@ void CZMBaseWeapon::PrimaryAttack( void )
 
     // Add our view kick in
     AddViewKick();
+}
+
+void CZMBaseWeapon::SecondaryAttack( void )
+{
+    if ( !CanAct() ) return;
+
+
+    BaseClass::SecondaryAttack();
 }
 
 #ifdef CLIENT_DLL
@@ -637,3 +656,17 @@ void CZMBaseWeapon::TransferReserveAmmo( CBaseCombatCharacter* pOwner )
     }
 }
 #endif
+
+bool CZMBaseWeapon::CanAct()
+{
+    CBaseCombatCharacter* pOwner = GetOwner();
+
+    if ( !pOwner )
+        return false;
+
+    if ( pOwner->GetMoveType() == MOVETYPE_LADDER )
+        return false;
+
+
+    return true;
+}
