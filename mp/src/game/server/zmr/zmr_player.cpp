@@ -500,6 +500,10 @@ void CZMPlayer::Spawn()
 	//SetPlayerUnderwater( false );
 
 
+    // Take 4x more damage when impacted by physics. (Same as HL2DM)
+    m_impactEnergyScale = 4.0f;
+
+
     // Reset activity. Makes sure we don't get insta-punished when spawning after spectating somebody, etc.
     m_flLastActivity = gpGlobals->curtime;
 
