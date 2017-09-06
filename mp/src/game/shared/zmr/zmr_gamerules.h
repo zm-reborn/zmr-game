@@ -166,6 +166,7 @@ private:
     int m_flRoundStartTime;
     bool m_bInRoundEnd;
     int m_nRounds;
+    int m_nHumansRoundStart;
 
 
     CZMEntLoadout* m_pLoadoutEnt;

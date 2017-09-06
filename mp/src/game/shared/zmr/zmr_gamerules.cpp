@@ -171,6 +171,7 @@ CZMRules::CZMRules()
     m_flRoundStartTime = 0.0f;
     m_bInRoundEnd = false;
     m_nRounds = 0;
+    m_nHumansRoundStart = 0;
 
 
     SetZombiePop( 0 );
@@ -961,6 +962,9 @@ void CZMRules::BeginRound( CZMPlayer* pZM )
     }
 
 
+    m_nHumansRoundStart = GetNumAliveHumans();
+
+
     if ( pZM )
     {
         UTIL_ClientPrintAll( HUD_PRINTTALK, UTIL_VarArgs( "%s is now the Zombie Master!\n", pZM->GetPlayerName() ) );
@@ -1111,6 +1115,7 @@ void CZMRules::RestoreMap()
 static ConVar zm_sv_resource_rate( "zm_sv_resource_rate", "5", FCVAR_NOTIFY );
 static ConVar zm_sv_resource_refill_min( "zm_sv_resource_refill_min", "25", FCVAR_NOTIFY );
 static ConVar zm_sv_resource_refill_max( "zm_sv_resource_refill_max", "75", FCVAR_NOTIFY );
+static ConVar zm_sv_resource_refill_roundstartcount( "zm_sv_resource_refill_roundstartcount", "1", FCVAR_NOTIFY, "Is refilling based on current human count or count at the start of the round." );
 
 void CZMRules::PlayerThink( CBasePlayer* pPlayer )
 {
@@ -1122,8 +1127,19 @@ void CZMRules::PlayerThink( CBasePlayer* pPlayer )
 
         if ( pZMPlayer->GetResources() < limit )
         {
+            int num;
+            if ( zm_sv_resource_refill_roundstartcount.GetBool() )
+            {
+                // Always choose the higher one. We never know if players late-spawn, etc.
+                num = max( m_nHumansRoundStart, GetNumAliveHumans() );
+            }
+            else
+            {
+                num = GetNumAliveHumans();
+            }
+
             pZMPlayer->IncResources( (int)SimpleSplineRemapVal(
-                    GetNumAliveHumans(),
+                    num,
                     1, gpGlobals->maxClients - 1,
                     zm_sv_resource_refill_min.GetFloat(),
                     zm_sv_resource_refill_max.GetFloat() ), true );
