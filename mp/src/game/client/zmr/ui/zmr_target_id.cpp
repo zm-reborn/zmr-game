@@ -110,14 +110,23 @@ void CZMTargetID::Paint()
 
     if ( !pLocalPlayer ) return;
 
+    int iIgnore = 0;
+
     if ( !pLocalPlayer->IsHuman() )
     {
         // Allow us to see people's target id even if we're dead.
-        if (!pLocalPlayer->IsObserver()
-        ||  pLocalPlayer->GetObserverTarget() == nullptr
-        ||  pLocalPlayer->GetObserverMode() != OBS_MODE_IN_EYE )
+        if ( !pLocalPlayer->IsObserver() )
         {
             return;
+        }
+
+        // Ignore our chase target.
+        int mode = pLocalPlayer->GetObserverMode();
+
+        if ((mode == OBS_MODE_IN_EYE || mode == OBS_MODE_CHASE)
+        &&  pLocalPlayer->GetObserverTarget())
+        {
+            iIgnore = pLocalPlayer->GetObserverTarget()->entindex();
         }
     }
 
@@ -147,19 +156,17 @@ void CZMTargetID::Paint()
 
     if ( !iEntIndex ) return;
 
+    if ( iEntIndex == iIgnore ) return;
+
 
     C_BasePlayer* pPlayer = ToBasePlayer( cl_entitylist->GetEnt( iEntIndex ) );
 
     if ( !pPlayer ) return;
 
-    if ( !pPlayer->InSameTeam( pLocalPlayer ) ) return;
-
 
     wchar_t wszPlayerName[MAX_PLAYER_NAME_LENGTH];
     wszPlayerName[0] = 0;
 
-    wchar_t wszHealth[MAX_PLAYER_NAME_LENGTH];
-    wszHealth[0] = 0;
 
 #define MAX_ID_STRING 128
     wchar_t sOutput[ MAX_ID_STRING ];
