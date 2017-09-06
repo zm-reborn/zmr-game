@@ -35,6 +35,7 @@ public:
     virtual void StartReload( void );
     virtual void Pump();
 
+    virtual bool CanPickupAmmo() OVERRIDE { return IsInReload(); };
     virtual bool IsInReload() OVERRIDE;
     
 protected:
