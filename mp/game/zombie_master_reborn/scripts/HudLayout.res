@@ -101,6 +101,9 @@
 		"tall"  "480"
 		"xpos"	"0"
 		"ypos"	"0"
+		
+		"TooltipFont"		"ZMHudTooltip"
+		"TooltipBgColor"	"70 0 0 150"
 	}
 	
 	HudHealth
