@@ -430,7 +430,9 @@ bool CZMEntZombieSpawn::CreateZombie( ZombieClass_t zclass )
     }
 
 
-    pZombie->Teleport( &spawnpos, &ang, &vec3_origin );
+    pZombie->Teleport( &spawnpos, nullptr, &vec3_origin );
+    ang.x = ang.z = 0.0f;
+    pZombie->SetAbsAngles( ang );
 
     // Don't drop to floor since npcs seem to get stuck on displacements.
     //UTIL_DropToFloor( pZombie, MASK_NPCSOLID );
@@ -449,6 +451,13 @@ bool CZMEntZombieSpawn::CreateZombie( ZombieClass_t zclass )
     if ( m_pRallyPoint )
     {
         DevMsg( "Commanding zombie to rallypoint...\n" );
+
+        // Face the rallypoint instead.
+        Vector dir = m_pRallyPoint->GetAbsOrigin() - pZombie->GetAbsOrigin();
+        ang.x = ang.z = 0.f;
+        ang.y = RAD2DEG( atan2f( dir.y, dir.x ) );
+        pZombie->SetAbsAngles( ang );
+
         pZombie->Command( m_pRallyPoint->GetAbsOrigin(), false, 256.0f ); // Some additional tolerance.
     }
     
@@ -558,6 +567,9 @@ bool CZMEntZombieSpawn::FindSpawnPoint( CZMBaseZombie* pZombie, Vector& outpos, 
         if ( pZombie->CanSpawn( pos ) )
         {
             outpos = pos;
+            Vector dir = pos - GetAbsOrigin(); // Face away from the zombie spawn.
+            outang.y = RAD2DEG( atan2f( dir.y, dir.x ) );
+
             return true;
         }
     }
