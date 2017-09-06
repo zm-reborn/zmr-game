@@ -34,9 +34,9 @@ ConVar zm_sv_popcost_drifter( "zm_sv_popcost_drifter", "2", FCVAR_REPLICATED | F
 ConVar zm_sv_popcost_immolator( "zm_sv_popcost_immolator", "8", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE );
 
 ConVar zm_sv_cost_shambler( "zm_sv_cost_shambler", "10", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE );
-ConVar zm_sv_cost_banshee( "zm_sv_cost_banshee", "50", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE );
-ConVar zm_sv_cost_hulk( "zm_sv_cost_hulk", "75", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE );
-ConVar zm_sv_cost_drifter( "zm_sv_cost_drifter", "40", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE );
+ConVar zm_sv_cost_banshee( "zm_sv_cost_banshee", "45", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE );
+ConVar zm_sv_cost_hulk( "zm_sv_cost_hulk", "70", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE );
+ConVar zm_sv_cost_drifter( "zm_sv_cost_drifter", "35", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE );
 ConVar zm_sv_cost_immolator( "zm_sv_cost_immolator", "100", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE );
 
 ConVar zm_sv_resource_max( "zm_sv_resource_max", "5000", FCVAR_NOTIFY | FCVAR_REPLICATED );
@@ -1113,8 +1113,8 @@ void CZMRules::RestoreMap()
 }
 
 static ConVar zm_sv_resource_rate( "zm_sv_resource_rate", "5", FCVAR_NOTIFY );
-static ConVar zm_sv_resource_refill_min( "zm_sv_resource_refill_min", "25", FCVAR_NOTIFY );
-static ConVar zm_sv_resource_refill_max( "zm_sv_resource_refill_max", "75", FCVAR_NOTIFY );
+static ConVar zm_sv_resource_refill_min( "zm_sv_resource_refill_min", "35", FCVAR_NOTIFY );
+static ConVar zm_sv_resource_refill_max( "zm_sv_resource_refill_max", "100", FCVAR_NOTIFY );
 static ConVar zm_sv_resource_refill_roundstartcount( "zm_sv_resource_refill_roundstartcount", "1", FCVAR_NOTIFY, "Is refilling based on current human count or count at the start of the round." );
 
 void CZMRules::PlayerThink( CBasePlayer* pPlayer )
