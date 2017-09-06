@@ -251,13 +251,15 @@ void ZM_Cmd_CreateHidden( const CCommand &args )
         return;
     }
 
-    // ZMRTODO: Face the zombie master.
-    // Apparently just setting the angle here doesn't work...
+    
+    pZombie->Teleport( &trace.endpos, nullptr, nullptr );
 
-    pZombie->Teleport( &trace.endpos, &vec3_angle, nullptr );
+    // Face away from ZM.
+    QAngle ang = pPlayer->GetAbsAngles();
+    ang.x = ang.z = 0.0f;
+    pZombie->SetAbsAngles( ang );
 
     pZombie->Activate();
-
 
     pPlayer->IncResources( -zm_sv_cost_hiddenshambler.GetInt() );
 }
