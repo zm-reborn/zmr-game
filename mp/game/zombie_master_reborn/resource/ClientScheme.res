@@ -682,7 +682,7 @@ Scheme
 				"name"		"Built Titling Rg"
 				"tall"		"48"
 				"weight"	"0"
-				"antialias" "0"
+				"antialias" "1"
 				"additive"	"1"
 				"custom"	"1"
 			}
