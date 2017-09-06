@@ -248,7 +248,7 @@ void CZMFrame::OnCommand( const char* command )
     }
     else if ( Q_stricmp( command, "MODE_SELECT_ALL" ) == 0 )
     {
-        engine->ClientCmd( "zm_cmd_selectall" );
+        ZMClientUtil::SelectAllZombies();
     }
     else if ( Q_stricmp( command, "MODE_DEFENSIVE" ) == 0 )
     {
@@ -623,8 +623,8 @@ void CZMFrame::FindZombiesInBox( int start_x, int start_y, int end_x, int end_y,
     trace_t trace;
     CTraceFilterNoNPCsOrPlayer filter( nullptr, COLLISION_GROUP_NONE );
 
-    CUtlVector<int> vZombieIndices;
-    vZombieIndices.Purge();
+    CUtlVector<C_ZMBaseZombie*> vZombies;
+    vZombies.Purge();
 
     if ( start_x > end_x )
     {
@@ -657,33 +657,12 @@ void CZMFrame::FindZombiesInBox( int start_x, int start_y, int end_x, int end_y,
 
         if ( x > start_x && x < end_x && y > start_y && y < end_y )
         {
-            vZombieIndices.AddToTail( pZombie->entindex() );
+            vZombies.AddToTail( pZombie );
         }
     }
 
-    // We didn't select anything.
-    if ( !vZombieIndices.Count() )
-    {
-        if ( !bSticky )
-        {
-            engine->ClientCmd( "zm_cmd_unselectall" );
-        }
 
-        return;
-    }
-
-    char cmdbuffer[512];
-    cmdbuffer[0] = 0;
-
-    for ( int i = 0; i < vZombieIndices.Count(); i++ )
-    {
-        Q_snprintf( cmdbuffer, sizeof( cmdbuffer ), "%s%i ", cmdbuffer, vZombieIndices.Element( i ) );
-    }
-
-    if ( cmdbuffer[0] )
-    {
-        engine->ClientCmd( VarArgs( "zm_cmd_selectmult %s %s",  bSticky ? "1": "0", cmdbuffer ) );
-    }
+    ZMClientUtil::SelectZombies( vZombies, bSticky );
 }
 
 void CZMFrame::FindZMObject( int x, int y, bool bSticky )
@@ -694,8 +673,7 @@ void CZMFrame::FindZMObject( int x, int y, bool bSticky )
     int i;
     C_ZMEntBaseUsable* pUsable;
     C_ZMBaseZombie* pZombie;
-    
-    
+
     TraceScreenToWorld( x, y, &trace, nullptr, zm_cl_poweruser.GetBool() ? 0 : MASK_ZMSELECTUSABLE );
 
 
@@ -759,16 +737,16 @@ void CZMFrame::FindZMObject( int x, int y, bool bSticky )
 
         if ( pZombie )
         {
-            engine->ClientCmd( VarArgs( "zm_cmd_select %i%s",
-                pZombie->entindex(),
-                bSticky ? " 1" : "" ) );
+            ZMClientUtil::SelectSingleZombie( pZombie, bSticky );
+
             bHit = true;
+            return;
         }
     }
 
     // If we didn't hit anything special then just unselect everything.
     if ( !bHit && !bSticky )
-        engine->ClientCmd( "zm_cmd_unselectall" );
+        ZMClientUtil::DeselectAllZombies();
 }
 
 void CZMFrame::CloseChildMenus()

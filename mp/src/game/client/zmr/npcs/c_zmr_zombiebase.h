@@ -18,7 +18,7 @@ class C_ZMBaseZombie : public C_AI_BaseNPC
 public:
 	DECLARE_CLASS( C_ZMBaseZombie, C_AI_BaseNPC )
 	DECLARE_CLIENTCLASS()
-	//DECLARE_PREDICTABLE()
+	DECLARE_PREDICTABLE();
     DECLARE_DATADESC()
 
     C_ZMBaseZombie();
