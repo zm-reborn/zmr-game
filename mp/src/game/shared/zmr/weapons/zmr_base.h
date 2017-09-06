@@ -34,10 +34,12 @@ public:
 	~CZMBaseWeapon();
     
 
+    virtual bool Reload() OVERRIDE;
     const CZMWeaponInfo& GetWpnData() const;
     // NOTE: Always use this to get the damage from .txt file.
     virtual void FireBullets( const FireBulletsInfo_t &info ) OVERRIDE;
     virtual void PrimaryAttack() OVERRIDE;
+    virtual void SecondaryAttack() OVERRIDE;
     
 
     virtual bool IsPredicted() const OVERRIDE { return true; };
@@ -81,12 +83,13 @@ public:
     float GetSpreadBias( WeaponProficiency_t ) OVERRIDE;
     const WeaponProficiencyInfo_t* GetProficiencyValues() OVERRIDE;
     static const WeaponProficiencyInfo_t* GetDefaultProficiencyValues();
-
+    
     // Our stuff
     CZMPlayer* GetPlayerOwner();
     virtual bool CanBeDropped() { return true; };
     virtual bool CanPickupAmmo() { return true; };
     virtual bool IsInReload() { return CanReload() && m_bInReload; };
+    virtual bool CanAct(); // Can we reload/attack?
 
 
 #ifndef CLIENT_DLL

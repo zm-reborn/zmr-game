@@ -68,8 +68,10 @@ void CZMBasePumpWeapon::ItemPostFrame( void )
 
 void CZMBasePumpWeapon::Pump()
 {
-    CZMPlayer* pOwner = GetPlayerOwner();
+    if ( !CanAct() ) return;
 
+
+    CZMPlayer* pOwner = GetPlayerOwner();
     if ( !pOwner ) return;
 
     
@@ -96,6 +98,8 @@ void CZMBasePumpWeapon::StartReload( void )
     if ( gpGlobals->curtime < m_flNextPrimaryAttack ) return;
 
     if ( Clip1() >= GetMaxClip1() ) return;
+
+    if ( !CanAct() ) return;
 
     CZMPlayer* pPlayer = GetPlayerOwner();
     if ( !pPlayer ) return;
