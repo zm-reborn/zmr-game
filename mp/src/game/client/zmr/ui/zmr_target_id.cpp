@@ -137,7 +137,7 @@ void CZMTargetID::Paint()
     if ( !iEntIndex )
     {
         // Check to see if we should clear our ID
-        if ( m_flLastChangeTime && (gpGlobals->curtime > (m_flLastChangeTime + 0.5)) )
+        if ( m_flLastChangeTime && (gpGlobals->curtime > (m_flLastChangeTime + 0.15f)) )
         {
             m_flLastChangeTime = 0;
             m_iLastEntIndex = 0;
@@ -216,4 +216,7 @@ void CZMTargetID::Paint()
         vgui::surface()->DrawSetTextColor( COLOR_WHITE );
         vgui::surface()->DrawPrintText( sOutput, wcslen( sOutput ) );
     }
+
+
+    m_iLastEntIndex = iEntIndex;
 }
