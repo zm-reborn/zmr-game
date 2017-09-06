@@ -94,6 +94,15 @@
 		"SmallOffsetY"	"0"
 	}
 	
+	ZMHudToolTip
+	{
+		"fieldName"		"ZMHudToolTip"
+		"wide"	"640"
+		"tall"  "480"
+		"xpos"	"0"
+		"ypos"	"0"
+	}
+	
 	HudHealth
 	{
 		"fieldName"		"HudHealth"

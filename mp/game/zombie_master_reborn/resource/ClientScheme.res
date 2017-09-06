@@ -700,6 +700,18 @@ Scheme
 				"custom"	"1"
 			}
 		}
+		ZMHudTooltip
+		{
+			"1"
+			{
+				"name"		"Built Titling Rg"
+				"tall"		"24"
+				"weight"	"0"
+				"antialias" "1"
+				"additive"	"1"
+				"custom"	"1"
+			}
+		}
 		HudNumbersSmall
 		{
 			"1"
