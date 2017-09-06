@@ -125,7 +125,8 @@ void ZMClientUtil::SelectZombies( const CUtlVector<C_ZMBaseZombie*>& vZombies, b
 
     if ( !bSticky )
     {
-        DeselectAllZombies( false );
+        // Send command if we didn't select anything.
+        DeselectAllZombies( !vZombies.Count() );
     }
 
 
