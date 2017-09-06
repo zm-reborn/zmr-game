@@ -171,7 +171,7 @@ CZMRules::CZMRules()
     m_flRoundStartTime = 0.0f;
     m_bInRoundEnd = false;
     m_nRounds = 0;
-    m_nHumansRoundStart = 0;
+    m_nRoundMaxHumansAlive = 0;
 
 
     SetZombiePop( 0 );
@@ -962,7 +962,7 @@ void CZMRules::BeginRound( CZMPlayer* pZM )
     }
 
 
-    m_nHumansRoundStart = GetNumAliveHumans();
+    m_nRoundMaxHumansAlive = GetNumAliveHumans();
 
 
     if ( pZM )
@@ -1131,7 +1131,10 @@ void CZMRules::PlayerThink( CBasePlayer* pPlayer )
             if ( zm_sv_resource_refill_roundstartcount.GetBool() )
             {
                 // Always choose the higher one. We never know if players late-spawn, etc.
-                num = max( m_nHumansRoundStart, GetNumAliveHumans() );
+                num = max( m_nRoundMaxHumansAlive, GetNumAliveHumans() );
+
+                // Update max humans.
+                m_nRoundMaxHumansAlive = num;
             }
             else
             {
