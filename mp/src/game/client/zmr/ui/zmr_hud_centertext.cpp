@@ -10,6 +10,26 @@
 
 using namespace vgui;
 
+
+
+
+CON_COMMAND( zm_hudcentertext, "Displays a center text message." )
+{
+    CZMHudCenterText* txt = GET_HUDELEMENT( CZMHudCenterText );
+
+    if ( txt )
+    {
+        const char* pszDelay = args.Arg( 3 );
+        const char* pszDisplay = args.Arg( 4 );
+
+        float smalldelay = ( pszDelay && *pszDelay ) ? atoi( pszDelay ) : 0.0f;
+        float displaytime = ( pszDisplay && *pszDisplay ) ? atoi( pszDisplay ) : 5.0f;
+
+        txt->ShowText( args.Arg( 1 ), args.Arg( 2 ), smalldelay, displaytime );
+    }
+}
+
+
 DECLARE_HUDELEMENT( CZMHudCenterText );
 DECLARE_HUD_MESSAGE( CZMHudCenterText, ZMCenterText );
 
@@ -106,6 +126,17 @@ void CZMHudCenterText::Paint()
         m_Color[3] = m_flSmallAlpha;
         PaintString( m_hSmallFont, m_hSmallShadowFont, m_Color, ScreenWidth() / 2.0f - w / 2.0f, m_flBigPosY + h_big + m_flSmallOffsetY, m_szSmall );
     }
+}
+
+void CZMHudCenterText::ShowText( const char* bigtxt, const char* smalltxt, float smalldelay, float displaytime )
+{
+    wchar_t big[256];
+    wchar_t small[256];
+
+    g_pVGuiLocalize->ConvertANSIToUnicode( bigtxt, big, sizeof( big ) );
+    g_pVGuiLocalize->ConvertANSIToUnicode( smalltxt, small, sizeof( small ) );
+
+    ShowText( big, small, smalldelay, displaytime );
 }
 
 void CZMHudCenterText::ShowText( const wchar_t* bigtxt, const wchar_t* smalltxt, float smalldelay, float displaytime )
