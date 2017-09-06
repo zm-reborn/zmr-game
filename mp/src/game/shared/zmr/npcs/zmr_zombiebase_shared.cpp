@@ -117,19 +117,15 @@ int CZMBaseZombie::GetSelectorIndex()
 
 void CZMBaseZombie::SetSelector( CZMPlayer* pPlayer )
 {
-#ifndef CLIENT_DLL
     int index = 0;
 
     if ( pPlayer ) index = pPlayer->entindex();
 
 
     SetSelector( index );
-#endif
 }
 
 void CZMBaseZombie::SetSelector( int index )
 {
-#ifndef CLIENT_DLL
     m_iSelectorIndex = index;
-#endif
 }
