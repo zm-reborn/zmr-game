@@ -2,12 +2,58 @@
 
 #ifdef CLIENT_DLL
 #include "view_scene.h"
+#include "zmr/ui/zmr_hud_tooltips.h"
 #endif
 
 #include "zmr/zmr_global_shared.h"
 #include "zmr_util.h"
 
 #ifdef CLIENT_DLL
+int ZMClientUtil::ShowTooltipByName( const char* szName )
+{
+    CZMHudTooltip* tips = GET_HUDELEMENT( CZMHudTooltip );
+
+    if ( tips )
+    {
+        return tips->SetMessageByName( szName );
+    }
+
+    return 0;
+}
+
+void ZMClientUtil::ShowTooltip( const char* szMsg )
+{
+    CZMHudTooltip* tips = GET_HUDELEMENT( CZMHudTooltip );
+
+    if ( tips )
+    {
+        tips->SetMessage( szMsg );
+    }
+}
+
+void ZMClientUtil::HideTooltip( int index )
+{
+    CZMHudTooltip* tips = GET_HUDELEMENT( CZMHudTooltip );
+
+    if ( tips )
+    {
+        if ( tips->GetCurrentIndex() == index )
+        {
+            tips->HideTooltip();
+        }
+    }
+}
+
+void ZMClientUtil::HideTooltip()
+{
+    CZMHudTooltip* tips = GET_HUDELEMENT( CZMHudTooltip );
+
+    if ( tips )
+    {
+        tips->HideTooltip();
+    }
+}
+
 bool ZMClientUtil::WorldToScreen( const Vector& pos, Vector& screen, int& x, int& y )
 {
     int behind = ScreenTransform( pos, screen );

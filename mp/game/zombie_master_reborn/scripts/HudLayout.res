@@ -94,7 +94,7 @@
 		"SmallOffsetY"	"0"
 	}
 	
-	ZMHudToolTip
+	ZMHudTooltip
 	{
 		"fieldName"		"ZMHudToolTip"
 		"wide"	"640"

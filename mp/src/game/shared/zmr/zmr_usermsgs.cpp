@@ -19,8 +19,9 @@ void RegisterZMUserMessages( void )
     usermessages->Register( "ZMObjDisplay", -1 );
     usermessages->Register( "ZMObjUpdate", -1 );
     usermessages->Register( "ZMObjUpdateLine", -1 );
-
+    
     usermessages->Register( "ZMCenterText", -1 );
+    usermessages->Register( "ZMTooltip", -1 );
 
 
     // From vote_manager

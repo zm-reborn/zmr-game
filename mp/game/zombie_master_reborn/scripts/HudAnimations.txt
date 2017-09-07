@@ -814,3 +814,17 @@ event ZMCenterTextFadeInSmall
 	
 	Animate ZMHudCenterText		SmallAlpha			"255"		Linear		0.0		0.5
 }
+
+event ZMTooltipShow
+{
+	StopEvent ZMTooltipHide 0.0
+	
+	Animate ZMHudTooltip		TooltipAlphaMult			"1"		Linear		0.0		0.4
+}
+
+event ZMTooltipHide
+{
+	StopEvent ZMTooltipShow 0.0
+	
+	Animate ZMHudTooltip		TooltipAlphaMult			"0"		Deaccel		0.0		0.4
+}

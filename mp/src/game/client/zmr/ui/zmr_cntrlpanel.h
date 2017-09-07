@@ -1,6 +1,6 @@
 #include "baseviewport.h"
 
-#include "vgui_bitmapbutton.h"
+#include "zmr_bitmapbutton.h"
 
 
 class CZMControlPanel
@@ -60,8 +60,8 @@ private:
     //remove buttons
     void RemoveButtons();
 
-    CBitmapButton *m_pButtons[NUM_BUTTONS];
-    CBitmapButton *m_pTabs[NUM_TABS];
+    CZMBitMapButton *m_pButtons[NUM_BUTTONS];
+    CZMBitMapButton *m_pTabs[NUM_TABS];
 
     int m_iActiveTab;
 
