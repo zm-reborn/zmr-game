@@ -30,7 +30,7 @@ CZMControlPanel::~CZMControlPanel()
 void CZMControlPanel::LoadButtons( vgui::Panel *pParent )
 {
     const color32 white = { 255, 255, 255, 255 };
-    const color32 grey = { 155, 155, 155, 255 };
+    const color32 grey = { 128, 128, 128, 255 };
     const color32 red = { 200, 55, 55, 255 };
     //-------
     //BUTTONS
@@ -69,21 +69,36 @@ void CZMControlPanel::LoadButtons( vgui::Panel *pParent )
         "MODE_JUMP_CEILING",
     };
 
-    //TGB: power costs are now printf'd into these, see toolTipCosts array below
-    /*const char *toolTip[NUM_BUTTONS] =
+    const bool buttonEnabled[NUM_BUTTONS] =
     {
-        "Explosion: Click in the world to blast objects away. \n[Cost: %i]",
-        "Nightvision: Toggles your nightvision.",
-        "Attack: Order selected units to attack any humans they see.",
-        "Defend: Order selected units to defend their current location.",
-        "Select all: Select all your zombies.",
-        "Ambush: Set up an ambush using selected units. The units will stay put until a human comes near the ambush trigger.",
-        "Create squad: Create a squad from selected units.",
-        "Select squad: Select the chosen squad. The units in this squad will be selected.",
-        "Hidden Summon: Click in the world to create a Shambler. Only works out of sight of the humans. \n[Cost: %i]",
-        "Expire: Relinquish your control of the currently selected units.",
-        "Banshee ceiling ambush: Order selected banshees to cling to the ceiling and hide until humans pass underneath."
-    };*/
+        true,
+        false,
+        true,
+        true,
+        true,
+        false,
+        false,
+        false,
+        true,
+        true,
+        false,
+    };
+
+    //TGB: power costs are now printf'd into these, see toolTipCosts array below
+    const char *toolTip[NUM_BUTTONS] =
+    {
+        "zmmenu_exp",
+        "zmmenu_nv",
+        "zmmenu_attack",
+        "zmmenu_defend",
+        "zmmenu_selectall",
+        "zmmenu_ambush",
+        "zmmenu_createsquad",
+        "zmmenu_selectsquad",
+        "zmmenu_createhidden",
+        "zmmenu_delete",
+        "zmmenu_bansheeceil"
+    };
 
     /*const int toolTipCosts[NUM_BUTTONS] =
     {
@@ -105,16 +120,20 @@ void CZMControlPanel::LoadButtons( vgui::Panel *pParent )
     //load buttons
     for (int i = 0; i < NUM_BUTTONS; i++)
     {
-        m_pButtons[i] = new CBitmapButton( pParent, buttonCmd[i], "" ); 
+        m_pButtons[i] = new CZMBitMapButton( pParent, buttonCmd[i], "" ); 
         m_pButtons[i]->SetImage( CBitmapButton::BUTTON_ENABLED, buttonMat[i], white );
         m_pButtons[i]->SetImage( CBitmapButton::BUTTON_ENABLED_MOUSE_OVER, buttonMat[i], red );
         m_pButtons[i]->SetImage( CBitmapButton::BUTTON_PRESSED, buttonMat[i], grey );
+        m_pButtons[i]->SetImage( CBitmapButton::BUTTON_DISABLED, buttonMat[i], grey );
         m_pButtons[i]->SetButtonBorderEnabled( false );
         m_pButtons[i]->SetPaintBorderEnabled( false );
+        m_pButtons[i]->SetEnabled( buttonEnabled[i] );
         m_pButtons[i]->SetProportional( false );
 
         //basic command stuff
         m_pButtons[i]->SetCommand( buttonCmd[i] );
+
+        m_pButtons[i]->SetTooltipName( toolTip[i] );
         
         //KeyValues *msg = new KeyValues("ButtonCommand");
         //msg->SetString("command", buttonCmd[i]);
@@ -154,7 +173,7 @@ void CZMControlPanel::LoadButtons( vgui::Panel *pParent )
     //load tab buttons
     for (int i = 0; i < NUM_TABS; i++)
     {
-        m_pTabs[i] = new CBitmapButton( pParent, tabCmd[i], "" ); 
+        m_pTabs[i] = new CZMBitMapButton( pParent, tabCmd[i], "" ); 
         m_pTabs[i]->SetImage( CBitmapButton::BUTTON_ENABLED, tabMat[i], white );
         m_pTabs[i]->SetImage( CBitmapButton::BUTTON_ENABLED_MOUSE_OVER, tabMat[i], red );
         m_pTabs[i]->SetImage( CBitmapButton::BUTTON_PRESSED, tabMat[i], grey );
