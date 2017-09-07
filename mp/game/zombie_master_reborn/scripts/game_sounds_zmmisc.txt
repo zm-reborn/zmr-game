@@ -18,3 +18,12 @@
 	"wave"	"^powers/explosion_3_boom.wav"
 
 }
+
+"ZMTooltip.Show"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"0.2"
+	"soundlevel"  "SNDLVL_60dB"
+
+	"wave"	"tools/ifm/beep.wav"
+}
