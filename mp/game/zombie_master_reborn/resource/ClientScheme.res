@@ -588,7 +588,7 @@ Scheme
 				"name"		"Monofonto"
 				"tall"		"42"
 				"weight"	"0"
-				"blur"		"2"
+				"blur"		"6"
 				"antialias" "0"
 				"additive"	"0"
 				"custom"	"1"
@@ -704,11 +704,11 @@ Scheme
 		{
 			"1"
 			{
-				"name"		"Built Titling Rg"
-				"tall"		"24"
-				"weight"	"0"
+				"name"		"Trebuchet MS"
+				"tall"		"14"
+				"weight"	"900"
 				"antialias" "1"
-				"additive"	"1"
+				"additive"	"0"
 				"custom"	"1"
 			}
 		}
