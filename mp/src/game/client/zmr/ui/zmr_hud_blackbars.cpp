@@ -43,7 +43,7 @@ DECLARE_HUDELEMENT( CZMHudBars );
 
 CZMHudBars::CZMHudBars( const char *pElementName ) : CHudElement( pElementName ), BaseClass( g_pClientMode->GetViewport(), "ZMHudBars" )
 {
-    SetPaintBackgroundEnabled( true );
+    SetPaintBackgroundEnabled( false );
     SetZPos( 9000 );
 }
 
@@ -55,13 +55,18 @@ void CZMHudBars::Init()
 void CZMHudBars::VidInit()
 {
     LevelInit();
-
-    SetSize( ScreenWidth(), ScreenHeight() );
 }
 
 void CZMHudBars::LevelInit()
 {
     HideBars();
+
+    Reset();
+}
+
+void CZMHudBars::Reset()
+{
+    SetWide( ScreenWidth() );
 }
 
 void CZMHudBars::OnThink()
@@ -81,8 +86,8 @@ void CZMHudBars::Paint()
 
     surface()->DrawSetColor( clr );
 
-    int w = ScreenWidth();
-    int h = ScreenHeight();
+    int w = GetWide();
+    int h = GetTall();
 
     if ( m_flTopBarY > 0.0f )
     {
