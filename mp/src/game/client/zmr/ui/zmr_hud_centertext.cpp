@@ -47,28 +47,27 @@ CZMHudCenterText::~CZMHudCenterText()
     
 }
 
-void CZMHudCenterText::Init( void )
+void CZMHudCenterText::Init()
 {
     HOOK_HUD_MESSAGE( CZMHudCenterText, ZMCenterText );
 
     Reset();
 }
 
-void CZMHudCenterText::VidInit( void )
+void CZMHudCenterText::VidInit()
 {
     Reset();
-
-    SetSize( ScreenWidth(), ScreenHeight() );
 }
 
 void CZMHudCenterText::Reset()
 {
+    SetWide( ScreenWidth() );
+
+
     m_szBig[0] = NULL;
     m_szSmall[0] = NULL;
     m_flShowSmall = 0.0f;
     m_flNextHide = 0.0f;
-
-    Msg( "Reset()\n" );
 }
 
 void CZMHudCenterText::OnThink()
@@ -116,7 +115,7 @@ void CZMHudCenterText::Paint()
     if ( m_szBig[0] != NULL )
     {
         m_Color[3] = m_flBigAlpha;
-        PaintString( m_hBigFont, m_hBigShadowFont, m_Color, ScreenWidth() / 2.0f - w / 2.0f, m_flBigPosY, m_szBig );
+        PaintString( m_hBigFont, m_hBigShadowFont, m_Color, GetWide() / 2.0f - w / 2.0f, m_flBigPosY, m_szBig );
     }
 
     if ( m_szSmall[0] != NULL )
@@ -124,7 +123,7 @@ void CZMHudCenterText::Paint()
         surface()->GetTextSize( m_hSmallFont, m_szSmall, w, h );
 
         m_Color[3] = m_flSmallAlpha;
-        PaintString( m_hSmallFont, m_hSmallShadowFont, m_Color, ScreenWidth() / 2.0f - w / 2.0f, m_flBigPosY + h_big + m_flSmallOffsetY, m_szSmall );
+        PaintString( m_hSmallFont, m_hSmallShadowFont, m_Color, GetWide() / 2.0f - w / 2.0f, m_flBigPosY + h_big + m_flSmallOffsetY, m_szSmall );
     }
 }
 

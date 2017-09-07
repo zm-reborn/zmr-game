@@ -15,6 +15,7 @@ public:
     virtual void Init() OVERRIDE;
     virtual void VidInit() OVERRIDE;
     virtual void LevelInit() OVERRIDE;
+    virtual void Reset() OVERRIDE;
 
     virtual void OnThink() OVERRIDE;
 
