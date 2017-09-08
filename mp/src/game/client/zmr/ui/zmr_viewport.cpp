@@ -175,12 +175,25 @@ void CZMFrame::SetClickMode( ZMClickMode_t mode, bool print )
 {
     if ( mode == m_iClickMode ) return;
 
-    switch ( mode )
+
+    if ( print )
     {
-    case ZMCLICKMODE_HIDDEN :
-        break;
-    default : break;
+        switch ( mode )
+        {
+        case ZMCLICKMODE_HIDDEN :
+            ZMClientUtil::ChatPrint( "#ZMClickModeHidden" );
+            break;
+        case ZMCLICKMODE_PHYSEXP :
+            ZMClientUtil::ChatPrint( "#ZMClickModeExp" );
+            break;
+        case ZMCLICKMODE_RALLYPOINT :
+            ZMClientUtil::ChatPrint( "#ZMClickModeRally" );
+            break;
+        default : break;
+        }
     }
+
+
     m_iClickMode = mode;
 }
 

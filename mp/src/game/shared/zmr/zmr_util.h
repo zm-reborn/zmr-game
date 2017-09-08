@@ -7,6 +7,8 @@
 #ifdef CLIENT_DLL
 namespace ZMClientUtil
 {
+    void ChatPrint( const char* format, ... );
+
     int ShowTooltipByName( const char* );
     void ShowTooltip( const char* );
     void HideTooltip( int index );
