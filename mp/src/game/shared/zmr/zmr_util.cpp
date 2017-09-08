@@ -2,6 +2,10 @@
 
 #ifdef CLIENT_DLL
 #include "view_scene.h"
+#include "text_message.h"
+#include <engine/IEngineSound.h>
+
+#include "zmr/ui/zmr_hud_chat.h"
 #include "zmr/ui/zmr_hud_tooltips.h"
 #endif
 
@@ -9,6 +13,35 @@
 #include "zmr_util.h"
 
 #ifdef CLIENT_DLL
+void ZMClientUtil::ChatPrint( const char* format, ... )
+{
+    CHudChat* pChat = GET_HUDELEMENT( CHudChat );
+
+    if ( !pChat ) return;
+
+
+
+    if ( format[0] == '#' )
+    {
+        pChat->ChatPrintf( GetLocalPlayerIndex(), CHAT_FILTER_NONE, "%s",
+            g_pVGuiLocalize->FindAsUTF8( format ) );
+    }
+    else
+    {
+        va_list marker;
+        char msg[512];
+
+        va_start( marker, format );
+        Q_vsnprintf( msg, sizeof( msg ), format, marker );
+        va_end( marker );
+
+        pChat->ChatPrintf( GetLocalPlayerIndex(), CHAT_FILTER_NONE, msg );
+    }
+
+    CLocalPlayerFilter filter;
+    C_BaseEntity::EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, "HudChat.Message" );
+}
+
 int ZMClientUtil::ShowTooltipByName( const char* szName )
 {
     CZMHudTooltip* tips = GET_HUDELEMENT( CZMHudTooltip );
