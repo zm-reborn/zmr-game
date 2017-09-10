@@ -5,7 +5,8 @@
 		"msg"			"#ZMHelpZMIntro"
 		"icon"			"zmr_effects/tt_icon_light"
 		"time"			"7"
-		"show"			"1"
+		"limit"			"1"
+		"limitpergame"	"1"
 		"priority"		"5"
 		"team"			"3"
 		"pulse"			"1"
@@ -15,13 +16,16 @@
 	{
 		"msg"			"#ZMHelpZMMoving"
 		"icon"			"zmr_effects/tt_icon_light"
-		"time"			"4"
-		"show"			"2"
+		"time"			"5"
+		"limit"			"3"
+		"limitpergame"	"2"
 		"priority"		"4"
 		"team"			"3"
 		"canbequeued"	"1"
 		"pulse"			"1"
 		"sound"			"1"
+		
+		"param1"		"key@zm_observermode"
 	}
 	"zmmenu_exp"
 	{

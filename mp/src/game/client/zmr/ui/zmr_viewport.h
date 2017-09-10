@@ -52,7 +52,7 @@ public:
     void ShowPanel( bool state ) { if ( IsVisible() == state ) return; SetVisible( state ); };
     
     inline ZMClickMode_t GetClickMode() { return m_iClickMode; };
-    void SetClickMode( ZMClickMode_t, bool = false );
+    void SetClickMode( ZMClickMode_t, bool print = true );
 
 
     CZMBuildMenu* GetBuildMenu() { return m_pBuildMenu; }; // ZMRTODO: Do same thing as mani menu.

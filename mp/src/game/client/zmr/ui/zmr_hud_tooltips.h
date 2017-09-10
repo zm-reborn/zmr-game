@@ -7,17 +7,39 @@
 #include <vgui_controls/TextImage.h>
 
 
+enum TipParamType_t
+{
+    TIPPARAMTYPE_NONE = 0,
+
+    TIPPARAMTYPE_KEY,
+    TIPPARAMTYPE_CVAR,
+};
+
+struct ZMTipQueue_T
+{
+    int m_iIndex;
+    float m_flDisplay;
+};
+
 class CZMTip
 {
 public:
     CZMTip( KeyValues* kv, int index );
     ~CZMTip();
-  
+    
+
+    void LoadUsed( KeyValues* kv );
+    void WriteUsed( KeyValues* kv );
+
+
+    bool ShouldShow();
 
     void Reset();
 
     const char* GetName();
     void SetName( const char* name );
+
+    void FormatMessage( char* buffer, int len );
     const char* GetMessage();
     void SetMessage( const char* msg );
     const char* GetIcon();
@@ -28,10 +50,22 @@ public:
     int GetPriority() { return m_iPriority; };
     int GetTeam() { return m_iTeam; };
     bool DoSound() { return m_bSound; };
+    bool CanBeQueued() { return m_bQueue; };
+    int GetLimit() { return m_nLimit; };
 
     int GetIndex() { return m_iIndex; };
+
+
+    int GetShown() { return m_nShown; };
+    void IncShown() { m_nShown++; };
+
+
+    static TipParamType_t TipNameToType( const char* );
     
 private:
+    void SetParam( const char* );
+
+
     char* m_pszName;
     char* m_pszMessage;
 
@@ -45,6 +79,13 @@ private:
     bool m_bQueue;
     bool m_bPulse;
     bool m_bSound;
+    int m_nLimit;
+
+    int m_nShown;
+
+
+    char* m_pszParam;
+    TipParamType_t m_iParamType;
 };
 
 class CZMHudTooltip : public CHudElement, public vgui::Panel
@@ -64,9 +105,12 @@ public:
     virtual void Paint() OVERRIDE;
 
 
+    void QueueTip( CZMTip*, float delay );
+    void QueueTip( int index, float delay );
     CZMTip* FindMessageByName( const char* name );
-    int SetMessageByName( const char* name );
-    void SetMessage( const char* msg, int index = 0, float displaytime = 5.0f, bool pulse = false, int priority = 0, const char* image = nullptr, bool bSound = false, int team = 0 );
+    CZMTip* FindMessageByIndex( int index );
+    int SetMessageByName( const char* name, bool force = false );
+    bool SetMessage( const char* msg, int index = 0, float displaytime = 5.0f, bool pulse = false, int priority = 0, const char* image = nullptr, bool bSound = false, int team = 0 );
 
 
     bool CanDisplay();
@@ -79,6 +123,10 @@ public:
     bool CanBeOverriden( int priority ) { return (CanBeOverriden() && (m_iPriority < priority || m_iPriority == 0)); };
 
 
+    void SaveUsed();
+
+
+
     void MsgFunc_ZMTooltip( bf_read& msg );
 
 private:
@@ -86,11 +134,15 @@ private:
     void SetText( const char* txt );
 
 
+    void LoadTips();
+    void LoadUsed();
+
+
     int m_nTexId;
     vgui::TextImage* m_pTextImage;
 
     CUtlVector<CZMTip*> m_vTips;
-    CUtlVector<int> m_vQueue;
+    CUtlVector<ZMTipQueue_T> m_vQueue;
 
 
     int m_iCurIndex;

@@ -9,7 +9,9 @@ namespace ZMClientUtil
 {
     void ChatPrint( const char* format, ... );
 
-    int ShowTooltipByName( const char* );
+
+    void QueueTooltip( const char*, float delay );
+    int ShowTooltipByName( const char*, bool force = false );
     void ShowTooltip( const char* );
     void HideTooltip( int index );
     void HideTooltip();
