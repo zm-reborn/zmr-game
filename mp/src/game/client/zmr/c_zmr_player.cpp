@@ -109,6 +109,11 @@ void C_ZMPlayer::TeamChange( int iNewTeam )
     // Execute team config.
     if ( iNewTeam == ZMTEAM_ZM )
     {
+        ZMClientUtil::QueueTooltip( "zmintro", 1.0f );
+        ZMClientUtil::QueueTooltip( "zmmoving", 12.0f );
+
+
+
         engine->ClientCmd( "exec zm.cfg" );
     }
     else if ( iNewTeam == ZMTEAM_HUMAN )

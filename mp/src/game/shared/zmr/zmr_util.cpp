@@ -42,13 +42,26 @@ void ZMClientUtil::ChatPrint( const char* format, ... )
     C_BaseEntity::EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, "HudChat.Message" );
 }
 
-int ZMClientUtil::ShowTooltipByName( const char* szName )
+void ZMClientUtil::QueueTooltip( const char* name, float delay )
 {
     CZMHudTooltip* tips = GET_HUDELEMENT( CZMHudTooltip );
 
     if ( tips )
     {
-        return tips->SetMessageByName( szName );
+        CZMTip* tip = tips->FindMessageByName( name );
+
+        if ( tip )
+            tips->QueueTip( tip, delay );
+    }
+}
+
+int ZMClientUtil::ShowTooltipByName( const char* szName, bool force )
+{
+    CZMHudTooltip* tips = GET_HUDELEMENT( CZMHudTooltip );
+
+    if ( tips )
+    {
+        return tips->SetMessageByName( szName, force );
     }
 
     return 0;

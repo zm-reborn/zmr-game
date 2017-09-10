@@ -10,11 +10,24 @@
 #include "usermessages.h"
 //#include "c_user_message_register.h"
 
+
+#include "IGameUIFuncs.h"
+#include <igameresources.h>
+
+extern IGameUIFuncs* gameuifuncs; // for key binding details
+
+
+
 #include "zmr/zmr_util.h"
 #include "zmr_hud_tooltips.h"
 
 
 using namespace vgui;
+
+
+
+ConVar zm_cl_showhelp( "zm_cl_showhelp", "1", 0, "" );
+
 
 
 #define DEF_TIP_TEAM            0
@@ -37,6 +50,16 @@ CON_COMMAND( zm_hudtooltipbyname, "Displays a tool-tip by name." )
     ZMClientUtil::ShowTooltipByName( args.ArgS() );
 }
 
+CON_COMMAND( zm_hudtooltipsaveshown, "Saves shown tool-tips to a file." )
+{
+    CZMHudTooltip* tips = GET_HUDELEMENT( CZMHudTooltip );
+
+    if ( tips )
+    {
+        return tips->SaveUsed();
+    }
+}
+
 CZMTip::CZMTip( KeyValues* kv, int index )
 {
     m_iIndex = index;
@@ -45,18 +68,42 @@ CZMTip::CZMTip( KeyValues* kv, int index )
     m_pszName = nullptr;
     m_pszMessage = nullptr;
     m_pszIcon = nullptr;
+    m_pszParam = nullptr;
     Reset();
 
 
     m_iTeam = kv->GetInt( "team", DEF_TIP_TEAM );
     m_flTime = kv->GetFloat( "time", DEF_TIP_TIME );
     m_iPriority = kv->GetInt( "priority", DEF_TIP_PRIORITY );
+    m_nLimit = kv->GetInt( "limit" );
     m_bQueue = kv->GetBool( "canbequeued", false );
     m_bPulse = kv->GetBool( "pulse", false );
     m_bSound = kv->GetBool( "sound", false );
     SetName( kv->GetName() );
     SetMessage( kv->GetString( "msg" ) );
     SetIcon( kv->GetString( "icon" ) );
+    SetParam( kv->GetString( "param1" ) );
+}
+
+void CZMTip::WriteUsed( KeyValues* kv )
+{
+    if ( m_nLimit < 1 ) return;
+
+
+    KeyValues* pKey = kv->CreateNewKey();
+
+    pKey->SetName( m_pszName );
+    pKey->SetInt( "shown", GetShown() );
+}
+
+void CZMTip::LoadUsed( KeyValues* kv )
+{
+    KeyValues* pKey = kv->FindKey( GetName() );
+
+    if ( !pKey ) return;
+
+
+    m_nShown = pKey->GetInt( "shown" );
 }
 
 CZMTip::~CZMTip()
@@ -64,6 +111,7 @@ CZMTip::~CZMTip()
     delete[] m_pszName;
     delete[] m_pszMessage;
     delete[] m_pszIcon;
+    delete[] m_pszParam;
 }
 
 void CZMTip::Reset()
@@ -74,6 +122,19 @@ void CZMTip::Reset()
     m_bQueue = false;
     m_bPulse = false;
     m_bSound = false;
+
+    m_nShown = 0;
+}
+
+bool CZMTip::ShouldShow()
+{
+    if ( m_nLimit > 0 && m_nShown >= m_nLimit ) return false;
+
+    if ( m_nLimit > 0 && !zm_cl_showhelp.GetBool() )
+        return false;
+    
+
+    return true;
 }
 
 const char* CZMTip::GetName()
@@ -91,6 +152,59 @@ void CZMTip::SetName( const char* name )
     int len = strlen( name ) + 1;
     m_pszName = new char[len];
     Q_strncpy( m_pszName, name, len );
+}
+
+void CZMTip::FormatMessage( char* buffer, int len )
+{
+    if ( !m_pszMessage ) return;
+
+
+    char param[128];
+    param[0] = NULL;
+
+    switch ( m_iParamType )
+    {
+    case TIPPARAMTYPE_KEY :
+    {
+        const char* key = Panel::KeyCodeToString( gameuifuncs->GetButtonCodeForBind( m_pszParam ) );
+
+        Q_strncpy( param, ( key && *key ) ? &key[4] : "(UNBOUND)", sizeof( param ) );
+
+        break;
+    }
+    case TIPPARAMTYPE_CVAR :
+    {
+        ConVar* pCon = cvar->FindVar( m_pszParam );
+
+        if ( pCon )
+            Q_strncpy( param, pCon->GetString(), sizeof( param ) );
+
+        break;
+    }
+    default : break;
+    }
+
+
+
+    if ( param )
+    {
+        const char* pFormat = m_pszMessage;
+
+        if ( pFormat[0] == '#' )
+        {
+            pFormat = g_pVGuiLocalize->FindAsUTF8( m_pszMessage );
+        }
+
+        if ( !pFormat )
+            pFormat = m_pszMessage;
+
+
+        Q_snprintf( buffer, len, pFormat, param );
+    }
+    else
+    {
+        Q_strncpy( buffer, m_pszMessage, len );
+    }
 }
 
 const char* CZMTip::GetMessage()
@@ -127,6 +241,50 @@ void CZMTip::SetIcon( const char* icon )
     Q_strncpy( m_pszIcon, icon, len );
 }
 
+void CZMTip::SetParam( const char* invalue )
+{
+    m_iParamType = TIPPARAMTYPE_NONE;
+    delete[] m_pszParam;
+
+
+    if ( !invalue ) return;
+
+
+    char buffer[128];
+    Q_strncpy( buffer, invalue, sizeof( buffer ) );
+
+
+    char* del = strchr( buffer, '@' );
+
+    if ( !del ) return;
+
+
+    *del = NULL;
+
+    char* param = del + 1;
+
+
+    m_iParamType = TipNameToType( buffer );
+
+    int len = strlen( param ) + 1;
+    m_pszParam = new char[len];
+    Q_strncpy( m_pszParam, param, len );
+}
+
+TipParamType_t CZMTip::TipNameToType( const char* name )
+{
+    if ( Q_stricmp( name, "key" ) == 0 )
+    {
+        return TIPPARAMTYPE_KEY;
+    }
+    else if ( Q_stricmp( name, "cvar" ) == 0 )
+    {
+        return TIPPARAMTYPE_CVAR;
+    }
+
+    return TIPPARAMTYPE_NONE;
+}
+
 CZMHudTooltip::CZMHudTooltip( const char *pElementName ) : CHudElement( pElementName ), BaseClass( g_pClientMode->GetViewport(), "ZMHudTooltip" )
 {
     SetPaintBackgroundEnabled( false );
@@ -159,28 +317,8 @@ void CZMHudTooltip::Init()
 
 
 
-    m_vTips.PurgeAndDeleteElements();
-
-    KeyValues* kv = new KeyValues( "Tips" );
-    kv->UsesEscapeSequences( true );
-
-
-    if ( kv->LoadFromFile( filesystem, "resource/zmtips.txt", "MOD" ) )
-    {
-        KeyValues* pKey = kv->GetFirstSubKey();
-
-        while ( pKey )
-        {
-            AddTip( pKey );
-            pKey = pKey->GetNextKey();
-        }
-    }
-    else
-    {
-        Warning( "Couldn't load tips from file!\n" );
-    }
-
-    kv->deleteThis();
+    LoadTips();
+    LoadUsed();
 
 
     Reset();
@@ -191,6 +329,9 @@ void CZMHudTooltip::LevelInit()
 {
     Reset();
     HideTooltip();
+
+
+    m_vQueue.Purge();
 }
 
 void CZMHudTooltip::VidInit()
@@ -210,6 +351,43 @@ void CZMHudTooltip::OnThink()
     {
         if ( m_flNextHide <= gpGlobals->curtime || !CanDisplay() )
             HideTooltip();
+    }
+    else if ( m_flAlphaMult <= 0.0f && !IsDisplayingTip() && m_vQueue.Count() )
+    {
+        // Find highest priority queued tip.
+
+        CZMTip* highest_tip = nullptr;
+        int highest_index = -1;
+
+        CZMTip* tip;
+
+
+        float curtime = gpGlobals->curtime;
+
+        for ( int i = 0; i < m_vQueue.Count(); i++ )
+        {
+            if ( m_vQueue[i].m_flDisplay > curtime ) continue;
+
+
+            tip = FindMessageByIndex( m_vQueue[i].m_iIndex );
+
+            if ( !tip ) continue;
+
+
+            if ( highest_tip == nullptr || highest_tip->GetPriority() < tip->GetPriority() )
+            {
+                highest_tip = tip;
+                highest_index = i;
+            }
+        }
+        
+
+        if ( highest_tip )
+        {
+            SetMessageByName( highest_tip->GetName() );
+
+            m_vQueue.Remove( highest_index );
+        }
     }
 }
 
@@ -260,7 +438,7 @@ void CZMHudTooltip::Paint()
 
     if ( m_bPulse )
     {
-        pulse = max( 128, 255 * sin( gpGlobals->curtime * 7.0f ) );
+        pulse = max( 128, 255 * sin( gpGlobals->curtime * 5.0f ) );
     }
     else
     {
@@ -320,6 +498,21 @@ void CZMHudTooltip::HideTooltip()
     m_flNextHide = 0.0f;
 }
 
+
+void CZMHudTooltip::QueueTip( int index, float delay )
+{
+    ZMTipQueue_T queue;
+    queue.m_iIndex = index;
+    queue.m_flDisplay = gpGlobals->curtime + delay;
+
+    m_vQueue.AddToTail( queue );
+}
+
+void CZMHudTooltip::QueueTip( CZMTip* tip, float delay )
+{
+    QueueTip( tip->GetIndex(), delay );
+}
+
 CZMTip* CZMHudTooltip::FindMessageByName( const char* name )
 {
     int len = m_vTips.Count();
@@ -334,31 +527,67 @@ CZMTip* CZMHudTooltip::FindMessageByName( const char* name )
     return nullptr;
 }
 
-int CZMHudTooltip::SetMessageByName( const char* name )
+CZMTip* CZMHudTooltip::FindMessageByIndex( int index )
+{
+    int len = m_vTips.Count();
+    for ( int i = 0; i < len; i++ )
+    {
+        if ( index == m_vTips[i]->GetIndex() )
+        {
+            return m_vTips[i];
+        }
+    }
+
+    return nullptr;
+}
+
+int CZMHudTooltip::SetMessageByName( const char* name, bool force )
 {
     CZMTip* tip = FindMessageByName( name );
 
     if ( !tip ) return 0;
 
 
-    SetMessage( tip->GetMessage(), tip->GetIndex(), tip->GetTime(), tip->GetPulse(), tip->GetPriority(), tip->GetIcon(), tip->DoSound(), tip->GetTeam() );
+    if ( !force && !tip->ShouldShow() )
+    {
+        return tip->GetIndex();
+    }
+
+
+    char buffer[512];
+    buffer[0] = NULL;
+
+    tip->FormatMessage( buffer, sizeof( buffer ) );
+
+    bool res = SetMessage( buffer, tip->GetIndex(), tip->GetTime(), tip->GetPulse(), tip->GetPriority(), tip->GetIcon(), tip->DoSound(), tip->GetTeam() );
+
+
+    if ( res )
+    {
+        tip->IncShown();
+    }
+    else
+    {
+        if ( tip->CanBeQueued() )
+            QueueTip( tip, 0.0f );
+    }
 
     return tip->GetIndex();
 }
 
-void CZMHudTooltip::SetMessage( const char* msg, int index, float displaytime, bool pulse, int priority, const char* image, bool bSound, int team )
+bool CZMHudTooltip::SetMessage( const char* msg, int index, float displaytime, bool pulse, int priority, const char* image, bool bSound, int team )
 {
-    if ( !msg ) return;
+    if ( !msg ) return false;
 
     if ( IsDisplayingTip() && !CanBeOverriden( priority ) )
     {
-        return;
+        return false;
     }
 
 
     m_iTeam = team;
 
-    if ( !CanDisplay() ) return;
+    if ( !CanDisplay() ) return false;
 
 
     SetText( msg );
@@ -396,6 +625,8 @@ void CZMHudTooltip::SetMessage( const char* msg, int index, float displaytime, b
     }
 
     m_iCurIndex = index;
+
+    return true;
 }
 
 void CZMHudTooltip::SetText( const char* txt )
@@ -428,6 +659,73 @@ void CZMHudTooltip::SetText( const char* txt )
     m_pTextImage->SetSize( w, 100 );
     m_pTextImage->SetText( pTxt );
     m_pTextImage->SetFont( m_hFont );
+}
+
+void CZMHudTooltip::LoadTips()
+{
+    m_vTips.PurgeAndDeleteElements();
+
+
+    KeyValues* kv = new KeyValues( "Tips" );
+    kv->UsesEscapeSequences( true );
+
+
+    if ( kv->LoadFromFile( filesystem, "resource/zmtips.txt", "MOD" ) )
+    {
+        KeyValues* pKey = kv->GetFirstSubKey();
+
+        while ( pKey )
+        {
+            AddTip( pKey );
+            pKey = pKey->GetNextKey();
+        }
+    }
+    else
+    {
+        Warning( "Couldn't load tips from file!\n" );
+    }
+
+    kv->deleteThis();
+}
+
+void CZMHudTooltip::LoadUsed()
+{
+    KeyValues* kv = new KeyValues( "Tips" );
+
+    if ( kv->LoadFromFile( filesystem, "resource/zmtips_used.txt", "MOD" ) )
+    {
+        KeyValues* pKey = kv->GetFirstSubKey();
+
+        while ( pKey )
+        {
+            CZMTip* tip = FindMessageByName( pKey->GetName() );
+
+
+            if ( tip )
+            {
+                tip->LoadUsed( pKey );
+            }
+
+            pKey = pKey->GetNextKey();
+        }
+    }
+
+    kv->deleteThis();
+}
+
+void CZMHudTooltip::SaveUsed()
+{
+    KeyValues* kv = new KeyValues( "Tips" );
+
+
+    for ( int i = 0; i < m_vTips.Count(); i++ )
+    {
+        m_vTips[i]->WriteUsed( kv );
+    }
+
+    kv->SaveToFile( filesystem, "resource/zmtips_used.txt", "MOD" );
+
+    kv->deleteThis();
 }
 
 void CZMHudTooltip::MsgFunc_ZMTooltip( bf_read& msg )
