@@ -76,6 +76,7 @@ CZMTip::CZMTip( KeyValues* kv, int index )
     m_flTime = kv->GetFloat( "time", DEF_TIP_TIME );
     m_iPriority = kv->GetInt( "priority", DEF_TIP_PRIORITY );
     m_nLimit = kv->GetInt( "limit" );
+    m_nLimitPerGame = kv->GetInt( "limitpergame" );
     m_bQueue = kv->GetBool( "canbequeued", false );
     m_bPulse = kv->GetBool( "pulse", false );
     m_bSound = kv->GetBool( "sound", false );
@@ -90,20 +91,14 @@ void CZMTip::WriteUsed( KeyValues* kv )
     if ( m_nLimit < 1 ) return;
 
 
-    KeyValues* pKey = kv->CreateNewKey();
+    KeyValues* pKey = kv->FindKey( m_pszName, true );
 
-    pKey->SetName( m_pszName );
-    pKey->SetInt( "shown", GetShown() );
+    pKey->SetInt( "shown", m_nShown );
 }
 
 void CZMTip::LoadUsed( KeyValues* kv )
 {
-    KeyValues* pKey = kv->FindKey( GetName() );
-
-    if ( !pKey ) return;
-
-
-    m_nShown = pKey->GetInt( "shown" );
+    m_nShown = kv->GetInt( "shown" );
 }
 
 CZMTip::~CZMTip()
@@ -124,13 +119,17 @@ void CZMTip::Reset()
     m_bSound = false;
 
     m_nShown = 0;
+    m_nShownPerGame = 0;
 }
 
 bool CZMTip::ShouldShow()
 {
     if ( m_nLimit > 0 && m_nShown >= m_nLimit ) return false;
 
-    if ( m_nLimit > 0 && !zm_cl_showhelp.GetBool() )
+    if ( m_nLimitPerGame > 0 && m_nShownPerGame >= m_nLimitPerGame ) return false;
+
+
+    if ( (m_nLimit > 0 || m_nLimitPerGame > 0) && !zm_cl_showhelp.GetBool() )
         return false;
     
 
@@ -294,6 +293,7 @@ CZMHudTooltip::CZMHudTooltip( const char *pElementName ) : CHudElement( pElement
     m_vQueue.Purge();
 
     m_nTexId = 0;
+    m_nTexSize = 0;
 
     m_flNextHide = 0.0f;
     m_bPulse = false;
@@ -302,6 +302,10 @@ CZMHudTooltip::CZMHudTooltip( const char *pElementName ) : CHudElement( pElement
 
     m_pTextImage = new TextImage( "" );
     m_pTextImage->SetWrap( true );
+
+
+    LoadTips();
+    LoadUsed();
 }
 
 CZMHudTooltip::~CZMHudTooltip()
@@ -316,11 +320,6 @@ void CZMHudTooltip::Init()
     HOOK_HUD_MESSAGE( CZMHudTooltip, ZMTooltip );
 
 
-
-    LoadTips();
-    LoadUsed();
-
-
     Reset();
     HideTooltip();
 }
@@ -330,8 +329,12 @@ void CZMHudTooltip::LevelInit()
     Reset();
     HideTooltip();
 
-
     m_vQueue.Purge();
+}
+
+void CZMHudTooltip::LevelShutdown()
+{
+    SaveUsed();
 }
 
 void CZMHudTooltip::VidInit()
@@ -343,6 +346,8 @@ void CZMHudTooltip::VidInit()
 void CZMHudTooltip::Reset()
 {
     SetWide( ScreenWidth() );
+
+    m_flNextSound = 0.0f;
 }
 
 void CZMHudTooltip::OnThink()
@@ -408,7 +413,7 @@ void CZMHudTooltip::Paint()
     m_pTextImage->GetContentSize( w, h );
 
 
-    int tex_size = !m_nTexId ? 0 : ( h * 1.333f );
+    int tex_size = !m_nTexId ? 0 : m_nTexSize;
     int padding_image = !tex_size ? 0 : PADDING_IMAGE;
 
 
@@ -618,10 +623,13 @@ bool CZMHudTooltip::SetMessage( const char* msg, int index, float displaytime, b
         m_nTexId = 0;
     }
 
-    if ( bSound )
+    if ( bSound && m_flNextSound <= gpGlobals->curtime )
     {
         CLocalPlayerFilter filter;
         C_BaseEntity::EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, "ZMTooltip.Show" );
+
+
+        m_flNextSound = gpGlobals->curtime + displaytime + 6.0f;
     }
 
     m_iCurIndex = index;
@@ -653,6 +661,9 @@ void CZMHudTooltip::SetText( const char* txt )
 
     int w, h;
     surface()->GetTextSize( m_hFont, pTxt, w, h );
+
+    m_nTexSize = h * 1.333f;
+
 
     if ( w > max_w ) w = max_w;
 
@@ -690,6 +701,9 @@ void CZMHudTooltip::LoadTips()
 
 void CZMHudTooltip::LoadUsed()
 {
+    DevMsg( "Loading used tips...\n" );
+
+
     KeyValues* kv = new KeyValues( "Tips" );
 
     if ( kv->LoadFromFile( filesystem, "resource/zmtips_used.txt", "MOD" ) )
@@ -715,6 +729,9 @@ void CZMHudTooltip::LoadUsed()
 
 void CZMHudTooltip::SaveUsed()
 {
+    DevMsg( "Saving used tips...\n" );
+
+
     KeyValues* kv = new KeyValues( "Tips" );
 
 
@@ -723,7 +740,12 @@ void CZMHudTooltip::SaveUsed()
         m_vTips[i]->WriteUsed( kv );
     }
 
-    kv->SaveToFile( filesystem, "resource/zmtips_used.txt", "MOD" );
+
+    if ( m_vTips.Count() )
+    {
+        kv->SaveToFile( filesystem, "resource/zmtips_used.txt", "MOD" );
+    }
+    
 
     kv->deleteThis();
 }

@@ -56,8 +56,7 @@ public:
     int GetIndex() { return m_iIndex; };
 
 
-    int GetShown() { return m_nShown; };
-    void IncShown() { m_nShown++; };
+    void IncShown() { m_nShown++; m_nShownPerGame++; };
 
 
     static TipParamType_t TipNameToType( const char* );
@@ -80,8 +79,10 @@ private:
     bool m_bPulse;
     bool m_bSound;
     int m_nLimit;
+    int m_nLimitPerGame;
 
     int m_nShown;
+    int m_nShownPerGame;
 
 
     char* m_pszParam;
@@ -99,6 +100,7 @@ public:
 
     virtual void Init() OVERRIDE;
     virtual void LevelInit() OVERRIDE;
+    virtual void LevelShutdown() OVERRIDE;
     virtual void VidInit() OVERRIDE;
     virtual void Reset() OVERRIDE;
     virtual void OnThink() OVERRIDE;
@@ -145,10 +147,13 @@ private:
     CUtlVector<ZMTipQueue_T> m_vQueue;
 
 
+    float m_flNextHide;
+    float m_flNextSound;
+    int m_nTexSize;
+
     int m_iCurIndex;
 
     bool m_bPulse;
-    float m_flNextHide;
     int m_iPriority;
     int m_iTeam;
 
