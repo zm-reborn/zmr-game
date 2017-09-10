@@ -4,8 +4,8 @@
 	{
 		"msg"			"#ZMHelpZMIntro"
 		"icon"			"zmr_effects/tt_icon_light"
-		"time"			"7"
-		"limit"			"1"
+		"time"			"8"
+		"limit"			"2"
 		"limitpergame"	"1"
 		"priority"		"5"
 		"team"			"3"
