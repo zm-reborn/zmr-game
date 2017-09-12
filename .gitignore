@@ -74,3 +74,4 @@ server_blacklist.txt
 *.prt
 *.vmx
 serverconfig.vdf
+settings.scr
