@@ -61,6 +61,7 @@ public:
 
     virtual void PrimaryAttack( void ) OVERRIDE;
     virtual bool Holster( CBaseCombatWeapon* pSwitchTo = nullptr ) OVERRIDE;
+    virtual void Drop( const Vector& ) OVERRIDE;
     virtual void ItemPostFrame( void ) OVERRIDE;
 
 
@@ -201,4 +202,11 @@ bool CZMWeaponRifle::Holster( CBaseCombatWeapon* pSwitchTo )
     CheckUnZoom();
 
     return BaseClass::Holster( pSwitchTo );
+}
+
+void CZMWeaponRifle::Drop( const Vector& vecVelocity )
+{
+    CheckUnZoom();
+
+    BaseClass::Drop( vecVelocity );
 }
