@@ -20,6 +20,8 @@ public:
     virtual void Paint() OVERRIDE;
 
 
+    static void ShowRoundStart( const char* smalltxt );
+
     void ShowText( const char* bigtxt = nullptr, const char* smalltxt = nullptr, float smalldelay = 0.0f, float displaytime = 5.0f );
     void ShowText( const wchar_t* bigtxt = nullptr, const wchar_t* smalltxt = nullptr, float smalldelay = 0.0f, float displaytime = 5.0f );
 

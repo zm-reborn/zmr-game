@@ -628,4 +628,9 @@
 	{
 		"fieldName"		"ZMBoxSelect"
 	}
+	
+	ZMHudControlPanel
+	{
+		"fieldName"		"ZMHudControlPanel"
+	}
 }

@@ -31,7 +31,7 @@ public:
 
         m_iTooltipIndex = ZMClientUtil::ShowTooltipByName( m_pszTooltipName );
     }
-
+    
     virtual void OnCursorExited() OVERRIDE
     {
         CBitmapButton::OnCursorExited();
@@ -56,6 +56,9 @@ public:
         m_pszTooltipName = new char[len];
         Q_strncpy( m_pszTooltipName, msg, len );
     }
+
+    // Stops the awful depressed offset shit.
+    virtual void RecalculateDepressedState() OVERRIDE {};
 
 private:
     char* m_pszTooltipName;
