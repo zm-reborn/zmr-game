@@ -571,7 +571,9 @@ private:
 	friend class CHL2GameMovement;
 	friend class CDODGameMovement;
 	friend class CPortalGameMovement;
-	
+#ifdef ZMR // ZMRCHANGE: Thanks Valve.
+	friend class CZMGameMovement;
+#endif
 	// Accessors for gamemovement
 	float GetStepSize( void ) const { return m_Local.m_flStepSize; }
 

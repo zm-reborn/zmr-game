@@ -244,6 +244,52 @@ void CZMGameMovement::PlayerMove( void )
 	}
 }
 
+static ConVar zm_sv_accelerate_fix( "zm_sv_accelerate_fix", "1", FCVAR_REPLICATED | FCVAR_NOTIFY, "Is ground-strafing limited? Ie. players can't go faster by spamming strafe keys/wall-boosting." );
+
+void CZMGameMovement::Accelerate( Vector& wishdir, float wishspeed, float accel )
+{
+    int i;
+    float addspeed, accelspeed, currentspeed;
+
+    // This gets overridden because some games (CSPort) want to allow dead (observer) players
+    // to be able to move around.
+    if ( !CanAccelerate() )
+        return;
+
+
+    // See if we are changing direction a bit
+
+    // Stops wall-strafing/pre-strafing.
+    if ( zm_sv_accelerate_fix.GetBool() )
+    {
+        currentspeed = sqrt( DotProduct( mv->m_vecVelocity, mv->m_vecVelocity ) );
+    }
+    else
+    {
+        currentspeed = mv->m_vecVelocity.Dot( wishdir );
+    }
+
+    // Reduce wishspeed by the amount of veer.
+    addspeed = wishspeed - currentspeed;
+
+    // If not going to add any speed, done.
+    if ( addspeed <= 0 )
+        return;
+
+    // Determine amount of accleration.
+    accelspeed = accel * gpGlobals->frametime * wishspeed * player->m_surfaceFriction;
+
+    // Cap at addspeed
+    if ( accelspeed > addspeed )
+        accelspeed = addspeed;
+    
+    // Adjust velocity.
+    for ( i = 0; i < 3; i++ )
+    {
+        mv->m_vecVelocity[i] += accelspeed * wishdir[i];	
+    }
+}
+
 void CZMGameMovement::FullZMMove( float factor, float maxacceleration )
 {
 	Vector wishvel;
