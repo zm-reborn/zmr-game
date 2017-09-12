@@ -4,6 +4,7 @@
 #include <vgui/ILocalize.h>
 #include <vgui/ISurface.h>
 
+#include "zmr/zmr_gamerules.h"
 #include "zmr_hud_centertext.h"
 
 
@@ -127,13 +128,80 @@ void CZMHudCenterText::Paint()
     }
 }
 
+void CZMHudCenterText::ShowRoundStart( const char* insmalltxt )
+{
+    CZMHudCenterText* center = GET_HUDELEMENT( CZMHudCenterText );
+
+    if ( !center ) return;
+
+
+    CZMRules* pRules = ZMRules();
+    if ( !pRules ) return;
+
+
+    wchar_t txt[128];
+    wchar_t smalltxt[128];
+    txt[0] = NULL;
+    smalltxt[0] = NULL;
+
+    // This is just silly...
+    wchar_t wround[64];
+    char round[32];
+    Q_snprintf( round, sizeof( round ), "%i", pRules->GetRounds() );
+    g_pVGuiLocalize->ConvertANSIToUnicode( round, wround, sizeof( wround ) );
+
+
+    g_pVGuiLocalize->ConstructString( txt, sizeof( txt ), g_pVGuiLocalize->Find( "#ZMRoundCount" ), 1, wround );
+
+    if ( insmalltxt )
+    {
+        g_pVGuiLocalize->ConvertANSIToUnicode( insmalltxt, smalltxt, sizeof( smalltxt ) );
+    }
+
+
+    center->ShowText( txt, smalltxt, 1.0f, 5.0f );
+}
+
 void CZMHudCenterText::ShowText( const char* bigtxt, const char* smalltxt, float smalldelay, float displaytime )
 {
     wchar_t big[256];
     wchar_t small[256];
 
-    g_pVGuiLocalize->ConvertANSIToUnicode( bigtxt, big, sizeof( big ) );
-    g_pVGuiLocalize->ConvertANSIToUnicode( smalltxt, small, sizeof( small ) );
+    big[0] = NULL;
+    small[0] = NULL;
+
+    if ( bigtxt )
+    {
+        if ( bigtxt[0] == '#' )
+        {
+            const wchar_t* pTemp = g_pVGuiLocalize->Find( bigtxt );
+
+            if ( pTemp )
+            {
+                Q_wcsncpy( big, pTemp, sizeof( big ) );
+            }
+        }
+
+        if ( big[0] == NULL )
+            g_pVGuiLocalize->ConvertANSIToUnicode( bigtxt, big, sizeof( big ) );
+    }
+    
+    if ( smalltxt )
+    {
+        if ( smalltxt[0] == '#' )
+        {
+            const wchar_t* pTemp = g_pVGuiLocalize->Find( smalltxt );
+
+            if ( pTemp )
+            {
+                Q_wcsncpy( small, pTemp, sizeof( small ) );
+            }
+        }
+
+        if ( small[0] == NULL)
+            g_pVGuiLocalize->ConvertANSIToUnicode( smalltxt, small, sizeof( small ) );
+    }
+    
 
     ShowText( big, small, smalldelay, displaytime );
 }

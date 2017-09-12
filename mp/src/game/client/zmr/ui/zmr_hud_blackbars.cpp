@@ -21,20 +21,12 @@ using namespace vgui;
 
 CON_COMMAND( zm_hudbars_show, "" )
 {
-    CZMHudBars* blackbars = GET_HUDELEMENT( CZMHudBars );
-    if ( blackbars )
-    {
-        blackbars->ShowBars( 9999.0f );
-    }
+    CZMHudBars::Show( 9999.0f );
 }
 
 CON_COMMAND( zm_hudbars_hide, "" )
 {
-    CZMHudBars* blackbars = GET_HUDELEMENT( CZMHudBars );
-    if ( blackbars )
-    {
-        blackbars->HideBars();
-    }
+    CZMHudBars::Hide();
 }
 
 
@@ -97,6 +89,24 @@ void CZMHudBars::Paint()
     if ( m_flBottomBarY < 480.0f )
     {
         surface()->DrawFilledRect( 0, YRES( m_flBottomBarY ), w, h );
+    }
+}
+
+void CZMHudBars::Show( float displaytime )
+{
+    CZMHudBars* blackbars = GET_HUDELEMENT( CZMHudBars );
+    if ( blackbars )
+    {
+        blackbars->ShowBars( displaytime );
+    }
+}
+
+void CZMHudBars::Hide()
+{
+    CZMHudBars* blackbars = GET_HUDELEMENT( CZMHudBars );
+    if ( blackbars )
+    {
+        blackbars->HideBars();
     }
 }
 

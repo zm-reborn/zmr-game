@@ -22,6 +22,9 @@ public:
     virtual void Paint() OVERRIDE;
 
 
+    static void Show( float displaytime = 0.0f );
+    static void Hide();
+
     void ShowBars( float displaytime = 0.0f );
     void HideBars();
 private:
