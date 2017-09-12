@@ -67,6 +67,7 @@ public:
     void FireBullets( const FireBulletsInfo_t& ) OVERRIDE;
     bool WantsLagCompensationOnNPC( const CZMBaseZombie* a, const CUserCmd* b, const CBitVec<MAX_EDICTS>* c ) const;
 
+    virtual int OnTakeDamage( const CTakeDamageInfo& ) OVERRIDE;
 	virtual void CommitSuicide( bool bExplode = false, bool bForce = false ) OVERRIDE;
 	virtual void CommitSuicide( const Vector &vecForce, bool bExplode = false, bool bForce = false ) OVERRIDE;
 

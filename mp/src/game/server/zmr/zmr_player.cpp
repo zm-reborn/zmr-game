@@ -559,6 +559,25 @@ bool CZMPlayer::WantsLagCompensationOnNPC( const CZMBaseZombie* pZombie, const C
 	return true;
 }
 
+int CZMPlayer::OnTakeDamage( const CTakeDamageInfo& inputInfo )
+{
+    // Fix for molotov fire damaging other players.
+    if ( !friendlyfire.GetBool() )
+    {
+        CBaseEntity* pAttacker = inputInfo.GetAttacker();
+
+        if ( pAttacker && pAttacker->GetOwnerEntity() )
+        {
+            if ( pAttacker->GetOwnerEntity()->GetTeamNumber() >= ZMTEAM_SPECTATOR )
+            {
+                return 0;
+            }
+        }
+    }
+
+    return BaseClass::OnTakeDamage( inputInfo );
+}
+
 void CZMPlayer::CommitSuicide( bool bExplode, bool bForce )
 {
     if ( !IsHuman() ) return;
