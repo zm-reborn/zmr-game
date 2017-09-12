@@ -42,7 +42,13 @@ public:
         if ( !pPlayer ) return;
 
 
-        pPlayer->ViewPunch( QAngle( random->RandomFloat( -2, -1 ), random->RandomFloat( -2, 2 ), 0 ) );
+        QAngle viewPunch;
+
+        viewPunch.x = SharedRandomFloat( "shotgunpax", -5.0f, -2.0f );
+        viewPunch.y = SharedRandomFloat( "shotgunpay", -3.5f, 3.5f );
+        viewPunch.z = 0.0f;
+
+        pPlayer->ViewPunch( viewPunch );
     }
     
     virtual float GetFireRate( void ) OVERRIDE { return 0.55f; };
@@ -132,10 +138,6 @@ void CZMWeaponShotgun::PrimaryAttack( void )
     
     // Fire the bullets, and force the first shot to be perfectly accuracy
     FireBullets( info );
-    
-    QAngle punch;
-    punch.Init( SharedRandomFloat( "shotgunpax", -2, -1 ), SharedRandomFloat( "shotgunpay", -2, 2 ), 0 );
-    pPlayer->ViewPunch( punch );
 
     if (!m_iClip1 && pPlayer->GetAmmoCount(m_iPrimaryAmmoType) <= 0)
     {
@@ -143,6 +145,7 @@ void CZMWeaponShotgun::PrimaryAttack( void )
         pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0); 
     }
 
+    AddViewKick();
 
     m_flNextPrimaryAttack = gpGlobals->curtime + GetFireRate();
 }
