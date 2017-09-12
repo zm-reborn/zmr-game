@@ -220,6 +220,8 @@ void CZMGrenadeMolotov::Detonate()
     //    CreateFlyingChunk( GetAbsOrigin() );
     //}
 
+    CBaseCombatCharacter* pThrower = GetThrower();
+
     Vector start, end;
     Vector fwd;
     QAngle ang;
@@ -241,11 +243,11 @@ void CZMGrenadeMolotov::Detonate()
 
         if ( firetrace.fraction != 1.0f )
         {
-            FireSystem_StartFire( firetrace.endpos, 125.0f, 128.0f, 20.0f, (SF_FIRE_START_ON|SF_FIRE_SMOKELESS), GetThrower(), FIRE_NATURAL);
+            FireSystem_StartFire( firetrace.endpos + ( firetrace.plane.normal * 12.0f ), 125.0f, 128.0f, 10.0f, (SF_FIRE_START_ON), pThrower, FIRE_NATURAL );
         }
         else
         {
-            FireSystem_StartFire( trace.endpos + ( trace.plane.normal * 12.0f ), 125.0f, 128.0f, 10.0f, (SF_FIRE_START_ON), GetThrower(), FIRE_NATURAL );
+            FireSystem_StartFire( firetrace.endpos, 125.0f, 128.0f, 20.0f, (SF_FIRE_START_ON|SF_FIRE_SMOKELESS), pThrower, FIRE_NATURAL );
         }
     }
 
@@ -253,10 +255,9 @@ void CZMGrenadeMolotov::Detonate()
     UTIL_ScreenShake( GetAbsOrigin(), 10.0f, 60.0f, 1.0f, 200.0f, SHAKE_START, true );
 
 
-    if ( GetThrower() )
+    if ( pThrower )
     {
-        SetOwnerEntity( GetThrower() );
-        RadiusDamage( CTakeDamageInfo( this, GetThrower(), 40.0f, DMG_BURN ), GetAbsOrigin(), 128.0f, CLASS_NONE, NULL );
+        RadiusDamage( CTakeDamageInfo( this, pThrower, 40.0f, DMG_BURN ), GetAbsOrigin(), 128.0f, CLASS_NONE, NULL );
     }
 
 
@@ -568,6 +569,7 @@ void CZMWeaponMolotov::Throw( CZMPlayer* pPlayer )
 
 
     pMolotov->SetThrower( pPlayer );
+    pMolotov->SetOwnerEntity( pPlayer );
     pMolotov->SetAbsVelocity( vel );
     pMolotov->m_takedamage = DAMAGE_EVENTS_ONLY;
     pMolotov->SetLocalAngularVelocity( QAngle( 0, 0, random->RandomFloat( -100, -500 ) ) );

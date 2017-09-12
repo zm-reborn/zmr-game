@@ -419,6 +419,9 @@ bool FireSystem_StartFire( const Vector &position, float fireHeight, float attac
 	fire->Init( testPos, fireHeight, attack, fuel, flags, type );
 	fire->Start();
 	fire->SetOwner( owner );
+#ifdef ZMR // ZMRCHANGE: Makes sure we know the owner. Used by the fire damage fix.
+    fire->SetOwnerEntity( owner );
+#endif
 
 	return true;
 }
