@@ -47,7 +47,13 @@ public:
         if ( !pPlayer ) return;
 
 
-        pPlayer->ViewPunch( QAngle( random->RandomFloat( -5, -2 ), random->RandomFloat( -3.5, 3.5 ), 0 ) );
+        QAngle viewPunch;
+
+        viewPunch.x = SharedRandomFloat( "riflepax", -10.0f, -6.0f );
+        viewPunch.y = SharedRandomFloat( "riflepay", -2.0f, 2.0f );
+        viewPunch.z = 0.0f;
+
+        pPlayer->ViewPunch( viewPunch );
     }
     
     virtual float GetFireRate( void ) OVERRIDE { return 0.9f; };
