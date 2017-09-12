@@ -75,3 +75,4 @@ server_blacklist.txt
 *.vmx
 serverconfig.vdf
 settings.scr
+*.mdmp
