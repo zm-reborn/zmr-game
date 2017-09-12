@@ -76,7 +76,9 @@
 
 			// Add the HL2 directory as a game search path.  This is also where where writes
 			// to the "game" path go.
-			game+game_write		hl2mp
+			game				hl2mp
+			// Fixes serverconfig.vdf and some other things being written into wrong places.
+			game_write			|gameinfo_path|
 
 			// Where the game's binaries are
 			//gamebin				hl2mp/bin
