@@ -35,7 +35,7 @@
 #define SIZE_AMMO_SMG1_GRENADE		1
 #ifdef ZMR
 #define SIZE_AMMO_BUCKSHOT			8
-#define SIZE_AMMO_357				10
+#define SIZE_AMMO_357				11
 #else
 #define SIZE_AMMO_BUCKSHOT			20
 #define SIZE_AMMO_357				6
