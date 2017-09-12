@@ -68,6 +68,8 @@ public:
 
     virtual bool ShouldCollide( int, int ) OVERRIDE;
 
+    virtual void DeathNotice( CBasePlayer*, const CTakeDamageInfo& ) OVERRIDE;
+
 #ifndef CLIENT_DLL
     virtual void CreateStandardEntities() OVERRIDE;
     virtual void LevelInitPostEntity() OVERRIDE;
