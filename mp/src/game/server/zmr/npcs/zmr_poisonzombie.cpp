@@ -159,7 +159,7 @@ public:
 	//virtual int RangeAttack1Conditions( float flDot, float flDist );
 	//virtual int RangeAttack2Conditions( float flDot, float flDist );
 
-	virtual float GetClawAttackRange() const { return 70; }
+	virtual float GetClawAttackRange() const OVERRIDE { return 80; };
 
 	virtual void PrescheduleThink( void );
 	virtual void BuildScheduleTestBits( void );
