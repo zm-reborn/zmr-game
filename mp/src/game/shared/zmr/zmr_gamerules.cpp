@@ -274,6 +274,86 @@ bool CZMRules::ShouldCollide( int collisionGroup0, int collisionGroup1 )
     return BaseClass::ShouldCollide( collisionGroup0, collisionGroup1 );
 }
 
+void CZMRules::DeathNotice( CBasePlayer* pVictim, const CTakeDamageInfo& info )
+{
+#ifndef CLIENT_DLL
+    // Work out what killed the player, and send a message to all clients about it
+    const char* killer_weapon_name = "world";		// by default, the player is killed by the world
+    int killer_ID = 0;
+
+    // Find the killer & the scorer
+    CBaseEntity* pInflictor = info.GetInflictor();
+    CBaseEntity* pKiller = info.GetAttacker();
+    CBasePlayer* pScorer = GetDeathScorer( pKiller, pInflictor );
+
+    // Custom kill type?
+    if ( info.GetDamageCustom() )
+    {
+        killer_weapon_name = GetDamageCustomString( info );
+        if ( pScorer )
+        {
+            killer_ID = pScorer->GetUserID();
+        }
+    }
+    else
+    {
+        // Is the killer a client?
+        if ( pScorer )
+        {
+            killer_ID = pScorer->GetUserID();
+            
+            if ( pInflictor )
+            {
+                if ( pInflictor == pScorer )
+                {
+                    // If the inflictor is the killer,  then it must be their current weapon doing the damage
+                    if ( pScorer->GetActiveWeapon() )
+                    {
+                        killer_weapon_name = pScorer->GetActiveWeapon()->GetClassname();
+                    }
+                }
+                else
+                {
+                    killer_weapon_name = pInflictor->GetClassname();  // it's just that easy
+                }
+            }
+        }
+        else
+        {
+            killer_weapon_name = pInflictor->GetClassname();
+        }
+
+        // strip the NPC_* or weapon_* from the inflictor's classname
+        if ( strncmp( killer_weapon_name, "weapon_", 7 ) == 0 )
+        {
+            killer_weapon_name += 7;
+        }
+        else if ( strncmp( killer_weapon_name, "npc_", 4 ) == 0 )
+        {
+            killer_weapon_name += 4;
+        }
+        else if ( strncmp( killer_weapon_name, "func_", 5 ) == 0 )
+        {
+            killer_weapon_name += 5;
+        }
+        else if ( strstr( killer_weapon_name, "physics" ) )
+        {
+            killer_weapon_name = "physics";
+        }
+    }
+
+    IGameEvent *event = gameeventmanager->CreateEvent( "player_death" );
+    if( event )
+    {
+        event->SetInt( "userid", pVictim->GetUserID() );
+        event->SetInt( "attacker", killer_ID );
+        event->SetString( "weapon", killer_weapon_name );
+        event->SetInt( "priority", 7 );
+        gameeventmanager->FireEvent( event );
+    }
+#endif
+}
+
 #ifndef CLIENT_DLL
 
 void CZMRules::ClientSettingsChanged( CBasePlayer* pPlayer )
