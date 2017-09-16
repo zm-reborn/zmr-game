@@ -13,6 +13,24 @@
 #include "zmr_util.h"
 
 #ifdef CLIENT_DLL
+ConVar zm_hudchat_color( "zm_hudchat_color", "c13c3c", FCVAR_ARCHIVE );
+
+void ZMClientUtil::PrintNotify( const char* msg )
+{
+    char buf[7];
+    Q_strncpy( buf, zm_hudchat_color.GetString(), sizeof( buf ) );
+
+    if ( msg[0] == '#' )
+    {
+        ZMClientUtil::ChatPrint( "\x07%s%s", buf, g_pVGuiLocalize->FindAsUTF8( msg ) );
+    }
+    else
+    {
+        ZMClientUtil::ChatPrint( "\x07%s%s", buf, msg );
+    }
+    
+}
+
 void ZMClientUtil::ChatPrint( const char* format, ... )
 {
     CHudChat* pChat = GET_HUDELEMENT( CHudChat );
