@@ -76,7 +76,7 @@ public:
 
     void ClientSettingsChanged( CBasePlayer* ) OVERRIDE;
 
-    virtual const char* GetGameDescription( void ) OVERRIDE { return ZMR_NAME; };
+    virtual const char* GetGameDescription( void ) OVERRIDE { return ZMR_GAMEDESC; };
 
     virtual void Think() OVERRIDE;
 

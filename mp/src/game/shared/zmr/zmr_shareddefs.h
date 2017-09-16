@@ -5,6 +5,8 @@
 #define ZMR_VERSION     "a4"
 
 
+#define ZMR_GAMEDESC    (ZMR_NAME" "ZMR_VERSION)
+
 enum
 {
     ZMTEAM_INVALID = -1,

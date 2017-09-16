@@ -133,7 +133,7 @@ void ClientGamePrecache( void )
 
 const char *GetGameDescription()
 {
-    return ( g_pGameRules ) ? g_pGameRules->GetGameDescription() : ZMR_NAME;
+    return ( g_pGameRules ) ? g_pGameRules->GetGameDescription() : ZMR_GAMEDESC;
 }
 
 void InstallGameRules()
