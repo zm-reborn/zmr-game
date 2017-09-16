@@ -1,0 +1,8 @@
+UnlitGeneric
+{
+	$basetexture zmr_effects\tt_icon_light
+	$ignorez 1
+	//$translucent 1
+	$vertexalpha 1
+	$vertexcolor 1
+}

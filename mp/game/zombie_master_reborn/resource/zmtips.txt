@@ -1,0 +1,96 @@
+"Tips"
+{
+	"zmintro"
+	{
+		"msg"			"#ZMHelpZMIntro"
+		"icon"			"zmr_effects/tt_icon_light"
+		"time"			"8"
+		"limit"			"2"
+		"limitpergame"	"1"
+		"priority"		"5"
+		"team"			"3"
+		"pulse"			"1"
+		"sound"			"1"
+	}
+	"zmmoving"
+	{
+		"msg"			"#ZMHelpZMMoving"
+		"icon"			"zmr_effects/tt_icon_light"
+		"time"			"5"
+		"limit"			"3"
+		"limitpergame"	"2"
+		"priority"		"4"
+		"team"			"3"
+		"canbequeued"	"1"
+		"pulse"			"1"
+		"sound"			"1"
+		
+		"param1"		"key@zm_observermode"
+	}
+	"zmmenu_exp"
+	{
+		"msg"			"#ZMMenuZMExp"
+		"time"			"10"
+		"team"			"3"
+	}
+	"zmmenu_nv"
+	{
+		"msg"			"#ZMMenuZMNV"
+		"time"			"10"
+		"team"			"3"
+	}
+	"zmmenu_attack"
+	{
+		"msg"			"#ZMMenuZMAttack"
+		"time"			"10"
+		"team"			"3"
+	}
+	"zmmenu_defend"
+	{
+		"msg"			"#ZMMenuZMDefend"
+		"time"			"10"
+		"team"			"3"
+	}
+	"zmmenu_selectall"
+	{
+		"msg"			"#ZMMenuZMSelAll"
+		"time"			"10"
+		"team"			"3"
+	}
+	"zmmenu_ambush"
+	{
+		"msg"			"#ZMMenuZMAmbush"
+		"time"			"10"
+		"team"			"3"
+	}
+	"zmmenu_createsquad"
+	{
+		"msg"			"#ZMMenuZMSquadCre"
+		"time"			"10"
+		"team"			"3"
+	}
+	"zmmenu_selectsquad"
+	{
+		"msg"			"#ZMMenuZMSquadSel"
+		"time"			"10"
+		"team"			"3"
+	}
+	"zmmenu_createhidden"
+	{
+		"msg"			"#ZMMenuZMSummon"
+		"time"			"10"
+		"team"			"3"
+	}
+	"zmmenu_delete"
+	{
+		"msg"			"#ZMMenuZMDelete"
+		"time"			"10"
+		"team"			"3"
+	}
+	"zmmenu_bansheeceil"
+	{
+		"msg"			"#ZMMenuZMBansheeCeil"
+		"time"			"10"
+		"team"			"3"
+	}
+}

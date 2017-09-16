@@ -772,3 +772,59 @@ event ZMFlashlightFadeIn
 	
 	Animate ZMHudFlashlight		FlashlightAlpha			"255"		Linear		0.0		0.2
 }
+
+event ZMBarsShow
+{
+	StopEvent ZMBarsHide 0.0
+	
+	Animate ZMHudBars		BarAlpha			"255"		Linear		0.0		0.5
+	
+	Animate ZMHudBars		TopBarY				"75"		Linear		0.0		0.5
+	Animate ZMHudBars		BottomBarY			"405"		Deaccel		0.0		0.5
+}
+
+event ZMBarsHide
+{
+	StopEvent ZMBarsShow 0.0
+	
+	Animate ZMHudBars		BarAlpha			"0"		Deaccel		0.0		0.5
+	
+	Animate ZMHudBars		TopBarY				"0"		Deaccel		0.0		0.5
+	Animate ZMHudBars		BottomBarY			"480"	Linear		0.0		0.5
+}
+
+event ZMCenterTextFadeOut
+{
+	StopEvent ZMCenterTextFadeIn 0.0
+	
+	Animate ZMHudCenterText		BigAlpha			"0"				Deaccel		0.0		0.5
+	Animate ZMHudCenterText		SmallAlpha			"0"				Deaccel		0.0		0.5
+}
+
+event ZMCenterTextFadeIn
+{
+	StopEvent ZMCenterTextFadeOut 0.0
+	
+	Animate ZMHudCenterText		BigAlpha			"255"		Linear		0.0		0.5
+}
+
+event ZMCenterTextFadeInSmall
+{
+	StopEvent ZMCenterTextFadeOut 0.0
+	
+	Animate ZMHudCenterText		SmallAlpha			"255"		Linear		0.0		0.5
+}
+
+event ZMTooltipShow
+{
+	StopEvent ZMTooltipHide 0.0
+	
+	Animate ZMHudTooltip		TooltipAlphaMult			"1"		Linear		0.0		0.4
+}
+
+event ZMTooltipHide
+{
+	StopEvent ZMTooltipShow 0.0
+	
+	Animate ZMHudTooltip		TooltipAlphaMult			"0"		Deaccel		0.0		0.4
+}
