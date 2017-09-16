@@ -1171,6 +1171,12 @@ float CZMBaseZombie::GetHitgroupDamageMultiplier( int iHitGroup, const CTakeDama
                     return 3.0f;
                 }
             }
+            // ZMRTODO: This random shit really has to go.
+            // ZMRTODO: Melee weapons currently only hits "generic" hitgroup.
+            else if ( info.GetDamageType() & DMG_CLUB )
+            {
+                return random->RandomFloat( 1.9f, 3.0f );
+            }
             else
             {
                 return 2.0f;
@@ -1184,21 +1190,6 @@ float CZMBaseZombie::GetHitgroupDamageMultiplier( int iHitGroup, const CTakeDama
 void CZMBaseZombie::TraceAttack( const CTakeDamageInfo& info, const Vector& vecDir, trace_t* ptr, CDmgAccumulator* pAccumulator )
 {
     CTakeDamageInfo infoCopy = info;
-
-
-    // ZMRTODO: This random shit really has to go.
-    if ( ptr->hitgroup == HITGROUP_HEAD )
-    {
-        if ( infoCopy.GetDamageType() & DMG_CLUB )
-        {
-            infoCopy.ScaleDamage( random->RandomFloat( 1.9f, 3.0f ) ); 
-            
-        }
-        else
-        {
-            infoCopy.ScaleDamage( 2.1f ); 
-        }
-    }
 
     if( infoCopy.GetDamageType() & DMG_BUCKSHOT )
     {
