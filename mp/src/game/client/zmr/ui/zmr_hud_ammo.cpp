@@ -41,7 +41,7 @@ protected:
     void UpdatePlayerAmmo();
     
 
-    void PaintGlowString( const HFont& font, const HFont& glowfont, const Color& clr, float blur, int xpos, int ypos, const wchar_t* str, int side );
+    void PaintGlowString( const Color& clr, float blur, int xpos, int ypos, const wchar_t* str, int side );
     void PaintString( const HFont& font, const Color& clr, int xpos, int ypos, const wchar_t* str );
 
 private:
@@ -60,6 +60,7 @@ private:
     
     CPanelAnimationVar( HFont, m_hFont, "AmmoBarFont", "HudNumbers" );
     CPanelAnimationVar( HFont, m_hGlowFont, "AmmoBarGlowFont", "HudNumbersGlow" );
+    CPanelAnimationVar( HFont, m_hShadowFont, "AmmoBarShadowFont", "HudNumbersShadow" );
 
     CPanelAnimationVarAliasType( float, m_ClipX, "ClipX", "0", "proportional_float" );
     CPanelAnimationVarAliasType( float, m_ClipY, "ClipY", "0", "proportional_float" );
@@ -222,16 +223,19 @@ void CZMHudAmmo::PaintString( const HFont& font, const Color& clr, int xpos, int
 	surface()->DrawUnicodeString( str );
 }
 
-void CZMHudAmmo::PaintGlowString( const HFont& font, const HFont& glowfont, const Color& clr, float blur, int xpos, int ypos, const wchar_t* str, int side )
+void CZMHudAmmo::PaintGlowString( const Color& clr, float blur, int xpos, int ypos, const wchar_t* str, int side )
 {
     if ( side != SIDE_LEFT )
     {
         int w, h;
-        surface()->GetTextSize( font, str, w, h );
+        surface()->GetTextSize( m_hFont, str, w, h );
 
         if ( side == SIDE_RIGHT )
             xpos -= w;
     }
+
+
+    PaintString( m_hShadowFont, Color( 0, 0, 0, 255 ), xpos, ypos, str );
 
 
 	for ( float fl = min( 1.0f, blur ); fl > 0.0f; fl -= 0.1f )
@@ -239,10 +243,10 @@ void CZMHudAmmo::PaintGlowString( const HFont& font, const HFont& glowfont, cons
         Color col = clr;
         col[3] = 150 * fl;
 
-		PaintString( glowfont, col, xpos, ypos, str );
+		PaintString( m_hGlowFont, col, xpos, ypos, str );
 	}
 
-    PaintString( font, clr, xpos, ypos, str );
+    PaintString( m_hFont, clr, xpos, ypos, str );
 }
 
 void CZMHudAmmo::Paint()
@@ -250,7 +254,7 @@ void CZMHudAmmo::Paint()
     wchar_t szAmmo[8];
     V_snwprintf( szAmmo, ARRAYSIZE( szAmmo ), L"%i", m_iAmmo );
 
-    PaintGlowString( m_hFont, m_hGlowFont, m_ClipColor, m_flClipBlur, m_ClipX, m_ClipY, szAmmo, SIDE_RIGHT );
+    PaintGlowString( m_ClipColor, m_flClipBlur, m_ClipX, m_ClipY, szAmmo, SIDE_RIGHT );
 
 
     if ( m_bDisplaySecondary )
@@ -260,6 +264,6 @@ void CZMHudAmmo::Paint()
 
         V_snwprintf( szAmmo, ARRAYSIZE( szAmmo ), L"%i", m_iAmmo2 );
 
-        PaintGlowString( m_hFont, m_hGlowFont, m_ResColor, m_flResBlur, m_ResX, m_ResY, szAmmo, SIDE_LEFT );
+        PaintGlowString( m_ResColor, m_flResBlur, m_ResX, m_ResY, szAmmo, SIDE_LEFT );
     }
 }

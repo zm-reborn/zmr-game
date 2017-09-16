@@ -124,7 +124,7 @@ CZMFrame::CZMFrame( const char* pElementName ) : CHudElement( pElementName ), Ba
 
     m_BoxSelect = new CZMBoxSelect( this );
 
-	m_pZMControl = new CZMControlPanel( this ); 
+	m_pZMControl = new CZMHudControlPanel();
 
 	m_pManiMenu = new CZMManiMenu( this ); 
 	m_pManiMenuNew = new CZMManiMenuNew( this ); 
@@ -154,6 +154,7 @@ void CZMFrame::VidInit()
 
 void CZMFrame::Reset()
 {
+    //m_pZMControl = GET_HUDELEMENT( CZMHudControlPanel );
     if ( m_pZMControl )
     {
         m_pZMControl->PositionButtons();
@@ -175,12 +176,25 @@ void CZMFrame::SetClickMode( ZMClickMode_t mode, bool print )
 {
     if ( mode == m_iClickMode ) return;
 
-    switch ( mode )
+
+    if ( print )
     {
-    case ZMCLICKMODE_HIDDEN :
-        break;
-    default : break;
+        switch ( mode )
+        {
+        case ZMCLICKMODE_HIDDEN :
+            ZMClientUtil::ChatPrint( "#ZMClickModeHidden" );
+            break;
+        case ZMCLICKMODE_PHYSEXP :
+            ZMClientUtil::ChatPrint( "#ZMClickModeExp" );
+            break;
+        case ZMCLICKMODE_RALLYPOINT :
+            ZMClientUtil::ChatPrint( "#ZMClickModeRally" );
+            break;
+        default : break;
+        }
     }
+
+
     m_iClickMode = mode;
 }
 
@@ -236,15 +250,15 @@ void CZMFrame::OnCommand( const char* command )
 {
     if ( Q_stricmp( command, "TAB_POWERS" ) == 0 )
     {
-        if ( m_pZMControl ) m_pZMControl->UpdateTabs( CZMControlPanel::TAB_POWERS );
+        if ( m_pZMControl ) m_pZMControl->UpdateTabs( CZMHudControlPanel::TAB_POWERS );
     }
     else if ( Q_stricmp( command, "TAB_MODES" ) == 0 )
     {
-    if ( m_pZMControl ) m_pZMControl->UpdateTabs( CZMControlPanel::TAB_MODES );
+        if ( m_pZMControl ) m_pZMControl->UpdateTabs( CZMHudControlPanel::TAB_MODES );
     }
     else if ( Q_stricmp( command, "TAB_ZEDS" ) == 0 )
     {
-        if ( m_pZMControl ) m_pZMControl->UpdateTabs( CZMControlPanel::TAB_ZEDS );
+        if ( m_pZMControl ) m_pZMControl->UpdateTabs( CZMHudControlPanel::TAB_ZEDS );
     }
     else if ( Q_stricmp( command, "MODE_SELECT_ALL" ) == 0 )
     {
@@ -264,13 +278,12 @@ void CZMFrame::OnCommand( const char* command )
     }
     else if ( Q_stricmp( command, "MODE_POWER_SPOTCREATE" ) == 0 )
     {
-        SetClickMode( ZMCLICKMODE_HIDDEN );
+        if ( g_pZMView ) g_pZMView->SetClickMode( ZMCLICKMODE_HIDDEN );
     }
     else if ( Q_stricmp( command, "MODE_POWER_PHYSEXP" ) == 0 )
     {
-        SetClickMode( ZMCLICKMODE_PHYSEXP );
+        if ( g_pZMView ) g_pZMView->SetClickMode( ZMCLICKMODE_PHYSEXP );
     }
-    
 
     BaseClass::OnCommand( command );
 }

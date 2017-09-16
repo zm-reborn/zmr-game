@@ -1,11 +1,51 @@
-#include "baseviewport.h"
+#pragma once
 
-#include "vgui_bitmapbutton.h"
+//#include "baseviewport.h"
+
+#include "zmr_bitmapbutton.h"
 
 
-class CZMControlPanel
+class CZMHudControlPanel// : public CHudElement, public vgui::Frame
 {
 public:
+    //DECLARE_CLASS_SIMPLE( CZMHudControlPanel, vgui::Frame );
+
+    CZMHudControlPanel();
+    //CZMHudControlPanel( const char* );
+    ~CZMHudControlPanel();
+
+
+    
+    //virtual void Init() OVERRIDE;
+    //virtual void VidInit() OVERRIDE;
+    //virtual void Paint() OVERRIDE;
+    //virtual void OnCommand( const char* command ) OVERRIDE;
+    //virtual void OnThink() OVERRIDE;
+    //virtual void Reset() OVERRIDE;
+    
+
+
+    void PositionButtons();
+    void PositionComboBox();
+
+
+    void GroupsListUpdate();
+    void RemoveGroup( int serial );
+
+    void PaintControls( vgui::ISurface *surface );
+
+    void UpdateTabs( int activatedTab = -1 );
+    
+
+    //qck: Keeps track of ents by handle serial numbers. They are unique, so there shouldn't be any problem.
+    CUtlVector<int> m_ComboBoxItems;
+    vgui::ComboBox *m_pZombieGroups;
+
+
+
+
+
+
     enum// Button
     { 
         BUTTON_POWER_PHYSEXP,
@@ -30,44 +70,23 @@ public:
         NUM_TABS
     };
 
-    CZMControlPanel( vgui::Panel *pParent ); //pParent = viewport ptr for parenting buttons
-    ~CZMControlPanel();
 
-
-    void PositionButtons();
-    void PositionComboBox();
-
-
-    void GroupsListUpdate();
-    void RemoveGroup( int serial );
-
-
-    void OnCommand( const char* command );
-
-    void PaintControls( vgui::ISurface *surface );
-
-    void UpdateTabs( int activatedTab = -1 );
-    
-
-    //qck: Keeps track of ents by handle serial numbers. They are unique, so there shouldn't be any problem.
-    CUtlVector<int> m_ComboBoxItems;
-    vgui::ComboBox *m_pZombieGroups;
 
 private:
 
     //create buttons
-    void LoadButtons( vgui::Panel *pParent );
+    void LoadButtons();
     //remove buttons
     void RemoveButtons();
 
-    CBitmapButton *m_pButtons[NUM_BUTTONS];
-    CBitmapButton *m_pTabs[NUM_TABS];
+    CZMBitMapButton *m_pButtons[NUM_BUTTONS];
+    CZMBitMapButton *m_pTabs[NUM_TABS];
 
     int m_iActiveTab;
 
     //see CBaseZombieMasterViewPort constructor on why these are needed -> the SetBounds part
     static const int HOR_ADJUST = 8; //8
-    static const int VER_ADJUST = 28; //28
+    static const int VER_ADJUST = 40; //28
     //base positioning values
     static const int BUTTON_SIZE = 32; //32 //40
     static const int BUTTON_SPACING = 10;
@@ -80,25 +99,10 @@ private:
     //static const int PANEL_BOTRIGHT_X = 640 + HOR_ADJUST - PANEL_SPACING;
     //static const int PANEL_BOTRIGHT_Y = 480 + VER_ADJUST - PANEL_SPACING;
     
-    static const int PANEL_SIZE_X = 156;//128 //100
-    static const int PANEL_SIZE_Y = 156;//128 //100
+    static const int PANEL_SIZE_X = 156; // 156
+    static const int PANEL_SIZE_Y = 144; // 156
 
     static const int COMBO_BOX_X_OFFSET = 11;
     static const int COMBO_BOX_Y_OFFSET = 64;
     static const int COMBO_BOX_WIDTH = 100;
-};
-
-//using namespace CZMControlPanel;
-const int buttonToTab[CZMControlPanel::NUM_BUTTONS] = {
-    CZMControlPanel::TAB_POWERS, //physexp
-    CZMControlPanel::TAB_POWERS, //night vision
-    CZMControlPanel::TAB_MODES, //defense
-    CZMControlPanel::TAB_MODES, //offense,
-    CZMControlPanel::TAB_MODES, //select all
-    CZMControlPanel::TAB_MODES, //ambush
-    CZMControlPanel::TAB_ZEDS, //create group
-    CZMControlPanel::TAB_ZEDS, //goto group
-    CZMControlPanel::TAB_POWERS, //spotcreate
-    CZMControlPanel::TAB_POWERS, //delete
-    CZMControlPanel::TAB_MODES //ceiling ambush
 };
