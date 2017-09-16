@@ -33,6 +33,9 @@ ConVar zombie_ambushdist( "zombie_ambushdist", "16000" );
 
 
 
+#define ZOMBIE_BULLET_DAMAGE_SCALE 0.5f
+
+
 int AE_ZOMBIE_ATTACK_RIGHT;
 int AE_ZOMBIE_ATTACK_LEFT;
 int AE_ZOMBIE_ATTACK_BOTH;
@@ -203,9 +206,10 @@ void CZMBaseZombie::SetModel( const char* model )
 
 float CZMBaseZombie::MaxYawSpeed( void )
 {
+    // ZMRCHANGE: Increased these to ZM 1.2.1 levels.
     if ( IsMoving() && HasPoseParameter( GetSequence(), m_poseMove_Yaw ) )
     {
-        return 15.0f;
+        return 20.0f;
     }
     else
     {
@@ -219,8 +223,10 @@ float CZMBaseZombie::MaxYawSpeed( void )
             return 15.0f;
             break;
         case ACT_WALK:
-        case ACT_IDLE:
             return 25.0f;
+            break;
+        case ACT_IDLE:
+            return 35.0f;
             break;
         case ACT_RANGE_ATTACK1:
         case ACT_RANGE_ATTACK2:
@@ -1195,7 +1201,11 @@ int CZMBaseZombie::OnTakeDamage_Alive( const CTakeDamageInfo& inputInfo )
         Ignite( 100.0f );
     }
 
-
+    // Take some percentage of damage from bullets (unless hit in the crab). Always take full buckshot & sniper damage
+    if ( (info.GetDamageType() & DMG_BULLET) && !(info.GetDamageType() & (DMG_BUCKSHOT/*|DMG_SNIPER*/)) )
+    {
+        info.ScaleDamage( ZOMBIE_BULLET_DAMAGE_SCALE );
+    }
 
     int tookDamage = BaseClass::OnTakeDamage_Alive( info );
 
