@@ -182,13 +182,13 @@ void CZMFrame::SetClickMode( ZMClickMode_t mode, bool print )
         switch ( mode )
         {
         case ZMCLICKMODE_HIDDEN :
-            ZMClientUtil::ChatPrint( "#ZMClickModeHidden" );
+            ZMClientUtil::PrintNotify( "#ZMClickModeHidden" );
             break;
         case ZMCLICKMODE_PHYSEXP :
-            ZMClientUtil::ChatPrint( "#ZMClickModeExp" );
+            ZMClientUtil::PrintNotify( "#ZMClickModeExp" );
             break;
         case ZMCLICKMODE_RALLYPOINT :
-            ZMClientUtil::ChatPrint( "#ZMClickModeRally" );
+            ZMClientUtil::PrintNotify( "#ZMClickModeRally" );
             break;
         default : break;
         }
