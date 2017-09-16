@@ -130,6 +130,7 @@ void CZMHudCenterText::Paint()
 
 void CZMHudCenterText::ShowRoundStart( const char* insmalltxt )
 {
+    /*
     CZMHudCenterText* center = GET_HUDELEMENT( CZMHudCenterText );
 
     if ( !center ) return;
@@ -159,7 +160,7 @@ void CZMHudCenterText::ShowRoundStart( const char* insmalltxt )
     }
 
 
-    center->ShowText( txt, smalltxt, 1.0f, 5.0f );
+    center->ShowText( txt, smalltxt, 1.0f, 5.0f );*/
 }
 
 void CZMHudCenterText::ShowText( const char* bigtxt, const char* smalltxt, float smalldelay, float displaytime )

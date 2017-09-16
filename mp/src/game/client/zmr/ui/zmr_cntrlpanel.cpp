@@ -10,19 +10,37 @@
 #include "zmr_cntrlpanel.h"
 
 
-extern IGameUIFuncs *gameuifuncs; // for key binding details
-
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
 using namespace vgui;
 
 
-DECLARE_HUDELEMENT( CZMHudControlPanel );
 
-CZMHudControlPanel::CZMHudControlPanel( const char* pElementName ) : CHudElement( pElementName ), Frame( g_pClientMode->GetViewport(), "ZMHudControlPanel", false )
+
+
+//using namespace CZMHudControlPanel;
+const int buttonToTab[CZMHudControlPanel::NUM_BUTTONS] = {
+    CZMHudControlPanel::TAB_POWERS, //physexp
+    CZMHudControlPanel::TAB_POWERS, //night vision
+    CZMHudControlPanel::TAB_MODES, //defense
+    CZMHudControlPanel::TAB_MODES, //offense,
+    CZMHudControlPanel::TAB_MODES, //select all
+    CZMHudControlPanel::TAB_MODES, //ambush
+    CZMHudControlPanel::TAB_ZEDS, //create group
+    CZMHudControlPanel::TAB_ZEDS, //goto group
+    CZMHudControlPanel::TAB_POWERS, //spotcreate
+    CZMHudControlPanel::TAB_POWERS, //delete
+    CZMHudControlPanel::TAB_MODES //ceiling ambush
+};
+
+//DECLARE_HUDELEMENT( CZMHudControlPanel );
+
+//CZMHudControlPanel::CZMHudControlPanel( const char* pElementName ) : CHudElement( pElementName ), Frame( g_pClientMode-CZMHudControlPanel::CZMHudControlPanel( const char* pElementName ) : CHudElement( pElementName ), Frame( g_pClientMode->GetViewport(), "ZMHudControlPanel", false )
+CZMHudControlPanel::CZMHudControlPanel()
 {
-    SetMouseInputEnabled( true );
+    /*
+    SetMouseInputEnabled( false );
     SetKeyBoardInputEnabled( false );
     SetProportional( false );
     SetPaintBackgroundEnabled( false );
@@ -34,10 +52,10 @@ CZMHudControlPanel::CZMHudControlPanel( const char* pElementName ) : CHudElement
 
     // Makes sure we don't get pressed / into a z-fight if other menus are on top of us.
     SetZPos( -100 );
-
+    */
     LoadButtons();
 
-    Reset();
+    //Reset();
 
 
     UpdateTabs( CZMHudControlPanel::TAB_MODES );
@@ -47,7 +65,7 @@ CZMHudControlPanel::~CZMHudControlPanel()
 {
     RemoveButtons();
 }
-
+/*
 void CZMHudControlPanel::Init()
 {
     Reset();
@@ -66,6 +84,7 @@ void CZMHudControlPanel::Reset()
     {
         SetParent( g_pZMView );
     }
+    
 }
 
 void CZMHudControlPanel::OnThink()
@@ -75,10 +94,11 @@ void CZMHudControlPanel::OnThink()
 
     if ( !IsCursorOver() ) return;
 
-    // Make sure we have focus.
-    //MoveToFront();
 
+    // Make sure we have focus.
+    MoveToFront();
 }
+*/
 
 void CZMHudControlPanel::LoadButtons()
 {
@@ -138,6 +158,21 @@ void CZMHudControlPanel::LoadButtons()
         "zmmenu_bansheeceil"
     };
 
+    const bool enabled[NUM_BUTTONS] =
+    {
+        true,
+        false,
+        true,
+        true,
+        true,
+        false,
+        false,
+        false,
+        true,
+        true,
+        false
+    };
+
     /*const int toolTipCosts[NUM_BUTTONS] =
     {
         0,//zm_physexp_cost.GetInt(),	//explosion
@@ -158,7 +193,7 @@ void CZMHudControlPanel::LoadButtons()
     //load buttons
     for (int i = 0; i < NUM_BUTTONS; i++)
     {
-        m_pButtons[i] = new CZMBitMapButton( this, buttonCmd[i], "" );
+        m_pButtons[i] = new CZMBitMapButton( g_pZMView, buttonCmd[i], "" );
         m_pButtons[i]->SetProportional( false );
         m_pButtons[i]->SetImage( CBitmapButton::BUTTON_ENABLED, buttonMat[i], white );
         m_pButtons[i]->SetImage( CBitmapButton::BUTTON_ENABLED_MOUSE_OVER, buttonMat[i], red );
@@ -167,12 +202,12 @@ void CZMHudControlPanel::LoadButtons()
         m_pButtons[i]->SetButtonBorderEnabled( false );
         m_pButtons[i]->SetPaintBorderEnabled( false );
 
-        m_pButtons[i]->SetZPos( -10000 );
-
         //basic command stuff
         m_pButtons[i]->SetCommand( buttonCmd[i] );
 
         m_pButtons[i]->SetTooltipName( toolTip[i] );
+
+        m_pButtons[i]->SetEnabled( enabled[i] );
         
         //KeyValues *msg = new KeyValues("ButtonCommand");
         //msg->SetString("command", buttonCmd[i]);
@@ -209,20 +244,29 @@ void CZMHudControlPanel::LoadButtons()
         "TAB_ZEDS",
     };
 
+    const bool tabEnabled[NUM_BUTTONS] =
+    {
+        true,
+        true,
+        false
+    };
+
     //load tab buttons
     for (int i = 0; i < NUM_TABS; i++)
     {
-        m_pTabs[i] = new CZMBitMapButton( this, tabCmd[i], "" );
+        m_pTabs[i] = new CZMBitMapButton( g_pZMView, tabCmd[i], "" );
         m_pTabs[i]->SetProportional( false );
         m_pTabs[i]->SetImage( CBitmapButton::BUTTON_ENABLED, tabMat[i], white );
         m_pTabs[i]->SetImage( CBitmapButton::BUTTON_ENABLED_MOUSE_OVER, tabMat[i], red );
         m_pTabs[i]->SetImage( CBitmapButton::BUTTON_PRESSED, tabMat[i], grey );
+        m_pTabs[i]->SetImage( CBitmapButton::BUTTON_DISABLED, tabMat[i], grey );
 
         //die borders! DIIIIEEEEE
         m_pTabs[i]->SetButtonBorderEnabled( false );
         m_pTabs[i]->SetPaintBorderEnabled( false );
-        
-        m_pTabs[i]->SetParent( this );
+
+        m_pTabs[i]->SetEnabled( tabEnabled[i] );
+
         //basic command stuff
         m_pTabs[i]->SetCommand( tabCmd[i] );
         //KeyValues *msg = new KeyValues("ButtonCommand");
@@ -233,7 +277,7 @@ void CZMHudControlPanel::LoadButtons()
         //m_pTabs[i]->SetTooltip( nullptr, "" );
     }
 
-    m_pZombieGroups = new ComboBox( this, "groupscombo", 5 , false ); 
+    m_pZombieGroups = new ComboBox( g_pZMView, "groupscombo", 5 , false ); 
     //m_pZombieGroups->SetOpenDirection( ComboBox::UP );
     m_pZombieGroups->SetText("None");
     m_pZombieGroups->GetMenu()->MakeReadyForUse();
@@ -337,10 +381,10 @@ void CZMHudControlPanel::PositionButtons()
     //const float flVerScale = (float)ScreenHeight() / 480.0f;
     const float flVerScale = 1;
 
-    const int PANEL_TOPLEFT_X = HOR_ADJUST - PANEL_SPACING;
-    //const int PANEL_TOPLEFT_X = ScreenWidth() - PANEL_SIZE_X + HOR_ADJUST - PANEL_SPACING;
-    const int PANEL_TOPLEFT_Y = VER_ADJUST - PANEL_SPACING;
-    //const int PANEL_TOPLEFT_Y = ScreenHeight() - PANEL_SIZE_Y + VER_ADJUST - PANEL_SPACING;
+    //const int PANEL_TOPLEFT_X = HOR_ADJUST - PANEL_SPACING;
+    const int PANEL_TOPLEFT_X = ScreenWidth() - PANEL_SIZE_X + HOR_ADJUST - PANEL_SPACING;
+    //const int PANEL_TOPLEFT_Y = VER_ADJUST - PANEL_SPACING;
+    const int PANEL_TOPLEFT_Y = ScreenHeight() - PANEL_SIZE_Y + VER_ADJUST - PANEL_SPACING;
     //-------
     //BUTTONS
     //-------
@@ -437,10 +481,10 @@ void CZMHudControlPanel::PositionComboBox()
     //const float flVerScale = (float)ScreenHeight() / 480.0f;
     const float flVerScale = 1;
 
-    const int PANEL_TOPLEFT_X = HOR_ADJUST - PANEL_SPACING;
-    //const int PANEL_TOPLEFT_X = ScreenWidth() - PANEL_SIZE_X + HOR_ADJUST - PANEL_SPACING;
-    const int PANEL_TOPLEFT_Y = VER_ADJUST - PANEL_SPACING;
-    //const int PANEL_TOPLEFT_Y = ScreenHeight() - PANEL_SIZE_Y + VER_ADJUST - PANEL_SPACING;
+    //const int PANEL_TOPLEFT_X = HOR_ADJUST - PANEL_SPACING;
+    const int PANEL_TOPLEFT_X = ScreenWidth() - PANEL_SIZE_X + HOR_ADJUST - PANEL_SPACING;
+    //const int PANEL_TOPLEFT_Y = VER_ADJUST - PANEL_SPACING;
+    const int PANEL_TOPLEFT_Y = ScreenHeight() - PANEL_SIZE_Y + VER_ADJUST - PANEL_SPACING;
     int combo_start_x = PANEL_TOPLEFT_X + COMBO_BOX_X_OFFSET;
     int combo_start_y = PANEL_TOPLEFT_Y + COMBO_BOX_Y_OFFSET;
 
@@ -452,50 +496,6 @@ void CZMHudControlPanel::PositionComboBox()
     m_pZombieGroups->SetWide( COMBO_BOX_WIDTH );
     m_pZombieGroups->SetPos( combo_start_x, combo_start_y );
     m_pZombieGroups->SetVisible( false );
-}
-
-void CZMHudControlPanel::OnCommand( const char* command )
-{
-    if ( Q_stricmp( command, "TAB_POWERS" ) == 0 )
-    {
-        UpdateTabs( CZMHudControlPanel::TAB_POWERS );
-    }
-    else if ( Q_stricmp( command, "TAB_MODES" ) == 0 )
-    {
-        UpdateTabs( CZMHudControlPanel::TAB_MODES );
-    }
-    else if ( Q_stricmp( command, "TAB_ZEDS" ) == 0 )
-    {
-        UpdateTabs( CZMHudControlPanel::TAB_ZEDS );
-    }
-    else if ( Q_stricmp( command, "MODE_SELECT_ALL" ) == 0 )
-    {
-        engine->ClientCmd( "zm_cmd_selectall" );
-    }
-    else if ( Q_stricmp( command, "MODE_DEFENSIVE" ) == 0 )
-    {
-        engine->ClientCmd( VarArgs( "zm_cmd_zombiemode %i", ZOMBIEMODE_DEFEND ) );
-    }
-    else if ( Q_stricmp( command, "MODE_OFFENSIVE" ) == 0 )
-    {
-        engine->ClientCmd( VarArgs( "zm_cmd_zombiemode %i", ZOMBIEMODE_OFFENSIVE ) );
-    }
-    else if ( Q_stricmp( command, "MODE_POWER_DELETEZOMBIES" ) == 0 )
-    {
-        engine->ClientCmd( "zm_cmd_delete" );
-    }
-    else if ( Q_stricmp( command, "MODE_POWER_SPOTCREATE" ) == 0 )
-    {
-        if ( g_pZMView ) g_pZMView->SetClickMode( ZMCLICKMODE_HIDDEN );
-    }
-    else if ( Q_stricmp( command, "MODE_POWER_PHYSEXP" ) == 0 )
-    {
-        if ( g_pZMView ) g_pZMView->SetClickMode( ZMCLICKMODE_PHYSEXP );
-    }
-
-    //BaseClass::OnCommand( command );
-
-    Msg( "OnCommand: %s\n", command );
 }
 
 void CZMHudControlPanel::UpdateTabs( int activatedTab )

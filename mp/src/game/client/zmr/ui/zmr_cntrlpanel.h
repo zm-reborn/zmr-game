@@ -1,23 +1,28 @@
-#include "baseviewport.h"
+#pragma once
+
+//#include "baseviewport.h"
 
 #include "zmr_bitmapbutton.h"
 
 
-class CZMHudControlPanel : public CHudElement, public vgui::Frame
+class CZMHudControlPanel// : public CHudElement, public vgui::Frame
 {
 public:
-    DECLARE_CLASS_SIMPLE( CZMHudControlPanel, vgui::Frame );
+    //DECLARE_CLASS_SIMPLE( CZMHudControlPanel, vgui::Frame );
 
-    CZMHudControlPanel( const char* ); //pParent = viewport ptr for parenting buttons
+    CZMHudControlPanel();
+    //CZMHudControlPanel( const char* );
     ~CZMHudControlPanel();
 
 
-    virtual void Init() OVERRIDE;
-    virtual void VidInit() OVERRIDE;
+    
+    //virtual void Init() OVERRIDE;
+    //virtual void VidInit() OVERRIDE;
     //virtual void Paint() OVERRIDE;
-    virtual void OnCommand( const char* command ) OVERRIDE;
-    virtual void OnThink() OVERRIDE;
-    virtual void Reset() OVERRIDE;
+    //virtual void OnCommand( const char* command ) OVERRIDE;
+    //virtual void OnThink() OVERRIDE;
+    //virtual void Reset() OVERRIDE;
+    
 
 
     void PositionButtons();
@@ -95,24 +100,9 @@ private:
     //static const int PANEL_BOTRIGHT_Y = 480 + VER_ADJUST - PANEL_SPACING;
     
     static const int PANEL_SIZE_X = 156; // 156
-    static const int PANEL_SIZE_Y = 150; // 156
+    static const int PANEL_SIZE_Y = 144; // 156
 
     static const int COMBO_BOX_X_OFFSET = 11;
     static const int COMBO_BOX_Y_OFFSET = 64;
     static const int COMBO_BOX_WIDTH = 100;
-};
-
-//using namespace CZMHudControlPanel;
-const int buttonToTab[CZMHudControlPanel::NUM_BUTTONS] = {
-    CZMHudControlPanel::TAB_POWERS, //physexp
-    CZMHudControlPanel::TAB_POWERS, //night vision
-    CZMHudControlPanel::TAB_MODES, //defense
-    CZMHudControlPanel::TAB_MODES, //offense,
-    CZMHudControlPanel::TAB_MODES, //select all
-    CZMHudControlPanel::TAB_MODES, //ambush
-    CZMHudControlPanel::TAB_ZEDS, //create group
-    CZMHudControlPanel::TAB_ZEDS, //goto group
-    CZMHudControlPanel::TAB_POWERS, //spotcreate
-    CZMHudControlPanel::TAB_POWERS, //delete
-    CZMHudControlPanel::TAB_MODES //ceiling ambush
 };
