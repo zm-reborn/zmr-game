@@ -6,6 +6,7 @@
 #include "npc_playercompanion.h"
 #include "EntityFlame.h"
 #include "ai_memory.h"
+#include "ai_route.h"
 
 #include "zmr/zmr_gamerules.h"
 #include "zmr/zmr_global_shared.h"
@@ -919,23 +920,26 @@ bool CZMBaseZombie::FindNearestPhysicsObject( int iMaxMass )
     }
 
 
+    if ( GetAbsOrigin().DistTo( vecTarget ) > ZOMBIE_PLAYER_MAX_SWAT_DIST )
+    {
+        return false;
+    }
+
+
     vecDirToGoal = vecTarget - GetAbsOrigin();
     vecDirToGoal.z = 0;
     VectorNormalize( vecDirToGoal );
 
-    Vector vecDirToWaypoint = GetNavigator()->GetCurWaypointPos() - GetAbsOrigin();
-    vecDirToWaypoint.z = 0;
-    VectorNormalize( vecDirToWaypoint );
-
-
-    // Don't bother swatting if we have to go the other way!
-    if ( DotProduct( vecDirToGoal, vecDirToWaypoint ) < -0.1f )
-        return false;
-
-
-    if( GetAbsOrigin().DistTo( vecTarget ) > ZOMBIE_PLAYER_MAX_SWAT_DIST )
+    if ( GetNavigator()->GetPath()->GetCurWaypoint() )
     {
-        return false;
+        Vector vecDirToWaypoint = GetNavigator()->GetCurWaypointPos() - GetAbsOrigin();
+        vecDirToWaypoint.z = 0;
+        VectorNormalize( vecDirToWaypoint );
+
+
+        // Don't bother swatting if we have to go the other way!
+        if ( DotProduct( vecDirToGoal, vecDirToWaypoint ) < -0.1f )
+            return false;
     }
 
 
