@@ -1186,6 +1186,20 @@ void CZMBaseZombie::TraceAttack( const CTakeDamageInfo& info, const Vector& vecD
     CTakeDamageInfo infoCopy = info;
 
 
+    // ZMRTODO: This random shit really has to go.
+    if ( ptr->hitgroup == HITGROUP_HEAD )
+    {
+        if ( infoCopy.GetDamageType() & DMG_CLUB )
+        {
+            infoCopy.ScaleDamage( random->RandomFloat( 1.9f, 3.0f ) ); 
+            
+        }
+        else
+        {
+            infoCopy.ScaleDamage( 2.1f ); 
+        }
+    }
+
     if( infoCopy.GetDamageType() & DMG_BUCKSHOT )
     {
         // Zombie gets across-the-board damage reduction for buckshot. This compensates for the recent changes which
