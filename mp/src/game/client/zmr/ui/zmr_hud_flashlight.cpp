@@ -98,7 +98,7 @@ void CZMHudFlashlight::OnThink()
     float newbattery = pPlayer->GetFlashlightBattery();
     bool ison = pPlayer->GetEffects() & EF_DIMLIGHT ? true : false;
 
-    if ( newbattery != m_flBattery )
+    if ( newbattery < m_flBattery )
     {
         if ( ison )
         {
