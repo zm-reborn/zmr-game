@@ -1088,6 +1088,14 @@ int CZMBaseZombie::MeleeAttack1Conditions( float flDot, float flDist )
         return COND_CAN_MELEE_ATTACK1;
     }
 
+    // If we're close enough just force the attack.
+    // The hull check may fail if there's something in the way.
+    if ( GetEnemy() )
+    {
+        if ( GetAttackPos().DistTo( GetEnemy()->WorldSpaceCenter() ) <= GetClawAttackRange() )
+            return COND_CAN_MELEE_ATTACK1;
+    }
+
 
     /*Vector vecTrace = tr.endpos - tr.startpos;
     float lenTraceSq = vecTrace.Length2DSqr();
@@ -1128,6 +1136,14 @@ void CZMBaseZombie::GetAttackHull( Vector& mins, Vector& maxs )
     mins.z = -(( EyePosition().z - GetAbsOrigin().z ) * 0.5f);
     // Let zombies attack higher than their head. (enemies right on top of them.)
     maxs.z *= 0.6f;
+}
+
+const Vector CZMBaseZombie::GetAttackPos() const
+{
+    Vector pos = GetAbsOrigin();
+    pos.z += GetHullHeight() * 0.7f; // About shoulder height.
+
+    return pos;
 }
 
 #define ZOMBIE_BUCKSHOT_TRIPLE_DAMAGE_DIST	96.0f // Triple damage from buckshot at 8 feet (headshot only)
@@ -1365,7 +1381,7 @@ CBaseEntity* CZMBaseZombie::ClawAttack( float flDist, int iDamage, const QAngle&
     if ( GetEnemy() )
     {
         trace_t	tr;
-        AI_TraceHull( WorldSpaceCenter(), GetEnemy()->WorldSpaceCenter(), -Vector(8,8,8), Vector(8,8,8), MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr );
+        AI_TraceLine( GetAttackPos(), GetEnemy()->WorldSpaceCenter(), MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr );
 
         if ( tr.fraction < 1.0f )
             return nullptr;
