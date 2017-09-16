@@ -245,6 +245,7 @@ $Project "Client (ZMR)"
 			
 			$File	"zmr\c_zmr_charcircle.cpp"
 			$File	"zmr\c_zmr_charcircle.h"
+			$File	"zmr\c_zmr_concommands.cpp"
 			$File	"zmr\c_zmr_entities.cpp"
 			$File	"zmr\c_zmr_entities.h"
 			$File	"zmr\c_zmr_legacy_objpanel.cpp"

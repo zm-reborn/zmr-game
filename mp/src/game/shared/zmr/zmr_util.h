@@ -10,6 +10,7 @@
 #ifdef CLIENT_DLL
 namespace ZMClientUtil
 {
+    void PrintNotify( const char* msg );
     void ChatPrint( const char* format, ... );
 
 
