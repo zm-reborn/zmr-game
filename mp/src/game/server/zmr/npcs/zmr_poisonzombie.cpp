@@ -348,27 +348,7 @@ float CNPC_PoisonZombie::MaxYawSpeed( void )
 
 void CNPC_PoisonZombie::SetZombieModel( void )
 {
-	Hull_t lastHull = GetHullType();
-
 	SetModel( "models/zombie/hulk.mdl" );
-	SetHullType( HULL_HUMAN );
-
-	//SetBodygroup( ZOMBIE_BODYGROUP_HEADCRAB, 0 );
-
-	SetHullSizeNormal( true );
-	SetDefaultEyeOffset();
-	SetActivity( ACT_IDLE );
-
-	// hull changed size, notify vphysics
-	// UNDONE: Solve this generally, systematically so other
-	// NPCs can change size
-	if ( lastHull != GetHullType() )
-	{
-		if ( VPhysicsGetObject() )
-		{
-			SetupVPhysicsHull();
-		}
-	}
 }
 
 //-----------------------------------------------------------------------------
