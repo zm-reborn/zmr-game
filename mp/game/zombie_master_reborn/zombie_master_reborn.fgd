@@ -170,6 +170,11 @@
 [
 ]
 
+@SolidClass base(Targetname, Origin, Activeable, InputActiveable) = trigger_blockphysexplosion :
+	"A trigger volume that stops physics explosions."
+[
+]
+
 
 @PointClass base(Targetname, Parentname, Origin, Angles) = info_loadout :
 	"Give a default loadout to the players.  Don't place more than one."
