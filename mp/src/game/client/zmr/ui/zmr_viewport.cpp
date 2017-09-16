@@ -124,7 +124,7 @@ CZMFrame::CZMFrame( const char* pElementName ) : CHudElement( pElementName ), Ba
 
     m_BoxSelect = new CZMBoxSelect( this );
 
-	//m_pZMControl = nullptr;
+	m_pZMControl = new CZMHudControlPanel();
 
 	m_pManiMenu = new CZMManiMenu( this ); 
 	m_pManiMenuNew = new CZMManiMenuNew( this ); 
@@ -135,7 +135,7 @@ CZMFrame::~CZMFrame()
 {
     delete m_BoxSelect;
 
-    //delete m_pZMControl;
+    delete m_pZMControl;
 
     delete m_pManiMenu;
     delete m_pManiMenuNew;
@@ -155,12 +155,11 @@ void CZMFrame::VidInit()
 void CZMFrame::Reset()
 {
     //m_pZMControl = GET_HUDELEMENT( CZMHudControlPanel );
-    //if ( m_pZMControl )
-    //{
-    //    m_pZMControl->SetParent( this );
-        //m_pZMControl->PositionButtons();
-        //m_pZMControl->PositionComboBox();
-    //}
+    if ( m_pZMControl )
+    {
+        m_pZMControl->PositionButtons();
+        m_pZMControl->PositionComboBox();
+    }
 }
 
 void CZMFrame::SetVisible( bool state )
@@ -249,6 +248,43 @@ void CZMFrame::OnMouseWheeled( int delta )
 
 void CZMFrame::OnCommand( const char* command )
 {
+    if ( Q_stricmp( command, "TAB_POWERS" ) == 0 )
+    {
+        if ( m_pZMControl ) m_pZMControl->UpdateTabs( CZMHudControlPanel::TAB_POWERS );
+    }
+    else if ( Q_stricmp( command, "TAB_MODES" ) == 0 )
+    {
+        if ( m_pZMControl ) m_pZMControl->UpdateTabs( CZMHudControlPanel::TAB_MODES );
+    }
+    else if ( Q_stricmp( command, "TAB_ZEDS" ) == 0 )
+    {
+        if ( m_pZMControl ) m_pZMControl->UpdateTabs( CZMHudControlPanel::TAB_ZEDS );
+    }
+    else if ( Q_stricmp( command, "MODE_SELECT_ALL" ) == 0 )
+    {
+        engine->ClientCmd( "zm_cmd_selectall" );
+    }
+    else if ( Q_stricmp( command, "MODE_DEFENSIVE" ) == 0 )
+    {
+        engine->ClientCmd( VarArgs( "zm_cmd_zombiemode %i", ZOMBIEMODE_DEFEND ) );
+    }
+    else if ( Q_stricmp( command, "MODE_OFFENSIVE" ) == 0 )
+    {
+        engine->ClientCmd( VarArgs( "zm_cmd_zombiemode %i", ZOMBIEMODE_OFFENSIVE ) );
+    }
+    else if ( Q_stricmp( command, "MODE_POWER_DELETEZOMBIES" ) == 0 )
+    {
+        engine->ClientCmd( "zm_cmd_delete" );
+    }
+    else if ( Q_stricmp( command, "MODE_POWER_SPOTCREATE" ) == 0 )
+    {
+        if ( g_pZMView ) g_pZMView->SetClickMode( ZMCLICKMODE_HIDDEN );
+    }
+    else if ( Q_stricmp( command, "MODE_POWER_PHYSEXP" ) == 0 )
+    {
+        if ( g_pZMView ) g_pZMView->SetClickMode( ZMCLICKMODE_PHYSEXP );
+    }
+
     BaseClass::OnCommand( command );
 }
 

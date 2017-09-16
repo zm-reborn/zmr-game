@@ -3,7 +3,7 @@
 
 
 #include "zmr_boxselect.h"
-//#include "zmr_cntrlpanel.h"
+#include "zmr_cntrlpanel.h"
 #include "zmr_buildmenu.h"
 #include "zmr_manimenu.h"
 #include "zmr_manimenu_new.h"
@@ -73,7 +73,7 @@ private:
     void CloseChildMenus();
 
     CZMBoxSelect* m_BoxSelect;
-    //CZMHudControlPanel* m_pZMControl;
+    CZMHudControlPanel* m_pZMControl;
     CZMManiMenu* m_pManiMenu;
     CZMManiMenuNew* m_pManiMenuNew;
     CZMBuildMenu* m_pBuildMenu;

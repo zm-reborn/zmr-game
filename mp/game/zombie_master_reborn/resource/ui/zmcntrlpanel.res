@@ -7,7 +7,7 @@
 		"xpos"		"0"
 		"ypos"		"0"
 		"wide"		"156"
-		"tall"		"150"
+		"tall"		"144"
 		"autoResize"		"0"
 		"pinCorner"		"0"
 		"RoundedCorners"		"15"
@@ -283,7 +283,6 @@
 		"textinsety"		"2"
 		"auto_wide_tocontents"		"0"
 		"use_proportional_insets"		"0"
-		"command"		"Close"
 		"Default"		"0"
 	}
 	"frame_menu"
