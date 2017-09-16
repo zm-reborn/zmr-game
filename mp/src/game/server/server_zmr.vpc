@@ -58,8 +58,8 @@ $Project "Server (ZMR)"
 		$File	"$SRCDIR\game\shared\touchlink.h"
 		$File	"trigger_area_capture.cpp"
 		$File	"trigger_area_capture.h"
-		//$File   "$SRCDIR\game\shared\teamplay_round_timer.cpp"
-		//$File   "$SRCDIR\game\shared\teamplay_round_timer.h"
+		$File   "$SRCDIR\game\shared\teamplay_round_timer.cpp"
+		$File   "$SRCDIR\game\shared\teamplay_round_timer.h"
 
 		$Folder	"HL2 DLL"
 		{

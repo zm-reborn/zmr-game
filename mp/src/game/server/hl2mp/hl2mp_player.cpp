@@ -17,7 +17,9 @@
 #include "KeyValues.h"
 #include "team.h"
 #include "weapon_hl2mpbase.h"
+#ifndef ZMR // ZMRCHANGE: Useless shit.
 #include "grenade_satchel.h"
+#endif
 #include "eventqueue.h"
 #include "gamestats.h"
 
@@ -1208,6 +1210,7 @@ void CHL2MP_Player::Weapon_Drop( CBaseCombatWeapon *pWeapon, const Vector *pvecT
 
 void CHL2MP_Player::DetonateTripmines( void )
 {
+#ifndef ZMR // ZMRCHANGE: Useless shit.
 	CBaseEntity *pEntity = NULL;
 
 	while ((pEntity = gEntList.FindEntityByClassname( pEntity, "npc_satchel" )) != NULL)
@@ -1221,6 +1224,7 @@ void CHL2MP_Player::DetonateTripmines( void )
 
 	// Play sound for pressing the detonator
 	EmitSound( "Weapon_SLAM.SatchelDetonate" );
+#endif
 }
 
 void CHL2MP_Player::Event_Killed( const CTakeDamageInfo &info )
