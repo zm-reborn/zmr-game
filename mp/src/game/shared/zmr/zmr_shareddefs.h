@@ -2,7 +2,7 @@
 
 
 #define ZMR_NAME        "Zombie Master: Reborn"
-#define ZMR_VERSION     "a3"
+#define ZMR_VERSION     "a4"
 
 
 enum
