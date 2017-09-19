@@ -129,7 +129,7 @@ CBasePlayer* BotPutInServer( const char* name )
 void Bot_RunAll()
 {
     if ( g_ZMBots.m_nBots < 1 ) return;
-    Msg( "Bot_RunAll()\n" );
+    
 
     for ( int i = 1; i <= gpGlobals->maxClients; i++ )
     {
