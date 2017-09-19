@@ -52,6 +52,7 @@ public:
     void PickDefaultSpawnTeam();
     virtual void ChangeTeam( int iTeam ) OVERRIDE;
     bool ShouldSpawn();
+    virtual bool IsValidObserverTarget( CBaseEntity* ) OVERRIDE;
 
     void SetPlayerModel( void );
     bool ValidatePlayerModel( const char* );

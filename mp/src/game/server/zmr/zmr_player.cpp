@@ -232,6 +232,49 @@ bool CZMPlayer::ShouldSpawn()
     return true;
 }
 
+ConVar zm_mp_forcecamera( "zm_mp_forcecamera", "0", FCVAR_NOTIFY | FCVAR_ARCHIVE, "Are spectators disallowed to spectate the ZM?" );
+
+bool CZMPlayer::IsValidObserverTarget( CBaseEntity* pEnt )
+{
+    if ( !pEnt ) return false;
+
+    // ZMRTODO: Allow zombie spectating, etc.
+    if ( !pEnt->IsPlayer() )
+    {
+        return true;
+    }
+
+
+    CZMPlayer* pPlayer = ToZMPlayer( pEnt );
+
+    // Don't spec observers or players who haven't picked a class yet
+    if ( pPlayer->IsObserver() )
+        return false;
+
+    if( pPlayer == this )
+        return false; // We can't observe ourselves.
+
+    if ( pPlayer->m_lifeState == LIFE_RESPAWNABLE ) // target is dead, waiting for respawn
+        return false;
+
+    if ( pPlayer->m_lifeState == LIFE_DEAD || pPlayer->m_lifeState == LIFE_DYING )
+    {
+        if ( (pPlayer->GetDeathTime() + DEATH_ANIMATION_TIME ) < gpGlobals->curtime )
+        {
+            return false; // allow watching until 3 seconds after death to see death animation
+        }
+    }
+        
+
+    if ( zm_mp_forcecamera.GetBool() )
+    {
+        if ( pPlayer->IsZM() )
+            return false;
+    }
+
+    return true;
+}
+
 void CZMPlayer::SetTeamSpecificProps()
 {
     // To shut up the asserts...
