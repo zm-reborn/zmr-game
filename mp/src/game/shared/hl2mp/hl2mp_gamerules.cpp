@@ -954,7 +954,7 @@ CAmmoDef *GetAmmoDef()
 #else
 
 #ifdef DEBUG
-
+#ifndef ZMR // ZMRCHANGE
 	// Handler for the "bot" command.
 	void Bot_f()
 	{		
@@ -976,7 +976,7 @@ CAmmoDef *GetAmmoDef()
 
 
 	ConCommand cc_Bot( "bot", Bot_f, "Add a bot.", FCVAR_CHEAT );
-
+#endif // ZMR
 #endif
 
 	bool CHL2MPRules::FShouldSwitchWeapon( CBasePlayer *pPlayer, CBaseCombatWeapon *pWeapon )

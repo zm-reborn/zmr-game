@@ -244,8 +244,8 @@ $Project "Server (ZMR)"
 
 		$Folder	"HL2MP"
 		{
-			$File	"hl2mp\hl2mp_bot_temp.cpp"
-			$File	"hl2mp\hl2mp_bot_temp.h"
+			//$File	"hl2mp\hl2mp_bot_temp.cpp"
+			//$File	"hl2mp\hl2mp_bot_temp.h"
 			//$File	"hl2mp\hl2mp_client.cpp"
 			$File	"hl2mp\hl2mp_cvars.cpp"
 			//$File	"hl2mp\hl2mp_gameinterface.cpp"
@@ -329,6 +329,7 @@ $Project "Server (ZMR)"
 				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_sledge.cpp"
 			}
 			
+			$File	"zmr\zmr_bot.cpp"
 			$File	"zmr\zmr_client.cpp"
 			$File	"zmr\zmr_concommands.cpp"
 			$File	"zmr\zmr_concommands_debug.cpp"
