@@ -88,6 +88,55 @@ void ZM_ForceTeam( const CCommand &args )
 
 static ConCommand zm_forceteam( "zm_forceteam", ZM_ForceTeam, "Usage: zm_forceteam <number> <name (optional)> | 1 = Spec, 2 = Human, 3 = ZM" );
 
+
+/*
+    Force human
+*/
+void ZM_ForceHuman( const CCommand &args )
+{
+    CZMPlayer* pPlayer = ToZMPlayer( UTIL_GetCommandClient() );
+
+    if ( !pPlayer ) return;
+
+
+    pPlayer->ChangeTeam( ZMTEAM_HUMAN );
+}
+
+static ConCommand forcehuman( "forcehuman", ZM_ForceHuman, "", FCVAR_CHEAT );
+
+
+/*
+    Force zm
+*/
+void ZM_ForceZM( const CCommand &args )
+{
+    CZMPlayer* pPlayer = ToZMPlayer( UTIL_GetCommandClient() );
+
+    if ( !pPlayer ) return;
+
+
+    pPlayer->ChangeTeam( ZMTEAM_ZM );
+}
+
+static ConCommand forcezm( "forcezm", ZM_ForceZM, "", FCVAR_CHEAT );
+
+
+/*
+    Force spectator
+*/
+void ZM_ForceSpec( const CCommand &args )
+{
+    CZMPlayer* pPlayer = ToZMPlayer( UTIL_GetCommandClient() );
+
+    if ( !pPlayer ) return;
+
+
+    pPlayer->ChangeTeam( ZMTEAM_SPECTATOR );
+}
+
+static ConCommand forcespec( "forcespec", ZM_ForceSpec, "", FCVAR_CHEAT );
+
+
 /*
     Set health (debugging)
 */
