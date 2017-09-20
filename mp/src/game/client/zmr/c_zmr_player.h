@@ -24,6 +24,7 @@ public:
     ~C_ZMPlayer();
 
     
+    virtual void ClientThink() OVERRIDE;
     virtual void TeamChange( int ) OVERRIDE;
     virtual bool CreateMove( float delta, CUserCmd* cmd ) OVERRIDE;
     virtual int DrawModel( int ) OVERRIDE;

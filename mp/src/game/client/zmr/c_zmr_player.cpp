@@ -71,6 +71,61 @@ C_ZMPlayer* C_ZMPlayer::GetLocalPlayer()
     return static_cast<C_ZMPlayer*>( C_BasePlayer::GetLocalPlayer() );
 }
 
+void C_ZMPlayer::ClientThink()
+{
+    // Update player model's look at target.
+    bool bFoundViewTarget = false;
+    
+    Vector vForward;
+    AngleVectors( GetLocalAngles(), &vForward );
+
+
+    if ( IsAlive() )
+    {
+        Vector vMyOrigin = GetAbsOrigin();
+
+        for ( int i = 1; i <= gpGlobals->maxClients; i++ )
+        {
+            C_BasePlayer* pPlayer = UTIL_PlayerByIndex( i );
+            if( !pPlayer ) continue;
+
+            // Don't look at dead players :(
+            if ( !pPlayer->IsAlive() ) continue;
+
+            if ( pPlayer->IsEffectActive( EF_NODRAW ) )
+                continue;
+
+            if ( pPlayer->entindex() == entindex() )
+                continue;
+
+
+            Vector vTargetOrigin = pPlayer->GetAbsOrigin();
+
+            Vector vDir = vTargetOrigin - vMyOrigin;
+        
+            if ( vDir.Length() > 192.0f ) 
+                continue;
+
+            VectorNormalize( vDir );
+
+            // < 0 is way too big of an angle.
+            if ( DotProduct( vForward, vDir ) < 0.5f )
+                 continue;
+
+            m_vLookAtTarget = pPlayer->EyePosition();
+            bFoundViewTarget = true;
+            break;
+        }
+    }
+
+    if ( !bFoundViewTarget )
+    {
+        m_vLookAtTarget = EyePosition() + vForward * 512.0f;
+    }
+
+    UpdateIDTarget();
+}
+
 void C_ZMPlayer::TeamChange( int iNewTeam )
 {
     // ZMRTODO: Test if there are any cases when TeamChange isn't fired!!!
