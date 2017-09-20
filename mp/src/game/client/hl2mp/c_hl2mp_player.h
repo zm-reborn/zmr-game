@@ -127,6 +127,11 @@ private:
 	CNetworkVar( HL2MPPlayerState, m_iPlayerState );	
 
 	bool m_fIsWalking;
+
+
+#ifdef ZMR // ZMRCHANGE
+    friend class C_ZMPlayer;
+#endif
 };
 
 inline C_HL2MP_Player *ToHL2MPPlayer( CBaseEntity *pEntity )
