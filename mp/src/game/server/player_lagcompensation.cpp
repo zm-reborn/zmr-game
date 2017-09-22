@@ -568,6 +568,8 @@ void CLagCompensationManager::StartLagCompensation( CBasePlayer *player, CUserCm
 	    // Custom checks for if things should lag compensate
 	    if ( !pNPC ) continue;
 
+        if ( !pNPC->IsAlive() ) continue;
+
         if ( !pZMPlayer->WantsLagCompensationOnNPC( pNPC, cmd, pEntityTransmitBits ) ) continue;
 
  
