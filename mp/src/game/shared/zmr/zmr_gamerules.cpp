@@ -589,7 +589,7 @@ void CZMRules::PlayerKilled( CBasePlayer* pVictim, const CTakeDamageInfo& info )
     }
 
     // Don't call HL2MP...
-    BaseClass::BaseClass::PlayerKilled( pVictim, info );
+    CTeamplayRules::PlayerKilled( pVictim, info );
 }
 
 ConVar zm_sv_joingrace( "zm_sv_joingrace", "60", FCVAR_NOTIFY );
