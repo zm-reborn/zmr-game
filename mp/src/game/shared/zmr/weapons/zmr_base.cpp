@@ -303,6 +303,15 @@ void CZMBaseWeapon::FallInit( void )
 		}
 		else
 		{
+            // Fixes weapon still being constrained when dropped.
+            // The constraint is destroyed when picked up but this re-creates it.
+
+            // I'm leaving this piece of code here to remind Valve how shameful it is.
+            // Yeah, let's just create a constraint and NOT USE m_pConstraint to reference it, I bet the constraint isn't even freed anywhere.
+            // I know, people make mistakes and shit happens, but I spent way too much fucking time debugging this shit.
+            // Thanks, Valve.
+
+            /*
 			// Constrained start?
 			if ( HasSpawnFlags( SF_WEAPON_START_CONSTRAINED ) )
 			{
@@ -328,6 +337,7 @@ void CZMBaseWeapon::FallInit( void )
 					pConstraint->SetGameData( (void *) this );
 				}
 			}
+            */
 		}
 	}
 
