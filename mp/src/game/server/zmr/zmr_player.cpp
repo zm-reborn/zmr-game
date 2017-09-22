@@ -493,7 +493,7 @@ void CZMPlayer::Spawn()
     SetCollisionGroup( COLLISION_GROUP_PLAYER );
 
 	//BaseClass::Spawn();
-    BaseClass::BaseClass::Spawn();
+    CHL2_Player::Spawn();
 
 
     SetTeamSpecificProps();
@@ -562,7 +562,7 @@ void CZMPlayer::FireBullets( const FireBulletsInfo_t& info )
 	NoteWeaponFired();
 
 
-    BaseClass::BaseClass::FireBullets( info );
+    CBaseEntity::FireBullets( info );
 
 	// Move other players back to history positions based on local player's lag
 	lagcompensation->FinishLagCompensation( this );
