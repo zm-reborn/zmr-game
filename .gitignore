@@ -76,3 +76,6 @@ server_blacklist.txt
 serverconfig.vdf
 settings.scr
 *.mdmp
+zombie_master_reborn/custom/
+zombie_master_reborn/download/
+zombie_master_reborn/downloadlist/
