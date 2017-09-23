@@ -232,7 +232,7 @@ protected:
     bool			m_fIsNavJumping;
     bool			m_fIsAttackJumping;
     bool			m_fHitApex;
-    mutable float	m_flJumpDist;
+    //mutable float	m_flJumpDist;
 
     bool			m_fHasScreamed;
 
@@ -260,7 +260,7 @@ BEGIN_DATADESC( CFastZombie )
     DEFINE_FIELD( m_fIsNavJumping, FIELD_BOOLEAN ),
     DEFINE_FIELD( m_fIsAttackJumping, FIELD_BOOLEAN ),
     DEFINE_FIELD( m_fHitApex, FIELD_BOOLEAN ),
-    DEFINE_FIELD( m_flJumpDist, FIELD_FLOAT ),
+    //DEFINE_FIELD( m_flJumpDist, FIELD_FLOAT ),
     DEFINE_FIELD( m_fHasScreamed, FIELD_BOOLEAN ),
     DEFINE_FIELD( m_flNextMeleeAttack, FIELD_TIME ),
     DEFINE_FIELD( m_fJustJumped, FIELD_BOOLEAN ),
@@ -1503,18 +1503,31 @@ void CFastZombie::StopLoopingSounds( void )
 //-----------------------------------------------------------------------------
 bool CFastZombie::IsJumpLegal(const Vector &startPos, const Vector &apex, const Vector &endPos) const
 {
+    // ZMRCHANGE: Increase max drop and use our own dist check to ignore z-axis.
+    // Eg. zm_desert_skystation
+
     const float MAX_JUMP_RISE		= 220.0f;
     const float MAX_JUMP_DISTANCE	= 512.0f;
-    const float MAX_JUMP_DROP		= 384.0f;
+    const float MAX_JUMP_DROP		= 1024.0f; // 384.0f
 
-    if ( BaseClass::IsJumpLegal( startPos, apex, endPos, MAX_JUMP_RISE, MAX_JUMP_DROP, MAX_JUMP_DISTANCE ) )
-    {
-        // Hang onto the jump distance. The AI is going to want it.
-        m_flJumpDist = (startPos - endPos).Length();
+    if ( (endPos.z - startPos.z) > MAX_JUMP_RISE + 0.1f ) 
+        return false;
+    if ( (startPos.z - endPos.z) > MAX_JUMP_DROP + 0.1f ) 
+        return false;
+    if ( (apex.z - startPos.z) > MAX_JUMP_RISE * 1.25f ) 
+        return false;
 
-        return true;
-    }
-    return false;
+
+    // Not used?
+
+    // Hang onto the jump distance. The AI is going to want it.
+    //m_flJumpDist = (startPos - endPos).Length();
+
+
+    if ( (startPos - endPos).Length2D() > MAX_JUMP_DISTANCE + 0.1f ) 
+        return false;
+
+    return true;
 }
 
 //-----------------------------------------------------------------------------
