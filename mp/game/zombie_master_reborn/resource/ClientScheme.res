@@ -39,6 +39,9 @@ Scheme
 		"ZMFgColor"			"255 255 255 255" // ZMR - Used by ammo and health.
 		"ZMFgColorCrit"		"200 0 0 255" // ZMR - When something is low.
 		
+		"ZMScoreboardBg"	"0 0 0 192"
+		"ZMScoreboardBorder""255 0 0 32"
+		
 		//"FgColor"			"255 220 0 100"
 		"FgColor"			"255 255 255 100"
 		"BgColor"			"0 0 0 76"

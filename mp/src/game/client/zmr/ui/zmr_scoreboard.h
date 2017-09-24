@@ -32,16 +32,13 @@ private:
     virtual void AddSection(int teamType, int teamNumber); // add a new section header for a team
 
     int GetSectionFromTeamNumber( int teamNumber );
-    enum
-    { 
-        CSTRIKE_NAME_WIDTH = 320,
-        CSTRIKE_CLASS_WIDTH = 56,
-        CSTRIKE_SCORE_WIDTH = 40,
-        CSTRIKE_DEATH_WIDTH = 46,
-        CSTRIKE_PING_WIDTH = 46,
-//		CSTRIKE_VOICE_WIDTH = 40, 
-//		CSTRIKE_FRIENDS_WIDTH = 24,
-    };
+
+    bool DisplayTeamCount( int iTeam );
+
+
+    // Max is 520.
+    enum { NAME_WIDTH = 200, SCORE_WIDTH = 100, DEATH_WIDTH = 80, PING_WIDTH = 60 };
+
 
     // rounded corners
     Color					 m_bgColor;

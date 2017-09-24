@@ -147,7 +147,14 @@ void CZMHudDeathNotice::Paint()
     if ( !m_iconD_skull )
         return;
 
-    int yStart = GetClientModeHL2MPNormal()->GetDeathMessageStartHeight();
+
+    CBaseViewport* pViewport = dynamic_cast<CBaseViewport*>( g_pClientMode->GetViewport() );
+
+    int yStart = YRES( 2 );
+
+    if ( pViewport )
+        yStart = pViewport->GetDeathMessageStartHeight();
+
 
     surface()->DrawSetTextFont( m_hTextFont );
     surface()->DrawSetTextColor( g_PR->GetTeamColor( 0 ) );
