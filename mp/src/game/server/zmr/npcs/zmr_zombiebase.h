@@ -62,6 +62,7 @@ enum
     SCHED_ZM_FORCED_GO,
     SCHED_ZM_DEFEND_GO_DEFPOS,
     SCHED_ZM_DEFEND_WAIT,
+    SCHED_ZM_MOVE_AWAY,
 
     LAST_BASE_ZOMBIE_SCHEDULE,
 };
@@ -136,12 +137,14 @@ public:
     virtual int SelectFailSchedule( int, int, AI_TaskFailureCode_t ) OVERRIDE;
     virtual void PrescheduleThink( void ) OVERRIDE;
     virtual bool OnInsufficientStopDist( AILocalMoveGoal_t*, float, AIMoveResult_t* ) OVERRIDE;
+    virtual bool OnObstructionPreSteer( AILocalMoveGoal_t* pMoveGoal, float distClear, AIMoveResult_t* pResult ) OVERRIDE;
+
 
     int GetSwatActivity( void );
     // By default don't swat objects.
     virtual bool CanSwatPhysicsObjects() { return false; };
     bool FindNearestPhysicsObject( int iMaxMass );
-
+    
     virtual float GetReactionDelay( CBaseEntity* pEnemy ) OVERRIDE { return 0.0; };
     virtual bool IsValidEnemy( CBaseEntity* ) OVERRIDE;
     // Always classify as a zombie. The AI relationships depend on it.
@@ -226,6 +229,8 @@ public:
     void SetSelector( int );
 
 
+    inline bool IsCloseToCommandPos() { return IsCloseToPos( m_vecLastCommandPos ); };
+    bool IsCloseToPos( const Vector& pos );
     inline bool HasBeenCommanded() { return m_bCommanded; };
     inline const Vector& GetLastCommandedPos() { return m_vecLastCommandPos; };
     inline ZombieMode_t GetZombieMode() { return m_iMode; };
@@ -262,7 +267,13 @@ protected:
     //int                     m_iMoanSound;
 
 
-private: // Our stuff...
+protected: // Our stuff...
+    inline int GetReturnSchedule() { return m_iReturnSchedule; };
+    inline void SetReturnSchedule( int retSched ) { m_iReturnSchedule = retSched; };
+
+private:
+    void UpdateRetry( float enddelay = 15.0f );
+
     ZombieClass_t           m_iZombieClass;
     ZombieMode_t            m_iMode;
     
@@ -274,6 +285,13 @@ private: // Our stuff...
     bool                    m_bSwatBreakable;
     float                   m_flAddGoalTolerance;
 
+    // After completing a schedule, AI will return to this schedule.
+    int                     m_iReturnSchedule;
+
+    // If schedule fails, we can keep retrying it.
+    int                     m_iScheduleRetry;
+    float                   m_flRetryEndTime;
+    Vector                  m_vecLastRetryPos;
     
 protected:
     inline void SetZombieClass( ZombieClass_t zclass ) { m_iZombieClass = zclass; };
