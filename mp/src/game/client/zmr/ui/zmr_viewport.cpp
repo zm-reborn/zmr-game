@@ -604,7 +604,7 @@ void CZMFrame::OnRightClick()
     // Otherwise, just move there.
     engine->ClientCmd( VarArgs( "zm_cmd_move %.1f %.1f %.1f %.1f",
         end[0], end[1], end[2],
-        clamp( (ZMClientUtil::GetSelectedZombieCount() - 1) * 8.0f, 0.0f, 256.0f ) ) );
+        clamp( (ZMClientUtil::GetSelectedZombieCount() - 1) * 2.5f, 0.0f, 92.0f ) ) );
 
     FX_AddQuad( end,
                 Vector( 0.0f, 0.0f, 1.0f ),
