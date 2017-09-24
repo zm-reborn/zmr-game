@@ -74,6 +74,7 @@ public:
 
     virtual CBaseEntity* EntSelectSpawnPoint( void ) OVERRIDE;
 
+    virtual void CheatImpulseCommands( int ) OVERRIDE;
     void GiveDefaultItems( void );
     virtual void EquipSuit( bool = false ) OVERRIDE;
     virtual void RemoveAllItems( bool removeSuit ) OVERRIDE;

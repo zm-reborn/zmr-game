@@ -389,6 +389,37 @@ void CZMPlayer::GiveDefaultItems()
 	}*/
 }
 
+void CZMPlayer::CheatImpulseCommands( int iImpulse )
+{
+    switch ( iImpulse )
+    {
+    case 101 :
+    {
+        if ( !sv_cheats->GetBool() ) return;
+
+        
+        GiveNamedItem( "weapon_zm_pistol" );
+        GiveNamedItem( "weapon_zm_revolver" );
+        GiveNamedItem( "weapon_zm_improvised" );
+        GiveNamedItem( "weapon_zm_sledge" );
+        GiveNamedItem( "weapon_zm_shotgun" );
+        GiveNamedItem( "weapon_zm_rifle" );
+        GiveNamedItem( "weapon_zm_mac10" );
+        GiveNamedItem( "weapon_zm_molotov" );
+
+        CBasePlayer::GiveAmmo( 80, "Pistol" );
+        CBasePlayer::GiveAmmo( 36, "Revolver" );
+        CBasePlayer::GiveAmmo( 24, "Buckshot" );
+        CBasePlayer::GiveAmmo( 11, "357" );
+        CBasePlayer::GiveAmmo( 60, "SMG1" );
+
+
+        break;
+    }
+    default : BaseClass::CheatImpulseCommands( iImpulse ); break;
+    }
+}
+
 void CZMPlayer::EquipSuit( bool bPlayEffects )
 {
     // Never play the effect.
