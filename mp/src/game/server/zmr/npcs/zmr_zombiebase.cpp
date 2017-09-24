@@ -110,6 +110,11 @@ CZMBaseZombie::CZMBaseZombie()
     m_hPhysicsEnt.Set( nullptr );
 
     m_flNextFlinch = 0.0f;
+
+    m_iReturnSchedule = SCHED_NONE;
+
+    m_iScheduleRetry = SCHED_NONE;
+    m_flRetryEndTime = 0.0f;
 }
 
 CZMBaseZombie::~CZMBaseZombie()
@@ -532,6 +537,28 @@ void CZMBaseZombie::StartTask( const Task_t* pTask )
         GetNavigator()->SetGoal( AI_NavGoal_t( m_vecLastCommandPos ) );
         break;
 
+    case TASK_GET_PATH_TO_LASTPOSITION :
+    {
+		if ( !GetNavigator()->SetGoal( m_vecLastPosition ) )
+		{
+            // We weren't able to move in to that specific position, attempt to move in that direction.
+            if ( IsDebugNPC( this ) )
+            {
+                DevWarning( "Unable to find path to goal, attempting to move in that direction...\n" );
+            }
+
+
+            Vector dir = m_vecLastPosition - GetAbsOrigin();
+
+            float dist = dir.Length2D();
+            VectorNormalize( dir );
+
+            // Don't bother trying going there if we're close enough, this is suppose to be a long-range fix.
+            if ( dist < 64.0f || !GetNavigator()->SetVectorGoal( dir, dist, GetHullWidth() ) )
+			    TaskFail( FAIL_NO_ROUTE );
+		}
+        break;
+    }
     case TASK_ZM_SET_TOLERANCE_DISTANCE :
         GetNavigator()->SetGoalTolerance( pTask->flTaskData + m_flAddGoalTolerance );
         TaskComplete();
@@ -795,6 +822,16 @@ int CZMBaseZombie::SelectSchedule( void )
         break;
     }
 
+
+    // Make the zombie return to previous schedule.
+    if ( GetReturnSchedule() != SCHED_NONE )
+    {
+        int newSched = GetReturnSchedule();
+        SetReturnSchedule( SCHED_NONE );
+        
+        return newSched;
+    }
+
     return CAI_BaseNPC::SelectSchedule();
 }
 
@@ -803,12 +840,19 @@ int CZMBaseZombie::SelectFailSchedule( int failedSched, int failedTask, AI_TaskF
     // Keep trying!
     if ( ShouldTryScheduleAgain( failedSched, failedTask, failCode ) )
     {
-        //ClearCondition( COND_ZM_FAILED_GOAL );
+        if ( m_iScheduleRetry != failedSched )
+        {
+            UpdateRetry();
+        }
+
+        m_iScheduleRetry = failedSched;
+
         return failedSched;
     }
     else
     {
-        //SetCondition( COND_ZM_FAILED_GOAL );
+        m_iScheduleRetry = SCHED_NONE;
+        m_flRetryEndTime = 0.0f;
     }
 
     return CAI_BaseNPC::SelectFailSchedule( failedSched, failedTask, failCode );
@@ -816,16 +860,6 @@ int CZMBaseZombie::SelectFailSchedule( int failedSched, int failedTask, AI_TaskF
 
 bool CZMBaseZombie::OnInsufficientStopDist( AILocalMoveGoal_t* pMoveGoal, float distClear, AIMoveResult_t* pResult )
 {
-    /*
-    if ( pMoveGoal->directTrace.fStatus == AIMR_BLOCKED_NPC )
-    {
-        CAI_BaseNPC* pNPC = pMoveGoal->directTrace.pObstruction ? pMoveGoal->directTrace.pObstruction->MyNPCPointer() : nullptr;
-
-
-        return ( pNPC && pNPC->IsMoving() );
-    }
-    */
-
     if ( !CanSwatPhysicsObjects() ) return false;
 
 
@@ -842,8 +876,13 @@ bool CZMBaseZombie::OnInsufficientStopDist( AILocalMoveGoal_t* pMoveGoal, float 
             if ((pPhys && pPhys->IsMoveable())
             ||  (pBreak && pBreak->IsBreakable()))
             {
-                
+                // Return to our previous schedule after being done with swatting the obstruction.
+                if ( GetCurSchedule() )
+                    SetReturnSchedule( GetCurSchedule()->GetId() );
+
+
                 SetSchedule( SCHED_ZOMBIE_SWATITEM );
+                
                 
                 m_hPhysicsEnt.Set( pEnt );
                 m_bSwatBreakable = pBreak ? true : false;
@@ -855,6 +894,23 @@ bool CZMBaseZombie::OnInsufficientStopDist( AILocalMoveGoal_t* pMoveGoal, float 
     }
     
     return false;
+}
+
+bool CZMBaseZombie::OnObstructionPreSteer( AILocalMoveGoal_t* pMoveGoal, float distClear, AIMoveResult_t* pResult )
+{
+    // If we're being obstructed by an NPC that's not doing anything, tell them to move.
+    if ( !IsCloseToCommandPos() && (pMoveGoal->directTrace.flTotalDist - pMoveGoal->directTrace.flDistObstructed) < GetHullWidth() * 1.5f )
+    {
+        CZMBaseZombie* pBlocker = dynamic_cast<CZMBaseZombie*>( pMoveGoal->directTrace.pObstruction->MyNPCPointer() );
+
+        if ( pBlocker && !pBlocker->IsMoving() && !pBlocker->IsCloseToCommandPos() && pBlocker->ConditionInterruptsCurSchedule( COND_GIVE_WAY ) )
+        {
+            pBlocker->GetMotor()->SetIdealYawToTarget( WorldSpaceCenter() );
+            pBlocker->SetSchedule( SCHED_ZM_MOVE_AWAY );
+        }
+    }
+
+    return BaseClass::OnObstructionPreSteer( pMoveGoal, distClear, pResult );
 }
 
 static ConVar zm_sv_swatlift( "zm_sv_swatlift", "20000", FCVAR_NOTIFY );
@@ -1749,25 +1805,73 @@ bool CZMBaseZombie::CanSpawn( const Vector& pos )
 
 bool CZMBaseZombie::ShouldTryScheduleAgain( int failedSched, int failedTask, AI_TaskFailureCode_t failCode )
 {
-    // We can't build path to position, definitely don't want to try again.
-    if ( failedTask == TASK_GET_PATH_TO_LASTPOSITION )
-        return false;
+    // We've attempted this schedule before and way too long.
+    if ( m_iScheduleRetry == failedSched && m_flRetryEndTime != 0.0f && m_flRetryEndTime <= gpGlobals->curtime )
+    {
+        // If we didn't move at all, just stop.
+        if ( GetAbsOrigin().DistToSqr( m_vecLastRetryPos ) < 1.0f )
+        {
+            DevWarning( "NPC %i failed schedule retry sanity check!\n", entindex() );
+            return false;
+        }
+        else
+        {
+            // We've moved, just update our retry position.
+            UpdateRetry();
+        }
+    }
+
 
     // If we have been commanded (incl. rally points), keep trying.
     switch ( failedSched )
     {
     case SCHED_ZM_FORCED_GO :
     case SCHED_ZM_GO :
+    {
+        // We're close enough.
+        if ( IsCloseToCommandPos() )
+            return false;
+
+
+        // We can't build path to position, definitely don't want to try again.
+        if ( failedTask == TASK_GET_PATH_TO_LASTPOSITION )
+        {
+            // If we were simply blocked by another NPC, keep trying. No reason to be ashamed.
+            CZMBaseZombie* pBlocker = GetNavigator()->GetBlockingEntity() ? dynamic_cast<CZMBaseZombie*>( GetNavigator()->GetBlockingEntity()->MyNPCPointer() ) : nullptr;
+
+
+            if ( pBlocker && !pBlocker->IsCloseToCommandPos() )
+                return true;
+
+            return false;
+        }
+
+
         if ( IsPathTaskFailure( failCode ) || failedTask == TASK_WAIT_FOR_MOVEMENT )
         {
-            if ( m_vecLastCommandPos.DistToSqr( GetAbsOrigin() ) > max( 48.0f * 48.0f, Square( m_flAddGoalTolerance ) ) )
-                return true;
+            return true;
         }
+
         break;
+    }
     default : break;
     }
 
     return false;
+}
+
+bool CZMBaseZombie::IsCloseToPos( const Vector& pos )
+{
+    float realtolerance = max( 48.0f + m_flAddGoalTolerance, GetNavigator()->GetGoalTolerance() );
+
+
+    return GetAbsOrigin().DistToSqr( pos ) <= max( 48.0f * 48.0f, Square( realtolerance ) );
+}
+
+void CZMBaseZombie::UpdateRetry( float enddelay )
+{
+    m_flRetryEndTime = gpGlobals->curtime + enddelay;
+    m_vecLastRetryPos = GetAbsOrigin();
 }
 
 AI_BEGIN_CUSTOM_NPC( zmbase_zombie, CZMBaseZombie )
@@ -2098,6 +2202,20 @@ AI_BEGIN_CUSTOM_NPC( zmbase_zombie, CZMBaseZombie )
         "		COND_CAN_MELEE_ATTACK1"
         "		COND_CAN_RANGE_ATTACK2"
         "		COND_CAN_MELEE_ATTACK2"
+    )
+
+    DEFINE_SCHEDULE
+    (
+	    SCHED_ZM_MOVE_AWAY, // The same as SCHED_MOVE_AWAY but a smaller path.
+
+	    "	Tasks"
+	    "		TASK_SET_FAIL_SCHEDULE					SCHEDULE:SCHED_MOVE_AWAY_FAIL"
+	    "		TASK_MOVE_AWAY_PATH						64"
+	    "		TASK_RUN_PATH							0"
+	    "		TASK_WAIT_FOR_MOVEMENT					0"
+	    "		TASK_SET_SCHEDULE						SCHEDULE:SCHED_MOVE_AWAY_END"
+	    ""
+	    "	Interrupts"
     )
 
 AI_END_CUSTOM_NPC()
