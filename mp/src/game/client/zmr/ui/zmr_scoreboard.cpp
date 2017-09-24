@@ -26,17 +26,17 @@
 
 #include "zmr_scoreboard.h"
 
+
 using namespace vgui;
 
-#define TEAM_MAXCOUNT			5
 
 // id's of sections used in the scoreboard
 enum EScoreboardSections
 {
-    SCORESECTION_ZM = 1,
+    SCORESECTION_HEADER = 0,
+    SCORESECTION_ZM,
     SCORESECTION_HUMAN,
     SCORESECTION_SPECTATOR,
-    SCORESECTION_FREEFORALL,
 };
 
 const int NumSegments = 7;
@@ -54,8 +54,9 @@ static int coord[NumSegments+1] = {
 //-----------------------------------------------------------------------------
 // Purpose: Konstructor
 //-----------------------------------------------------------------------------
-CZMClientScoreBoardDialog::CZMClientScoreBoardDialog(IViewPort *pViewPort):CClientScoreBoardDialog(pViewPort)
+CZMClientScoreBoardDialog::CZMClientScoreBoardDialog( IViewPort* pViewPort ) : CClientScoreBoardDialog( pViewPort )
 {
+    
 }
 
 //-----------------------------------------------------------------------------
@@ -312,14 +313,14 @@ void CZMClientScoreBoardDialog::PaintBorder()
 //-----------------------------------------------------------------------------
 // Purpose: Apply scheme settings
 //-----------------------------------------------------------------------------
-void CZMClientScoreBoardDialog::ApplySchemeSettings( vgui::IScheme *pScheme )
+void CZMClientScoreBoardDialog::ApplySchemeSettings( vgui::IScheme* pScheme )
 {
     BaseClass::ApplySchemeSettings( pScheme );
 
-    m_bgColor = GetSchemeColor("SectionedListPanel.BgColor", GetBgColor(), pScheme);
-    m_borderColor = pScheme->GetColor( "FgColor", Color( 0, 0, 0, 0 ) );
+    m_bgColor = GetSchemeColor( "ZMScoreboardBg", GetBgColor(), pScheme );
+    m_borderColor = GetSchemeColor( "ZMScoreboardBorder", GetFgColor(), pScheme );
 
-    SetBgColor( Color(0, 0, 0, 0) );
+    SetBgColor( Color( 0, 0, 0, 0 ) );
     SetBorder( pScheme->GetBorder( "BaseBorder" ) );
 }
 
@@ -329,12 +330,13 @@ void CZMClientScoreBoardDialog::ApplySchemeSettings( vgui::IScheme *pScheme )
 //-----------------------------------------------------------------------------
 void CZMClientScoreBoardDialog::InitScoreboardSections()
 {
-    m_pPlayerList->SetBgColor( Color(0, 0, 0, 0) );
-    m_pPlayerList->SetBorder(NULL);
+    m_pPlayerList->SetBgColor( Color( 0, 0, 0, 0 ) );
+    m_pPlayerList->SetBorder( nullptr );
+
+    m_pPlayerList->SetVerticalScrollbar( true );
 
     // fill out the structure of the scoreboard
     AddHeader();
-
     AddSection( TYPE_TEAM, ZMTEAM_ZM );
     AddSection( TYPE_TEAM, ZMTEAM_HUMAN );
     AddSection( TYPE_TEAM, ZMTEAM_SPECTATOR );
@@ -359,57 +361,50 @@ void CZMClientScoreBoardDialog::UpdateTeamInfo()
     }
 
     // update the team sections in the scoreboard
-    for ( int i = ZMTEAM_SPECTATOR; i < TEAM_MAXCOUNT; i++ )
+    for ( int i = ZMTEAM_SPECTATOR; i <= ZMTEAM_ZM; i++ )
     {
-        wchar_t *teamName = NULL;
+        wchar_t* teamName = L"";
         int sectionID = 0;
-        C_Team *team = GetGlobalTeam(i);
+        C_Team* team = GetGlobalTeam( i );
 
-        if ( team )
-        {
-            sectionID = GetSectionFromTeamNumber( i );
+        if ( !team ) continue;
+
+
+        sectionID = GetSectionFromTeamNumber( i );
     
-            // update team name
-            wchar_t name[64];
-            wchar_t string1[1024];
-            wchar_t wNumPlayers[6];
+        // update team name
+        wchar_t name[64];
 
+        if ( *teamName == NULL && team )
+        {
+            const char* tempname = team->Get_Name();
 
-            _snwprintf(wNumPlayers, ARRAYSIZE(wNumPlayers), L"%i", team->Get_Number_Players());
-
-            if (!teamName && team)
-            {
-                const char* tempname = team->Get_Name();
-
-                g_pVGuiLocalize->ConvertANSIToUnicode(tempname ? tempname : "No team name :(", name, sizeof(name));
+            g_pVGuiLocalize->ConvertANSIToUnicode( tempname ? tempname : "NO TEAM NAME", name, sizeof( name ) );
                 
-                teamName = name;
-            }
+            teamName = name;
+        }
 
-            if (team->Get_Number_Players() == 1)
+        if ( DisplayTeamCount( i ) )
+        {
+            wchar_t wNumPlayers[6];
+            wchar_t string1[512];
+
+            _snwprintf( wNumPlayers, ARRAYSIZE( wNumPlayers ), L"%i", team->Get_Number_Players() );
+
+            if ( team->Get_Number_Players() == 1 )
             {
-                g_pVGuiLocalize->ConstructString( string1, sizeof(string1), g_pVGuiLocalize->Find("#ScoreBoard_Player"), 2, teamName, wNumPlayers );
+                g_pVGuiLocalize->ConstructString( string1, sizeof( string1 ), g_pVGuiLocalize->Find( "#ScoreBoard_Player" ), 2, teamName, wNumPlayers );
             }
             else
             {
-                g_pVGuiLocalize->ConstructString( string1, sizeof(string1), g_pVGuiLocalize->Find("#ScoreBoard_Players"), 2, teamName, wNumPlayers );
+                g_pVGuiLocalize->ConstructString( string1, sizeof( string1 ), g_pVGuiLocalize->Find( "#ScoreBoard_Players" ), 2, teamName, wNumPlayers );
             }
 
-            // update stats
-            wchar_t val[6];
-            V_snwprintf(val, ARRAYSIZE(val), L"%d", team->Get_Score());
-            m_pPlayerList->ModifyColumn(sectionID, "frags", val);
-            if (team->Get_Ping() < 1)
-            {
-                m_pPlayerList->ModifyColumn(sectionID, "ping", L"");
-            }
-            else
-            {
-                V_snwprintf(val, ARRAYSIZE(val), L"%d", team->Get_Ping());
-                m_pPlayerList->ModifyColumn(sectionID, "ping", val);
-            }
-        
-            m_pPlayerList->ModifyColumn(sectionID, "name", string1);
+            m_pPlayerList->ModifyColumn( sectionID, "name", string1 );
+        }
+        else
+        {
+            m_pPlayerList->ModifyColumn( sectionID, "name", teamName );
         }
     }
 }
@@ -419,52 +414,73 @@ void CZMClientScoreBoardDialog::UpdateTeamInfo()
 //-----------------------------------------------------------------------------
 void CZMClientScoreBoardDialog::AddHeader()
 {
-    // add the top header
-    m_pPlayerList->AddSection(0, "");
-    m_pPlayerList->SetSectionAlwaysVisible(0);
+	// add the top header
     HFont hFallbackFont = scheme()->GetIScheme( GetScheme() )->GetFont( "DefaultVerySmallFallBack", false );
-    m_pPlayerList->AddColumnToSection(0, "name", "", 0, scheme()->GetProportionalScaledValueEx( GetScheme(), CSTRIKE_NAME_WIDTH ), hFallbackFont );
-    m_pPlayerList->AddColumnToSection(0, "class", "", 0, scheme()->GetProportionalScaledValueEx( GetScheme(), CSTRIKE_CLASS_WIDTH ) );
-    m_pPlayerList->AddColumnToSection(0, "frags", "#PlayerScore", 0 | SectionedListPanel::COLUMN_RIGHT, scheme()->GetProportionalScaledValueEx( GetScheme(), CSTRIKE_SCORE_WIDTH ) );
-    m_pPlayerList->AddColumnToSection(0, "deaths", "#PlayerDeath", 0 | SectionedListPanel::COLUMN_RIGHT, scheme()->GetProportionalScaledValueEx( GetScheme(), CSTRIKE_DEATH_WIDTH ) );
-    m_pPlayerList->AddColumnToSection(0, "ping", "#PlayerPing", 0 | SectionedListPanel::COLUMN_RIGHT, scheme()->GetProportionalScaledValueEx( GetScheme(), CSTRIKE_PING_WIDTH ) );
-//	m_pPlayerList->AddColumnToSection(0, "voice", "#PlayerVoice", SectionedListPanel::COLUMN_IMAGE | SectionedListPanel::HEADER_TEXT| SectionedListPanel::COLUMN_CENTER, scheme()->GetProportionalScaledValueEx( GetScheme(), CSTRIKE_VOICE_WIDTH ) );
-//	m_pPlayerList->AddColumnToSection(0, "tracker", "#PlayerTracker", SectionedListPanel::COLUMN_IMAGE | SectionedListPanel::HEADER_TEXT, scheme()->GetProportionalScaledValueEx( GetScheme(), CSTRIKE_FRIENDS_WIDTH ) );
+
+
+	m_pPlayerList->AddSection( SCORESECTION_HEADER, "" );
+	m_pPlayerList->SetSectionAlwaysVisible( SCORESECTION_HEADER );
+
+    if ( ShowAvatars() )
+		m_pPlayerList->AddColumnToSection( SCORESECTION_HEADER, "avatar", "", 0, m_iAvatarWidth * 2 );
+
+	m_pPlayerList->AddColumnToSection( SCORESECTION_HEADER, "name", "", 0, scheme()->GetProportionalScaledValueEx( GetScheme(), NAME_WIDTH ), hFallbackFont );
+	m_pPlayerList->AddColumnToSection( SCORESECTION_HEADER, "frags", "#PlayerScore", SectionedListPanel::COLUMN_RIGHT, scheme()->GetProportionalScaledValueEx( GetScheme() , SCORE_WIDTH ) );
+	m_pPlayerList->AddColumnToSection( SCORESECTION_HEADER, "deaths", "#PlayerDeath", SectionedListPanel::COLUMN_RIGHT, scheme()->GetProportionalScaledValueEx( GetScheme(), DEATH_WIDTH ) );
+	m_pPlayerList->AddColumnToSection( SCORESECTION_HEADER, "ping", "#PlayerPing", SectionedListPanel::COLUMN_RIGHT, scheme()->GetProportionalScaledValueEx( GetScheme(), PING_WIDTH ) );
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: Adds a new section to the scoreboard (i.e the team header)
 //-----------------------------------------------------------------------------
-void CZMClientScoreBoardDialog::AddSection(int teamType, int teamNumber)
+void CZMClientScoreBoardDialog::AddSection( int teamType, int iTeam )
 {
     HFont hFallbackFont = scheme()->GetIScheme( GetScheme() )->GetFont( "DefaultVerySmallFallBack", false );
 
-    int sectionID = GetSectionFromTeamNumber( teamNumber );
-    if ( teamType == TYPE_TEAM )
+    int sectionID = GetSectionFromTeamNumber( iTeam );
+
+
+    if ( teamType != TYPE_TEAM )
     {
-        m_pPlayerList->AddSection(sectionID, "", StaticPlayerSortFunc);
-
-        // setup the columns
-        m_pPlayerList->AddColumnToSection(sectionID, "name", "", 0, scheme()->GetProportionalScaledValueEx( GetScheme(), CSTRIKE_NAME_WIDTH ), hFallbackFont );
-        m_pPlayerList->AddColumnToSection(sectionID, "class", "" , 0, scheme()->GetProportionalScaledValueEx( GetScheme(), CSTRIKE_CLASS_WIDTH ) );
-        m_pPlayerList->AddColumnToSection(sectionID, "frags", "", SectionedListPanel::COLUMN_RIGHT, scheme()->GetProportionalScaledValueEx( GetScheme(), CSTRIKE_SCORE_WIDTH ) );
-        m_pPlayerList->AddColumnToSection(sectionID, "deaths", "", SectionedListPanel::COLUMN_RIGHT, scheme()->GetProportionalScaledValueEx( GetScheme(), CSTRIKE_DEATH_WIDTH ) );
-        m_pPlayerList->AddColumnToSection(sectionID, "ping", "", SectionedListPanel::COLUMN_RIGHT, scheme()->GetProportionalScaledValueEx( GetScheme(), CSTRIKE_PING_WIDTH ) );
-
-        // set the section to have the team color
-        if ( teamNumber )
-        {
-            if ( GameResources() )
-                m_pPlayerList->SetSectionFgColor(sectionID,  GameResources()->GetTeamColor(teamNumber));
-        }
-
-        m_pPlayerList->SetSectionAlwaysVisible(sectionID);
+        Warning( "Attempting to add an invalid scoreboard section type!\n" );
+        return;
     }
-    else if ( teamType == TYPE_SPECTATORS )
+    
+
+
+    m_pPlayerList->AddSection( sectionID, "", StaticPlayerSortFunc );
+    
+
+    if ( iTeam == ZMTEAM_HUMAN )
     {
-        m_pPlayerList->AddSection(sectionID, "");
-        m_pPlayerList->AddColumnToSection(sectionID, "name", "#Spectators", 0, scheme()->GetProportionalScaledValueEx( GetScheme(), CSTRIKE_NAME_WIDTH ), hFallbackFont );
-        m_pPlayerList->AddColumnToSection(sectionID, "class", "" , 0, scheme()->GetProportionalScaledValueEx( GetScheme(), 100 ) );
+        m_pPlayerList->SetSectionMinimumHeight( sectionID, 50 );
+    }
+
+    if ( iTeam != ZMTEAM_SPECTATOR )
+    {
+        m_pPlayerList->SetSectionAlwaysVisible( sectionID, true );
+    }
+    else
+    {
+        m_pPlayerList->SetSectionAlwaysVisible( sectionID, false );
+    }
+
+
+	// Avatars are always displayed at 32x32 regardless of resolution
+    if ( ShowAvatars() )
+		m_pPlayerList->AddColumnToSection( sectionID, "avatar", "", SectionedListPanel::COLUMN_IMAGE, m_iAvatarWidth * 2 );
+
+    // setup the columns
+    m_pPlayerList->AddColumnToSection( sectionID, "name", "", 0, scheme()->GetProportionalScaledValueEx( GetScheme(), NAME_WIDTH ), hFallbackFont );
+	m_pPlayerList->AddColumnToSection( sectionID, "frags", "", SectionedListPanel::COLUMN_RIGHT, scheme()->GetProportionalScaledValueEx( GetScheme(), SCORE_WIDTH ) );
+	m_pPlayerList->AddColumnToSection( sectionID, "deaths", "", SectionedListPanel::COLUMN_RIGHT, scheme()->GetProportionalScaledValueEx( GetScheme(), DEATH_WIDTH ) );
+	m_pPlayerList->AddColumnToSection( sectionID, "ping", "", SectionedListPanel::COLUMN_RIGHT, scheme()->GetProportionalScaledValueEx( GetScheme(), PING_WIDTH ) );
+
+    // set the section to have the team color
+    if ( iTeam )
+    {
+        if ( GameResources() )
+            m_pPlayerList->SetSectionFgColor( sectionID, GameResources()->GetTeamColor( iTeam ) );
     }
 }
 
@@ -584,6 +600,8 @@ void CZMClientScoreBoardDialog::UpdatePlayerInfo()
             // add the player to the list
             KeyValues *playerData = new KeyValues("data");
             GetPlayerScoreInfo( i, playerData );
+            UpdatePlayerAvatar( i, playerData );
+
             int itemID = FindItemIDForPlayerIndex( i );
             int sectionID = GetSectionFromTeamNumber( g_PR->GetTeam( i ) );
                         
@@ -623,6 +641,11 @@ void CZMClientScoreBoardDialog::UpdatePlayerInfo()
     {
         m_pPlayerList->SetSelectedItem(selectedRow);
     }
+}
 
-    
+bool CZMClientScoreBoardDialog::DisplayTeamCount( int iTeam )
+{
+    if ( iTeam == ZMTEAM_HUMAN ) return true;
+
+    return false;
 }
