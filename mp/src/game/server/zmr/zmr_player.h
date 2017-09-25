@@ -111,6 +111,7 @@ public:
 
 
     void SetTeamSpecificProps();
+    void PushAway( const Vector& pos, float force );
 
 
     // Implemented in zm_player_shared

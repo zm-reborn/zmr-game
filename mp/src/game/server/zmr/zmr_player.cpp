@@ -20,6 +20,9 @@ static ConVar zm_sv_randomplayermodel( "zm_sv_randomplayermodel", "1", FCVAR_NOT
 ConVar zm_sv_antiafk( "zm_sv_antiafk", "90", FCVAR_NOTIFY | FCVAR_ARCHIVE, "If the player is AFK for this many seconds, put them into spectator mode. 0 = disable" );
 
 
+static ConVar zm_sv_npcheadpushoff( "zm_sv_npcheadpushoff", "200", FCVAR_NOTIFY | FCVAR_ARCHIVE, "How much force is applied to the player when standing on an NPC." );
+
+
 IMPLEMENT_SERVERCLASS_ST( CZMPlayer, DT_ZM_Player )
     SendPropDataTable( SENDINFO_DT( m_ZMLocal ), &REFERENCE_SEND_TABLE( DT_ZM_PlyLocal ), SendProxy_SendLocalDataTable ),
 END_SEND_TABLE()
@@ -165,10 +168,30 @@ void CZMPlayer::PreThink( void )
                 SetFlashlightBattery( 100.0f );
             }
         }
+
+        // Force player off the NPCs head!
+        if ( zm_sv_npcheadpushoff.GetFloat() != 0.0f && GetGroundEntity() && !GetGroundEntity()->IsStandable() && GetGroundEntity()->IsNPC() )
+        {
+            PushAway( GetGroundEntity()->GetAbsOrigin(), zm_sv_npcheadpushoff.GetFloat() );
+        }
     }
 
 
     BaseClass::PreThink();
+}
+
+void CZMPlayer::PushAway( const Vector& pos, float force )
+{
+    Vector fwd = GetAbsOrigin() - pos;
+    fwd.z = 0.0f;
+
+    VectorNormalize( fwd );
+
+
+    Vector vel = force * fwd;
+    vel.z = GetAbsVelocity().z; // Make sure we have our z-velocity the same in case we need to apply fall damage or something.
+
+    SetAbsVelocity( vel );
 }
 
 bool CZMPlayer::ClientCommand( const CCommand &args )
