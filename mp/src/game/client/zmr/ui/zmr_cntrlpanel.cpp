@@ -170,7 +170,7 @@ void CZMHudControlPanel::LoadButtons()
         false,
         true,
         true,
-        false
+        true
     };
 
     /*const int toolTipCosts[NUM_BUTTONS] =

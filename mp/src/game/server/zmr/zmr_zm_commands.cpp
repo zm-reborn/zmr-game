@@ -8,6 +8,7 @@
 
 
 #include "npcs/zmr_zombiebase.h"
+#include "npcs/zmr_fastzombie.h"
 #include "zmr/zmr_global_shared.h"
 
 #include "zmr_player.h"
@@ -821,3 +822,38 @@ void ZM_Cmd_SetZombieMode( const CCommand &args )
 }
 
 static ConCommand zm_cmd_zombiemode( "zm_cmd_zombiemode", ZM_Cmd_SetZombieMode, "" );
+
+
+/*
+    Set banshee ceiling cling.
+*/
+void ZM_Cmd_SetBansheeCeil( const CCommand &args )
+{
+    CZMPlayer* pPlayer = ToZMPlayer( UTIL_GetCommandClient() );
+
+    if ( !pPlayer ) return;
+    
+    if ( !pPlayer->IsZM() ) return;
+
+
+
+    CZMBaseZombie* pZombie;
+    for ( int i = 0; i < g_pZombies->Count(); i++ )
+    {
+        pZombie = g_pZombies->Element( i );
+
+        if ( !pZombie ) continue;
+
+        if ( pZombie->GetSelector() != pPlayer && pZombie->GetZombieClass() != ZMCLASS_BANSHEE )
+            continue;
+
+
+        if (!pZombie->IsCurSchedule( SCHED_FASTZOMBIE_CEILING_JUMP ) &&
+            !pZombie->IsCurSchedule( SCHED_FASTZOMBIE_CEILING_CLING ))
+        {
+            pZombie->SetSchedule( SCHED_FASTZOMBIE_CEILING_JUMP );
+        }
+    }
+}
+
+static ConCommand zm_cmd_bansheeceiling( "zm_cmd_bansheeceiling", ZM_Cmd_SetBansheeCeil, "" );
