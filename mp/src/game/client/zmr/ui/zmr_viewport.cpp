@@ -8,7 +8,7 @@
 #include "clientmode_shared.h"
 #include "clientsideeffects.h"
 #include "fx_quad.h"
-
+#include <vgui/IInput.h>
 
 #include "zmr/zmr_player_shared.h"
 #include "zmr/zmr_gamerules.h"
@@ -37,6 +37,23 @@ ConVar zm_cl_hidemouseinscore( "zm_cl_hidemouseinscore", "1", FCVAR_ARCHIVE, "Is
 
 ConVar zm_cl_usenewmenus( "zm_cl_usenewmenus", "1", FCVAR_ARCHIVE, "Use new ZM menus?" );
 
+
+// ZMRTODO: Remove this abomination.
+static int GetGroupByKey()
+{
+    if ( vgui::input()->IsKeyDown( KEY_1 ) ) return 1;
+    if ( vgui::input()->IsKeyDown( KEY_2 ) ) return 2;
+    if ( vgui::input()->IsKeyDown( KEY_3 ) ) return 3;
+    if ( vgui::input()->IsKeyDown( KEY_4 ) ) return 4;
+    if ( vgui::input()->IsKeyDown( KEY_5 ) ) return 5;
+    if ( vgui::input()->IsKeyDown( KEY_6 ) ) return 6;
+    if ( vgui::input()->IsKeyDown( KEY_7 ) ) return 7;
+    if ( vgui::input()->IsKeyDown( KEY_8 ) ) return 8;
+    if ( vgui::input()->IsKeyDown( KEY_9 ) ) return 9;
+    if ( vgui::input()->IsKeyDown( KEY_0 ) ) return 0;
+
+    return INVALID_GROUP_INDEX;
+}
 
 
 DECLARE_HUDELEMENT( CZMFrame );
@@ -401,6 +418,22 @@ void CZMFrame::OnThink()
         {
             engine->ClientCmd( "-lookup" );
             engine->ClientCmd( "-lookdown" );
+        }
+    }
+
+
+    // ZMRTODO: Put this somewhere else. This is a terrible place to do this.
+    // OnKeyCodePressed, etc. can't be used here since we have to have keyboard input disabled in order to let the game accept inputs.
+    int group = GetGroupByKey();
+    if ( group != INVALID_GROUP_INDEX )
+    {
+        if ( pPlayer->m_nButtons & IN_DUCK )
+        {
+            ZMClientUtil::SetSelectedGroup( group );
+        }
+        else
+        {
+            ZMClientUtil::SelectGroup( group );
         }
     }
 }
