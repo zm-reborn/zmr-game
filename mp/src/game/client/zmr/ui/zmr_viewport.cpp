@@ -284,6 +284,10 @@ void CZMFrame::OnCommand( const char* command )
     {
         if ( g_pZMView ) g_pZMView->SetClickMode( ZMCLICKMODE_PHYSEXP );
     }
+    else if ( Q_stricmp( command, "MODE_JUMP_CEILING" ) == 0 )
+    {
+        engine->ClientCmd( "zm_cmd_bansheeceiling" );
+    }
 
     BaseClass::OnCommand( command );
 }

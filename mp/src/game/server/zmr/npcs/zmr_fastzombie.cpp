@@ -22,6 +22,7 @@
 
 
 #include "zmr/zmr_gamerules.h"
+#include "zmr_fastzombie.h"
 #include "zmr_zombiebase.h"
 
 
@@ -47,22 +48,6 @@
 #define FASTZOMBIE_MAUL_RANGE	300
 
 
-enum
-{
-	SCHED_FASTZOMBIE_RANGE_ATTACK1 = LAST_SHARED_SCHEDULE + 100, // hack to get past the base zombie's schedules
-	SCHED_FASTZOMBIE_UNSTICK_JUMP,
-	SCHED_FASTZOMBIE_CLIMBING_UNSTICK_JUMP,
-	SCHED_FASTZOMBIE_MELEE_ATTACK1,
-	SCHED_FASTZOMBIE_CEILING_JUMP,
-	SCHED_FASTZOMBIE_CEILING_CLING,
-};
-
-enum
-{
-    COND_FASTZOMBIE_CLIMB_TOUCH	= LAST_BASE_ZOMBIE_CONDITION,
-};
-
-
 extern ConVar zm_sk_banshee_health;
 extern ConVar zm_sk_banshee_dmg_claw;
 extern ConVar zm_sk_banshee_dmg_leap;
@@ -83,17 +68,7 @@ int AE_FASTZOMBIE_CLIMB_RIGHT;
 //=========================================================
 // tasks
 //=========================================================
-enum 
-{
-    TASK_FASTZOMBIE_DO_ATTACK = LAST_SHARED_TASK + 100,	// again, my !!!HACKHACK
-    TASK_FASTZOMBIE_LAND_RECOVER,
-    TASK_FASTZOMBIE_UNSTICK_JUMP,
-    TASK_FASTZOMBIE_JUMP_BACK,
-    TASK_FASTZOMBIE_VERIFY_ATTACK,
-    TASK_FASTZOMBIE_JUMP_TO_CEILING, //tgb
-    TASK_FASTZOMBIE_CLING_TO_CEILING,
-    TASK_FASTZOMBIE_CHECK_CEILING,
-};
+
 
 //=========================================================
 // activities
@@ -1786,26 +1761,25 @@ bool CFastZombie::IsCeilingFlat(Vector plane_normal )
 CBaseEntity* CFastZombie::GetClingAmbushTarget()
 {
     // look around target
-    CBaseEntity *pList[64];
-    const int count = UTIL_EntitiesInSphere(pList, 64, m_vClingJumpStart, FASTZOMBIE_CLING_DETECTRANGE, FL_CLIENT);
+    CBaseEntity* pList[32];
+    const int count = UTIL_EntitiesInSphere(pList, ARRAYSIZE( pList ), m_vClingJumpStart, FASTZOMBIE_CLING_DETECTRANGE, FL_CLIENT);
 
     // loop through any finds
-    CBaseEntity *nearest = NULL;
+    CBaseEntity *nearest = nullptr;
     float nearest_dist = 0;
     for ( int i = 0; i < count; i++ )
     {
-        if ( pList[i] == NULL )
+        if ( !pList[i] )
             continue;
 
-        if ( pList[i]->GetTeamNumber() != 2)
-            continue;//skip anyone who is not on the survivor team
+        if ( pList[i]->GetTeamNumber() != ZMTEAM_HUMAN || !pList[i]->IsAlive() )
+            continue;
 
-        if ( FVisible(pList[i], MASK_SOLID) == false )
+        if ( !FVisible( pList[i], MASK_SOLID ) )
             continue; //skip out of LOS
 
         const float current_dist = EnemyDistance(pList[i]);
-        if (nearest == NULL ||
-            nearest_dist > current_dist)
+        if (!nearest || nearest_dist > current_dist)
         {
             nearest = pList[i];
             nearest_dist = current_dist;
