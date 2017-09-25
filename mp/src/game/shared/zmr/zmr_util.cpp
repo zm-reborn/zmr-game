@@ -263,4 +263,96 @@ void ZMClientUtil::SelectZombies( const CUtlVector<C_ZMBaseZombie*>& vZombies, b
         engine->ClientCmd( VarArgs( "zm_cmd_selectmult %s %s",  bSticky ? "1": "0", cmdbuffer ) );
     }
 }
+
+int ZMClientUtil::GetGroupZombieCount( int group )
+{
+    C_ZMBaseZombie* pZombie;
+
+    int num = 0;
+
+
+    for ( int i = 0; i < g_pZombies->Count(); i++ )
+    {
+        pZombie = g_pZombies->Element( i );
+
+        if ( !pZombie ) continue;
+
+
+        if ( pZombie->GetGroup() == group )
+        {
+            ++num;
+        }
+    }
+
+    return num;
+}
+
+void ZMClientUtil::SetSelectedGroup( int group )
+{
+    int index = GetLocalPlayerIndex();
+
+    if ( !index ) return;
+
+
+    C_ZMBaseZombie* pZombie;
+
+    for ( int i = 0; i < g_pZombies->Count(); i++ )
+    {
+        pZombie = g_pZombies->Element( i );
+
+        if ( !pZombie ) continue;
+
+
+        if ( pZombie->GetSelectorIndex() == index )
+        {
+            pZombie->SetGroup( group );
+        }
+        else if ( pZombie->GetGroup() == group )
+        {
+            pZombie->SetGroup( INVALID_GROUP_INDEX );
+        }
+    }
+}
+
+void ZMClientUtil::SelectGroup( int group, bool force )
+{
+    int index = GetLocalPlayerIndex();
+
+    if ( !index ) return;
+
+
+    C_ZMBaseZombie* pZombie;
+    CUtlVector<C_ZMBaseZombie*> vSelect;
+    vSelect.Purge();
+
+
+    if ( !force && GetGroupZombieCount( group ) == 0 )
+        return;
+
+    // Don't send selection if we've already selected that group.
+    bool bNew = false;
+    
+    for ( int i = 0; i < g_pZombies->Count(); i++ )
+    {
+        pZombie = g_pZombies->Element( i );
+
+        if ( pZombie )
+        {
+            if ( pZombie->GetGroup() == group )
+                vSelect.AddToTail( pZombie );
+
+            if ((pZombie->GetGroup() == group && pZombie->GetSelectorIndex() != index)
+            ||  (pZombie->GetGroup() != group && pZombie->GetSelectorIndex() == index))
+            {
+                bNew = true;
+            }
+        }
+    }
+
+    if ( bNew )
+    {
+        DeselectAllZombies( false );
+        SelectZombies( vSelect, false );
+    }
+}
 #endif
