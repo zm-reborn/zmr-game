@@ -23,6 +23,8 @@ void ClientPutInServer( edict_t* pEdict, const char* playername );
 void Bot_Think( CZMPlayer* pBot );
 
 
+static ConVar bot_stop( "bot_stop", "0", 0, "Stops all bot processing." );
+
 ConVar bot_forcefireweapon( "bot_forcefireweapon", "", 0, "Force bots with the specified weapon to fire." );
 ConVar bot_forceattack2( "bot_forceattack2", "0", 0, "When firing, use attack2." );
 ConVar bot_forceattackon( "bot_forceattackon", "0", 0, "When firing, don't tap fire, hold it down." );
@@ -130,6 +132,7 @@ void Bot_RunAll()
 {
     if ( g_ZMBots.m_nBots < 1 ) return;
     
+    if ( bot_stop.GetBool() ) return;
 
     for ( int i = 1; i <= gpGlobals->maxClients; i++ )
     {
