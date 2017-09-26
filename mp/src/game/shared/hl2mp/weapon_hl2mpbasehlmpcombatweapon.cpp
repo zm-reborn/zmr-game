@@ -214,6 +214,7 @@ void CBaseHL2MPCombatWeapon::WeaponIdle( void )
 
 #if defined( CLIENT_DLL )
 
+#ifndef ZMR // ZMRCHANGE: Get the fuck out.
 #define	HL2_BOB_CYCLE_MIN	1.0f
 #define	HL2_BOB_CYCLE_MAX	0.45f
 #define	HL2_BOB			0.002f
@@ -233,13 +234,14 @@ static ConVar	v_ipitch_cycle( "v_ipitch_cycle", "1", FCVAR_REPLICATED | FCVAR_CH
 static ConVar	v_iyaw_level( "v_iyaw_level", "0.3", FCVAR_REPLICATED | FCVAR_CHEAT );
 static ConVar	v_iroll_level( "v_iroll_level", "0.1", FCVAR_REPLICATED | FCVAR_CHEAT );
 static ConVar	v_ipitch_level( "v_ipitch_level", "0.3", FCVAR_REPLICATED | FCVAR_CHEAT );
-
+#endif // ZMR
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Output : float
 //-----------------------------------------------------------------------------
 float CBaseHL2MPCombatWeapon::CalcViewmodelBob( void )
 {
+#ifndef ZMR // ZMRCHANGE: Fuck you too.
 	static	float bobtime;
 	static	float lastbobtime;
 	float	cycle;
@@ -302,7 +304,7 @@ float CBaseHL2MPCombatWeapon::CalcViewmodelBob( void )
 	g_lateralBob = speed*0.005f;
 	g_lateralBob = g_lateralBob*0.3 + g_lateralBob*0.7*sin(cycle);
 	g_lateralBob = clamp( g_lateralBob, -7.0f, 4.0f );
-	
+#endif
 	//NOTENOTE: We don't use this return value in our case (need to restructure the calculation function setup!)
 	return 0.0f;
 }
@@ -315,6 +317,7 @@ float CBaseHL2MPCombatWeapon::CalcViewmodelBob( void )
 //-----------------------------------------------------------------------------
 void CBaseHL2MPCombatWeapon::AddViewmodelBob( CBaseViewModel *viewmodel, Vector &origin, QAngle &angles )
 {
+#ifndef ZMR // ZMRCHANGE: Eat shit.
 	Vector	forward, right;
 	AngleVectors( angles, &forward, &right, NULL );
 
@@ -333,6 +336,7 @@ void CBaseHL2MPCombatWeapon::AddViewmodelBob( CBaseViewModel *viewmodel, Vector 
 	angles[ YAW ]	-= g_lateralBob  * 0.3f;
 
 	VectorMA( origin, g_lateralBob * 0.8f, right, origin );
+#endif
 }
 
 //-----------------------------------------------------------------------------
