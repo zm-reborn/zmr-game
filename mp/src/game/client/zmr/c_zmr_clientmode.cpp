@@ -1,8 +1,9 @@
 #include "cbase.h"
 #include "clientmode_shared.h"
-#include "hl2mptextwindow.h"
 #include "ienginevgui.h"
 
+#include "zmr/ui/zmr_spectator_ui.h"
+#include "zmr/ui/zmr_textwindow.h"
 #include "zmr/ui/zmr_scoreboard.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -69,12 +70,12 @@ IViewPortPanel* CZMViewport::CreatePanelByName( const char* szPanelName )
     }
     else if ( Q_strcmp( PANEL_INFO, szPanelName ) == 0 )
     {
-        newpanel = new CHL2MPTextWindow( this );
+        newpanel = new CZMTextWindow( this );
         return newpanel;
     }
     else if ( Q_strcmp( PANEL_SPECGUI, szPanelName ) == 0 )
     {
-        newpanel = new CHL2MPSpectatorGUI( this );	
+        newpanel = new CZMSpectatorGUI( this );	
         return newpanel;
     }
 
