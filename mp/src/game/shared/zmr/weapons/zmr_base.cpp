@@ -456,37 +456,39 @@ void CZMBaseWeapon::Equip( CBaseCombatCharacter* pCharacter )
 
 // Viewmodel stuff from basehl2mpcombatweapon.
 #ifdef CLIENT_DLL
+// Version of cl_bob* cvars that are actually useful...
+ConVar cl_bobcycle( "cl_bobcycle", "0.45", 0 , "How fast the bob cycles", true, 0.01f, false, 0.0f );
+ConVar cl_bobup( "cl_bobup", "0.5", 0 , "Don't change...", true, 0.01f, true, 0.99f );
+ConVar cl_bobvertscale( "cl_bobvertscale", "0.1", 0, "Vertical scale" );
+ConVar cl_boblatscale( "cl_boblatscale", "0.8", 0, "Lateral scale" );
 
-#define	HL2_BOB_CYCLE_MIN	1.0f
-#define	HL2_BOB_CYCLE_MAX	0.45f
-#define	HL2_BOB			0.002f
-#define	HL2_BOB_UP		0.5f
-
-extern float	g_lateralBob;
-extern float	g_verticalBob;
+extern float g_lateralBob;
+extern float g_verticalBob;
 
 float CZMBaseWeapon::CalcViewmodelBob( void )
 {
-    static	float bobtime;
-    static	float lastbobtime;
-    float	cycle;
+    static float    bobtime;
+    static float    lastbobtime;
+    float           cycle;
+
+    float           bobup = cl_bobup.GetFloat();
+    float           bobcycle = cl_bobcycle.GetFloat();
     
-    CBasePlayer *player = ToBasePlayer( GetOwner() );
-    //Assert( player );
+
+    C_BasePlayer* player = GetPlayerOwner();
 
     //NOTENOTE: For now, let this cycle continue when in the air, because it snaps badly without it
 
-    if ( ( !gpGlobals->frametime ) || ( player == NULL ) )
+    if (!player ||
+        !gpGlobals->frametime ||
+        bobcycle <= 0.0f ||
+        bobup <= 0.0f || bobup >= 1.0f)
     {
-        //NOTENOTE: We don't use this return value in our case (need to restructure the calculation function setup!)
-        return 0.0f;// just use old value
+        return 0.0f;
     }
 
-    //Find the speed of the player
-    float speed = player->GetLocalVelocity().Length2D();
 
-    //FIXME: This maximum speed value must come from the server.
-    //		 MaxSpeed() is not sufficient for dealing with sprinting - jdw
+    float speed = player->GetLocalVelocity().Length2D();
 
     speed = clamp( speed, -320, 320 );
 
@@ -496,16 +498,16 @@ float CZMBaseWeapon::CalcViewmodelBob( void )
     lastbobtime = gpGlobals->curtime;
 
     //Calculate the vertical bob
-    cycle = bobtime - (int)(bobtime/HL2_BOB_CYCLE_MAX)*HL2_BOB_CYCLE_MAX;
-    cycle /= HL2_BOB_CYCLE_MAX;
+    cycle = bobtime - (int)(bobtime/bobcycle)*bobcycle;
+    cycle /= bobcycle;
 
-    if ( cycle < HL2_BOB_UP )
+    if ( cycle < bobup )
     {
-        cycle = M_PI * cycle / HL2_BOB_UP;
+        cycle = M_PI * cycle / bobup;
     }
     else
     {
-        cycle = M_PI + M_PI*(cycle-HL2_BOB_UP)/(1.0 - HL2_BOB_UP);
+        cycle = M_PI + M_PI*(cycle-bobup)/(1.0 - bobup);
     }
     
     g_verticalBob = speed*0.005f;
@@ -514,16 +516,16 @@ float CZMBaseWeapon::CalcViewmodelBob( void )
     g_verticalBob = clamp( g_verticalBob, -7.0f, 4.0f );
 
     //Calculate the lateral bob
-    cycle = bobtime - (int)(bobtime/HL2_BOB_CYCLE_MAX*2)*HL2_BOB_CYCLE_MAX*2;
-    cycle /= HL2_BOB_CYCLE_MAX*2;
+    cycle = bobtime - (int)(bobtime/bobcycle*2)*bobcycle*2;
+    cycle /= bobcycle*2;
 
-    if ( cycle < HL2_BOB_UP )
+    if ( cycle < bobup )
     {
-        cycle = M_PI * cycle / HL2_BOB_UP;
+        cycle = M_PI * cycle / bobup;
     }
     else
     {
-        cycle = M_PI + M_PI*(cycle-HL2_BOB_UP)/(1.0 - HL2_BOB_UP);
+        cycle = M_PI + M_PI*(cycle-bobup)/(1.0 - bobup);
     }
 
     g_lateralBob = speed*0.005f;
@@ -542,7 +544,7 @@ void CZMBaseWeapon::AddViewmodelBob( CBaseViewModel *viewmodel, Vector& origin, 
     CalcViewmodelBob();
 
     // Apply bob, but scaled down to 40%
-    VectorMA( origin, g_verticalBob * 0.1f, forward, origin );
+    VectorMA( origin, g_verticalBob * cl_bobvertscale.GetFloat(), forward, origin );
     
     // Z bob a bit more
     origin[2] += g_verticalBob * 0.1f;
@@ -553,7 +555,7 @@ void CZMBaseWeapon::AddViewmodelBob( CBaseViewModel *viewmodel, Vector& origin, 
 
     angles[ YAW ]	-= g_lateralBob  * 0.3f;
 
-    VectorMA( origin, g_lateralBob * 0.8f, right, origin );
+    VectorMA( origin, g_lateralBob * cl_boblatscale.GetFloat(), right, origin );
 }
 
 Vector CZMBaseWeapon::GetBulletSpread( WeaponProficiency_t proficiency )
