@@ -331,7 +331,10 @@ void CZMPlayer::SetTeamSpecificProps()
             SetMoveType( MOVETYPE_NOCLIP );
             SetCollisionGroup( COLLISION_GROUP_DEBRIS );
             AddSolidFlags( FSOLID_NOT_SOLID );
-            AddEffects( EF_NODRAW );
+
+            // Client will simply not render the ZM.
+            // This allows the ZM movement to be interpolated.
+            //AddEffects( EF_NODRAW );
         }
         else
         {
@@ -566,11 +569,11 @@ void CZMPlayer::Spawn()
         if ( IsHuman() )
         {
 		    RemoveSolidFlags( FSOLID_NOT_SOLID );
-		    RemoveEffects( EF_NODRAW );
-
 
             GiveDefaultItems();
         }
+
+        RemoveEffects( EF_NODRAW );
 	}
 
 
