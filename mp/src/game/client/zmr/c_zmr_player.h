@@ -27,6 +27,8 @@ public:
     virtual void ClientThink() OVERRIDE;
     virtual void TeamChange( int ) OVERRIDE;
     virtual bool CreateMove( float delta, CUserCmd* cmd ) OVERRIDE;
+
+    virtual bool ShouldDraw() OVERRIDE;
     virtual int DrawModel( int ) OVERRIDE;
 
     // Custom...

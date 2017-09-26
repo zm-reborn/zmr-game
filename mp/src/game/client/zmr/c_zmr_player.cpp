@@ -190,6 +190,15 @@ bool C_ZMPlayer::CreateMove( float delta, CUserCmd* cmd )
     return bResult;
 }
 
+bool C_ZMPlayer::ShouldDraw()
+{
+    if ( GetTeamNumber() == ZMTEAM_ZM )
+        return false;
+
+
+    return BaseClass::ShouldDraw();
+}
+
 int C_ZMPlayer::DrawModel( int flags )
 {
     C_ZMPlayer* pPlayer = C_ZMPlayer::GetLocalPlayer();
