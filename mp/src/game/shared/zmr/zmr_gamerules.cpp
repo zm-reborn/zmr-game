@@ -72,9 +72,9 @@ static const char* g_PreserveEnts[] =
     "info_node",
     "info_target",
     "info_node_hint",
-    "info_player_deathmatch",
-    "info_player_combine",
-    "info_player_rebel",
+    //"info_player_deathmatch",
+    //"info_player_combine",
+    //"info_player_rebel",
     "info_map_parameters",
     //"keyframe_rope", // Will fuck up maps that parent ropes to objects.
     //"move_rope",
@@ -94,8 +94,8 @@ static const char* g_PreserveEnts[] =
     // Our preserved ents...
     "zm_gamerules",
     "func_win",
-    "info_player_zombiemaster",
-    "info_player_survivor",
+    //"info_player_zombiemaster",
+    //"info_player_survivor",
     "info_loadout",
 
     "zm_objectives_manager",
@@ -1237,6 +1237,9 @@ void CZMRules::PlayerThink( CBasePlayer* pPlayer )
 
 bool CZMRules::IsSpawnPointValid( CBaseEntity* pSpot, CBasePlayer* pPlayer )
 {
+    if ( pPlayer->GetTeamNumber() == ZMTEAM_ZM )
+        return true;
+
     // Use our own filter since if the player collisions are off, all players will bunch up together.
     class CZMTraceFilterSpawnPoint : public CTraceFilterSimple
     {
@@ -1255,7 +1258,13 @@ bool CZMRules::IsSpawnPointValid( CBaseEntity* pSpot, CBasePlayer* pPlayer )
                 return false;
 
             if ( pEntity && pEntity->IsPlayer() )
+            {
+                if ( pEntity->IsEffectActive( EF_NODRAW ) )
+                    return false;
+
+
                 return true;
+            }
 
             return CTraceFilterSimple::ShouldHitEntity( pHandleEntity, contentsMask );
         }

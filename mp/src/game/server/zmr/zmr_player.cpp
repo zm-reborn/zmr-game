@@ -36,11 +36,6 @@ LINK_ENTITY_TO_CLASS( player, CZMPlayer );
 PRECACHE_REGISTER( player );
 
 
-//LINK_ENTITY_TO_CLASS( info_player_deathmatch, CPointEntity ); // Is already defined in subs.cpp
-LINK_ENTITY_TO_CLASS( info_player_survivor, CPointEntity );
-LINK_ENTITY_TO_CLASS( info_player_zombiemaster, CPointEntity );
-
-
 // ZMRTODO: Add support for loading models from file.
 const char* g_ZMPlayerModels[] = 
 {
@@ -744,37 +739,54 @@ bool CZMPlayer::BumpWeapon( CBaseCombatWeapon *pWeapon )
 CBaseEntity* CZMPlayer::EntSelectSpawnPoint( void )
 {
     const char *pszFallback = "info_player_deathmatch";
-    const char *pszSpawn = pszFallback;
-
-    CBaseEntity* pTarget = nullptr;
+    const char *pszSpawn = IsZM() ? "info_player_zombiemaster" : "info_player_survivor";
 
 
-    if ( IsZM() )
-    {
-        pszSpawn = "info_player_zombiemaster";
+    CUtlVector<CBaseEntity*> vValidSpots;
+    vValidSpots.Purge();
 
-        pTarget = gEntList.FindEntityByClassname( nullptr, pszSpawn );
-	    if ( pTarget == nullptr )
-	    {
-		    pszSpawn = pszFallback;
-	    }
-        else
-        {
-            return pTarget;
-        }
-    }
 
+
+    bool bCheckEnabled = true;
     CBaseEntity* pEnt;
     
-    // Try to find a spawn that isn't taken.
-    pEnt = nullptr;
-    while ( (pEnt = gEntList.FindEntityByClassname( pEnt, pszSpawn )) != nullptr )
+    // Find all valid spawn points.
+    for ( int i = 0; i < 2; i++ )
     {
-        if ( g_pGameRules->IsSpawnPointValid( pEnt, this ) )
+        // Loop through our wanted spawnpoint, if it fails, use fallback.
+        for ( int j = 0; j < 2; j++ )
         {
-            return pEnt;
+            pEnt = nullptr;
+            while ( (pEnt = gEntList.FindEntityByClassname( pEnt, pszSpawn )) != nullptr )
+            {
+                if ( (!bCheckEnabled || static_cast<CZMEntSpawnPoint*>( pEnt )->IsEnabled()) && g_pGameRules->IsSpawnPointValid( pEnt, this ) )
+                {
+                    if ( vValidSpots.Find( pEnt ) == -1 )
+                        vValidSpots.AddToTail( pEnt );
+                }
+            }
+
+            if ( vValidSpots.Count() )
+                break;
+
+            pszSpawn = pszFallback;
         }
+
+        if ( vValidSpots.Count() )
+            break;
+
+        // If even that failed, don't check if the spawnpoint is enabled.
+        bCheckEnabled = false;
     }
+
+    if ( vValidSpots.Count() )
+    {
+        return vValidSpots[random->RandomInt( 0, vValidSpots.Count() - 1 )];
+    }
+
+
+    Warning( "Couldn't find a valid spawnpoint for %i, using first fallback...\n", entindex() );
+
 
     // Didn't work, now just find any spot.
     pEnt = gEntList.FindEntityByClassname( nullptr, pszFallback );
