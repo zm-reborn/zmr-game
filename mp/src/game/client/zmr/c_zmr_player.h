@@ -31,6 +31,8 @@ public:
     virtual bool ShouldDraw() OVERRIDE;
     virtual int DrawModel( int ) OVERRIDE;
 
+    virtual bool ShouldInterpolate() OVERRIDE;
+
     // Custom...
     inline bool IsZM() { return GetTeamNumber() == ZMTEAM_ZM; };
     inline bool IsHuman() { return GetTeamNumber() == ZMTEAM_HUMAN; };

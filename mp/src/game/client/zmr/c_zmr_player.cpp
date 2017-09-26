@@ -233,6 +233,24 @@ int C_ZMPlayer::DrawModel( int flags )
     return BaseClass::DrawModel( flags );
 }
 
+bool C_ZMPlayer::ShouldInterpolate()
+{
+    // Always interpolate our observer target.
+    // Mainly here for ZM observering being laggy.
+    // ZMRTODO: See if this has any side-effects.
+    if ( !IsLocalPlayer() )
+    {
+        C_ZMPlayer* pPlayer = GetLocalPlayer();
+
+        if ( pPlayer && pPlayer->GetObserverTarget() == this )
+        {
+            return true;
+        }
+    }
+
+    return BaseClass::ShouldInterpolate();
+}
+
 void C_ZMPlayer::SetMouseWheelMove( float dir )
 {
     if ( !zm_cl_mwheelmove.GetBool() ) return;
