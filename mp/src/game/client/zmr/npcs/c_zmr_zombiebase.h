@@ -10,6 +10,7 @@
 #include "zmr/zmr_shareddefs.h"
 
 
+#define INVALID_GROUP_INDEX         -1
 
 
 // ZMRTODO: Predict selector index.
@@ -42,6 +43,10 @@ public:
     void SetSelector( CZMPlayer* );
     void SetSelector( int );
 
+
+    inline int GetGroup() { return m_iGroup; };
+    inline void SetGroup( int group ) { m_iGroup = group; };
+
 protected:
     CZMCharCircle* m_fxHealth;
     CZMCharCircle* m_fxInner;
@@ -49,4 +54,6 @@ protected:
 private:
     CNetworkVar( int, m_iSelectorIndex );
     CNetworkVar( float, m_flHealthRatio );
+
+    int m_iGroup;
 };

@@ -42,6 +42,8 @@ C_ZMBaseZombie::C_ZMBaseZombie()
 
     m_fxHealth = nullptr;
     m_fxInner = nullptr;
+
+    m_iGroup = INVALID_GROUP_INDEX;
     
 
     // Always create FX.
