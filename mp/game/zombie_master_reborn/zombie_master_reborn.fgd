@@ -32,6 +32,19 @@
 	input Unhide(void) : "Unhides"
 ]
 
+@BaseClass = ZMSpawnpoint
+[
+	enabled(choices) : "Enabled" : 1 : "Can players spawn on this spawnpoint?" =
+	[
+		0: "No"
+		1: "Yes"
+	]
+	
+	input Toggle(void) : "Toggles spawnpoint availability."
+	input Enable(void) : "Enables spawnpoint availability."
+	input Disable(void) : "Disables spawnpoint availability."
+]
+
 @PointClass base(Targetname, Parentname, Origin, Angles) = func_win :
 	"Target for the Humans to win or lose the game"
 [
@@ -120,10 +133,9 @@
 @PointClass base(Weapon) studio("models/weapons/smg_zm_3rd.mdl") = weapon_zm_mac10 : "Mac 10" []
 @PointClass base(Weapon) studio("models/weapons/w_357.mdl") = weapon_zm_revolver : "Revolver" []
 
-@PointClass base(PlayerClass, Angles) studio("models/editor/playerstart.mdl") = info_player_zombiemaster :
-	"This entity indicates the position and facing direction at which the Zombiemaster will spawn"
-[
-]
+@PointClass base(Targetname, PlayerClass, Angles, ZMSpawnpoint) studio("models/editor/playerstart.mdl") = info_player_zombiemaster : "Spawnpoint for the Zombie Master." []
+@PointClass base(Targetname, PlayerClass, Angles, ZMSpawnpoint) studio("models/editor/playerstart.mdl") = info_player_deathmatch : "Spawnpoint for the Survivors." []
+@PointClass base(Targetname, PlayerClass, Angles, ZMSpawnpoint) studio("models/editor/playerstart.mdl") = info_player_survivor : "Spawnpoint for the Survivors." []
 
 @SolidClass base(Trigger, Targetname, Activeable, InputActiveable) = trigger_playercount :
 	"A trigger volume that counts players."
@@ -157,12 +169,6 @@
 	]
 	
 	input GiveResources(integer) : "Give/Take x resources"
-]
-
-@PointClass base(PlayerClass, Angles) studio("models/editor/playerstart.mdl") = info_player_deathmatch :
-	"This entity indicates the position and facing direction at which the player will spawn during a deathmatch map. Any number of "+
-	"info_player_deathmatch entities may be placed in a map."
-[
 ]
 
 @SolidClass base(Targetname, Origin, Activeable, InputActiveable) = trigger_blockspotcreate :

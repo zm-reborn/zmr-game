@@ -1803,3 +1803,48 @@ void CZMEntTeamScore::InputApplyScoreSurvivors( inputdata_t& inputData )
 {
     ApplyScore( GetGlobalTeam( ZMTEAM_HUMAN ) );
 }
+
+
+/*
+    Spawn points
+*/
+static const char* g_szSpawnpoints[] =
+{
+    "info_player_deathmatch",
+    "info_player_survivor",
+    "info_player_zombiemaster",
+    "info_player_start"
+};
+
+BEGIN_DATADESC( CZMEntSpawnPoint )
+    DEFINE_KEYFIELD( m_bIsEnabled, FIELD_BOOLEAN, "enabled" ),
+
+    DEFINE_INPUTFUNC( FIELD_VOID, "Enable", InputEnable ),
+    DEFINE_INPUTFUNC( FIELD_VOID, "Disable", InputDisable ),
+    DEFINE_INPUTFUNC( FIELD_VOID, "Toggle", InputToggle ),
+END_DATADESC()
+
+CZMEntSpawnPoint::CZMEntSpawnPoint()
+{
+    m_bIsEnabled = true;
+}
+
+void CZMEntSpawnPoint::InputEnable( inputdata_t& inputData )
+{
+    m_bIsEnabled = true;
+}
+
+void CZMEntSpawnPoint::InputDisable( inputdata_t& inputData )
+{
+    m_bIsEnabled = false;
+}
+
+void CZMEntSpawnPoint::InputToggle( inputdata_t& inputData )
+{
+    m_bIsEnabled = !m_bIsEnabled;
+}
+
+LINK_ENTITY_TO_CLASS( info_player_start, CZMEntSpawnPoint );
+LINK_ENTITY_TO_CLASS( info_player_deathmatch, CZMEntSpawnPoint );
+LINK_ENTITY_TO_CLASS( info_player_survivor, CZMEntSpawnPoint );
+LINK_ENTITY_TO_CLASS( info_player_zombiemaster, CZMEntSpawnPoint );
