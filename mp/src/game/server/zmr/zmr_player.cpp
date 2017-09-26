@@ -167,7 +167,12 @@ void CZMPlayer::PreThink( void )
         // Force player off the NPCs head!
         if ( zm_sv_npcheadpushoff.GetFloat() != 0.0f && GetGroundEntity() && !GetGroundEntity()->IsStandable() && GetGroundEntity()->IsNPC() )
         {
-            PushAway( GetGroundEntity()->GetAbsOrigin(), zm_sv_npcheadpushoff.GetFloat() );
+            // A hack to keep pushing the player in the same direction they're looking at.
+            // People wanting to crowd surf will get angry otherwise.
+            Vector vec;
+            AngleVectors( QAngle( 0.0f, GetAbsAngles().y, 0.0f ), &vec );
+
+            PushAway( GetAbsOrigin() + vec * -10.0f, zm_sv_npcheadpushoff.GetFloat() );
         }
     }
 
