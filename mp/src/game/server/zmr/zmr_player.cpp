@@ -177,6 +177,11 @@ void CZMPlayer::PreThink( void )
     }
 
 
+    // Fixes player not changing target after the first target has died.
+    if ( GetObserverMode() > OBS_MODE_FREEZECAM )
+        CheckObserverSettings();
+
+
     BaseClass::PreThink();
 }
 
