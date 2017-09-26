@@ -18,9 +18,20 @@ bool CZMTeam::ShouldTransmitToPlayer( CBasePlayer* pRecipient, CBaseEntity* pEnt
         //}
     }
     
-    // Always transmit the observer target to players
-    if ( pRecipient->IsObserver() && pRecipient->GetObserverTarget() == pEntity )
-        return true;
+    if ( pRecipient->IsObserver() && pRecipient->GetObserverTarget() )
+    {
+        // Always transmit the observer target to players
+        if ( pRecipient->GetObserverTarget() == pEntity )
+            return true;
+
+
+        if ( pRecipient->GetObserverTarget()->IsPlayer() )
+        {
+            // If the our observer target is the ZM, always show other players as well.
+            if ( pRecipient->GetObserverTarget()->GetTeamNumber() == ZMTEAM_ZM )
+                return true;
+        }
+    }
 
     return false;
 }
