@@ -365,3 +365,27 @@ private:
 
     EHANDLE m_hSpark;
 };
+
+/*
+    Spawn points
+*/
+class CZMEntSpawnPoint : public CServerOnlyPointEntity
+{
+public:
+    DECLARE_CLASS( CZMEntSpawnPoint, CServerOnlyPointEntity );
+    DECLARE_DATADESC();
+
+
+    CZMEntSpawnPoint();
+
+
+    void InputEnable( inputdata_t& inputData );
+    void InputDisable( inputdata_t& inputData );
+    void InputToggle( inputdata_t& inputData );
+
+    inline bool IsEnabled() { return m_bIsEnabled; };
+    inline void SetEnabled( bool b ) { m_bIsEnabled = b; };
+
+private:
+    bool m_bIsEnabled;
+};
