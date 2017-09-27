@@ -1879,6 +1879,11 @@ END_SEND_TABLE()
 //-----------------------------------------------------------------------------
 CDynamicProp::CDynamicProp()
 {
+    // ZMRCHANGE: Make sure we do not create bone followers if the value isn't defined in the map data.
+    // This little fix can save hundreds of edict slots... thanks prop_dynamic ragdolls...
+#ifdef ZMR
+    m_bDisableBoneFollowers = true;
+#endif
 	m_nPendingSequence = -1;
 	if ( g_pGameRules->IsMultiplayer() )
 	{
