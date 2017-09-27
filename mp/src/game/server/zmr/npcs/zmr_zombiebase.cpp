@@ -115,11 +115,16 @@ CZMBaseZombie::CZMBaseZombie()
 
     m_iScheduleRetry = SCHED_NONE;
     m_flRetryEndTime = 0.0f;
+
+    m_hAmbushEnt.Set( nullptr );
 }
 
 CZMBaseZombie::~CZMBaseZombie()
 {
     g_pZombies->FindAndRemove( this );
+
+
+    RemoveFromAmbush( false );
 
 
 
@@ -777,6 +782,11 @@ int CZMBaseZombie::SelectSchedule( void )
             }
             
         }
+    }
+    else if ( GetZombieMode() == ZOMBIEMODE_AMBUSH )
+    {
+        if ( !HasCondition( COND_ZM_FAIL_AMBUSH ) )
+            return SCHED_ZM_AMBUSH_MODE;
     }
 
     switch ( m_NPCState )
@@ -1717,11 +1727,12 @@ void CZMBaseZombie::SetZombieMode( ZombieMode_t mode )
         m_bCommanded = true;
     }
 
-    /*switch ( mode )
+
+    if ( mode != ZOMBIEMODE_AMBUSH && m_hAmbushEnt.Get() )
     {
-    case ZOMBIEMODE_DEFEND :
-        SetSchedule( SCHED_ZM_ )
-    }*/
+        RemoveFromAmbush( false );
+    }
+
 
     m_iMode = mode;
 }
@@ -1874,6 +1885,33 @@ void CZMBaseZombie::UpdateRetry( float enddelay )
     m_vecLastRetryPos = GetAbsOrigin();
 }
 
+void CZMBaseZombie::SetAmbush( CZMEntAmbushTrigger* pTrigger )
+{
+    m_hAmbushEnt.Set( pTrigger );
+
+    SetSchedule( SCHED_ZM_AMBUSH_MODE );
+    SetZombieMode( ZOMBIEMODE_AMBUSH );
+}
+
+void CZMBaseZombie::RemoveFromAmbush( bool bRemoveSched, bool bRemoveFromAmbushEnt )
+{
+    if ( bRemoveFromAmbushEnt && m_hAmbushEnt.Get() )
+    {
+        m_hAmbushEnt.Get()->RemoveZombieFromAmbush();
+    }
+
+    m_hAmbushEnt.Set( nullptr );
+
+
+    if ( bRemoveSched )
+    {
+        SetCondition( COND_ZM_FAIL_AMBUSH );
+    }
+
+
+    SetZombieMode( ZOMBIEMODE_OFFENSIVE );
+}
+
 AI_BEGIN_CUSTOM_NPC( zmbase_zombie, CZMBaseZombie )
     
     DECLARE_TASK( TASK_ZOMBIE_DELAY_SWAT )
@@ -1901,6 +1939,7 @@ AI_BEGIN_CUSTOM_NPC( zmbase_zombie, CZMBaseZombie )
     DECLARE_CONDITION( COND_ZM_DEFEND_ENEMY_CLOSE )
     DECLARE_CONDITION( COND_ZM_DEFEND_ENEMY_TOOFAR )
     //DECLARE_CONDITION( COND_ZM_FAILED_GOAL )
+    DECLARE_CONDITION( COND_ZM_FAIL_AMBUSH )
 
 
     DECLARE_ANIMEVENT( AE_ZOMBIE_ATTACK_RIGHT )
@@ -2216,6 +2255,19 @@ AI_BEGIN_CUSTOM_NPC( zmbase_zombie, CZMBaseZombie )
 	    "		TASK_SET_SCHEDULE						SCHEDULE:SCHED_MOVE_AWAY_END"
 	    ""
 	    "	Interrupts"
+    )
+
+    DEFINE_SCHEDULE
+    (
+        SCHED_ZM_AMBUSH_MODE,
+
+        "	Tasks"
+        "		TASK_STOP_MOVING		0"
+        "		TASK_SET_ACTIVITY		ACTIVITY:ACT_IDLE"
+        "		TASK_WAIT_PVS			0"
+        "	"
+        "	Interrupts"
+        "		COND_ZM_FAIL_AMBUSH"
     )
 
 AI_END_CUSTOM_NPC()

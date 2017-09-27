@@ -5,8 +5,9 @@
 #include "ai_blended_movement.h"
 #include "ai_behavior_actbusy.h"
 #include "soundenvelope.h"
+#include "ehandle.h"
 
-#include "zmr/zmr_player_shared.h"
+
 #include "zmr/zmr_shareddefs.h"
 #include "zmr_npclagcomp.h"
 
@@ -63,6 +64,7 @@ enum
     SCHED_ZM_DEFEND_GO_DEFPOS,
     SCHED_ZM_DEFEND_WAIT,
     SCHED_ZM_MOVE_AWAY,
+    SCHED_ZM_AMBUSH_MODE,
 
     LAST_BASE_ZOMBIE_SCHEDULE,
 };
@@ -92,10 +94,14 @@ enum Zombie_Conds
     COND_ZM_DEFEND_ENEMY_CLOSE,
     COND_ZM_DEFEND_ENEMY_TOOFAR,
     //COND_ZM_FAILED_GOAL,
+    COND_ZM_FAIL_AMBUSH,
 
     LAST_BASE_ZOMBIE_CONDITION,
 };
 
+
+class CZMPlayer;
+class CZMEntAmbushTrigger;
 
 typedef CAI_BlendingHost<CAI_BehaviorHost<CAI_BaseNPC>> CAI_BaseZombieBase;
 
@@ -239,6 +245,11 @@ public:
     inline void SetAddGoalTolerance( float tolerance ) { m_flAddGoalTolerance = tolerance; };
     bool ShouldTryScheduleAgain( int failedSched, int failedTask, AI_TaskFailureCode_t );
 
+
+    CZMEntAmbushTrigger* GetAmbushTrigger() { return m_hAmbushEnt.Get(); };
+    void SetAmbush( CZMEntAmbushTrigger* trigger );
+    void RemoveFromAmbush( bool bRemoveSched, bool bRemoveFromAmbushEnt = true );
+
 public: // From base zombie...
     static int              ACT_ZOM_SWATLEFTMID;
     static int              ACT_ZOM_SWATRIGHTMID;
@@ -292,6 +303,8 @@ private:
     int                     m_iScheduleRetry;
     float                   m_flRetryEndTime;
     Vector                  m_vecLastRetryPos;
+
+    CHandle<CZMEntAmbushTrigger>    m_hAmbushEnt;
     
 protected:
     inline void SetZombieClass( ZombieClass_t zclass ) { m_iZombieClass = zclass; };

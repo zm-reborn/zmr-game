@@ -165,7 +165,7 @@ void CZMHudControlPanel::LoadButtons()
         true,
         true,
         true,
-        false,
+        true,
         false,
         false,
         true,
