@@ -691,6 +691,108 @@ void CZMEntManipulateTrigger::ScanThink( void )
     SetNextThink( gpGlobals->curtime + 0.5f );
 }
 
+
+/*
+    Ambush trigger
+*/
+
+ConVar zm_sv_ambush_triggerrange( "zm_sv_ambush_triggerrange", "100", FCVAR_NOTIFY );
+
+
+//IMPLEMENT_SERVERCLASS_ST( CZMEntManipulateTrigger, DT_ZM_EntManipulateTrigger )
+//END_SEND_TABLE()
+
+BEGIN_DATADESC( CZMEntAmbushTrigger )
+    DEFINE_THINKFUNC( ScanThink ),
+END_DATADESC()
+
+LINK_ENTITY_TO_CLASS( info_ambush_trigger, CZMEntAmbushTrigger );
+
+CZMEntAmbushTrigger::CZMEntAmbushTrigger()
+{
+    m_nAmbushZombies = 0;
+}
+
+CZMEntAmbushTrigger::~CZMEntAmbushTrigger()
+{
+
+}
+
+void CZMEntAmbushTrigger::Precache( void )
+{
+    PrecacheModel( "models/trap.mdl" );
+}
+
+void CZMEntAmbushTrigger::Spawn( void )
+{ 
+    Precache();
+    SetModel( "models/trap.mdl" );
+
+    SetSolid( SOLID_NONE );
+
+    SetThink( &CZMEntAmbushTrigger::ScanThink );
+    SetNextThink( gpGlobals->curtime + 0.5f );
+}
+
+void CZMEntAmbushTrigger::SetAmbushZombies( int count )
+{
+    if ( count < 1 )
+    {
+        Warning( "Can't create an ambush trigger with 0 zombies!\n" );
+        return;
+    }
+
+
+    m_nAmbushZombies = count;
+}
+
+void CZMEntAmbushTrigger::RemoveZombieFromAmbush()
+{
+    if ( --m_nAmbushZombies <= 0 )
+    {
+        UTIL_Remove( this );
+    }
+}
+
+void CZMEntAmbushTrigger::Trigger( CBaseEntity* pActivator )
+{
+    CZMBaseZombie* pZombie;
+    for ( int i = 0; i < g_pZombies->Count(); i++ )
+    {
+        pZombie = g_pZombies->Element( i );
+
+        if ( pZombie && pZombie->IsAlive() && pZombie->GetAmbushTrigger() == this )
+        {
+            pZombie->RemoveFromAmbush( true, false );
+
+            // Make them see the enemy but only if they have no enemy.
+            if ( !pZombie->HasCondition( COND_SEE_ENEMY ) && !pZombie->GetEnemy() )
+                pZombie->SetEnemy( pActivator );
+        }
+    }
+}
+
+void CZMEntAmbushTrigger::ScanThink( void )
+{
+    CBaseEntity* pEnt = nullptr;
+    while ( (pEnt = gEntList.FindEntityInSphere( pEnt, GetAbsOrigin(), zm_sv_ambush_triggerrange.GetFloat() )) != nullptr )
+    {
+        CZMPlayer* pPlayer = ToZMPlayer( pEnt );
+
+        if ( pPlayer && pPlayer->IsHuman() && pPlayer->IsAlive() )
+        {
+            Trigger( pPlayer );
+
+
+            UTIL_Remove( this );
+            return;
+        }
+    }
+
+    SetNextThink( gpGlobals->curtime + 0.3f );
+}
+
+
 /*
     Trap
 */

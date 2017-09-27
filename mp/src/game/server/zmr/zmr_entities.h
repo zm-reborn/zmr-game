@@ -1,18 +1,19 @@
 #pragma once
 
 
-class CZMEntRallyPoint;
-class CZMEntSpawnNode;
-class CZMPlayer;
-class CZMBaseZombie;
-
 #include "triggers.h"
 #include "physobj.h"
 
-#include "zmr_player.h"
-#include "npcs/zmr_zombiebase.h"
+//#include "zmr_player.h"
+#//include "npcs/zmr_zombiebase.h"
 #include "zmr/zmr_shareddefs.h"
 
+
+
+class CZMPlayer;
+class CZMBaseZombie;
+class CZMEntSpawnNode;
+class CZMEntRallyPoint;
 
 /*
     ZMRTODO: Make networking these ents lighter?
@@ -169,6 +170,37 @@ public:
 
     void ScanThink( void );
 };
+
+
+/*
+    Ambush trigger
+*/
+class CZMEntAmbushTrigger : public CZMEntBaseSimple
+{
+public:
+	DECLARE_CLASS( CZMEntAmbushTrigger, CZMEntBaseSimple )
+    //DECLARE_SERVERCLASS()
+    DECLARE_DATADESC()
+
+    CZMEntAmbushTrigger();
+    ~CZMEntAmbushTrigger();
+
+
+    void Spawn( void ) OVERRIDE;
+    void Precache( void ) OVERRIDE;
+
+
+    void SetAmbushZombies( int count );
+    void RemoveZombieFromAmbush();
+
+    void Trigger( CBaseEntity* pActivator );
+
+    void ScanThink( void );
+
+private:
+    int m_nAmbushZombies;
+};
+
 
 /*
     ZMRTODO: Use string tables.

@@ -207,6 +207,8 @@ void CZMFrame::SetClickMode( ZMClickMode_t mode, bool print )
         case ZMCLICKMODE_RALLYPOINT :
             ZMClientUtil::PrintNotify( "#ZMClickModeRally" );
             break;
+        case ZMCLICKMODE_AMBUSH :
+            ZMClientUtil::PrintNotify( "#ZMClickModeAmbush" );
         default : break;
         }
     }
@@ -300,6 +302,10 @@ void CZMFrame::OnCommand( const char* command )
     else if ( Q_stricmp( command, "MODE_POWER_PHYSEXP" ) == 0 )
     {
         if ( g_pZMView ) g_pZMView->SetClickMode( ZMCLICKMODE_PHYSEXP );
+    }
+    else if ( Q_stricmp( command, "MODE_AMBUSH_CREATE" ) == 0 )
+    {
+        if ( g_pZMView ) g_pZMView->SetClickMode( ZMCLICKMODE_AMBUSH );
     }
     else if ( Q_stricmp( command, "MODE_JUMP_CEILING" ) == 0 )
     {
@@ -542,6 +548,13 @@ void CZMFrame::OnLeftClick()
                 pos[1],
                 pos[2] ) );
             break;
+
+        case ZMCLICKMODE_AMBUSH :
+            pos = pos + trace.plane.normal * 1.0f;
+            engine->ClientCmd( VarArgs( "zm_cmd_createambush %.1f %.1f %.1f",
+                pos[0],
+                pos[1],
+                pos[2]  ) );
 
         default : break;
         }

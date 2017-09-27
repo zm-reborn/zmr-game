@@ -355,4 +355,25 @@ void ZMClientUtil::SelectGroup( int group, bool force )
         SelectZombies( vSelect, false );
     }
 }
+#else
+int ZMUtil::GetSelectedZombieCount( int iPlayerIndex )
+{
+    int num = 0;
+
+    CZMBaseZombie* pZombie;
+    for ( int i = 0; i < g_pZombies->Count(); i++ )
+    {
+        pZombie = g_pZombies->Element( i );
+
+        if ( !pZombie ) continue;
+
+
+        if ( pZombie->GetSelectorIndex() == iPlayerIndex )
+        {
+            ++num;
+        }
+    }
+
+    return num;
+}
 #endif

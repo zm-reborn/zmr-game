@@ -34,4 +34,9 @@ namespace ZMClientUtil
     void SetSelectedGroup( int group );
     void SelectGroup( int group, bool force = false );
 };
+#else
+namespace ZMUtil
+{
+    int GetSelectedZombieCount( int iPlayerIndex );
+};
 #endif

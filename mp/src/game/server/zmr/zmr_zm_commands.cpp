@@ -10,6 +10,7 @@
 #include "npcs/zmr_zombiebase.h"
 #include "npcs/zmr_fastzombie.h"
 #include "zmr/zmr_global_shared.h"
+#include "zmr/zmr_util.h"
 
 #include "zmr_player.h"
 #include "zmr_entities.h"
@@ -857,3 +858,73 @@ void ZM_Cmd_SetBansheeCeil( const CCommand &args )
 }
 
 static ConCommand zm_cmd_bansheeceiling( "zm_cmd_bansheeceiling", ZM_Cmd_SetBansheeCeil, "" );
+
+
+/*
+    Set zombie ambush.
+*/
+void ZM_Cmd_CreateAmbush( const CCommand &args )
+{
+    CZMPlayer* pPlayer = ToZMPlayer( UTIL_GetCommandClient() );
+
+    if ( !pPlayer ) return;
+    
+    if ( !pPlayer->IsZM() ) return;
+
+    if ( args.ArgC() < 4 ) return;
+
+    if ( !ZMUtil::GetSelectedZombieCount( pPlayer->entindex() ) )
+        return;
+    
+
+    Vector pos;
+    pos.x = atof( args.Arg( 1 ) );
+    pos.y = atof( args.Arg( 2 ) );
+    pos.z = atof( args.Arg( 3 ) );
+
+    if ( UTIL_PointContents( pos ) & CONTENTS_SOLID )
+        return;
+
+
+    CZMEntAmbushTrigger* pTrigger = dynamic_cast<CZMEntAmbushTrigger*>( CreateEntityByName( "info_ambush_trigger" ) );
+
+    if ( !pTrigger ) return;
+
+    if ( DispatchSpawn( pTrigger ) != 0 )
+        return;
+
+
+    pTrigger->Teleport( &pos, nullptr, nullptr );
+    pTrigger->Activate();
+
+
+    int count = 0;
+
+    CZMBaseZombie* pZombie;
+    for ( int i = 0; i < g_pZombies->Count(); i++ )
+    {
+        pZombie = g_pZombies->Element( i );
+
+        if ( !pZombie ) continue;
+
+        if ( pZombie->GetSelector() != pPlayer )
+            continue;
+
+
+        ++count;
+
+
+        pZombie->RemoveFromAmbush( false );
+
+        pZombie->SetAmbush( pTrigger );
+    }
+
+
+    pTrigger->SetAmbushZombies( count );
+
+
+
+    ClientPrint( pPlayer, HUD_PRINTTALK, "Created an ambush!" );
+}
+
+static ConCommand zm_cmd_createambush( "zm_cmd_createambush", ZM_Cmd_CreateAmbush, "" );

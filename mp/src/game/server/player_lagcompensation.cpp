@@ -15,6 +15,7 @@
 #include "tier0/vprof.h"
 
 #ifdef ZMR
+#include "zmr_player_shared.h"
 #include "zmr/npcs/zmr_zombiebase.h"
 #include "zmr_global_shared.h"
 #endif
