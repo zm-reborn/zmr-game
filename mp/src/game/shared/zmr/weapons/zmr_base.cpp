@@ -459,7 +459,7 @@ void CZMBaseWeapon::Equip( CBaseCombatCharacter* pCharacter )
 // Version of cl_bob* cvars that are actually useful...
 ConVar cl_bobcycle( "cl_bobcycle", "0.45", 0 , "How fast the bob cycles", true, 0.01f, false, 0.0f );
 ConVar cl_bobup( "cl_bobup", "0.5", 0 , "Don't change...", true, 0.01f, true, 0.99f );
-ConVar cl_bobvertscale( "cl_bobvertscale", "0.1", 0, "Vertical scale" );
+ConVar cl_bobvertscale( "cl_bobvertscale", "0.6", 0, "Vertical scale" ); // Def. is 0.1
 ConVar cl_boblatscale( "cl_boblatscale", "0.8", 0, "Lateral scale" );
 
 extern float g_lateralBob;
