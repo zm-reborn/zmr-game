@@ -129,10 +129,6 @@ LINK_ENTITY_TO_CLASS( trigger, CBaseTrigger );
 CBaseTrigger::CBaseTrigger()
 {
 	AddEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID );
-
-#ifdef ZMR // ZMRCHANGE: Make all triggers server-only. As they should be.
-    AddEFlags( EFL_SERVER_ONLY );
-#endif
 }
 
 //------------------------------------------------------------------------------
