@@ -149,6 +149,9 @@ private:
     int m_nPickPriority;
     float m_flLastActivity;
     float m_flLastActivityWarning;
+
+    // So we don't lag compensate more than once.
+    bool m_bIsFireBulletsRecursive;
 };
 
 inline CZMPlayer* ToZMPlayer( CBaseEntity* pEntity )

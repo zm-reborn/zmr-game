@@ -70,6 +70,9 @@ CZMPlayer::CZMPlayer()
 
     
     SetWeaponSlotFlags( 0 );
+
+
+    m_bIsFireBulletsRecursive = false;
 }
 
 CZMPlayer::~CZMPlayer( void )
@@ -617,17 +620,31 @@ void CZMPlayer::Spawn()
 
 void CZMPlayer::FireBullets( const FireBulletsInfo_t& info )
 {
-	// Move other players back to history positions based on local player's lag
-	lagcompensation->StartLagCompensation( this, this->GetCurrentCommand() );
+    // Make sure we don't lag compensate twice.
+    // This is called recursively from HandleShotImpactingGlass.
+    if ( !m_bIsFireBulletsRecursive )
+    {
+	    // Move ents back to history positions based on local player's lag
+	    lagcompensation->StartLagCompensation( this, this->GetCurrentCommand() );
 
 
-	NoteWeaponFired();
+	    NoteWeaponFired();
 
 
-    CBaseEntity::FireBullets( info );
+        m_bIsFireBulletsRecursive = true;
+        CBaseEntity::FireBullets( info );
+        m_bIsFireBulletsRecursive = false;
 
-	// Move other players back to history positions based on local player's lag
-	lagcompensation->FinishLagCompensation( this );
+
+	    // Move ents back to their original positions.
+	    lagcompensation->FinishLagCompensation( this );
+    }
+    else
+    {
+        DevMsg( "Called FireBullets recursively!\n" );
+
+        CBaseEntity::FireBullets( info );
+    }
 }
 
 extern ConVar sv_maxunlag;
