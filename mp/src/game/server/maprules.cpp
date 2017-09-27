@@ -20,7 +20,9 @@ class CRuleEntity : public CBaseEntity
 {
 public:
 	DECLARE_CLASS( CRuleEntity, CBaseEntity );
-
+#ifdef ZMR // ZMRCHANGE: Make all game_* ents server-only. As they should be.
+    CRuleEntity() : CBaseEntity( true ) {}
+#endif
 	void	Spawn( void );
 
 	DECLARE_DATADESC();
