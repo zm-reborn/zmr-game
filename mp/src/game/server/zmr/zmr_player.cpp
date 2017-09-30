@@ -855,3 +855,47 @@ void CZMPlayer::PlayerUse( void )
 
     BaseClass::PlayerUse();
 }
+
+int CZMPlayer::ShouldTransmit( const CCheckTransmitInfo* pInfo )
+{
+    // "The most difficult thing in life is to know yourself." - Some guy
+    // I searched for a fitting "know yourself" quote to joke about it but I shouldn't have put so much effort into this...
+    if ( pInfo->m_pClientEnt == edict() )
+	{
+		return FL_EDICT_ALWAYS;
+	}
+
+
+    if ( IsEffectActive( EF_NODRAW ) )
+        return FL_EDICT_DONTSEND;
+
+
+    // Don't send observers at all.
+    // The player doesn't get switched fast enough to warrant this.
+	if ( IsObserver()
+    /*&&  (gpGlobals->curtime - m_flDeathTime) > 0.5f
+	&&  m_lifeState == LIFE_DEAD && (gpGlobals->curtime - m_flDeathAnimTime) > 0.5f*/ )
+	{
+		return FL_EDICT_DONTSEND;
+	}
+
+
+
+	CZMPlayer* pRecipientPlayer = static_cast<CZMPlayer*>( CBaseEntity::Instance( pInfo->m_pClientEnt ) );
+
+    if ( !pRecipientPlayer )
+        return FL_EDICT_DONTSEND;
+
+
+    if ( IsZM() )
+    {
+        // Don't send us if the recipient is alive, they're not suppose to know about us.
+        if ( !pRecipientPlayer->IsObserver() )
+        {
+            return FL_EDICT_DONTSEND;
+        }
+    }
+
+
+    return CBaseEntity::ShouldTransmit( pInfo );
+}
