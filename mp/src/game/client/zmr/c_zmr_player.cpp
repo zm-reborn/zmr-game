@@ -201,6 +201,10 @@ bool C_ZMPlayer::ShouldDraw()
 
 int C_ZMPlayer::DrawModel( int flags )
 {
+    // Again, ShouldDraw is not enough.
+    if ( IsZM() ) return 0;
+
+
     C_ZMPlayer* pPlayer = C_ZMPlayer::GetLocalPlayer();
     if ( !pPlayer || !pPlayer->IsZM() )
     {
