@@ -30,6 +30,10 @@
 #include "cdll_int.h"
 #include <vgui/IPanel.h>
 
+#ifdef ZMR
+#include "zmr/zmr_shareddefs.h"
+#endif
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -233,6 +237,11 @@ void CVoiceStatus::DrawHeadLabels()
 		// Don't show an icon for dead or spectating players (ie: invisible entities).
 		if( pPlayer->IsPlayerDead() )
 			continue;
+
+#ifdef ZMR // ZMRCHANGE: No icon for ZM.
+        if ( pPlayer->GetTeamNumber() == ZMTEAM_ZM )
+            continue;
+#endif
 
 		// Place it 20 units above his head.
 		Vector vOrigin = pPlayer->WorldSpaceCenter();
