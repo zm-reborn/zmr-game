@@ -423,6 +423,24 @@ void CZMPlayer::GiveDefaultItems()
 	}*/
 }
 
+void CZMPlayer::ImpulseCommands()
+{
+    int iImpulse = GetImpulse();
+    switch ( iImpulse )
+    {
+    case 201 : // Spraying
+    {
+        // Don't allow ZM to spray...
+        if ( IsZM() ) return;
+
+        break;
+    }
+    default : break;
+    }
+
+    BaseClass::ImpulseCommands();
+}
+
 void CZMPlayer::CheatImpulseCommands( int iImpulse )
 {
     switch ( iImpulse )
