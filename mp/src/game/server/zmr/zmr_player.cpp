@@ -389,38 +389,13 @@ void CZMPlayer::GiveDefaultItems()
     }
 
 
-	/*CBasePlayer::GiveAmmo( 255,	"Pistol");
-	CBasePlayer::GiveAmmo( 45,	"SMG1");
-	CBasePlayer::GiveAmmo( 1,	"grenade" );
-	CBasePlayer::GiveAmmo( 6,	"Buckshot");
-	CBasePlayer::GiveAmmo( 6,	"357" );
-
-	if ( GetPlayerModelType() == PLAYER_SOUNDS_METROPOLICE || GetPlayerModelType() == PLAYER_SOUNDS_COMBINESOLDIER )
-	{
-		GiveNamedItem( "weapon_stunstick" );
-	}
-	else if ( GetPlayerModelType() == PLAYER_SOUNDS_CITIZEN )
-	{
-		GiveNamedItem( "weapon_crowbar" );
-	}
-	
-	GiveNamedItem( "weapon_pistol" );
-	GiveNamedItem( "weapon_smg1" );
-	GiveNamedItem( "weapon_frag" );
-	GiveNamedItem( "weapon_physcannon" );
-
-	const char *szDefaultWeaponName = engine->GetClientConVarValue( entindex(), "cl_defaultweapon" );
-
-	CBaseCombatWeapon *pDefaultWeapon = Weapon_OwnsThisType( szDefaultWeaponName );
-
-	if ( pDefaultWeapon )
-	{
-		Weapon_Switch( pDefaultWeapon );
-	}
-	else
-	{
-		Weapon_Switch( Weapon_OwnsThisType( "weapon_physcannon" ) );
-	}*/
+    // Change weapon to best we have.
+    CBaseCombatWeapon* pWep = GetWeaponOfHighestSlot();
+    
+    if ( pWep )
+    {
+        Weapon_Switch( pWep );
+    }
 }
 
 void CZMPlayer::ImpulseCommands()
@@ -872,4 +847,71 @@ void CZMPlayer::PlayerUse( void )
     }
 
     BaseClass::PlayerUse();
+}
+
+CZMBaseWeapon* CZMPlayer::GetWeaponOfHighestSlot()
+{
+    CZMBaseWeapon* pWep = nullptr;
+
+    if ( (pWep = GetWeaponOfSlot( ZMWEAPONSLOT_LARGE )) != nullptr )
+        return pWep;
+
+    if ( (pWep = GetWeaponOfSlot( ZMWEAPONSLOT_SIDEARM )) != nullptr )
+        return pWep;
+
+    if ( (pWep = GetWeaponOfSlot( ZMWEAPONSLOT_MELEE )) != nullptr )
+        return pWep;
+
+    if ( (pWep = GetWeaponOfSlot( ZMWEAPONSLOT_EQUIPMENT )) != nullptr )
+        return pWep;
+
+    // Just default to fists.
+    return static_cast<CZMBaseWeapon*>( Weapon_OwnsThisType( "weapon_zm_fists" ) );
+}
+
+CZMBaseWeapon* CZMPlayer::GetWeaponOfSlot( int slot )
+{
+    // You can search for multiple slots.
+    if ( !(GetWeaponSlotFlags() & slot) )
+        return nullptr;
+
+
+    CZMBaseWeapon* pWep;
+
+    for ( int i = 0; i < MAX_WEAPONS; i++ ) 
+    {
+        pWep = dynamic_cast<CZMBaseWeapon*>( m_hMyWeapons[i].Get() );
+
+        if ( pWep && pWep->GetSlotFlag() & slot )
+        {
+            return pWep;
+        }
+    }
+
+    return nullptr;
+}
+
+CZMBaseWeapon* CZMPlayer::GetWeaponOfSlot( const char* szSlotName )
+{
+    if ( Q_stricmp( szSlotName, "sidearm" ) == 0 )
+    {
+        return GetWeaponOfSlot( ZMWEAPONSLOT_SIDEARM );
+    }
+
+    if ( Q_stricmp( szSlotName, "melee" ) == 0 )
+    {
+        return GetWeaponOfSlot( ZMWEAPONSLOT_MELEE );
+    }
+
+    if ( Q_stricmp( szSlotName, "large" ) == 0 )
+    {
+        return GetWeaponOfSlot( ZMWEAPONSLOT_LARGE );
+    }
+
+    if ( Q_stricmp( szSlotName, "equipment" ) == 0 )
+    {
+        return GetWeaponOfSlot( ZMWEAPONSLOT_EQUIPMENT );
+    }
+
+    return nullptr;
 }
