@@ -127,7 +127,10 @@ public:
     Participation_t GetParticipation();
     virtual void PlayStepSound( Vector& vecOrigin, surfacedata_t* psurface, float fvol, bool force ) OVERRIDE;
 
-    
+
+    CZMBaseWeapon* GetWeaponOfHighestSlot();
+    CZMBaseWeapon* GetWeaponOfSlot( const char* szSlotName );
+    CZMBaseWeapon* GetWeaponOfSlot( int slot );
     int GetWeaponSlotFlags() { return m_fWeaponSlotFlags; };
     void SetWeaponSlotFlags( int flags ) { m_fWeaponSlotFlags = flags; };
     void AddWeaponSlotFlag( int flag ) { m_fWeaponSlotFlags |= flag; };
