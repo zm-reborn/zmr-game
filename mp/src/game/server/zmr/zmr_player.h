@@ -53,6 +53,7 @@ public:
     virtual void ChangeTeam( int iTeam ) OVERRIDE;
     bool ShouldSpawn();
     virtual bool IsValidObserverTarget( CBaseEntity* ) OVERRIDE;
+    virtual int ShouldTransmit( const CCheckTransmitInfo* ) OVERRIDE;
 
     void SetPlayerModel( void );
     bool ValidatePlayerModel( const char* );
