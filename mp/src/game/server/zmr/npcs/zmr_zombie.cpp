@@ -77,6 +77,18 @@ envelopePoint_t envZombieMoanIgnited[] =
 	},
 };
 
+static const char* g_szZombieModels[] = {
+    "models/zombie/zm_classic_01.mdl",
+    "models/zombie/zm_classic_02.mdl",
+    "models/zombie/zm_classic_03.mdl",
+    "models/zombie/zm_classic_04.mdl",
+    "models/zombie/zm_classic_05.mdl",
+    "models/zombie/zm_classic_06.mdl",
+    "models/zombie/zm_classic_07.mdl",
+    "models/zombie/zm_classic_08.mdl",
+    "models/zombie/zm_classic_09.mdl",
+};
+
 
 //=============================================================================
 //=============================================================================
@@ -240,15 +252,10 @@ void CZMZombie::Precache( void )
 {
 	BaseClass::Precache();
 
-	PrecacheModel( "models/zombie/zm_classic_01.mdl" );
-	PrecacheModel( "models/zombie/zm_classic_02.mdl" );
-	PrecacheModel( "models/zombie/zm_classic_03.mdl" );
-	PrecacheModel( "models/zombie/zm_classic_04.mdl" );
-	PrecacheModel( "models/zombie/zm_classic_05.mdl" );
-	PrecacheModel( "models/zombie/zm_classic_06.mdl" );
-	PrecacheModel( "models/zombie/zm_classic_07.mdl" );
-	PrecacheModel( "models/zombie/zm_classic_08.mdl" );
-	PrecacheModel( "models/zombie/zm_classic_09.mdl" );
+    for ( int i = 0; i < ARRAYSIZE( g_szZombieModels ); i++ )
+    {
+        PrecacheModel( g_szZombieModels[i] );
+    }
 
 	PrecacheScriptSound( "Zombie.FootstepRight" );
 	PrecacheScriptSound( "Zombie.FootstepLeft" );
@@ -415,21 +422,7 @@ void CZMZombie::AttackSound( void )
 //---------------------------------------------------------
 void CZMZombie::SetZombieModel( void )
 {
-	const char* modelname[] = {
-		"models/zombie/zm_classic_01.mdl",
-		"models/zombie/zm_classic_01.mdl",
-		"models/zombie/zm_classic_02.mdl",
-		"models/zombie/zm_classic_03.mdl",
-		"models/zombie/zm_classic_04.mdl",
-		"models/zombie/zm_classic_05.mdl",
-		"models/zombie/zm_classic_06.mdl",
-		"models/zombie/zm_classic_07.mdl",
-		"models/zombie/zm_classic_08.mdl",
-		"models/zombie/zm_classic_09.mdl",
-	};
-
-
-	SetModel( modelname[random->RandomInt( 0, ARRAYSIZE( modelname ) - 1 )] );
+	SetModel( g_szZombieModels[random->RandomInt( 0, ARRAYSIZE( g_szZombieModels ) - 1 )] );
 }
 
 //---------------------------------------------------------
