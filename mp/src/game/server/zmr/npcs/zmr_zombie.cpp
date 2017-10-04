@@ -26,6 +26,10 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+
+ConVar zm_sv_happyzombies( "zm_sv_happyzombies", "0", FCVAR_NOTIFY, "The zombies are smiling! :O" );
+
+
 // ACT_FLINCH_PHYSICS
 
 envelopePoint_t envZombieMoanVolumeFast[] =
@@ -423,6 +427,17 @@ void CZMZombie::AttackSound( void )
 void CZMZombie::SetZombieModel( void )
 {
 	SetModel( g_szZombieModels[random->RandomInt( 0, ARRAYSIZE( g_szZombieModels ) - 1 )] );
+
+
+
+    if ( zm_sv_happyzombies.GetBool() )
+    {
+        SetFlexWeight( "smile", 1.0f );
+        SetFlexWeight( "jaw_clench", 1.0f );
+        SetFlexWeight( "right_inner_raiser", 1.0f );
+        SetFlexWeight( "right_outer_raiser", 1.0f );
+        SetFlexWeight( "left_lowerer", 1.0f );
+    }
 }
 
 //---------------------------------------------------------
