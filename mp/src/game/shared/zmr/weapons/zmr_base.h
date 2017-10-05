@@ -33,7 +33,9 @@ public:
 	CZMBaseWeapon();
 	~CZMBaseWeapon();
     
-
+#ifdef CLIENT_DLL
+    virtual void Spawn() OVERRIDE;
+#endif
     virtual bool Reload() OVERRIDE;
     const CZMWeaponInfo& GetWpnData() const;
     // NOTE: Always use this to get the damage from .txt file.
@@ -45,6 +47,10 @@ public:
     virtual bool IsPredicted() const OVERRIDE { return true; };
 
 #ifdef CLIENT_DLL
+    virtual void ClientThink() OVERRIDE;
+    virtual void GetGlowEffectColor( float& r, float& g, float& b ) OVERRIDE;
+    void UpdateGlow();
+
     virtual void OnDataChanged( DataUpdateType_t ) OVERRIDE;
     virtual bool ShouldPredict() OVERRIDE;
 #endif
@@ -92,13 +98,13 @@ public:
     virtual bool CanAct(); // Can we reload/attack?
 
 
+    int GetSlotFlag() { return m_iSlotFlag; };
 #ifndef CLIENT_DLL
+    void FreeWeaponSlot();
+
+
     virtual const char* GetDropAmmoName() { return nullptr; };
     virtual int GetDropAmmoAmount() { return 1; };
-
-    int GetSlotFlag() { return m_iSlotFlag; };
-
-    void FreeWeaponSlot();
 
     inline int GetReserveAmmo( ) { return m_nReserveAmmo; };
     inline void SetReserveAmmo( int ammo ) { m_nReserveAmmo = ammo; };
@@ -110,11 +116,8 @@ protected:
     void TransferReserveAmmo( CBaseCombatCharacter* );
     // No support for secondary ammo since we'll never use it anyway, RIGHT?
     int m_nReserveAmmo;
-
+#endif
 
     inline void SetSlotFlag( int flags ) { m_iSlotFlag = flags; };
     int m_iSlotFlag;
-
-
-#endif
 };

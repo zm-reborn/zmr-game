@@ -96,9 +96,7 @@ CZMWeaponShotgun::CZMWeaponShotgun()
 
     m_bFiresUnderwater = false;
 
-#ifndef CLIENT_DLL
     SetSlotFlag( ZMWEAPONSLOT_LARGE );
-#endif
 }
 
 void CZMWeaponShotgun::PrimaryAttack( void )

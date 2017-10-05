@@ -96,9 +96,7 @@ CZMWeaponRevolver::CZMWeaponRevolver()
 
     m_bFiresUnderwater = false;
 
-#ifndef CLIENT_DLL
     SetSlotFlag( ZMWEAPONSLOT_SIDEARM );
-#endif
 }
 
 void CZMWeaponRevolver::PrimaryAttack()

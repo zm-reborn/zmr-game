@@ -119,6 +119,7 @@ public:
     // Implemented in zm_player_shared
     bool HasEnoughResToSpawn( ZombieClass_t );
     bool HasEnoughRes( int );
+    int GetWeaponSlotFlags();
     int GetResources();
     void IncResources( int, bool bLimit = false );
     void SetResources( int );
@@ -127,15 +128,15 @@ public:
     bool Weapon_CanSwitchTo( CBaseCombatWeapon* ) OVERRIDE;
     Participation_t GetParticipation();
     virtual void PlayStepSound( Vector& vecOrigin, surfacedata_t* psurface, float fvol, bool force ) OVERRIDE;
+    CBaseCombatWeapon* GetWeaponForAmmo( int iAmmoType );
 
 
     CZMBaseWeapon* GetWeaponOfHighestSlot();
     CZMBaseWeapon* GetWeaponOfSlot( const char* szSlotName );
     CZMBaseWeapon* GetWeaponOfSlot( int slot );
-    int GetWeaponSlotFlags() { return m_fWeaponSlotFlags; };
-    void SetWeaponSlotFlags( int flags ) { m_fWeaponSlotFlags = flags; };
-    void AddWeaponSlotFlag( int flag ) { m_fWeaponSlotFlags |= flag; };
-    void RemoveWeaponSlotFlag( int flag ) { m_fWeaponSlotFlags &= ~flag; };
+    void SetWeaponSlotFlags( int flags ) { m_ZMLocal.m_fWeaponSlotFlags = flags; };
+    void AddWeaponSlotFlag( int flag ) { m_ZMLocal.m_fWeaponSlotFlags |= flag; };
+    void RemoveWeaponSlotFlag( int flag ) { m_ZMLocal.m_fWeaponSlotFlags &= ~flag; };
 
     inline int GetPickPriority() { return m_nPickPriority; };
     inline void SetPickPriority( int i ) { m_nPickPriority = i; };
@@ -150,7 +151,6 @@ private:
 
     int m_iBuildSpawnIndex; // To update build menu.
     //Participation_t m_iParticipation;
-    int m_fWeaponSlotFlags;
     int m_nPickPriority;
     float m_flLastActivity;
     float m_flLastActivityWarning;

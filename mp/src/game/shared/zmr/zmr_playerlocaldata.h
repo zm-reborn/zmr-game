@@ -16,6 +16,7 @@ public:
     CZMPlayerLocalData();
 
 
+    CNetworkVar( int, m_fWeaponSlotFlags );
     CNetworkVar( int, m_nResources );
     CNetworkVar( float, m_flFlashlightBattery );
 };

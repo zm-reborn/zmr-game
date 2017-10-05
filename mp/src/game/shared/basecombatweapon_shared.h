@@ -143,7 +143,12 @@ namespace vgui2
 #if defined USES_ECON_ITEMS
 #define BASECOMBATWEAPON_DERIVED_FROM		CEconEntity
 #else 
+#if defined( CLIENT_DLL ) && defined( ZMR ) // ZMRCHANGE: Let the guns glow!
+#include "glowstencil/c_glowbase.h"
+#define BASECOMBATWEAPON_DERIVED_FROM		C_BaseGlowEntity
+#else
 #define BASECOMBATWEAPON_DERIVED_FROM		CBaseAnimating
+#endif // CLIENT_DLL
 #endif 
 
 //-----------------------------------------------------------------------------

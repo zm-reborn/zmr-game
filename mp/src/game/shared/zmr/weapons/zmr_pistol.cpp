@@ -94,7 +94,5 @@ CZMWeaponPistol::CZMWeaponPistol()
 
     m_bFiresUnderwater = true;
 
-#ifndef CLIENT_DLL
     SetSlotFlag( ZMWEAPONSLOT_SIDEARM );
-#endif
 }

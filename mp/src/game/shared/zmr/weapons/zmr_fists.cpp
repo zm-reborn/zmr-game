@@ -84,9 +84,7 @@ IMPLEMENT_ACTTABLE( CZMWeaponFists );
 
 CZMWeaponFists::CZMWeaponFists()
 {
-#ifndef CLIENT_DLL
     SetSlotFlag( ZMWEAPONSLOT_NONE );
-#endif
 }
 
 #ifndef CLIENT_DLL

@@ -107,9 +107,7 @@ IMPLEMENT_ACTTABLE( CZMWeaponSledge );
 
 CZMWeaponSledge::CZMWeaponSledge()
 {
-#ifndef CLIENT_DLL
     SetSlotFlag( ZMWEAPONSLOT_MELEE );
-#endif
 }
 
 void CZMWeaponSledge::Hit( trace_t& traceHit, Activity nHitActivity )
