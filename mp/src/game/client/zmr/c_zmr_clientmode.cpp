@@ -1,6 +1,7 @@
 #include "cbase.h"
 #include "clientmode_shared.h"
 #include "ienginevgui.h"
+#include "glow_outline_effect.h"
 
 #include "zmr/ui/zmr_spectator_ui.h"
 #include "zmr/ui/zmr_textwindow.h"
@@ -26,6 +27,8 @@ public:
     ~ClientModeZMNormal();
 
     virtual void Init() OVERRIDE;
+
+    virtual bool DoPostScreenSpaceEffects( const CViewSetup* pSetup );
 };
 
 
@@ -36,6 +39,13 @@ IClientMode *GetClientModeNormal()
     return &g_ClientModeNormal;
 }
 
+
+bool ClientModeZMNormal::DoPostScreenSpaceEffects( const CViewSetup* pSetup )
+{
+    g_GlowObjectManager.RenderGlowEffects( pSetup, 0 );
+
+    return true;
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: this is the viewport that contains all the hud elements
