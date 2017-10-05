@@ -172,6 +172,11 @@ $Project "Client (ZMR)"
 		}
 		$Folder "ZMR"
 		{
+			$Folder "GlowStencil"
+			{
+				$File	"glowstencil\c_glowbase.cpp"
+				$File	"glowstencil\c_glowbase.h"
+			}
 			$Folder "Npcs"
 			{
 				$File	"zmr\npcs\c_zmr_zombiebase.cpp"
