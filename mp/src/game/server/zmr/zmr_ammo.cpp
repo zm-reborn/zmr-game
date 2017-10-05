@@ -32,7 +32,25 @@ void CZMAmmo::Spawn()
     Precache();
     SetModel( GetItemModel() );
 
-    BaseClass::Spawn( );
+    BaseClass::Spawn();
+}
+
+void CZMAmmo::SetNextPickupTouch( float delay )
+{
+    SetTouch( &CZMAmmo::EmptyTouch );
+
+    SetThink( &CZMAmmo::NoPickupThink );
+    SetNextThink( gpGlobals->curtime + delay );
+}
+
+void CZMAmmo::NoPickupThink()
+{
+    SetThink( nullptr );
+    SetTouch( &CItem::ItemTouch );
+}
+
+void CZMAmmo::EmptyTouch( CBaseEntity* pOther )
+{
 }
 
 void CZMAmmo::Precache()
@@ -59,6 +77,12 @@ bool CZMAmmo::MyTouch( CBasePlayer* pPlayer )
 IMPLEMENT_SERVERCLASS_ST( CZMAmmo, DT_ZM_Ammo )
     SendPropInt( SENDINFO( m_iAmmoType ), 8 ),
 END_SEND_TABLE()
+
+BEGIN_DATADESC( CZMAmmo )
+    DEFINE_ENTITYFUNC( EmptyTouch ),
+    DEFINE_THINKFUNC( NoPickupThink ),
+END_DATADESC()
+
 
 
 REGISTER_ZMAMMO( item_box_buckshot, CZMAmmo_Buckshot, "models/items/boxbuckshot.mdl", "Buckshot", SIZE_AMMO_BUCKSHOT );

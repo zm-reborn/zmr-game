@@ -3,6 +3,7 @@
 #include "items.h"
 
 
+#include "zmr_ammo.h"
 #include "zmr/weapons/zmr_base.h"
 #include "zmr/zmr_shareddefs.h"
 #include "zmr_player.h"
@@ -46,8 +47,8 @@ void ZM_DropAmmo( const CCommand &args )
 
     pPlayer->EyeVectors( &fwd, nullptr, nullptr );
 
-    src = pPlayer->EyePosition();
-    end = pPlayer->EyePosition() + fwd * 70.0f;
+    src = pPlayer->EyePosition() + Vector( 0.0f, 0.0f, -12.0f );
+    end = src + fwd * 38.0f;
 
     // Make sure we don't spawn in the wall.
     Vector testhull( 6, 6, 6 );
@@ -55,9 +56,13 @@ void ZM_DropAmmo( const CCommand &args )
     UTIL_TraceHull( src, end, -testhull, testhull, MASK_SOLID, pPlayer, COLLISION_GROUP_NONE, &trace );
 
 
-    CItem* ammobox = (CItem*)CBaseEntity::Create( ammoname, trace.endpos, pWeapon->GetAbsAngles(), nullptr );
+    CZMAmmo* ammobox = (CZMAmmo*)CBaseEntity::Create( ammoname, trace.endpos, pWeapon->GetAbsAngles(), nullptr );
     
     if ( !ammobox ) return;
+
+
+    // Don't let players pickup this ammo instantly...
+    ammobox->SetNextPickupTouch( 1.0f );
 
 
     IPhysicsObject* pPhys = ammobox->VPhysicsGetObject();
