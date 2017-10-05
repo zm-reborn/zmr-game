@@ -294,6 +294,11 @@ $Project "Server (ZMR)"
 		}
 		$Folder "ZMR"
 		{
+			$Folder "GlowStencil"
+			{
+				$File	"glowstencil\glowbase.cpp"
+				$File	"glowstencil\glowbase.h"
+			}
 			$Folder "Npcs"
 			{
 				$File	"zmr\npcs\zmr_burnzombie.cpp"
