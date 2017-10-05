@@ -16,15 +16,24 @@
 #include "player_pickup.h"
 #include "positionwatcher.h"
 
+// ZMRCHANGE
+#include "glowstencil/glowbase.h"
+
 //=============================================================================================================
 // PROP TYPES
 //=============================================================================================================
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+#ifdef ZMR // ZMRCHANGE: Let the props glow!
+class CBaseProp : public CBaseGlowProp
+{
+	DECLARE_CLASS( CBaseProp, CBaseGlowProp );
+#else
 class CBaseProp : public CBaseAnimating
 {
 	DECLARE_CLASS( CBaseProp, CBaseAnimating );
+#endif
 public:
 
 	void Spawn( void );
