@@ -34,7 +34,7 @@ int ITEM_GiveAmmo( CBasePlayer *pPlayer, float flCount, const char *pszAmmoName,
 
 	return pPlayer->GiveAmmo( flCount, iAmmoType, bSuppressSound );
 }
-
+#ifndef ZMR // ZMRCHANGE: Defined by us.
 // ========================================================================
 //	>> BoxSRounds
 // ========================================================================
@@ -588,7 +588,7 @@ public:
 };
 
 LINK_ENTITY_TO_CLASS( item_ammo_ar2_altfire, CItem_AR2AltFireRound );
-
+#endif // ZMR
 // ==================================================================
 // Ammo crate which will supply infinite ammo of the specified type
 // ==================================================================

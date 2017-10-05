@@ -252,6 +252,7 @@ $Project "Client (ZMR)"
 				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_sledge.cpp"
 			}
 			
+			$File	"zmr\c_zmr_ammo.cpp"
 			$File	"zmr\c_zmr_charcircle.cpp"
 			$File	"zmr\c_zmr_charcircle.h"
 			$File	"zmr\c_zmr_clientmode.cpp"

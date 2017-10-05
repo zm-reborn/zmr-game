@@ -1468,44 +1468,6 @@ void CZMEntLoadout::GiveWeapon( CZMPlayer* pPlayer, int loadout_wep )
 }
 
 
-int ITEM_GiveAmmo( CBasePlayer *pPlayer, float flCount, const char *pszAmmoName, bool bSuppressSound = false );
-
-/*
-    Ammo - revolver
-*/
-class CZMItemRevolverAmmo : public CItem
-{
-public:
-	DECLARE_CLASS( CZMItemRevolverAmmo, CItem );
-
-	void Spawn( void )
-	{ 
-		Precache();
-		SetModel( "models/items/revolverammo.mdl" );
-		BaseClass::Spawn();
-	}
-	void Precache( void )
-	{
-		PrecacheModel( "models/items/revolverammo.mdl" );
-	}
-	bool MyTouch( CBasePlayer *pPlayer )
-	{
-		if ( ITEM_GiveAmmo( pPlayer, SIZE_ZMAMMO_REVOLVER, "Revolver" ) )
-		{
-			if ( g_pGameRules->ItemShouldRespawn( this ) == GR_ITEM_RESPAWN_NO )
-			{
-				UTIL_Remove( this );
-			}
-
-			return true;
-		}
-		return false;
-	}
-};
-
-LINK_ENTITY_TO_CLASS( item_ammo_revolver, CZMItemRevolverAmmo );
-
-
 /*
     Block hidden trigger
 */

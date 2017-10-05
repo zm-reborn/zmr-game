@@ -42,6 +42,7 @@ public:
     // Implemented in zm_player_shared
     bool HasEnoughResToSpawn( ZombieClass_t );
     bool HasEnoughRes( int );
+    int GetWeaponSlotFlags();
     int GetResources();
     void IncResources( int, bool bLimit = false );
     void SetResources( int );
@@ -52,6 +53,7 @@ public:
     static Participation_t GetLocalParticipation();
     static void SetLocalParticipation( Participation_t );
     virtual void PlayStepSound( Vector& vecOrigin, surfacedata_t* psurface, float fvol, bool force ) OVERRIDE;
+    CBaseCombatWeapon* GetWeaponForAmmo( int iAmmoType );
 
 
     void SetMouseWheelMove( float dir );
