@@ -123,9 +123,7 @@ CZMWeaponRifle::CZMWeaponRifle()
     m_bFiresUnderwater = false;
 
 
-#ifndef CLIENT_DLL
     SetSlotFlag( ZMWEAPONSLOT_LARGE );
-#endif
 
     m_bInZoom = false;
 }

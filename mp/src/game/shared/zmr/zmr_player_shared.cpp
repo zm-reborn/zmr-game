@@ -33,6 +33,11 @@ bool CZMPlayer::HasEnoughRes( int cost )
     return GetResources() >= cost;
 }
 
+int CZMPlayer::GetWeaponSlotFlags()
+{
+    return m_ZMLocal.m_fWeaponSlotFlags;
+}
+
 int CZMPlayer::GetResources()
 {
     return m_ZMLocal.m_nResources;
@@ -139,4 +144,21 @@ void CZMPlayer::SetLocalParticipation( Participation_t part )
 void CZMPlayer::PlayStepSound( Vector& vecOrigin, surfacedata_t* psurface, float fvol, bool force )
 {
     CBasePlayer::PlayStepSound( vecOrigin, psurface, fvol, force );
+}
+
+// Shared version of Weapon_GetWpnForAmmo.
+CBaseCombatWeapon* CZMPlayer::GetWeaponForAmmo( int iAmmoType )
+{
+    for ( int i = 0; i < MAX_WEAPONS; i++ )
+    {
+        CBaseCombatWeapon* pWep = GetWeapon( i );
+
+        if ( !pWep ) continue;
+
+
+        if ( pWep->GetPrimaryAmmoType() == iAmmoType )
+            return pWep;
+    }
+    
+    return nullptr;
 }

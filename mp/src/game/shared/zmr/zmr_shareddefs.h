@@ -139,3 +139,8 @@ enum ObjRecipient_t
 
     OBJRECIPIENT_MAX
 };
+
+
+
+// How far items will glow if players can pick them up.
+#define ITEM_GLOW_DIST_SQR          ( 162.0f * 162.0f )

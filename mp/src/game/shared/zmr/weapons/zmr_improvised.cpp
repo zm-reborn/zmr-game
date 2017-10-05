@@ -70,9 +70,7 @@ IMPLEMENT_ACTTABLE( CZMWeaponImprovised );
 
 CZMWeaponImprovised::CZMWeaponImprovised()
 {
-#ifndef CLIENT_DLL
     SetSlotFlag( ZMWEAPONSLOT_MELEE );
-#endif
 }
 
 void CZMWeaponImprovised::ItemPostFrame()

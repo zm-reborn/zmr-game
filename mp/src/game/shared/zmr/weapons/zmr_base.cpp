@@ -10,6 +10,10 @@
 
 #ifdef CLIENT_DLL
 void UTIL_ClipPunchAngleOffset( QAngle &in, const QAngle &punch, const QAngle &clip );
+
+
+ConVar zm_cl_glow_weapon( "zm_cl_glow_weapon", "1 .2 .2", FCVAR_ARCHIVE );
+ConVar zm_cl_glow_weapon_enabled( "zm_cl_glow_weapon_enabled", "1", FCVAR_ARCHIVE );
 #endif
 
 
@@ -37,9 +41,8 @@ CZMBaseWeapon::CZMBaseWeapon()
 	SetPredictionEligible( true );
 	AddSolidFlags( FSOLID_TRIGGER ); // Nothing collides with these but it gets touches.
 
-#ifndef CLIENT_DLL
+
     SetSlotFlag( ZMWEAPONSLOT_NONE );
-#endif
 }
 
 CZMBaseWeapon::~CZMBaseWeapon()
@@ -202,6 +205,57 @@ void CZMBaseWeapon::SecondaryAttack( void )
 }
 
 #ifdef CLIENT_DLL
+void CZMBaseWeapon::Spawn()
+{
+    BaseClass::Spawn();
+
+    SetNextClientThink( gpGlobals->curtime + 0.1f );
+}
+
+void CZMBaseWeapon::ClientThink()
+{
+    UpdateGlow();
+
+    SetNextClientThink( gpGlobals->curtime + 0.1f );
+}
+
+void CZMBaseWeapon::UpdateGlow()
+{
+    if ( !zm_cl_glow_weapon_enabled.GetBool() )
+    {
+        if ( IsClientSideGlowEnabled() )
+            SetClientSideGlowEnabled( false );
+
+        return;
+    }
+
+
+    C_ZMPlayer* pPlayer = C_ZMPlayer::GetLocalPlayer();
+
+    if (pPlayer
+    &&  GetOwner() == nullptr
+    &&  pPlayer->IsHuman()
+    &&  pPlayer->GetAbsOrigin().DistToSqr( GetAbsOrigin() ) < ITEM_GLOW_DIST_SQR
+    &&  !(pPlayer->GetWeaponSlotFlags() & GetSlotFlag()) )
+    {
+        if ( !IsClientSideGlowEnabled() )
+            SetClientSideGlowEnabled( true );
+    }
+    else
+    {
+        SetClientSideGlowEnabled( false );
+    }
+}
+
+void CZMBaseWeapon::GetGlowEffectColor( float& r, float& g, float& b )
+{
+    CSplitString split( zm_cl_glow_weapon.GetString(), " " );
+
+    if ( split.Count() > 0 ) r = atof( split[0] );
+    if ( split.Count() > 1 ) g = atof( split[1] );
+    if ( split.Count() > 2 ) b = atof( split[2] );
+}
+
 void CZMBaseWeapon::OnDataChanged( DataUpdateType_t type )
 {
     BaseClass::OnDataChanged( type );

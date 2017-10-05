@@ -92,9 +92,7 @@ CZMWeaponMac10::CZMWeaponMac10()
 
     m_bFiresUnderwater = false;
 
-#ifndef CLIENT_DLL
     SetSlotFlag( ZMWEAPONSLOT_LARGE );
-#endif
 }
 
 const WeaponProficiencyInfo_t *CZMWeaponMac10::GetProficiencyValues()
