@@ -1,0 +1,23 @@
+ //-------------------------------------------------------------------------
+//
+// Spawnpoints.
+//
+//-------------------------------------------------------------------------
+
+@BaseClass = ZMSpawnpoint
+[
+	enabled(choices) : "Enabled" : 1 : "Can players spawn on this spawnpoint?" =
+	[
+		0: "No"
+		1: "Yes"
+	]
+	
+	input Toggle(void) : "Toggles spawnpoint availability."
+	input Enable(void) : "Enables spawnpoint availability."
+	input Disable(void) : "Disables spawnpoint availability."
+]
+
+
+@PointClass base(Targetname, PlayerClass, Angles, ZMSpawnpoint) studio("models/editor/playerstart.mdl") = info_player_zombiemaster : "Spawnpoint for the Zombie Master." []
+@PointClass base(Targetname, PlayerClass, Angles, ZMSpawnpoint) studio("models/editor/playerstart.mdl") = info_player_deathmatch : "Spawnpoint for the Survivors." []
+@PointClass base(Targetname, PlayerClass, Angles, ZMSpawnpoint) studio("models/editor/playerstart.mdl") = info_player_survivor : "Spawnpoint for the Survivors." []

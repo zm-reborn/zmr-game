@@ -1,0 +1,71 @@
+// -----------------------
+// 
+// NPCs.
+//
+// -----------------------
+@include "zmr_base_game.fgd"
+
+
+// -----------------------
+//
+// Our NPCs.
+//
+// -----------------------
+@NPCClass base(BaseNPC) studio("models/zombie/zm_classic.mdl") = npc_zombie : "Shambler"
+[
+]
+
+@NPCClass base(BaseNPC) studio("models/zombie/zm_fast.mdl") = npc_fastzombie : "Banshee"
+[
+]
+
+@NPCClass base(BaseNPC) studio("models/zombie/hulk.mdl") = npc_poisonzombie : "Hulk"
+[
+]
+
+@NPCClass base(BaseNPC) studio("models/humans/zm_draggy.mdl") = npc_dragzombie : "Drifter"
+[
+]
+
+@NPCClass base(BaseNPC) studio("models/zombie/burnzie.mdl") = npc_burnzombie : "Immolator"
+[
+]
+
+
+// -----------------------
+//
+// Misc. NPCs.
+//
+// -----------------------
+@NPCClass base(BaseNPC) studio("models/crow.mdl") = npc_crow : "Crow"
+[
+	input FlyAway( string ) : "Forces the crow to fly to the nearest crow flyto hint node."
+
+	deaf(choices) : "Deaf?" : 0 =
+	[
+		0 : "No."
+		1 : "Yes. Ignore sounds."
+	]
+]
+
+@NPCClass base(BaseNPC) studio("models/seagull.mdl") = npc_seagull : "Seagull"
+[
+	input FlyAway( string ) : "Forces the seagull to fly to the nearest crow flyto hint node."
+
+	deaf(choices) : "Deaf?" : 0 =
+	[
+		0 : "No."
+		1 : "Yes. Ignore sounds."
+	]
+]
+
+@NPCClass base(BaseNPC) studio("models/pigeon.mdl") = npc_pigeon : "Pigeon"
+[
+	input FlyAway( string ) : "Forces the pigeon to fly to the nearest crow flyto hint node."
+
+	deaf(choices) : "Deaf?" : 0 =
+	[
+		0 : "No."
+		1 : "Yes. Ignore sounds."
+	]
+]

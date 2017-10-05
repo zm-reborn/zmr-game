@@ -4,9 +4,18 @@
 //
 //-------------------------------------------------------------------------
 
-@include "base.fgd" 
-@include "halflife2.fgd"
+@include "fgd/zmr_base_game.fgd" // base.fgd
+@include "fgd/zmr_base_mod.fgd" // hl2.fgd
+@include "fgd/zmr_items.fgd"
+@include "fgd/zmr_npcs.fgd"
+@include "fgd/zmr_spawns.fgd"
 
+
+//-------------------------------------------------------------------------
+//
+// Base Classes
+//
+//-------------------------------------------------------------------------
 @BaseClass = Activeable
 [
 	Active(choices) : "Active" : 1 =
@@ -32,24 +41,29 @@
 	input Unhide(void) : "Unhides"
 ]
 
-@BaseClass = ZMSpawnpoint
-[
-	enabled(choices) : "Enabled" : 1 : "Can players spawn on this spawnpoint?" =
-	[
-		0: "No"
-		1: "Yes"
-	]
-	
-	input Toggle(void) : "Toggles spawnpoint availability."
-	input Enable(void) : "Enables spawnpoint availability."
-	input Disable(void) : "Disables spawnpoint availability."
-]
 
+
+//-------------------------------------------------------------------------
+//
+// Point Entities.
+//
+//-------------------------------------------------------------------------
 @PointClass base(Targetname, Parentname, Origin, Angles) = func_win :
 	"Target for the Humans to win or lose the game"
 [
 	input Win(void) : "Human Win"
 	input Lose(void) : "Zombie Master Win!"
+]
+
+@PointClass base(Targetname, Parentname, Origin, Angles) = func_giveresources :
+	"Give or take resources from the ZM's stash"
+[
+	spawnflags(flags) =
+	[
+		1: "Limit To Max" : 0
+	]
+	
+	input GiveResources(integer) : "Give/Take x resources"
 ]
 
 @PointClass base(Targetname, Parentname, Origin, Angles, Activeable, InputActiveable, RemoveOnTrigger) = info_manipulate :
@@ -97,111 +111,6 @@
 @BaseClass color(0 0 200) base(Targetname, Angles, Shadow) = Item
 [
 	output OnPlayerTouch(void) : "Fires when the player touches this object"
-]
-
-@PointClass base(Item) studio("models/items/boxsrounds.mdl")= item_ammo_pistol : "Box of Pistol ammo" []
-@PointClass base(Item) studio("models/items/boxsrounds.mdl")= item_ammo_pistol_large : "Large Box of Pistol ammo" []
-@PointClass base(Item) studio("models/items/357ammo.mdl")= item_ammo_357 : "Box of 357 ammo" []
-@PointClass base(Item) studio("models/items/357ammobox.mdl")= item_ammo_357_large : "Large Box of 357 ammo" []
-@PointClass base(Item) studio("models/items/boxbuckshot.mdl")= item_box_buckshot : "Box Buckshot" []
-@PointClass base(Item) studio("models/items/revolverammo.mdl")= item_ammo_revolver : "Box of Revolver ammo" []
-
-@PointClass base(Item) studio("models/items/boxmrounds.mdl")= item_ammo_smg1 : "Box of SMG1 ammo" []
-@PointClass base(Item) studio("models/items/boxmrounds.mdl")= item_ammo_smg1_large : "Large Box of SMG1 ammo" []
-@PointClass base(Item) studio("models/items/ar2_grenade.mdl")= item_ammo_smg1_grenade : "SMG1 Grenade" []
-
-
-@BaseClass color(0 0 200) base(Targetname, Angles) = Weapon
-[
-	spawnflags(Flags) =
-	[
-		1 : "Start constrained" : 0
-	]
-
-	output OnPlayerUse(void) : "Fires when the player +uses this weapon"
-	output OnPlayerPickup(void) : "Fires when the player picks up this weapon"
-	output OnNPCPickup(void) : "Fires when an NPC picks up this weapon"
-]
-
-@PointClass base(Weapon) studio("models/Weapons/w_shotgun_zm.mdl") = weapon_zm_shotgun : "Shotgun" []
-@PointClass base(Weapon) studio("models/weapons/w_crowbar.mdl") = weapon_zm_improvised : "Improvised weapon" []
-@PointClass base(Weapon) studio("models/weapons/pistol3rd_zm.mdl") = weapon_zm_pistol : "Pistol" []
-@PointClass base(Weapon) studio("models/weapons/rifle_zm_3rd.mdl") = weapon_zm_rifle : "Rifle" []
-//@PointClass base(Weapon) studio("models/weapons/flashlight3rd_zm.mdl") = weapon_zm_flashlight : "Flashlight" []
-@PointClass base(Weapon) studio("models/weapons/molotov3rd_zm.mdl") = weapon_zm_molotov : "Molotov Cocktail" []
-@PointClass base(Weapon) studio("models/weapons/sledgehammer3rd_zm.mdl") = weapon_zm_sledge : "Sledgehammer" []
-@PointClass base(Weapon) studio("models/weapons/smg_zm_3rd.mdl") = weapon_zm_mac10 : "Mac 10" []
-@PointClass base(Weapon) studio("models/weapons/w_357.mdl") = weapon_zm_revolver : "Revolver" []
-
-@PointClass base(Targetname, PlayerClass, Angles, ZMSpawnpoint) studio("models/editor/playerstart.mdl") = info_player_zombiemaster : "Spawnpoint for the Zombie Master." []
-@PointClass base(Targetname, PlayerClass, Angles, ZMSpawnpoint) studio("models/editor/playerstart.mdl") = info_player_deathmatch : "Spawnpoint for the Survivors." []
-@PointClass base(Targetname, PlayerClass, Angles, ZMSpawnpoint) studio("models/editor/playerstart.mdl") = info_player_survivor : "Spawnpoint for the Survivors." []
-
-@SolidClass base(Trigger, Targetname, Activeable, InputActiveable) = trigger_playercount :
-	"A trigger volume that counts players."
-[
-	// Outputs
-	output OnCount(void) : "Fired whenever this trigger counts equal or greater than the percentage."
-
-	percentagetofire(integer) : "PercentageToFire" : 100 : "The number of players required to activate"
-]
-
-@SolidClass base(Trigger, Targetname, InputActiveable, Activeable) = trigger_entitycount :
-	"A trigger volume that counts entities."
-[
-	// Inputs
-	input Count(void) : "Checks the entities"
-
-	// Outputs
-	output OnCount(void) : "Fired whenever this trigger counts equal or greater than the count."
-	output OnNotCount(void) : "Fired whenever this trigger counts less than the count."
-
-	counttofire(integer) : "CountToFire" : 100 : "The number of ents required to activate"
-	triggerflags(integer) : "Triggerflags" : 1 : "What does this count? 1 = players, 2 = NPCs, 3 = props"
-]
-
-@PointClass base(Targetname, Parentname, Origin, Angles) = func_giveresources :
-	"Give or take resources from the ZM's stash"
-[
-	spawnflags(flags) =
-	[
-		1: "Limit To Max" : 0
-	]
-	
-	input GiveResources(integer) : "Give/Take x resources"
-]
-
-@SolidClass base(Targetname, Origin, Activeable, InputActiveable) = trigger_blockspotcreate :
-	"A trigger volume that stops hidden summons."
-[
-]
-
-@SolidClass base(Targetname, Origin, Activeable, InputActiveable) = trigger_blockphysexplosion :
-	"A trigger volume that stops physics explosions."
-[
-]
-
-
-@PointClass base(Targetname, Parentname, Origin, Angles) = info_loadout :
-	"Give a default loadout to the players.  Don't place more than one."
-[
-	Method(integer) : "Method" : 0 : "Handout style.  1 is one weapon per player, 2 is one weapon of each type per player."
-	Pistols(integer) : "Pistols" : 0 : "Max pistols to hand out"
-	Shotguns(integer) : "Shotguns" : 0 : "Max shotguns to hand out"
-	Rifles(integer) : "Rifles" : 0 : "Max rifles to hand out"
-	Mac10s(integer) : "Mac10s" : 0 : "Max Mac10s to hand out"
-	Molotovs(integer) : "Molotovs" : 0 : "Max Molotovs to hand out"
-	Sledges(integer) : "Sledges" : 0 : "Max Sledges to hand out"
-	Improvised(integer) : "Improvised" : 0 : "Max Improvised weapons to hand out"
-	Revolvers(integer) : "Revolvers" : 0 : "Max Revolvers to hand out"
-]
-
-
-@SolidClass base(Trigger, Targetname) = trigger_givepoints :
-	"A trigger volume that gives points to players."
-[
-	// Inputs
-	input Award(integer) : "Give the specified number of points to players inside the area"
 ]
 
 @PointClass base(Targetname) size(-8 -8 -8, 8 8 8) = game_score_team : 
@@ -276,4 +185,67 @@
 	input ResetChild2(void) : "Resets child 2 objective. (text, completion, etc.)"
 	input ResetChild3(void) : "Resets child 3 objective. (text, completion, etc.)"
 	input ResetChild4(void) : "Resets child 4 objective. (text, completion, etc.)"
+]
+
+
+
+//-------------------------------------------------------------------------
+//
+// Brush Entities.
+//
+//-------------------------------------------------------------------------
+@SolidClass base(Trigger, Targetname, Activeable, InputActiveable) = trigger_playercount :
+	"A trigger volume that counts players."
+[
+	// Outputs
+	output OnCount(void) : "Fired whenever this trigger counts equal or greater than the percentage."
+
+	percentagetofire(integer) : "PercentageToFire" : 100 : "The number of players required to activate"
+]
+
+@SolidClass base(Trigger, Targetname, InputActiveable, Activeable) = trigger_entitycount :
+	"A trigger volume that counts entities."
+[
+	// Inputs
+	input Count(void) : "Checks the entities"
+
+	// Outputs
+	output OnCount(void) : "Fired whenever this trigger counts equal or greater than the count."
+	output OnNotCount(void) : "Fired whenever this trigger counts less than the count."
+
+	counttofire(integer) : "CountToFire" : 100 : "The number of ents required to activate"
+	triggerflags(integer) : "Triggerflags" : 1 : "What does this count? 1 = players, 2 = NPCs, 3 = props"
+]
+
+@SolidClass base(Targetname, Origin, Activeable, InputActiveable) = trigger_blockspotcreate :
+	"A trigger volume that stops hidden summons."
+[
+]
+
+@SolidClass base(Targetname, Origin, Activeable, InputActiveable) = trigger_blockphysexplosion :
+	"A trigger volume that stops physics explosions."
+[
+]
+
+
+@PointClass base(Targetname, Parentname, Origin, Angles) = info_loadout :
+	"Give a default loadout to the players.  Don't place more than one."
+[
+	Method(integer) : "Method" : 0 : "Handout style.  1 is one weapon per player, 2 is one weapon of each type per player."
+	Pistols(integer) : "Pistols" : 0 : "Max pistols to hand out"
+	Shotguns(integer) : "Shotguns" : 0 : "Max shotguns to hand out"
+	Rifles(integer) : "Rifles" : 0 : "Max rifles to hand out"
+	Mac10s(integer) : "Mac10s" : 0 : "Max Mac10s to hand out"
+	Molotovs(integer) : "Molotovs" : 0 : "Max Molotovs to hand out"
+	Sledges(integer) : "Sledges" : 0 : "Max Sledges to hand out"
+	Improvised(integer) : "Improvised" : 0 : "Max Improvised weapons to hand out"
+	Revolvers(integer) : "Revolvers" : 0 : "Max Revolvers to hand out"
+]
+
+
+@SolidClass base(Trigger, Targetname) = trigger_givepoints :
+	"A trigger volume that gives points to players."
+[
+	// Inputs
+	input Award(integer) : "Give the specified number of points to players inside the area"
 ]

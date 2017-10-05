@@ -1,0 +1,23 @@
+ //-------------------------------------------------------------------------
+//
+// Custom baseclasses used in our files.
+//
+//-------------------------------------------------------------------------
+
+@BaseClass = ZMGlow
+[
+	glowenable(choices) : "Glow State" : 0 =
+	[
+		0 : "Off"
+		1 : "On"
+	]
+	
+	glowcolor(color255) : "Glow Color" : "255 255 255"
+	
+	
+	input EnableGlow(void) : "Turn on glow effect."
+	input DisableGlow(void) : "Turn off glow effect."
+	input ToggleGlow(void) : "Toggle glow effect."
+	
+	input SetGlowColor(color255) : "Change glow color. Format: <Red 0-255> <Green 0-255> <Blue 0-255>"
+]
