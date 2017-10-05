@@ -15,6 +15,10 @@
 
 #define FULL_FRAME_TEXTURE "_rt_FullFrameFB"
 
+#ifdef ZMR // ZMRCHANGE: Enable glow.
+#define GLOWS_ENABLE
+#endif
+
 #ifdef GLOWS_ENABLE
 
 ConVar glow_outline_effect_enable( "glow_outline_effect_enable", "1", FCVAR_ARCHIVE, "Enable entity outline glow effects." );
