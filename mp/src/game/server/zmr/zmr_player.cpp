@@ -609,6 +609,13 @@ void CZMPlayer::Spawn()
     m_flLastActivity = gpGlobals->curtime;
 
     SetFlashlightBattery( 100.0f );
+
+
+    // Don't display crosshair if the map is a background.
+    if ( gpGlobals->eLoadType == MapLoad_Background )
+    {
+        ShowCrosshair( false );
+    }
 }
 
 void CZMPlayer::FireBullets( const FireBulletsInfo_t& info )
