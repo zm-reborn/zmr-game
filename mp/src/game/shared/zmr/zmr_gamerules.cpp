@@ -1328,7 +1328,8 @@ bool CZMRules::ShouldLateSpawn( CZMPlayer* pPlayer )
     {
         int flags = ZMRules()->GetServerParticipationFlags();
 
-        if ( flags & ZMPARTFLAG_NOSPECONLY )
+        
+        if ( !(flags & ZMPARTFLAG_NOSPECONLY) ) // Server allows spec only?
             return false;
     }
 
