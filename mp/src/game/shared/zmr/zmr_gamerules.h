@@ -109,6 +109,10 @@ public:
     virtual bool UseSuicidePenalty() OVERRIDE { return false; };
     virtual bool FlPlayerFallDeathDoesScreenFade( CBasePlayer* pPlayer ) OVERRIDE { return false; }; // Don't fade to eternal darkness when getting killed.
 
+    virtual void InitDefaultAIRelationships() OVERRIDE;
+    virtual bool FAllowNPCs() OVERRIDE;
+
+
     static void IncPopCount( ZombieClass_t );
 
     void OnClientFinishedPutInServer( CZMPlayer* );
@@ -144,9 +148,6 @@ public:
     static int GetServerParticipationFlags();
 
 #ifndef CLIENT_DLL
-    virtual void InitDefaultAIRelationships( void );
-
-
     static void RewardResources( int, bool bLimit = false );
 #endif
 

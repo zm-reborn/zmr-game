@@ -596,6 +596,11 @@ ConVar zm_sv_joingrace( "zm_sv_joingrace", "60", FCVAR_NOTIFY );
 
 void CZMRules::OnClientFinishedPutInServer( CZMPlayer* pPlayer )
 {
+    // Don't restart the round if we're loaded as a background.
+    if ( gpGlobals->eLoadType == MapLoad_Background )
+        return;
+
+
     if ( IsInRoundEnd() ) return;
 
 
@@ -767,7 +772,7 @@ void CZMRules::IncPopCount( ZombieClass_t zclass )
     pRules->SetZombiePop( pRules->GetZombiePop() + CZMBaseZombie::GetPopCost( zclass ) );
 }
 
-void CZMRules::InitDefaultAIRelationships( void )
+void CZMRules::InitDefaultAIRelationships()
 {
     int i, j;
 
@@ -788,6 +793,16 @@ void CZMRules::InitDefaultAIRelationships( void )
     CBaseCombatCharacter::SetDefaultRelationship( CLASS_ZOMBIE, CLASS_NONE,         D_NU, 0 );
     CBaseCombatCharacter::SetDefaultRelationship( CLASS_ZOMBIE, CLASS_PLAYER,       D_HT, 0 );
     CBaseCombatCharacter::SetDefaultRelationship( CLASS_ZOMBIE, CLASS_ZOMBIE,       D_NU, 0 );
+}
+
+bool CZMRules::FAllowNPCs()
+{
+    // Make sure background maps don't generate node graph.
+    if ( gpGlobals->eLoadType == MapLoad_Background )
+        return false;
+
+
+    return true;
 }
 
 ConVar zm_mp_roundlimit( "zm_mp_roundlimit", "0", FCVAR_NOTIFY, "How many rounds do we play before going into intermission. 0 = Disable" );
