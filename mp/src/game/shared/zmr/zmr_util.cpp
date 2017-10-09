@@ -14,11 +14,12 @@
 
 #ifdef CLIENT_DLL
 ConVar zm_hudchat_color( "zm_hudchat_color", "c13c3c", FCVAR_ARCHIVE );
+ConVar zm_hudchat_color_zm( "zm_hudchat_color_zm", "49ff59", FCVAR_ARCHIVE );
 
-void ZMClientUtil::PrintNotify( const char* msg )
+void ZMClientUtil::PrintNotify( const char* msg, ZMChatNotifyType_t type )
 {
     char buf[7];
-    Q_strncpy( buf, zm_hudchat_color.GetString(), sizeof( buf ) );
+    GetNotifyTypeColor( type, buf, ARRAYSIZE( buf ) );
 
     if ( msg[0] == '#' )
     {
@@ -29,6 +30,20 @@ void ZMClientUtil::PrintNotify( const char* msg )
         ZMClientUtil::ChatPrint( "\x07%s%s", buf, msg );
     }
     
+}
+
+void ZMClientUtil::GetNotifyTypeColor( ZMChatNotifyType_t type, char* buffer, size_t len )
+{
+    const char* pColor = nullptr;
+
+    switch ( type )
+    {
+    case ZMCHATNOTIFY_ZM : pColor = zm_hudchat_color_zm.GetString(); break;
+    default : pColor = zm_hudchat_color.GetString(); break;
+    }
+
+    if ( pColor )
+        Q_strncpy( buffer, pColor, len );
 }
 
 void ZMClientUtil::ChatPrint( const char* format, ... )
