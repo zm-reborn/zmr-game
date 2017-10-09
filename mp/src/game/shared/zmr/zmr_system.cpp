@@ -10,7 +10,9 @@
 #include <engine/IEngineSound.h>
 #endif
 
+#include "zmr/zmr_shareddefs.h"
 #include "zmr/zmr_web.h"
+#include "zmr/zmr_util.h"
 
 
 class CZMSystem : public CAutoGameSystem, public CGameEventListener
@@ -23,6 +25,8 @@ public:
     virtual void PostInit() OVERRIDE;
 #ifndef CLIENT_DLL
     virtual void LevelInitPostEntity() OVERRIDE;
+#else
+    void PrintRoundEndMessage( ZMRoundEndReason_t reason );
 #endif
 
 
@@ -32,6 +36,7 @@ public:
 void CZMSystem::PostInit()
 {
 #ifdef CLIENT_DLL
+    ListenForGameEvent( "round_end_post" );
     ListenForGameEvent( "round_restart_post" );
 #endif
 
@@ -60,7 +65,16 @@ void CZMSystem::LevelInitPostEntity()
 void CZMSystem::FireGameEvent( IGameEvent* pEvent )
 {
 #ifdef CLIENT_DLL
-    if ( Q_strcmp( pEvent->GetName(), "round_restart_post" ) == 0 )
+    if ( Q_strcmp( pEvent->GetName(), "round_end_post" ) == 0 )
+    {
+        DevMsg( "Client received round end event!\n" );
+        
+
+        ZMRoundEndReason_t reason = (ZMRoundEndReason_t)pEvent->GetInt( "reason", ZMROUND_GAMEBEGIN );
+
+        PrintRoundEndMessage( reason );
+    }
+    else if ( Q_strcmp( pEvent->GetName(), "round_restart_post" ) == 0 )
     {
         DevMsg( "Client received round restart event!\n" );
 
@@ -94,5 +108,28 @@ void CZMSystem::FireGameEvent( IGameEvent* pEvent )
     }
 #endif
 }
+
+#ifdef CLIENT_DLL
+void CZMSystem::PrintRoundEndMessage( ZMRoundEndReason_t reason )
+{
+    const char* pMsg = nullptr;
+
+    switch ( reason )
+    {
+    case ZMROUND_HUMANDEAD : pMsg = "#ZMRoundEndHumanDead"; break;
+    case ZMROUND_HUMANLOSE : pMsg = "#ZMRoundEndHumanLose"; break;
+    case ZMROUND_HUMANWIN : pMsg = "#ZMRoundEndHumanWin"; break;
+    case ZMROUND_ZMSUBMIT : pMsg = "#ZMRoundEndSubmit"; break;
+    case ZMROUND_GAMEBEGIN : pMsg = "#ZMRoundEndGameBegin"; break;
+    case ZMROUND_VOTERESTART : pMsg = "#ZMRoundEndVoteRestart"; break;
+    default : break;
+    }
+
+    if ( pMsg )
+    {
+        ZMClientUtil::PrintNotify( pMsg, ZMCHATNOTIFY_NORMAL );
+    }
+}
+#endif
 
 CZMSystem g_ZMSystem;

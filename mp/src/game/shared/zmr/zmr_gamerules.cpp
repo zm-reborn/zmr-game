@@ -816,8 +816,6 @@ void CZMRules::EndRound( ZMRoundEndReason_t reason )
 
     RewardPoints( reason );
 
-    PrintRoundEndMessage( reason );
-
 
     m_flRoundRestartTime = gpGlobals->curtime + zm_sv_roundintermissiontime.GetFloat();
     m_bInRoundEnd = true;
@@ -889,33 +887,6 @@ void CZMRules::RewardPoints( ZMRoundEndReason_t reason )
             break;
         }
 
-    }
-}
-
-void CZMRules::PrintRoundEndMessage( ZMRoundEndReason_t reason )
-{
-    switch ( reason )
-    {
-    case ZMROUND_HUMANDEAD :
-        UTIL_ClientPrintAll( HUD_PRINTTALK, "The Zombie Master has slain the living!\n" );
-        break;
-    case ZMROUND_HUMANLOSE :
-        UTIL_ClientPrintAll( HUD_PRINTTALK, "The living have failed their objectives!\n" );
-        break;
-    case ZMROUND_HUMANWIN :
-        UTIL_ClientPrintAll( HUD_PRINTTALK, "The living have prevailed!\n" );
-        break;
-    case ZMROUND_ZMSUBMIT :
-        UTIL_ClientPrintAll( HUD_PRINTTALK, "The Zombie Master has submitted...\n" );
-        break;
-    case ZMROUND_GAMEBEGIN :
-        UTIL_ClientPrintAll( HUD_PRINTTALK, "The game will begin...\n" );
-        break;
-    case ZMROUND_VOTERESTART :
-        UTIL_ClientPrintAll( HUD_PRINTTALK, "Vote has finished to restart the round!\n" );
-        break;
-    default :
-        break;
     }
 }
 
