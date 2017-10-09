@@ -159,7 +159,6 @@ private:
 
 #ifndef CLIENT_DLL
     void RewardPoints( ZMRoundEndReason_t );
-    void PrintRoundEndMessage( ZMRoundEndReason_t );
 
     CZMPlayer* ChooseZM();
     void BeginRound( CZMPlayer* );
