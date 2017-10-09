@@ -141,6 +141,12 @@ enum ObjRecipient_t
 };
 
 
+enum ZMChatNotifyType_t
+{
+    ZMCHATNOTIFY_NORMAL = 0,
+    ZMCHATNOTIFY_ZM
+};
+
 
 // How far items will glow if players can pick them up.
 #define ITEM_GLOW_DIST_SQR          ( 162.0f * 162.0f )
