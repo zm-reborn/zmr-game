@@ -7,10 +7,15 @@
 #include "zmr/npcs/c_zmr_zombiebase.h"
 #endif
 
+#include "zmr/zmr_shareddefs.h"
+
+
 #ifdef CLIENT_DLL
 namespace ZMClientUtil
 {
-    void PrintNotify( const char* msg );
+    void PrintNotify( const char* msg, ZMChatNotifyType_t type = ZMCHATNOTIFY_NORMAL );
+    void GetNotifyTypeColor( ZMChatNotifyType_t type, char* buffer, size_t len );
+
     void ChatPrint( const char* format, ... );
 
 
