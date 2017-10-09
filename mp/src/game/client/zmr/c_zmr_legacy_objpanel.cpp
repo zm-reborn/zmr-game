@@ -83,26 +83,23 @@ bool ZMLegacyObjPanel::LoadObjectivesFromFile()
     }
 
 
-    char* szBuffer = new char[len + 1];
-
     FileHandle_t file = filesystem->Open( szPath, "rb", "GAME" );
 
     if ( file == FILESYSTEM_INVALID_HANDLE )
     {
         DevMsg( "Couldn't open map info '%s' for read!\n", szPath );
-
-        delete[] szBuffer;
         return false;
     }
 
-    szBuffer[len] = 0;
 
+    char* szBuffer = new char[len + 1];
 
     filesystem->Read( szBuffer, len, file );
     filesystem->Close( file );
 
+    szBuffer[len] = 0;
 
-    g_pStringTableInfoPanel->AddString( false, OBJ_STRINGTABLE_ENTRY, len, szBuffer );
+    g_pStringTableInfoPanel->AddString( false, OBJ_STRINGTABLE_ENTRY, len + 1, szBuffer );
 
     delete[] szBuffer;
 
