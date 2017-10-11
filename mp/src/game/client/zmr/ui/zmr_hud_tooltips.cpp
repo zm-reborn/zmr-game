@@ -18,7 +18,7 @@ extern IGameUIFuncs* gameuifuncs; // for key binding details
 
 
 
-#include "zmr/zmr_util.h"
+#include "zmr/c_zmr_util.h"
 #include "zmr_hud_tooltips.h"
 
 

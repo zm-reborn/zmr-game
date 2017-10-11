@@ -23,6 +23,8 @@ void RegisterZMUserMessages( void )
     usermessages->Register( "ZMCenterText", -1 );
     usermessages->Register( "ZMTooltip", -1 );
 
+    usermessages->Register( "ZMChatNotify", -1 );
+
 
     // From vote_manager
     usermessages->Register( "CallVoteFailed", -1 );

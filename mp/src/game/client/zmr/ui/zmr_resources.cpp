@@ -8,7 +8,7 @@
 #include "zmr/c_zmr_player.h"
 #include "zmr/zmr_gamerules.h"
 #include "zmr/npcs/c_zmr_zombiebase.h"
-#include "zmr/zmr_util.h"
+#include "zmr/c_zmr_util.h"
 
 
 using namespace vgui;

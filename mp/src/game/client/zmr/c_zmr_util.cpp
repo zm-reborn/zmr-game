@@ -1,18 +1,18 @@
 #include "cbase.h"
 
-#ifdef CLIENT_DLL
 #include "view_scene.h"
 #include "text_message.h"
 #include <engine/IEngineSound.h>
+#include "c_user_message_register.h"
+
 
 #include "zmr/ui/zmr_hud_chat.h"
 #include "zmr/ui/zmr_hud_tooltips.h"
-#endif
 
 #include "zmr/zmr_global_shared.h"
-#include "zmr_util.h"
+#include "c_zmr_util.h"
 
-#ifdef CLIENT_DLL
+
 ConVar zm_hudchat_color( "zm_hudchat_color", "c13c3c", FCVAR_ARCHIVE );
 ConVar zm_hudchat_color_zm( "zm_hudchat_color_zm", "49ff59", FCVAR_ARCHIVE );
 
@@ -370,25 +370,15 @@ void ZMClientUtil::SelectGroup( int group, bool force )
         SelectZombies( vSelect, false );
     }
 }
-#else
-int ZMUtil::GetSelectedZombieCount( int iPlayerIndex )
+
+void __MsgFunc_ZMChatNotify( bf_read& msg )
 {
-    int num = 0;
+    ZMChatNotifyType_t type = (ZMChatNotifyType_t)msg.ReadByte();
 
-    CZMBaseZombie* pZombie;
-    for ( int i = 0; i < g_pZombies->Count(); i++ )
-    {
-        pZombie = g_pZombies->Element( i );
+    char buf[512];
+    msg.ReadString( buf, sizeof( buf ) );
 
-        if ( !pZombie ) continue;
-
-
-        if ( pZombie->GetSelectorIndex() == iPlayerIndex )
-        {
-            ++num;
-        }
-    }
-
-    return num;
+    ZMClientUtil::PrintNotify( buf, type );
 }
-#endif
+
+USER_MESSAGE_REGISTER( ZMChatNotify );

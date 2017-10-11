@@ -150,14 +150,14 @@ void ZM_Cmd_CreateHidden( const CCommand &args )
 
     if ( !CZMBaseZombie::HasEnoughPopToSpawn( ZMCLASS_SHAMBLER ) )
     {
-        ClientPrint( pPlayer, HUD_PRINTCENTER, "You do not have enough population to do that!" );
+        ZMUtil::PrintNotify( pPlayer, ZMCHATNOTIFY_ZM, "#ZMNotEnoughPop" );
         return;
     }
         
 
     if ( !pPlayer->HasEnoughRes( zm_sv_cost_hiddenshambler.GetInt() ) )
     {
-        ClientPrint( pPlayer, HUD_PRINTCENTER, "You do not have enough resources to do that!" );
+        ZMUtil::PrintNotify( pPlayer, ZMCHATNOTIFY_ZM, "#ZMNotEnoughRes" );
         return;
     }
 
@@ -179,7 +179,7 @@ void ZM_Cmd_CreateHidden( const CCommand &args )
         &&  pBlock->CollisionProp()
         &&  pBlock->CollisionProp()->IsPointInBounds( pos ) )
         {
-            ClientPrint( pPlayer, HUD_PRINTTALK, "No hidden zombie may be created there!" );
+            ZMUtil::PrintNotify( pPlayer, ZMCHATNOTIFY_ZM, "#ZMHiddenCreateBlocked" );
             return;
         }
     }
@@ -219,7 +219,7 @@ void ZM_Cmd_CreateHidden( const CCommand &args )
 
     if ( bVisible )
     {
-        ClientPrint( pPlayer, HUD_PRINTCENTER, "A human can see that spot!" );
+        ZMUtil::PrintNotify( pPlayer, ZMCHATNOTIFY_ZM, "#ZMHiddenCreateHumanSee" );
         return;
     }
 
@@ -246,7 +246,7 @@ void ZM_Cmd_CreateHidden( const CCommand &args )
     if (trace.startsolid || trace.fraction == 1.0f
     ||  (trace.fraction != 1.0f && trace.plane.normal[2] < 0.2)) // Is our spawn location ground?
     {
-        ClientPrint( pPlayer, HUD_PRINTCENTER, "That is an invalid spot!" );
+        ZMUtil::PrintNotify( pPlayer, ZMCHATNOTIFY_ZM, "#ZMInvalidSpot" );
 
         pZombie->SUB_Remove();
 
@@ -343,6 +343,9 @@ void ZM_Cmd_SelectAll( const CCommand &args )
     
     if ( !pPlayer->IsZM() ) return;
 
+    // No zombies to select...
+    if ( g_pZombies->Count() < 1 ) return;
+
 
     int entindex = pPlayer->entindex();
 
@@ -356,6 +359,8 @@ void ZM_Cmd_SelectAll( const CCommand &args )
             pZombie->SetSelector( entindex );
         }
     }
+
+    ZMUtil::PrintNotify( pPlayer, ZMCHATNOTIFY_ZM, "#ZMSelectAll" );
 }
 
 static ConCommand zm_cmd_selectall( "zm_cmd_selectall", ZM_Cmd_SelectAll, "Select all da zombies!" );
@@ -559,13 +564,13 @@ void ZM_Cmd_CreateTrigger( const CCommand &args )
     {
         if ( !pPlayer->HasEnoughRes( pTrap->GetTrapCost() ) )
         {
-            ClientPrint( pPlayer, HUD_PRINTTALK, "You do not have enough resources for that!" );
+            ZMUtil::PrintNotify( pPlayer, ZMCHATNOTIFY_ZM, "#ZMNotEnoughRes" );
             return;
         }
 
         if ( pTrap->GetTriggerCount() >= zm_sv_maxtraptriggers.GetInt() )
         {
-            ClientPrint( pPlayer, HUD_PRINTTALK, "You cannot create any more triggers!" );
+            ZMUtil::PrintNotify( pPlayer, ZMCHATNOTIFY_ZM, "#ZMMaxTrapTriggers" );
             return;
         }
 
@@ -575,7 +580,7 @@ void ZM_Cmd_CreateTrigger( const CCommand &args )
         
         pPlayer->IncResources( -pTrap->GetTrapCost() );
 
-        ClientPrint( pPlayer, HUD_PRINTTALK, "Created trap!" );
+        ZMUtil::PrintNotify( pPlayer, ZMCHATNOTIFY_ZM, "#ZMCreatedTrap" );
     }
 }
 
@@ -613,7 +618,7 @@ void ZM_Cmd_SetRally( const CCommand &args )
     {
         pSpawn->SetRallyPoint( pos );
 
-        ClientPrint( pPlayer, HUD_PRINTTALK, "Set zombie spawn rally point!" );
+        ZMUtil::PrintNotify( pPlayer, ZMCHATNOTIFY_ZM, "#ZMCreatedRally" );
     }
 }
 
@@ -725,7 +730,7 @@ void ZM_Cmd_PhysExp( const CCommand &args )
 
     if ( !pPlayer->HasEnoughRes( zm_sv_physexp_cost.GetInt() ) )
     {
-        ClientPrint( pPlayer, HUD_PRINTTALK, "You do not have enough resources!" );
+        ZMUtil::PrintNotify( pPlayer, ZMCHATNOTIFY_ZM, "#ZMNotEnoughRes" );
         return;
     }
 
@@ -736,7 +741,7 @@ void ZM_Cmd_PhysExp( const CCommand &args )
 
     if ( UTIL_PointContents( pos ) & CONTENTS_SOLID )
     {
-        ClientPrint( pPlayer, HUD_PRINTTALK, "You cannot create a physics explosion there!" );
+        ZMUtil::PrintNotify( pPlayer, ZMCHATNOTIFY_ZM, "#ZMPhysExpBlocked" );
         return;
     }
 
@@ -750,7 +755,7 @@ void ZM_Cmd_PhysExp( const CCommand &args )
         &&  pBlock->CollisionProp()
         &&  pBlock->CollisionProp()->IsPointInBounds( pos ) )
         {
-            ClientPrint( pPlayer, HUD_PRINTTALK, "No explosions may be created there!" );
+            ZMUtil::PrintNotify( pPlayer, ZMCHATNOTIFY_ZM, "#ZMPhysExpBlocked" );
             return;
         }
     }
@@ -782,7 +787,8 @@ void ZM_Cmd_PhysExp( const CCommand &args )
 
     pPlayer->IncResources( -zm_sv_physexp_cost.GetInt() );
 
-    ClientPrint( pPlayer, HUD_PRINTTALK, "Created a physics explosion!" );
+
+    ZMUtil::PrintNotify( pPlayer, ZMCHATNOTIFY_ZM, "#ZMCreatedPhysExp" );
 }
 
 static ConCommand zm_cmd_physexp( "zm_cmd_physexp", ZM_Cmd_PhysExp, "", FCVAR_HIDDEN );
@@ -807,7 +813,6 @@ void ZM_Cmd_SetZombieMode( const CCommand &args )
     if ( mode <= ZOMBIEMODE_INVALID || mode >= ZOMBIEMODE_MAX )
         return;
 
-
     CZMBaseZombie* pZombie;
     for ( int i = 0; i < g_pZombies->Count(); i++ )
     {
@@ -819,7 +824,9 @@ void ZM_Cmd_SetZombieMode( const CCommand &args )
         }
     }
 
-    ClientPrint( pPlayer, HUD_PRINTTALK, "Set selected zombies' mode!" );
+
+    ZMUtil::PrintNotify( pPlayer, ZMCHATNOTIFY_ZM,
+        ( mode == ZOMBIEMODE_OFFENSIVE ) ? "#ZMSetZombieModeOff" : "#ZMSetZombieModeDef" );
 }
 
 static ConCommand zm_cmd_zombiemode( "zm_cmd_zombiemode", ZM_Cmd_SetZombieMode, "" );
@@ -837,6 +844,7 @@ void ZM_Cmd_SetBansheeCeil( const CCommand &args )
     if ( !pPlayer->IsZM() ) return;
 
 
+    bool bSet = false;
 
     CZMBaseZombie* pZombie;
     for ( int i = 0; i < g_pZombies->Count(); i++ )
@@ -853,8 +861,12 @@ void ZM_Cmd_SetBansheeCeil( const CCommand &args )
             !pZombie->IsCurSchedule( SCHED_FASTZOMBIE_CEILING_CLING ))
         {
             pZombie->SetSchedule( SCHED_FASTZOMBIE_CEILING_JUMP );
+
+            bSet = true;
         }
     }
+
+    ZMUtil::PrintNotify( pPlayer, ZMCHATNOTIFY_ZM, bSet ? "#ZMBansheeCeilSet" : "#ZMBansheeCeilNoSel" );
 }
 
 static ConCommand zm_cmd_bansheeceiling( "zm_cmd_bansheeceiling", ZM_Cmd_SetBansheeCeil, "" );
@@ -924,7 +936,7 @@ void ZM_Cmd_CreateAmbush( const CCommand &args )
 
 
 
-    ClientPrint( pPlayer, HUD_PRINTTALK, "Created an ambush!" );
+    ZMUtil::PrintNotify( pPlayer, ZMCHATNOTIFY_ZM, "#ZMSetZombieModeAmb" );
 }
 
 static ConCommand zm_cmd_createambush( "zm_cmd_createambush", ZM_Cmd_CreateAmbush, "" );

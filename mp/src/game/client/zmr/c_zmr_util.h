@@ -1,16 +1,9 @@
 #pragma once
 
 
-#include "cbase.h"
-
-#ifdef CLIENT_DLL
 #include "zmr/npcs/c_zmr_zombiebase.h"
-#endif
-
 #include "zmr/zmr_shareddefs.h"
 
-
-#ifdef CLIENT_DLL
 namespace ZMClientUtil
 {
     void PrintNotify( const char* msg, ZMChatNotifyType_t type = ZMCHATNOTIFY_NORMAL );
@@ -39,9 +32,3 @@ namespace ZMClientUtil
     void SetSelectedGroup( int group );
     void SelectGroup( int group, bool force = false );
 };
-#else
-namespace ZMUtil
-{
-    int GetSelectedZombieCount( int iPlayerIndex );
-};
-#endif
