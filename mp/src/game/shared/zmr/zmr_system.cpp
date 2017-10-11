@@ -8,11 +8,12 @@
 #include "c_soundscape.h"
 
 #include <engine/IEngineSound.h>
+
+#include "zmr/c_zmr_util.h"
 #endif
 
 #include "zmr/zmr_shareddefs.h"
 #include "zmr/zmr_web.h"
-#include "zmr/zmr_util.h"
 
 
 class CZMSystem : public CAutoGameSystem, public CGameEventListener
