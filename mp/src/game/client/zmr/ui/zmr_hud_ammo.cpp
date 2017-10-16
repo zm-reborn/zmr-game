@@ -41,8 +41,9 @@ protected:
     void UpdatePlayerAmmo();
     
 
-    void PaintGlowString( const Color& clr, float blur, int xpos, int ypos, const wchar_t* str, int side );
+    void PaintGlowString( const HFont& font, const HFont& glowfont, const HFont& shadowfont, const Color& clr, float blur, int xpos, int ypos, const wchar_t* str, int side );
     void PaintString( const HFont& font, const Color& clr, int xpos, int ypos, const wchar_t* str );
+	void PaintBg();
 
 private:
     CHandle<C_BaseCombatWeapon> m_hCurrentActiveWeapon;
@@ -50,27 +51,33 @@ private:
     int m_iAmmo2;
     //CHudTexture* m_iconPrimaryAmmo;
 
+	int m_nTexPanelBgId;
+
 
     CPanelAnimationVar( float, m_flClipBlur, "ClipBlur", "0" );
     CPanelAnimationVar( float, m_flResBlur, "ResBlur", "0" );
 
     CPanelAnimationVar( Color, m_ClipColor, "ClipColor", "ZMFgColor" );
-    CPanelAnimationVar( Color, m_MidColor, "MidColor", "ZMFgColor" );
     CPanelAnimationVar( Color, m_ResColor, "ResColor", "ZMFgColor" );
+	CPanelAnimationVar( Color, m_BgColor, "BgColor", "ZMHudBgColor" );
     
     CPanelAnimationVar( HFont, m_hFont, "AmmoBarFont", "HudNumbers" );
     CPanelAnimationVar( HFont, m_hGlowFont, "AmmoBarGlowFont", "HudNumbersGlow" );
     CPanelAnimationVar( HFont, m_hShadowFont, "AmmoBarShadowFont", "HudNumbersShadow" );
 
+    CPanelAnimationVar( HFont, m_hResFont, "AmmoBarResFont", "HudNumbers" );
+    CPanelAnimationVar( HFont, m_hResGlowFont, "AmmoBarResGlowFont", "HudNumbersGlow" );
+    CPanelAnimationVar( HFont, m_hResShadowFont, "AmmoBarResShadowFont", "HudNumbersShadow" );
+
     CPanelAnimationVarAliasType( float, m_ClipX, "ClipX", "0", "proportional_float" );
     CPanelAnimationVarAliasType( float, m_ClipY, "ClipY", "0", "proportional_float" );
-    CPanelAnimationVarAliasType( float, m_MidX, "MidX", "0", "proportional_float" );
-    CPanelAnimationVarAliasType( float, m_MidY, "MidY", "0", "proportional_float" );
     CPanelAnimationVarAliasType( float, m_ResX, "ResX", "0", "proportional_float" );
     CPanelAnimationVarAliasType( float, m_ResY, "ResY", "0", "proportional_float" );
 
-    CPanelAnimationVarAliasType( float, m_MidWidth, "MidWidth", "0", "proportional_float" );
-    CPanelAnimationVarAliasType( float, m_MidHeight, "MidHeight", "0", "proportional_float" );
+    CPanelAnimationVarAliasType( float, m_flBgX, "BgX", "0", "proportional_float" );
+    CPanelAnimationVarAliasType( float, m_flBgY, "BgY", "0", "proportional_float" );
+    CPanelAnimationVarAliasType( float, m_flBgSizeX, "BgSizeX", "0", "proportional_float" );
+    CPanelAnimationVarAliasType( float, m_flBgSizeY, "BgSizeY", "0", "proportional_float" );
 
     bool m_bDisplaySecondary;
 };
@@ -83,6 +90,9 @@ DECLARE_HUDELEMENT( CZMHudAmmo );
 CZMHudAmmo::CZMHudAmmo( const char *pElementName ) : CHudElement( pElementName ), BaseClass( g_pClientMode->GetViewport(), "ZMHudAmmo" )
 {
     SetHiddenBits( HIDEHUD_HEALTH | HIDEHUD_PLAYERDEAD | HIDEHUD_NEEDSUIT | HIDEHUD_WEAPONSELECTION );
+
+    m_nTexPanelBgId = surface()->CreateNewTextureID();
+    surface()->DrawSetTextureFile( m_nTexPanelBgId, "zmr_effects/hud_bg_ammo", true, false );
 }
 
 void CZMHudAmmo::Init( void )
@@ -223,19 +233,19 @@ void CZMHudAmmo::PaintString( const HFont& font, const Color& clr, int xpos, int
 	surface()->DrawUnicodeString( str );
 }
 
-void CZMHudAmmo::PaintGlowString( const Color& clr, float blur, int xpos, int ypos, const wchar_t* str, int side )
+void CZMHudAmmo::PaintGlowString( const HFont& font, const HFont& glowfont, const HFont& shadowfont, const Color& clr, float blur, int xpos, int ypos, const wchar_t* str, int side )
 {
     if ( side != SIDE_LEFT )
     {
         int w, h;
-        surface()->GetTextSize( m_hFont, str, w, h );
+        surface()->GetTextSize( font, str, w, h );
 
         if ( side == SIDE_RIGHT )
             xpos -= w;
     }
 
 
-    PaintString( m_hShadowFont, Color( 0, 0, 0, 255 ), xpos, ypos, str );
+    PaintString( shadowfont, Color( 0, 0, 0, 255 ), xpos, ypos, str );
 
 
 	for ( float fl = min( 1.0f, blur ); fl > 0.0f; fl -= 0.1f )
@@ -243,27 +253,47 @@ void CZMHudAmmo::PaintGlowString( const Color& clr, float blur, int xpos, int yp
         Color col = clr;
         col[3] = 150 * fl;
 
-		PaintString( m_hGlowFont, col, xpos, ypos, str );
+		PaintString( glowfont, col, xpos, ypos, str );
 	}
 
-    PaintString( m_hFont, clr, xpos, ypos, str );
+    PaintString( font, clr, xpos, ypos, str );
+}
+
+void CZMHudAmmo::PaintBg()
+{
+    int size_x = m_flBgSizeX;
+    int size_y = m_flBgSizeY;
+
+    int offset_x = m_flBgX;
+    int offset_y = m_flBgY;
+
+
+    surface()->DrawSetColor( m_BgColor );
+    surface()->DrawSetTexture( m_nTexPanelBgId );
+    surface()->DrawTexturedRect( offset_x, offset_y, offset_x + size_x, offset_y + size_y );
 }
 
 void CZMHudAmmo::Paint()
 {
+	PaintBg();
+
+
     wchar_t szAmmo[8];
     V_snwprintf( szAmmo, ARRAYSIZE( szAmmo ), L"%i", m_iAmmo );
 
-    PaintGlowString( m_ClipColor, m_flClipBlur, m_ClipX, m_ClipY, szAmmo, SIDE_RIGHT );
+    PaintGlowString( m_hFont, m_hGlowFont, m_hShadowFont, m_ClipColor, m_flClipBlur, m_ClipX, m_ClipY, szAmmo, SIDE_RIGHT );
 
 
     if ( m_bDisplaySecondary )
     {
-        surface()->DrawSetColor( m_MidColor );
-        surface()->DrawFilledRect( m_MidX, m_MidY, m_MidX + m_MidWidth, m_MidY + m_MidHeight );
+        int w, h, hsmall;
+        surface()->GetTextSize( m_hFont, szAmmo, w, h );
+		surface()->GetTextSize( m_hResFont, szAmmo, w, hsmall );
+
+		int pos_y = m_ClipY + ( h - hsmall );
 
         V_snwprintf( szAmmo, ARRAYSIZE( szAmmo ), L"%i", m_iAmmo2 );
 
-        PaintGlowString( m_ResColor, m_flResBlur, m_ResX, m_ResY, szAmmo, SIDE_LEFT );
+        PaintGlowString( m_hResFont, m_hResGlowFont, m_hResShadowFont, m_ResColor, m_flResBlur, m_ResX, pos_y, szAmmo, SIDE_LEFT );
     }
 }
