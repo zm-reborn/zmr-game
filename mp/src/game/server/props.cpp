@@ -1752,9 +1752,13 @@ void CBreakableProp::Break( CBaseEntity *pBreaker, const CTakeDamageInfo &info )
 		WRITE_ANGLES( GetAbsAngles() );
 		MessageEnd();
 
+#ifdef ZMR // ZMRCHANGE: What's the point of not being removed?
+		UTIL_Remove( this );
+#else
 #ifndef HL2MP
 		UTIL_Remove( this );
 #endif
+#endif // ZMR
 		return;
 	}
 
@@ -1818,9 +1822,13 @@ void CBreakableProp::Break( CBaseEntity *pBreaker, const CTakeDamageInfo &info )
 		}
 	}
 
+#ifdef ZMR // ZMRCHANGE: What's the point of not being removed?
+		UTIL_Remove( this );
+#else
 #ifndef HL2MP
 	UTIL_Remove( this );
 #endif
+#endif // ZMR
 }
 
 
