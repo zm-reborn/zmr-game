@@ -765,6 +765,11 @@ void CZMEntAmbushTrigger::Trigger( CBaseEntity* pActivator )
         {
             pZombie->RemoveFromAmbush( true, false );
 
+            if ( pZombie->GetState() <= NPC_STATE_IDLE ) // We need some kind of state!
+            {
+                pZombie->SetState( NPC_STATE_ALERT );
+            }
+
             // Make them see the enemy but only if they have no enemy.
             if ( !pZombie->HasCondition( COND_SEE_ENEMY ) && !pZombie->GetEnemy() )
                 pZombie->SetEnemy( pActivator );
