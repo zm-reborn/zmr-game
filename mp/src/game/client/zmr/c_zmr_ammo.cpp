@@ -9,6 +9,9 @@ ConVar zm_cl_glow_ammo( "zm_cl_glow_ammo", "1 .2 .2", FCVAR_ARCHIVE );
 ConVar zm_cl_glow_ammo_enabled( "zm_cl_glow_ammo_enabled", "1", FCVAR_ARCHIVE );
 
 
+extern ConVar zm_sv_glow_item_enabled;
+
+
 
 class C_ZMAmmo : public C_BaseGlowEntity
 {
@@ -56,7 +59,7 @@ void C_ZMAmmo::ClientThink()
 
 void C_ZMAmmo::UpdateGlow()
 {
-    if ( !zm_cl_glow_ammo_enabled.GetBool() )
+    if ( !zm_cl_glow_ammo_enabled.GetBool() || !zm_sv_glow_item_enabled.GetBool() )
     {
         if ( IsClientSideGlowEnabled() )
             SetClientSideGlowEnabled( false );
