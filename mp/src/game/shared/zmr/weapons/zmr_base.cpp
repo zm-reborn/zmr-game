@@ -14,6 +14,8 @@ void UTIL_ClipPunchAngleOffset( QAngle &in, const QAngle &punch, const QAngle &c
 
 ConVar zm_cl_glow_weapon( "zm_cl_glow_weapon", "1 .2 .2", FCVAR_ARCHIVE );
 ConVar zm_cl_glow_weapon_enabled( "zm_cl_glow_weapon_enabled", "1", FCVAR_ARCHIVE );
+
+extern ConVar zm_sv_glow_item_enabled;
 #endif
 
 
@@ -221,7 +223,7 @@ void CZMBaseWeapon::ClientThink()
 
 void CZMBaseWeapon::UpdateGlow()
 {
-    if ( !zm_cl_glow_weapon_enabled.GetBool() )
+    if ( !zm_cl_glow_weapon_enabled.GetBool() || !zm_sv_glow_item_enabled.GetBool() )
     {
         if ( IsClientSideGlowEnabled() )
             SetClientSideGlowEnabled( false );
