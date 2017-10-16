@@ -38,6 +38,7 @@ public:
 
 private:
     void LoadIcons();
+    void Reposition();
 
 
     HScheme scheme;
@@ -67,6 +68,7 @@ CZMResourceHud::CZMResourceHud( const char *pElementName ) : CHudElement( pEleme
 
     SetPaintBackgroundEnabled( false );
     SetProportional( false );
+    SetSize( 120, 100 );
 
 
     LoadIcons();
@@ -102,12 +104,19 @@ void CZMResourceHud::Reset()
     m_nResCountDif = 0;
     m_nPopCount = 0;
     m_nSelected = 0;
+
+    Reposition();
 }
 
 void CZMResourceHud::VidInit()
 {
     LoadIcons();
     Reset();
+}
+
+void CZMResourceHud::Reposition()
+{
+    SetPos( 15, ScreenHeight() - GetTall() );
 }
 
 void CZMResourceHud::OnThink()

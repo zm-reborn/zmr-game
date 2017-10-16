@@ -59,13 +59,9 @@
 		"BgSizeY"	"50"
 	}
 	
-	"ZMResourceHud"
+	ZMResourceHud
 	{
 		"fieldName"		"ZMResourceHud"
-		"xpos"	"15"
-		"ypos"	"400"
-		"wide"	"120"
-		"tall"  "80"
 	}
 	
 	ZMHudObjectives
