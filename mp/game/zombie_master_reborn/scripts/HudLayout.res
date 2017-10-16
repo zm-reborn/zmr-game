@@ -59,6 +59,15 @@
 		"BgSizeY"	"50"
 	}
 	
+	"ZMResourceHud"
+	{
+		"fieldName"		"ZMResourceHud"
+		"xpos"	"15"
+		"ypos"	"400"
+		"wide"	"120"
+		"tall"  "80"
+	}
+	
 	ZMHudObjectives
 	{
 		"fieldName"		"ZMHudObjectives"
@@ -627,10 +636,7 @@
 	{
 		"fieldName"		"ZMFrame"
 	}
-	"ZMResourceHud"
-	{
-		"fieldName"		"ZMResourceHud"
-	}
+	
 	"ZMBoxSelect"
 	{
 		"fieldName"		"ZMBoxSelect"
