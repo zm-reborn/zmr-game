@@ -8,14 +8,18 @@
 		"wide"	"150"
 		"tall"  "50"
 		
-		"BarX"	"0"
+		"BarX"	"10"
 		"BarY"	"12"
 		"BarSize"	"30"
 		"HealthBarFont"	"ZMHudNumbers"
 		"HealthBarGlowFont"	"ZMHudNumbersGlow"
 		"HealthBarShadowFont"	"ZMHudNumbersShadow"
-		"HealthX"	"40"
+		"HealthX"	"50"
 		"HealthY"	"5"
+		"BgX"		"0"
+		"BgY"		"0"
+		"BgSizeX"	"110"
+		"BgSizeY"	"50"
 	}
 	
 	ZMHudFlashlight
@@ -33,23 +37,26 @@
 	ZMHudAmmo
 	{
 		"fieldName"		"ZMHudAmmo"
-		"xpos"	"r120"
+		"xpos"	"r140"
 		"ypos"	"425"
 		"wide"	"120"
 		"tall"  "50"
 		
-		"ClipX"	"40"
-		"ClipY"	"2"
-		"MidX"	"51"
-		"MidY"	"11"
-		"ResX"	"65"
-		"ResY"	"2"
+		"ClipX"	"50"
+		"ClipY"	"5"
+		"ResX"	"75"
 		"AmmoBarFont"	"ZMHudNumbers"
 		"AmmoBarGlowFont"	"ZMHudNumbersGlow"
 		"AmmoBarShadowFont"	"ZMHudNumbersShadow"
 		
-		"MidWidth"	"6"
-		"MidHeight"	"25"
+		"AmmoBarResFont"	"ZMHudNumbersSmall"
+		"AmmoBarResGlowFont"	"ZMHudNumbersSmallGlow"
+		"AmmoBarResShadowFont"	"ZMHudNumbersSmallShadow"
+		
+		"BgX"		"0"
+		"BgY"		"0"
+		"BgSizeX"	"120"
+		"BgSizeY"	"50"
 	}
 	
 	ZMHudObjectives

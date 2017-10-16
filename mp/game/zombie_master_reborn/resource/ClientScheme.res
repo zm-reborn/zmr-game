@@ -38,6 +38,7 @@ Scheme
 	{
 		"ZMFgColor"			"255 255 255 255" // ZMR - Used by ammo and health.
 		"ZMFgColorCrit"		"200 0 0 255" // ZMR - When something is low.
+		"ZMHudBgColor"		"70 0 0 150" // ZMR - Hud background color (hp, ammo, etc.)
 		
 		"ZMScoreboardBg"	"0 0 0 192"
 		"ZMScoreboardBorder""255 0 0 32"
@@ -590,6 +591,45 @@ Scheme
 			{
 				"name"		"Monofonto"
 				"tall"		"42"
+				"weight"	"0"
+				"blur"		"6"
+				"antialias" "0"
+				"additive"	"0"
+				"custom"	"1"
+			}
+		}
+		ZMHudNumbersSmall
+		{
+			"1"
+			{
+				"name"		"Monofonto"
+				"tall"		"36"
+				"weight"	"0"
+				"antialias" "1"
+				"additive"	"0"
+				"custom"	"1"
+			}
+		}
+		ZMHudNumbersSmallGlow
+		{
+			"1"
+			{
+				"name"		"Monofonto"
+				"tall"		"36"
+				"weight"	"0"
+				"blur"		"2"
+				"scanlines" "2"
+				"antialias" "1"
+				"additive"	"1"
+				"custom"	"1"
+			}
+		}
+		ZMHudNumbersSmallShadow
+		{
+			"1"
+			{
+				"name"		"Monofonto"
+				"tall"		"36"
 				"weight"	"0"
 				"blur"		"6"
 				"antialias" "0"

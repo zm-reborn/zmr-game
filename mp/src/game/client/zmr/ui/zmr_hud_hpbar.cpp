@@ -46,8 +46,11 @@ private:
     int m_nTexFgCriticalId;
     int m_nTexFgId;
 
+	int m_nTexPanelBgId;
+
 
     void PaintString( const HFont, const wchar_t*, const Color& );
+	void PaintBg();
     void PaintBar();
 
 
@@ -55,16 +58,24 @@ private:
 
     CPanelAnimationVarAliasType( float, m_flBarX, "BarX", "0", "proportional_float" );
     CPanelAnimationVarAliasType( float, m_flBarY, "BarY", "0", "proportional_float" );
-
     CPanelAnimationVarAliasType( float, m_flBarSize, "BarSize", "64", "proportional_float" );
+
+    CPanelAnimationVarAliasType( float, m_flBgX, "BgX", "0", "proportional_float" );
+    CPanelAnimationVarAliasType( float, m_flBgY, "BgY", "0", "proportional_float" );
+    CPanelAnimationVarAliasType( float, m_flBgSizeX, "BgSizeX", "0", "proportional_float" );
+    CPanelAnimationVarAliasType( float, m_flBgSizeY, "BgSizeY", "0", "proportional_float" );
+
+    CPanelAnimationVarAliasType( float, m_flHealthX, "HealthX", "0", "proportional_float" );
+    CPanelAnimationVarAliasType( float, m_flHealthY, "HealthY", "0", "proportional_float" );
+
+
     CPanelAnimationVar( float, m_flBlur, "Blur", "0" );
 
     CPanelAnimationVar( HFont, m_hFont, "HealthBarFont", "HudNumbers" );
     CPanelAnimationVar( HFont, m_hGlowFont, "HealthBarGlowFont", "HudNumbersGlow" );
     CPanelAnimationVar( HFont, m_hShadowFont, "HealthBarShadowFont", "HudNumbersShadow" );
 
-    CPanelAnimationVarAliasType( float, m_flHealthX, "HealthX", "0", "proportional_float" );
-    CPanelAnimationVarAliasType( float, m_flHealthY, "HealthY", "0", "proportional_float" );
+	CPanelAnimationVar( Color, m_BgColor, "BgColor", "ZMHudBgColor" );
 };
 
 DECLARE_HUDELEMENT( CZMHudHPBar );
@@ -87,6 +98,10 @@ CZMHudHPBar::CZMHudHPBar( const char *pElementName ) : CHudElement( pElementName
 
     m_nTexFgId = surface()->CreateNewTextureID();
     surface()->DrawSetTextureFile( m_nTexFgId, "zmr_effects/hpbar_fg", true, false );
+
+
+    m_nTexPanelBgId = surface()->CreateNewTextureID();
+    surface()->DrawSetTextureFile( m_nTexPanelBgId, "zmr_effects/hud_bg_hp", true, false );
 }
 
 void CZMHudHPBar::Init()
@@ -133,6 +148,7 @@ void CZMHudHPBar::OnThink()
 
 void CZMHudHPBar::Paint()
 {
+	PaintBg();
     PaintBar();
 
 
@@ -166,6 +182,20 @@ void CZMHudHPBar::PaintString( HFont font, const wchar_t* txt, const Color& clr 
     surface()->DrawSetTextPos( m_flHealthX, m_flHealthY );
     surface()->DrawSetTextFont( font );
     surface()->DrawUnicodeString( txt );
+}
+
+void CZMHudHPBar::PaintBg()
+{
+    int size_x = m_flBgSizeX;
+    int size_y = m_flBgSizeY;
+
+    int offset_x = m_flBgX;
+    int offset_y = m_flBgY;
+
+
+    surface()->DrawSetColor( m_BgColor );
+    surface()->DrawSetTexture( m_nTexPanelBgId );
+    surface()->DrawTexturedRect( offset_x, offset_y, offset_x + size_x, offset_y + size_y );
 }
 
 void CZMHudHPBar::PaintBar()

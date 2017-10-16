@@ -1,0 +1,7 @@
+UnlitGeneric
+{
+	$basetexture zmr_effects\hud_bg_hp
+	$ignorez 1
+	$vertexalpha 1
+	$vertexcolor 1
+}
