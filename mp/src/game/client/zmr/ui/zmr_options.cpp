@@ -15,6 +15,8 @@
 extern ConVar zm_cl_usenewmenus;
 extern ConVar zm_cl_poweruser;
 extern ConVar zm_cl_poweruser_boxselect;
+extern ConVar zm_cl_glow_weapon_enabled;
+extern ConVar zm_cl_glow_ammo_enabled;
 
 extern ConVar cl_yawspeed;
 extern ConVar cl_pitchspeed;
@@ -61,6 +63,8 @@ protected:
     CheckButton* m_pCheck_NewMenus;
     CheckButton* m_pCheck_PowerUser;
     CheckButton* m_pCheck_BoxPowerUser;
+    CheckButton* m_pCheck_WepGlow;
+    CheckButton* m_pCheck_AmmoGlow;
     Slider* m_pSlider_Pitch;
     Slider* m_pSlider_Yaw;
 
@@ -132,6 +136,8 @@ CZMOptionsMenu::CZMOptionsMenu( VPANEL parent ) : BaseClass( nullptr, "ZMOptions
     LoadItem( &m_pSlider_Pitch, "scrollver_slider" );
     LoadItem( &m_pModelPanel, "CZMModelPanel1" );
     LoadItem( &m_pModelCombo, "ModelComboBox" );
+    LoadItem( &m_pCheck_WepGlow, "check_wepglow" );
+    LoadItem( &m_pCheck_AmmoGlow, "check_ammoglow" );
 
     if ( FailedLoad() ) return;
 
@@ -252,6 +258,8 @@ void CZMOptionsMenu::UpdateMenu()
     m_pCheck_NewMenus->SetSelected( zm_cl_usenewmenus.GetBool() );
     m_pCheck_PowerUser->SetSelected( zm_cl_poweruser.GetBool() );
     m_pCheck_BoxPowerUser->SetSelected( zm_cl_poweruser_boxselect.GetBool() );
+    m_pCheck_WepGlow->SetSelected( zm_cl_glow_weapon_enabled.GetBool() );
+    m_pCheck_AmmoGlow->SetSelected( zm_cl_glow_ammo_enabled.GetBool() );
 
 
     m_pSlider_Yaw->SetValue( (int)cl_yawspeed.GetFloat() );
@@ -292,6 +300,8 @@ void CZMOptionsMenu::ApplySettings()
 
     zm_cl_poweruser.SetValue( m_pCheck_PowerUser->IsSelected() ? 1 : 0 );
     zm_cl_poweruser_boxselect.SetValue( m_pCheck_BoxPowerUser->IsSelected() ? 1 : 0 );
+    zm_cl_glow_weapon_enabled.SetValue( m_pCheck_WepGlow->IsSelected() ? 1 : 0 );
+    zm_cl_glow_ammo_enabled.SetValue( m_pCheck_AmmoGlow->IsSelected() ? 1 : 0 );
 
 
     cl_yawspeed.SetValue( m_pSlider_Yaw->GetValue() );
