@@ -120,7 +120,7 @@ public:
     
     int GetCurrentIndex() { return m_iCurIndex; };
 
-    bool IsDisplayingTip() { return m_flNextHide != 0.0f; };
+    bool IsDisplayingTip() { return m_flAlphaMult > 0.0f; };
     bool CanBeOverriden() { return m_iPriority != -1; };
     bool CanBeOverriden( int priority ) { return (CanBeOverriden() && (m_iPriority < priority || m_iPriority == 0)); };
 
