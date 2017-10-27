@@ -15,6 +15,9 @@
 #include "tier0/memdbgon.h"
 
 
+#define MASK_MELEE          ( MASK_SHOT_HULL | CONTENTS_HITBOX )
+
+
 void DispatchEffect( const char *pName, const CEffectData &data );
 
 
@@ -109,7 +112,7 @@ void CZMBaseMeleeWeapon::TraceMeleeAttack( trace_t& traceHit )
     pOwner->EyeVectors( &forward, nullptr, nullptr );
 
     Vector swingEnd = swingStart + forward * GetRange();
-    UTIL_TraceLine( swingStart, swingEnd, MASK_SHOT_HULL, pOwner, COLLISION_GROUP_NONE, &traceHit );
+    UTIL_TraceLine( swingStart, swingEnd, MASK_MELEE, pOwner, COLLISION_GROUP_NONE, &traceHit );
 
     if ( traceHit.fraction == 1.0f )
     {
@@ -118,7 +121,7 @@ void CZMBaseMeleeWeapon::TraceMeleeAttack( trace_t& traceHit )
         // Back off by hull "radius"
         swingEnd -= forward * bludgeonHullRadius;
 
-        UTIL_TraceHull( swingStart, swingEnd, g_bludgeonMins, g_bludgeonMaxs, MASK_SHOT_HULL, pOwner, COLLISION_GROUP_NONE, &traceHit );
+        UTIL_TraceHull( swingStart, swingEnd, g_bludgeonMins, g_bludgeonMaxs, MASK_MELEE, pOwner, COLLISION_GROUP_NONE, &traceHit );
         if ( traceHit.fraction < 1.0 && traceHit.m_pEnt )
         {
             Vector vecToTarget = traceHit.m_pEnt->GetAbsOrigin() - swingStart;
@@ -231,7 +234,7 @@ void CZMBaseMeleeWeapon::ChooseIntersectionPoint( trace_t &hitTrace, const Vecto
     Vector vecSrc = hitTrace.startpos;
 
     vecHullEnd = vecSrc + ((vecHullEnd - vecSrc)*2);
-    UTIL_TraceLine( vecSrc, vecHullEnd, MASK_SHOT_HULL, pOwner, COLLISION_GROUP_NONE, &tmpTrace );
+    UTIL_TraceLine( vecSrc, vecHullEnd, MASK_MELEE, pOwner, COLLISION_GROUP_NONE, &tmpTrace );
     if ( tmpTrace.fraction == 1.0f )
     {
         for ( i = 0; i < 2; i++ )
@@ -244,7 +247,7 @@ void CZMBaseMeleeWeapon::ChooseIntersectionPoint( trace_t &hitTrace, const Vecto
                     vecEnd.y = vecHullEnd.y + minmaxs[j][1];
                     vecEnd.z = vecHullEnd.z + minmaxs[k][2];
 
-                    UTIL_TraceLine( vecSrc, vecEnd, MASK_SHOT_HULL, pOwner, COLLISION_GROUP_NONE, &tmpTrace );
+                    UTIL_TraceLine( vecSrc, vecEnd, MASK_MELEE, pOwner, COLLISION_GROUP_NONE, &tmpTrace );
                     if ( tmpTrace.fraction < 1.0 )
                     {
                         float thisDistance = (tmpTrace.endpos - vecSrc).Length();
