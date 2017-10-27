@@ -352,12 +352,13 @@ void CZMHudTooltip::Reset()
 
 void CZMHudTooltip::OnThink()
 {
-    if ( m_flNextHide != 0.0f || m_flAlphaMult == 1.0f )
+    if ( IsDisplayingTip() && m_flNextHide != 0.0f )
     {
         if ( m_flNextHide <= gpGlobals->curtime || !CanDisplay() )
             HideTooltip();
     }
-    else if ( m_flAlphaMult <= 0.0f && !IsDisplayingTip() && m_vQueue.Count() )
+    
+    if ( !IsDisplayingTip() && m_vQueue.Count() )
     {
         // Find highest priority queued tip.
 
@@ -500,7 +501,7 @@ void CZMHudTooltip::HideTooltip()
     
     m_iCurIndex = 0;
 
-    m_flNextHide = 0.0f;
+    m_flNextHide = gpGlobals->curtime + 2.0f;
 }
 
 
