@@ -8,17 +8,17 @@
 		"wide"	"150"
 		"tall"  "50"
 		
-		"BarX"	"10"
+		"BarX"	"15"
 		"BarY"	"12"
 		"BarSize"	"30"
 		"HealthBarFont"	"ZMHudNumbers"
 		"HealthBarGlowFont"	"ZMHudNumbersGlow"
 		"HealthBarShadowFont"	"ZMHudNumbersShadow"
-		"HealthX"	"50"
+		"HealthX"	"55"
 		"HealthY"	"5"
 		"BgX"		"0"
 		"BgY"		"0"
-		"BgSizeX"	"110"
+		"BgSizeX"	"120"
 		"BgSizeY"	"50"
 	}
 	
