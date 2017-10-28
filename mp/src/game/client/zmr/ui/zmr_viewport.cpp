@@ -137,8 +137,6 @@ CZMFrame::CZMFrame( const char* pElementName ) : CHudElement( pElementName ), Ba
     m_MouseDragStatus = BUTTON_CODE_INVALID;
     SetClickMode( ZMCLICKMODE_NORMAL );
 
-    m_flLastLeftClick = m_flLastRightClick = 0.0f;
-
 
     m_BoxSelect = new CZMBoxSelect( this );
 
@@ -168,6 +166,11 @@ void CZMFrame::Init()
 void CZMFrame::VidInit()
 {
     Reset();
+}
+
+void CZMFrame::LevelInit()
+{
+    m_flLastLeftClick = m_flLastRightClick = 0.0f;
 }
 
 void CZMFrame::Reset()

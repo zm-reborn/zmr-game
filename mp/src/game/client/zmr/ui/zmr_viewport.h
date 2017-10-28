@@ -35,6 +35,7 @@ public:
 
     virtual void Init() OVERRIDE;
     virtual void VidInit() OVERRIDE;
+    virtual void LevelInit() OVERRIDE;
     virtual void Reset() OVERRIDE;
     //virtual bool ShouldDraw() OVERRIDE;
     virtual void OnMouseReleased( MouseCode code ) OVERRIDE;
