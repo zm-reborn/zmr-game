@@ -74,6 +74,10 @@ void ZM_Cmd_Target( const CCommand &args )
     if ( !pTarget ) return;
 
 
+    // ZM wants to break it.
+    bool bForceBreakable = atoi( args.Arg( 2 ) ) ? true : false;
+
+
     bool bTarget = false;
     bool bSwat = false;
     bool bBreakable = false;
@@ -98,9 +102,9 @@ void ZM_Cmd_Target( const CCommand &args )
 
 
     Vector pos;
-    pos.x = atof( args.Arg( 2 ) );
-    pos.y = atof( args.Arg( 3 ) );
-    pos.z = atof( args.Arg( 4 ) );
+    pos.x = atof( args.Arg( 3 ) );
+    pos.y = atof( args.Arg( 4 ) );
+    pos.z = atof( args.Arg( 5 ) );
     
 
     CZMBaseZombie* pZombie;
@@ -116,7 +120,10 @@ void ZM_Cmd_Target( const CCommand &args )
 
         if ( (pZombie->CanSwatPhysicsObjects() && bSwat) || bBreakable )
         {
-            pZombie->Swat( pTarget, bBreakable );
+            // If we're allowed to swat and we're forced to break it, break it.
+            bool bForcedBreak = pZombie->CanSwatPhysicsObjects() && bForceBreakable;
+
+            pZombie->Swat( pTarget, bBreakable || bForcedBreak );
         }
         else
         {

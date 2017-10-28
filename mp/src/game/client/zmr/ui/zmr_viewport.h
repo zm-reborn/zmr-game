@@ -21,6 +21,8 @@ enum ZMClickMode_t
     ZMCLICKMODE_MAX
 };
 
+#define DOUBLECLICK_DELTA           0.4f
+
 class CZMFrame : public CHudElement, public vgui::Frame
 
 {
@@ -59,6 +61,9 @@ public:
     CZMBuildMenu* GetBuildMenu() { return m_pBuildMenu; }; // ZMRTODO: Do same thing as mani menu.
     CZMManiMenuBase* GetManiMenu();
 
+    inline bool IsDoubleClickLeft() { return ( gpGlobals->curtime - m_flLastLeftClick ) < DOUBLECLICK_DELTA; };
+    inline bool IsDoubleClickRight() { return ( gpGlobals->curtime - m_flLastRightClick ) < DOUBLECLICK_DELTA; };
+
 private:
     void TraceScreenToWorld( int, int, trace_t*, CTraceFilterSimple*, int );
     
@@ -82,6 +87,9 @@ private:
     MouseCode m_MouseDragStatus;
 
     ZMClickMode_t m_iClickMode;
+
+    float m_flLastLeftClick;
+    float m_flLastRightClick;
 };
 
 extern CZMFrame* g_pZMView;

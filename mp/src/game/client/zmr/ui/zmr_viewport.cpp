@@ -137,6 +137,7 @@ CZMFrame::CZMFrame( const char* pElementName ) : CHudElement( pElementName ), Ba
     m_MouseDragStatus = BUTTON_CODE_INVALID;
     SetClickMode( ZMCLICKMODE_NORMAL );
 
+    m_flLastLeftClick = m_flLastRightClick = 0.0f;
 
 
     m_BoxSelect = new CZMBoxSelect( this );
@@ -324,9 +325,11 @@ void CZMFrame::OnMousePressed( MouseCode code )
     {
     case MOUSE_RIGHT :
         OnRightClick();
+        m_flLastRightClick = gpGlobals->curtime;
         break;
     case MOUSE_LEFT :
         OnLeftClick();
+        m_flLastLeftClick = gpGlobals->curtime;
         break;
     default : break;
     }
@@ -628,7 +631,10 @@ void CZMFrame::OnRightClick()
 
         if ( bObj )
         {
-            engine->ClientCmd( VarArgs( "zm_cmd_target %i %.1f %.1f %.1f", pTarget->entindex(), end[0], end[1], end[2] ) );
+            engine->ClientCmd( VarArgs( "zm_cmd_target %i %i %.1f %.1f %.1f",
+                pTarget->entindex(),
+                IsDoubleClickRight() ? 1 : 0, // Forced break?
+                end[0], end[1], end[2] ) );
 
 
             FX_AddQuad( end + trace.plane.normal * 2.0f,
