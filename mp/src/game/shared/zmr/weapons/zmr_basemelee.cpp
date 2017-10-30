@@ -2,6 +2,7 @@
 #include "effect_dispatch_data.h"
 #include "itempents.h"
 #include "in_buttons.h"
+#include "takedamageinfo.h"
 
 #ifndef CLIENT_DLL
 #include "ilagcompensationmanager.h"
@@ -157,21 +158,21 @@ void CZMBaseMeleeWeapon::Hit( trace_t& traceHit, Activity nHitActivity )
         pPlayer->EyeVectors( &hitDirection, NULL, NULL );
         VectorNormalize( hitDirection );
 
-#ifndef CLIENT_DLL
+
         CTakeDamageInfo info( GetOwner(), GetOwner(), this, GetDamageForActivity( nHitActivity ), DMG_CLUB, 0 );
 
-        if( pHitEntity->IsNPC() )
-        {
+        //if( pHitEntity->IsNPC() )
+        //{
             // If bonking an NPC, adjust damage.
-            info.AdjustPlayerDamageInflictedForSkillLevel();
-        }
+        //    info.AdjustPlayerDamageInflictedForSkillLevel();
+        //}
 
         CalculateMeleeDamageForce( &info, hitDirection, traceHit.endpos );
 
         pHitEntity->DispatchTraceAttack( info, hitDirection, &traceHit ); 
         ApplyMultiDamage();
 
-
+#ifndef CLIENT_DLL
         // Now hit all triggers along the ray that... 
         TraceAttackToTriggers( info, traceHit.startpos, traceHit.endpos, hitDirection );
 #endif
