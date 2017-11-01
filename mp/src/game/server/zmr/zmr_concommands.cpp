@@ -104,7 +104,7 @@ void ZM_DropWeapon( const CCommand &args )
 
         if ( pBase )
         {
-            pPlayer->Weapon_Drop( pBase );
+            pPlayer->Weapon_Drop( pBase, nullptr, nullptr );
             UTIL_Remove( pBase );
         }
 

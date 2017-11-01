@@ -213,7 +213,7 @@ void CZMBaseMeleeWeapon::Swing( bool bSecondary, const bool bUseAnimationEvent )
     SendWeaponAnim( nHitActivity );
 
     WeaponSound( SINGLE );
-    pOwner->SetAnimation( PLAYER_ATTACK1 );
+    pOwner->DoAnimationEvent( PLAYERANIMEVENT_ATTACK_PRIMARY );
 
     //Setup our next attack times
     m_flNextPrimaryAttack = gpGlobals->curtime + GetFireRate();

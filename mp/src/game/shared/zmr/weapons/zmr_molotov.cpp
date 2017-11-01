@@ -459,7 +459,7 @@ void CZMWeaponMolotov::ItemPostFrame()
 #ifndef CLIENT_DLL
     if ( m_iThrowState == MOLOTOVSTATE_THROWN && IsViewModelSequenceFinished() )
     {
-        pPlayer->Weapon_Drop( this );
+        pPlayer->Weapon_Drop( this, nullptr, nullptr );
 
         UTIL_Remove( this );
         return;
