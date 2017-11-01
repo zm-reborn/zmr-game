@@ -78,7 +78,14 @@ bool CZMBaseWeapon::Reload()
     if ( !CanAct() ) return false;
 
 
-    return BaseClass::Reload();
+    bool ret = DefaultReload( GetMaxClip1(), GetMaxClip2(), ACT_VM_RELOAD );
+
+    if ( ret )
+    {
+        GetPlayerOwner()->DoAnimationEvent( PLAYERANIMEVENT_RELOAD );
+    }
+
+    return ret;
 }
 
 const CZMWeaponInfo& CZMBaseWeapon::GetWpnData() const
@@ -131,7 +138,7 @@ void CZMBaseWeapon::PrimaryAttack( void )
     pPlayer->DoMuzzleFlash();
 
     SendWeaponAnim( GetPrimaryAttackActivity() );
-    pPlayer->SetAnimation( PLAYER_ATTACK1 );
+    pPlayer->DoAnimationEvent( PLAYERANIMEVENT_ATTACK_PRIMARY );
 
 
     FireBulletsInfo_t info;
