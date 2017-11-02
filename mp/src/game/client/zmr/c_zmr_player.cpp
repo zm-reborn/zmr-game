@@ -49,12 +49,12 @@ IMPLEMENT_CLIENTCLASS_DT( C_ZMPlayer, DT_ZM_Player, CZMPlayer )
 END_RECV_TABLE()
 
 BEGIN_PREDICTION_DATA( C_ZMPlayer )
-	DEFINE_PRED_FIELD( m_flCycle, FIELD_FLOAT, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
-	//DEFINE_PRED_FIELD( m_fIsWalking, FIELD_BOOLEAN, FTYPEDESC_INSENDTABLE ),
-	DEFINE_PRED_FIELD( m_nSequence, FIELD_INTEGER, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
-	DEFINE_PRED_FIELD( m_flPlaybackRate, FIELD_FLOAT, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
-	DEFINE_PRED_ARRAY_TOL( m_flEncodedController, FIELD_FLOAT, MAXSTUDIOBONECTRLS, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE, 0.02f ),
-	DEFINE_PRED_FIELD( m_nNewSequenceParity, FIELD_INTEGER, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
+    DEFINE_PRED_FIELD( m_flCycle, FIELD_FLOAT, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
+    //DEFINE_PRED_FIELD( m_fIsWalking, FIELD_BOOLEAN, FTYPEDESC_INSENDTABLE ),
+    DEFINE_PRED_FIELD( m_nSequence, FIELD_INTEGER, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
+    DEFINE_PRED_FIELD( m_flPlaybackRate, FIELD_FLOAT, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
+    DEFINE_PRED_ARRAY_TOL( m_flEncodedController, FIELD_FLOAT, MAXSTUDIOBONECTRLS, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE, 0.02f ),
+    DEFINE_PRED_FIELD( m_nNewSequenceParity, FIELD_INTEGER, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
 END_PREDICTION_DATA()
 
 
@@ -62,9 +62,6 @@ CZMPlayerAnimState* CreateZMPlayerAnimState( C_ZMPlayer* pPlayer );
 
 C_ZMPlayer::C_ZMPlayer() : m_iv_angEyeAngles( "C_ZMPlayer::m_iv_angEyeAngles" )
 {
-    m_angEyeAngles.Init();
-
-
     AddVar( &m_angEyeAngles, &m_iv_angEyeAngles, LATCH_SIMULATION_VAR );
 
     //m_EntClientFlags |= ENTCLIENTFLAG_DONTUSEIK;
@@ -177,7 +174,13 @@ void C_ZMPlayer::ClientThink()
 
 void C_ZMPlayer::PreThink()
 {
+    // Don't let base class change our max speed (sprinting)
+    float spd = MaxSpeed();
+
     BaseClass::PreThink();
+
+    if ( MaxSpeed() != spd )
+        SetMaxSpeed( spd );
 
     //HandleSpeedChanges();
 
@@ -188,8 +191,6 @@ void C_ZMPlayer::PreThink()
     //        StopSprinting();
     //    }
     //}
-
-    SetMaxSpeed( 190 );
 }
 
 void C_ZMPlayer::UpdateClientSideAnimation()
@@ -504,6 +505,11 @@ const QAngle& C_ZMPlayer::GetRenderAngles()
     {
         return m_pPlayerAnimState->GetRenderAngles();
     }
+}
+
+const QAngle& C_ZMPlayer::EyeAngles()
+{
+    return IsLocalPlayer() ? BaseClass::EyeAngles() : m_angEyeAngles;
 }
 
 int C_ZMPlayer::GetIDTarget() const
