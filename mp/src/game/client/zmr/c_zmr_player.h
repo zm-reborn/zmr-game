@@ -36,6 +36,7 @@ public:
     virtual bool            ShouldDraw() OVERRIDE;
     virtual int             DrawModel( int ) OVERRIDE;
     virtual const QAngle&   GetRenderAngles() OVERRIDE;
+    virtual const QAngle&   EyeAngles() OVERRIDE;
 
     int GetIDTarget() const;
 

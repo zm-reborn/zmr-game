@@ -85,6 +85,7 @@ public:
     bool            ValidatePlayerModel( const char* );
 
     virtual void    FlashlightTurnOn() OVERRIDE;
+    virtual void    FlashlightTurnOff() OVERRIDE;
 
     virtual bool    BecomeRagdollOnClient( const Vector& force ) OVERRIDE;
     void            CreateRagdollEntity();
