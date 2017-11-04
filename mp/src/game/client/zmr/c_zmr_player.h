@@ -24,7 +24,6 @@ public:
     C_ZMPlayer();
     ~C_ZMPlayer();
 
-    virtual void Spawn() OVERRIDE;
     virtual void ClientThink() OVERRIDE;
     virtual void PreThink() OVERRIDE;
     virtual void TeamChange( int ) OVERRIDE;
@@ -37,6 +36,8 @@ public:
     virtual int             DrawModel( int ) OVERRIDE;
     virtual const QAngle&   GetRenderAngles() OVERRIDE;
     virtual const QAngle&   EyeAngles() OVERRIDE;
+    virtual float           GetFOV() OVERRIDE;
+    virtual float           GetMinFOV() const OVERRIDE { return 5.0f; };
 
     int GetIDTarget() const;
 
@@ -48,12 +49,15 @@ public:
     virtual void                CalcView( Vector& eyeOrigin, QAngle& eyeAngles, float& zNear, float& zFar, float& fov ) OVERRIDE;
     virtual CStudioHdr*         OnNewModel() OVERRIDE;
     void                        Initialize();
+    inline void                 SetLookat( const Vector& pos ) { m_viewtarget = pos; };
+    inline void                 BlinkEyes() { m_blinktoggle = !m_blinktoggle; };
 
     virtual void                TraceAttack( const CTakeDamageInfo& info, const Vector& vecDir, trace_t* ptr, CDmgAccumulator* pAccumulator ) OVERRIDE;
     virtual void                DoImpactEffect( trace_t& tr, int nDamageType ) OVERRIDE;
 
     virtual void                NotifyShouldTransmit( ShouldTransmitState_t state ) OVERRIDE;
     virtual void                OnDataChanged( DataUpdateType_t type ) OVERRIDE;
+    virtual void                PostDataUpdate( DataUpdateType_t updateType ) OVERRIDE;
     virtual bool                ShouldInterpolate() OVERRIDE;
 
     // Custom...
@@ -90,31 +94,20 @@ protected:
 private:
     CNetworkVarEmbedded( CZMPlayerLocalData, m_ZMLocal );
 
-    QAngle m_angEyeAngles;
+    QAngle  m_angEyeAngles;
     CInterpolatedVar<QAngle> m_iv_angEyeAngles;
+    int     m_iSpawnInterpCounter;
+    int     m_iSpawnInterpCounterCache;
     EHANDLE	m_hRagdoll;
 
     CZMPlayerAnimState* m_pPlayerAnimState;
 
-    void UpdateLookAt();
     void UpdateIDTarget();
 
     int m_iIDEntIndex;
 
     void ReleaseFlashlight();
     Beam_t* m_pFlashlightBeam;
-
-    int	m_headYawPoseParam;
-    int	m_headPitchPoseParam;
-    float m_headYawMin;
-    float m_headYawMax;
-    float m_headPitchMin;
-    float m_headPitchMax;
-    float m_flLastBodyYaw;
-    float m_flCurrentHeadYaw;
-    float m_flCurrentHeadPitch;
-    CountdownTimer m_blinkTimer;
-    Vector m_vLookAtTarget;
 
 
     // Only used locally.

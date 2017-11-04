@@ -3,11 +3,12 @@
 
 #include "Multiplayer/multiplayer_animstate.h"
 
+
 #ifdef CLIENT_DLL
-class C_ZMPlayer;
-#else
-class CZMPlayer;
+#define CZMPlayer C_ZMPlayer
 #endif
+
+class CZMPlayer;
 
 
 class CZMPlayerAnimState : public CMultiPlayerAnimState
@@ -19,14 +20,9 @@ public:
 	CZMPlayerAnimState( CBasePlayer* pPlayer, MultiPlayerMovementData_t& movementData );
 	~CZMPlayerAnimState();
 
-#ifdef CLIENT_DLL
-	void InitZMAnimState( C_ZMPlayer* pPlayer );
-	C_ZMPlayer* GetZMPlayer() { return m_pZMPlayer; };
-#else
+
 	void InitZMAnimState( CZMPlayer* pPlayer );
 	CZMPlayer* GetZMPlayer() { return m_pZMPlayer; };
-#endif
-
 
 	virtual void ClearAnimationState() OVERRIDE;
 	virtual Activity TranslateActivity( Activity actDesired ) OVERRIDE;
@@ -50,10 +46,27 @@ private:
 	virtual void    ComputePoseParam_AimYaw( CStudioHdr* pStudioHdr ) OVERRIDE;
 
 #ifdef CLIENT_DLL
-    C_ZMPlayer*     m_pZMPlayer;
-#else
-	CZMPlayer*      m_pZMPlayer;
+    void            ComputePoseParam_Head( CStudioHdr* pStudioHdr );
+
+    void            UpdateLookAt();
 #endif
+
+	CZMPlayer*      m_pZMPlayer;
 	bool            m_bInAirWalk;
 	float           m_flHoldDeployedPoseUntilTime;
+
+
+    Vector m_vLookAtTarget;
+    float m_flLastLookAtUpdate;
+
+    int	m_headYawPoseParam;
+    int	m_headPitchPoseParam;
+    float m_headYawMin;
+    float m_headYawMax;
+    float m_headPitchMin;
+    float m_headPitchMax;
+    float m_flLastBodyYaw;
+    float m_flCurrentHeadYaw;
+    float m_flCurrentHeadPitch;
+    CountdownTimer m_blinkTimer;
 };

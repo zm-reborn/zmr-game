@@ -18,6 +18,7 @@
 
 
 static ConVar zm_sv_randomplayermodel( "zm_sv_randomplayermodel", "1", FCVAR_NOTIFY | FCVAR_ARCHIVE, "If player has an invalid model, use a random one. Temporary 'fix' for model choosing not working." );
+static ConVar zm_sv_modelchangedelay( "zm_sv_modelchangedelay", "6", FCVAR_NOTIFY | FCVAR_ARCHIVE, "", true, 0.0f, false, 0.0f );
 
 ConVar zm_sv_antiafk( "zm_sv_antiafk", "90", FCVAR_NOTIFY | FCVAR_ARCHIVE, "If the player is AFK for this many seconds, put them into spectator mode. 0 = disable" );
 
@@ -33,6 +34,7 @@ IMPLEMENT_SERVERCLASS_ST( CZMPlayer, DT_ZM_Player )
 
     SendPropFloat( SENDINFO_VECTORELEM( m_angEyeAngles, 0 ), 8, SPROP_CHANGES_OFTEN, -90.0f, 90.0f ),
     SendPropAngle( SENDINFO_VECTORELEM( m_angEyeAngles, 1 ), 10, SPROP_CHANGES_OFTEN ),
+    SendPropInt( SENDINFO( m_iSpawnInterpCounter ), 4 ),
     SendPropEHandle( SENDINFO( m_hRagdoll ) ),
 
     
@@ -91,9 +93,11 @@ CZMPlayerAnimState* CreateZMPlayerAnimState( CZMPlayer* pPlayer );
 CZMPlayer::CZMPlayer()
 {
     m_angEyeAngles.Init();
+    m_iSpawnInterpCounter = 0;
     m_bIsFireBulletsRecursive = false;
     m_iLastWeaponFireUsercmd = 0;
     m_bEnterObserver = false;
+    m_flNextModelChangeTime = 0.0f;
 
     BaseClass::ChangeTeam( 0 );
 
@@ -576,10 +580,10 @@ void CZMPlayer::FlashlightTurnOff()
 
 void CZMPlayer::SetAnimation( PLAYER_ANIM playerAnim )
 {
-    DevMsg( "SetAnimation( %i )\n", playerAnim );
+    // CBasePlayer may still call this.
 }
 
-void CZMPlayer::SetPlayerModel( void )
+void CZMPlayer::SetPlayerModel()
 {
     const char* pszFallback = zm_sv_randomplayermodel.GetBool() ?
         g_ZMPlayerModels[random->RandomInt( 0, ARRAYSIZE( g_ZMPlayerModels ) - 1 )] :
@@ -623,6 +627,9 @@ void CZMPlayer::SetPlayerModel( void )
     {
         SetModel( szModelName );
     }
+
+
+    m_flNextModelChangeTime = gpGlobals->curtime + zm_sv_modelchangedelay.GetFloat();
 }
 
 bool CZMPlayer::ValidatePlayerModel( const char* szModelName )
@@ -640,6 +647,9 @@ bool CZMPlayer::ValidatePlayerModel( const char* szModelName )
 
 void CZMPlayer::Spawn()
 {
+    m_iSpawnInterpCounter = (m_iSpawnInterpCounter + 1) % 8;
+
+
     PickDefaultSpawnTeam();
     
     // Must set player model before calling base class spawn...

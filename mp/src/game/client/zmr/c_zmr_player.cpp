@@ -45,6 +45,7 @@ IMPLEMENT_CLIENTCLASS_DT( C_ZMPlayer, DT_ZM_Player, CZMPlayer )
 
     RecvPropFloat( RECVINFO( m_angEyeAngles[0] ) ),
     RecvPropFloat( RECVINFO( m_angEyeAngles[1] ) ),
+    RecvPropInt( RECVINFO( m_iSpawnInterpCounter ) ),
     RecvPropEHandle( RECVINFO( m_hRagdoll ) ),
 END_RECV_TABLE()
 
@@ -55,6 +56,9 @@ BEGIN_PREDICTION_DATA( C_ZMPlayer )
     DEFINE_PRED_FIELD( m_flPlaybackRate, FIELD_FLOAT, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
     DEFINE_PRED_ARRAY_TOL( m_flEncodedController, FIELD_FLOAT, MAXSTUDIOBONECTRLS, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE, 0.02f ),
     DEFINE_PRED_FIELD( m_nNewSequenceParity, FIELD_INTEGER, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
+
+    DEFINE_PRED_FIELD( m_blinktoggle, FIELD_INTEGER, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
+    DEFINE_PRED_FIELD( m_viewtarget, FIELD_VECTOR, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
 END_PREDICTION_DATA()
 
 
@@ -65,10 +69,10 @@ C_ZMPlayer::C_ZMPlayer() : m_iv_angEyeAngles( "C_ZMPlayer::m_iv_angEyeAngles" )
     AddVar( &m_angEyeAngles, &m_iv_angEyeAngles, LATCH_SIMULATION_VAR );
 
     //m_EntClientFlags |= ENTCLIENTFLAG_DONTUSEIK;
-    m_blinkTimer.Invalidate();
 
     m_pFlashlightBeam = NULL;
     m_iIDEntIndex = 0;
+    m_iSpawnInterpCounterCache = 0;
 
 
     m_pPlayerAnimState = CreateZMPlayerAnimState( this );
@@ -108,67 +112,8 @@ C_ZMPlayer* C_ZMPlayer::GetLocalPlayer()
     return static_cast<C_ZMPlayer*>( C_BasePlayer::GetLocalPlayer() );
 }
 
-void C_ZMPlayer::Spawn()
-{
-    SetNextClientThink( CLIENT_THINK_ALWAYS );
-}
-
 void C_ZMPlayer::ClientThink()
 {
-    // Update player model's look at target.
-    bool bFoundViewTarget = false;
-    
-    Vector vForward;
-    AngleVectors( GetLocalAngles(), &vForward );
-
-
-    if ( IsAlive() )
-    {
-        Vector vMyOrigin = GetAbsOrigin();
-
-        for ( int i = 1; i <= gpGlobals->maxClients; i++ )
-        {
-            C_ZMPlayer* pPlayer = ToZMPlayer( UTIL_PlayerByIndex( i ) );
-            if( !pPlayer ) continue;
-
-            // Don't look at dead players :(
-            if ( !pPlayer->IsAlive() )
-                continue;
-
-            if ( pPlayer->IsZM() || pPlayer->IsObserver() )
-                continue;
-
-            if ( pPlayer->IsEffectActive( EF_NODRAW ) )
-                continue;
-
-            if ( pPlayer->entindex() == entindex() )
-                continue;
-
-
-            Vector vTargetOrigin = pPlayer->GetAbsOrigin();
-
-            Vector vDir = vTargetOrigin - vMyOrigin;
-        
-            if ( vDir.Length() > 192.0f ) 
-                continue;
-
-            VectorNormalize( vDir );
-
-            // < 0 is way too big of an angle.
-            if ( DotProduct( vForward, vDir ) < 0.5f )
-                 continue;
-
-            m_vLookAtTarget = pPlayer->EyePosition();
-            bFoundViewTarget = true;
-            break;
-        }
-    }
-
-    if ( !bFoundViewTarget )
-    {
-        m_vLookAtTarget = EyePosition() + vForward * 512.0f;
-    }
-
     UpdateIDTarget();
 }
 
@@ -512,6 +457,13 @@ const QAngle& C_ZMPlayer::EyeAngles()
     return IsLocalPlayer() ? BaseClass::EyeAngles() : m_angEyeAngles;
 }
 
+float C_ZMPlayer::GetFOV()
+{
+    float fov = C_BasePlayer::GetFOV() + GetZoom();
+    
+    return MAX( GetMinFOV(), fov );
+}
+
 int C_ZMPlayer::GetIDTarget() const
 {
     return m_iIDEntIndex;
@@ -552,57 +504,6 @@ void C_ZMPlayer::UpdateIDTarget()
             m_iIDEntIndex = pEntity->entindex();
         }
     }
-}
-
-void C_ZMPlayer::UpdateLookAt()
-{
-    // head yaw
-    if (m_headYawPoseParam < 0 || m_headPitchPoseParam < 0)
-        return;
-
-    // orient eyes
-    m_viewtarget = m_vLookAtTarget;
-
-    // blinking
-    if (m_blinkTimer.IsElapsed())
-    {
-        m_blinktoggle = !m_blinktoggle;
-        m_blinkTimer.Start( RandomFloat( 1.5f, 4.0f ) );
-    }
-
-    // Figure out where we want to look in world space.
-    QAngle desiredAngles;
-    Vector to = m_vLookAtTarget - EyePosition();
-    VectorAngles( to, desiredAngles );
-
-    // Figure out where our body is facing in world space.
-    QAngle bodyAngles( 0, 0, 0 );
-    bodyAngles[YAW] = GetLocalAngles()[YAW];
-
-
-    float flBodyYawDiff = bodyAngles[YAW] - m_flLastBodyYaw;
-    m_flLastBodyYaw = bodyAngles[YAW];
-    
-
-    // Set the head's yaw.
-    float desired = AngleNormalize( desiredAngles[YAW] - bodyAngles[YAW] );
-    desired = clamp( desired, m_headYawMin, m_headYawMax );
-    m_flCurrentHeadYaw = ApproachAngle( desired, m_flCurrentHeadYaw, 130 * gpGlobals->frametime );
-
-    // Counterrotate the head from the body rotation so it doesn't rotate past its target.
-    m_flCurrentHeadYaw = AngleNormalize( m_flCurrentHeadYaw - flBodyYawDiff );
-    desired = clamp( desired, m_headYawMin, m_headYawMax );
-    
-    SetPoseParameter( m_headYawPoseParam, m_flCurrentHeadYaw );
-
-    
-    // Set the head's yaw.
-    desired = AngleNormalize( desiredAngles[PITCH] );
-    desired = clamp( desired, m_headPitchMin, m_headPitchMax );
-    
-    m_flCurrentHeadPitch = ApproachAngle( desired, m_flCurrentHeadPitch, 130 * gpGlobals->frametime );
-    m_flCurrentHeadPitch = AngleNormalize( m_flCurrentHeadPitch );
-    SetPoseParameter( m_headPitchPoseParam, m_flCurrentHeadPitch );
 }
 
 void C_ZMPlayer::TraceAttack( const CTakeDamageInfo& info, const Vector& vecDir, trace_t* ptr, CDmgAccumulator* pAccumulator )
@@ -712,7 +613,7 @@ IRagdoll* C_ZMPlayer::GetRepresentativeRagdoll() const
 
 CStudioHdr* C_ZMPlayer::OnNewModel( void )
 {
-    CStudioHdr *hdr = BaseClass::OnNewModel();
+    CStudioHdr* hdr = BaseClass::OnNewModel();
     
     Initialize();
 
@@ -726,12 +627,6 @@ CStudioHdr* C_ZMPlayer::OnNewModel( void )
 
 void C_ZMPlayer::Initialize()
 {
-    m_headYawPoseParam = LookupPoseParameter( "head_yaw" );
-    GetPoseParameterRange( m_headYawPoseParam, m_headYawMin, m_headYawMax );
-
-    m_headPitchPoseParam = LookupPoseParameter( "head_pitch" );
-    GetPoseParameterRange( m_headPitchPoseParam, m_headPitchMin, m_headPitchMax );
-
     CStudioHdr *hdr = GetModelPtr();
     for ( int i = 0; i < hdr->GetNumPoseParameters() ; i++ )
     {
@@ -774,7 +669,24 @@ void C_ZMPlayer::OnDataChanged( DataUpdateType_t type )
 {
     BaseClass::OnDataChanged( type );
 
+    if ( type == DATA_UPDATE_CREATED )
+    {
+        SetNextClientThink( CLIENT_THINK_ALWAYS );
+    }
+
     UpdateVisibility();
+}
+
+void C_ZMPlayer::PostDataUpdate( DataUpdateType_t updateType )
+{
+    if ( m_iSpawnInterpCounter != m_iSpawnInterpCounterCache )
+    {
+        MoveToLastReceivedPosition( true );
+        ResetLatched();
+        m_iSpawnInterpCounterCache = m_iSpawnInterpCounter;
+    }
+
+    BaseClass::PostDataUpdate( updateType );
 }
 
 void C_ZMPlayer::ReleaseFlashlight()
