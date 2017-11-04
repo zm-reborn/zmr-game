@@ -198,18 +198,22 @@ public:
     inline bool     IsCloseToAFK() { return zm_sv_antiafk.GetInt() > 0 && (gpGlobals->curtime - GetLastActivity()) > (zm_sv_antiafk.GetFloat() * 0.8f); };
     inline bool     IsAFK() { return zm_sv_antiafk.GetInt() > 0 && (gpGlobals->curtime - GetLastActivity()) > zm_sv_antiafk.GetFloat(); };
 
+    inline float    GetNextModelChangeTime() { return m_flNextModelChangeTime; };
+
 private:
     // Since I didn't get this at first either, this is only sent to THIS player.
     CNetworkVarEmbedded( CZMPlayerLocalData, m_ZMLocal );
 
     CNetworkQAngle( m_angEyeAngles );
+    CNetworkVar( int, m_iSpawnInterpCounter );
     CNetworkHandle( CBaseEntity, m_hRagdoll );
 
-    int m_iLastWeaponFireUsercmd;
-    Vector m_vecTotalBulletForce; // Accumulator for bullet force in a single frame
-	ZMPlayerState_t m_iPlayerState;
+    int                 m_iLastWeaponFireUsercmd;
+    Vector              m_vecTotalBulletForce; // Accumulator for bullet force in a single frame
+	ZMPlayerState_t     m_iPlayerState;
 	CZMPlayerStateInfo* m_pCurStateInfo;
-    bool m_bEnterObserver;
+    bool                m_bEnterObserver;
+    float               m_flNextModelChangeTime;
 
     CZMPlayerAnimState* m_pPlayerAnimState;
 

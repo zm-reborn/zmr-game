@@ -16,6 +16,9 @@
 #define HL2MP_WALK_SPEED			75.0f
 #define HL2MP_CROUCHWALK_SPEED		110.0f
 
+// Don't let the head spass out.
+#define ZM_LOOKAT_UPDATE_TIME       0.1f
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Input  : *pPlayer - 
@@ -48,7 +51,6 @@ CZMPlayerAnimState* CreateZMPlayerAnimState( CZMPlayer* pPlayer )
 CZMPlayerAnimState::CZMPlayerAnimState()
 {
     m_pZMPlayer = NULL;
-
     // Don't initialize ZM specific variables here. Init them in InitZMAnimState()
 }
 
@@ -80,6 +82,9 @@ CZMPlayerAnimState::~CZMPlayerAnimState()
 void CZMPlayerAnimState::InitZMAnimState( CZMPlayer* pPlayer )
 {
     m_pZMPlayer = pPlayer;
+
+    m_blinkTimer.Invalidate();
+    m_flLastLookAtUpdate = 0.0f;
 }
 
 //-----------------------------------------------------------------------------
@@ -116,7 +121,7 @@ void CZMPlayerAnimState::Update( float eyeYaw, float eyePitch )
     VPROF( "CZMPlayerAnimState::Update" );
 
     // Get the ZM player.
-    CZMPlayer* pZMPlayer = m_pZMPlayer;
+    CZMPlayer* pZMPlayer = GetZMPlayer();
     if ( !pZMPlayer )
         return;
 
@@ -124,6 +129,13 @@ void CZMPlayerAnimState::Update( float eyeYaw, float eyePitch )
     CStudioHdr *pStudioHdr = pZMPlayer->GetModelPtr();
     if ( !pStudioHdr )
         return;
+
+
+    // We're not updating if we don't need to.
+#ifdef CLIENT_DLL
+    if ( pZMPlayer->IsLocalPlayer() && !C_BasePlayer::ShouldDrawLocalPlayer() )
+        return;
+#endif
 
     // Check to see if we should be updating the animation state - dead, ragdolled?
     if ( !ShouldUpdateAnimState() )
@@ -149,6 +161,14 @@ void CZMPlayerAnimState::Update( float eyeYaw, float eyePitch )
 
         // Pose parameter - Torso aiming (rotation).
         ComputePoseParam_AimYaw( pStudioHdr );
+
+        // ZMR
+        // Pose parameter - Head + eyes
+        // NOTE: If we ever decide to care/care less about lag compensation on players, we can just make these shared/all on client.
+        // IIRC pose parameters aren't lag compensated anyway.
+#ifdef CLIENT_DLL
+        ComputePoseParam_Head( pStudioHdr );
+#endif
     }
 
 #ifdef CLIENT_DLL 
@@ -410,6 +430,19 @@ bool CZMPlayerAnimState::SetupPoseParameters( CStudioHdr *pStudioHdr )
     if ( m_PoseParameterData.m_iAimYaw < 0 )
         return false;
 
+#ifdef CLIENT_DLL
+    // ZMR
+    m_headYawPoseParam = GetBasePlayer()->LookupPoseParameter( "head_yaw" );
+    if ( m_headYawPoseParam < 0 )
+        return false;
+    GetBasePlayer()->GetPoseParameterRange( m_headYawPoseParam, m_headYawMin, m_headYawMax );
+
+    m_headPitchPoseParam = GetBasePlayer()->LookupPoseParameter( "head_pitch" );
+    if ( m_headPitchPoseParam < 0 )
+        return false;
+    GetBasePlayer()->GetPoseParameterRange( m_headPitchPoseParam, m_headPitchMin, m_headPitchMax );
+#endif
+
     m_bPoseParameterInit = true;
 
     return true;
@@ -657,6 +690,121 @@ void CZMPlayerAnimState::ComputePoseParam_AimYaw( CStudioHdr *pStudioHdr )
     GetBasePlayer()->SetAbsAngles( angle );
 #endif
 }
+
+#ifdef CLIENT_DLL
+void CZMPlayerAnimState::UpdateLookAt()
+{
+    if ( (gpGlobals->curtime - m_flLastLookAtUpdate) < ZM_LOOKAT_UPDATE_TIME )
+        return;
+
+    if ( !m_pZMPlayer->IsAlive() )
+        return;
+
+
+    // Update player model's look at target.
+    bool bFoundViewTarget = false;
+    
+    Vector vForward;
+    AngleVectors( m_pZMPlayer->GetLocalAngles(), &vForward );
+
+    Vector vMyOrigin = m_pZMPlayer->GetAbsOrigin();
+
+    for ( int i = 1; i <= gpGlobals->maxClients; i++ )
+    {
+        C_ZMPlayer* pPlayer = ToZMPlayer( UTIL_PlayerByIndex( i ) );
+        if( !pPlayer ) continue;
+
+        // Don't look at dead players :(
+        if ( !pPlayer->IsAlive() )
+            continue;
+
+        if ( pPlayer->IsZM() || pPlayer->IsObserver() )
+            continue;
+
+        if ( pPlayer->IsEffectActive( EF_NODRAW ) )
+            continue;
+
+        if ( pPlayer->entindex() == m_pZMPlayer->entindex() )
+            continue;
+
+
+        Vector vTargetOrigin = pPlayer->GetAbsOrigin();
+
+        Vector vDir = vTargetOrigin - vMyOrigin;
+        
+        if ( vDir.Length() > 192.0f ) 
+            continue;
+
+        VectorNormalize( vDir );
+
+        // < 0 is way too big of an angle.
+        if ( DotProduct( vForward, vDir ) < 0.5f )
+                continue;
+
+        m_vLookAtTarget = pPlayer->EyePosition();
+        bFoundViewTarget = true;
+        break;
+    }
+
+    if ( !bFoundViewTarget )
+    {
+        m_vLookAtTarget = m_pZMPlayer->EyePosition() + vForward * 512.0f;
+    }
+
+
+    m_flLastLookAtUpdate = gpGlobals->curtime;
+}
+
+void CZMPlayerAnimState::ComputePoseParam_Head( CStudioHdr* hdr )
+{
+    UpdateLookAt();
+
+
+    // orient eyes
+    m_pZMPlayer->SetLookat( m_vLookAtTarget );
+
+    // blinking
+    if ( m_blinkTimer.IsElapsed() )
+    {
+        m_pZMPlayer->BlinkEyes();
+        m_blinkTimer.Start( RandomFloat( 1.5f, 4.0f ) );
+    }
+
+    // Figure out where we want to look in world space.
+    QAngle desiredAngles;
+    Vector to = m_vLookAtTarget - m_pZMPlayer->EyePosition();
+    VectorAngles( to, desiredAngles );
+
+    // Figure out where our body is facing in world space.
+    QAngle bodyAngles( 0, 0, 0 );
+    bodyAngles[YAW] = m_flGoalFeetYaw; // Just use our feet goal yaw.
+
+
+    float flBodyYawDiff = bodyAngles[YAW] - m_flLastBodyYaw;
+    m_flLastBodyYaw = bodyAngles[YAW];
+    
+
+    // Set the head's yaw.
+    float desired = AngleNormalize( desiredAngles[YAW] - bodyAngles[YAW] );
+    desired = clamp( desired, m_headYawMin, m_headYawMax );
+    m_flCurrentHeadYaw = ApproachAngle( desired, m_flCurrentHeadYaw, 130 * gpGlobals->frametime );
+
+    // Counterrotate the head from the body rotation so it doesn't rotate past its target.
+    m_flCurrentHeadYaw = AngleNormalize( m_flCurrentHeadYaw - flBodyYawDiff );
+    desired = clamp( desired, m_headYawMin, m_headYawMax );
+    
+    m_pZMPlayer->SetPoseParameter( m_headYawPoseParam, m_flCurrentHeadYaw );
+
+    
+    // Set the head's pitch.
+    desired = AngleNormalize( desiredAngles[PITCH] );
+    desired = clamp( desired, m_headPitchMin, m_headPitchMax );
+    
+    m_flCurrentHeadPitch = ApproachAngle( desired, m_flCurrentHeadPitch, 130 * gpGlobals->frametime );
+    m_flCurrentHeadPitch = AngleNormalize( m_flCurrentHeadPitch );
+    m_pZMPlayer->SetPoseParameter( m_headPitchPoseParam, m_flCurrentHeadPitch );
+}
+#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: Override the default, because hl2mp models don't use moveX

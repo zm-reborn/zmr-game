@@ -375,7 +375,7 @@ void CZMRules::ClientSettingsChanged( CBasePlayer* pPlayer )
         //Too soon, set the cvar back to what it was.
         //Note: this will make this function be called again
         //but since our models will match it'll just skip this whole dealio.
-        /*if ( pZMPlayer->GetNextModelChangeTime() >= gpGlobals->curtime )
+        if ( pZMPlayer->GetNextModelChangeTime() >= gpGlobals->curtime )
         {
             char szReturnString[512];
 
@@ -385,7 +385,7 @@ void CZMRules::ClientSettingsChanged( CBasePlayer* pPlayer )
             Q_snprintf( szReturnString, sizeof( szReturnString ), "Please wait %.1f more seconds before trying to switch player models.\n", (pZMPlayer->GetNextModelChangeTime() - gpGlobals->curtime) );
             ClientPrint( pZMPlayer, HUD_PRINTTALK, szReturnString );
             return;
-        }*/
+        }
 
 
         pZMPlayer->SetPlayerModel();
