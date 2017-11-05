@@ -85,6 +85,10 @@ int CZMBaseZombie::ACT_ZOM_FALL;
 IMPLEMENT_SERVERCLASS_ST( CZMBaseZombie, DT_ZM_BaseZombie )
     SendPropInt( SENDINFO( m_iSelectorIndex ) ),
     SendPropFloat( SENDINFO( m_flHealthRatio ) ),
+
+    SendPropExclude( "DT_BaseFlex", "m_flexWeight" ),
+    SendPropExclude( "DT_BaseFlex", "m_blinktoggle" ),
+    SendPropExclude( "DT_BaseFlex", "m_viewtarget" ),
 END_SEND_TABLE()
 
 BEGIN_DATADESC( CZMBaseZombie )
@@ -190,9 +194,6 @@ void CZMBaseZombie::Precache()
 
 void CZMBaseZombie::SetModel( const char* model )
 {
-    Hull_t lastHull = GetHullType();
-
-
     BaseClass::SetModel( model );
 
 
@@ -202,17 +203,6 @@ void CZMBaseZombie::SetModel( const char* model )
     SetHullSizeNormal( true );
     SetDefaultEyeOffset();
     SetActivity( ACT_IDLE );
-
-    // hull changed size, notify vphysics
-    // UNDONE: Solve this generally, systematically so other
-    // NPCs can change size
-    if ( lastHull != GetHullType() )
-    {
-        if ( VPhysicsGetObject() )
-        {
-            SetupVPhysicsHull();
-        }
-    }
 }
 
 float CZMBaseZombie::MaxYawSpeed( void )
