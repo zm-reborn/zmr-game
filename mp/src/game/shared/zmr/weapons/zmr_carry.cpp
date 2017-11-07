@@ -758,12 +758,6 @@ void CPlayerPickupController::Init( CBasePlayer *pPlayer, CBaseEntity *pObject )
     }
 
 
-    CHL2MP_Player *pOwner = (CHL2MP_Player *)ToBasePlayer( pPlayer );
-    if ( pOwner )
-    {
-        pOwner->EnableSprint( false );
-    }
-
     // If the target is debris, convert it to non-debris
     if ( pObject->GetCollisionGroup() == COLLISION_GROUP_DEBRIS )
     {
@@ -811,12 +805,6 @@ void CPlayerPickupController::Shutdown( bool bThrown )
 
     if ( m_pPlayer )
     {
-        CHL2MP_Player *pOwner = (CHL2MP_Player *)ToBasePlayer( m_pPlayer );
-        if ( pOwner )
-        {
-            pOwner->EnableSprint( true );
-        }
-
         m_pPlayer->SetUseEntity( NULL );
         if ( m_pPlayer->GetActiveWeapon() )
         {
@@ -938,9 +926,7 @@ public:
     DECLARE_CLASS( CZMWeaponCarry, CZMBaseWeapon );
     DECLARE_NETWORKCLASS();
     DECLARE_PREDICTABLE(); // Requires semicolon, thanks Valve.
-#ifndef CLIENT_DLL
     DECLARE_ACTTABLE();
-#endif
 
     CZMWeaponCarry();
 
@@ -1101,9 +1087,9 @@ END_PREDICTION_DATA()
 LINK_ENTITY_TO_CLASS( weapon_zm_carry, CZMWeaponCarry );
 PRECACHE_WEAPON_REGISTER( weapon_zm_carry );
 
-#ifndef CLIENT_DLL
 acttable_t CZMWeaponCarry::m_acttable[] = 
 {
+    /*
     { ACT_HL2MP_IDLE,					ACT_HL2MP_IDLE_PHYSGUN,					false },
     { ACT_HL2MP_RUN,					ACT_HL2MP_RUN_PHYSGUN,					false },
     { ACT_HL2MP_IDLE_CROUCH,			ACT_HL2MP_IDLE_CROUCH_PHYSGUN,			false },
@@ -1111,9 +1097,18 @@ acttable_t CZMWeaponCarry::m_acttable[] =
     { ACT_HL2MP_GESTURE_RANGE_ATTACK,	ACT_HL2MP_GESTURE_RANGE_ATTACK_PHYSGUN,	false },
     { ACT_HL2MP_GESTURE_RELOAD,			ACT_HL2MP_GESTURE_RELOAD_PHYSGUN,		false },
     { ACT_HL2MP_JUMP,					ACT_HL2MP_JUMP_PHYSGUN,					false },
+    */
+    { ACT_MP_STAND_IDLE,				ACT_HL2MP_IDLE_PHYSGUN,                 false },
+    { ACT_MP_CROUCH_IDLE,				ACT_HL2MP_IDLE_CROUCH_PHYSGUN,			false },
+    { ACT_MP_RUN,					    ACT_HL2MP_RUN_PHYSGUN,                  false },
+    { ACT_MP_CROUCHWALK,                ACT_HL2MP_WALK_CROUCH_PHYSGUN,          false },
+    { ACT_MP_ATTACK_STAND_PRIMARYFIRE,  ACT_HL2MP_GESTURE_RANGE_ATTACK_PHYSGUN, false },
+    { ACT_MP_ATTACK_CROUCH_PRIMARYFIRE, ACT_HL2MP_GESTURE_RANGE_ATTACK_PHYSGUN, false },
+    { ACT_MP_RELOAD_STAND,              ACT_HL2MP_GESTURE_RELOAD_PHYSGUN,       false },
+    { ACT_MP_RELOAD_CROUCH,             ACT_HL2MP_GESTURE_RELOAD_PHYSGUN,       false },
+    { ACT_MP_JUMP,                      ACT_HL2MP_JUMP_PHYSGUN,                 false },
 };
 IMPLEMENT_ACTTABLE( CZMWeaponCarry );
-#endif
 
 
 enum
@@ -1765,7 +1760,7 @@ bool CZMWeaponCarry::AttachObject( CBaseEntity *pObject, const Vector &vPosition
     if ( !pPhysics )
         return false;
 
-    CHL2MP_Player *pOwner = (CHL2MP_Player *)ToBasePlayer( GetOwner() );
+    CZMPlayer* pOwner = (CZMPlayer*)GetOwner();
 
     m_bActive = true;
     if( pOwner )
@@ -2091,12 +2086,7 @@ void CZMWeaponCarry::DetachObject( bool playSound, bool wasLaunched )
     if ( m_bActive == false )
         return;
 
-    CHL2MP_Player *pOwner = (CHL2MP_Player *)ToBasePlayer( GetOwner() );
-    if( pOwner != NULL )
-    {
-        pOwner->EnableSprint( true );
-        pOwner->SetMaxSpeed( hl2_normspeed.GetFloat() );
-    }
+    CZMPlayer* pOwner = GetPlayerOwner();
 
     CBaseEntity *pObject = m_grabController.GetAttached();
 

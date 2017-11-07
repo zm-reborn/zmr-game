@@ -1347,6 +1347,134 @@ void CZMGameMovement::FullLadderMove()
 #endif
 }
 
+bool CZMGameMovement::CheckJumpButton( void )
+{
+    if (player->pl.deadflag)
+    {
+        mv->m_nOldButtons |= IN_JUMP ;	// don't jump again until released
+        return false;
+    }
+
+    // See if we are waterjumping.  If so, decrement count and return.
+    if (player->m_flWaterJumpTime)
+    {
+        player->m_flWaterJumpTime -= gpGlobals->frametime;
+        if (player->m_flWaterJumpTime < 0)
+            player->m_flWaterJumpTime = 0;
+        
+        return false;
+    }
+
+    // If we are in the water most of the way...
+    if ( player->GetWaterLevel() >= 2 )
+    {	
+        // swimming, not jumping
+        SetGroundEntity( NULL );
+
+        if(player->GetWaterType() == CONTENTS_WATER)    // We move up a certain amount
+            mv->m_vecVelocity[2] = 100;
+        else if (player->GetWaterType() == CONTENTS_SLIME)
+            mv->m_vecVelocity[2] = 80;
+        
+        // play swiming sound
+        if ( player->m_flSwimSoundTime <= 0 )
+        {
+            // Don't play sound again for 1 second
+            player->m_flSwimSoundTime = 1000;
+            PlaySwimSound();
+        }
+
+        return false;
+    }
+
+    // No more effect
+    if (player->GetGroundEntity() == NULL)
+    {
+        mv->m_nOldButtons |= IN_JUMP;
+        return false;		// in air, so no effect
+    }
+
+    // Don't allow jumping when the player is in a stasis field.
+#ifndef HL2_EPISODIC
+    if ( player->m_Local.m_bSlowMovement )
+        return false;
+#endif
+
+    if ( mv->m_nOldButtons & IN_JUMP )
+        return false;		// don't pogo stick
+
+    // Cannot jump will in the unduck transition.
+    if ( player->m_Local.m_bDucking && (  player->GetFlags() & FL_DUCKING ) )
+        return false;
+
+    // Still updating the eye position.
+    if ( player->m_Local.m_flDuckJumpTime > 0.0f )
+        return false;
+
+
+    // In the air now.
+    SetGroundEntity( NULL );
+    
+    player->PlayStepSound( (Vector &)mv->GetAbsOrigin(), player->m_pSurfaceData, 1.0, true );
+    
+    //MoveHelper()->PlayerSetAnimation( PLAYER_JUMP );
+    GetZMPlayer()->DoAnimationEvent( PLAYERANIMEVENT_JUMP );
+
+    float flGroundFactor = 1.0f;
+    if (player->m_pSurfaceData)
+    {
+        flGroundFactor = player->m_pSurfaceData->game.jumpFactor; 
+    }
+
+    float flMul;
+    if ( g_bMovementOptimizations )
+    {
+#if defined(HL2_DLL) || defined(HL2_CLIENT_DLL)
+        Assert( GetCurrentGravity() == 600.0f );
+        flMul = 160.0f;	// approx. 21 units.
+#else
+        Assert( GetCurrentGravity() == 800.0f );
+        flMul = 268.3281572999747f;
+#endif
+
+    }
+    else
+    {
+        flMul = sqrt(2 * GetCurrentGravity() * GAMEMOVEMENT_JUMP_HEIGHT);
+    }
+
+    // Acclerate upward
+    // If we are ducking...
+    float startz = mv->m_vecVelocity[2];
+    if ( (  player->m_Local.m_bDucking ) || (  player->GetFlags() & FL_DUCKING ) )
+    {
+        // d = 0.5 * g * t^2		- distance traveled with linear accel
+        // t = sqrt(2.0 * 45 / g)	- how long to fall 45 units
+        // v = g * t				- velocity at the end (just invert it to jump up that high)
+        // v = g * sqrt(2.0 * 45 / g )
+        // v^2 = g * g * 2.0 * 45 / g
+        // v = sqrt( g * 2.0 * 45 )
+        mv->m_vecVelocity[2] = flGroundFactor * flMul;  // 2 * gravity * height
+    }
+    else
+    {
+        mv->m_vecVelocity[2] += flGroundFactor * flMul;  // 2 * gravity * height
+    }
+
+
+
+    FinishGravity();
+
+    mv->m_outJumpVel.z += mv->m_vecVelocity[2] - startz;
+    mv->m_outStepHeight += 0.15f;
+
+    OnJump(mv->m_outJumpVel.z);
+
+    // Flag that we jumped.
+    mv->m_nOldButtons |= IN_JUMP;	// don't jump again until released
+    return true;
+}
+
 /*
     NOTE: Remove this same shit from hl2/hl_gamemovement.cpp
 */

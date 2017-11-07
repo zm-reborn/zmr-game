@@ -5,9 +5,11 @@
 #include "player_pickup.h"
 
 #include "ilagcompensationmanager.h"
+#include "predicted_viewmodel.h"
 
 
 #include "npcs/zmr_zombiebase.h"
+#include "zmr_player_ragdoll.h"
 #include "zmr_entities.h"
 #include "zmr/zmr_gamerules.h"
 #include "zmr/zmr_global_shared.h"
@@ -16,6 +18,7 @@
 
 
 static ConVar zm_sv_randomplayermodel( "zm_sv_randomplayermodel", "1", FCVAR_NOTIFY | FCVAR_ARCHIVE, "If player has an invalid model, use a random one. Temporary 'fix' for model choosing not working." );
+static ConVar zm_sv_modelchangedelay( "zm_sv_modelchangedelay", "6", FCVAR_NOTIFY | FCVAR_ARCHIVE, "", true, 0.0f, false, 0.0f );
 
 ConVar zm_sv_antiafk( "zm_sv_antiafk", "90", FCVAR_NOTIFY | FCVAR_ARCHIVE, "If the player is AFK for this many seconds, put them into spectator mode. 0 = disable" );
 
@@ -25,6 +28,31 @@ static ConVar zm_sv_npcheadpushoff( "zm_sv_npcheadpushoff", "200", FCVAR_NOTIFY 
 
 IMPLEMENT_SERVERCLASS_ST( CZMPlayer, DT_ZM_Player )
     SendPropDataTable( SENDINFO_DT( m_ZMLocal ), &REFERENCE_SEND_TABLE( DT_ZM_PlyLocal ), SendProxy_SendLocalDataTable ),
+
+    // send a lo-res origin to other players
+    //SendPropVector	(SENDINFO( m_vecOrigin ), -1, SPROP_COORD_MP_LOWPRECISION|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_Origin ),
+
+    SendPropFloat( SENDINFO_VECTORELEM( m_angEyeAngles, 0 ), 8, SPROP_CHANGES_OFTEN, -90.0f, 90.0f ),
+    SendPropAngle( SENDINFO_VECTORELEM( m_angEyeAngles, 1 ), 10, SPROP_CHANGES_OFTEN ),
+    SendPropInt( SENDINFO( m_iSpawnInterpCounter ), 4 ),
+    SendPropEHandle( SENDINFO( m_hRagdoll ) ),
+
+    
+    SendPropExclude( "DT_BaseAnimating", "m_flPoseParameter" ),
+    SendPropExclude( "DT_BaseAnimating", "m_flPlaybackRate" ),	
+    SendPropExclude( "DT_BaseAnimating", "m_nSequence" ),
+    SendPropExclude( "DT_BaseEntity", "m_angRotation" ),
+    SendPropExclude( "DT_BaseAnimatingOverlay", "overlay_vars" ),
+
+    //SendPropExclude( "DT_BaseEntity", "m_vecOrigin" ),
+
+    // playeranimstate and clientside animation takes care of these on the client
+    SendPropExclude( "DT_ServerAnimationData" , "m_flCycle" ),	
+    SendPropExclude( "DT_AnimTimeMustBeFirst" , "m_flAnimTime" ),
+
+    SendPropExclude( "DT_BaseFlex", "m_flexWeight" ),
+    SendPropExclude( "DT_BaseFlex", "m_blinktoggle" ),
+    SendPropExclude( "DT_BaseFlex", "m_viewtarget" ),
 END_SEND_TABLE()
 
 
@@ -34,6 +62,7 @@ END_DATADESC()
 
 LINK_ENTITY_TO_CLASS( player, CZMPlayer );
 PRECACHE_REGISTER( player );
+
 
 
 // ZMRTODO: Add support for loading models from file.
@@ -59,8 +88,23 @@ const char* g_ZMPlayerModels[] =
 };
 
 
+CZMPlayerAnimState* CreateZMPlayerAnimState( CZMPlayer* pPlayer );
+
 CZMPlayer::CZMPlayer()
 {
+    m_angEyeAngles.Init();
+    m_iSpawnInterpCounter = 0;
+    m_bIsFireBulletsRecursive = false;
+    m_iLastWeaponFireUsercmd = 0;
+    m_bEnterObserver = false;
+    m_flNextModelChangeTime = 0.0f;
+
+    BaseClass::ChangeTeam( 0 );
+
+
+    m_pPlayerAnimState = CreateZMPlayerAnimState( this );
+    UseClientSideAnimation();
+
     SetResources( 0 );
 
     m_flLastActivity = gpGlobals->curtime;
@@ -70,14 +114,11 @@ CZMPlayer::CZMPlayer()
 
     
     SetWeaponSlotFlags( 0 );
-
-
-    m_bIsFireBulletsRecursive = false;
 }
 
 CZMPlayer::~CZMPlayer( void )
 {
-
+    m_pPlayerAnimState->Release();
 }
 
 void CZMPlayer::Precache( void )
@@ -115,6 +156,26 @@ void CZMPlayer::Precache( void )
     //PrecacheScriptSound( "NPC_MetroPolice.Die" );
     //PrecacheScriptSound( "NPC_CombineS.Die" );
     //PrecacheScriptSound( "NPC_Citizen.die" );
+}
+
+void CZMPlayer::UpdateOnRemove()
+{
+    if ( m_hRagdoll.Get() )
+    {
+        UTIL_RemoveImmediate( m_hRagdoll.Get() );
+        m_hRagdoll.Set( nullptr );
+    }
+
+    BaseClass::UpdateOnRemove();
+}
+
+void CZMPlayer::NoteWeaponFired()
+{
+    Assert( m_pCurrentCommand );
+    if ( m_pCurrentCommand )
+    {
+        m_iLastWeaponFireUsercmd = m_pCurrentCommand->command_number;
+    }
 }
 
 extern ConVar zm_sv_antiafk_punish;
@@ -185,7 +246,40 @@ void CZMPlayer::PreThink( void )
         CheckObserverSettings();
 
 
+
     BaseClass::PreThink();
+
+    SetMaxSpeed( 190 );
+    State_PreThink();
+
+    // Reset bullet force accumulator, only lasts one frame
+    m_vecTotalBulletForce = vec3_origin;
+}
+
+void CZMPlayer::PostThink()
+{
+    BaseClass::PostThink();
+    
+    if ( GetFlags() & FL_DUCKING )
+    {
+        SetCollisionBounds( VEC_CROUCH_TRACE_MIN, VEC_CROUCH_TRACE_MAX );
+    }
+
+
+    QAngle angles = GetLocalAngles();
+    angles[PITCH] = 0;
+    SetLocalAngles( angles );
+
+    m_angEyeAngles = EyeAngles();
+    m_pPlayerAnimState->Update( m_angEyeAngles[YAW], m_angEyeAngles[PITCH] );
+}
+
+void CZMPlayer::PlayerDeathThink()
+{
+    if( !IsObserver() )
+    {
+        BaseClass::PlayerDeathThink();
+    }
 }
 
 void CZMPlayer::PushAway( const Vector& pos, float force )
@@ -212,7 +306,7 @@ void CZMPlayer::ChangeTeam( int iTeam )
     int oldteam = GetTeamNumber();
 
     // Change the team silently...
-	CBasePlayer::ChangeTeam( iTeam, true, true );
+    CBasePlayer::ChangeTeam( iTeam, true, true );
 
 
     if ( oldteam != ZMTEAM_UNASSIGNED && ShouldSpawn() )
@@ -310,7 +404,7 @@ void CZMPlayer::SetTeamSpecificProps()
 {
     // To shut up the asserts...
     // These states aren't even used, except for going into observer mode.
-    State_Transition( STATE_ACTIVE );
+    State_Transition( ZMSTATE_ACTIVE );
 
 
     RemoveFlag( FL_NOTARGET );
@@ -342,7 +436,7 @@ void CZMPlayer::SetTeamSpecificProps()
         else
         {
             // Apparently this sets the observer physics flag.
-		    State_Transition( STATE_OBSERVER_MODE );
+            State_Transition( ZMSTATE_OBSERVER_MODE );
         }
 
 
@@ -357,8 +451,8 @@ void CZMPlayer::SetTeamSpecificProps()
 
 void CZMPlayer::PickDefaultSpawnTeam()
 {
-	if ( GetTeamNumber() == ZMTEAM_UNASSIGNED )
-	{
+    if ( GetTeamNumber() == ZMTEAM_UNASSIGNED )
+    {
         ChangeTeam( ZMTEAM_SPECTATOR );
     }
 }
@@ -370,7 +464,7 @@ void CZMPlayer::GiveDefaultItems()
 
     if ( !IsSuitEquipped() )
         EquipSuit( false ); // Don't play "effects" (hand showcase anim)
-	
+    
 
     GiveNamedItem( "weapon_zm_carry" );
     GiveNamedItem( "weapon_zm_fists" );
@@ -451,8 +545,6 @@ void CZMPlayer::EquipSuit( bool bPlayEffects )
 {
     // Never play the effect.
     CBasePlayer::EquipSuit( false );
-
-    m_HL2Local.m_bDisplayReticle = true;
 }
 
 void CZMPlayer::RemoveAllItems( bool removeSuit )
@@ -476,7 +568,22 @@ void CZMPlayer::FlashlightTurnOn()
     }
 }
 
-void CZMPlayer::SetPlayerModel( void )
+void CZMPlayer::FlashlightTurnOff()
+{
+    RemoveEffects( EF_DIMLIGHT );
+
+    if ( IsHuman() && IsAlive() )
+    {
+        EmitSound( "HL2Player.FlashlightOff" );
+    }
+}
+
+void CZMPlayer::SetAnimation( PLAYER_ANIM playerAnim )
+{
+    // CBasePlayer may still call this.
+}
+
+void CZMPlayer::SetPlayerModel()
 {
     const char* pszFallback = zm_sv_randomplayermodel.GetBool() ?
         g_ZMPlayerModels[random->RandomInt( 0, ARRAYSIZE( g_ZMPlayerModels ) - 1 )] :
@@ -519,12 +626,10 @@ void CZMPlayer::SetPlayerModel( void )
     if ( modelIndexCurrent == -1 || modelIndex != modelIndexCurrent )
     {
         SetModel( szModelName );
-
-        //SetupPlayerSoundsByModel( szModelName );
-        m_iPlayerSoundType = PLAYER_SOUNDS_CITIZEN;
-
-        m_flNextModelChangeTime = gpGlobals->curtime + 10.0f;
     }
+
+
+    m_flNextModelChangeTime = gpGlobals->curtime + zm_sv_modelchangedelay.GetFloat();
 }
 
 bool CZMPlayer::ValidatePlayerModel( const char* szModelName )
@@ -542,7 +647,10 @@ bool CZMPlayer::ValidatePlayerModel( const char* szModelName )
 
 void CZMPlayer::Spawn()
 {
-	PickDefaultSpawnTeam();
+    m_iSpawnInterpCounter = (m_iSpawnInterpCounter + 1) % 8;
+
+
+    PickDefaultSpawnTeam();
     
     // Must set player model before calling base class spawn...
     SetPlayerModel();
@@ -550,55 +658,54 @@ void CZMPlayer::Spawn()
     // Spawnpoint look-up depend on the fact that player's are solid which is done before setting player's collision group...
     SetCollisionGroup( COLLISION_GROUP_PLAYER );
 
-	//BaseClass::Spawn();
-    CHL2_Player::Spawn();
+    //BaseClass::Spawn();
+    CBasePlayer::Spawn();
 
 
     SetTeamSpecificProps();
 
 
-	if ( !IsObserver() )
-	{
-		pl.deadflag = false;
+    if ( !IsObserver() )
+    {
+        pl.deadflag = false;
 
 
         if ( IsHuman() )
         {
-		    RemoveSolidFlags( FSOLID_NOT_SOLID );
+            RemoveSolidFlags( FSOLID_NOT_SOLID );
 
             GiveDefaultItems();
+
+            SetMaxSpeed( ZM_WALK_SPEED );
         }
 
         RemoveEffects( EF_NODRAW );
-	}
+    }
 
 
-	SetNumAnimOverlays( 3 );
-	ResetAnimation();
-
-	m_nRenderFX = kRenderNormal;
+    m_nRenderFX = kRenderNormal;
 
 
     if ( IsHuman() )
-	    AddFlag( FL_ONGROUND );
+        AddFlag( FL_ONGROUND );
     else
         RemoveFlag( FL_ONGROUND );
 
-	/*if ( HL2MPRules()->IsIntermission() )
-	{
-		AddFlag( FL_FROZEN );
-	}
-	else
-	{
-		RemoveFlag( FL_FROZEN );
-	}*/
+    /*if ( HL2MPRules()->IsIntermission() )
+    {
+        AddFlag( FL_FROZEN );
+    }
+    else
+    {
+        RemoveFlag( FL_FROZEN );
+    }*/
 
     //m_bReady = false;
 
 
     // Set in BasePlayer
-	//m_Local.m_bDucked = false;
-	//SetPlayerUnderwater( false );
+    //m_Local.m_bDucked = false;
+    //SetPlayerUnderwater( false );
 
 
     // Take 4x more damage when impacted by physics. (Same as HL2DM)
@@ -616,6 +723,46 @@ void CZMPlayer::Spawn()
     {
         ShowCrosshair( false );
     }
+
+
+    DoAnimationEvent( PLAYERANIMEVENT_SPAWN );
+}
+
+bool CZMPlayer::BecomeRagdollOnClient( const Vector& force )
+{
+    return true;
+}
+
+void CZMPlayer::CreateRagdollEntity()
+{
+    if ( m_hRagdoll.Get() )
+    {
+        UTIL_RemoveImmediate( m_hRagdoll.Get() );
+        m_hRagdoll.Set( nullptr );
+    }
+
+    // If we already have a ragdoll, don't make another one.
+    CZMRagdoll* pRagdoll = dynamic_cast<CZMRagdoll*>( m_hRagdoll.Get() );
+    
+    if ( !pRagdoll )
+    {
+        // create a new one
+        pRagdoll = dynamic_cast<CZMRagdoll*>( CreateEntityByName( "zm_ragdoll" ) );
+    }
+
+    if ( pRagdoll )
+    {
+        pRagdoll->m_hPlayer = this;
+        pRagdoll->m_vecRagdollOrigin = GetAbsOrigin();
+        pRagdoll->m_vecRagdollVelocity = GetAbsVelocity();
+        pRagdoll->m_nModelIndex = m_nModelIndex;
+        pRagdoll->m_nForceBone = m_nForceBone;
+        pRagdoll->m_vecForce = m_vecTotalBulletForce;
+        pRagdoll->SetAbsOrigin( GetAbsOrigin() );
+    }
+
+    // ragdolls will be removed on round restart automatically
+    m_hRagdoll.Set( pRagdoll );
 }
 
 void CZMPlayer::FireBullets( const FireBulletsInfo_t& info )
@@ -624,11 +771,11 @@ void CZMPlayer::FireBullets( const FireBulletsInfo_t& info )
     // This is called recursively from HandleShotImpactingGlass.
     if ( !m_bIsFireBulletsRecursive )
     {
-	    // Move ents back to history positions based on local player's lag
-	    lagcompensation->StartLagCompensation( this, this->GetCurrentCommand() );
+        // Move ents back to history positions based on local player's lag
+        lagcompensation->StartLagCompensation( this, this->GetCurrentCommand() );
 
 
-	    NoteWeaponFired();
+        NoteWeaponFired();
 
 
         m_bIsFireBulletsRecursive = true;
@@ -636,8 +783,8 @@ void CZMPlayer::FireBullets( const FireBulletsInfo_t& info )
         m_bIsFireBulletsRecursive = false;
 
 
-	    // Move ents back to their original positions.
-	    lagcompensation->FinishLagCompensation( this );
+        // Move ents back to their original positions.
+        lagcompensation->FinishLagCompensation( this );
     }
     else
     {
@@ -651,34 +798,80 @@ extern ConVar sv_maxunlag;
 
 bool CZMPlayer::WantsLagCompensationOnNPC( const CZMBaseZombie* pZombie, const CUserCmd* pCmd, const CBitVec<MAX_EDICTS>* pEntityTransmitBits ) const
 {
-	// If this entity hasn't been transmitted to us and acked, then don't bother lag compensating it.
-	if ( pEntityTransmitBits && !pEntityTransmitBits->Get( pZombie->entindex() ) )
-		return false;
+    // If this entity hasn't been transmitted to us and acked, then don't bother lag compensating it.
+    if ( pEntityTransmitBits && !pEntityTransmitBits->Get( pZombie->entindex() ) )
+        return false;
 
 #define NPC_MAXSPEED        100.0f
-	const Vector &vMyOrigin = GetAbsOrigin();
-	const Vector &vHisOrigin = pZombie->GetAbsOrigin();
+    const Vector &vMyOrigin = GetAbsOrigin();
+    const Vector &vHisOrigin = pZombie->GetAbsOrigin();
 
-	// get max distance player could have moved within max lag compensation time, 
-	// multiply by 1.5 to to avoid "dead zones"  (sqrt(2) would be the exact value)
-	float maxDistance = 1.5f * NPC_MAXSPEED * sv_maxunlag.GetFloat();
+    // get max distance player could have moved within max lag compensation time, 
+    // multiply by 1.5 to to avoid "dead zones"  (sqrt(2) would be the exact value)
+    float maxDistance = 1.5f * NPC_MAXSPEED * sv_maxunlag.GetFloat();
 
-	// If the player is within this distance, lag compensate them in case they're running past us.
-	if ( vHisOrigin.DistTo( vMyOrigin ) < maxDistance )
-		return true;
+    // If the player is within this distance, lag compensate them in case they're running past us.
+    if ( vHisOrigin.DistTo( vMyOrigin ) < maxDistance )
+        return true;
 
-	// If their origin is not within a 45 degree cone in front of us, no need to lag compensate.
-	Vector vForward;
-	AngleVectors( pCmd->viewangles, &vForward );
-	
-	Vector vDiff = vHisOrigin - vMyOrigin;
-	VectorNormalize( vDiff );
+    // If their origin is not within a 45 degree cone in front of us, no need to lag compensate.
+    Vector vForward;
+    AngleVectors( pCmd->viewangles, &vForward );
     
-	float flCosAngle = DOT_45DEGREE;
-	if ( vForward.Dot( vDiff ) < flCosAngle )
-		return false;
+    Vector vDiff = vHisOrigin - vMyOrigin;
+    VectorNormalize( vDiff );
+    
+    float flCosAngle = DOT_45DEGREE;
+    if ( vForward.Dot( vDiff ) < flCosAngle )
+        return false;
 
-	return true;
+    return true;
+}
+
+void CZMPlayer::Event_Killed( const CTakeDamageInfo &info )
+{
+    //update damage info with our accumulated physics force
+    CTakeDamageInfo subinfo = info;
+    subinfo.SetDamageForce( m_vecTotalBulletForce );
+
+
+    // Note: since we're dead, it won't draw us on the client, but we don't set EF_NODRAW
+    // because we still want to transmit to the clients in our PVS.
+    CreateRagdollEntity();
+
+
+    BaseClass::Event_Killed( subinfo );
+
+    if ( info.GetDamageType() & DMG_DISSOLVE )
+    {
+        if ( m_hRagdoll )
+        {
+            m_hRagdoll->GetBaseAnimating()->Dissolve( NULL, gpGlobals->curtime, false, ENTITY_DISSOLVE_NORMAL );
+        }
+    }
+
+
+    CBaseEntity *pAttacker = info.GetAttacker();
+
+    if ( pAttacker )
+    {
+        int iScoreToAdd = 1;
+
+        if ( pAttacker == this )
+        {
+            iScoreToAdd = -1;
+        }
+
+        GetGlobalTeam( pAttacker->GetTeamNumber() )->AddScore( iScoreToAdd );
+    }
+
+
+    FlashlightTurnOff();
+
+    m_lifeState = LIFE_DEAD;
+
+    RemoveEffects( EF_NODRAW );	// still draw player body
+    StopZooming();
 }
 
 int CZMPlayer::OnTakeDamage( const CTakeDamageInfo& inputInfo )
@@ -696,6 +889,10 @@ int CZMPlayer::OnTakeDamage( const CTakeDamageInfo& inputInfo )
             }
         }
     }
+
+    m_vecTotalBulletForce += inputInfo.GetDamageForce();
+
+    //gamestats->Event_PlayerDamage( this, inputInfo );
 
     return BaseClass::OnTakeDamage( inputInfo );
 }
@@ -716,6 +913,37 @@ void CZMPlayer::CommitSuicide( const Vector &vecForce, bool bExplode, bool bForc
     BaseClass::CommitSuicide( vecForce, bExplode, bForce );
 }
 
+void CZMPlayer::DeathSound( const CTakeDamageInfo &info )
+{
+    if ( m_hRagdoll.Get() && m_hRagdoll.Get()->GetBaseAnimating()->IsDissolving() )
+         return;
+
+
+    const char* szStepSound = "NPC_Citizen.Die";
+
+    const char *pModelName = STRING( GetModelName() );
+
+    CSoundParameters params;
+    if ( GetParametersForSound( szStepSound, params, pModelName ) == false )
+        return;
+
+    Vector vecOrigin = GetAbsOrigin();
+    
+    CRecipientFilter filter;
+    filter.AddRecipientsByPAS( vecOrigin );
+
+    EmitSound_t ep;
+    ep.m_nChannel = params.channel;
+    ep.m_pSoundName = params.soundname;
+    ep.m_flVolume = params.volume;
+    ep.m_SoundLevel = params.soundlevel;
+    ep.m_nFlags = 0;
+    ep.m_nPitch = params.pitch;
+    ep.m_pOrigin = &vecOrigin;
+
+    EmitSound( filter, entindex(), ep );
+}
+
 extern ConVar physcannon_maxmass;
 
 void CZMPlayer::PickupObject( CBaseEntity *pObject, bool bLimitMassAndSize )
@@ -724,6 +952,25 @@ void CZMPlayer::PickupObject( CBaseEntity *pObject, bool bLimitMassAndSize )
 
 
     PlayerAttemptPickup( this, pObject );
+}
+
+void CZMPlayer::CreateViewModel( int index )
+{
+    Assert( index >= 0 && index < MAX_VIEWMODELS );
+
+    if ( GetViewModel( index ) )
+        return;
+
+    CPredictedViewModel* vm = (CPredictedViewModel*)CreateEntityByName( "predicted_viewmodel" );
+    if ( vm )
+    {
+        vm->SetAbsOrigin( GetAbsOrigin() );
+        vm->SetOwner( this );
+        vm->SetIndex( index );
+        DispatchSpawn( vm );
+        vm->FollowEntity( this, false );
+        m_hViewModel.Set( index, vm );
+    }
 }
 
 bool CZMPlayer::BumpWeapon( CBaseCombatWeapon *pWeapon )
@@ -747,7 +994,7 @@ bool CZMPlayer::BumpWeapon( CBaseCombatWeapon *pWeapon )
     
     
     // Apparently, the reason why this wasn't working was because the center was in solid.
-	trace_t tr;
+    trace_t tr;
     CTraceFilterSkipTwoEntities filter( this, pWeapon, COLLISION_GROUP_NONE );
     UTIL_TraceLine( pWeapon->WorldSpaceCenter(), EyePosition(), MASK_OPAQUE, &filter, &tr );
 
@@ -928,9 +1175,9 @@ int CZMPlayer::ShouldTransmit( const CCheckTransmitInfo* pInfo )
     // "The most difficult thing in life is to know yourself." - Some guy
     // I searched for a fitting "know yourself" quote to joke about it but I shouldn't have put so much effort into this...
     if ( pInfo->m_pClientEnt == edict() )
-	{
-		return FL_EDICT_ALWAYS;
-	}
+    {
+        return FL_EDICT_ALWAYS;
+    }
 
 
     if ( IsEffectActive( EF_NODRAW ) )
@@ -939,16 +1186,16 @@ int CZMPlayer::ShouldTransmit( const CCheckTransmitInfo* pInfo )
 
     // Don't send observers at all.
     // The player doesn't get switched fast enough to warrant this.
-	if ( IsObserver()
+    if ( IsObserver()
     /*&&  (gpGlobals->curtime - m_flDeathTime) > 0.5f
-	&&  m_lifeState == LIFE_DEAD && (gpGlobals->curtime - m_flDeathAnimTime) > 0.5f*/ )
-	{
-		return FL_EDICT_DONTSEND;
-	}
+    &&  m_lifeState == LIFE_DEAD && (gpGlobals->curtime - m_flDeathAnimTime) > 0.5f*/ )
+    {
+        return FL_EDICT_DONTSEND;
+    }
 
 
 
-	CZMPlayer* pRecipientPlayer = static_cast<CZMPlayer*>( CBaseEntity::Instance( pInfo->m_pClientEnt ) );
+    CZMPlayer* pRecipientPlayer = static_cast<CZMPlayer*>( CBaseEntity::Instance( pInfo->m_pClientEnt ) );
 
     if ( !pRecipientPlayer )
         return FL_EDICT_DONTSEND;
@@ -965,4 +1212,126 @@ int CZMPlayer::ShouldTransmit( const CCheckTransmitInfo* pInfo )
 
 
     return CBaseEntity::ShouldTransmit( pInfo );
+}
+
+void CZMPlayer::State_Transition( ZMPlayerState_t newState )
+{
+    State_Leave();
+    State_Enter( newState );
+}
+
+
+void CZMPlayer::State_Enter( ZMPlayerState_t newState )
+{
+    m_iPlayerState = newState;
+    m_pCurStateInfo = State_LookupInfo( newState );
+
+    // Initialize the new state.
+    if ( m_pCurStateInfo && m_pCurStateInfo->pfnEnterState )
+        (this->*m_pCurStateInfo->pfnEnterState)();
+}
+
+
+void CZMPlayer::State_Leave()
+{
+    if ( m_pCurStateInfo && m_pCurStateInfo->pfnLeaveState )
+    {
+        (this->*m_pCurStateInfo->pfnLeaveState)();
+    }
+}
+
+
+void CZMPlayer::State_PreThink()
+{
+    if ( m_pCurStateInfo && m_pCurStateInfo->pfnPreThink )
+    {
+        (this->*m_pCurStateInfo->pfnPreThink)();
+    }
+}
+
+
+CZMPlayerStateInfo* CZMPlayer::State_LookupInfo( ZMPlayerState_t state )
+{
+    // This table MUST match the 
+    static CZMPlayerStateInfo playerStateInfos[] =
+    {
+        { ZMSTATE_ACTIVE,			"STATE_ACTIVE",			&CZMPlayer::State_Enter_ACTIVE, NULL, &CZMPlayer::State_PreThink_ACTIVE },
+        { ZMSTATE_OBSERVER_MODE,	"STATE_OBSERVER_MODE",	&CZMPlayer::State_Enter_OBSERVER_MODE,	NULL, &CZMPlayer::State_PreThink_OBSERVER_MODE }
+    };
+
+    for ( int i=0; i < ARRAYSIZE( playerStateInfos ); i++ )
+    {
+        if ( playerStateInfos[i].m_iPlayerState == state )
+            return &playerStateInfos[i];
+    }
+
+    return NULL;
+}
+
+bool CZMPlayer::StartObserverMode( int mode )
+{
+    //we only want to go into observer mode if the player asked to, not on a death timeout
+    if ( m_bEnterObserver == true )
+    {
+        VPhysicsDestroyObject();
+        return BaseClass::StartObserverMode( mode );
+    }
+    return false;
+}
+
+void CZMPlayer::StopObserverMode()
+{
+    m_bEnterObserver = false;
+    BaseClass::StopObserverMode();
+}
+
+void CZMPlayer::State_Enter_OBSERVER_MODE()
+{
+    int observerMode = m_iObserverLastMode;
+    if ( IsNetClient() )
+    {
+        const char *pIdealMode = engine->GetClientConVarValue( engine->IndexOfEdict( edict() ), "cl_spec_mode" );
+        if ( pIdealMode )
+        {
+            observerMode = atoi( pIdealMode );
+            if ( observerMode <= OBS_MODE_FIXED || observerMode > OBS_MODE_ROAMING )
+            {
+                observerMode = m_iObserverLastMode;
+            }
+        }
+    }
+    m_bEnterObserver = true;
+    StartObserverMode( observerMode );
+}
+
+void CZMPlayer::State_PreThink_OBSERVER_MODE()
+{
+    // Make sure nobody has changed any of our state.
+    //	Assert( GetMoveType() == MOVETYPE_FLY );
+    Assert( m_takedamage == DAMAGE_NO );
+    Assert( IsSolidFlagSet( FSOLID_NOT_SOLID ) );
+    //	Assert( IsEffectActive( EF_NODRAW ) );
+
+    // Must be dead.
+    Assert( m_lifeState == LIFE_DEAD );
+    Assert( pl.deadflag );
+}
+
+
+void CZMPlayer::State_Enter_ACTIVE()
+{
+    SetMoveType( MOVETYPE_WALK );
+    
+    // md 8/15/07 - They'll get set back to solid when they actually respawn. If we set them solid now and mp_forcerespawn
+    // is false, then they'll be spectating but blocking live players from moving.
+    // RemoveSolidFlags( FSOLID_NOT_SOLID );
+    
+    m_Local.m_iHideHUD = 0;
+}
+
+
+void CZMPlayer::State_PreThink_ACTIVE()
+{
+    //we don't really need to do anything here. 
+    //This state_prethink structure came over from CS:S and was doing an assert check that fails the way hl2dm handles death
 }
