@@ -1,37 +1,64 @@
 #pragma once
 
 //#include "c_baseplayer.h"
-#include "hl2mp/c_hl2mp_player.h"
+#include "hl2/c_basehlplayer.h"
+#include "beamdraw.h"
 
+#include "c_zmr_charcircle.h"
 
-#include "zmr/c_zmr_charcircle.h"
+#include "zmr/zmr_playeranimstate.h"
 #include "zmr/zmr_shareddefs.h"
 
 #include "zmr/zmr_playerlocaldata.h"
-#include "zmr/zmr_player_shared.h"
 
 
-class C_ZMPlayer : public C_HL2MP_Player
+class C_ZMPlayer : public C_BaseHLPlayer
 {
 public:
-    DECLARE_CLASS( C_ZMPlayer, C_HL2MP_Player );
+    DECLARE_CLASS( C_ZMPlayer, C_BaseHLPlayer );
     DECLARE_CLIENTCLASS();
-    //DECLARE_PREDICTABLE(); 
+    DECLARE_PREDICTABLE(); 
     DECLARE_INTERPOLATION();
 
 
     C_ZMPlayer();
     ~C_ZMPlayer();
 
-    
     virtual void ClientThink() OVERRIDE;
+    virtual void PreThink() OVERRIDE;
     virtual void TeamChange( int ) OVERRIDE;
     virtual bool CreateMove( float delta, CUserCmd* cmd ) OVERRIDE;
 
-    virtual bool ShouldDraw() OVERRIDE;
-    virtual int DrawModel( int ) OVERRIDE;
+    virtual void            AddEntity() OVERRIDE;
+    virtual ShadowType_t    ShadowCastType() OVERRIDE;
+    virtual bool            ShouldReceiveProjectedTextures( int flags ) OVERRIDE;
+    virtual bool            ShouldDraw() OVERRIDE;
+    virtual int             DrawModel( int ) OVERRIDE;
+    virtual const QAngle&   GetRenderAngles() OVERRIDE;
+    virtual const QAngle&   EyeAngles() OVERRIDE;
+    virtual float           GetFOV() OVERRIDE;
+    virtual float           GetMinFOV() const OVERRIDE { return 5.0f; };
 
-    virtual bool ShouldInterpolate() OVERRIDE;
+    int GetIDTarget() const;
+
+    virtual void UpdateClientSideAnimation() OVERRIDE;
+    virtual void CalculateIKLocks( float currentTime ) OVERRIDE;
+
+    virtual C_BaseAnimating*    BecomeRagdollOnClient() OVERRIDE;
+    IRagdoll*                   GetRepresentativeRagdoll() const OVERRIDE;
+    virtual void                CalcView( Vector& eyeOrigin, QAngle& eyeAngles, float& zNear, float& zFar, float& fov ) OVERRIDE;
+    virtual CStudioHdr*         OnNewModel() OVERRIDE;
+    void                        Initialize();
+    inline void                 SetLookat( const Vector& pos ) { m_viewtarget = pos; };
+    inline void                 BlinkEyes() { m_blinktoggle = !m_blinktoggle; };
+
+    virtual void                TraceAttack( const CTakeDamageInfo& info, const Vector& vecDir, trace_t* ptr, CDmgAccumulator* pAccumulator ) OVERRIDE;
+    virtual void                DoImpactEffect( trace_t& tr, int nDamageType ) OVERRIDE;
+
+    virtual void                NotifyShouldTransmit( ShouldTransmitState_t state ) OVERRIDE;
+    virtual void                OnDataChanged( DataUpdateType_t type ) OVERRIDE;
+    virtual void                PostDataUpdate( DataUpdateType_t updateType ) OVERRIDE;
+    virtual bool                ShouldInterpolate() OVERRIDE;
 
     // Custom...
     inline bool IsZM() { return GetTeamNumber() == ZMTEAM_ZM; };
@@ -40,21 +67,23 @@ public:
     static C_ZMPlayer* GetLocalPlayer();
 
     // Implemented in zm_player_shared
-    bool HasEnoughResToSpawn( ZombieClass_t );
-    bool HasEnoughRes( int );
-    int GetWeaponSlotFlags();
-    int GetResources();
-    void IncResources( int, bool bLimit = false );
-    void SetResources( int );
-    float GetFlashlightBattery();
-    void SetFlashlightBattery( float );
-    bool Weapon_CanSwitchTo( C_BaseCombatWeapon* ) OVERRIDE;
-    Participation_t GetParticipation();
-    static Participation_t GetLocalParticipation();
-    static void SetLocalParticipation( Participation_t );
-    virtual void PlayStepSound( Vector& vecOrigin, surfacedata_t* psurface, float fvol, bool force ) OVERRIDE;
-    CBaseCombatWeapon* GetWeaponForAmmo( int iAmmoType );
-
+    bool                    HasEnoughResToSpawn( ZombieClass_t );
+    bool                    HasEnoughRes( int );
+    int                     GetWeaponSlotFlags();
+    int                     GetResources();
+    void                    IncResources( int, bool bLimit = false );
+    void                    SetResources( int );
+    float                   GetFlashlightBattery();
+    void                    SetFlashlightBattery( float );
+    bool                    Weapon_CanSwitchTo( C_BaseCombatWeapon* ) OVERRIDE;
+    Participation_t         GetParticipation();
+    static Participation_t  GetLocalParticipation();
+    static void             SetLocalParticipation( Participation_t );
+    virtual void            PlayStepSound( Vector& vecOrigin, surfacedata_t* psurface, float fvol, bool force ) OVERRIDE;
+    C_BaseCombatWeapon*     GetWeaponForAmmo( int iAmmoType );
+    Vector                  GetAttackSpread( C_BaseCombatWeapon* pWeapon, C_BaseEntity* pTarget = nullptr );
+    Vector                  GetAutoaimVector( float flScale ) OVERRIDE;
+    void                    DoAnimationEvent( PlayerAnimEvent_t playerAnim, int nData = 0 );
 
     void SetMouseWheelMove( float dir );
 
@@ -64,6 +93,22 @@ protected:
 
 private:
     CNetworkVarEmbedded( CZMPlayerLocalData, m_ZMLocal );
+
+    QAngle  m_angEyeAngles;
+    CInterpolatedVar<QAngle> m_iv_angEyeAngles;
+    int     m_iSpawnInterpCounter;
+    int     m_iSpawnInterpCounterCache;
+    EHANDLE	m_hRagdoll;
+
+    CZMPlayerAnimState* m_pPlayerAnimState;
+
+    void UpdateIDTarget();
+
+    int m_iIDEntIndex;
+
+    void ReleaseFlashlight();
+    Beam_t* m_pFlashlightBeam;
+
 
     // Only used locally.
     float m_flUpMove;

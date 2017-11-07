@@ -4,6 +4,8 @@
 #include "zmr_player_shared.h"
 
 #ifdef CLIENT_DLL
+#include "prediction.h"
+
 #include "zmr/c_zmr_player.h"
 #include "zmr/npcs/c_zmr_zombiebase.h"
 #else
@@ -140,6 +142,22 @@ void CZMPlayer::SetLocalParticipation( Participation_t part )
 #endif
 
 
+Vector CZMPlayer::GetAttackSpread( CBaseCombatWeapon *pWeapon, CBaseEntity *pTarget )
+{
+	if ( pWeapon )
+		return pWeapon->GetBulletSpread( WEAPON_PROFICIENCY_PERFECT );
+	
+	return VECTOR_CONE_15DEGREES;
+}
+
+Vector CZMPlayer::GetAutoaimVector( float flScale )
+{
+    Vector fwd;
+    AngleVectors( EyeAngles() + m_Local.m_vecPunchAngle, &fwd );
+
+    return fwd;
+}
+
 // Play normal footsteps instead of HL2DM ones.
 void CZMPlayer::PlayStepSound( Vector& vecOrigin, surfacedata_t* psurface, float fvol, bool force )
 {
@@ -161,4 +179,27 @@ CBaseCombatWeapon* CZMPlayer::GetWeaponForAmmo( int iAmmoType )
     }
     
     return nullptr;
+}
+
+#ifndef CLIENT_DLL
+void TE_PlayerAnimEvent( CBasePlayer* pPlayer, PlayerAnimEvent_t playerAnim, int nData );
+#endif
+
+void CZMPlayer::DoAnimationEvent( PlayerAnimEvent_t playerAnim, int nData )
+{
+#ifdef CLIENT_DLL
+	if ( IsLocalPlayer() )
+	{
+		if ( ( prediction->InPrediction() && !prediction->IsFirstTimePredicted() ) )
+			return;
+	}
+
+	MDLCACHE_CRITICAL_SECTION();
+#endif
+
+    m_pPlayerAnimState->DoAnimationEvent( playerAnim, nData );
+
+#ifndef CLIENT_DLL
+    TE_PlayerAnimEvent( this, playerAnim, nData );
+#endif
 }

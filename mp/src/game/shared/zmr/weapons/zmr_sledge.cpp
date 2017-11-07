@@ -20,9 +20,7 @@ public:
 	DECLARE_CLASS( CZMWeaponSledge, CZMBaseMeleeWeapon );
 	DECLARE_NETWORKCLASS(); 
 	DECLARE_PREDICTABLE();
-#ifndef CLIENT_DLL
 	DECLARE_ACTTABLE();
-#endif
 
     CZMWeaponSledge();
 
@@ -78,21 +76,9 @@ END_PREDICTION_DATA()
 LINK_ENTITY_TO_CLASS( weapon_zm_sledge, CZMWeaponSledge );
 PRECACHE_WEAPON_REGISTER( weapon_zm_sledge );
 
-#ifndef CLIENT_DLL
-// Old
-/*acttable_t CZMWeaponSledge::m_acttable[] = 
-{
-    { ACT_RANGE_ATTACK1,				ACT_RANGE_ATTACK_SLAM,                  true },
-    { ACT_HL2MP_IDLE,					ACT_HL2MP_IDLE_MELEE,					false },
-    { ACT_HL2MP_RUN,					ACT_HL2MP_RUN_MELEE,					false },
-    { ACT_HL2MP_IDLE_CROUCH,			ACT_HL2MP_IDLE_CROUCH_MELEE,			false },
-    { ACT_HL2MP_WALK_CROUCH,			ACT_HL2MP_WALK_CROUCH_MELEE,			false },
-    { ACT_HL2MP_GESTURE_RANGE_ATTACK,	ACT_HL2MP_GESTURE_RANGE_ATTACK_MELEE,	false },
-    { ACT_HL2MP_GESTURE_RELOAD,			ACT_HL2MP_GESTURE_RELOAD_MELEE,			false },
-    { ACT_HL2MP_JUMP,					ACT_HL2MP_JUMP_MELEE,					false },
-};*/
 acttable_t CZMWeaponSledge::m_acttable[] = 
 {
+    /*
     { ACT_RANGE_ATTACK1,				ACT_RANGE_ATTACK_SLAM,              true },
     { ACT_HL2MP_IDLE,					ACT_ZM_IDLE_SLEDGE,					false },
     { ACT_HL2MP_RUN,					ACT_ZM_RUN_SLEDGE,					false },
@@ -101,9 +87,18 @@ acttable_t CZMWeaponSledge::m_acttable[] =
     { ACT_HL2MP_GESTURE_RANGE_ATTACK,	ACT_ZM_GESTURE_RANGE_ATTACK_SLEDGE,	false },
     { ACT_HL2MP_GESTURE_RELOAD,			ACT_HL2MP_GESTURE_RELOAD_MELEE,	    false },
     { ACT_HL2MP_JUMP,					ACT_ZM_JUMP_SLEDGE,					false },
+    */
+    { ACT_MP_STAND_IDLE,				ACT_ZM_IDLE_SLEDGE,                 false },
+    { ACT_MP_CROUCH_IDLE,				ACT_ZM_IDLE_CROUCH_SLEDGE,			false },
+    { ACT_MP_RUN,					    ACT_ZM_RUN_SLEDGE,					false },
+    { ACT_MP_CROUCHWALK,			    ACT_ZM_WALK_CROUCH_SLEDGE,          false },
+    { ACT_MP_ATTACK_STAND_PRIMARYFIRE,  ACT_ZM_GESTURE_RANGE_ATTACK_SLEDGE, false },
+    { ACT_MP_ATTACK_CROUCH_PRIMARYFIRE,	ACT_ZM_GESTURE_RANGE_ATTACK_SLEDGE,	false },
+    { ACT_MP_RELOAD_STAND,			    ACT_HL2MP_GESTURE_RELOAD_MELEE,     false },
+    { ACT_MP_RELOAD_CROUCH,				ACT_HL2MP_GESTURE_RELOAD_MELEE,     false },
+    { ACT_MP_JUMP,					    ACT_ZM_JUMP_SLEDGE,                 false },
 };
 IMPLEMENT_ACTTABLE( CZMWeaponSledge );
-#endif
 
 CZMWeaponSledge::CZMWeaponSledge()
 {

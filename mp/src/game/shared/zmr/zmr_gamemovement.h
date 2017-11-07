@@ -12,6 +12,7 @@
 #include "hl2/c_basehlplayer.h"
 #endif
 
+#include "zmr_player_shared.h"
 
 /*
     NOTE:
@@ -25,11 +26,13 @@
 class CZMGameMovement : public CGameMovement
 {
 protected:
-    virtual void PlayerMove( void ) OVERRIDE;
-    virtual bool LadderMove( void ) OVERRIDE;
+    virtual void PlayerMove() OVERRIDE;
+    virtual bool LadderMove() OVERRIDE;
 
     virtual void FullLadderMove() OVERRIDE;
     void FullZMMove( float factor, float maxacceleration );
+
+    virtual bool CheckJumpButton() OVERRIDE;
 
     // Lets dead players accelerate or otherwise spectators can't move in roaming mode. Thanks Valve.
     virtual bool CanAccelerate() OVERRIDE { return !(player->GetWaterJumpTime()); };
