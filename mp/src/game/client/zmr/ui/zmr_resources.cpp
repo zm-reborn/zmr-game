@@ -77,14 +77,15 @@ CZMResourceHud::CZMResourceHud( const char *pElementName ) : CHudElement( pEleme
 
 CZMResourceHud::~CZMResourceHud()
 {
-    for ( int i = 0; i < NUM_ICONS; i++ )
+    // HUD icons are automatically loaded/unloaded. gHUD.GetIcon doesn't do any allocation.
+    /*for ( int i = 0; i < NUM_ICONS; i++ )
     {
         if ( m_pIcons[i] )
         {
             delete m_pIcons[i];
             m_pIcons[i] = NULL;
         }
-    }
+    }*/
 }
 
 void CZMResourceHud::Init()
