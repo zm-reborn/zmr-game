@@ -52,6 +52,10 @@ public:
 
 	DECLARE_SERVERCLASS();
 
+#ifdef ZMR // ZMRCHANGE: Transmit to ZM.
+    virtual int UpdateTransmitState() OVERRIDE { return SetTransmitState( FL_EDICT_FULLCHECK ); };
+#endif
+
 	void Spawn( void );
 	void Precache( void );
 	bool CreateVPhysics();
