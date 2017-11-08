@@ -1,0 +1,48 @@
+"Radial"
+{
+	"Shambler"
+	{
+		"img_over"		"zmr_buildmenu/btn01_over"
+		"size"			"72"
+		"offset"		"54"
+		"startfrac"		"0.31"
+		"endfrac"		"0.94"
+		"command"		"zm_cmd_queue %i 0"
+	}
+	"Banshee"
+	{
+		"img_over"		"zmr_buildmenu/btn02_over"
+		"size"			"72"
+		"offset"		"126"
+		"startfrac"		"0.31"
+		"endfrac"		"0.94"
+		"command"		"zm_cmd_queue %i 1"
+	}
+	"Drifter"
+	{
+		"img_over"		"zmr_buildmenu/btn03_over"
+		"size"			"72"
+		"offset"		"-18"
+		"startfrac"		"0.31"
+		"endfrac"		"0.94"
+		"command"		"zm_cmd_queue %i 3"
+	}
+	"Hulk"
+	{
+		//"img_over"		"zmr_buildmenu/btn04_over"
+		"size"			"72"
+		"offset"		"-162"
+		"startfrac"		"0.31"
+		"endfrac"		"0.94"
+		"command"		"zm_cmd_queue %i 2"
+	}
+	"Immolator"
+	{
+		//"img_over"		"zmr_buildmenu/btn05_over"
+		"size"			"72"
+		"offset"		"-90"
+		"startfrac"		"0.31"
+		"endfrac"		"0.94"
+		"command"		"zm_cmd_queue %i 4"
+	}
+}
