@@ -9,6 +9,9 @@
 #include "c_zmr_zombiebase.h"
 
 
+static ConVar zm_cl_zombiefadein( "zm_cl_zombiefadein", "0.55", FCVAR_ARCHIVE, "How ", true, 0.0f, true, 2.0f );
+
+
 IMPLEMENT_CLIENTCLASS_DT( C_ZMBaseZombie, DT_ZM_BaseZombie, CZMBaseZombie )
 	RecvPropInt( RECVINFO( m_iSelectorIndex ) ),
 	RecvPropFloat( RECVINFO( m_flHealthRatio ) ),
@@ -81,7 +84,7 @@ int C_ZMBaseZombie::DrawModel( int flags )
 
     if ( !pPlayer || !pPlayer->IsZM() )
     {
-        return BaseClass::DrawModel( flags );
+        return DrawModelAndEffects( flags );
     }
         
 
@@ -110,7 +113,66 @@ int C_ZMBaseZombie::DrawModel( int flags )
         m_fxHealth->Draw();
     }
 
-    return BaseClass::DrawModel( flags );
+    return DrawModelAndEffects( flags );
+}
+
+int C_ZMBaseZombie::DrawModelAndEffects( int flags )
+{
+    if ( !m_bReadyToDraw )
+        return BaseClass::DrawModel( flags );
+
+
+    float fadein = zm_cl_zombiefadein.GetFloat();
+
+    if ( fadein <= EQUAL_EPSILON )
+        return BaseClass::DrawModel( flags );
+
+
+
+    float delta = gpGlobals->curtime - SpawnTime();
+
+    if ( delta > fadein )
+        return BaseClass::DrawModel( flags );
+
+    delta /= fadein;
+
+    const float l = delta * delta;
+    const Vector clr( 1.0f, l, l );
+
+
+    // ZMRTODO: See why on some maps this doesn't work at all.
+    CMatRenderContextPtr pRenderContext( materials );
+    
+    // Pop into existence.
+    // ZMRTODO: Remove hardcoded height.
+    const Vector4D plane( 0.0f, 0.0f, -1.0f, -90.0f * delta );
+    pRenderContext->EnableClipping( true );
+    pRenderContext->PushCustomClipPlane( (float*)&plane );
+    
+    // Color it a bit.
+    float blend = delta;
+
+    // Don't go above our fx blend. Some zombies may have custom fx.
+    float fxblend = GetFxBlend() / 255.0f;
+
+    if ( blend > fxblend )
+        blend = fxblend;
+
+    render->SetBlend( blend );
+    render->SetColorModulation( (float*)&clr );
+
+
+    int ret = BaseClass::DrawModel( flags );
+
+
+    pRenderContext->PopCustomClipPlane();
+    pRenderContext->EnableClipping( false );
+
+    const Vector reset( 1.0f, 1.0f, 1.0f );
+    render->SetBlend( 1.0f );
+    render->SetColorModulation( (float*)&reset );
+
+    return ret;
 }
 
 /*void C_ZMBaseZombie::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr, CDmgAccumulator *pAccumulator )
