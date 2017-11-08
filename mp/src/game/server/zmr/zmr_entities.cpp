@@ -813,6 +813,8 @@ BEGIN_DATADESC( CZMEntManipulate )
     DEFINE_KEYFIELD( m_bRemoveOnTrigger, FIELD_BOOLEAN, "RemoveOnTrigger" ),
 
     DEFINE_OUTPUT( m_OnPressed, "OnPressed" ),
+
+    DEFINE_INPUTFUNC( FIELD_VOID, "Press", InputPress ),
 END_DATADESC()
 
 LINK_ENTITY_TO_CLASS( info_manipulate, CZMEntManipulate );
@@ -871,13 +873,17 @@ void CZMEntManipulate::InputUnhide( inputdata_t &inputdata )
     BaseClass::InputUnhide( inputdata );
 }
 
+void CZMEntManipulate::InputPress( inputdata_t &inputdata )
+{
+    Trigger( nullptr );
+}
+
 void CZMEntManipulate::Trigger( CBaseEntity* pActivator )
 {
     if ( !IsActive() ) return;
 
 
-    CZMEntManipulateTrigger* pTrigger = dynamic_cast<CZMEntManipulateTrigger*>( pActivator );
-    if ( !pTrigger && pActivator->IsPlayer() )
+    if ( pActivator && pActivator->IsPlayer() )
     {
         CZMPlayer* pPlayer = ToZMPlayer( pActivator );
 
@@ -893,6 +899,7 @@ void CZMEntManipulate::Trigger( CBaseEntity* pActivator )
             }
         }
     }
+
 
 
     m_OnPressed.FireOutput( pActivator, this );

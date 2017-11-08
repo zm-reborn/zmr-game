@@ -224,7 +224,7 @@ public:
     void InputToggle( inputdata_t &inputdata );
     void InputHide( inputdata_t &inputdata );
     void InputUnhide( inputdata_t &inputdata );
-    //void InputTrigger( inputdata_t &inputdata );
+    void InputPress( inputdata_t &inputdata );
 
 
     void Trigger( CBaseEntity* pActivator );
