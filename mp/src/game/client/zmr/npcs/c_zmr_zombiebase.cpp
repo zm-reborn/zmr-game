@@ -140,12 +140,16 @@ int C_ZMBaseZombie::DrawModelAndEffects( int flags )
     const Vector clr( 1.0f, l, l );
 
 
-    // ZMRTODO: See why on some maps this doesn't work at all.
     CMatRenderContextPtr pRenderContext( materials );
     
     // Pop into existence.
     // ZMRTODO: Remove hardcoded height.
-    const Vector4D plane( 0.0f, 0.0f, -1.0f, -90.0f * delta );
+    const Vector down( 0.0f, 0.0f, -1.0f );
+
+    Vector pos = GetAbsOrigin();
+    pos += 90.0f * delta;
+
+    const Vector4D plane( down.x, down.y, down.z, down.Dot( pos ) );
     pRenderContext->EnableClipping( true );
     pRenderContext->PushCustomClipPlane( (float*)&plane );
     
