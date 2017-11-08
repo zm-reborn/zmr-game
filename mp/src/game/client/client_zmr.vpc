@@ -74,6 +74,13 @@ $Project "Client (ZMR)"
 				$File	"hl2mp\ui\backgroundpanel.h"
 			}
 		}
+		$Folder "Client-side Entities"
+		{
+			$File	"cl_ents\c_cliententitysystem.cpp"
+			$File	"cl_ents\c_cliententitysystem.h"
+			$File	"cl_ents\c_clientsprite.cpp"
+			$File	"cl_ents\c_clientsprite.h"
+		}
 		$Folder "ZMR"
 		{
 			$Folder "Game Shader"

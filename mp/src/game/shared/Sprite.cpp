@@ -31,6 +31,10 @@ const float MAX_GLOW_PROXY_SIZE = 64.0f;
 LINK_ENTITY_TO_CLASS( env_sprite, CSprite );
 LINK_ENTITY_TO_CLASS( env_sprite_oriented, CSpriteOriented );
 #if !defined( CLIENT_DLL )
+#ifdef ZMR // ZMRCHANGE: Client-side sprites
+static CEntityFactory<CSprite> env_sprite_clientside( "env_sprite_clientside" );
+#endif
+
 LINK_ENTITY_TO_CLASS( env_glow, CSprite ); // For backwards compatibility, remove when no longer needed.
 #endif
 
@@ -246,6 +250,19 @@ void CSprite::Spawn( void )
 	m_nStartBrightness = m_nDestBrightness = m_nBrightness;
 #endif
 
+#if defined( GAME_DLL ) && defined( ZMR ) // ZMRCHANGE: Client-side sprites
+	// Delete client-side only sprites.
+	// env_sprite also works if sprite has no name or parent.
+
+	// IMPORTANT: We need to get this far before deleting self
+	// because the material needs to be precached for the client.
+	// AFAIK there is no way to precache sprites on client.
+	if ((FClassnameIs( this, "env_sprite_clientside" )) ||
+		(FClassnameIs( this, "env_sprite" ) && GetEntityName() == NULL_STRING && GetMoveParent() == nullptr) )
+	{
+		UTIL_Remove( this );
+	}
+#endif
 }
 
 

@@ -272,6 +272,10 @@ private:
 	int			m_nStartBrightness;
 	int			m_nDestBrightness;		//Destination brightness
 	float		m_flBrightnessTimeStart;//Real time for brightness
+
+#if defined( CLIENT_DLL ) && defined( ZMR )
+	friend class C_ClientSprite;
+#endif
 };
 
 

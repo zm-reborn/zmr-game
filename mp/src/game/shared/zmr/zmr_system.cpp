@@ -11,6 +11,8 @@
 #include "cdll_client_int.h"
 #include "c_soundscape.h"
 
+#include "cl_ents/c_cliententitysystem.h"
+
 #include <engine/IEngineSound.h>
 
 
@@ -177,8 +179,9 @@ void CZMSystem::FireGameEvent( IGameEvent* pEvent )
         DevMsg( "Client received round restart event!\n" );
 
 
-        // Read client-side phys props from map and recreate em.
+        // Read client-side entities from map and recreate em.
         C_PhysPropClientside::RecreateAll();
+        g_ClientEntitySystem.RecreateAll();
 
 
         tempents->Clear();
