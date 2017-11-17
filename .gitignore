@@ -82,3 +82,5 @@ settings.scr
 *.ain
 *.csv
 mp/game/zombie_master_reborn/resource/zmtips_used.txt
+mp/src/materialsystem/stdshaders/filestocopy.txt
+mp/src/materialsystem/stdshaders/uniquefilestocopy.txt
