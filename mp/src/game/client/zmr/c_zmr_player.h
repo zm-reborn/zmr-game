@@ -12,6 +12,9 @@
 #include "zmr/zmr_playerlocaldata.h"
 
 
+class C_ZMRagdoll;
+
+
 class C_ZMPlayer : public C_BaseHLPlayer
 {
 public:
@@ -47,6 +50,10 @@ public:
     virtual C_BaseAnimating*    BecomeRagdollOnClient() OVERRIDE;
     IRagdoll*                   GetRepresentativeRagdoll() const OVERRIDE;
     virtual void                CalcView( Vector& eyeOrigin, QAngle& eyeAngles, float& zNear, float& zFar, float& fov ) OVERRIDE;
+
+    void                        DeathCam_Firstperson( Vector& eyeOrigin, QAngle& eyeAngles, float& zNear, float& zFar, float& fov );
+    void                        DeathCam_Thirdperson( Vector& eyeOrigin, QAngle& eyeAngles, float& zNear, float& zFar, float& fov );
+
     virtual CStudioHdr*         OnNewModel() OVERRIDE;
     void                        Initialize();
     inline void                 SetLookat( const Vector& pos ) { m_viewtarget = pos; };
@@ -94,13 +101,14 @@ protected:
 private:
     CNetworkVarEmbedded( CZMPlayerLocalData, m_ZMLocal );
 
-    QAngle  m_angEyeAngles;
-    CInterpolatedVar<QAngle> m_iv_angEyeAngles;
-    int     m_iSpawnInterpCounter;
-    int     m_iSpawnInterpCounterCache;
-    EHANDLE	m_hRagdoll;
+    QAngle                      m_angEyeAngles;
+    CInterpolatedVar<QAngle>    m_iv_angEyeAngles;
+    int                         m_iSpawnInterpCounter;
+    int                         m_iSpawnInterpCounterCache;
+    CHandle<C_ZMRagdoll>        m_hRagdoll;
 
     CZMPlayerAnimState* m_pPlayerAnimState;
+    int m_iAttachmentEyes;
 
     void UpdateIDTarget();
 

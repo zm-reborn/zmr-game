@@ -554,47 +554,73 @@ C_BaseAnimating* C_ZMPlayer::BecomeRagdollOnClient()
     return nullptr;
 }
 
+// ZMRTODO: When happy, set to 1.
+ConVar zm_cl_firstperson_deathcam( "zm_cl_firstperson_deathcam", "0" );
+
 void C_ZMPlayer::CalcView( Vector& eyeOrigin, QAngle& eyeAngles, float& zNear, float& zFar, float& fov )
 {
     if ( m_lifeState != LIFE_ALIVE && !IsObserver() )
     {
-        Vector origin = EyePosition();			
-
-        IRagdoll* pRagdoll = GetRepresentativeRagdoll();
-
-        if ( pRagdoll )
+        if ( zm_cl_firstperson_deathcam.GetBool() )
         {
-            origin = pRagdoll->GetRagdollOrigin();
-            origin.z += VEC_DEAD_VIEWHEIGHT_SCALED( this ).z; // look over ragdoll, not through
+            DeathCam_Firstperson( eyeOrigin, eyeAngles, zNear, zFar, fov );
+        }
+        else
+        {
+            DeathCam_Thirdperson( eyeOrigin, eyeAngles, zNear, zFar, fov );
         }
 
-        BaseClass::CalcView( eyeOrigin, eyeAngles, zNear, zFar, fov );
-
-        eyeOrigin = origin;
-        
-        Vector vForward; 
-        AngleVectors( eyeAngles, &vForward );
-
-        VectorNormalize( vForward );
-        VectorMA( origin, -CHASE_CAM_DISTANCE_MAX, vForward, eyeOrigin );
-
-        Vector WALL_MIN( -WALL_OFFSET, -WALL_OFFSET, -WALL_OFFSET );
-        Vector WALL_MAX( WALL_OFFSET, WALL_OFFSET, WALL_OFFSET );
-
-        trace_t trace; // clip against world
-        C_BaseEntity::PushEnableAbsRecomputations( false ); // HACK don't recompute positions while doing RayTrace
-        UTIL_TraceHull( origin, eyeOrigin, WALL_MIN, WALL_MAX, MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &trace );
-        C_BaseEntity::PopEnableAbsRecomputations();
-
-        if ( trace.fraction < 1.0f )
-        {
-            eyeOrigin = trace.endpos;
-        }
-        
         return;
     }
 
     BaseClass::CalcView( eyeOrigin, eyeAngles, zNear, zFar, fov );
+}
+
+void C_ZMPlayer::DeathCam_Firstperson( Vector& eyeOrigin, QAngle& eyeAngles, float& zNear, float& zFar, float& fov )
+{
+    C_ZMRagdoll* pRagdoll = m_hRagdoll.Get();
+
+    if ( !pRagdoll || m_iAttachmentEyes == -1 )
+        DeathCam_Thirdperson( eyeOrigin, eyeAngles, zNear, zFar, fov );
+
+
+    pRagdoll->GetAttachment( m_iAttachmentEyes, eyeOrigin, eyeAngles );
+}
+
+void C_ZMPlayer::DeathCam_Thirdperson( Vector& eyeOrigin, QAngle& eyeAngles, float& zNear, float& zFar, float& fov )
+{
+    Vector origin = EyePosition();			
+
+    IRagdoll* pRagdoll = GetRepresentativeRagdoll();
+
+    if ( pRagdoll )
+    {
+        origin = pRagdoll->GetRagdollOrigin();
+        origin.z += VEC_DEAD_VIEWHEIGHT_SCALED( this ).z; // look over ragdoll, not through
+    }
+
+    BaseClass::CalcView( eyeOrigin, eyeAngles, zNear, zFar, fov );
+
+    eyeOrigin = origin;
+        
+    Vector vForward; 
+    AngleVectors( eyeAngles, &vForward );
+
+    VectorNormalize( vForward );
+    VectorMA( origin, -CHASE_CAM_DISTANCE_MAX, vForward, eyeOrigin );
+
+    Vector WALL_MIN( -WALL_OFFSET, -WALL_OFFSET, -WALL_OFFSET );
+    Vector WALL_MAX( WALL_OFFSET, WALL_OFFSET, WALL_OFFSET );
+
+    trace_t trace; // clip against world
+    C_BaseEntity::PushEnableAbsRecomputations( false ); // HACK don't recompute positions while doing RayTrace
+    UTIL_TraceHull( origin, eyeOrigin, WALL_MIN, WALL_MAX, MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &trace );
+    C_BaseEntity::PopEnableAbsRecomputations();
+
+    if ( trace.fraction < 1.0f )
+    {
+        eyeOrigin = trace.endpos;
+    }
 }
 
 IRagdoll* C_ZMPlayer::GetRepresentativeRagdoll() const
@@ -632,6 +658,10 @@ void C_ZMPlayer::Initialize()
     {
         SetPoseParameter( hdr, i, 0.0 );
     }
+
+
+    // This is used for deathcam. Should be safe since we're using the same model as the ragdoll.
+    m_iAttachmentEyes = LookupAttachment( "eyes" );
 }
 
 bool C_ZMPlayer::ShouldInterpolate()
