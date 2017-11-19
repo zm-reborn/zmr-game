@@ -710,7 +710,17 @@ void RagdollSolveSeparation( ragdoll_t &ragdoll, CBaseEntity *pEntity )
 // xbox defaults to 4 ragdolls max
 ConVar g_ragdoll_maxcount("g_ragdoll_maxcount", "4", FCVAR_REPLICATED );
 #else
+#ifdef ZMR // ZMRCHANGE: No reason to replicate this since there's no way ragdoll removal can be synchronized.
+
+#ifdef CLIENT_DLL
+ConVar g_ragdoll_maxcount( "zm_cl_ragdollmaxcount", "8", FCVAR_ARCHIVE );
+#else
+ConVar g_ragdoll_maxcount( "g_ragdoll_maxcount", "8" );
+#endif // CLIENT_DLL
+
+#else // ZMR
 ConVar g_ragdoll_maxcount("g_ragdoll_maxcount", "8", FCVAR_REPLICATED );
+#endif // ZMR
 #endif
 ConVar g_debug_ragdoll_removal("g_debug_ragdoll_removal", "0", FCVAR_REPLICATED |FCVAR_CHEAT );
 
@@ -742,6 +752,30 @@ bool ShouldRemoveThisRagdoll( CBaseAnimating *pRagdoll )
 		return false;
 	*/
 
+    // ZMRCHANGE: Old check was broken.
+    // IsBoxInViewCluster, CullBox & IsBoxVisible didn't seem to do the job.
+#ifdef ZMR
+    Vector origin;
+
+    if ( pRagdoll->m_pRagdoll )
+    {
+	    origin = pRagdoll->m_pRagdoll->GetRagdollOrigin();
+    }
+    else
+    {
+        origin = pRagdoll->GetAbsOrigin();
+    }
+    
+
+    // SUPER HACK...
+    Vector vDir = origin - MainViewOrigin();
+    VectorNormalize( vDir );
+
+    if ( DotProduct( MainViewForward(), vDir ) < 0.4f )
+    {
+        return true;
+    }
+#else // ZMR
 	// Bail if we have a null ragdoll pointer.
 	if ( !pRagdoll->m_pRagdoll )
 		return true;
@@ -750,6 +784,7 @@ bool ShouldRemoveThisRagdoll( CBaseAnimating *pRagdoll )
 
 	Vector origin = pRagdoll->m_pRagdoll->GetRagdollOrigin();
 	pRagdoll->m_pRagdoll->GetRagdollBounds( vMins, vMaxs );
+
 
 	if( engine->IsBoxInViewCluster( vMins + origin, vMaxs + origin) == false )
 	{
@@ -771,8 +806,9 @@ bool ShouldRemoveThisRagdoll( CBaseAnimating *pRagdoll )
 
 		return true;
 	}
-
+#endif // ZMR
 #else
+#ifndef ZMR // ZMRCHANGE: This doesn't seem to work in mp.
 	CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
 
 	if( !UTIL_FindClientInPVS( pRagdoll->edict() ) )
@@ -789,7 +825,7 @@ bool ShouldRemoveThisRagdoll( CBaseAnimating *pRagdoll )
 		
 		return true;
 	}
-
+#endif // ZMR
 #endif
 
 	return false;
@@ -941,6 +977,99 @@ void CRagdollLRURetirement::Update( float frametime ) // EPISODIC VERSION
 
 #else
 
+#ifdef ZMR // ZMRCHANGE: Use our own version.
+void CRagdollLRURetirement::Update( float frametime )
+{
+	VPROF( "CRagdollLRURetirement::Update" );
+
+	int i, next;
+
+
+	int iMaxRagdollCount = m_iMaxRagdolls;
+
+	if ( iMaxRagdollCount == -1 )
+	{
+		iMaxRagdollCount = g_ragdoll_maxcount.GetInt();
+	}
+
+	// fade them all for the low violence version
+	if ( g_RagdollLVManager.IsLowViolence() )
+	{
+		iMaxRagdollCount = 0;
+	}
+    else if ( iMaxRagdollCount < 0 ) // No limit.
+    {
+        iMaxRagdollCount = 256;
+    }
+
+	m_iRagdollCount = 0;
+	m_iSimulatedRagdollCount = 0;
+
+	for ( i = m_LRU.Head(); i != m_LRU.InvalidIndex(); i = next )
+	{
+		next = m_LRU.Next( i );
+
+		CBaseAnimating* pRagdoll = m_LRU[i].Get();
+
+		if ( pRagdoll )
+		{
+			m_iRagdollCount++;
+
+			IPhysicsObject* pObject = pRagdoll->VPhysicsGetObject();
+			if ( pObject && !pObject->IsAsleep() )
+			{
+				m_iSimulatedRagdollCount++;
+			}
+
+			if ( m_LRU.Count() > iMaxRagdollCount )
+			{
+				// Found one, we're done.
+				if ( ShouldRemoveThisRagdoll( pRagdoll ) )
+				{
+#ifdef CLIENT_DLL
+					pRagdoll->SUB_Remove();
+#else
+					pRagdoll->SUB_StartFadeOut( 0 );
+#endif
+
+					m_LRU.Remove( i );
+				}
+			}
+		}
+		else 
+		{
+			m_LRU.Remove( i );
+		}
+	}
+
+
+    // Force remove until we're good.
+	for ( i = m_LRU.Head(); i != m_LRU.InvalidIndex(); i = next )
+	{
+        if ( m_LRU.Count() <= iMaxRagdollCount )
+            return;
+
+
+		next = m_LRU.Next( i );
+
+		CBaseAnimating* pRagdoll = m_LRU[i].Get();
+
+        if ( !pRagdoll ) // I shouldn't be possible
+            continue;
+
+		
+		//if ( pRagdoll->GetEffectEntity() )
+		//	continue;
+
+#ifdef CLIENT_DLL
+		pRagdoll->SUB_Remove();
+#else
+		pRagdoll->SUB_StartFadeOut( 0 );
+#endif
+		m_LRU.Remove( i );
+	}
+}
+#else // ZMR
 void CRagdollLRURetirement::Update( float frametime ) // Non-episodic version
 {
 	VPROF( "CRagdollLRURetirement::Update" );
@@ -1023,6 +1152,7 @@ void CRagdollLRURetirement::Update( float frametime ) // Non-episodic version
 		m_LRU.Remove(i);
 	}
 }
+#endif // ZMR
 
 #endif // HL2_EPISODIC
 
