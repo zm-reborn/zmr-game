@@ -146,8 +146,11 @@ int C_ZMBaseZombie::DrawModelAndEffects( int flags )
     // ZMRTODO: Remove hardcoded height.
     const Vector down( 0.0f, 0.0f, -1.0f );
 
+    Vector mins, maxs;
+    GetRenderBounds( mins, maxs );
+
     Vector pos = GetAbsOrigin();
-    pos += 90.0f * delta;
+    pos += maxs.z * delta;
 
     const Vector4D plane( down.x, down.y, down.z, down.Dot( pos ) );
     pRenderContext->EnableClipping( true );
