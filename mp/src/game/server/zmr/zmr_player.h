@@ -26,6 +26,7 @@ extern ConVar zm_sv_antiafk;
 
 class CZMBaseZombie;
 class CZMBaseWeapon;
+class CZMRagdoll;
 
 enum ZMPlayerState_t
 {
@@ -206,7 +207,7 @@ private:
 
     CNetworkQAngle( m_angEyeAngles );
     CNetworkVar( int, m_iSpawnInterpCounter );
-    CNetworkHandle( CBaseEntity, m_hRagdoll );
+    CNetworkHandle( CZMRagdoll, m_hRagdoll );
 
     int                 m_iLastWeaponFireUsercmd;
     Vector              m_vecTotalBulletForce; // Accumulator for bullet force in a single frame
