@@ -143,7 +143,6 @@ int C_ZMBaseZombie::DrawModelAndEffects( int flags )
     CMatRenderContextPtr pRenderContext( materials );
     
     // Pop into existence.
-    // ZMRTODO: Remove hardcoded height.
     const Vector down( 0.0f, 0.0f, -1.0f );
 
     Vector mins, maxs;
