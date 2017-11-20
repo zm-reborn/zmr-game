@@ -280,16 +280,11 @@ void C_ZMPlayer::TeamChange( int iNewTeam )
 
 
     // Turn off nightvision.
-    ZMVision::TurnOff();
+    //ZMVision::TurnOff();
 }
 
-void C_ZMPlayer::AddEntity()
+void C_ZMPlayer::Simulate()
 {
-    BaseClass::AddEntity();
-
-    // Zero out model pitch, blending takes care of all of it.
-    SetLocalAnglesDim( X_INDEX, 0 );
-
     if ( this != C_BasePlayer::GetLocalPlayer() )
     {
         if ( IsEffectActive( EF_DIMLIGHT ) )

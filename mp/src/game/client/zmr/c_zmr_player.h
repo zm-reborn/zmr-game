@@ -32,7 +32,7 @@ public:
     virtual void TeamChange( int ) OVERRIDE;
     virtual bool CreateMove( float delta, CUserCmd* cmd ) OVERRIDE;
 
-    virtual void            AddEntity() OVERRIDE;
+    virtual void            Simulate() OVERRIDE;
     virtual ShadowType_t    ShadowCastType() OVERRIDE;
     virtual bool            ShouldReceiveProjectedTextures( int flags ) OVERRIDE;
     virtual bool            ShouldDraw() OVERRIDE;
