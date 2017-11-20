@@ -27,7 +27,8 @@ public:
 
     virtual void Spawn( void ) OVERRIDE;
 
-    virtual int DrawModel( int ) OVERRIDE;
+    virtual int DrawModel( int flags ) OVERRIDE;
+    int         DrawModelAndEffects( int flags );
     
     //virtual void TraceAttack( const CTakeDamageInfo&, const Vector&, trace_t*,CDmgAccumulator* ) OVERRIDE;
     
