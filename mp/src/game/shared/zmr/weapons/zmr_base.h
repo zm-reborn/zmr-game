@@ -47,9 +47,13 @@ public:
     virtual bool IsPredicted() const OVERRIDE { return true; };
 
 #ifdef CLIENT_DLL
-    virtual void ClientThink() OVERRIDE;
-    virtual void GetGlowEffectColor( float& r, float& g, float& b ) OVERRIDE;
-    void UpdateGlow();
+    virtual void    ClientThink() OVERRIDE;
+    virtual void    GetGlowEffectColor( float& r, float& g, float& b ) OVERRIDE;
+    void            UpdateGlow();
+
+    virtual bool    GlowOccluded() OVERRIDE { return false; };
+    virtual bool    GlowUnoccluded() OVERRIDE { return true; };
+
 
     virtual void OnDataChanged( DataUpdateType_t ) OVERRIDE;
     virtual bool ShouldPredict() OVERRIDE;
