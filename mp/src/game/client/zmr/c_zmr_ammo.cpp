@@ -28,6 +28,9 @@ public:
 
     void            UpdateGlow();
     virtual void    GetGlowEffectColor( float& r, float& g, float& b ) OVERRIDE;
+    
+    virtual bool    GlowOccluded() OVERRIDE { return false; };
+    virtual bool    GlowUnoccluded() OVERRIDE { return true; };
 
 protected:
     CNetworkVar( int, m_iAmmoType );
