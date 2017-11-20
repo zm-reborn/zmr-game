@@ -133,8 +133,9 @@ void CZMPlayerAnimState::Update( float eyeYaw, float eyePitch )
 
     // We're not updating if we don't need to.
 #ifdef CLIENT_DLL
-    if ( pZMPlayer->IsLocalPlayer() && !C_BasePlayer::ShouldDrawLocalPlayer() )
-        return;
+    // This will screw up localplayer's ragdoll.
+    //if ( pZMPlayer->IsLocalPlayer() && !C_BasePlayer::ShouldDrawLocalPlayer() )
+    //    return;
 #endif
 
     // Check to see if we should be updating the animation state - dead, ragdolled?
