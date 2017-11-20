@@ -18,6 +18,7 @@
 #include "c_zmr_player_ragdoll.h"
 
 #include "c_zmr_player.h"
+#include "c_zmr_zmvision.h"
 
 
 // ZMRTODO: Replace these
@@ -276,6 +277,10 @@ void C_ZMPlayer::TeamChange( int iNewTeam )
     {
         engine->ClientCmd( "exec survivor.cfg" );
     }
+
+
+    // Turn off nightvision.
+    ZMVision::TurnOff();
 }
 
 void C_ZMPlayer::AddEntity()
@@ -289,21 +294,19 @@ void C_ZMPlayer::AddEntity()
     {
         if ( IsEffectActive( EF_DIMLIGHT ) )
         {
-            int iAttachment = LookupAttachment( "anim_attachment_RH" );
-
-            if ( iAttachment < 0 )
+            if ( m_iAttachmentRH == -1 )
                 return;
 
             Vector vecOrigin;
-            QAngle eyeAngles = m_angEyeAngles;
+            QAngle eyeAngles;
     
-            GetAttachment( iAttachment, vecOrigin, eyeAngles );
+            GetAttachment( m_iAttachmentRH, vecOrigin, eyeAngles );
 
             Vector vForward;
-            AngleVectors( eyeAngles, &vForward );
+            AngleVectors( m_angEyeAngles, &vForward );
                 
             trace_t tr;
-            UTIL_TraceLine( vecOrigin, vecOrigin + (vForward * 200), MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
+            UTIL_TraceLine( vecOrigin, vecOrigin + (vForward * 200), MASK_SOLID, this, COLLISION_GROUP_NONE, &tr );
 
             if ( !m_pFlashlightBeam )
             {
@@ -662,6 +665,7 @@ void C_ZMPlayer::Initialize()
 
     // This is used for deathcam. Should be safe since we're using the same model as the ragdoll.
     m_iAttachmentEyes = LookupAttachment( "eyes" );
+    m_iAttachmentRH = LookupAttachment( "anim_attachment_RH" );
 }
 
 bool C_ZMPlayer::ShouldInterpolate()
