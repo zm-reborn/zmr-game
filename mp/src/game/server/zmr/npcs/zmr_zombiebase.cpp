@@ -197,8 +197,7 @@ void CZMBaseZombie::SetModel( const char* model )
     BaseClass::SetModel( model );
 
 
-    SetHullType( HULL_HUMAN );
-
+    SetHullType( GetZombieHull() );
 
     SetHullSizeNormal( true );
     SetDefaultEyeOffset();

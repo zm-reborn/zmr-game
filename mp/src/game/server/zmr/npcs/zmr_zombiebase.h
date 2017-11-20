@@ -123,8 +123,9 @@ public:
     virtual int OnTakeDamage_Alive( const CTakeDamageInfo& ) OVERRIDE;
     virtual void HandleAnimEvent( animevent_t* ) OVERRIDE;
     
-    virtual void SetModel( const char* ) OVERRIDE;
-    virtual void SetZombieModel( void ) = 0;
+    virtual void    SetModel( const char* ) OVERRIDE;
+    virtual void    SetZombieModel( void ) = 0;
+    virtual Hull_t  GetZombieHull() { return HULL_HUMAN; };
 
     virtual bool ShouldGib( const CTakeDamageInfo& ) OVERRIDE;
     virtual bool CorpseGib( const CTakeDamageInfo &info ) OVERRIDE;
