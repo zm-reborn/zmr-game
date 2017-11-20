@@ -197,6 +197,10 @@ void CZMBaseZombie::SetModel( const char* model )
     BaseClass::SetModel( model );
 
 
+    // Set random skin in case we have one.
+    m_nSkin = random->RandomInt( 0, GetModelPtr()->numskinfamilies() - 1 );
+
+
     SetHullType( GetZombieHull() );
 
     SetHullSizeNormal( true );
