@@ -109,6 +109,7 @@ private:
 
     CZMPlayerAnimState* m_pPlayerAnimState;
     int m_iAttachmentEyes;
+    int m_iAttachmentRH;
 
     void UpdateIDTarget();
 
