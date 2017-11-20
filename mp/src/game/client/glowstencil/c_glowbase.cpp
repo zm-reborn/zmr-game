@@ -37,7 +37,7 @@ void C_BaseGlowEntity::UpdateGlowEffect()
         float r, g, b;
         GetGlowEffectColor( r, g, b );
 
-        m_pGlowEffect = new CGlowObject( this, Vector( r, g, b ), 1.0f, true );
+        m_pGlowEffect = new CGlowObject( this, Vector( r, g, b ), 1.0f, GlowOccluded(), GlowUnoccluded() );
     }
 }
 

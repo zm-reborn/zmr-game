@@ -20,6 +20,9 @@ public:
     void            SetClientSideGlowEnabled( bool bEnabled ) { m_bClientSideGlowEnabled = bEnabled; UpdateGlowEffect(); };
     inline bool     IsClientSideGlowEnabled() { return m_bClientSideGlowEnabled; };
 
+    virtual bool    GlowOccluded() { return true; };
+    virtual bool    GlowUnoccluded() { return true; };
+
 protected:
     virtual void    UpdateGlowEffect();
     virtual void    DestroyGlowEffect();
