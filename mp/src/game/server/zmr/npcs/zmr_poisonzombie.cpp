@@ -146,6 +146,9 @@ public:
         SetZombieClass( ZMCLASS_HULK );
         CZMRules::IncPopCount( GetZombieClass() );
     }
+
+    virtual Hull_t GetZombieHull() OVERRIDE { return HULL_MEDIUM_TALL; };
+
 	//
 	// CBaseZombie implemenation.
 	//
