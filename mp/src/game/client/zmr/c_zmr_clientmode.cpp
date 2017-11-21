@@ -13,11 +13,6 @@
 
 using namespace vgui;
 
-
-HScheme g_hVGuiCombineScheme = 0;
-
-
-
 class ClientModeZMNormal : public ClientModeShared
 {
 public:
@@ -106,12 +101,4 @@ ClientModeZMNormal::~ClientModeZMNormal()
 void ClientModeZMNormal::Init()
 {
     BaseClass::Init();
-
-    // Load up the combine control panel scheme
-    g_hVGuiCombineScheme = scheme()->LoadSchemeFromFileEx( enginevgui->GetPanel( PANEL_CLIENTDLL ), "resource/CombinePanelScheme.res", "CombineScheme" );
-    
-    if ( !g_hVGuiCombineScheme )
-    {
-        Warning( "Couldn't load combine panel scheme!\n" );
-    }
 }
