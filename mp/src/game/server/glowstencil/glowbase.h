@@ -27,4 +27,5 @@ public:
 protected:
     CNetworkVar( bool, m_bGlowEnabled );
     CNetworkColor32( m_GlowColor );
+    CNetworkVar( int, m_fGlowType );
 };

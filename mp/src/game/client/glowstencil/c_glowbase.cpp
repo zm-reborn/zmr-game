@@ -3,6 +3,7 @@
 
 
 #include "c_glowbase.h"
+#include "zmr/zmr_shareddefs.h"
 
 
 
@@ -54,6 +55,7 @@ void C_BaseGlowEntity::DestroyGlowEffect()
 IMPLEMENT_CLIENTCLASS_DT( C_BaseGlowProp, DT_BaseGlowProp, CBaseGlowProp )
     RecvPropBool( RECVINFO( m_bGlowEnabled ) ),
     RecvPropInt( RECVINFO( m_GlowColor ) ),
+    RecvPropInt( RECVINFO( m_fGlowType ) ),
 END_RECV_TABLE()
 
 void C_BaseGlowProp::OnPreDataChanged( DataUpdateType_t updateType )
@@ -62,6 +64,7 @@ void C_BaseGlowProp::OnPreDataChanged( DataUpdateType_t updateType )
 
     m_bOldGlowEnabled = m_bGlowEnabled;
     m_GlowOldColor = m_GlowColor.Get();
+    m_fOldGlowType = m_fGlowType;
 }
 
 void C_BaseGlowProp::OnDataChanged( DataUpdateType_t updateType )
@@ -69,7 +72,7 @@ void C_BaseGlowProp::OnDataChanged( DataUpdateType_t updateType )
     C_BaseAnimating::OnDataChanged( updateType );
 
 
-    if ( m_bOldGlowEnabled != m_bGlowEnabled || m_GlowOldColor != m_GlowColor )
+    if ( m_bOldGlowEnabled != m_bGlowEnabled || m_GlowOldColor != m_GlowColor || m_fOldGlowType != m_fGlowType )
     {
         UpdateGlowEffect();
     }
@@ -85,4 +88,14 @@ void C_BaseGlowProp::GetGlowEffectColor( float& r, float& g, float& b )
     r = m_GlowColor.GetR() / 255.0f;
     g = m_GlowColor.GetG() / 255.0f;
     b = m_GlowColor.GetB() / 255.0f;
+}
+
+bool C_BaseGlowProp::GlowOccluded()
+{
+    return (m_fGlowType & GLOWFLAG_OCCLUDED) != 0;
+}
+
+bool C_BaseGlowProp::GlowUnoccluded()
+{
+    return (m_fGlowType & GLOWFLAG_UNOCCLUDED) != 0;
 }
