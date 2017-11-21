@@ -5,7 +5,8 @@
 #include "glow_outline_effect.h"
 
 
-abstract_class C_BaseGlowEntity : public C_BaseAnimating // Client-only version.
+// Client-only version.
+abstract_class C_BaseGlowEntity : public C_BaseAnimating
 {
 public:
     DECLARE_CLASS( C_BaseGlowEntity, C_BaseAnimating )
@@ -45,10 +46,15 @@ public:
     virtual bool    ShouldCreateGlow() OVERRIDE;
     virtual void    GetGlowEffectColor( float& r, float& g, float& b ) OVERRIDE;
 
+    virtual bool    GlowOccluded() OVERRIDE;
+    virtual bool    GlowUnoccluded() OVERRIDE;
+
 protected:
     CNetworkVar( bool, m_bGlowEnabled );
     CNetworkColor32( m_GlowColor );
+    CNetworkVar( int, m_fGlowType );
 
     bool            m_bOldGlowEnabled;
     color32         m_GlowOldColor;
+    int             m_fOldGlowType;
 };

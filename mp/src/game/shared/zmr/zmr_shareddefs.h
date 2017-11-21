@@ -151,4 +151,9 @@ enum ZMChatNotifyType_t
 // How far items will glow if players can pick them up.
 #define ITEM_GLOW_DIST_SQR          ( 162.0f * 162.0f )
 
+#define GLOWFLAG_OCCLUDED           ( 1 << 0 )
+#define GLOWFLAG_UNOCCLUDED         ( 1 << 1 )
+#define GLOWFLAG_ALWAYS             ( GLOWFLAG_OCCLUDED | GLOWFLAG_UNOCCLUDED )
+
+
 #define ZM_WALK_SPEED               190.0f
