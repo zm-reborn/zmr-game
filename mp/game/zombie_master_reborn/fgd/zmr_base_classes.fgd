@@ -14,6 +14,13 @@
 	
 	glowcolor(color255) : "Glow Color" : "255 255 255"
 	
+	glowtype(choices) : "Glow Visibility" : 0 =
+	[
+		0 : "Always"
+		1 : "Occluded"
+		2 : "Unoccluded"
+	]
+	
 	
 	input EnableGlow(void) : "Turn on glow effect."
 	input DisableGlow(void) : "Turn off glow effect."
