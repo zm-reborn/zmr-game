@@ -2,7 +2,7 @@ versioninfo
 {
 	"editorversion" "400"
 	"editorbuild" "7538"
-	"mapversion" "93"
+	"mapversion" "95"
 	"formatversion" "100"
 	"prefab" "0"
 }
@@ -20,7 +20,7 @@ viewsettings
 world
 {
 	"id" "1"
-	"mapversion" "93"
+	"mapversion" "95"
 	"classname" "worldspawn"
 	"detailmaterial" "detail/detailsprites"
 	"detailvbsp" "detail.vbsp"
@@ -7403,6 +7403,7 @@ entity
 	"fadescale" "1"
 	"glowcolor" "255 0 0"
 	"glowenable" "0"
+	"glowtype" "2"
 	"MaxAnimTime" "10"
 	"MinAnimTime" "5"
 	"model" "models/props_pipes/concrete_pipe001a.mdl"
@@ -7434,6 +7435,7 @@ entity
 	"forcetoenablemotion" "0"
 	"glowcolor" "255 0 255"
 	"glowenable" "0"
+	"glowtype" "0"
 	"inertiaScale" "1.0"
 	"massScale" "0"
 	"minhealthdmg" "0"
