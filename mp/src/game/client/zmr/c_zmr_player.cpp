@@ -293,7 +293,7 @@ void C_ZMPlayer::TeamChange( int iNewTeam )
 
 
     // Turn off nightvision.
-    //ZMVision::TurnOff();
+    g_ZMVision.TurnOff();
 }
 
 void C_ZMPlayer::Simulate()
