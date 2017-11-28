@@ -39,7 +39,7 @@ public:
     DECLARE_DATADESC()
 
 
-    void Spawn( void ) OVERRIDE;
+    void Spawn() OVERRIDE;
 
 
     void UpdateUsable();
@@ -75,8 +75,8 @@ public:
     CZMEntZombieSpawn();
 
 
-    void Spawn( void ) OVERRIDE;
-    void Precache( void ) OVERRIDE;
+    void Spawn() OVERRIDE;
+    void Precache() OVERRIDE;
 
     void InputToggle( inputdata_t &inputdata );
     void InputHide( inputdata_t &inputdata );
@@ -129,8 +129,8 @@ public:
 	DECLARE_CLASS( CZMEntSpawnNode, CZMEntBaseSimple )
     DECLARE_DATADESC()
 
-    void Spawn( void ) OVERRIDE;
-    void Precache( void ) OVERRIDE;
+    void Spawn() OVERRIDE;
+    void Precache() OVERRIDE;
 
     string_t m_sNextNodeName;
 };
@@ -145,8 +145,8 @@ public:
 	DECLARE_CLASS( CZMEntRallyPoint, CZMEntBaseSimple )
     DECLARE_DATADESC()
 
-    void Spawn( void ) OVERRIDE;
-    void Precache( void ) OVERRIDE;
+    void Spawn() OVERRIDE;
+    void Precache() OVERRIDE;
 };
 
 
@@ -164,11 +164,11 @@ public:
     ~CZMEntManipulateTrigger();
 
 
-    void Spawn( void ) OVERRIDE;
-    void Precache( void ) OVERRIDE;
+    void Spawn() OVERRIDE;
+    void Precache() OVERRIDE;
 
 
-    void ScanThink( void );
+    void ScanThink();
 };
 
 
@@ -186,8 +186,8 @@ public:
     ~CZMEntAmbushTrigger();
 
 
-    void Spawn( void ) OVERRIDE;
-    void Precache( void ) OVERRIDE;
+    void Spawn() OVERRIDE;
+    void Precache() OVERRIDE;
 
 
     void SetAmbushZombies( int count );
@@ -195,7 +195,7 @@ public:
 
     void Trigger( CBaseEntity* pActivator );
 
-    void ScanThink( void );
+    void ScanThink();
 
 private:
     int m_nAmbushZombies;
@@ -218,8 +218,8 @@ public:
     ~CZMEntManipulate();
 
 
-    void Spawn( void ) OVERRIDE;
-    void Precache( void ) OVERRIDE;
+    void Spawn() OVERRIDE;
+    void Precache() OVERRIDE;
 
     void InputToggle( inputdata_t &inputdata );
     void InputHide( inputdata_t &inputdata );
@@ -297,7 +297,7 @@ public:
     ~CZMEntLoadout();
 
 
-    void Spawn( void ) OVERRIDE;
+    void Spawn() OVERRIDE;
 
 
 
@@ -332,7 +332,7 @@ public:
     CZMEntTriggerBlockHidden();
     ~CZMEntTriggerBlockHidden();
 
-    void Spawn( void ) OVERRIDE;
+    void Spawn() OVERRIDE;
 
 
     inline bool IsActive() { return m_bActive; };
@@ -359,7 +359,7 @@ public:
     CZMEntTriggerBlockPhysExp();
     ~CZMEntTriggerBlockPhysExp();
 
-    void Spawn( void ) OVERRIDE;
+    void Spawn() OVERRIDE;
 
 
     inline bool IsActive() { return m_bActive; };
@@ -386,8 +386,8 @@ public:
     CZMPhysExplosion();
     ~CZMPhysExplosion();
 
-    void Spawn( void ) OVERRIDE;
-    void Precache( void ) OVERRIDE;
+    void Spawn() OVERRIDE;
+    void Precache() OVERRIDE;
     
     void DelayedExplode( float );
 

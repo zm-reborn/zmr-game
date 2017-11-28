@@ -37,14 +37,12 @@ public:
     virtual void Spawn() OVERRIDE;
 #endif
     virtual bool Reload() OVERRIDE;
-    const CZMWeaponInfo& GetWpnData() const;
     // NOTE: Always use this to get the damage from .txt file.
     virtual void FireBullets( const FireBulletsInfo_t &info ) OVERRIDE;
     virtual void PrimaryAttack() OVERRIDE;
     virtual void SecondaryAttack() OVERRIDE;
     
-
-    virtual bool IsPredicted() const OVERRIDE { return true; };
+    const CZMWeaponInfo& GetWpnData() const;
 
 #ifdef CLIENT_DLL
     virtual void    ClientThink() OVERRIDE;
@@ -58,6 +56,7 @@ public:
     virtual void OnDataChanged( DataUpdateType_t ) OVERRIDE;
     virtual bool ShouldPredict() OVERRIDE;
 #endif
+    virtual bool IsPredicted() const OVERRIDE { return true; };
 
     void WeaponSound( WeaponSound_t, float soundtime = 0.0f ) OVERRIDE;
 
@@ -72,10 +71,8 @@ public:
 #endif
     // Makes our weapons not cry about spawning.
     virtual void FallInit( void );
-
     // Override this so our guns don't disappear.
     virtual void SetPickupTouch( void ) OVERRIDE;
-
     virtual bool CanBeSelected( void ) OVERRIDE;
     // Never let anybody tell you're not beautiful even without any ammo, alright?
     // Let us always select this weapon even when we don't have any ammo for it.
@@ -87,31 +84,32 @@ public:
 
 
     // Viewmodel/misc stuff
-    float CalcViewmodelBob( void ) OVERRIDE;
-    void AddViewmodelBob( CBaseViewModel*, Vector&, QAngle& ) OVERRIDE;
-    Vector GetBulletSpread( WeaponProficiency_t ) OVERRIDE;
-    float GetSpreadBias( WeaponProficiency_t ) OVERRIDE;
-    const WeaponProficiencyInfo_t* GetProficiencyValues() OVERRIDE;
-    static const WeaponProficiencyInfo_t* GetDefaultProficiencyValues();
+    float   CalcViewmodelBob( void ) OVERRIDE;
+    void    AddViewmodelBob( CBaseViewModel*, Vector&, QAngle& ) OVERRIDE;
+    Vector  GetBulletSpread( WeaponProficiency_t ) OVERRIDE;
+    float   GetSpreadBias( WeaponProficiency_t ) OVERRIDE;
+
+    const WeaponProficiencyInfo_t*          GetProficiencyValues() OVERRIDE;
+    static const WeaponProficiencyInfo_t*   GetDefaultProficiencyValues();
     
     // Our stuff
-    CZMPlayer* GetPlayerOwner();
-    virtual bool CanBeDropped() { return true; };
-    virtual bool CanPickupAmmo() { return true; };
-    virtual bool IsInReload() { return CanReload() && m_bInReload; };
-    virtual bool CanAct(); // Can we reload/attack?
+    CZMPlayer*      GetPlayerOwner();
+    virtual bool    CanBeDropped() { return true; };
+    virtual bool    CanPickupAmmo() { return true; };
+    virtual bool    IsInReload() { return CanReload() && m_bInReload; };
+    virtual bool    CanAct(); // Can we reload/attack?
 
 
-    int GetSlotFlag() { return m_iSlotFlag; };
+    inline int GetSlotFlag() { return m_iSlotFlag; };
 #ifndef CLIENT_DLL
-    void FreeWeaponSlot();
+    void                FreeWeaponSlot();
 
 
     virtual const char* GetDropAmmoName() { return nullptr; };
-    virtual int GetDropAmmoAmount() { return 1; };
+    virtual int         GetDropAmmoAmount() { return 1; };
 
-    inline int GetReserveAmmo( ) { return m_nReserveAmmo; };
-    inline void SetReserveAmmo( int ammo ) { m_nReserveAmmo = ammo; };
+    inline int          GetReserveAmmo( ) { return m_nReserveAmmo; };
+    inline void         SetReserveAmmo( int ammo ) { m_nReserveAmmo = ammo; };
 #endif
     
 protected:
