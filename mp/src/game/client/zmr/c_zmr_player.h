@@ -27,6 +27,7 @@ public:
     C_ZMPlayer();
     ~C_ZMPlayer();
 
+    virtual void Spawn() OVERRIDE;
     virtual void ClientThink() OVERRIDE;
     virtual void PreThink() OVERRIDE;
     virtual void TeamChange( int ) OVERRIDE;

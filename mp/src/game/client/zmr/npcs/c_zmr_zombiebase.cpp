@@ -6,7 +6,11 @@
 
 #include "zmr/zmr_player_shared.h"
 #include "zmr/zmr_global_shared.h"
+#include "zmr/c_zmr_zmvision.h"
 #include "c_zmr_zombiebase.h"
+
+
+extern bool g_bRenderPostProcess;
 
 
 static ConVar zm_cl_zombiefadein( "zm_cl_zombiefadein", "0.55", FCVAR_ARCHIVE, "How ", true, 0.0f, true, 2.0f );
@@ -67,6 +71,8 @@ C_ZMBaseZombie::~C_ZMBaseZombie()
 
     delete m_fxHealth;
     delete m_fxInner;
+
+    g_ZMVision.RemoveSilhouette( this );
 }
 
 void C_ZMBaseZombie::Spawn( void )
@@ -76,6 +82,9 @@ void C_ZMBaseZombie::Spawn( void )
     // This allows the client to make us bleed and spawn blood decals.
     // Possibly add option to turn off?
     m_takedamage = DAMAGE_YES;
+
+
+    g_ZMVision.AddSilhouette( this );
 }
 
 int C_ZMBaseZombie::DrawModel( int flags )
@@ -88,36 +97,43 @@ int C_ZMBaseZombie::DrawModel( int flags )
     }
         
 
-    float ratio = m_flHealthRatio > 1.0f ? 1.0f : m_flHealthRatio;
-    if ( ratio < 0.0f ) ratio = 0.0f;
-
-    float g = ratio;
-    float r = 1.0f - g;
-
-    bool bSelected = m_iSelectorIndex > 0 && m_iSelectorIndex == GetLocalPlayerIndex();
-
-    if ( m_fxInner )
+    if ( !g_bRenderPostProcess )
     {
-        m_fxInner->SetColor( r, g, 0 );
-        m_fxInner->SetAlpha( bSelected ? 0.8f : 0.01f ); // Decrease alpha a bit.
-        m_fxInner->SetPos( GetAbsOrigin() + Vector( 0.0f, 0.0f, 3.0f ) );
-        m_fxInner->Draw();
+        float ratio = m_flHealthRatio > 1.0f ? 1.0f : m_flHealthRatio;
+        if ( ratio < 0.0f ) ratio = 0.0f;
+
+        float g = ratio;
+        float r = 1.0f - g;
+
+        bool bSelected = m_iSelectorIndex > 0 && m_iSelectorIndex == GetLocalPlayerIndex();
+
+        if ( m_fxInner )
+        {
+            m_fxInner->SetColor( r, g, 0 );
+            m_fxInner->SetAlpha( bSelected ? 0.8f : 0.01f ); // Decrease alpha a bit.
+            m_fxInner->SetPos( GetAbsOrigin() + Vector( 0.0f, 0.0f, 3.0f ) );
+            m_fxInner->Draw();
+        }
+
+
+        if ( m_fxHealth )
+        {
+            m_fxHealth->SetColor( r, g, 0 );
+            m_fxHealth->SetAlpha( bSelected ? 0.8f : 0.1f );
+            m_fxHealth->SetPos( GetAbsOrigin() + Vector( 0.0f, 0.0f, 3.0f ) );
+            m_fxHealth->Draw();
+        }
     }
 
-
-    if ( m_fxHealth )
-    {
-        m_fxHealth->SetColor( r, g, 0 );
-        m_fxHealth->SetAlpha( bSelected ? 0.8f : 0.1f );
-        m_fxHealth->SetPos( GetAbsOrigin() + Vector( 0.0f, 0.0f, 3.0f ) );
-        m_fxHealth->Draw();
-    }
 
     return DrawModelAndEffects( flags );
 }
 
 int C_ZMBaseZombie::DrawModelAndEffects( int flags )
 {
+    if ( g_bRenderPostProcess )
+        return BaseClass::DrawModel( flags );
+
     if ( !m_bReadyToDraw )
         return BaseClass::DrawModel( flags );
 
