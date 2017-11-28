@@ -298,7 +298,7 @@ void C_ZMPlayer::TeamChange( int iNewTeam )
 
 void C_ZMPlayer::Simulate()
 {
-    if ( this != C_BasePlayer::GetLocalPlayer() )
+    if ( !IsLocalPlayer() )
     {
         if ( IsEffectActive( EF_DIMLIGHT ) )
         {
@@ -373,7 +373,7 @@ void C_ZMPlayer::Simulate()
 
 bool C_ZMPlayer::ShouldDraw()
 {
-    if ( GetTeamNumber() == ZMTEAM_ZM )
+    if ( IsZM() )
         return false;
 
     if ( !IsAlive() )

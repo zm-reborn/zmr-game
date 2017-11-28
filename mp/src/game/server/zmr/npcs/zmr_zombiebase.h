@@ -117,11 +117,11 @@ public:
     ~CZMBaseZombie();
     
 
-    virtual void Spawn() OVERRIDE;
-    virtual void Precache() OVERRIDE;
+    virtual void    Spawn() OVERRIDE;
+    virtual void    Precache() OVERRIDE;
 
-    virtual int OnTakeDamage_Alive( const CTakeDamageInfo& ) OVERRIDE;
-    virtual void HandleAnimEvent( animevent_t* ) OVERRIDE;
+    virtual int     OnTakeDamage_Alive( const CTakeDamageInfo& ) OVERRIDE;
+    virtual void    HandleAnimEvent( animevent_t* ) OVERRIDE;
     
     virtual void    SetModel( const char* ) OVERRIDE;
     virtual void    SetZombieModel( void ) = 0;
@@ -131,55 +131,58 @@ public:
     virtual bool CorpseGib( const CTakeDamageInfo &info ) OVERRIDE;
 
     
-    virtual float MaxYawSpeed( void ) OVERRIDE;
-    virtual bool OverrideMoveFacing( const AILocalMoveGoal_t&, float ) OVERRIDE;
+    virtual float   MaxYawSpeed( void ) OVERRIDE;
+    virtual bool    OverrideMoveFacing( const AILocalMoveGoal_t&, float ) OVERRIDE;
 
     
-    virtual void StartTask( const Task_t* ) OVERRIDE;
-    virtual void RunTask( const Task_t* ) OVERRIDE;
-    virtual void GatherConditions( void ) OVERRIDE;
-    virtual int TranslateSchedule( int ) OVERRIDE;
-    virtual void OnScheduleChange( void ) OVERRIDE;
-    virtual int SelectSchedule( void ) OVERRIDE;
-    virtual int SelectFailSchedule( int, int, AI_TaskFailureCode_t ) OVERRIDE;
-    virtual void PrescheduleThink( void ) OVERRIDE;
-    virtual bool OnInsufficientStopDist( AILocalMoveGoal_t*, float, AIMoveResult_t* ) OVERRIDE;
-    virtual bool OnObstructionPreSteer( AILocalMoveGoal_t* pMoveGoal, float distClear, AIMoveResult_t* pResult ) OVERRIDE;
+    virtual void    StartTask( const Task_t* ) OVERRIDE;
+    virtual void    RunTask( const Task_t* ) OVERRIDE;
+    virtual void    GatherConditions( void ) OVERRIDE;
+    virtual int     TranslateSchedule( int ) OVERRIDE;
+    virtual void    OnScheduleChange( void ) OVERRIDE;
+    virtual int     SelectSchedule( void ) OVERRIDE;
+    virtual int     SelectFailSchedule( int, int, AI_TaskFailureCode_t ) OVERRIDE;
+    virtual void    PrescheduleThink( void ) OVERRIDE;
+
+    virtual bool    OnInsufficientStopDist( AILocalMoveGoal_t*, float, AIMoveResult_t* ) OVERRIDE;
+    virtual bool    OnObstructionPreSteer( AILocalMoveGoal_t* pMoveGoal, float distClear, AIMoveResult_t* pResult ) OVERRIDE;
 
 
-    int GetSwatActivity( void );
+    int             GetSwatActivity();
     // By default don't swat objects.
-    virtual bool CanSwatPhysicsObjects() { return false; };
-    bool FindNearestPhysicsObject( int iMaxMass );
+    virtual bool    CanSwatPhysicsObjects() { return false; };
+    bool            FindNearestPhysicsObject( int iMaxMass );
     
-    virtual float GetReactionDelay( CBaseEntity* pEnemy ) OVERRIDE { return 0.0; };
-    virtual bool IsValidEnemy( CBaseEntity* ) OVERRIDE;
+    virtual float   GetReactionDelay( CBaseEntity* pEnemy ) OVERRIDE { return 0.0; };
+    virtual bool    IsValidEnemy( CBaseEntity* ) OVERRIDE;
     // Always classify as a zombie. The AI relationships depend on it.
-    virtual Class_T Classify( void ) OVERRIDE { return CLASS_ZOMBIE; };
-    Disposition_t IRelationType( CBaseEntity* pTarget ) OVERRIDE { return CAI_BaseNPC::IRelationType( pTarget ); };
+    virtual Class_T Classify() OVERRIDE { return CLASS_ZOMBIE; };
+    Disposition_t   IRelationType( CBaseEntity* pTarget ) OVERRIDE { return CAI_BaseNPC::IRelationType( pTarget ); };
 
-    virtual int RangeAttack1Conditions ( float flDot, float flDist ) OVERRIDE { return 0; };
-    virtual int MeleeAttack1Conditions( float, float ) OVERRIDE;
-    virtual float GetClawAttackRange() const { return ZOMBIE_MELEE_REACH; };
-    virtual bool MustCloseToAttack() { return true; };
-    virtual CBaseEntity* ClawAttack( float flDist, int iDamage, const QAngle& qaViewPunch, const Vector& vecVelocityPunch, int BloodOrigin );
-    void GetAttackHull( Vector& mins, Vector& maxs );
-    virtual const Vector GetAttackPos() const;
+    virtual int             RangeAttack1Conditions ( float flDot, float flDist ) OVERRIDE { return 0; };
+    virtual int             MeleeAttack1Conditions( float, float ) OVERRIDE;
+    virtual float           GetClawAttackRange() const { return ZOMBIE_MELEE_REACH; };
+    virtual bool            MustCloseToAttack() { return true; };
+    virtual CBaseEntity*    ClawAttack( float flDist, int iDamage, const QAngle& qaViewPunch, const Vector& vecVelocityPunch, int BloodOrigin );
+    
 
-    virtual float GetHitgroupDamageMultiplier( int, const CTakeDamageInfo& ) OVERRIDE;
-    virtual void TraceAttack( const CTakeDamageInfo&, const Vector&, trace_t*, CDmgAccumulator* ) OVERRIDE;
+    void                    GetAttackHull( Vector& mins, Vector& maxs );
+    virtual const Vector    GetAttackPos() const;
+
+    virtual float           GetHitgroupDamageMultiplier( int, const CTakeDamageInfo& ) OVERRIDE;
+    virtual void            TraceAttack( const CTakeDamageInfo&, const Vector&, trace_t*, CDmgAccumulator* ) OVERRIDE;
 
 
 
     // Let derived classes set this.
-    bool ShouldPlayIdleSound( void ) { return false; };
+    bool ShouldPlayIdleSound() { return false; };
 
     virtual void PainSound( const CTakeDamageInfo &info ) = 0;
-    virtual void AlertSound( void ) = 0;
-    virtual void IdleSound( void ) = 0;
-    virtual void AttackSound( void ) = 0;
-    virtual void AttackHitSound( void ) = 0;
-    virtual void AttackMissSound( void ) = 0;
+    virtual void AlertSound() = 0;
+    virtual void IdleSound() = 0;
+    virtual void AttackSound() = 0;
+    virtual void AttackHitSound() = 0;
+    virtual void AttackMissSound() = 0;
     virtual void FootstepSound( bool fRightFoot ) = 0;
     virtual void FootscuffSound( bool fRightFoot ) = 0;
 
@@ -193,17 +196,17 @@ public:
         OnTakeDamage( CTakeDamageInfo( this, this, m_iHealth * 2, DMG_GENERIC ) );
     }
 
-    float DistToPhysicsEnt( void );
+    float DistToPhysicsEnt();
 
 
-    virtual void BuildScheduleTestBits( void ) OVERRIDE;
-    virtual void OnStateChange( NPC_STATE oldState, NPC_STATE newState ) OVERRIDE;
-    virtual Activity NPC_TranslateActivity( Activity baseAct ) OVERRIDE;
+    virtual void        BuildScheduleTestBits( void ) OVERRIDE;
+    virtual void        OnStateChange( NPC_STATE oldState, NPC_STATE newState ) OVERRIDE;
+    virtual Activity    NPC_TranslateActivity( Activity baseAct ) OVERRIDE;
 
 
-    virtual	bool AllowedToIgnite( void ) OVERRIDE { return true; };
-    bool ShouldIgnite( const CTakeDamageInfo& info );
-    virtual void Ignite( float, bool = true, float = 0.0f, bool = false ) OVERRIDE;
+    virtual	bool    AllowedToIgnite() OVERRIDE { return true; };
+    bool            ShouldIgnite( const CTakeDamageInfo& info );
+    virtual void    Ignite( float, bool = true, float = 0.0f, bool = false ) OVERRIDE;
 
 
 
@@ -214,42 +217,42 @@ public:
 
     
     // Player commanded means the zombie will ignore new enemies for a short period of time.
-    virtual void Command( const Vector&, bool bPlayerCommanded = true, float tolerance = 0.0f );
-    virtual bool Swat( CBaseEntity*, bool );
-    void SwatObject( IPhysicsObject*, Vector& );
-    virtual bool TargetEnemy( CBaseEntity* );
+    virtual void    Command( const Vector&, bool bPlayerCommanded = true, float tolerance = 0.0f );
+    virtual bool    Swat( CBaseEntity*, bool );
+    void            SwatObject( IPhysicsObject*, Vector& );
+    virtual bool    TargetEnemy( CBaseEntity* );
 
 
     bool CanSpawn( const Vector& );
 
 
     // Implemented in zmr_zombiebase_shared
-    static bool IsValidClass( ZombieClass_t );
-    static ZombieClass_t NameToClass( const char* );
-    static const char* ClassToName( ZombieClass_t );
-    static int GetPopCost( ZombieClass_t );
-    static int GetCost( ZombieClass_t );
-    static bool HasEnoughPopToSpawn( ZombieClass_t );
-    int GetSelectorIndex();
-    CZMPlayer* GetSelector();
-    void SetSelector( CZMPlayer* );
-    void SetSelector( int );
+    static bool             IsValidClass( ZombieClass_t );
+    static ZombieClass_t    NameToClass( const char* );
+    static const char*      ClassToName( ZombieClass_t );
+    static int              GetPopCost( ZombieClass_t );
+    static int              GetCost( ZombieClass_t );
+    static bool             HasEnoughPopToSpawn( ZombieClass_t );
+    int                     GetSelectorIndex();
+    CZMPlayer*              GetSelector();
+    void                    SetSelector( CZMPlayer* );
+    void                    SetSelector( int );
 
 
-    inline bool IsCloseToCommandPos() { return IsCloseToPos( m_vecLastCommandPos ); };
-    bool IsCloseToPos( const Vector& pos );
-    inline bool HasBeenCommanded() { return m_bCommanded; };
-    inline const Vector& GetLastCommandedPos() { return m_vecLastCommandPos; };
-    inline ZombieMode_t GetZombieMode() { return m_iMode; };
-    void SetZombieMode( ZombieMode_t mode );
+    inline bool             IsCloseToCommandPos() { return IsCloseToPos( m_vecLastCommandPos ); };
+    bool                    IsCloseToPos( const Vector& pos );
+    inline bool             HasBeenCommanded() { return m_bCommanded; };
+    inline const Vector&    GetLastCommandedPos() { return m_vecLastCommandPos; };
+    inline ZombieMode_t     GetZombieMode() { return m_iMode; };
+    void                    SetZombieMode( ZombieMode_t mode );
 
     inline void SetAddGoalTolerance( float tolerance ) { m_flAddGoalTolerance = tolerance; };
-    bool ShouldTryScheduleAgain( int failedSched, int failedTask, AI_TaskFailureCode_t );
+    bool        ShouldTryScheduleAgain( int failedSched, int failedTask, AI_TaskFailureCode_t );
 
 
-    CZMEntAmbushTrigger* GetAmbushTrigger() { return m_hAmbushEnt.Get(); };
-    void SetAmbush( CZMEntAmbushTrigger* trigger );
-    void RemoveFromAmbush( bool bRemoveSched, bool bRemoveFromAmbushEnt = true );
+    CZMEntAmbushTrigger*    GetAmbushTrigger() { return m_hAmbushEnt.Get(); };
+    void                    SetAmbush( CZMEntAmbushTrigger* trigger );
+    void                    RemoveFromAmbush( bool bRemoveSched, bool bRemoveFromAmbushEnt = true );
 
 public: // From base zombie...
     static int              ACT_ZOM_SWATLEFTMID;
@@ -280,7 +283,7 @@ protected:
 
 
 protected: // Our stuff...
-    inline int GetReturnSchedule() { return m_iReturnSchedule; };
+    inline int  GetReturnSchedule() { return m_iReturnSchedule; };
     inline void SetReturnSchedule( int retSched ) { m_iReturnSchedule = retSched; };
 
 private:

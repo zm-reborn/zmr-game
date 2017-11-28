@@ -13,7 +13,7 @@
 extern bool g_bRenderPostProcess;
 
 
-static ConVar zm_cl_zombiefadein( "zm_cl_zombiefadein", "0.55", FCVAR_ARCHIVE, "How ", true, 0.0f, true, 2.0f );
+static ConVar zm_cl_zombiefadein( "zm_cl_zombiefadein", "0.55", FCVAR_ARCHIVE, "How fast zombie fades.", true, 0.0f, true, 2.0f );
 
 
 IMPLEMENT_CLIENTCLASS_DT( C_ZMBaseZombie, DT_ZM_BaseZombie, CZMBaseZombie )
@@ -169,7 +169,7 @@ int C_ZMBaseZombie::DrawModelAndEffects( int flags )
 
     const Vector4D plane( down.x, down.y, down.z, down.Dot( pos ) );
     pRenderContext->EnableClipping( true );
-    pRenderContext->PushCustomClipPlane( (float*)&plane );
+    pRenderContext->PushCustomClipPlane( plane.Base() );
     
     // Color it a bit.
     float blend = delta;
@@ -181,7 +181,7 @@ int C_ZMBaseZombie::DrawModelAndEffects( int flags )
         blend = fxblend;
 
     render->SetBlend( blend );
-    render->SetColorModulation( (float*)&clr );
+    render->SetColorModulation( clr.Base() );
 
 
     int ret = BaseClass::DrawModel( flags );
@@ -192,7 +192,7 @@ int C_ZMBaseZombie::DrawModelAndEffects( int flags )
 
     const Vector reset( 1.0f, 1.0f, 1.0f );
     render->SetBlend( 1.0f );
-    render->SetColorModulation( (float*)&reset );
+    render->SetColorModulation( reset.Base() );
 
     return ret;
 }

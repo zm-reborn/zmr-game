@@ -29,7 +29,7 @@ public:
 	DECLARE_CLASS( CZMEntWin, CServerOnlyPointEntity )
     DECLARE_DATADESC()
 
-    void Spawn( void ) OVERRIDE;
+    void Spawn() OVERRIDE;
 
     void InputHumanWin( inputdata_t &inputdata );
     void InputHumanLose( inputdata_t &inputdata );
@@ -42,7 +42,7 @@ END_DATADESC()
 
 LINK_ENTITY_TO_CLASS( func_win, CZMEntWin );
 
-void CZMEntWin::Spawn( void )
+void CZMEntWin::Spawn()
 { 
     SetSolid( SOLID_NONE );
     AddEffects( EF_NODRAW );
@@ -93,7 +93,7 @@ void CZMEntBaseUsable::InputUnhide( inputdata_t &inputdata )
     UpdateUsable();
 }
 
-void CZMEntBaseUsable::Spawn( void )
+void CZMEntBaseUsable::Spawn()
 {
     SetSolid( SOLID_NONE );
     AddSolidFlags( FSOLID_NOT_STANDABLE );
@@ -153,12 +153,12 @@ CZMEntZombieSpawn::CZMEntZombieSpawn()
     m_vSpawnQueue.Purge();
 }
 
-void CZMEntZombieSpawn::Precache( void )
+void CZMEntZombieSpawn::Precache()
 {
     PrecacheModel( "models/zombiespawner.mdl" );
 }
 
-void CZMEntZombieSpawn::Spawn( void )
+void CZMEntZombieSpawn::Spawn()
 {
     BaseClass::Spawn();
 
@@ -587,12 +587,12 @@ END_DATADESC()
 
 LINK_ENTITY_TO_CLASS( info_spawnnode, CZMEntSpawnNode );
 
-void CZMEntSpawnNode::Precache( void )
+void CZMEntSpawnNode::Precache()
 {
     PrecacheModel( "models/spawnnode.mdl" );
 }
 
-void CZMEntSpawnNode::Spawn( void )
+void CZMEntSpawnNode::Spawn()
 {
     Precache();
     SetModel( "models/spawnnode.mdl" );
@@ -609,12 +609,12 @@ END_DATADESC()
 
 LINK_ENTITY_TO_CLASS( info_rallypoint, CZMEntRallyPoint );
 
-void CZMEntRallyPoint::Precache( void )
+void CZMEntRallyPoint::Precache()
 {
     PrecacheModel( "models/rallypoint.mdl" );
 }
 
-void CZMEntRallyPoint::Spawn( void )
+void CZMEntRallyPoint::Spawn()
 { 
     Precache();
     SetModel( "models/rallypoint.mdl" );
@@ -650,12 +650,12 @@ CZMEntManipulateTrigger::~CZMEntManipulateTrigger()
     }
 }
 
-void CZMEntManipulateTrigger::Precache( void )
+void CZMEntManipulateTrigger::Precache()
 {
     PrecacheModel( "models/trap.mdl" );
 }
 
-void CZMEntManipulateTrigger::Spawn( void )
+void CZMEntManipulateTrigger::Spawn()
 { 
     Precache();
     SetModel( "models/trap.mdl" );
@@ -668,7 +668,7 @@ void CZMEntManipulateTrigger::Spawn( void )
 
 ConVar zm_sv_trap_triggerrange( "zm_sv_trap_triggerrange", "100", FCVAR_NOTIFY );
 
-void CZMEntManipulateTrigger::ScanThink( void )
+void CZMEntManipulateTrigger::ScanThink()
 {
     CBaseEntity* pEnt = nullptr;
     while ( (pEnt = gEntList.FindEntityInSphere( pEnt, GetAbsOrigin(), zm_sv_trap_triggerrange.GetFloat() )) != nullptr )
@@ -718,12 +718,12 @@ CZMEntAmbushTrigger::~CZMEntAmbushTrigger()
 
 }
 
-void CZMEntAmbushTrigger::Precache( void )
+void CZMEntAmbushTrigger::Precache()
 {
     PrecacheModel( "models/trap.mdl" );
 }
 
-void CZMEntAmbushTrigger::Spawn( void )
+void CZMEntAmbushTrigger::Spawn()
 { 
     Precache();
     SetModel( "models/trap.mdl" );
@@ -777,7 +777,7 @@ void CZMEntAmbushTrigger::Trigger( CBaseEntity* pActivator )
     }
 }
 
-void CZMEntAmbushTrigger::ScanThink( void )
+void CZMEntAmbushTrigger::ScanThink()
 {
     CBaseEntity* pEnt = nullptr;
     while ( (pEnt = gEntList.FindEntityInSphere( pEnt, GetAbsOrigin(), zm_sv_ambush_triggerrange.GetFloat() )) != nullptr )
@@ -831,14 +831,14 @@ CZMEntManipulate::~CZMEntManipulate()
     RemoveTriggers();
 }
 
-void CZMEntManipulate::Precache( void )
+void CZMEntManipulate::Precache()
 {
     PrecacheModel( "models/manipulatable.mdl" );
 
     UTIL_PrecacheOther( "info_manipulate_trigger" );
 }
 
-void CZMEntManipulate::Spawn( void )
+void CZMEntManipulate::Spawn()
 {
     BaseClass::Spawn();
 
@@ -965,9 +965,9 @@ public:
     DECLARE_DATADESC()
 
 
-    void Spawn( void );
+    void Spawn();
 
-    void CountThink( void );
+    void CountThink();
 
 
     void InputToggle( inputdata_t &inputData );
@@ -1002,7 +1002,7 @@ END_DATADESC()
 LINK_ENTITY_TO_CLASS( trigger_playercount, CZMEntTriggerPlayerCount );
 
 
-void CZMEntTriggerPlayerCount::Spawn( void )
+void CZMEntTriggerPlayerCount::Spawn()
 {
     BaseClass::Spawn();
 
@@ -1046,7 +1046,7 @@ void CZMEntTriggerPlayerCount::UpdateState( bool newstate )
     }
 }
 
-void CZMEntTriggerPlayerCount::CountThink( void )
+void CZMEntTriggerPlayerCount::CountThink()
 {
     if ( !IsActive() ) return;
 
@@ -1108,7 +1108,7 @@ public:
     DECLARE_DATADESC()
 
 
-    void Spawn( void );
+    void Spawn();
 
     void InputCount( inputdata_t &inputData );
     void InputToggle( inputdata_t &inputData );
@@ -1151,7 +1151,7 @@ END_DATADESC()
 LINK_ENTITY_TO_CLASS( trigger_entitycount, CZMEntTriggerEntityCount );
 
 
-void CZMEntTriggerEntityCount::Spawn( void )
+void CZMEntTriggerEntityCount::Spawn()
 {
     BaseClass::Spawn();
 
@@ -1287,7 +1287,7 @@ CZMEntLoadout::~CZMEntLoadout()
     }
 }
 
-void CZMEntLoadout::Spawn( void )
+void CZMEntLoadout::Spawn()
 {
     SetSolid( SOLID_NONE );
     AddEffects( EF_NODRAW );
@@ -1504,7 +1504,7 @@ CZMEntTriggerBlockHidden::~CZMEntTriggerBlockHidden()
     g_pBlockHidden->FindAndRemove( this );
 }
 
-void CZMEntTriggerBlockHidden::Spawn( void )
+void CZMEntTriggerBlockHidden::Spawn()
 {
     BaseClass::Spawn();
 
@@ -1551,7 +1551,7 @@ CZMEntTriggerBlockPhysExp::~CZMEntTriggerBlockPhysExp()
     g_pBlockPhysExp->FindAndRemove( this );
 }
 
-void CZMEntTriggerBlockPhysExp::Spawn( void )
+void CZMEntTriggerBlockPhysExp::Spawn()
 {
     BaseClass::Spawn();
 
@@ -1586,7 +1586,7 @@ public:
     DECLARE_DATADESC()
 
 
-    void Spawn( void );
+    void Spawn();
 
     void InputGiveResources( inputdata_t &inputData );
 };
@@ -1598,7 +1598,7 @@ END_DATADESC()
 LINK_ENTITY_TO_CLASS( func_giveresources, CZMEntGiveResources );
 
 
-void CZMEntGiveResources::Spawn( void )
+void CZMEntGiveResources::Spawn()
 {
     SetSolid( SOLID_NONE );
     AddEffects( EF_NODRAW );
@@ -1621,7 +1621,7 @@ public:
     DECLARE_DATADESC()
 
 
-    void Spawn( void );
+    void Spawn();
 
     void InputAward( inputdata_t &inputData );
 };
@@ -1633,7 +1633,7 @@ END_DATADESC()
 LINK_ENTITY_TO_CLASS( trigger_givepoints, CZMEntTriggerGivePoints );
 
 
-void CZMEntTriggerGivePoints::Spawn( void )
+void CZMEntTriggerGivePoints::Spawn()
 {
     BaseClass::Spawn();
 
@@ -1689,14 +1689,14 @@ CZMPhysExplosion::~CZMPhysExplosion()
     }
 }
 
-void CZMPhysExplosion::Spawn( void )
+void CZMPhysExplosion::Spawn()
 {
     BaseClass::Spawn();
 
     Precache();
 }
 
-void CZMPhysExplosion::Precache( void )
+void CZMPhysExplosion::Precache()
 {
     PrecacheScriptSound( "ZMPower.PhysExplode_Buildup" );
     PrecacheScriptSound( "ZMPower.PhysExplode_Boom" );
@@ -1784,7 +1784,7 @@ public:
     DECLARE_DATADESC()
 
 
-    void Spawn( void ) OVERRIDE;
+    void Spawn() OVERRIDE;
 
 
     void InputApplyScore( inputdata_t& inputData );
@@ -1813,7 +1813,7 @@ END_DATADESC()
 
 LINK_ENTITY_TO_CLASS( game_score_team, CZMEntTeamScore );
 
-void CZMEntTeamScore::Spawn( void )
+void CZMEntTeamScore::Spawn()
 {
 }
 

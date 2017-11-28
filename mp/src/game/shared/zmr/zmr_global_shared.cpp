@@ -9,6 +9,7 @@ CZMGlobalLists::CZMGlobalLists()
 
 #ifndef CLIENT_DLL
     m_BlockHidden.Purge();
+    m_BlockPhysExp.Purge();
 #endif
 }
 
