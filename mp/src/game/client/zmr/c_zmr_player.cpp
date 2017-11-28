@@ -21,6 +21,9 @@
 #include "c_zmr_zmvision.h"
 
 
+extern bool g_bRenderPostProcess;
+
+
 // ZMRTODO: Replace these
 #define MAT_HPCIRCLE        "effects/zm_healthring"
 #define MAT_INNERFLARE      "effects/yellowflare"
@@ -106,6 +109,16 @@ C_ZMPlayer::~C_ZMPlayer()
 
     delete m_fxHealth;
     delete m_fxInner;
+
+    g_ZMVision.RemoveSilhouette( this );
+}
+
+void C_ZMPlayer::Spawn()
+{
+    BaseClass::Spawn();
+
+    if ( !IsLocalPlayer() )
+        g_ZMVision.AddSilhouette( this );
 }
 
 C_ZMPlayer* C_ZMPlayer::GetLocalPlayer()
@@ -390,27 +403,31 @@ int C_ZMPlayer::DrawModel( int flags )
     }
 
 
-    float ratio = (GetHealth() > 0 ? GetHealth() : 1) / 100.0f;
-
-    float g = ratio;
-    float r = 1.0f - g;
-
-
-    if ( m_fxInner )
+    if ( !g_bRenderPostProcess )
     {
-        m_fxInner->SetPos( GetAbsOrigin() + Vector( 0.0f, 0.0f, 3.0f ) );
-        m_fxInner->SetYaw( random->RandomFloat( 0.0f, 360.0f ) );
-        m_fxInner->Draw();
+        float ratio = (GetHealth() > 0 ? GetHealth() : 1) / 100.0f;
+
+        float g = ratio;
+        float r = 1.0f - g;
+
+
+        if ( m_fxInner )
+        {
+            m_fxInner->SetPos( GetAbsOrigin() + Vector( 0.0f, 0.0f, 3.0f ) );
+            m_fxInner->SetYaw( random->RandomFloat( 0.0f, 360.0f ) );
+            m_fxInner->Draw();
+        }
+
+
+        if ( m_fxHealth )
+        {
+            m_fxHealth->SetAlpha( 0.5f );
+            m_fxHealth->SetColor( r, g, 0 );
+            m_fxHealth->SetPos( GetAbsOrigin() + Vector( 0.0f, 0.0f, 3.0f ) );
+            m_fxHealth->Draw();
+        }
     }
 
-
-    if ( m_fxHealth )
-    {
-        m_fxHealth->SetAlpha( 0.5f );
-        m_fxHealth->SetColor( r, g, 0 );
-        m_fxHealth->SetPos( GetAbsOrigin() + Vector( 0.0f, 0.0f, 3.0f ) );
-        m_fxHealth->Draw();
-    }
 
     return BaseClass::DrawModel( flags );
 }

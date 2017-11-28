@@ -286,6 +286,8 @@ $Project "Client (ZMR)"
 			$File	"zmr\c_zmr_playeranimevent.h"
 			$File	"zmr\c_zmr_util.cpp"
 			$File	"zmr\c_zmr_util.h"
+			$File	"zmr\c_zmr_zmvision.cpp"
+			$File	"zmr\c_zmr_zmvision.h"
 			
 			// Shared
 			$File	"$SRCDIR\game\shared\zmr\zmr_ammodef.cpp"

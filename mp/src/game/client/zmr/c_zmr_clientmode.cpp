@@ -3,12 +3,17 @@
 #include "ienginevgui.h"
 #include "glow_outline_effect.h"
 
-#include "zmr/ui/zmr_spectator_ui.h"
-#include "zmr/ui/zmr_textwindow.h"
-#include "zmr/ui/zmr_scoreboard.h"
+#include "ui/zmr_spectator_ui.h"
+#include "ui/zmr_textwindow.h"
+#include "ui/zmr_scoreboard.h"
+#include "c_zmr_zmvision.h"
+
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
+
+
+bool g_bRenderPostProcess = false;
 
 
 using namespace vgui;
@@ -23,7 +28,8 @@ public:
 
     virtual void Init() OVERRIDE;
 
-    virtual bool DoPostScreenSpaceEffects( const CViewSetup* pSetup );
+    virtual bool DoPostScreenSpaceEffects( const CViewSetup* pSetup ) OVERRIDE;
+    virtual void PostRender() OVERRIDE;
 };
 
 
@@ -37,9 +43,26 @@ IClientMode *GetClientModeNormal()
 
 bool ClientModeZMNormal::DoPostScreenSpaceEffects( const CViewSetup* pSetup )
 {
+    // Makes sure we don't redraw character circles here.
+    g_bRenderPostProcess = true;
+
+
     g_GlowObjectManager.RenderGlowEffects( pSetup, 0 );
 
+    g_ZMVision.RenderSilhouette();
+
+
+    g_bRenderPostProcess = false;
+
+
     return true;
+}
+
+void ClientModeZMNormal::PostRender()
+{
+    g_ZMVision.UpdateLight();
+
+    BaseClass::PostRender();
 }
 
 //-----------------------------------------------------------------------------
