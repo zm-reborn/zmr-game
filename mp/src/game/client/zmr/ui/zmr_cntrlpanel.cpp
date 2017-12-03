@@ -161,7 +161,7 @@ void CZMHudControlPanel::LoadButtons()
     const bool enabled[NUM_BUTTONS] =
     {
         true,
-        false,
+        true,
         true,
         true,
         true,
