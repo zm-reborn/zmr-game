@@ -1,7 +1,12 @@
 #include "cbase.h"
+#include "convar.h"
+
+
 #include "zmr/zmr_team.h"
 #include "zmr/zmr_shareddefs.h"
 
+
+static ConVar zm_sv_transmitdistance( "zm_sv_transmitdistance", "1600", FCVAR_NOTIFY, "", true, 0.0f, false, 0.0f );
 
 LINK_ENTITY_TO_CLASS( team_manager, CZMTeam );
 
@@ -9,29 +14,32 @@ bool CZMTeam::ShouldTransmitToPlayer( CBasePlayer* pRecipient, CBaseEntity* pEnt
 {
     if ( !pRecipient ) return false;
 
-    // Always transmit to ZM.
-    if ( pRecipient->GetTeamNumber() == ZMTEAM_ZM )
-    {
-        //if ( UTIL_PointContents( pRecipient->EyePosition() ) & CONTENTS_SOLID )
-        //{
-            return true;
-        //}
-    }
-    
-    if ( pRecipient->IsObserver() && pRecipient->GetObserverTarget() )
+    if ( !pEntity ) return false;
+
+
+
+    if (pRecipient->GetTeamNumber() == ZMTEAM_ZM ||
+        (pRecipient->IsObserver()
+    &&  pRecipient->GetObserverTarget()
+    &&  pRecipient->GetObserverTarget()->GetTeamNumber() == ZMTEAM_ZM) )
     {
         // Always transmit the observer target to players
         if ( pRecipient->GetObserverTarget() == pEntity )
             return true;
 
+        // Always transmit players.
+        if ( pEntity->IsPlayer() )
+            return true;
+        
+        float dist = zm_sv_transmitdistance.GetFloat();
+        dist *= dist;
 
-        if ( pRecipient->GetObserverTarget()->IsPlayer() )
+        if ( pEntity->GetAbsOrigin().DistToSqr( pRecipient->GetAbsOrigin() ) < dist && UTIL_PointContents( pRecipient->EyePosition() ) & CONTENTS_SOLID )
         {
-            // If the our observer target is the ZM, always show other players as well.
-            if ( pRecipient->GetObserverTarget()->GetTeamNumber() == ZMTEAM_ZM )
-                return true;
+            return true;
         }
     }
+
 
     return false;
 }
