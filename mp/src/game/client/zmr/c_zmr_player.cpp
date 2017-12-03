@@ -373,6 +373,10 @@ void C_ZMPlayer::Simulate()
 
 bool C_ZMPlayer::ShouldDraw()
 {
+    // ZMRTODO: See if this has any side-effects.
+    if ( IsDormant() )
+        return false;
+
     if ( IsZM() )
         return false;
 
