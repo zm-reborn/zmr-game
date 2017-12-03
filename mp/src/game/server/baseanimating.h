@@ -50,6 +50,9 @@ public:
 	virtual void Spawn();
 	virtual void Precache();
 	virtual void SetTransmit( CCheckTransmitInfo *pInfo, bool bAlways );
+#ifdef ZMR // ZMRCHANGE: Transmit to ZM.
+    virtual int UpdateTransmitState() OVERRIDE { return SetTransmitState( FL_EDICT_FULLCHECK ); };
+#endif
 
 	virtual int	 Restore( IRestore &restore );
 	virtual void OnRestore();
