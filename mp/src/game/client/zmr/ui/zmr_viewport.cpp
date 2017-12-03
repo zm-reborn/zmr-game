@@ -10,6 +10,7 @@
 #include "fx_quad.h"
 #include <vgui/IInput.h>
 
+#include "zmr/c_zmr_zmvision.h"
 #include "zmr/zmr_player_shared.h"
 #include "zmr/zmr_gamerules.h"
 #include "zmr/zmr_global_shared.h"
@@ -314,6 +315,10 @@ void CZMFrame::OnCommand( const char* command )
     else if ( Q_stricmp( command, "MODE_JUMP_CEILING" ) == 0 )
     {
         engine->ClientCmd( "zm_cmd_bansheeceiling" );
+    }
+    else if ( Q_stricmp( command, "MODE_POWER_NIGHTVISION" ) == 0 )
+    {
+        g_ZMVision.Toggle();
     }
 
     BaseClass::OnCommand( command );
