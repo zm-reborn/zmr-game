@@ -22,6 +22,8 @@ using namespace vgui;
 
 static ConVar hud_deathnotice_time( "hud_deathnotice_time", "6", 0 );
 
+ConVar zm_cl_deathnotice_enabled( "zm_cl_deathnotice_enabled", "1", FCVAR_ARCHIVE, "Are deathnotices displayed?" );
+
 
 
 // Player entries in a death notice
@@ -358,7 +360,8 @@ void CZMHudDeathNotice::FireGameEvent( IGameEvent* event )
     }
 
     // Add it to our list of death notices
-    m_DeathNotices.AddToTail( deathMsg );
+    if ( zm_cl_deathnotice_enabled.GetBool() )
+        m_DeathNotices.AddToTail( deathMsg );
 
 
 
