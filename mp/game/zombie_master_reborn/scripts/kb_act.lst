@@ -20,6 +20,7 @@
 "roundrestart"			"Restart The Round"
 "+moveup"				"Go Up"
 "+movedown"				"Go Down"
+"zm_vision"				"Toggle Vision"
 "zm_observermode"		"Toggle RTS Mode"
 "zm_cmd_selectall"		"Select All Zombies"
 "zm_cmd_delete"			"Delete Selected Zombies"
