@@ -9,6 +9,7 @@
 #include "zmr/c_zmr_player.h"
 #include "zmr_options_general.h"
 #include "zmr_options_graphics.h"
+#include "zmr_options_misc.h"
 
 
 
@@ -84,6 +85,7 @@ CZMOptionsMenu::CZMOptionsMenu( VPANEL parent ) : BaseClass( nullptr, "ZMOptions
 
     AddPage( new CZMOptionsSubGeneral( this ), "General" );
     AddPage( new CZMOptionsSubGraphics( this ), "Video" );
+    AddPage( new CZMOptionsSubMisc( this ), "Misc" );
 
 
     vgui::ivgui()->AddTickSignal( GetVPanel(), 100 );
