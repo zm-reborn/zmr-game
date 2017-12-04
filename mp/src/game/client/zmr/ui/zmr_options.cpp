@@ -3,6 +3,7 @@
 
 #include <vgui/IVGui.h>
 #include <vgui_controls/AnimationController.h>
+#include <vgui_controls/PropertySheet.h>
 
 #include "zmr_options.h"
 #include "zmr/c_zmr_player.h"
@@ -28,6 +29,9 @@ public:
     virtual void OnThink() OVERRIDE;
     
     virtual void OnCommand( const char* ) OVERRIDE;
+
+private:
+    void UpdateMenu();
 };
 
 class CZMOptionsMenuInterface : public IZMUi
@@ -69,7 +73,7 @@ CZMOptionsMenu::CZMOptionsMenu( VPANEL parent ) : BaseClass( nullptr, "ZMOptions
 {
     SetParent( parent );
 
-    //SetDeleteSelfOnClose( true );
+
     SetBounds( 150, 100, 420, 350 );
 
     SetVisible( false );
@@ -99,7 +103,7 @@ void CZMOptionsMenu::OnTick()
         SetVisible( g_bZMOptionsShow );
 
         if ( IsVisible() )
-            //UpdateMenu();
+            UpdateMenu();
 
         return;
     }
@@ -112,9 +116,9 @@ void CZMOptionsMenu::OnThink()
 
 void CZMOptionsMenu::OnCommand( const char* command )
 {
-    if ( Q_stricmp( command, "Close" ) == 0 )
+    if ( Q_stricmp( command, "Close" ) == 0 || Q_stricmp( command, "Cancel" ) == 0 )
     {
-        // Don't do fade in/our effects right now.
+        // Don't do fade in/out effects right now.
         g_bZMOptionsShow = false;
         return;
     }
@@ -126,4 +130,20 @@ void CZMOptionsMenu::OnCommand( const char* command )
     }
 
     BaseClass::OnCommand( command );
+}
+
+void CZMOptionsMenu::UpdateMenu()
+{
+    PropertySheet* pSheet = GetPropertySheet();
+
+    int len = pSheet->GetNumPages();
+    for ( int i = 0; i < len; i++ )
+    {
+        PropertyPage* pPage = dynamic_cast<PropertyPage*>( pSheet->GetPage( i ) );
+
+        if ( pPage )
+        {
+            pPage->OnResetData();
+        }
+    }
 }

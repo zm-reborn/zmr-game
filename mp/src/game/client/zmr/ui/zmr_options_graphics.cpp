@@ -7,6 +7,8 @@
 
 extern ConVar zm_cl_glow_weapon_enabled;
 extern ConVar zm_cl_glow_ammo_enabled;
+extern ConVar zm_cl_zmvision_dlight;
+extern ConVar zm_cl_silhouette_onlyzmvision;
 extern ConVar g_ragdoll_maxcount;
 
 
@@ -16,6 +18,8 @@ CZMOptionsSubGraphics::CZMOptionsSubGraphics( Panel* parent ) : BaseClass( paren
 
     LoadItem( &m_pCheck_WepGlow, "CheckWeaponGlow" );
     LoadItem( &m_pCheck_AmmoGlow, "CheckAmmoGlow" );
+    LoadItem( &m_pCheck_VisionDynLight, "CheckVisionDynLight" );
+    LoadItem( &m_pCheck_SilhouetteVision, "CheckSilhouetteVision" );
     LoadItem( &m_pSlider_MaxRagdolls, "MaxRagdollsSlider" );
     LoadItem( &m_pTextEntry_MaxRagdolls, "MaxRagdollsEntry" );
 
@@ -37,6 +41,8 @@ void CZMOptionsSubGraphics::OnApplyChanges()
 
     zm_cl_glow_weapon_enabled.SetValue( m_pCheck_WepGlow->IsSelected() ? 1 : 0 );
     zm_cl_glow_ammo_enabled.SetValue( m_pCheck_AmmoGlow->IsSelected() ? 1 : 0 );
+    zm_cl_zmvision_dlight.SetValue( m_pCheck_VisionDynLight->IsSelected() ? 1 : 0 );
+    zm_cl_silhouette_onlyzmvision.SetValue( m_pCheck_SilhouetteVision->IsSelected() ? 1 : 0 );
     g_ragdoll_maxcount.SetValue( m_pSlider_MaxRagdolls->GetValue() );
 }
 
@@ -47,6 +53,8 @@ void CZMOptionsSubGraphics::OnResetData()
 
     m_pCheck_WepGlow->SetSelected( zm_cl_glow_weapon_enabled.GetBool() );
     m_pCheck_AmmoGlow->SetSelected( zm_cl_glow_ammo_enabled.GetBool() );
+    m_pCheck_VisionDynLight->SetSelected( zm_cl_zmvision_dlight.GetBool() );
+    m_pCheck_SilhouetteVision->SetSelected( zm_cl_silhouette_onlyzmvision.GetBool() );
     m_pSlider_MaxRagdolls->SetValue( g_ragdoll_maxcount.GetInt() );
 
 

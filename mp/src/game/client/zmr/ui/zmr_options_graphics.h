@@ -26,6 +26,8 @@ public:
 private:
     vgui::CheckButton*  m_pCheck_WepGlow;
     vgui::CheckButton*  m_pCheck_AmmoGlow;
+    vgui::CheckButton*  m_pCheck_VisionDynLight;
+    vgui::CheckButton*  m_pCheck_SilhouetteVision;
     vgui::Slider*       m_pSlider_MaxRagdolls;
     vgui::TextEntry*    m_pTextEntry_MaxRagdolls;
 };
