@@ -198,6 +198,8 @@ $Project "Client (ZMR)"
 					$File	"zmr\ui\zmr_options_general.h"
 					$File	"zmr\ui\zmr_options_graphics.cpp"
 					$File	"zmr\ui\zmr_options_graphics.h"
+					$File	"zmr\ui\zmr_options_misc.cpp"
+					$File	"zmr\ui\zmr_options_misc.h"
 					$File	"zmr\ui\zmr_options_tab.cpp"
 					$File	"zmr\ui\zmr_options_tab.h"
 				}
