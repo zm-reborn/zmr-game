@@ -1,0 +1,20 @@
+// load the base configuration
+//exec default.cfg
+// Setup custom controller
+exec joystick.cfg
+
+// run a user script file if present
+exec autoexec.cfg
+
+
+// Leaving this here since quick search shows that it's used by gamerules/baseplayer.
+mp_forcerespawn			0
+
+// ZM maps are not designed with HDR+bloom in mind. This is not cheat protected so change it if you want more/less eye rape.
+mat_bloomscale			0.4
+
+
+//
+// stuff command line statements
+//
+stuffcmds
