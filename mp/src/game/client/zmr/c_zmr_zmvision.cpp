@@ -4,6 +4,7 @@
 #include "model_types.h"
 
 #include "c_zmr_player.h"
+#include "c_zmr_util.h"
 #include "c_zmr_zmvision.h"
 
 
@@ -158,12 +159,17 @@ void CZMVision::SetVision( bool bEnable )
 {
     C_ZMPlayer* pLocal = C_ZMPlayer::GetLocalPlayer();
 
-    if ( !pLocal || ( bEnable && !pLocal->IsZM() ) )
+    if ( !pLocal || !pLocal->IsZM() )
     {
         SetVisionOff();
         return;
     }
 
+
+    if ( bEnable != m_bIsOn )
+    {
+        ZMClientUtil::PrintNotify( "#ZMToggleVision", ZMCHATNOTIFY_ZM );
+    }
 
     m_bIsOn = bEnable;
 }
