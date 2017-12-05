@@ -20,4 +20,5 @@ public:
 private:
     vgui::CheckButton*  m_pCheck_FpDeathcam;
     vgui::CheckButton*  m_pCheck_Deathnotice;
+    vgui::CheckButton*  m_pCheck_ShowHelp;
 };
