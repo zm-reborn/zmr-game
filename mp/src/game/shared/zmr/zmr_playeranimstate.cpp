@@ -567,8 +567,13 @@ void CZMPlayerAnimState::ComputePoseParam_MoveYaw( CStudioHdr *pStudioHdr )
     // view direction relative to movement
     float flYaw;	 
 
-    QAngle	angles = GetBasePlayer()->GetLocalAngles();
-    float ang = angles[ YAW ];
+    // ZMRCHANGE: This fucked feet movement.
+    // I spent way too much time (AGAIN) debugging this shit.
+    // The above code has it right. Why the fuck was it changed?
+    // AFAIK, it wouldn't only affect us. Really weird that it wasn't caught. It probably was but I copied an older version. Oh well...
+    //QAngle	angles = GetBasePlayer()->GetAbsAngles();
+    //float ang = angles[ YAW ];
+    float ang = m_flEyeYaw;
     if ( ang > 180.0f )
     {
         ang -= 360.0f;
