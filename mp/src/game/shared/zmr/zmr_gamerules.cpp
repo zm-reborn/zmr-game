@@ -636,6 +636,12 @@ ConVar zm_sv_antiafk_punish( "zm_sv_antiafk_punish", "1", FCVAR_NOTIFY | FCVAR_A
 
 bool CZMRules::CanInactivityPunish( CZMPlayer* pPlayer )
 {
+    // Ignore bots.
+    // For testing purposes and ZM AI ;)
+    if ( pPlayer->IsBot() )
+        return false;
+
+
     if ( pPlayer->IsZM() && zm_sv_antiafk_replacezm.GetBool() )
     {
         return true;
