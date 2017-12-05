@@ -26,7 +26,8 @@ using namespace vgui;
 
 
 
-ConVar zm_cl_showhelp( "zm_cl_showhelp", "1", 0, "" );
+ConVar zm_cl_showhelp( "zm_cl_showhelp", "1", FCVAR_ARCHIVE, "Show help?" );
+ConVar zm_cl_help_randomtips( "zm_cl_help_randomtips", "320", FCVAR_ARCHIVE, "Show random tips every X seconds. 0 = disable" );
 
 
 
@@ -78,6 +79,7 @@ CZMTip::CZMTip( KeyValues* kv, int index )
     m_nLimit = kv->GetInt( "limit" );
     m_nLimitPerGame = kv->GetInt( "limitpergame" );
     m_bQueue = kv->GetBool( "canbequeued", false );
+    m_bRandom = kv->GetBool( "random", false );
     m_bPulse = kv->GetBool( "pulse", false );
     m_bSound = kv->GetBool( "sound", false );
     SetName( kv->GetName() );
@@ -115,6 +117,7 @@ void CZMTip::Reset()
     m_flTime = DEF_TIP_TIME;
     m_iPriority = DEF_TIP_PRIORITY;
     m_bQueue = false;
+    m_bRandom = false;
     m_bPulse = false;
     m_bSound = false;
 
@@ -132,6 +135,15 @@ bool CZMTip::ShouldShow()
     if ( (m_nLimit > 0 || m_nLimitPerGame > 0) && !zm_cl_showhelp.GetBool() )
         return false;
     
+
+    C_BasePlayer* pLocal = C_BasePlayer::GetLocalPlayer();
+
+    if ( m_iTeam != DEF_TIP_TEAM )
+    {
+        if ( !pLocal || pLocal->GetTeamNumber() != m_iTeam )
+            return false;
+    }
+
 
     return true;
 }
@@ -295,6 +307,7 @@ CZMHudTooltip::CZMHudTooltip( const char *pElementName ) : CHudElement( pElement
     m_nTexId = 0;
     m_nTexSize = 0;
 
+    m_flNextRandomTip = 0.0f;
     m_flNextHide = 0.0f;
     m_bPulse = false;
     m_iPriority = 0;
@@ -358,43 +371,88 @@ void CZMHudTooltip::OnThink()
             HideTooltip();
     }
     
-    if ( !IsDisplayingTip() && m_vQueue.Count() )
+    if ( !IsDisplayingTip() )
     {
-        // Find highest priority queued tip.
-
-        CZMTip* highest_tip = nullptr;
-        int highest_index = -1;
-
-        CZMTip* tip;
-
-
-        float curtime = gpGlobals->curtime;
-
-        for ( int i = 0; i < m_vQueue.Count(); i++ )
+        if ( m_vQueue.Count() )
         {
-            if ( m_vQueue[i].m_flDisplay > curtime ) continue;
-
-
-            tip = FindMessageByIndex( m_vQueue[i].m_iIndex );
-
-            if ( !tip ) continue;
-
-
-            if ( highest_tip == nullptr || highest_tip->GetPriority() < tip->GetPriority() )
-            {
-                highest_tip = tip;
-                highest_index = i;
-            }
+            FindNextQueueTip();
         }
-        
-
-        if ( highest_tip )
+        else
         {
-            SetMessageByName( highest_tip->GetName() );
-
-            m_vQueue.Remove( highest_index );
+            FindNextRandomTipToQueue();
         }
     }
+}
+
+void CZMHudTooltip::FindNextQueueTip()
+{
+    // Find highest priority queued tip.
+
+    CZMTip* highest_tip = nullptr;
+    int highest_index = -1;
+
+    CZMTip* tip;
+
+
+    float curtime = gpGlobals->curtime;
+
+    int len = m_vQueue.Count();
+    for ( int i = 0; i < len; i++ )
+    {
+        if ( m_vQueue[i].m_flDisplay > curtime ) continue;
+
+
+        tip = FindMessageByIndex( m_vQueue[i].m_iIndex );
+
+        if ( !tip ) continue;
+
+
+        if ( highest_tip == nullptr || highest_tip->GetPriority() < tip->GetPriority() )
+        {
+            highest_tip = tip;
+            highest_index = i;
+        }
+    }
+        
+
+    if ( highest_tip )
+    {
+        SetMessageByName( highest_tip->GetName() );
+
+        m_vQueue.Remove( highest_index );
+    }
+}
+
+void CZMHudTooltip::FindNextRandomTipToQueue()
+{
+    float delay = zm_cl_help_randomtips.GetFloat();
+
+    if ( delay == 0.0f )
+        return;
+
+    if ( m_flNextRandomTip > gpGlobals->curtime )
+        return;
+
+
+    CUtlVector<int> vTips;
+    vTips.Purge();
+
+    int len = m_vTips.Count();
+    for ( int i = 0; i < len; i++ )
+    {
+        if ( m_vTips[i]->ShowRandom() && m_vTips[i]->ShouldShow() )
+        {
+            vTips.AddToTail( m_vTips[i]->GetIndex() );
+        }
+    }
+
+    if ( vTips.Count() )
+    {
+        QueueTip( vTips[random->RandomInt( 0, vTips.Count() - 1)], 0.0f );
+    }
+
+
+    m_flNextRandomTip = gpGlobals->curtime + delay;
 }
 
 void CZMHudTooltip::Paint()

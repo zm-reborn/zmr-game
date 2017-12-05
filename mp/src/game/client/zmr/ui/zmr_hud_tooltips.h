@@ -51,6 +51,7 @@ public:
     int GetTeam() { return m_iTeam; };
     bool DoSound() { return m_bSound; };
     bool CanBeQueued() { return m_bQueue; };
+    bool ShowRandom() { return m_bRandom; };
     int GetLimit() { return m_nLimit; };
 
     int GetIndex() { return m_iIndex; };
@@ -76,6 +77,7 @@ private:
     float m_flTime;
     int m_iPriority;
     bool m_bQueue;
+    bool m_bRandom;
     bool m_bPulse;
     bool m_bSound;
     int m_nLimit;
@@ -105,6 +107,10 @@ public:
     virtual void Reset() OVERRIDE;
     virtual void OnThink() OVERRIDE;
     virtual void Paint() OVERRIDE;
+
+
+    void FindNextQueueTip();
+    void FindNextRandomTipToQueue();
 
 
     void QueueTip( CZMTip*, float delay );
@@ -147,6 +153,7 @@ private:
     CUtlVector<ZMTipQueue_T> m_vQueue;
 
 
+    float m_flNextRandomTip;
     float m_flNextHide;
     float m_flNextSound;
     int m_nTexSize;

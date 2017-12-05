@@ -27,6 +27,21 @@
 		
 		"param1"		"key@zm_observermode"
 	}
+	"zmvision"
+	{
+		"msg"			"#ZMHelpZMVision"
+		"icon"			"zmr_effects/tt_icon_light"
+		"time"			"9"
+		"limit"			"2"
+		"limitpergame"	"1"
+		"priority"		"3"
+		"team"			"3"
+		"random"		"1"
+		"pulse"			"1"
+		"sound"			"0"
+		
+		"param1"		"key@zm_vision"
+	}
 	"zmmenu_exp"
 	{
 		"msg"			"#ZMMenuZMExp"
