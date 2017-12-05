@@ -50,10 +50,12 @@ public:
 
     virtual C_BaseAnimating*    BecomeRagdollOnClient() OVERRIDE;
     IRagdoll*                   GetRepresentativeRagdoll() const OVERRIDE;
+    C_ZMRagdoll*                GetRagdoll() const;
+    int                         GetEyeAttachment() const;
     virtual void                CalcView( Vector& eyeOrigin, QAngle& eyeAngles, float& zNear, float& zFar, float& fov ) OVERRIDE;
 
-    void                        DeathCam_Firstperson( Vector& eyeOrigin, QAngle& eyeAngles, float& zNear, float& zFar, float& fov );
-    void                        DeathCam_Thirdperson( Vector& eyeOrigin, QAngle& eyeAngles, float& zNear, float& zFar, float& fov );
+    void                        DeathCam_Firstperson( C_ZMPlayer* pPlayer, Vector& eyeOrigin, QAngle& eyeAngles, float& zNear, float& zFar, float& fov );
+    void                        DeathCam_Thirdperson( C_ZMPlayer* pPlayer, Vector& eyeOrigin, QAngle& eyeAngles, float& zNear, float& zFar, float& fov );
 
     virtual CStudioHdr*         OnNewModel() OVERRIDE;
     void                        Initialize();

@@ -579,15 +579,25 @@ ConVar zm_cl_firstperson_deathcam( "zm_cl_firstperson_deathcam", "0" );
 
 void C_ZMPlayer::CalcView( Vector& eyeOrigin, QAngle& eyeAngles, float& zNear, float& zFar, float& fov )
 {
-    if ( m_lifeState != LIFE_ALIVE && !IsObserver() )
+    C_ZMPlayer* pPlayer = this;
+
+    if (IsObserver()
+    &&  GetObserverMode() == OBS_MODE_IN_EYE
+    &&  GetObserverTarget()
+    &&  GetObserverTarget()->IsPlayer() )
+    {
+        pPlayer = ToZMPlayer( GetObserverTarget() );
+    }
+
+    if ( pPlayer->m_lifeState != LIFE_ALIVE && !pPlayer->IsObserver() )
     {
         if ( zm_cl_firstperson_deathcam.GetBool() )
         {
-            DeathCam_Firstperson( eyeOrigin, eyeAngles, zNear, zFar, fov );
+            DeathCam_Firstperson( pPlayer, eyeOrigin, eyeAngles, zNear, zFar, fov );
         }
         else
         {
-            DeathCam_Thirdperson( eyeOrigin, eyeAngles, zNear, zFar, fov );
+            DeathCam_Thirdperson( pPlayer, eyeOrigin, eyeAngles, zNear, zFar, fov );
         }
 
         return;
@@ -596,27 +606,27 @@ void C_ZMPlayer::CalcView( Vector& eyeOrigin, QAngle& eyeAngles, float& zNear, f
     BaseClass::CalcView( eyeOrigin, eyeAngles, zNear, zFar, fov );
 }
 
-void C_ZMPlayer::DeathCam_Firstperson( Vector& eyeOrigin, QAngle& eyeAngles, float& zNear, float& zFar, float& fov )
+void C_ZMPlayer::DeathCam_Firstperson( C_ZMPlayer* pPlayer, Vector& eyeOrigin, QAngle& eyeAngles, float& zNear, float& zFar, float& fov )
 {
-    C_ZMRagdoll* pRagdoll = m_hRagdoll.Get();
+    C_ZMRagdoll* pRagdoll = pPlayer->GetRagdoll();
 
-    if ( !pRagdoll || m_iAttachmentEyes == -1 )
-        DeathCam_Thirdperson( eyeOrigin, eyeAngles, zNear, zFar, fov );
+    if ( !pRagdoll || pPlayer->GetEyeAttachment() == -1 )
+        DeathCam_Thirdperson( pPlayer, eyeOrigin, eyeAngles, zNear, zFar, fov );
 
 
-    pRagdoll->GetAttachment( m_iAttachmentEyes, eyeOrigin, eyeAngles );
+    pRagdoll->GetAttachment( pPlayer->GetEyeAttachment(), eyeOrigin, eyeAngles );
 }
 
-void C_ZMPlayer::DeathCam_Thirdperson( Vector& eyeOrigin, QAngle& eyeAngles, float& zNear, float& zFar, float& fov )
+void C_ZMPlayer::DeathCam_Thirdperson( C_ZMPlayer* pPlayer, Vector& eyeOrigin, QAngle& eyeAngles, float& zNear, float& zFar, float& fov )
 {
-    Vector origin = EyePosition();			
+    Vector origin = pPlayer->EyePosition();			
 
-    IRagdoll* pRagdoll = GetRepresentativeRagdoll();
+    IRagdoll* pRagdoll = pPlayer->GetRepresentativeRagdoll();
 
     if ( pRagdoll )
     {
         origin = pRagdoll->GetRagdollOrigin();
-        origin.z += VEC_DEAD_VIEWHEIGHT_SCALED( this ).z; // look over ragdoll, not through
+        origin.z += VEC_DEAD_VIEWHEIGHT_SCALED( pPlayer ).z; // look over ragdoll, not through
     }
 
     BaseClass::CalcView( eyeOrigin, eyeAngles, zNear, zFar, fov );
@@ -634,7 +644,7 @@ void C_ZMPlayer::DeathCam_Thirdperson( Vector& eyeOrigin, QAngle& eyeAngles, flo
 
     trace_t trace; // clip against world
     C_BaseEntity::PushEnableAbsRecomputations( false ); // HACK don't recompute positions while doing RayTrace
-    UTIL_TraceHull( origin, eyeOrigin, WALL_MIN, WALL_MAX, MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &trace );
+    UTIL_TraceHull( origin, eyeOrigin, WALL_MIN, WALL_MAX, MASK_SOLID_BRUSHONLY, pPlayer, COLLISION_GROUP_NONE, &trace );
     C_BaseEntity::PopEnableAbsRecomputations();
 
     if ( trace.fraction < 1.0f )
@@ -645,16 +655,24 @@ void C_ZMPlayer::DeathCam_Thirdperson( Vector& eyeOrigin, QAngle& eyeAngles, flo
 
 IRagdoll* C_ZMPlayer::GetRepresentativeRagdoll() const
 {
-    if ( m_hRagdoll.Get() )
+    if ( GetRagdoll() )
     {
-        C_ZMRagdoll* pRagdoll = (C_ZMRagdoll*)m_hRagdoll.Get();
-
-        return pRagdoll->GetIRagdoll();
+        return GetRagdoll()->GetIRagdoll();
     }
     else
     {
         return nullptr;
     }
+}
+
+C_ZMRagdoll* C_ZMPlayer::GetRagdoll() const
+{
+    return m_hRagdoll.Get();
+}
+
+int C_ZMPlayer::GetEyeAttachment() const
+{
+    return m_iAttachmentEyes;
 }
 
 CStudioHdr* C_ZMPlayer::OnNewModel( void )
