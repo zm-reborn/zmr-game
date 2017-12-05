@@ -267,6 +267,11 @@ void C_ZMPlayer::TeamChange( int iNewTeam )
         }
     }
 
+
+    // Turn off nightvision.
+    g_ZMVision.TurnOff();
+
+
     // Reset back to old team just in case something uses it.
     C_BaseEntity::ChangeTeam( iOldTeam );
     
@@ -290,10 +295,6 @@ void C_ZMPlayer::TeamChange( int iNewTeam )
     {
         engine->ClientCmd( "exec survivor.cfg" );
     }
-
-
-    // Turn off nightvision.
-    g_ZMVision.TurnOff();
 }
 
 void C_ZMPlayer::Simulate()
