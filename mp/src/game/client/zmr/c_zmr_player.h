@@ -34,6 +34,7 @@ public:
     virtual bool CreateMove( float delta, CUserCmd* cmd ) OVERRIDE;
 
     virtual void            Simulate() OVERRIDE;
+    virtual void            CreateLightEffects() OVERRIDE {};
     virtual ShadowType_t    ShadowCastType() OVERRIDE;
     virtual bool            ShouldReceiveProjectedTextures( int flags ) OVERRIDE;
     virtual bool            ShouldDraw() OVERRIDE;
