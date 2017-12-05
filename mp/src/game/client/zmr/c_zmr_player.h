@@ -132,7 +132,7 @@ inline C_ZMPlayer* ToZMPlayer( C_BaseEntity* pEntity )
 	if ( !pEntity || !pEntity->IsPlayer() )
 		return nullptr;
 
-	return dynamic_cast<C_ZMPlayer*>( pEntity );
+	return static_cast<C_ZMPlayer*>( pEntity );
 }
 
 inline C_ZMPlayer* ToZMPlayer( C_BasePlayer* pPlayer )
