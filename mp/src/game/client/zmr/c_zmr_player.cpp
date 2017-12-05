@@ -299,6 +299,9 @@ void C_ZMPlayer::TeamChange( int iNewTeam )
 
 void C_ZMPlayer::Simulate()
 {
+    BaseClass::Simulate();
+
+
     if ( !IsLocalPlayer() )
     {
         if ( IsEffectActive( EF_DIMLIGHT ) )
