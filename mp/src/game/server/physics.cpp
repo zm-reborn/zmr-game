@@ -729,7 +729,17 @@ bool CCollisionEvent::ShouldFreezeContacts( IPhysicsObject **pObjectList, int ob
 #endif
 	}
 	m_lastTickFrictionError = gpGlobals->tickcount;
+
+    // ZMRCHANGE: This will help with performance problems with huge piles of physics objects. Eg. zm_fridgeofdoom weapons and ammo.
+    // This isn't only affected by shitty maps, players can make any server and map unplayable by throwing a ton of props/ammo onto each other.
+
+    // ZMRTODO: Look into letting some physics interactions pass this. Right now if you have enough objects, you can freeze an object by simply throwing it at the pile.
+    // The desired effect would be to freeze the pile, but let the thrown object not affect the pile at all.
+#ifdef ZMR
+    return true;
+#else
 	return false;
+#endif
 }
 
 // NOTE: these are fully edge triggered events 
