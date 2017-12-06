@@ -105,7 +105,11 @@ void CZMOptionsMenu::OnTick()
         SetVisible( g_bZMOptionsShow );
 
         if ( IsVisible() )
+        {
             UpdateMenu();
+
+            Activate();
+        }
 
         return;
     }
