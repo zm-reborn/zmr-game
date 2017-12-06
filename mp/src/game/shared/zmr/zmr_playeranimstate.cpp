@@ -85,6 +85,10 @@ void CZMPlayerAnimState::InitZMAnimState( CZMPlayer* pPlayer )
 
     m_blinkTimer.Invalidate();
     m_flLastLookAtUpdate = 0.0f;
+
+    m_flLastBodyYaw = 0.0f;
+    m_flCurrentHeadYaw = 0.0f;
+    m_flCurrentHeadPitch = 0.0f;
 }
 
 //-----------------------------------------------------------------------------
