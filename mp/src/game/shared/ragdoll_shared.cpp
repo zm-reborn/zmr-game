@@ -713,7 +713,7 @@ ConVar g_ragdoll_maxcount("g_ragdoll_maxcount", "4", FCVAR_REPLICATED );
 #ifdef ZMR // ZMRCHANGE: No reason to replicate this since there's no way ragdoll removal can be synchronized.
 
 #ifdef CLIENT_DLL
-ConVar g_ragdoll_maxcount( "zm_cl_ragdollmaxcount", "8", FCVAR_ARCHIVE );
+ConVar g_ragdoll_maxcount( "zm_cl_ragdollmaxcount", "18", FCVAR_ARCHIVE, "Client's maximum ragdoll count." );
 #else
 ConVar g_ragdoll_maxcount( "g_ragdoll_maxcount", "8" );
 #endif // CLIENT_DLL
