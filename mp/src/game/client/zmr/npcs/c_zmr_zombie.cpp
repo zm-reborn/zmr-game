@@ -32,7 +32,9 @@ static int UTIL_CreateClientModel( const char* pszModel )
     return index;
 }
 
-bool C_ZMHolidayHat::Initialize( C_BaseEntity* pOwner, const char* pszAttachment, const char* pszModel )
+// ZMRTODO: If we ever care enough, we need to re-do this completely.
+// This is not a good way of doing this.
+bool C_ZMHolidayHat::Initialize( C_BaseEntity* pOwner, const char* pszModel )
 {
     int modelIndex = UTIL_CreateClientModel( pszModel );
     if ( modelIndex == -1 )
@@ -42,6 +44,19 @@ bool C_ZMHolidayHat::Initialize( C_BaseEntity* pOwner, const char* pszAttachment
     {
         return false;
     }
+
+
+    SetOwnerEntity( pOwner );
+
+	SetNextClientThink( CLIENT_THINK_NEVER );
+
+    return true;
+}
+
+bool C_ZMHolidayHat::Parent( const char* pszAttachment )
+{
+    C_BaseEntity* pOwner = GetOwnerEntity();
+
 
     int iAttachment = pOwner->LookupAttachment( pszAttachment );
 
@@ -53,26 +68,16 @@ bool C_ZMHolidayHat::Initialize( C_BaseEntity* pOwner, const char* pszAttachment
     bool lastvalid = C_BaseEntity::IsAbsQueriesValid();
     C_BaseEntity::SetAbsQueriesValid( true );
 
-
-    SetLocalOrigin( vec3_origin );
-    SetLocalAngles( vec3_angle );
-    SetLocalVelocity( vec3_origin );
-
+    SetParent( pOwner, iAttachment );
     SetAbsOrigin( pOwner->GetAbsOrigin() );
     SetAbsAngles( vec3_angle );
-    SetAbsVelocity( vec3_origin );
-
-    SetParent( pOwner, iAttachment );
-    SetOwnerEntity( pOwner );
 
     C_BaseEntity::SetAbsQueriesValid( lastvalid );
 
-    DestroyShadow();
+    SetLocalOrigin( vec3_origin );
+    SetLocalAngles( vec3_angle );
 
-	UpdateVisibility();
-
-	SetNextClientThink( CLIENT_THINK_NEVER );
-
+    UpdateVisibility();
 
     return true;
 }
@@ -113,6 +118,20 @@ C_BaseAnimating* C_ZMZombie::BecomeRagdollOnClient()
     return pRagdoll;
 }
 
+void C_ZMZombie::UpdateVisibility()
+{
+    BaseClass::UpdateVisibility();
+
+    // Stay parented, silly.
+    if ( m_pHat )
+    {
+        m_pHat->UpdateVisibility();
+
+        if ( !IsDormant() )
+            m_pHat->Parent( "eyes" );
+    }
+}
+
 void C_ZMZombie::CreateHat()
 {
     ReleaseHat();
@@ -130,7 +149,7 @@ void C_ZMZombie::CreateHat()
     }
 
 
-    if ( !m_pHat || !m_pHat->Initialize( this, "eyes", model ) )
+    if ( !m_pHat || !m_pHat->Initialize( this, model ) || !m_pHat->Parent( "eyes" ) )
     {
         ReleaseHat();
     }
