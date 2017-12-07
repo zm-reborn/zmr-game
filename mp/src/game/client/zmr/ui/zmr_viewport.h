@@ -33,6 +33,7 @@ public:
     CZMFrame( const char* pElementName );
     ~CZMFrame();
 
+    virtual void ApplySchemeSettings( vgui::IScheme* pScheme ) OVERRIDE;
     virtual void Init() OVERRIDE;
     virtual void VidInit() OVERRIDE;
     virtual void LevelInit() OVERRIDE;
@@ -45,7 +46,8 @@ public:
     //virtual void OnMouseDoublePressed( MouseCode code ) OVERRIDE;
     bool ShouldDraw() OVERRIDE { return IsVisible(); };
     virtual void OnThink() OVERRIDE;
-    virtual void Paint() OVERRIDE {};
+    virtual void Paint() OVERRIDE;
+    //virtual void PaintBackground() OVERRIDE;
     virtual void SetVisible( bool ) OVERRIDE;
 
     virtual void OnMouseWheeled( int ) OVERRIDE;

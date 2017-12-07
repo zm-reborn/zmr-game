@@ -159,6 +159,14 @@ CZMFrame::~CZMFrame()
     delete m_pBuildMenu;
 }
 
+void CZMFrame::ApplySchemeSettings( IScheme* pScheme )
+{
+    BaseClass::ApplySchemeSettings( pScheme );
+
+    if ( m_pZMControl )
+        m_pZMControl->SetBgColor( GetSchemeColor( "ZMHudBgColor", pScheme ) );
+}
+
 void CZMFrame::Init()
 {
     Reset();
@@ -192,6 +200,12 @@ void CZMFrame::SetVisible( bool state )
     engine->ClientCmd( "-right" );
     engine->ClientCmd( "-lookup" );
     engine->ClientCmd( "-lookdown" );
+}
+
+void CZMFrame::Paint()
+{
+    if ( m_pZMControl )
+        m_pZMControl->Paint();
 }
 
 void CZMFrame::SetClickMode( ZMClickMode_t mode, bool print )

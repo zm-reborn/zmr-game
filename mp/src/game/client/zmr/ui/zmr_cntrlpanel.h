@@ -23,7 +23,8 @@ public:
     //virtual void OnThink() OVERRIDE;
     //virtual void Reset() OVERRIDE;
     
-
+    void SetBgColor( const Color& clr );
+    void Paint();
 
     void PositionButtons();
     void PositionComboBox();
@@ -31,8 +32,7 @@ public:
 
     void GroupsListUpdate();
     void RemoveGroup( int serial );
-
-    void PaintControls( vgui::ISurface *surface );
+    
 
     void UpdateTabs( int activatedTab = -1 );
     
@@ -41,7 +41,7 @@ public:
     CUtlVector<int> m_ComboBoxItems;
     vgui::ComboBox *m_pZombieGroups;
 
-
+    int m_nTexBgId;
 
 
 
@@ -84,6 +84,8 @@ private:
 
     int m_iActiveTab;
 
+    Color m_BgColor;
+
     //see CBaseZombieMasterViewPort constructor on why these are needed -> the SetBounds part
     static const int HOR_ADJUST = 8; //8
     static const int VER_ADJUST = 40; //28
@@ -100,7 +102,7 @@ private:
     //static const int PANEL_BOTRIGHT_Y = 480 + VER_ADJUST - PANEL_SPACING;
     
     static const int PANEL_SIZE_X = 156; // 156
-    static const int PANEL_SIZE_Y = 144; // 156
+    static const int PANEL_SIZE_Y = 150; // 156
 
     static const int COMBO_BOX_X_OFFSET = 11;
     static const int COMBO_BOX_Y_OFFSET = 64;

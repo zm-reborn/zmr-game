@@ -40,11 +40,13 @@ private:
     void LoadIcons();
     void Reposition();
 
+    void PaintBg();
 
-    HScheme scheme;
+
     HFont m_hMediumFont;
     HFont m_hLargeFont;
 
+    int m_nTexBgId;
 
     int m_nResCount;
     int m_nResCountDif;
@@ -53,14 +55,17 @@ private:
     int m_nSelected;
 
     CHudTexture* m_pIcons[NUM_ICONS];
+
+
+    CPanelAnimationVar( Color, m_BgColor, "BgColor", "ZMHudBgColor" );
 };
 
 DECLARE_HUDELEMENT( CZMResourceHud );
 
 
-CZMResourceHud::CZMResourceHud( const char *pElementName ) : CHudElement( pElementName ), BaseClass( g_pClientMode->GetViewport(), "ZMResourceHud" )
+CZMResourceHud::CZMResourceHud( const char *pElementName ) : CHudElement( pElementName ), BaseClass( g_pClientMode->GetViewport(), "ZMHudResource" )
 {
-    scheme = vgui::scheme()->LoadSchemeFromFile( "resource/ClientScheme.res", "ClientScheme" );
+    HScheme scheme = vgui::scheme()->LoadSchemeFromFile( "resource/ClientScheme.res", "ClientScheme" );
 
     m_hMediumFont = vgui::scheme()->GetIScheme( scheme )->GetFont( "Trebuchet20", false );
     m_hLargeFont = vgui::scheme()->GetIScheme( scheme )->GetFont( "Trebuchet30", false );
@@ -68,11 +73,15 @@ CZMResourceHud::CZMResourceHud( const char *pElementName ) : CHudElement( pEleme
 
     SetPaintBackgroundEnabled( false );
     SetProportional( false );
-    SetSize( 120, 100 );
+    SetSize( 140, 140 );
 
 
     LoadIcons();
     Reset();
+
+
+    m_nTexBgId = surface()->CreateNewTextureID();
+    surface()->DrawSetTextureFile( m_nTexBgId, "zmr_effects/hud_bg_zmres", true, false );
 }
 
 CZMResourceHud::~CZMResourceHud()
@@ -117,7 +126,7 @@ void CZMResourceHud::VidInit()
 
 void CZMResourceHud::Reposition()
 {
-    SetPos( 15, ScreenHeight() - GetTall() );
+    SetPos( 0, ScreenHeight() - GetTall() );
 }
 
 void CZMResourceHud::OnThink()
@@ -146,24 +155,43 @@ void CZMResourceHud::OnThink()
     m_nResCount = newres;
 }
 
+void CZMResourceHud::PaintBg()
+{
+    int sizex = GetWide();
+    int sizey = GetTall();
+
+    vgui::surface()->DrawSetColor( m_BgColor );
+    surface()->DrawSetTexture( m_nTexBgId );
+    surface()->DrawTexturedRect( 0, 0, sizex, sizey );
+}
+
 void CZMResourceHud::Paint()
 {
-    wchar_t text[32];
+    PaintBg();
 
+
+    wchar_t text[32];
+    int w, h;
+
+    const int offsety = 45;
     
     _snwprintf( text, ARRAYSIZE(text) - 1, L"%i", m_nResCount );
 
 	surface()->DrawSetTextFont( m_hLargeFont );
-	surface()->DrawSetTextPos( 45, 5 );
+	surface()->DrawSetTextPos( 60, offsety + 0 );
 	surface()->DrawSetTextColor( COLOR_WHITE );
 	surface()->DrawPrintText( text, wcslen( text ) );
 
+    surface()->GetTextSize( m_hLargeFont, text, w, h );
 
 
-    _snwprintf( text, ARRAYSIZE(text) - 1, L"+ %i", m_nResCountDif );
+    _snwprintf( text, ARRAYSIZE(text) - 1, L"+%i", m_nResCountDif );
+
+    int w2;
+    surface()->GetTextSize( m_hMediumFont, text, w2, h );
 
 	surface()->DrawSetTextFont( m_hMediumFont );
-	surface()->DrawSetTextPos( 70, 30 );
+	surface()->DrawSetTextPos( 60 + w - w2, offsety + 25 );
 	surface()->DrawSetTextColor( COLOR_WHITE );
 	surface()->DrawPrintText( text, wcslen( text ) );
 
@@ -176,14 +204,14 @@ void CZMResourceHud::Paint()
 
 
 	surface()->DrawSetTextFont( m_hMediumFont );
-	surface()->DrawSetTextPos( 35, 58 );
+	surface()->DrawSetTextPos( 50, offsety + 53 );
 	surface()->DrawSetTextColor( COLOR_WHITE );
 	surface()->DrawPrintText( text, wcslen( text ) );
     
 
 
-    int x = 2;
-    int y = 5;
+    int x = 17;
+    int y = offsety + 0;
     for ( int i = 0; i < NUM_ICONS; i++ )
     {
         if ( m_pIcons[i] )
