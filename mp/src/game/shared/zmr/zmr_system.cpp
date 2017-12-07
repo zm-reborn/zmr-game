@@ -1,5 +1,6 @@
 #include "cbase.h"
 #include "GameEventListener.h"
+#include <ctime>
 
 #ifdef CLIENT_DLL
 #include "physpropclientside.h"
@@ -26,6 +27,10 @@ public:
     virtual void PostInit() OVERRIDE;
 #ifndef CLIENT_DLL
     virtual void LevelInitPostEntity() OVERRIDE;
+
+
+
+    void CheckSpecialDates();
 #else
     void PrintRoundEndMessage( ZMRoundEndReason_t reason );
 #endif
@@ -48,6 +53,29 @@ void CZMSystem::PostInit()
 }
 
 #ifndef CLIENT_DLL
+ConVar zm_sv_happyzombies_usedate( "zm_sv_happyzombies_usedate", "1", FCVAR_NOTIFY, "Special dates bring happy zombies :)" );
+
+void CZMSystem::CheckSpecialDates()
+{
+    if ( !zm_sv_happyzombies_usedate.GetBool() )
+        return;
+
+
+    ConVarRef pHappyZombies( "zm_sv_happyzombies" );
+
+    time_t curtime;
+    time( &curtime );
+    tm* t = localtime( &curtime );
+
+    if (t->tm_mon == 11
+    /*||  */)
+    {
+        pHappyZombies.SetValue( 1 );
+
+        DevMsg( "Happy zombies activated by date!\n" );
+    }
+}
+
 void CZMSystem::LevelInitPostEntity()
 {
     if ( engine->IsDedicatedServer() )
@@ -60,6 +88,8 @@ void CZMSystem::LevelInitPostEntity()
 
         g_pZMWeb->QueryVersionNumber();
     }
+
+    CheckSpecialDates();
 }
 #endif
 

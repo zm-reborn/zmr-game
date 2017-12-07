@@ -184,6 +184,8 @@ $Project "Client (ZMR)"
 			}
 			$Folder "Npcs"
 			{
+				$File	"zmr\npcs\c_zmr_zombie.cpp"
+				$File	"zmr\npcs\c_zmr_zombie.h"
 				$File	"zmr\npcs\c_zmr_zombiebase.cpp"
 				$File	"zmr\npcs\c_zmr_zombiebase.h"
 				

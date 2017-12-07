@@ -27,9 +27,6 @@
 #include "tier0/memdbgon.h"
 
 
-ConVar zm_sv_happyzombies( "zm_sv_happyzombies", "0", FCVAR_NOTIFY, "The zombies are smiling! :O" );
-
-
 // ACT_FLINCH_PHYSICS
 
 envelopePoint_t envZombieMoanVolumeFast[] =
@@ -106,6 +103,7 @@ class CZMZombie : public CAI_BlendingHost<CZMBaseZombie>
 public:
 	DECLARE_DATADESC();
 	DECLARE_CLASS( CZMZombie, CAI_BlendingHost<CZMBaseZombie> );
+    DECLARE_SERVERCLASS()
     
 
 	CZMZombie()
@@ -187,6 +185,9 @@ private:
 
 	Vector				 m_vPositionCharged;
 };
+
+IMPLEMENT_SERVERCLASS_ST( CZMZombie, DT_ZM_ClassicZombie )
+END_SEND_TABLE()
 
 LINK_ENTITY_TO_CLASS( npc_zombie, CZMZombie );
 //LINK_ENTITY_TO_CLASS( npc_zombie_torso, CZMZombie );
@@ -427,17 +428,6 @@ void CZMZombie::AttackSound( void )
 void CZMZombie::SetZombieModel( void )
 {
 	SetModel( g_szZombieModels[random->RandomInt( 0, ARRAYSIZE( g_szZombieModels ) - 1 )] );
-
-
-
-    if ( zm_sv_happyzombies.GetBool() )
-    {
-        SetFlexWeight( "smile", 1.0f );
-        SetFlexWeight( "jaw_clench", 1.0f );
-        SetFlexWeight( "right_inner_raiser", 1.0f );
-        SetFlexWeight( "right_outer_raiser", 1.0f );
-        SetFlexWeight( "left_lowerer", 1.0f );
-    }
 }
 
 //---------------------------------------------------------
