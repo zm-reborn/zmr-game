@@ -150,7 +150,7 @@ void ZM_Cmd_CreateHidden( const CCommand &args )
 
     if ( !pPlayer ) return;
     
-    if ( !pPlayer->IsZM() ) return;
+    if ( !UTIL_IsCommandIssuedByServerAdmin() && !pPlayer->IsZM() ) return;
 
     if ( args.ArgC() < 4 ) return;
     
@@ -240,18 +240,20 @@ void ZM_Cmd_CreateHidden( const CCommand &args )
 
     DispatchSpawn( pZombie );
     
-
+    const Vector findground( 0.0f, 0.0f, 2.0f );
 
     // Trace down to get ground position.
     UTIL_TraceHull(
-        pos + Vector( 0.0f, 0.0f, 16.0f ),
-        pos - Vector( 0.0f, 0.0f, 2.0f ),
+        pos + Vector( 0.0f, 0.0f, 8.0f ),
+        pos - findground,
         pZombie->GetHullMins(), pZombie->GetHullMaxs(),
         MASK_NPCSOLID, pZombie, COLLISION_GROUP_NONE, &trace );
-
+    
+    const Vector up = Vector( 0.0f, 0.0f, 1.0f );
+    const float dot = DotProduct( up, trace.plane.normal );
 
     if (trace.startsolid || trace.fraction == 1.0f
-    ||  (trace.fraction != 1.0f && trace.plane.normal[2] < 0.2)) // Is our spawn location ground?
+    ||  (trace.fraction != 1.0f && dot < 0.6f)) // Is our spawn location ground?
     {
         ZMUtil::PrintNotify( pPlayer, ZMCHATNOTIFY_ZM, "#ZMInvalidSpot" );
 
