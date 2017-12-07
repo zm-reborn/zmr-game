@@ -158,9 +158,10 @@ void CZMHudFlashlight::Paint()
     if ( battery > 100.0f ) battery = 100.0f;
 
 
-    float frac = battery / 100.0f;
+    int fill_x = (int)(size_x * (battery / 100.0f));
 
-    int fill_x = (int)(size_x * frac);
+    // Use integers so the transition isn't jittery.
+    float frac = (fill_x / (float)size_x);
 
     surface()->DrawSetColor( m_Color );
     surface()->DrawSetTexture( tex );
