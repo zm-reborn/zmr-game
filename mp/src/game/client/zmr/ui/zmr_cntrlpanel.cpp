@@ -3,6 +3,7 @@
 #include "vgui_controls/ComboBox.h"
 #include "spectatorgui.h"
 #include "iclientmode.h"
+#include "vgui_bitmapbutton.h"
 
 
 
@@ -543,6 +544,25 @@ void CZMHudControlPanel::UpdateTabs( int activatedTab )
 void CZMHudControlPanel::SetBgColor( const Color& clr )
 {
     m_BgColor = clr;
+}
+
+void CZMHudControlPanel::SetFgColor( const Color& clr )
+{
+    m_FgColor = clr;
+
+    for ( int i = 0; i < ARRAYSIZE( m_pButtons ); i++ )
+    {
+        if ( !m_pButtons[i] ) continue;
+
+        m_pButtons[i]->GetBitmapImage( CBitmapButton::BUTTON_ENABLED )->SetColor( clr );
+    }
+
+    for ( int i = 0; i < ARRAYSIZE( m_pTabs ); i++ )
+    {
+        if ( !m_pTabs[i] ) continue;
+
+        m_pTabs[i]->GetBitmapImage( CBitmapButton::BUTTON_ENABLED )->SetColor( clr );
+    }
 }
 
 void CZMHudControlPanel::Paint()
