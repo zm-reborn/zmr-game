@@ -12,6 +12,7 @@
 		"test_speakers"		1
 		"test_hardware"		1
 		"zmr_testmap"		1
+		"zmr_example"		1
 	}
 	supportsvr	0
 	
