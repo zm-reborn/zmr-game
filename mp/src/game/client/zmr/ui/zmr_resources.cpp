@@ -58,6 +58,7 @@ private:
 
 
     CPanelAnimationVar( Color, m_BgColor, "BgColor", "ZMHudBgColor" );
+    CPanelAnimationVar( Color, m_FgColor, "FgColor", "ZMFgColor" );
 };
 
 DECLARE_HUDELEMENT( CZMResourceHud );
@@ -179,7 +180,7 @@ void CZMResourceHud::Paint()
 
 	surface()->DrawSetTextFont( m_hLargeFont );
 	surface()->DrawSetTextPos( 60, offsety + 0 );
-	surface()->DrawSetTextColor( COLOR_WHITE );
+	surface()->DrawSetTextColor( m_FgColor );
 	surface()->DrawPrintText( text, wcslen( text ) );
 
     surface()->GetTextSize( m_hLargeFont, text, w, h );
@@ -192,7 +193,7 @@ void CZMResourceHud::Paint()
 
 	surface()->DrawSetTextFont( m_hMediumFont );
 	surface()->DrawSetTextPos( 60 + w - w2, offsety + 25 );
-	surface()->DrawSetTextColor( COLOR_WHITE );
+	surface()->DrawSetTextColor( m_FgColor );
 	surface()->DrawPrintText( text, wcslen( text ) );
 
 
@@ -205,7 +206,7 @@ void CZMResourceHud::Paint()
 
 	surface()->DrawSetTextFont( m_hMediumFont );
 	surface()->DrawSetTextPos( 50, offsety + 53 );
-	surface()->DrawSetTextColor( COLOR_WHITE );
+	surface()->DrawSetTextColor( m_FgColor );
 	surface()->DrawPrintText( text, wcslen( text ) );
     
 
@@ -231,7 +232,7 @@ void CZMResourceHud::Paint()
                     break;
             }
 
-            m_pIcons[i]->DrawSelf( x + indent, y, w, h, COLOR_WHITE );
+            m_pIcons[i]->DrawSelf( x + indent, y, w, h, m_FgColor );
 
             //for now just assume we move down
             y += h + 25;

@@ -60,6 +60,8 @@ public:
     // Stops the awful depressed offset shit.
     virtual void RecalculateDepressedState() OVERRIDE {};
 
+    BitmapImage* GetBitmapImage( int index ) { return &(m_pImage[index]); };
+
 private:
     char* m_pszTooltipName;
     int m_iTooltipIndex;

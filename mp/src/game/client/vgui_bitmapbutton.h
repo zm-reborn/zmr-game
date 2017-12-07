@@ -59,6 +59,9 @@ private:
 
 	BitmapImage	m_pImage[BUTTON_STATE_COUNT];
 	bool m_bImageLoaded[BUTTON_STATE_COUNT];
+#ifdef ZMR // ZMRCHANGE: Fuck whoever made m_pImage private.
+    friend class CZMBitMapButton;
+#endif
 };
 
 

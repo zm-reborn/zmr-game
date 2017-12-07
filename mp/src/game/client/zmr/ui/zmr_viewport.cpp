@@ -164,7 +164,10 @@ void CZMFrame::ApplySchemeSettings( IScheme* pScheme )
     BaseClass::ApplySchemeSettings( pScheme );
 
     if ( m_pZMControl )
+    {
         m_pZMControl->SetBgColor( GetSchemeColor( "ZMHudBgColor", pScheme ) );
+        m_pZMControl->SetFgColor( GetSchemeColor( "ZMFgColor", pScheme ) );
+    }
 }
 
 void CZMFrame::Init()

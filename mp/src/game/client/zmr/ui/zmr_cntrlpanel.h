@@ -24,6 +24,7 @@ public:
     //virtual void Reset() OVERRIDE;
     
     void SetBgColor( const Color& clr );
+    void SetFgColor( const Color& clr );
     void Paint();
 
     void PositionButtons();
@@ -85,6 +86,7 @@ private:
     int m_iActiveTab;
 
     Color m_BgColor;
+    Color m_FgColor;
 
     //see CBaseZombieMasterViewPort constructor on why these are needed -> the SetBounds part
     static const int HOR_ADJUST = 8; //8
