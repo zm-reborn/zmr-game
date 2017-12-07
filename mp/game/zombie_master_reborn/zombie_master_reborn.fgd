@@ -100,7 +100,7 @@
 @PointClass base(Targetname, Parentname, Origin, Angles) = info_spawnnode :
 	"Specific spawn point for Zombie Spawn"
 [
-	nodename(target_destination) : "Nodename" : "" : "Targetname of the next node in the chain, if any."
+	nodename(target_destination) : "Next Node" : "" : "Next node in the chain, if any."
 ]
 
 @PointClass base(Targetname, Parentname, Origin, Angles) = info_rallypoint :
@@ -231,7 +231,12 @@
 @PointClass base(Targetname, Parentname, Origin, Angles) = info_loadout :
 	"Give a default loadout to the players.  Don't place more than one."
 [
-	Method(integer) : "Method" : 0 : "Handout style.  1 is one weapon per player, 2 is one weapon of each type per player."
+	Method(choices) : "Distribution method" : 0 =
+	[
+		0: "One of each weapon type"
+		1: "One random weapon"
+	]
+	
 	Pistols(integer) : "Pistols" : 0 : "Max pistols to hand out"
 	Shotguns(integer) : "Shotguns" : 0 : "Max shotguns to hand out"
 	Rifles(integer) : "Rifles" : 0 : "Max rifles to hand out"
