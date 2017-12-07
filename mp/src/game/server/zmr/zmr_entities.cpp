@@ -1312,11 +1312,30 @@ void CZMEntLoadout::Spawn()
     }
 }
 
+// Hack to fix some old maps using this shit wrong.
+CZMEntLoadout::LoadOutMethod_t CZMEntLoadout::GetMethod()
+{
+    if ( m_iMethod <= LOMETHOD_INVALID || m_iMethod >= LOMETHOD_MAX )
+        return LOMETHOD_RANDOM;
+
+    return m_iMethod;
+}
+
 void CZMEntLoadout::Reset()
 {
     switch ( GetMethod() )
     {
+    case LOMETHOD_RANDOM :
+    {
+        for ( int i = 0; i < LO_MAX; i++ )
+        {
+            m_iCurRandom[i] = m_iCounts[i];
+        }
+        break;
+
+    }
     case LOMETHOD_CATEGORY : // My favorite...
+    default :
     {
         for ( int i = 0; i < LOCAT_MAX; i++ )
         {
@@ -1356,17 +1375,6 @@ void CZMEntLoadout::Reset()
         break;
 
     }
-    case LOMETHOD_RANDOM :
-    {
-        for ( int i = 0; i < LO_MAX; i++ )
-        {
-            m_iCurRandom[i] = m_iCounts[i];
-        }
-        break;
-
-    }
-    default :
-        break;
     }
 
 }

@@ -276,8 +276,12 @@ public:
 
     enum LoadOutMethod_t
     {
-        LOMETHOD_CATEGORY = 0,
+        LOMETHOD_INVALID = 0,
+
+        LOMETHOD_CATEGORY,
         LOMETHOD_RANDOM,
+
+        LOMETHOD_MAX
     };
 
     enum
@@ -305,7 +309,7 @@ public:
     void DistributeToPlayer( CZMPlayer* );
     
 
-    inline LoadOutMethod_t GetMethod() { return m_iMethod; };
+    inline LoadOutMethod_t GetMethod();
 
 private:
     void GiveWeapon( CZMPlayer*, int );
