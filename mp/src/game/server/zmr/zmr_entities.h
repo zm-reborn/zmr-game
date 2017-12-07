@@ -257,7 +257,7 @@ private:
 /*
     Loadout ent
 */
-class CZMEntLoadout : public CPointEntity
+class CZMEntLoadout : public CServerOnlyPointEntity
 {
 public:
     enum
