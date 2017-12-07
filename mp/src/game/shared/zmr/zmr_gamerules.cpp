@@ -51,6 +51,10 @@ static ConVar zm_sv_reward_kill( "zm_sv_reward_kill", "100", FCVAR_NOTIFY | FCVA
 #endif
 
 
+ConVar zm_sv_happyzombies( "zm_sv_happyzombies", "0", FCVAR_REPLICATED, "Happy, happy zombies :)" );
+
+
+
 #ifndef CLIENT_DLL
 static const char* g_PreserveEnts[] =
 {

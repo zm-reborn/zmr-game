@@ -1,0 +1,5 @@
+VertexlitGeneric
+{
+	$basetexture models\props\misc\zombie_santahat
+	$model 1
+}
