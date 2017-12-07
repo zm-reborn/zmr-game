@@ -10,6 +10,8 @@
 
 #include <engine/IEngineSound.h>
 
+
+#include "zmr/c_zmr_zmvision.h"
 #include "zmr/c_zmr_util.h"
 #endif
 
@@ -25,11 +27,11 @@ public:
     }
 
     virtual void PostInit() OVERRIDE;
-#ifndef CLIENT_DLL
+
     virtual void LevelInitPostEntity() OVERRIDE;
 
 
-
+#ifndef CLIENT_DLL
     void CheckSpecialDates();
 #else
     void PrintRoundEndMessage( ZMRoundEndReason_t reason );
@@ -75,9 +77,11 @@ void CZMSystem::CheckSpecialDates()
         DevMsg( "Happy zombies activated by date!\n" );
     }
 }
+#endif
 
 void CZMSystem::LevelInitPostEntity()
 {
+#ifndef CLIENT_DLL
     if ( engine->IsDedicatedServer() )
     {
         // HACK!!! After the first map change, the api hasn't been initialized yet.
@@ -90,8 +94,11 @@ void CZMSystem::LevelInitPostEntity()
     }
 
     CheckSpecialDates();
-}
+#else
+    g_ZMVision.TurnOff();
 #endif
+}
+
 
 void CZMSystem::FireGameEvent( IGameEvent* pEvent )
 {
