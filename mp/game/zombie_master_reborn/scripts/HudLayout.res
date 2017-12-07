@@ -59,9 +59,12 @@
 		"BgSizeY"	"50"
 	}
 	
-	ZMResourceHud
+	ZMHudResource
 	{
 		"fieldName"		"ZMResourceHud"
+		
+		//"wide"	"120"
+		//"tall"  "50"
 	}
 	
 	ZMHudObjectives

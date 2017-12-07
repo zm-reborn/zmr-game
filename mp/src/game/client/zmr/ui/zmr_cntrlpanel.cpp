@@ -59,6 +59,10 @@ CZMHudControlPanel::CZMHudControlPanel()
 
 
     UpdateTabs( CZMHudControlPanel::TAB_MODES );
+
+
+    m_nTexBgId = surface()->CreateNewTextureID();
+    surface()->DrawSetTextureFile( m_nTexBgId, "zmr_effects/hud_bg_zmcntrl", true, false );
 }
 
 CZMHudControlPanel::~CZMHudControlPanel()
@@ -394,7 +398,7 @@ void CZMHudControlPanel::PositionButtons()
 
     //working in unscaled values
     int start_x = PANEL_TOPLEFT_X + BUTTON_SPACING;
-    int start_y = PANEL_TOPLEFT_Y + BUTTON_SPACING;
+    int start_y = PANEL_TOPLEFT_Y + BUTTON_SPACING + 8; // Add a bit more spacing between tabs and buttons.
     //and now they're scaled
     start_x = (int)(start_x * flVerScale);
     start_y = (int)(start_y * flVerScale);
@@ -536,55 +540,18 @@ void CZMHudControlPanel::UpdateTabs( int activatedTab )
     
 }
 
-//draw background onto given surface
-void CZMHudControlPanel::PaintControls( vgui::ISurface *surface )
+void CZMHudControlPanel::SetBgColor( const Color& clr )
 {
-    if (!surface)
-        return;
+    m_BgColor = clr;
+}
 
-    //TGB: UNDONE: no more scaling
-    //const float flVerScale = (float)ScreenHeight() / 480.0f;
-//	const float flVerScale = 1;
+void CZMHudControlPanel::Paint()
+{
+    // Just paint background. Buttons are handled by viewport.
+    int sizex = PANEL_SIZE_X + 30;
+    int sizey = PANEL_SIZE_Y + 30;
 
-    //TGB: replaced with unscaled method of positioning
-    //const int x_tl = (int)(PANEL_TOPLEFT_X * flVerScale);
-    //const int y_tl = (int)(PANEL_TOPLEFT_Y * flVerScale);
-    //const int x_br = (int)(PANEL_BOTRIGHT_X * flVerScale);
-    //const int y_br = (int)(PANEL_BOTRIGHT_Y * flVerScale);
-    const int x_tl = ScreenWidth() - PANEL_SIZE_X + HOR_ADJUST - PANEL_SPACING;
-    const int y_tl = ScreenHeight() - PANEL_SIZE_Y + VER_ADJUST - PANEL_SPACING;
-    //the bottom is simpler
-    const int x_br = ScreenWidth() + HOR_ADJUST - PANEL_SPACING;
-    const int y_br = ScreenHeight() + VER_ADJUST - PANEL_SPACING;
-
-    surface->DrawSetColor( Color( 70, 0, 0, 76 ) );
-    surface->DrawFilledRect( x_tl, y_tl, x_br, y_br ); 
-
-    //TGB: draw tab bgs
-    int top_x = 0, top_y = 0;
-    int bot_x = 0, bot_y = 0;
-//	const int spacing = 0;
-    for (int i = 0; i < NUM_TABS; i++)
-    {
-        if (!m_pTabs[i]) return;
-        
-        m_pTabs[i]->GetPos( top_x, top_y );
-        int w, h;
-        m_pTabs[i]->GetSize( w, h );
-        bot_x = top_x + w;
-        bot_y = top_y + h;
-        
-        if ( m_iActiveTab == i )
-        {
-            surface->DrawSetColor( Color( 70, 0, 0, 76 ) );
-            m_pTabs[i]->SetAlpha( 255 );
-        }
-        else
-        {
-            m_pTabs[i]->SetAlpha( 100 );
-            surface->DrawSetColor( Color( 70, 0, 0, 40 ) );
-        }
-
-        surface->DrawFilledRect( top_x, top_y, bot_x, bot_y ); 
-    }
+    vgui::surface()->DrawSetColor( m_BgColor );
+    surface()->DrawSetTexture( m_nTexBgId );
+    surface()->DrawTexturedRect( ScreenWidth() - sizex, ScreenHeight() - sizey, ScreenWidth(), ScreenHeight() );
 }
