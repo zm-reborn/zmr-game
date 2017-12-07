@@ -9,7 +9,8 @@ public:
     DECLARE_CLASS( C_ZMHolidayHat, C_BaseAnimating )
 
     
-    virtual bool Initialize( C_BaseEntity* pOwner, const char* pszAttachment, const char* pszModel );
+    virtual bool Initialize( C_BaseEntity* pOwner, const char* pszModel );
+    virtual bool Parent( const char* pszAttachment );
 };
 
 class C_ZMZombie : public C_ZMBaseZombie
@@ -25,6 +26,7 @@ public:
 
     virtual CStudioHdr* OnNewModel() OVERRIDE;
     virtual C_BaseAnimating* BecomeRagdollOnClient() OVERRIDE;
+    virtual void UpdateVisibility() OVERRIDE;
 
     LocalFlexController_t GetFlexControllerNumByName( const char* pszName );
     void SetFlexWeightSafe( const char* pszName, float value );
