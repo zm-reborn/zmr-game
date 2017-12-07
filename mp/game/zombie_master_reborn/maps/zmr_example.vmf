@@ -2,7 +2,7 @@ versioninfo
 {
 	"editorversion" "400"
 	"editorbuild" "7538"
-	"mapversion" "38"
+	"mapversion" "39"
 	"formatversion" "100"
 	"prefab" "0"
 }
@@ -20,7 +20,7 @@ viewsettings
 world
 {
 	"id" "1"
-	"mapversion" "38"
+	"mapversion" "39"
 	"classname" "worldspawn"
 	"detailmaterial" "detail/detailsprites"
 	"detailvbsp" "detail.vbsp"
@@ -2035,6 +2035,7 @@ entity
 	"classname" "info_zombiespawn"
 	"Active" "0"
 	"angles" "0 0 0"
+	"nodename" "spawnnode1"
 	"origin" "128 800 160"
 	"spawnflags" "31"
 	"targetname" "spawn2"
