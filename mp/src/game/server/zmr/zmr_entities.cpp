@@ -1380,22 +1380,6 @@ void CZMEntLoadout::DistributeToPlayer( CZMPlayer* pPlayer )
 
     switch ( GetMethod() )
     {
-    case LOMETHOD_CATEGORY :
-    {
-        for ( int i = 0; i < LOCAT_MAX; i++ )
-        {
-            if ( m_vCurCat[i].Count() > 0 )
-            {
-                int j = random->RandomInt( 0, m_vCurCat[i].Count() - 1 );
-
-                GiveWeapon( pPlayer, m_vCurCat[i].Element( j ) );
-
-                m_vCurCat[i].Remove( j );
-            }
-        }
-        break;
-    }
-
     case LOMETHOD_RANDOM :
     {
         CUtlVector<int> vRemaining;
@@ -1417,9 +1401,23 @@ void CZMEntLoadout::DistributeToPlayer( CZMPlayer* pPlayer )
         }
         break;
     }
-
+    
+    case LOMETHOD_CATEGORY :
     default :
+    {
+        for ( int i = 0; i < LOCAT_MAX; i++ )
+        {
+            if ( m_vCurCat[i].Count() > 0 )
+            {
+                int j = random->RandomInt( 0, m_vCurCat[i].Count() - 1 );
+
+                GiveWeapon( pPlayer, m_vCurCat[i].Element( j ) );
+
+                m_vCurCat[i].Remove( j );
+            }
+        }
         break;
+    }
     }
 }
 
