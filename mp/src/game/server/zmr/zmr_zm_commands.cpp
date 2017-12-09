@@ -68,7 +68,7 @@ void ZM_Cmd_Target( const CCommand &args )
 
 
 
-    CBaseEntity* pTarget = UTIL_EntityByIndex( atof( args.Arg( 1 ) ) );
+    CBaseEntity* pTarget = UTIL_EntityByIndex( atoi( args.Arg( 1 ) ) );
 
 
     if ( !pTarget ) return;
@@ -78,9 +78,10 @@ void ZM_Cmd_Target( const CCommand &args )
     bool bForceBreakable = atoi( args.Arg( 2 ) ) ? true : false;
 
 
-    bool bTarget = false;
-    bool bSwat = false;
-    bool bBreakable = false;
+    bool bTarget = false; // Just target an enemy.
+    bool bSwat = false; // Just swat the object away/towards an enemy.
+    bool bBreak = false; // Tell zombie to break this object.
+    bool bCanBeDamaged = pTarget->GetHealth() > 0 && pTarget->m_takedamage == DAMAGE_YES;
 
     if ( pTarget->IsPlayer() )
     {
@@ -94,10 +95,14 @@ void ZM_Cmd_Target( const CCommand &args )
         bSwat = phys && phys->IsMoveable();
 
 
-        // If we're breakable (func_breakable, etc.) then try to break.
-        CBreakable* pBreak = dynamic_cast<CBreakable*>( pTarget );
+        if ( bCanBeDamaged )
+        {
+            // If we're breakable (func_breakable, etc.) then force to break.
+            // If we're a physics object and we can't be moved, force to break.
+            CBreakable* pBreak = dynamic_cast<CBreakable*>( pTarget );
 
-        bBreakable = pBreak && pBreak->GetHealth() > 0 && pBreak->IsBreakable() && pBreak->m_takedamage == DAMAGE_YES;
+            bBreak = (phys && !phys->IsMotionEnabled()) || (pBreak && pBreak->IsBreakable());
+        }
     }
 
 
@@ -118,12 +123,12 @@ void ZM_Cmd_Target( const CCommand &args )
         if ( pZombie->GetSelector() != pPlayer ) continue;
 
 
-        if ( (pZombie->CanSwatPhysicsObjects() && bSwat) || bBreakable )
+        if ( (pZombie->CanSwatPhysicsObjects() && bSwat) || bBreak )
         {
             // If we're allowed to swat and we're forced to break it, break it.
             bool bForcedBreak = pZombie->CanSwatPhysicsObjects() && bForceBreakable;
 
-            pZombie->Swat( pTarget, bBreakable || bForcedBreak );
+            pZombie->Swat( pTarget, bCanBeDamaged && (bBreak || bForcedBreak) );
         }
         else
         {
