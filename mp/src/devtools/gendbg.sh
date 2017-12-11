@@ -1,6 +1,11 @@
 #!/bin/bash
 
-OBJCOPY=$STEAM_RUNTIME_PATH/bin/objcopy
+# It isn't guaranteed that this is set.
+if [ -n "$STEAM_RUNTIME_PATH" ]; then
+	OBJCOPY=$STEAM_RUNTIME_PATH/bin/objcopy
+else
+	OBJCOPY=/usr/bin/objcopy
+fi
 
 function usage {
 	echo "$0 /path/to/input/file [-o /path/to/output/file ]"
