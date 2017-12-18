@@ -13,6 +13,8 @@ mp_forcerespawn			0
 // ZM maps are not designed with HDR+bloom in mind. This is not cheat protected so change it if you want more/less eye rape.
 mat_bloomscale			0.4
 
+ai_frametime_limit 0.1
+
 
 //
 // stuff command line statements

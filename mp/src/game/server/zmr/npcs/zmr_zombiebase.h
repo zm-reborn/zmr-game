@@ -133,7 +133,7 @@ public:
     
     virtual float   MaxYawSpeed( void ) OVERRIDE;
     virtual bool    OverrideMoveFacing( const AILocalMoveGoal_t&, float ) OVERRIDE;
-
+    virtual void    UpdateEfficiency( bool bInPVS ) OVERRIDE;
     
     virtual void    StartTask( const Task_t* ) OVERRIDE;
     virtual void    RunTask( const Task_t* ) OVERRIDE;
