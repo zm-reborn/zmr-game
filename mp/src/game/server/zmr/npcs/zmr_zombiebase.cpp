@@ -286,6 +286,76 @@ bool CZMBaseZombie::OverrideMoveFacing( const AILocalMoveGoal_t& move, float flI
     return true;
 }
 
+extern ConVar ai_frametime_limit;
+ConVar zm_ai_minimum_efficiency( "zm_ai_minimum_efficiency", "0", FCVAR_NOTIFY, "Higher the value, the dumber the AI will be (max. 3). Only increase if you're noticing performance problems. Going over 1 will make AI really dumb." );
+
+void CZMBaseZombie::UpdateEfficiency( bool bInPVS )
+{
+    // Never change move efficiency.
+    SetMoveEfficiency( AIME_NORMAL );
+
+
+    // Sleeping NPCs always dormant
+    if ( GetSleepState() != AISS_AWAKE )
+    {
+        SetEfficiency( AIE_DORMANT );
+        return;
+    }
+
+
+
+    AI_Efficiency_t newEfficiency = GetEfficiency();
+
+    bool bFramerateOk = true;
+
+    
+
+    float frametimelimit = ai_frametime_limit.GetFloat();
+
+    if ( frametimelimit > 0.0f )
+    {
+        // If our frametime limit is smaller than tickrate, use the tickrate instead.
+        if ( frametimelimit < gpGlobals->interval_per_tick )
+            frametimelimit = gpGlobals->interval_per_tick * 2.0f;
+    
+        bFramerateOk = ( gpGlobals->frametime >= frametimelimit );
+
+
+        if ( !bFramerateOk )
+        {
+            newEfficiency = (AI_Efficiency_t)((int)newEfficiency + 1);
+        }
+    }
+
+    if ( bFramerateOk )
+    {
+        newEfficiency = (AI_Efficiency_t)zm_ai_minimum_efficiency.GetInt();
+
+
+        if ( newEfficiency <= AIE_NORMAL )
+        {
+            // If we're not doing anything special, just run efficiently.
+            if (GetState() <= NPC_STATE_IDLE
+            ||  GetState() > NPC_STATE_COMBAT
+            ||  !bInPVS )
+            {
+                newEfficiency = AIE_EFFICIENT;
+            }
+        }
+    }
+
+    if ( newEfficiency < AIE_NORMAL )
+    {
+        newEfficiency = AIE_NORMAL;
+    }
+    else if ( newEfficiency >= AIE_DORMANT )
+    {
+        newEfficiency = AIE_SUPER_EFFICIENT;
+    }
+
+    SetEfficiency( newEfficiency );
+}
+
 void CZMBaseZombie::HandleAnimEvent( animevent_t* pEvent )
 {
     if ( pEvent->event == AE_ZOMBIE_POUND )
