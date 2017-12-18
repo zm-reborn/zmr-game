@@ -623,8 +623,13 @@ void CZMBaseZombie::StartTask( const Task_t* pTask )
 
             // Don't bother trying going there if we're close enough, this is suppose to be a long-range fix.
             if ( dist < 64.0f || !GetNavigator()->SetVectorGoal( dir, dist, GetHullWidth() ) )
+            {
 			    TaskFail( FAIL_NO_ROUTE );
+                return;
+            }
 		}
+
+        TaskComplete();
         break;
     }
     case TASK_ZM_SET_TOLERANCE_DISTANCE :
@@ -714,21 +719,24 @@ void CZMBaseZombie::RunTask( const Task_t* pTask )
 {
     switch( pTask->iTask )
     {
-    case TASK_ZOMBIE_SWAT_ITEM:
+    case TASK_ZOMBIE_SWAT_ITEM :
         if( IsActivityFinished() )
         {
             TaskComplete();
         }
         break;
 
-    case TASK_ZOMBIE_WAIT_POST_MELEE:
+    case TASK_ZOMBIE_WAIT_POST_MELEE :
+        if ( IsWaitFinished() )
         {
-            if ( IsWaitFinished() )
-            {
-                TaskComplete();
-            }
+            TaskComplete();
         }
         break;
+
+    case TASK_GET_PATH_TO_LASTPOSITION : // This can sometimes find its way here.
+        TaskComplete();
+        break;
+
     default:
         BaseClass::RunTask( pTask );
         break;
@@ -1828,6 +1836,18 @@ void CZMBaseZombie::Command( const Vector& pos, bool bPlayerCommanded, float tol
     {
         ClearCondition( COND_RECEIVED_ORDERS );
         SetSchedule( SCHED_ZM_GO );
+    }
+
+
+    // HACK: Force us to instantly start the tasks next frame.
+    if ( (gpGlobals->curtime - m_flLastCommand) > 0.5f )
+    {
+        // Keep last efficiency.
+        AI_Efficiency_t eff = GetEfficiency();
+        ForceDecisionThink();
+        SetEfficiency( eff );
+
+        SetNextThink( gpGlobals->curtime );
     }
 
     m_flLastCommand = gpGlobals->curtime;
