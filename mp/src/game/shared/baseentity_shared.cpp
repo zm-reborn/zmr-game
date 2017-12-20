@@ -1615,6 +1615,11 @@ typedef CTraceFilterSimpleList CBulletsTraceFilter;
 
 #ifdef ZMR
 static ConVar zm_sv_bulletspassplayers( "zm_sv_bulletspassplayers", "1", FCVAR_NOTIFY | FCVAR_ARCHIVE | FCVAR_REPLICATED, "Do bullets players shoot pass through other players?" );
+
+#ifdef _DEBUG
+static ConVar zm_sv_debugbullets( "zm_sv_debugbullets", "0", FCVAR_NOTIFY | FCVAR_REPLICATED, "" );
+static ConVar zm_sv_debugbullets_time( "zm_sv_debugbullets_time", "1", FCVAR_NOTIFY | FCVAR_REPLICATED, "" );
+#endif // _DEBUG
 #endif
 
 void CBaseEntity::FireBullets( const FireBulletsInfo_t &info )
@@ -2073,6 +2078,18 @@ void CBaseEntity::FireBullets( const FireBulletsInfo_t &info )
 			}
 		}
 
+#if defined( ZMR ) && defined( _DEBUG ) // ZMRCHANGE: Allows bullet debugging.
+        if ( zm_sv_debugbullets.GetBool() && !engine->IsDedicatedServer() )
+        {
+#ifdef CLIENT_DLL
+            const int dbgclr[3] = { 255, 0, 0 };
+#else
+            const int dbgclr[3] = { 0, 0, 255 };
+#endif // CLIENT_DLL
+
+            DebugDrawLine( tr.startpos, tr.endpos, dbgclr[0], dbgclr[1], dbgclr[2], false, abs( zm_sv_debugbullets_time.GetFloat() ) );
+        }
+#endif // ZMR
 		//NOTENOTE: We could expand this to a more general solution for various material penetration types (wood, thin metal, etc)
 
 		// See if we should pass through glass
