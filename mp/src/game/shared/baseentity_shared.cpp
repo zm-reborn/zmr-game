@@ -2079,7 +2079,7 @@ void CBaseEntity::FireBullets( const FireBulletsInfo_t &info )
 		}
 
 #if defined( ZMR ) && defined( _DEBUG ) // ZMRCHANGE: Allows bullet debugging.
-        if ( zm_sv_debugbullets.GetBool() && !engine->IsDedicatedServer() )
+        if ( zm_sv_debugbullets.GetBool() )
         {
 #ifdef CLIENT_DLL
             const int dbgclr[3] = { 255, 0, 0 };
