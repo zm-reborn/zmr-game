@@ -142,3 +142,43 @@ void ZM_RoundRestart( const CCommand &args )
 }
 
 static ConCommand roundrestart( "roundrestart", ZM_RoundRestart, "Restart the round as ZM." );
+
+
+void ZM_ObserveZombie( const CCommand &args )
+{
+    CZMPlayer* pPlayer = ToZMPlayer( UTIL_GetCommandClient() );
+
+    if ( !pPlayer ) return;
+
+    if ( !pPlayer->IsObserver() ) return;
+
+
+    CZMBaseZombie* pZombie = nullptr;
+    if ( args.ArgC() > 1 )
+    {
+        pZombie = dynamic_cast<CZMBaseZombie*>( UTIL_EntityByIndex( atoi( args.Arg( 1 ) ) ) );
+    }
+    else
+    {
+        // No argument, trace a line.
+        trace_t tr;
+        UTIL_TraceLine( pPlayer->EyePosition(), pPlayer->EyeDirection3D() * MAX_COORD_FLOAT, MASK_NPCSOLID, pPlayer, COLLISION_GROUP_NPC, &tr );
+
+        if ( tr.m_pEnt && tr.m_pEnt->MyNPCPointer() )
+        {
+            pZombie = dynamic_cast<CZMBaseZombie*>( tr.m_pEnt );
+        }
+    }
+
+    if ( !pZombie ) return;
+
+    if ( !pZombie->IsAlive() ) return;
+
+
+    if ( pPlayer->SetObserverTarget( pZombie ) )
+    {
+        pPlayer->SetObserverMode( OBS_MODE_CHASE );
+    }
+}
+
+static ConCommand zm_observezombie( "zm_observezombie", ZM_ObserveZombie, "Allows observer to spectate a given zombie (ent index)." );

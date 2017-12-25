@@ -78,7 +78,10 @@ public:
     void            PickDefaultSpawnTeam();
     virtual void    ChangeTeam( int iTeam ) OVERRIDE;
     bool            ShouldSpawn();
-    virtual bool    IsValidObserverTarget( CBaseEntity* ) OVERRIDE;
+
+    virtual bool            IsValidObserverTarget( CBaseEntity* ) OVERRIDE;
+    virtual CBaseEntity*    FindNextObserverTarget( bool bReverse ) OVERRIDE;
+
     virtual int     ShouldTransmit( const CCheckTransmitInfo* ) OVERRIDE;
 
     virtual void    SetAnimation( PLAYER_ANIM playerAnim ) OVERRIDE;

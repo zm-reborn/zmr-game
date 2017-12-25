@@ -29,6 +29,10 @@ public:
 
     virtual int     DrawModel( int flags ) OVERRIDE;
     int             DrawModelAndEffects( int flags );
+
+    virtual Vector          GetObserverCamOrigin() OVERRIDE { return WorldSpaceCenter(); };
+    virtual const QAngle&   EyeAngles() OVERRIDE;
+    virtual Vector          EyePosition() OVERRIDE;
     
     //virtual void TraceAttack( const CTakeDamageInfo&, const Vector&, trace_t*,CDmgAccumulator* ) OVERRIDE;
     
@@ -57,4 +61,6 @@ private:
     CNetworkVar( float, m_flHealthRatio );
 
     int m_iGroup;
+
+    QAngle m_angEyeAttachment;
 };

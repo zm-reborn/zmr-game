@@ -87,9 +87,41 @@ void C_ZMBaseZombie::Spawn( void )
     g_ZMVision.AddSilhouette( this );
 }
 
+const QAngle& C_ZMBaseZombie::EyeAngles()
+{
+    if ( m_iEyeAttachment > 0 )
+    {
+        Vector origin;
+        GetAttachment( m_iEyeAttachment, origin, m_angEyeAttachment );
+
+        return m_angEyeAttachment;
+    }
+
+    return BaseClass::EyeAngles();
+}
+
+Vector C_ZMBaseZombie::EyePosition()
+{
+    if ( m_iEyeAttachment > 0 )
+    {
+        Vector origin;
+        GetAttachment( m_iEyeAttachment, origin );
+
+        return origin;
+    }
+
+    return BaseClass::EyePosition();
+}
+
 int C_ZMBaseZombie::DrawModel( int flags )
 {
     CZMPlayer* pPlayer = ToZMPlayer( C_BasePlayer::GetLocalPlayer() );
+
+    if (pPlayer
+    &&  pPlayer->IsObserver()
+    &&  pPlayer->GetObserverTarget() == this
+    &&  pPlayer->GetObserverMode() == OBS_MODE_IN_EYE)
+        return 0;
 
     if ( !pPlayer || !pPlayer->IsZM() )
     {
