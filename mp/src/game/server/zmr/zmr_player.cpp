@@ -366,11 +366,17 @@ bool CZMPlayer::IsValidObserverTarget( CBaseEntity* pEnt )
     // ZMRTODO: Allow zombie spectating, etc.
     if ( !pEnt->IsPlayer() )
     {
-        return true;
+        if ( pEnt->MyNPCPointer() != nullptr )
+            return true;
+
+        return false;
     }
 
 
     CZMPlayer* pPlayer = ToZMPlayer( pEnt );
+
+    if ( !pPlayer )
+        return false;
 
     // Don't spec observers or players who haven't picked a class yet
     if ( pPlayer->IsObserver() )
@@ -398,6 +404,60 @@ bool CZMPlayer::IsValidObserverTarget( CBaseEntity* pEnt )
     }
 
     return true;
+}
+
+CBaseEntity* CZMPlayer::FindNextObserverTarget( bool bReverse )
+{
+    // If we were spectating a zombie, find next zombie.
+    CZMBaseZombie* pZombie;
+    if (GetObserverTarget()
+    &&  GetObserverMode() != OBS_MODE_ROAMING
+    &&  (pZombie = dynamic_cast<CZMBaseZombie*>( GetObserverTarget()->MyNPCPointer() )) != nullptr )
+    {
+        int i;
+        CZMBaseZombie* pLoop;
+
+        int origin = -1;
+        int len = g_pZombies->Count();
+        
+
+        for ( i = 0; i < len; i++ )
+        {
+            if ( g_pZombies->Element( i ) == pZombie )
+            {
+                origin = i;
+                break;
+            }
+        }
+
+        if ( origin != -1 )
+        {
+            int iDir = bReverse ? -1 : 1;
+            int i = origin;
+            while ( true )
+            {
+                i += iDir;
+
+                if ( i >= len )
+                    i = 0;
+                else if ( i < 0 )
+                    i = len - 1;
+
+                if ( i == origin )
+                    break;
+
+
+                pLoop = g_pZombies->Element( i );
+                if ( pLoop && pLoop->IsAlive() )
+                {
+                    return pLoop;
+                }
+            }
+        }
+    }
+
+
+    return BaseClass::FindNextObserverTarget( bReverse );
 }
 
 void CZMPlayer::SetTeamSpecificProps()
