@@ -578,7 +578,7 @@ C_BaseAnimating* C_ZMPlayer::BecomeRagdollOnClient()
 }
 
 // ZMRTODO: When happy, set to 1.
-ConVar zm_cl_firstperson_deathcam( "zm_cl_firstperson_deathcam", "0" );
+ConVar zm_cl_firstperson_deathcam( "zm_cl_firstperson_deathcam", "0", FCVAR_ARCHIVE );
 
 void C_ZMPlayer::CalcView( Vector& eyeOrigin, QAngle& eyeAngles, float& zNear, float& zFar, float& fov )
 {
