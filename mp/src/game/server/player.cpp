@@ -6448,6 +6448,11 @@ bool CBasePlayer::ClientCommand( const CCommand &args )
 			}
 
 		}
+
+#ifdef ZMR // ZMRCHANGE: Ignore this point of interest bullshit.
+        if ( mode == OBS_MODE_POI )
+            mode = OBS_MODE_POI + 1;
+#endif
 	
 		// don't allow input while player or death cam animation
 		if ( GetObserverMode() > OBS_MODE_DEATHCAM )
