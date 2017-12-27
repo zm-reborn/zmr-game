@@ -103,7 +103,7 @@ IViewPortPanel* CZMViewport::CreatePanelByName( const char* szPanelName )
     }
     else if ( Q_strcmp( PANEL_SPECGUI, szPanelName ) == 0 )
     {
-        newpanel = new CZMSpectatorGUI( this );	
+        //newpanel = new CZMHudSpectatorUI( this );
         return newpanel;
     }
 
