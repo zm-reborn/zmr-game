@@ -22,7 +22,40 @@
     You must add custom animation events in eventlist.h && eventlist.cpp
 */
 
-class CZMBaseWeapon : public CBaseCombatWeapon
+class CZMPredictionSeed
+{
+public:
+    CZMPredictionSeed()
+    {
+        m_nLastPredictionSeed = -1;
+    }
+    
+    void    SetLastPredictionSeed( int seed ) { m_nLastPredictionSeed = seed; };
+    int     GetLastPredictionSeed() { return m_nLastPredictionSeed; };
+
+
+    // This function doesn't hash like SharedRandomFloat does, but it gets the job done.
+    float GetPredictedRandomFloat( float flMinVal, float flMaxVal )
+    {
+        int seed = ( CBaseEntity::GetPredictionRandomSeed() == -1 ) ?
+            GetLastPredictionSeed() :
+            CBaseEntity::GetPredictionRandomSeed();
+
+        RandomSeed( seed );
+        return RandomFloat( flMinVal, flMaxVal );
+    }
+
+private:
+    int m_nLastPredictionSeed;
+};
+
+#define RECORD_PREDICTION_SEED  void ItemPostFrame() OVERRIDE \
+                                { \
+                                    BaseClass::ItemPostFrame(); \
+                                    SetLastPredictionSeed( CBaseEntity::GetPredictionRandomSeed() ); \
+                                } \
+
+class CZMBaseWeapon : public CBaseCombatWeapon, public CZMPredictionSeed
 {
 public:
 	DECLARE_CLASS( CZMBaseWeapon, CBaseCombatWeapon );

@@ -141,6 +141,8 @@ void CZMWeaponRevolver::ItemPostFrame()
     //if ( !pPlayer ) return;
 
     BaseClass::ItemPostFrame();
+
+    SetLastPredictionSeed( CBaseEntity::GetPredictionRandomSeed() );
 }
 
 // ZMRTODO: Use base class for this shit.
@@ -256,21 +258,36 @@ void CZMWeaponRevolver::AddViewKick()
 
     Activity act = GetActivity();
 
-#ifndef CLIENT_DLL
+    // ZMRTODO: This isn't called on client.
     if ( act == ACT_VM_SECONDARYATTACK )
     {
-        //Disorient the player
+        // Disorient the player.
         QAngle angles = pPlayer->GetLocalAngles();
 
-        angles.x += random->RandomInt( -2, 2 );
-        angles.y += random->RandomInt( 2, 4 );
-        angles.z = 0;
-        pPlayer->SnapEyeAngles( angles );
-    }
-#endif
+        angles.x += GetPredictedRandomFloat( -2, 2 );
+        angles.y += GetPredictedRandomFloat( 2, 4 );
 
-    if ( act == ACT_VM_PRIMARYATTACK )
-        pPlayer->ViewPunch( QAngle( -8, random->RandomFloat( -1, 1 ), 0 ) );
-    else
-        pPlayer->ViewPunch( QAngle( random->RandomFloat( -8, 2 ), random->RandomFloat( -2, 2 ), 0 ) );
+#ifdef CLIENT_DLL
+        pPlayer->SetLocalAngles( angles );
+#else
+        pPlayer->SnapEyeAngles( angles );
+#endif
+    }
+
+
+    QAngle ang;
+    ang.z = 0.0f;
+
+    if ( act == ACT_VM_PRIMARYATTACK ) // Slow
+    {
+        ang.x = -8.0f;
+        ang.y = GetPredictedRandomFloat( -1, 1 );
+    }
+    else // Fast
+    {
+        ang.x = GetPredictedRandomFloat( -8, 2 );
+        ang.y = GetPredictedRandomFloat( -2, 2 );
+    }
+
+    pPlayer->ViewPunch( ang );
 }
