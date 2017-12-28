@@ -25,6 +25,8 @@ public:
     CZMWeaponSledge();
 
 
+    RECORD_PREDICTION_SEED;
+
     float GetRange() OVERRIDE { return 60.0f; };
     float GetFireRate() OVERRIDE { return 2.9f; };
     float GetDamageForActivity( Activity act ) OVERRIDE
@@ -52,7 +54,14 @@ public:
     {
         CZMPlayer* pPlayer = GetPlayerOwner();
         if ( !pPlayer ) return;
-	    pPlayer->ViewPunch( QAngle( random->RandomFloat( 5.0f, 10.0f ), random->RandomFloat( -2.0f, -1.0f ), 0.0f ) );
+
+        // ZMRTODO: This isn't called on client.
+        QAngle ang;
+        ang.x = GetPredictedRandomFloat( 5.0f, 10.0f );
+        ang.y = GetPredictedRandomFloat( -2.0f, -1.0f );
+        ang.z = 0.0f;
+
+	    pPlayer->ViewPunch( ang );
     };
 
 
