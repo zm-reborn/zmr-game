@@ -115,6 +115,8 @@ public:
 
     virtual void    ImpulseCommands() OVERRIDE;
     virtual void    CheatImpulseCommands( int ) OVERRIDE;
+
+    virtual int     GiveAmmo( int nCount, int nAmmoIndex, bool bSuppressSound ) OVERRIDE;
     void            GiveDefaultItems( void );
     virtual void    EquipSuit( bool = false ) OVERRIDE;
     virtual void    RemoveAllItems( bool removeSuit ) OVERRIDE;
@@ -230,6 +232,9 @@ private:
 
     // So we don't lag compensate more than once.
     bool m_bIsFireBulletsRecursive;
+
+    // Store all the ammo indices denied for this frame.
+    CUtlVector<int> m_vAmmoDenied;
 };
 
 inline CZMPlayer* ToZMPlayer( CBaseEntity* pEntity )
