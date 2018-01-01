@@ -174,5 +174,7 @@ private:
 #ifndef CLIENT_DLL
     string_t        m_OverrideViewModel;
     string_t        m_OverrideWorldModel;
+
+    int             m_nOverrideDamage;
 #endif
 };

@@ -36,6 +36,8 @@ END_PREDICTION_DATA()
 BEGIN_DATADESC( CZMBaseWeapon )
     DEFINE_KEYFIELD( m_OverrideViewModel, FIELD_MODELNAME, "v_modeloverride" ),
     DEFINE_KEYFIELD( m_OverrideWorldModel, FIELD_MODELNAME, "w_modeloverride" ),
+
+    DEFINE_KEYFIELD( m_nOverrideDamage, FIELD_INTEGER, "dmgoverride" ),
 END_DATADESC()
 
 
@@ -52,6 +54,7 @@ CZMBaseWeapon::CZMBaseWeapon()
 
 #ifndef CLIENT_DLL
     m_OverrideViewModel = m_OverrideWorldModel = NULL_STRING;
+    m_nOverrideDamage = -1;
 #endif
 }
 
@@ -118,7 +121,12 @@ void CZMBaseWeapon::FireBullets( const FireBulletsInfo_t &info )
 
 	FireBulletsInfo_t modinfo = info;
 
+#ifndef CLIENT_DLL
+    modinfo.m_flDamage = ( m_nOverrideDamage > -1 ) ? (float)m_nOverrideDamage : GetWpnData().m_flDamage;
+#else
     modinfo.m_flDamage = GetWpnData().m_flDamage;
+#endif
+    
 	modinfo.m_iPlayerDamage = (int)modinfo.m_flDamage;
     
     
