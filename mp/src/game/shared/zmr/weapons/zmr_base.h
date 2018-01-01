@@ -55,6 +55,10 @@ private:
                                     SetLastPredictionSeed( CBaseEntity::GetPredictionRandomSeed() ); \
                                 } \
 
+
+// 1 is constrained.
+#define SF_ZMWEAPON_TEMPLATE        ( 1 << 1 )
+
 class CZMBaseWeapon : public CBaseCombatWeapon, public CZMPredictionSeed
 {
 public:
@@ -100,6 +104,8 @@ public:
     virtual int GetMaxBurst( void ) OVERRIDE { return 1; };
     
 #ifndef CLIENT_DLL
+    virtual bool IsTemplate() OVERRIDE;
+
     virtual void Materialize( void ) OVERRIDE;
 #endif
     // Makes our weapons not cry about spawning.

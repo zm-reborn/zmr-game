@@ -306,6 +306,16 @@ void CZMBaseWeapon::WeaponSound( WeaponSound_t sound_type, float soundtime /* = 
 }
 
 #ifndef CLIENT_DLL
+bool CZMBaseWeapon::IsTemplate()
+{
+    if ( HasSpawnFlags( SF_ZMWEAPON_TEMPLATE ) )
+    {
+        return true;
+    }
+
+    return BaseClass::IsTemplate();
+}
+
 void CZMBaseWeapon::Materialize( void )
 {
 	if ( IsEffectActive( EF_NODRAW ) )
