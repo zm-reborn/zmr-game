@@ -32,11 +32,15 @@ IMPLEMENT_NETWORKCLASS_ALIASED( ZMBaseWeapon, DT_ZM_BaseWeapon )
 BEGIN_PREDICTION_DATA( CZMBaseWeapon )
 END_PREDICTION_DATA()
 
+#ifndef CLIENT_DLL
 BEGIN_DATADESC( CZMBaseWeapon )
+    DEFINE_KEYFIELD( m_OverrideViewModel, FIELD_MODELNAME, "v_modeloverride" ),
+    DEFINE_KEYFIELD( m_OverrideWorldModel, FIELD_MODELNAME, "w_modeloverride" ),
 END_DATADESC()
 
-LINK_ENTITY_TO_CLASS( weapon_zm_base, CZMBaseWeapon );
 
+LINK_ENTITY_TO_CLASS( weapon_zm_base, CZMBaseWeapon );
+#endif
 
 CZMBaseWeapon::CZMBaseWeapon()
 {
@@ -45,6 +49,10 @@ CZMBaseWeapon::CZMBaseWeapon()
 
 
     SetSlotFlag( ZMWEAPONSLOT_NONE );
+
+#ifndef CLIENT_DLL
+    m_OverrideViewModel = m_OverrideWorldModel = NULL_STRING;
+#endif
 }
 
 CZMBaseWeapon::~CZMBaseWeapon()
@@ -213,7 +221,35 @@ void CZMBaseWeapon::SecondaryAttack( void )
     BaseClass::SecondaryAttack();
 }
 
-#ifdef CLIENT_DLL
+#ifndef CLIENT_DLL
+void CZMBaseWeapon::Precache()
+{
+    BaseClass::Precache();
+
+
+    // Make sure we precache all models.
+    // It's possible to only precache the override model and the default one is left out.
+    if ( GetWpnData().szViewModel[0] != NULL )
+    {
+        PrecacheModel( GetWpnData().szViewModel );
+    }
+
+    if ( GetWpnData().szWorldModel[0] != NULL )
+    {
+        PrecacheModel( GetWpnData().szWorldModel );
+    }
+
+    if ( m_OverrideViewModel != NULL_STRING )
+    {
+        PrecacheModel( STRING( m_OverrideViewModel ) );
+    }
+
+    if ( m_OverrideWorldModel != NULL_STRING )
+    {
+        PrecacheModel( STRING( m_OverrideWorldModel ) );
+    }
+}
+#else
 void CZMBaseWeapon::Spawn()
 {
     BaseClass::Spawn();
@@ -303,6 +339,61 @@ void CZMBaseWeapon::WeaponSound( WeaponSound_t sound_type, float soundtime /* = 
 #else
 		BaseClass::WeaponSound( sound_type, soundtime );
 #endif
+}
+
+const char* CZMBaseWeapon::GetViewModel( int vmIndex ) const
+{
+#ifndef CLIENT_DLL
+    if ( m_OverrideViewModel != NULL_STRING )
+    {
+        return STRING( m_OverrideViewModel );
+    }
+#endif
+
+    return BaseClass::GetViewModel( vmIndex );
+}
+
+const char* CZMBaseWeapon::GetWorldModel() const
+{
+#ifndef CLIENT_DLL
+    if ( m_OverrideWorldModel != NULL_STRING )
+    {
+        return STRING( m_OverrideWorldModel );
+    }
+#endif
+
+    return BaseClass::GetWorldModel();
+}
+
+void CZMBaseWeapon::SetViewModel()
+{
+    CBasePlayer* pOwner = GetPlayerOwner();
+    if ( !pOwner ) return;
+
+    CBaseViewModel* vm = pOwner->GetViewModel( m_nViewModelIndex, false );
+    if ( !vm ) return;
+
+    Assert( vm->ViewModelIndex() == m_nViewModelIndex );
+    
+
+    // Use the model index instead of GetViewModel()...
+    // This makes sure we don't have to network the model path to the client.
+    const char* pszModel = nullptr;
+
+
+    const model_t* pModel = modelinfo->GetModel( m_iViewModelIndex );
+    if ( pModel )
+    {
+        pszModel = modelinfo->GetModelName( pModel );
+    }
+
+    // Our networked index isn't valid, use the shared version.
+    if ( !pszModel || !(*pszModel) )
+    {
+        pszModel = GetViewModel( m_nViewModelIndex );
+    }
+
+    vm->SetWeaponModel( pszModel, this );
 }
 
 #ifndef CLIENT_DLL
