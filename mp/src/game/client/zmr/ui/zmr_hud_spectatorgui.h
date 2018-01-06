@@ -2,15 +2,16 @@
 
 #include <vgui_controls/Frame.h>
 #include <vgui_controls/EditablePanel.h>
+#include <vgui_controls/Label.h>
 #include <game/client/iviewport.h>
 
 #include "viewport_panel_names.h"
 
 
-class CZMHudSpectatorUI : public CHudElement, public vgui::Panel
+class CZMHudSpectatorUI : public CHudElement, public vgui::EditablePanel
 {
 public:
-    DECLARE_CLASS_SIMPLE( CZMHudSpectatorUI, vgui::Panel );
+    DECLARE_CLASS_SIMPLE( CZMHudSpectatorUI, vgui::EditablePanel );
 
     CZMHudSpectatorUI( const char* pElementName );
 
@@ -23,12 +24,15 @@ public:
     virtual void OnThink() OVERRIDE;
     virtual void Paint() OVERRIDE;
 
+    virtual bool IsVisible() OVERRIDE;
+
+    virtual void ApplySchemeSettings( vgui::IScheme* pScheme ) OVERRIDE;
 
 protected:
     void PaintBar( int y, int h, bool bFlip );
     void PaintBorder( int border_y, int border_height, bool bFlip );
-    void DrawText( int x, int y );
 
+    void Update();
     bool UpdateTargetText();
 
 private:
@@ -38,11 +42,13 @@ private:
     C_BaseEntity*   m_pOldTarget;
     int             m_nOldTargetHealth;
     int             m_nOldObserverMode;
-    wchar_t         m_szTargetTxt[256];
-    Color            m_TargetColor;
 
     CPanelAnimationVar( Color, m_BarColor, "BarColor", "0 0 0 220" );
     CPanelAnimationVar( vgui::HFont, m_hTextFont, "TextFont", "ZMHudVoteText" );
+
+
+    vgui::Label*    m_pNameLabel;
+    vgui::Label*    m_pInfoLabel;
 };
 
 /*class CZMHudSpectatorUI : public vgui::EditablePanel, public IViewPortPanel

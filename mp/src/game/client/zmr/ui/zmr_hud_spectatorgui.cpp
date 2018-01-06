@@ -28,9 +28,22 @@ CZMHudSpectatorUI::CZMHudSpectatorUI( const char *pElementName ) : CHudElement( 
     m_nTexPanelBgTopId = surface()->CreateNewTextureID();
     surface()->DrawSetTextureFile( m_nTexPanelBgTopId, "zmr_effects/hud_bg_spec_top", true, false );
 
-    m_szTargetTxt[0] = NULL;
     m_pOldTarget = nullptr;
     m_nOldObserverMode = OBS_MODE_NONE;
+
+
+    SetProportional( true );
+}
+
+void CZMHudSpectatorUI::ApplySchemeSettings( IScheme* pScheme )
+{
+    BaseClass::ApplySchemeSettings( pScheme );
+
+    LoadControlSettings( "resource/ui/zmspectatorui.res" );
+
+
+    m_pNameLabel = dynamic_cast<Label*>( FindChildByName( "ObservedTargetName" ) );
+    m_pInfoLabel = dynamic_cast<Label*>( FindChildByName( "ObservedTargetInfo" ) );
 }
 
 void CZMHudSpectatorUI::Init()
@@ -46,6 +59,20 @@ void CZMHudSpectatorUI::VidInit()
 void CZMHudSpectatorUI::LevelInit()
 {
     Reset();
+
+    /*
+    Label* pLabel = dynamic_cast<Label*>( FindChildByName( "mapinfo" ) );
+
+    char buffer[128];
+    wchar_t wMapName[256];
+    wchar_t wBuffer[256];
+    Q_FileBase( engine->GetLevelName(), buffer, sizeof buffer );
+
+    g_pVGuiLocalize->ConvertANSIToUnicode( buffer, wMapName, sizeof wMapName );
+    g_pVGuiLocalize->ConstructString( wBuffer, sizeof wBuffer, g_pVGuiLocalize->Find( "#Spec_Map" ), 1, wMapName );
+
+    pLabel->SetText( wBuffer );
+    */
 }
 
 void CZMHudSpectatorUI::Reset()
@@ -53,11 +80,21 @@ void CZMHudSpectatorUI::Reset()
     SetBounds( 0, 0, ScreenWidth(), ScreenHeight() );
 }
 
+bool CZMHudSpectatorUI::IsVisible()
+{
+    return BaseClass::IsVisible();
+}
+
 void CZMHudSpectatorUI::OnThink()
 {
     C_BasePlayer* pLocal = C_BasePlayer::GetLocalPlayer();
-    if ( !pLocal || !pLocal->IsObserver() )
-        return;
+
+    SetVisible( pLocal && pLocal->IsObserver() );
+
+
+
+    if ( !IsVisible() ) return;
+
 
     if (m_pOldTarget
     &&  pLocal->GetObserverTarget() == m_pOldTarget
@@ -65,11 +102,7 @@ void CZMHudSpectatorUI::OnThink()
     &&  m_pOldTarget->GetHealth() == m_nOldTargetHealth )
         return;
 
-    if ( !UpdateTargetText() )
-    {
-        m_szTargetTxt[0] = NULL;
-        return;
-    }
+    Update();
 }
 
 void CZMHudSpectatorUI::PaintBar( int y, int h, bool bFlip )
@@ -121,11 +154,6 @@ void CZMHudSpectatorUI::PaintBorder( int border_y, int border_height, bool bFlip
 
 void CZMHudSpectatorUI::Paint()
 {
-    C_BasePlayer* pLocal = C_BasePlayer::GetLocalPlayer();
-    if ( !pLocal || !pLocal->IsObserver() )
-        return;
-
-
     const int bar_height = ScreenHeight() * 0.1f;
     const int border_height = 64;
 
@@ -136,33 +164,30 @@ void CZMHudSpectatorUI::Paint()
     // Bottom
     PaintBar( ScreenHeight() - bar_height, bar_height, false );
     PaintBorder( ScreenHeight() - bar_height - border_height, border_height, false );
-    
 
-    DrawText( ScreenWidth() / 2.0f, ScreenHeight() - bar_height / 2.0f );
+    BaseClass::Paint();
 }
 
-void CZMHudSpectatorUI::DrawText( int x, int y )
+void CZMHudSpectatorUI::Update()
 {
-    if ( m_szTargetTxt[0] == NULL )
+    if ( !UpdateTargetText() )
+    {
+        m_pNameLabel->SetText( "" );
+        m_pInfoLabel->SetText( "" );
         return;
-
-
-    int w, h;
-    surface()->GetTextSize( m_hTextFont, m_szTargetTxt, w, h );
-
-	surface()->DrawSetTextFont( m_hTextFont );
-    surface()->DrawSetTextColor( m_TargetColor );
-	surface()->DrawSetTextPos( x - w / 2.0f, y - h );
-	surface()->DrawUnicodeString( m_szTargetTxt );
+    }
 }
 
 bool CZMHudSpectatorUI::UpdateTargetText()
 {
     C_BasePlayer* pLocal = C_BasePlayer::GetLocalPlayer();
-    if ( !pLocal || !pLocal->IsObserver() )
-        return false;
-
     C_BaseEntity* pEnt = pLocal->GetObserverTarget();
+
+
+    m_pOldTarget = pEnt;
+    m_nOldTargetHealth = pEnt ? pEnt->GetHealth() : 0;
+    m_nOldObserverMode = pLocal->GetObserverMode();
+
 
     if (!pEnt
     ||  (pLocal->GetObserverMode() != OBS_MODE_IN_EYE && pLocal->GetObserverMode() != OBS_MODE_CHASE) )
@@ -170,6 +195,8 @@ bool CZMHudSpectatorUI::UpdateTargetText()
         return false;
     }
 
+
+    Color clr;
     const char* pszName = nullptr;
 
     
@@ -181,43 +208,45 @@ bool CZMHudSpectatorUI::UpdateTargetText()
         pszName = pTargetPlayer->GetPlayerName();
         health = pTargetPlayer->GetHealth();
 
-        m_TargetColor = g_PR->GetTeamColor( g_PR->GetTeam( pEnt->entindex() ) );
+        clr = g_PR->GetTeamColor( g_PR->GetTeam( pEnt->entindex() ) );
     }
     else
     {
-        C_ZMBaseZombie* pZombie = ToBaseZombie( pEnt );
+        C_ZMBaseZombie* pZombie = dynamic_cast<C_ZMBaseZombie*>( pEnt );
 
         if ( pZombie )
         {
+            // ZMRTODO: Get zombie type name.
             pszName = "Zombie";
-
-            m_TargetColor = g_PR->GetTeamColor( ZMTEAM_ZM );
         }
+
+        clr = g_PR->GetTeamColor( ZMTEAM_ZM );
     }
 
 
-    if ( !pszName || !*pszName )
+    if ( !pszName || !(*pszName) )
         return false;
 
 
-    
+    wchar_t buffer[162];
 
-    wchar_t szName[MAX_PLAYER_NAME_LENGTH];
-    g_pVGuiLocalize->ConvertANSIToUnicode( pszName, szName, ARRAYSIZE( szName ) );
+    // Name label.
+    g_pVGuiLocalize->ConvertANSIToUnicode( pszName, buffer, ARRAYSIZE( buffer ) );
+    m_pNameLabel->SetText( buffer );
+    m_pNameLabel->SetFgColor( clr );
 
+    // Info label.
     if ( health > 0 )
     {
-        V_snwprintf( m_szTargetTxt, ARRAYSIZE( m_szTargetTxt ), L"%s (%i)", szName, health );
+        V_snwprintf( buffer, ARRAYSIZE( buffer ), L"%i", health );
     }
     else
     {
-        V_snwprintf( m_szTargetTxt, ARRAYSIZE( m_szTargetTxt ), L"%s", szName );
+        buffer[0] = NULL;
     }
     
-
-    m_pOldTarget = pEnt;
-    m_nOldTargetHealth = health;
-    m_nOldObserverMode = pLocal->GetObserverMode();
+    m_pInfoLabel->SetText( buffer );
+    m_pInfoLabel->SetFgColor( clr );
 
     return true;
 }
