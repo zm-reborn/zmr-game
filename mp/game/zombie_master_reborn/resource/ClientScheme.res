@@ -755,6 +755,30 @@ Scheme
 				"custom"	"1"
 			}
 		}
+		ZMHudSpecUI18
+		{
+			"1"
+			{
+				"name"		"Trebuchet MS"
+				"tall"		"18"
+				"weight"	"900"
+				"antialias" "1"
+				"additive"	"0"
+				"custom"	"1"
+			}
+		}
+		ZMHudSpecUI16
+		{
+			"1"
+			{
+				"name"		"Trebuchet MS"
+				"tall"		"16"
+				"weight"	"900"
+				"antialias" "1"
+				"additive"	"0"
+				"custom"	"1"
+			}
+		}
 		HudNumbersSmall
 		{
 			"1"
