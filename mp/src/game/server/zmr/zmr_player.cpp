@@ -1176,6 +1176,9 @@ CBaseEntity* CZMPlayer::EntSelectSpawnPoint( void )
 
 
     // Didn't work, now just find any spot.
+    pEnt = gEntList.FindEntityByClassname( nullptr, pszSpawn );
+    if ( pEnt ) return pEnt;
+
     pEnt = gEntList.FindEntityByClassname( nullptr, pszFallback );
     if ( pEnt ) return pEnt;
 
@@ -1185,7 +1188,7 @@ CBaseEntity* CZMPlayer::EntSelectSpawnPoint( void )
 
     Warning( "Map has no spawnpoints! Returning world...\n" );
 
-    return UTIL_EntityByIndex( 0 );
+    return GetContainingEntity( INDEXENT( 0 ) );
 }
 
 void CZMPlayer::DeselectAllZombies()
