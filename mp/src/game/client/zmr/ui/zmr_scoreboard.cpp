@@ -9,643 +9,471 @@
 #include "hud.h"
 #include "c_team.h"
 #include "c_playerresource.h"
-#include "c_hl2mp_player.h"
-#include "hl2mp_gamerules.h"
-
-#include <KeyValues.h>
 
 #include <vgui/IScheme.h>
 #include <vgui/ILocalize.h>
 #include <vgui/ISurface.h>
 #include <vgui/IVGui.h>
+#include <vgui_controls/ImageList.h>
 #include <vgui_controls/SectionedListPanel.h>
 
 #include "voice_status.h"
+#include "vgui_avatarimage.h"
 
 #include "zmr/zmr_shareddefs.h"
 
+#include "zmr/zmr_gamerules.h"
+
+#include "zmr_listpanel.h"
 #include "zmr_scoreboard.h"
 
 
 using namespace vgui;
 
+// HACK
+static char g_szHostname[256];
 
-// id's of sections used in the scoreboard
-enum EScoreboardSections
+
+#define MAX_SCORE_HEIGHT            SCALE_HEIGHT( 450 )
+
+static bool SortHumanSection( KeyValues* kv1, KeyValues* kv2 )
 {
-    SCORESECTION_HEADER = 0,
-    SCORESECTION_ZM,
-    SCORESECTION_HUMAN,
-    SCORESECTION_SPECTATOR,
-};
+    if ( !kv1 || !kv2 ) return false;
 
-const int NumSegments = 7;
-static int coord[NumSegments+1] = {
-    0,
-    1,
-    2,
-    3,
-    4,
-    6,
-    9,
-    10
-};
 
-//-----------------------------------------------------------------------------
-// Purpose: Konstructor
-//-----------------------------------------------------------------------------
-CZMClientScoreBoardDialog::CZMClientScoreBoardDialog( IViewPort* pViewPort ) : CClientScoreBoardDialog( pViewPort )
-{
-    
+    int p1 = kv1->GetInt( "playerIndex" );
+    int p2 = kv2->GetInt( "playerIndex" );
+
+    if ( p1 > 0 && p2 > 0 && g_PR )
+    {
+        // Spectators go last.
+        if ( g_PR->GetTeam( p1 ) > g_PR->GetTeam( p2 ) )
+            return true;
+    }
+
+    // We have more score?
+    if ( kv1->GetInt( "frags" ) > kv2->GetInt( "frags" ) )
+        return true;
+
+    // We have less deaths?
+    if ( kv1->GetInt( "deaths" ) < kv2->GetInt( "deaths" ) )
+        return true;
+
+    return false;
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: Destructor
-//-----------------------------------------------------------------------------
+static bool SortZMSection( KeyValues* kv1, KeyValues* kv2 )
+{
+    if ( !kv1 || !kv2 ) return false;
+
+
+    return ( kv1->GetInt( "zmkills" ) > kv2->GetInt( "zmkills" ) );
+}
+
+
+int CZMAvatarList::CreateAvatarBySteamId( CSteamID id )
+{
+    int index = -1;
+
+    if ( (index = FindAvatarBySteamId( id )) != -1 )
+        return index;
+
+
+    CAvatarImage* pImage = new CAvatarImage();
+    pImage->SetDrawFriend( false );
+    pImage->SetSize( 32, 32 );
+    pImage->SetAvatarSteamID( id );
+
+    return m_ImageList.AddToTail( zm_avatarimg_t( id, pImage ) );
+}
+
+int CZMAvatarList::FindAvatarBySteamId( CSteamID id )
+{
+    int len = m_ImageList.Count();
+    for ( int i = 0; i < len; i++ )
+    {
+        if ( m_ImageList[i].SteamId == id )
+            return i;
+    }
+
+    return -1;
+}
+
+
+CZMClientScoreBoardDialog::CZMClientScoreBoardDialog( IViewPort* pViewPort ) : EditablePanel( nullptr, PANEL_SCOREBOARD )
+{
+    // Has to be set to load fonts correctly.
+    SetScheme( vgui::scheme()->LoadSchemeFromFile( "resource/ClientScheme.res", "ClientScheme" ) );
+
+
+    m_iPlayerIndexSymbol = KeyValuesSystem()->GetSymbolForString( "playerIndex" );
+
+
+    ListenForGameEvent( "server_spawn" );
+
+
+    SetProportional( true );
+
+
+    m_flNextUpdateTime = 0.0f;
+
+    m_nTexBgSideId = surface()->CreateNewTextureID();
+    surface()->DrawSetTextureFile( m_nTexBgSideId, "zmr_effects/hud_bg_spec_side", true, false );
+
+    m_nTexBgTopId = surface()->CreateNewTextureID();
+    surface()->DrawSetTextureFile( m_nTexBgTopId, "zmr_effects/hud_bg_spec_top", true, false );
+
+    m_nTexBgCornerId = surface()->CreateNewTextureID();
+    surface()->DrawSetTextureFile( m_nTexBgCornerId, "zmr_effects/hud_bg_spec_corner", true, false );
+
+
+    LoadControlSettings( "resource/ui/zmscoreboard.res" );
+
+    m_pList = dynamic_cast<CZMListPanel*>( FindChildByName( "PlayerList" ) );
+    Assert( m_pList );
+
+    m_iSectionZM = m_pList->GetSectionByName( "SectionTeamZM" );
+    m_iSectionHuman = m_pList->GetSectionByName( "SectionTeamHuman" );
+    Assert( m_iSectionHuman != -1 && m_iSectionZM != -1 );
+
+    m_pList->SetSectionSortingFunc( m_iSectionZM, SortZMSection );
+    m_pList->SetSectionSortingFunc( m_iSectionHuman, SortHumanSection );
+}
+
 CZMClientScoreBoardDialog::~CZMClientScoreBoardDialog()
 {
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: Paint background for rounded corners
-//-----------------------------------------------------------------------------
-void CZMClientScoreBoardDialog::PaintBackground()
-{
-    m_pPlayerList->SetBgColor( Color(0, 0, 0, 0) );
-    m_pPlayerList->SetBorder(NULL);
-
-    int x1, x2, y1, y2;
-    surface()->DrawSetColor(m_bgColor);
-    surface()->DrawSetTextColor(m_bgColor);
-
-    int wide, tall;
-    GetSize( wide, tall );
-
-    int i;
-
-    // top-left corner --------------------------------------------------------
-    int xDir = 1;
-    int yDir = -1;
-    int xIndex = 0;
-    int yIndex = NumSegments - 1;
-    int xMult = 1;
-    int yMult = 1;
-    int x = 0;
-    int y = 0;
-    for ( i=0; i<NumSegments; ++i )
-    {
-        x1 = MIN( x + coord[xIndex]*xMult, x + coord[xIndex+1]*xMult );
-        x2 = MAX( x + coord[xIndex]*xMult, x + coord[xIndex+1]*xMult );
-        y1 = MAX( y + coord[yIndex]*yMult, y + coord[yIndex+1]*yMult );
-        y2 = y + coord[NumSegments];
-        surface()->DrawFilledRect( x1, y1, x2, y2 );
-
-        xIndex += xDir;
-        yIndex += yDir;
-    }
-
-    // top-right corner -------------------------------------------------------
-    xDir = 1;
-    yDir = -1;
-    xIndex = 0;
-    yIndex = NumSegments - 1;
-    x = wide;
-    y = 0;
-    xMult = -1;
-    yMult = 1;
-    for ( i=0; i<NumSegments; ++i )
-    {
-        x1 = MIN( x + coord[xIndex]*xMult, x + coord[xIndex+1]*xMult );
-        x2 = MAX( x + coord[xIndex]*xMult, x + coord[xIndex+1]*xMult );
-        y1 = MAX( y + coord[yIndex]*yMult, y + coord[yIndex+1]*yMult );
-        y2 = y + coord[NumSegments];
-        surface()->DrawFilledRect( x1, y1, x2, y2 );
-        xIndex += xDir;
-        yIndex += yDir;
-    }
-
-    // bottom-right corner ----------------------------------------------------
-    xDir = 1;
-    yDir = -1;
-    xIndex = 0;
-    yIndex = NumSegments - 1;
-    x = wide;
-    y = tall;
-    xMult = -1;
-    yMult = -1;
-    for ( i=0; i<NumSegments; ++i )
-    {
-        x1 = MIN( x + coord[xIndex]*xMult, x + coord[xIndex+1]*xMult );
-        x2 = MAX( x + coord[xIndex]*xMult, x + coord[xIndex+1]*xMult );
-        y1 = y - coord[NumSegments];
-        y2 = MIN( y + coord[yIndex]*yMult, y + coord[yIndex+1]*yMult );
-        surface()->DrawFilledRect( x1, y1, x2, y2 );
-        xIndex += xDir;
-        yIndex += yDir;
-    }
-
-    // bottom-left corner -----------------------------------------------------
-    xDir = 1;
-    yDir = -1;
-    xIndex = 0;
-    yIndex = NumSegments - 1;
-    x = 0;
-    y = tall;
-    xMult = 1;
-    yMult = -1;
-    for ( i=0; i<NumSegments; ++i )
-    {
-        x1 = MIN( x + coord[xIndex]*xMult, x + coord[xIndex+1]*xMult );
-        x2 = MAX( x + coord[xIndex]*xMult, x + coord[xIndex+1]*xMult );
-        y1 = y - coord[NumSegments];
-        y2 = MIN( y + coord[yIndex]*yMult, y + coord[yIndex+1]*yMult );
-        surface()->DrawFilledRect( x1, y1, x2, y2 );
-        xIndex += xDir;
-        yIndex += yDir;
-    }
-
-    // paint between top left and bottom left ---------------------------------
-    x1 = 0;
-    x2 = coord[NumSegments];
-    y1 = coord[NumSegments];
-    y2 = tall - coord[NumSegments];
-    surface()->DrawFilledRect( x1, y1, x2, y2 );
-
-    // paint between left and right -------------------------------------------
-    x1 = coord[NumSegments];
-    x2 = wide - coord[NumSegments];
-    y1 = 0;
-    y2 = tall;
-    surface()->DrawFilledRect( x1, y1, x2, y2 );
-    
-    // paint between top right and bottom right -------------------------------
-    x1 = wide - coord[NumSegments];
-    x2 = wide;
-    y1 = coord[NumSegments];
-    y2 = tall - coord[NumSegments];
-    surface()->DrawFilledRect( x1, y1, x2, y2 );
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: Paint border for rounded corners
-//-----------------------------------------------------------------------------
-void CZMClientScoreBoardDialog::PaintBorder()
-{
-    int x1, x2, y1, y2;
-    surface()->DrawSetColor(m_borderColor);
-    surface()->DrawSetTextColor(m_borderColor);
-
-    int wide, tall;
-    GetSize( wide, tall );
-
-    int i;
-
-    // top-left corner --------------------------------------------------------
-    int xDir = 1;
-    int yDir = -1;
-    int xIndex = 0;
-    int yIndex = NumSegments - 1;
-    int xMult = 1;
-    int yMult = 1;
-    int x = 0;
-    int y = 0;
-    for ( i=0; i<NumSegments; ++i )
-    {
-        x1 = MIN( x + coord[xIndex]*xMult, x + coord[xIndex+1]*xMult );
-        x2 = MAX( x + coord[xIndex]*xMult, x + coord[xIndex+1]*xMult );
-        y1 = MIN( y + coord[yIndex]*yMult, y + coord[yIndex+1]*yMult );
-        y2 = MAX( y + coord[yIndex]*yMult, y + coord[yIndex+1]*yMult );
-        surface()->DrawFilledRect( x1, y1, x2, y2 );
-
-        xIndex += xDir;
-        yIndex += yDir;
-    }
-
-    // top-right corner -------------------------------------------------------
-    xDir = 1;
-    yDir = -1;
-    xIndex = 0;
-    yIndex = NumSegments - 1;
-    x = wide;
-    y = 0;
-    xMult = -1;
-    yMult = 1;
-    for ( i=0; i<NumSegments; ++i )
-    {
-        x1 = MIN( x + coord[xIndex]*xMult, x + coord[xIndex+1]*xMult );
-        x2 = MAX( x + coord[xIndex]*xMult, x + coord[xIndex+1]*xMult );
-        y1 = MIN( y + coord[yIndex]*yMult, y + coord[yIndex+1]*yMult );
-        y2 = MAX( y + coord[yIndex]*yMult, y + coord[yIndex+1]*yMult );
-        surface()->DrawFilledRect( x1, y1, x2, y2 );
-        xIndex += xDir;
-        yIndex += yDir;
-    }
-
-    // bottom-right corner ----------------------------------------------------
-    xDir = 1;
-    yDir = -1;
-    xIndex = 0;
-    yIndex = NumSegments - 1;
-    x = wide;
-    y = tall;
-    xMult = -1;
-    yMult = -1;
-    for ( i=0; i<NumSegments; ++i )
-    {
-        x1 = MIN( x + coord[xIndex]*xMult, x + coord[xIndex+1]*xMult );
-        x2 = MAX( x + coord[xIndex]*xMult, x + coord[xIndex+1]*xMult );
-        y1 = MIN( y + coord[yIndex]*yMult, y + coord[yIndex+1]*yMult );
-        y2 = MAX( y + coord[yIndex]*yMult, y + coord[yIndex+1]*yMult );
-        surface()->DrawFilledRect( x1, y1, x2, y2 );
-        xIndex += xDir;
-        yIndex += yDir;
-    }
-
-    // bottom-left corner -----------------------------------------------------
-    xDir = 1;
-    yDir = -1;
-    xIndex = 0;
-    yIndex = NumSegments - 1;
-    x = 0;
-    y = tall;
-    xMult = 1;
-    yMult = -1;
-    for ( i=0; i<NumSegments; ++i )
-    {
-        x1 = MIN( x + coord[xIndex]*xMult, x + coord[xIndex+1]*xMult );
-        x2 = MAX( x + coord[xIndex]*xMult, x + coord[xIndex+1]*xMult );
-        y1 = MIN( y + coord[yIndex]*yMult, y + coord[yIndex+1]*yMult );
-        y2 = MAX( y + coord[yIndex]*yMult, y + coord[yIndex+1]*yMult );
-        surface()->DrawFilledRect( x1, y1, x2, y2 );
-        xIndex += xDir;
-        yIndex += yDir;
-    }
-
-    // top --------------------------------------------------------------------
-    x1 = coord[NumSegments];
-    x2 = wide - coord[NumSegments];
-    y1 = 0;
-    y2 = 1;
-    surface()->DrawFilledRect( x1, y1, x2, y2 );
-
-    // bottom -----------------------------------------------------------------
-    x1 = coord[NumSegments];
-    x2 = wide - coord[NumSegments];
-    y1 = tall - 1;
-    y2 = tall;
-    surface()->DrawFilledRect( x1, y1, x2, y2 );
-
-    // left -------------------------------------------------------------------
-    x1 = 0;
-    x2 = 1;
-    y1 = coord[NumSegments];
-    y2 = tall - coord[NumSegments];
-    surface()->DrawFilledRect( x1, y1, x2, y2 );
-
-    // right ------------------------------------------------------------------
-    x1 = wide - 1;
-    x2 = wide;
-    y1 = coord[NumSegments];
-    y2 = tall - coord[NumSegments];
-    surface()->DrawFilledRect( x1, y1, x2, y2 );
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: Apply scheme settings
-//-----------------------------------------------------------------------------
 void CZMClientScoreBoardDialog::ApplySchemeSettings( vgui::IScheme* pScheme )
 {
     BaseClass::ApplySchemeSettings( pScheme );
 
-    m_bgColor = GetSchemeColor( "ZMScoreboardBg", GetBgColor(), pScheme );
-    m_borderColor = GetSchemeColor( "ZMScoreboardBorder", GetFgColor(), pScheme );
 
-    SetBgColor( Color( 0, 0, 0, 0 ) );
-    SetBorder( pScheme->GetBorder( "BaseBorder" ) );
+    SetBgColor( vgui::scheme()->GetIScheme( GetScheme() )->GetColor( "ZMScoreboardBg", COLOR_BLACK ) );
 }
 
-
-//-----------------------------------------------------------------------------
-// Purpose: sets up base sections
-//-----------------------------------------------------------------------------
-void CZMClientScoreBoardDialog::InitScoreboardSections()
+void CZMClientScoreBoardDialog::FireGameEvent( IGameEvent* event )
 {
-    m_pPlayerList->SetBgColor( Color( 0, 0, 0, 0 ) );
-    m_pPlayerList->SetBorder( nullptr );
+    if ( Q_strcmp( event->GetName(), "server_spawn" ) == 0 )
+    {
+        m_pList->ClearRows( m_iSectionHuman );
+        m_pList->ClearRows( m_iSectionZM );
 
-    m_pPlayerList->SetVerticalScrollbar( true );
+        // We'll post the message ourselves instead of using SetControlString()
+        // so we don't try to translate the hostname.
+        const char* hostname = event->GetString( "hostname" );
 
-    // fill out the structure of the scoreboard
-    AddHeader();
-    AddSection( TYPE_TEAM, ZMTEAM_ZM );
-    AddSection( TYPE_TEAM, ZMTEAM_HUMAN );
-    AddSection( TYPE_TEAM, ZMTEAM_SPECTATOR );
+        Q_strncpy( g_szHostname, hostname, sizeof( g_szHostname ) );
+
+        Panel* control = FindChildByName( "ServerName" );
+        if ( control )
+        {
+            PostMessage( control, new KeyValues( "SetText", "text", hostname ) );
+            control->MoveToFront();
+        }
+    }
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: resets the scoreboard team info
-//-----------------------------------------------------------------------------
-void CZMClientScoreBoardDialog::UpdateTeamInfo()
+void CZMClientScoreBoardDialog::OnListLayout( KeyValues* kv )
 {
-    if ( g_PR == NULL )
+    PerformLayout();
+}
+
+void CZMClientScoreBoardDialog::Reset()
+{
+    Update();
+    UpdateStats();
+
+    PerformLayout();
+}
+
+void CZMClientScoreBoardDialog::Update()
+{
+    UpdateScoreboard();
+
+    m_flNextUpdateTime = gpGlobals->curtime + 0.5f;
+}
+
+bool CZMClientScoreBoardDialog::NeedsUpdate()
+{
+    return m_flNextUpdateTime < gpGlobals->curtime;
+}
+
+void CZMClientScoreBoardDialog::ShowPanel( bool bShow )
+{
+    if ( IsVisible() == bShow )
         return;
 
-    int iNumPlayersInGame = 0;
 
-    for ( int j = 1; j <= gpGlobals->maxClients; j++ )
-    {	
-        if ( g_PR->IsConnected( j ) )
-        {
-            iNumPlayersInGame++;
-        }
-    }
-
-    // update the team sections in the scoreboard
-    for ( int i = ZMTEAM_SPECTATOR; i <= ZMTEAM_ZM; i++ )
+    if ( bShow )
     {
-        wchar_t* teamName = L"";
-        int sectionID = 0;
-        C_Team* team = GetGlobalTeam( i );
-
-        if ( !team ) continue;
-
-
-        sectionID = GetSectionFromTeamNumber( i );
-    
-        // update team name
-        wchar_t name[64];
-
-        if ( *teamName == NULL && team )
-        {
-            const char* tempname = team->Get_Name();
-
-            g_pVGuiLocalize->ConvertANSIToUnicode( tempname ? tempname : "NO TEAM NAME", name, sizeof( name ) );
-                
-            teamName = name;
-        }
-
-        if ( DisplayTeamCount( i ) )
-        {
-            wchar_t wNumPlayers[6];
-            wchar_t string1[512];
-
-            _snwprintf( wNumPlayers, ARRAYSIZE( wNumPlayers ), L"%i", team->Get_Number_Players() );
-
-            if ( team->Get_Number_Players() == 1 )
-            {
-                g_pVGuiLocalize->ConstructString( string1, sizeof( string1 ), g_pVGuiLocalize->Find( "#ScoreBoard_Player" ), 2, teamName, wNumPlayers );
-            }
-            else
-            {
-                g_pVGuiLocalize->ConstructString( string1, sizeof( string1 ), g_pVGuiLocalize->Find( "#ScoreBoard_Players" ), 2, teamName, wNumPlayers );
-            }
-
-            m_pPlayerList->ModifyColumn( sectionID, "name", string1 );
-        }
-        else
-        {
-            m_pPlayerList->ModifyColumn( sectionID, "name", teamName );
-        }
-    }
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: adds the top header of the scoreboars
-//-----------------------------------------------------------------------------
-void CZMClientScoreBoardDialog::AddHeader()
-{
-	// add the top header
-    HFont hFallbackFont = scheme()->GetIScheme( GetScheme() )->GetFont( "DefaultVerySmallFallBack", false );
-
-
-	m_pPlayerList->AddSection( SCORESECTION_HEADER, "" );
-	m_pPlayerList->SetSectionAlwaysVisible( SCORESECTION_HEADER );
-
-    if ( ShowAvatars() )
-		m_pPlayerList->AddColumnToSection( SCORESECTION_HEADER, "avatar", "", 0, m_iAvatarWidth * 2 );
-
-	m_pPlayerList->AddColumnToSection( SCORESECTION_HEADER, "name", "", 0, scheme()->GetProportionalScaledValueEx( GetScheme(), NAME_WIDTH ), hFallbackFont );
-	m_pPlayerList->AddColumnToSection( SCORESECTION_HEADER, "frags", "#PlayerScore", SectionedListPanel::COLUMN_RIGHT, scheme()->GetProportionalScaledValueEx( GetScheme() , SCORE_WIDTH ) );
-	m_pPlayerList->AddColumnToSection( SCORESECTION_HEADER, "deaths", "#PlayerDeath", SectionedListPanel::COLUMN_RIGHT, scheme()->GetProportionalScaledValueEx( GetScheme(), DEATH_WIDTH ) );
-	m_pPlayerList->AddColumnToSection( SCORESECTION_HEADER, "ping", "#PlayerPing", SectionedListPanel::COLUMN_RIGHT, scheme()->GetProportionalScaledValueEx( GetScheme(), PING_WIDTH ) );
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: Adds a new section to the scoreboard (i.e the team header)
-//-----------------------------------------------------------------------------
-void CZMClientScoreBoardDialog::AddSection( int teamType, int iTeam )
-{
-    HFont hFallbackFont = scheme()->GetIScheme( GetScheme() )->GetFont( "DefaultVerySmallFallBack", false );
-
-    int sectionID = GetSectionFromTeamNumber( iTeam );
-
-
-    if ( teamType != TYPE_TEAM )
-    {
-        Warning( "Attempting to add an invalid scoreboard section type!\n" );
-        return;
-    }
-    
-
-
-    m_pPlayerList->AddSection( sectionID, "", StaticPlayerSortFunc );
-    
-
-    if ( iTeam == ZMTEAM_HUMAN )
-    {
-        m_pPlayerList->SetSectionMinimumHeight( sectionID, 50 );
-    }
-
-    if ( iTeam != ZMTEAM_SPECTATOR )
-    {
-        m_pPlayerList->SetSectionAlwaysVisible( sectionID, true );
+        Reset();
+        Update();
+        SetVisible( true );
+        MoveToFront();
     }
     else
     {
-        m_pPlayerList->SetSectionAlwaysVisible( sectionID, false );
-    }
-
-
-	// Avatars are always displayed at 32x32 regardless of resolution
-    if ( ShowAvatars() )
-		m_pPlayerList->AddColumnToSection( sectionID, "avatar", "", SectionedListPanel::COLUMN_IMAGE, m_iAvatarWidth * 2 );
-
-    // setup the columns
-    m_pPlayerList->AddColumnToSection( sectionID, "name", "", 0, scheme()->GetProportionalScaledValueEx( GetScheme(), NAME_WIDTH ), hFallbackFont );
-	m_pPlayerList->AddColumnToSection( sectionID, "frags", "", SectionedListPanel::COLUMN_RIGHT, scheme()->GetProportionalScaledValueEx( GetScheme(), SCORE_WIDTH ) );
-	m_pPlayerList->AddColumnToSection( sectionID, "deaths", "", SectionedListPanel::COLUMN_RIGHT, scheme()->GetProportionalScaledValueEx( GetScheme(), DEATH_WIDTH ) );
-	m_pPlayerList->AddColumnToSection( sectionID, "ping", "", SectionedListPanel::COLUMN_RIGHT, scheme()->GetProportionalScaledValueEx( GetScheme(), PING_WIDTH ) );
-
-    // set the section to have the team color
-    if ( iTeam )
-    {
-        if ( GameResources() )
-            m_pPlayerList->SetSectionFgColor( sectionID, GameResources()->GetTeamColor( iTeam ) );
+        SetVisible( false );
+        SetMouseInputEnabled( false );
+        SetKeyBoardInputEnabled( false );
     }
 }
 
-int CZMClientScoreBoardDialog::GetSectionFromTeamNumber( int teamNumber )
+void CZMClientScoreBoardDialog::PerformLayout()
 {
-    switch ( teamNumber )
-    {
-    case ZMTEAM_ZM:
-        return SCORESECTION_ZM;
-    case ZMTEAM_HUMAN:
-        return SCORESECTION_HUMAN;
-    case ZMTEAM_SPECTATOR:
-        return SCORESECTION_SPECTATOR;
-    default:
-        return SCORESECTION_SPECTATOR;
-    }
-    return SCORESECTION_SPECTATOR;
+    // Set size
+    int max_h = MAX_SCORE_HEIGHT;
+    int min_h = SCALE_HEIGHT( 270 );
+
+    int x, y, w, h;
+    m_pList->GetBounds( x, y, w, h );
+
+
+    y += h + SCALE_HEIGHT( 32 );
+    if ( y < min_h )
+        y = min_h;
+    else if ( y > max_h )
+        y = max_h;
+
+
+    SetSize( GetWide(), y );
+
+    // Center
+    SetPos( (ScreenWidth() - GetWide()) / 2, (ScreenHeight() - MAX_SCORE_HEIGHT) / 2 );
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: Adds a new row to the scoreboard, from the playerinfo structure
-//-----------------------------------------------------------------------------
-bool CZMClientScoreBoardDialog::GetPlayerScoreInfo(int playerIndex, KeyValues *kv)
+void CZMClientScoreBoardDialog::PaintBackground()
 {
-    kv->SetInt("playerIndex", playerIndex);
-    kv->SetInt("team", g_PR->GetTeam( playerIndex ) );
-    kv->SetString("name", g_PR->GetPlayerName(playerIndex) );
-    kv->SetInt("deaths", g_PR->GetDeaths( playerIndex ));
-    kv->SetInt("frags", g_PR->GetPlayerScore( playerIndex ));
-    kv->SetString("class", "");
+    // Paint fancy border.
+
+    int x, y;
+    int w, h;
+    GetSize( w, h );
+
+    int repeats;
+    float tx1, ty1;
+
+
+    const Color clr = GetBgColor();
+
+    // Actual length of texture.
+    const int nBorderTexLength = 512;
+
+    const int border_w = SCALE_WIDTH( 32 );
+    const int border_h = SCALE_HEIGHT( 32 );
+
+
+    x = border_w;
+    y = border_h;
+    w -= border_w * 2;
+    h -= border_h * 2;
+
+
+    repeats = (int)(nBorderTexLength / (float)h);
+    if ( repeats < 1 ) repeats = 1;
+
+    ty1 = (float)repeats;
+
+
+    surface()->DrawSetColor( clr );
+
+    // Left
+    surface()->DrawSetTexture( m_nTexBgSideId );
+    surface()->DrawTexturedSubRect( 0, border_h, border_w, border_h + h, 0.0f, 0.0f, 1.0f, ty1 );
+
+    // Right
+    surface()->DrawSetTexture( m_nTexBgSideId );
+    surface()->DrawTexturedSubRect( border_w + w, border_h, border_w + w + border_w, border_h + h, 1.0f, 1.0f, 0.0f, (-ty1) + 1.0f );
     
-    if (g_PR->GetPing( playerIndex ) < 1)
-    {
-        if ( g_PR->IsFakePlayer( playerIndex ) )
-        {
-            kv->SetString("ping", "BOT");
-        }
-        else
-        {
-            kv->SetString("ping", "");
-        }
-    }
-    else
-    {
-        kv->SetInt("ping", g_PR->GetPing( playerIndex ));
-    }
-    
-    return true;
+
+    repeats = (int)(nBorderTexLength / (float)w);
+    if ( repeats < 1 ) repeats = 1;
+
+    tx1 = (float)repeats;
+
+    // Top
+    surface()->DrawSetTexture( m_nTexBgTopId );
+    surface()->DrawTexturedSubRect( border_w, 0, border_w + w, border_h, 0.0f, 0.0f, tx1, 1.0f );
+
+    // Bottom
+    surface()->DrawSetTexture( m_nTexBgTopId );
+    surface()->DrawTexturedSubRect( border_w, border_h + h, border_w + w, border_h + h + border_h, 1.0f, 1.0f, (-tx1) + 1.0f, 0.0f );
+
+
+    // Top left corner
+    surface()->DrawSetTexture( m_nTexBgCornerId );
+    surface()->DrawTexturedRect( 0, 0, border_w, border_h );
+
+    // Top right corner
+    surface()->DrawSetTexture( m_nTexBgCornerId );
+    surface()->DrawTexturedSubRect( border_w + w, 0, border_w + w + border_w, border_h, 1.0f, 0.0f, 0.0f, 1.0f );
+
+    // Bottom left corner
+    surface()->DrawSetTexture( m_nTexBgCornerId );
+    surface()->DrawTexturedSubRect( 0, border_h + h, border_w, border_h + h + border_h, 0.0f, 1.0f, 1.0f, 0.0f );
+
+    // Bottom right corner
+    surface()->DrawSetTexture( m_nTexBgCornerId );
+    surface()->DrawTexturedSubRect( border_w + w, border_h + h, border_w + w + border_w, border_h + h + border_h, 1.0f, 1.0f, 0.0f, 0.0f );
+
+
+    // Actual background.
+    surface()->DrawFilledRect( x, y, x + w, y + h );
 }
 
-enum {
-    MAX_PLAYERS_PER_TEAM = 16,
-    MAX_SCOREBOARD_PLAYERS = 32
-};
-struct PlayerScoreInfo
+int CZMClientScoreBoardDialog::FindPlayerItem( int playerIndex )
 {
-    int index;
-    int frags;
-    int deaths;
-    bool important;
-    bool alive;
-};
-
-static int PlayerScoreInfoSort( const PlayerScoreInfo *p1, const PlayerScoreInfo *p2 )
-{
-    // check local
-    if ( p1->important )
-        return -1;
-    if ( p2->important )
-        return 1;
-
-    // check alive
-    if ( p1->alive && !p2->alive )
-        return -1;
-    if ( p2->alive && !p1->alive )
-        return 1;
-
-    // check frags
-    if ( p1->frags > p2->frags )
-        return -1;
-    if ( p2->frags > p1->frags )
-        return 1;
-
-    // check deaths
-    if ( p1->deaths < p2->deaths )
-        return -1;
-    if ( p2->deaths < p1->deaths )
-        return 1;
-
-    // check index
-    if ( p1->index < p2->index )
-        return -1;
-
-    return 1;
+    return m_pList->FindItemByKey( m_iPlayerIndexSymbol, playerIndex );
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
+void CZMClientScoreBoardDialog::UpdateStats()
+{
+    //Label* pRoundLabel = dynamic_cast<Label*>( FindChildByName( "RoundLabel" ) );
+    //if ( pRoundLabel )
+    //{
+    //    ZMRules()->GetRoundCount()
+    //}
+
+    Label* pInfo = dynamic_cast<Label*>( FindChildByName( "MinorInfo" ) );
+    if ( pInfo )
+    {
+        char tempstr[128];
+        wchar_t buf[256];
+        wchar_t wMapName[64];
+
+
+        Q_FileBase( engine->GetLevelName(), tempstr, sizeof( tempstr ) );
+
+        g_pVGuiLocalize->ConvertANSIToUnicode( tempstr, wMapName, sizeof( wMapName ) );
+        g_pVGuiLocalize->ConstructString( buf, sizeof( buf ), g_pVGuiLocalize->Find( "#Spec_Map" ), 1, wMapName );
+
+        pInfo->SetText( buf );
+    }
+
+    Label* pHostnameLabel = dynamic_cast<Label*>( FindChildByName( "ServerName" ) );
+    if ( pHostnameLabel )
+    {
+        pHostnameLabel->SetText( g_szHostname );
+    }
+}
+
+void CZMClientScoreBoardDialog::UpdateScoreboard()
+{
+    UpdatePlayerInfo();
+}
+
+int CZMClientScoreBoardDialog::TeamToSection( int iTeam )
+{
+    switch ( iTeam )
+    {
+    case ZMTEAM_ZM : return m_iSectionZM;
+    case ZMTEAM_HUMAN :
+    default :
+        return m_iSectionHuman;
+    }
+}
+
 void CZMClientScoreBoardDialog::UpdatePlayerInfo()
 {
-    m_iSectionId = 0; // 0'th row is a header
-    int selectedRow = -1;
-    int i;
+    if ( !g_PR ) return;
 
-    CBasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
 
-    if ( !pPlayer || !g_PR )
-        return;
-
-    // walk all the players and make sure they're in the scoreboard
-    for ( i = 1; i <= gpGlobals->maxClients; i++ )
+    for ( int i = 1; i <= gpGlobals->maxClients; ++i )
     {
-        bool shouldShow = g_PR->IsConnected( i );
-        if ( shouldShow )
+        if ( !g_PR->IsConnected( i ) )
         {
-            // add the player to the list
-            KeyValues *playerData = new KeyValues("data");
-            GetPlayerScoreInfo( i, playerData );
-            UpdatePlayerAvatar( i, playerData );
+            // Remove the player.
+            int itemId = FindPlayerItem( i );
 
-            int itemID = FindItemIDForPlayerIndex( i );
-            int sectionID = GetSectionFromTeamNumber( g_PR->GetTeam( i ) );
-                        
-            if (itemID == -1)
+            if ( itemId != -1 )
             {
-                // add a new row
-                itemID = m_pPlayerList->AddItem( sectionID, playerData );
-            }
-            else
-            {
-                // modify the current row
-                m_pPlayerList->ModifyItem( itemID, sectionID, playerData );
+                m_pList->RemoveItemById( itemId );
             }
 
-            if ( i == pPlayer->entindex() )
-            {
-                selectedRow = itemID;	// this is the local player, hilight this row
-            }
+            continue;
+        }
 
-            // set the row color based on the players team
-            m_pPlayerList->SetItemFgColor( itemID, g_PR->GetTeamColor( g_PR->GetTeam( i ) ) );
 
-            playerData->deleteThis();
+        int iTeam = g_PR->GetTeam( i );
+
+        // Get the player data.
+        KeyValues* data = new KeyValues( "data" );
+        GetPlayerScoreInfo( i, data );
+        UpdatePlayerAvatar( i, data );
+
+        const char* oldName = data->GetString( "name", "" );
+        char newName[MAX_PLAYER_NAME_LENGTH * 2 + 1];
+
+        UTIL_MakeSafeName( oldName, newName, sizeof( newName ) );
+
+        data->SetString( "name", newName );
+
+
+        int itemId = FindPlayerItem( i );
+            
+        //if ( g_PR->IsLocalPlayer( i ) )
+        //{
+        //    selectedRow = itemId;
+        //}
+
+        int section = TeamToSection( iTeam );
+        int itemIndex = -1;
+
+        if ( itemId == -1 )
+        {
+            // Add new row.
+            itemIndex = m_pList->AddItem( section, data );
         }
         else
         {
-            // remove the player
-            int itemID = FindItemIDForPlayerIndex( i );
-            if (itemID != -1)
-            {
-                m_pPlayerList->RemoveItem(itemID);
-            }
+            // Modify the current row.
+            itemIndex = m_pList->ModifyItem( itemId, section, data );
         }
-    }
 
-    if ( selectedRow != -1 )
-    {
-        m_pPlayerList->SetSelectedItem(selectedRow);
+        if ( itemIndex != -1 )
+        {
+            m_pList->SetItemColor( section, itemIndex, g_PR->GetTeamColor( iTeam ) );
+        }
     }
 }
 
-bool CZMClientScoreBoardDialog::DisplayTeamCount( int iTeam )
+void CZMClientScoreBoardDialog::GetPlayerScoreInfo( int playerIndex, KeyValues* kv )
 {
-    if ( iTeam == ZMTEAM_HUMAN ) return true;
+    kv->SetInt( "playerIndex", playerIndex ); // Must always be set.
 
-    return false;
+    kv->SetString( "name", g_PR->GetPlayerName( playerIndex ) );
+
+    // ZMRTODO: Add ZM kills.
+    kv->SetInt( "zmkills", g_PR->GetFrags( playerIndex ) );
+
+    kv->SetInt( "frags", g_PR->GetFrags( playerIndex ) );
+
+	kv->SetInt( "deaths", g_PR->GetDeaths( playerIndex ) );
+
+    if ( g_PR->IsFakePlayer( playerIndex ) )
+        kv->SetString( "ping", "BOT" );
+    else
+        kv->SetInt( "ping", g_PR->GetPing( playerIndex ) );
+}
+
+void CZMClientScoreBoardDialog::UpdatePlayerAvatar( int playerIndex, KeyValues* kv )
+{
+    // Update their avatar
+    if ( kv /*&& ShowAvatars()*/ && steamapicontext->SteamFriends() && steamapicontext->SteamUtils() )
+    {
+        player_info_t pi;
+        if ( engine->GetPlayerInfo( playerIndex, &pi ) )
+        {
+            if ( pi.friendsID )
+            {
+                CSteamID SteamId( pi.friendsID, 1, steamapicontext->SteamUtils()->GetConnectedUniverse(), k_EAccountTypeIndividual );
+
+
+                int index = m_Avatars.CreateAvatarBySteamId( SteamId );
+
+                kv->SetInt( "avatar", m_pList->AddImage( m_Avatars.GetImage( index ) ) );
+            }
+        }
+    }
 }

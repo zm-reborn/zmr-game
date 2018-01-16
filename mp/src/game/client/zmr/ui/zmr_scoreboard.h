@@ -1,46 +1,100 @@
 #pragma once
 
 #include <clientscoreboarddialog.h>
+//#include "zmr_listpanel.h"
 
-//-----------------------------------------------------------------------------
-// Purpose: Game ScoreBoard
-//-----------------------------------------------------------------------------
-class CZMClientScoreBoardDialog : public CClientScoreBoardDialog
+class CZMListRow;
+class CZMListSection;
+class CZMListPanel;
+class CAvatarImage;
+
+struct zm_avatarimg_t
+{
+    zm_avatarimg_t( CSteamID id, CAvatarImage* img )
+    {
+        SteamId = id;
+        pImage = img;
+    }
+
+    CSteamID        SteamId;
+    CAvatarImage*   pImage;
+};
+
+class CZMAvatarList
+{
+public:
+    CZMAvatarList() { m_ImageList.Purge(); };
+
+
+    int CreateAvatarBySteamId( CSteamID id );
+    int FindAvatarBySteamId( CSteamID id );
+
+    CAvatarImage*   GetImage( int i ) { return m_ImageList[i].pImage; };
+
+private:
+    CUtlVector<zm_avatarimg_t>   m_ImageList;
+};
+
+
+
+class CZMClientScoreBoardDialog : public vgui::EditablePanel, public IViewPortPanel, public CGameEventListener
 {
 private:
-    DECLARE_CLASS_SIMPLE( CZMClientScoreBoardDialog, CClientScoreBoardDialog );
+    DECLARE_CLASS_SIMPLE( CZMClientScoreBoardDialog, vgui::EditablePanel );
     
 public:
-    CZMClientScoreBoardDialog( IViewPort *pViewPort );
+    CZMClientScoreBoardDialog( IViewPort* pViewPort );
     ~CZMClientScoreBoardDialog();
 
 
-protected:
-    // scoreboard overrides
-    virtual void InitScoreboardSections();
-    virtual void UpdateTeamInfo();
-    virtual bool GetPlayerScoreInfo(int playerIndex, KeyValues *outPlayerInfo);
-    virtual void UpdatePlayerInfo();
+    virtual void PerformLayout() OVERRIDE;
+    virtual void PaintBackground() OVERRIDE;
 
-    // vgui overrides for rounded corner background
-    virtual void PaintBackground();
-    virtual void PaintBorder();
-    virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
+    virtual const char* GetName() OVERRIDE { return PANEL_SCOREBOARD; };
+    virtual void        SetData( KeyValues *data) OVERRIDE {};
+    virtual bool        HasInputElements() OVERRIDE { return true; };
+    vgui::VPANEL        GetVPanel( void ) OVERRIDE { return BaseClass::GetVPanel(); };
+    virtual bool        IsVisible() OVERRIDE { return BaseClass::IsVisible(); };
+    virtual void        SetParent( vgui::VPANEL parent ) OVERRIDE { BaseClass::SetParent( parent ); };
+
+
+    virtual void        ApplySchemeSettings( vgui::IScheme* pScheme ) OVERRIDE;
+    virtual void        FireGameEvent( IGameEvent* event ) OVERRIDE;
+
+
+    virtual void        Reset() OVERRIDE;
+    virtual void        Update() OVERRIDE;
+    virtual bool        NeedsUpdate() OVERRIDE;
+    virtual void        ShowPanel( bool bShow ) OVERRIDE;
+
+
+    MESSAGE_FUNC_PARAMS( OnListLayout, "OnListLayout", kv );
 
 private:
-    virtual void AddHeader(); // add the start header of the scoreboard
-    virtual void AddSection(int teamType, int teamNumber); // add a new section header for a team
+    void UpdateStats();
 
-    int GetSectionFromTeamNumber( int teamNumber );
+    int FindPlayerItem( int playerIndex );
+    int TeamToSection( int iTeam );
 
-    bool DisplayTeamCount( int iTeam );
+    void UpdateScoreboard();
+
+    void UpdatePlayerInfo();
+    void GetPlayerScoreInfo( int playerIndex, KeyValues* kv );
+    void UpdatePlayerAvatar( int playerIndex, KeyValues* kv );
 
 
-    // Max is 520.
-    enum { NAME_WIDTH = 200, SCORE_WIDTH = 100, DEATH_WIDTH = 80, PING_WIDTH = 60 };
+    CZMListPanel* m_pList;
 
+    int     m_iPlayerIndexSymbol;
+    float   m_flNextUpdateTime;
 
-    // rounded corners
-    Color					 m_bgColor;
-    Color					 m_borderColor;
+    int     m_iSectionZM;
+    int     m_iSectionHuman;
+
+    int     m_nTexBgSideId;
+    int     m_nTexBgTopId;
+    int     m_nTexBgCornerId;
+
+    
+    CZMAvatarList  m_Avatars;
 };
