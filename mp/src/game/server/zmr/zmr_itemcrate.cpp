@@ -1,6 +1,11 @@
 #include "cbase.h"
 #include "props.h"
 #include "items.h"
+#include "TemplateEntities.h"
+#include "mapentities.h"
+
+
+#include "weapons/zmr_base.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -14,11 +19,13 @@ public:
     DECLARE_CLASS( CZMEntItemCrate, CPhysicsProp );
     DECLARE_DATADESC();
 
+    CZMEntItemCrate();
+
     void Precache();
     void Spawn();
 
 
-    inline const char*  GetItemClass() { return STRING( m_strItemClass ); };
+    inline const char*  GetItemClass() { return STRING( m_iszItemClass ); };
     inline int          GetItemCount() { return m_nItemCount; };
 
 private:
@@ -30,9 +37,17 @@ private:
 
     int             TranslateItemClassToSkin();
 
+    CBaseEntity*    CreateItem();
+    CZMBaseWeapon*  CreateTemplateItem();
 
-    string_t        m_strItemClass;
+
+
+    string_t        m_iszItemClass;
     int             m_nItemCount;
+
+    string_t        m_iszTemplateName;
+    string_t        m_iszTemplateData;
+
 
     COutputEvent    m_OnCacheInteraction;
 };
@@ -42,12 +57,22 @@ LINK_ENTITY_TO_CLASS( item_item_crate, CZMEntItemCrate );
 
 
 BEGIN_DATADESC( CZMEntItemCrate )
-    DEFINE_KEYFIELD( m_strItemClass, FIELD_STRING, "ItemClass" ),
+    DEFINE_KEYFIELD( m_iszItemClass, FIELD_STRING, "ItemClass" ),
     DEFINE_KEYFIELD( m_nItemCount, FIELD_INTEGER, "ItemCount" ),
+
+    DEFINE_KEYFIELD( m_iszTemplateName, FIELD_STRING, "ItemTemplate" ),
+
 
     DEFINE_OUTPUT( m_OnCacheInteraction, "OnCacheInteraction" ),
 END_DATADESC()
 
+
+CZMEntItemCrate::CZMEntItemCrate()
+{
+    m_iszItemClass = NULL_STRING;
+    m_iszTemplateName = NULL_STRING;
+    m_iszTemplateData = NULL_STRING;
+}
 
 void CZMEntItemCrate::Precache()
 {
@@ -57,11 +82,23 @@ void CZMEntItemCrate::Precache()
     BaseClass::Precache();
 
     
-    if ( NULL_STRING != m_strItemClass )
+    if ( m_iszItemClass != NULL_STRING )
     {
-        // Don't precache if this is a null string. 
-        UTIL_PrecacheOther( STRING( m_strItemClass ) );
+        UTIL_PrecacheOther( STRING( m_iszItemClass ) );
     }
+
+
+    // We have template data, precache our template entity.
+	if ( m_iszTemplateData != NULL_STRING )
+	{
+        CBaseEntity* pEntity = CreateTemplateItem();
+
+        if ( pEntity )
+        {
+            pEntity->Precache();
+            UTIL_RemoveImmediate( pEntity );
+        }
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -82,10 +119,34 @@ void CZMEntItemCrate::Spawn()
         return;
     }
 
-    if (NULL_STRING == m_strItemClass
-    ||  EntityFactoryDictionary()->FindFactory( STRING( m_strItemClass ) ) == nullptr ) // Is this an invalid classname?
+
+    // Attempt to use template first.
+    if ( m_iszTemplateName != NULL_STRING )
     {
-        Warning( "Invalid or no item class defined for item crate! (%i | item class: '%s')\n", entindex(), STRING( m_strItemClass ) );
+        CBaseEntity* pTestEntity = nullptr;
+
+        bool bFailed = false;
+
+
+        if ((m_iszTemplateData = Templates_FindByTargetName( STRING( m_iszTemplateName ) )) == NULL_STRING // Is it a template?
+        ||  (pTestEntity = CreateTemplateItem()) == nullptr) // Attempt to create the template.
+        {
+            Warning( "Invalid or no item template defined for item crate! (%i | item template: '%s')\n", entindex(), STRING( m_iszTemplateName ) );
+            UTIL_Remove( this );
+            
+            bFailed = true;
+        }
+
+        if ( pTestEntity )
+            UTIL_RemoveImmediate( pTestEntity );
+
+
+        if ( bFailed ) return;
+    }
+    else if (NULL_STRING == m_iszItemClass
+    ||  EntityFactoryDictionary()->FindFactory( STRING( m_iszItemClass ) ) == nullptr ) // Is this an invalid classname?
+    {
+        Warning( "Invalid or no item class defined for item crate! (%i | item class: '%s')\n", entindex(), STRING( m_iszItemClass ) );
         UTIL_Remove( this );
         return;
     }
@@ -125,7 +186,7 @@ void CZMEntItemCrate::OnBreak( const Vector& vecVelocity, const AngularImpulse& 
 
     for ( int i = 0; i < m_nItemCount; ++i )
     {
-        CBaseEntity* pSpawn = CreateEntityByName( STRING( m_strItemClass ) );
+        CBaseEntity* pSpawn = CreateItem();
 
         if ( !pSpawn )
             return;
@@ -159,6 +220,36 @@ void CZMEntItemCrate::OnBreak( const Vector& vecVelocity, const AngularImpulse& 
     }
 }
 
+CBaseEntity* CZMEntItemCrate::CreateItem()
+{
+    return ( m_iszTemplateData != NULL_STRING ) ? CreateTemplateItem() : CreateEntityByName( STRING( m_iszItemClass ) );
+}
+
+CZMBaseWeapon* CZMEntItemCrate::CreateTemplateItem()
+{
+    CBaseEntity* pEntity = nullptr;
+
+    MapEntity_ParseEntity( pEntity, STRING( m_iszTemplateData ), nullptr );
+
+    if ( !pEntity )
+    {
+        return nullptr;
+    }
+
+    CZMBaseWeapon* pWeapon = dynamic_cast<CZMBaseWeapon*>( pEntity );
+
+    if ( !pWeapon )
+    {
+        UTIL_RemoveImmediate( pEntity );
+    }
+    else
+    {
+        pWeapon->RemoveSpawnFlags( SF_ZMWEAPON_TEMPLATE );
+    }
+
+    return pWeapon;
+}
+
 void CZMEntItemCrate::OnPhysGunPickup( CBasePlayer* pPhysGunUser, PhysGunPickup_t reason )
 {
     BaseClass::OnPhysGunPickup( pPhysGunUser, reason );
@@ -175,7 +266,7 @@ void CZMEntItemCrate::OnPhysGunPickup( CBasePlayer* pPhysGunUser, PhysGunPickup_
 int CZMEntItemCrate::TranslateItemClassToSkin()
 {
     // ZMRTODO: Implement me.
-    const char* c = STRING( m_strItemClass );
+    const char* c = STRING( m_iszItemClass );
 
 
     if ( AMMO_EQU( c, "item_ammo_pistol" ) )
