@@ -2,7 +2,7 @@ versioninfo
 {
 	"editorversion" "400"
 	"editorbuild" "7538"
-	"mapversion" "95"
+	"mapversion" "98"
 	"formatversion" "100"
 	"prefab" "0"
 }
@@ -14,13 +14,13 @@ viewsettings
 	"bSnapToGrid" "1"
 	"bShowGrid" "1"
 	"bShowLogicalGrid" "0"
-	"nGridSpacing" "16"
+	"nGridSpacing" "2"
 	"bShow3DGrid" "0"
 }
 world
 {
 	"id" "1"
-	"mapversion" "95"
+	"mapversion" "98"
 	"classname" "worldspawn"
 	"detailmaterial" "detail/detailsprites"
 	"detailvbsp" "detail.vbsp"
@@ -4938,6 +4938,8 @@ entity
 	"id" "487"
 	"classname" "weapon_zm_pistol"
 	"angles" "0 0 0"
+	"clip1override" "-1"
+	"dmgoverride" "-1"
 	"spawnflags" "0"
 	"targetname" "pistol"
 	"origin" "-96 928 80"
@@ -5271,6 +5273,8 @@ entity
 	"id" "840"
 	"classname" "weapon_zm_rifle"
 	"angles" "0 0 0"
+	"clip1override" "-1"
+	"dmgoverride" "-1"
 	"spawnflags" "0"
 	"origin" "-944 -320 16"
 	editor
@@ -5802,6 +5806,8 @@ entity
 	"id" "1638"
 	"classname" "weapon_zm_mac10"
 	"angles" "0 0 0"
+	"clip1override" "-1"
+	"dmgoverride" "-1"
 	"spawnflags" "0"
 	"origin" "-944 -288 16"
 	editor
@@ -5845,6 +5851,8 @@ entity
 	"id" "1653"
 	"classname" "weapon_zm_shotgun"
 	"angles" "0 0 0"
+	"clip1override" "-1"
+	"dmgoverride" "-1"
 	"spawnflags" "0"
 	"origin" "-944 -352 16"
 	editor
@@ -5888,6 +5896,8 @@ entity
 	"id" "1761"
 	"classname" "weapon_zm_improvised"
 	"angles" "0 0 0"
+	"clip1override" "-1"
+	"dmgoverride" "-1"
 	"origin" "-944 -256 16"
 	editor
 	{
@@ -5902,6 +5912,8 @@ entity
 	"id" "1763"
 	"classname" "weapon_zm_pistol"
 	"angles" "0 0 0"
+	"clip1override" "-1"
+	"dmgoverride" "-1"
 	"spawnflags" "0"
 	"origin" "-944 -384 16"
 	editor
@@ -5917,6 +5929,8 @@ entity
 	"id" "1767"
 	"classname" "weapon_zm_sledge"
 	"angles" "0 0 0"
+	"clip1override" "-1"
+	"dmgoverride" "-1"
 	"origin" "-944 -224 16"
 	editor
 	{
@@ -5931,6 +5945,8 @@ entity
 	"id" "1782"
 	"classname" "weapon_zm_revolver"
 	"angles" "0 0 0"
+	"clip1override" "-1"
+	"dmgoverride" "-1"
 	"spawnflags" "0"
 	"origin" "-944 -416 16"
 	editor
@@ -8057,6 +8073,50 @@ entity
 	editor
 	{
 		"color" "232 219 8"
+		"visgroupshown" "1"
+		"visgroupautoshown" "1"
+		"logicalpos" "[0 0]"
+	}
+}
+entity
+{
+	"id" "6058"
+	"classname" "item_item_crate"
+	"angles" "0 0 0"
+	"fademindist" "-1"
+	"fadescale" "1"
+	"glowcolor" "255 255 255"
+	"inertiaScale" "1.0"
+	"ItemClass" "weapon_zm_pistol"
+	"ItemCount" "3"
+	"ItemTemplate" "templatemac10"
+	"modelscale" "1.0"
+	"physdamagescale" "0.1"
+	"spawnflags" "256"
+	"origin" "-928 -576 2"
+	editor
+	{
+		"color" "220 30 220"
+		"visgroupshown" "1"
+		"visgroupautoshown" "1"
+		"logicalpos" "[0 0]"
+	}
+}
+entity
+{
+	"id" "6230"
+	"classname" "weapon_zm_mac10"
+	"angles" "0 0 0"
+	"clip1override" "20"
+	"dmgoverride" "100"
+	"spawnflags" "2"
+	"targetname" "templatemac10"
+	"v_modeloverride" "models/weapons/v_irifle.mdl"
+	"w_modeloverride" "models/weapons/w_irifle.mdl"
+	"origin" "-928 -576 30"
+	editor
+	{
+		"color" "0 0 200"
 		"visgroupshown" "1"
 		"visgroupautoshown" "1"
 		"logicalpos" "[0 0]"
