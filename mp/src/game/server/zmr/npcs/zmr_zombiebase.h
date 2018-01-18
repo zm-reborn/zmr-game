@@ -213,7 +213,6 @@ public:
     // Our stuff...
     int GetPopCost() { return CZMBaseZombie::GetPopCost( GetZombieClass() ); };
     int GetCost() { return CZMBaseZombie::GetCost( GetZombieClass() ); };
-    ZombieClass_t GetZombieClass() { return m_iZombieClass; };
 
     
     // Player commanded means the zombie will ignore new enemies for a short period of time.
@@ -237,6 +236,10 @@ public:
     CZMPlayer*              GetSelector();
     void                    SetSelector( CZMPlayer* );
     void                    SetSelector( int );
+    ZombieClass_t           GetZombieClass();
+protected:
+    void                    SetZombieClass( ZombieClass_t );
+public:
 
 
     inline bool             IsCloseToCommandPos() { return IsCloseToPos( m_vecLastCommandPos ); };
@@ -310,9 +313,6 @@ private:
 
     CHandle<CZMEntAmbushTrigger>    m_hAmbushEnt;
     
-protected:
-    inline void SetZombieClass( ZombieClass_t zclass ) { m_iZombieClass = zclass; };
-
 
     CNetworkVar( int, m_iSelectorIndex );
     CNetworkVar( float, m_flHealthRatio ); // For humans we can use health/maxhealth
