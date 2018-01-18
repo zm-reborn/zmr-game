@@ -85,6 +85,7 @@ public:
     
     const CZMWeaponInfo& GetWpnData() const;
 
+    virtual int         GetMaxClip1() const OVERRIDE;
 	virtual const char* GetViewModel( int vmIndex = 0 ) const OVERRIDE;
 	virtual const char* GetWorldModel() const OVERRIDE;
     virtual void        SetViewModel() OVERRIDE;
@@ -177,4 +178,5 @@ private:
 
     int             m_nOverrideDamage;
 #endif
+    CNetworkVar( int, m_nOverrideClip1 );
 };

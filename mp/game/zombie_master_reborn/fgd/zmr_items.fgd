@@ -22,6 +22,7 @@
 	v_modeloverride(studio) : "Override View Model" : "" : "View model the weapon will use. If left empty, use default."
 	w_modeloverride(studio) : "Override World Model" : "" : "World model the weapon will use. If left empty, use default."
 	dmgoverride(integer) : "Override Damage" : -1 : "Amount of damage weapon will inflict. Use numbers less than zero to use default."
+	clip1override(integer) : "Override Clip" : -1 : "How big the weapon clip/magazine is. Use numbers less than zero to use default."
 
 	output OnPlayerUse(void) : "Fires when the player +uses this weapon"
 	output OnPlayerPickup(void) : "Fires when the player picks up this weapon"

@@ -25,6 +25,11 @@ static ConVar zm_sv_weaponreserveammo( "zm_sv_weaponreserveammo", "1", FCVAR_NOT
 
 
 BEGIN_NETWORK_TABLE( CZMBaseWeapon, DT_ZM_BaseWeapon )
+#ifdef CLIENT_DLL
+    RecvPropInt( RECVINFO( m_nOverrideClip1 ) )
+#else
+    SendPropInt( SENDINFO( m_nOverrideClip1 ) )
+#endif
 END_NETWORK_TABLE()
 
 IMPLEMENT_NETWORKCLASS_ALIASED( ZMBaseWeapon, DT_ZM_BaseWeapon )
@@ -38,6 +43,7 @@ BEGIN_DATADESC( CZMBaseWeapon )
     DEFINE_KEYFIELD( m_OverrideWorldModel, FIELD_MODELNAME, "w_modeloverride" ),
 
     DEFINE_KEYFIELD( m_nOverrideDamage, FIELD_INTEGER, "dmgoverride" ),
+    DEFINE_KEYFIELD( m_nOverrideClip1, FIELD_INTEGER, "clip1override" ),
 END_DATADESC()
 
 
@@ -55,6 +61,7 @@ CZMBaseWeapon::CZMBaseWeapon()
 #ifndef CLIENT_DLL
     m_OverrideViewModel = m_OverrideWorldModel = NULL_STRING;
     m_nOverrideDamage = -1;
+    m_nOverrideClip1 = -1;
 #endif
 }
 
@@ -347,6 +354,16 @@ void CZMBaseWeapon::WeaponSound( WeaponSound_t sound_type, float soundtime /* = 
 #else
 		BaseClass::WeaponSound( sound_type, soundtime );
 #endif
+}
+
+int CZMBaseWeapon::GetMaxClip1() const
+{
+    if ( m_nOverrideClip1 >= 0 )
+    {
+        return m_nOverrideClip1;
+    }
+
+    return BaseClass::GetMaxClip1();
 }
 
 const char* CZMBaseWeapon::GetViewModel( int vmIndex ) const
