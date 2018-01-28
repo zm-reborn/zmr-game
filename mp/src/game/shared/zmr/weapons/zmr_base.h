@@ -22,19 +22,60 @@
     You must add custom animation events in eventlist.h && eventlist.cpp
 */
 
-class CZMBaseWeapon : public CBaseCombatWeapon
+class CZMPredictionSeed
+{
+public:
+    CZMPredictionSeed()
+    {
+        m_nLastPredictionSeed = -1;
+    }
+    
+    void    SetLastPredictionSeed( int seed ) { m_nLastPredictionSeed = seed; };
+    int     GetLastPredictionSeed() { return m_nLastPredictionSeed; };
+
+
+    // This function doesn't hash like SharedRandomFloat does, but it gets the job done.
+    float GetPredictedRandomFloat( float flMinVal, float flMaxVal )
+    {
+        int seed = ( CBaseEntity::GetPredictionRandomSeed() == -1 ) ?
+            GetLastPredictionSeed() :
+            CBaseEntity::GetPredictionRandomSeed();
+
+        RandomSeed( seed );
+        return RandomFloat( flMinVal, flMaxVal );
+    }
+
+private:
+    int m_nLastPredictionSeed;
+};
+
+#define RECORD_PREDICTION_SEED  void ItemPostFrame() OVERRIDE \
+                                { \
+                                    BaseClass::ItemPostFrame(); \
+                                    SetLastPredictionSeed( CBaseEntity::GetPredictionRandomSeed() ); \
+                                } \
+
+
+// 1 is constrained.
+#define SF_ZMWEAPON_TEMPLATE        ( 1 << 1 )
+
+class CZMBaseWeapon : public CBaseCombatWeapon, public CZMPredictionSeed
 {
 public:
 	DECLARE_CLASS( CZMBaseWeapon, CBaseCombatWeapon );
 	DECLARE_NETWORKCLASS(); 
 	DECLARE_PREDICTABLE();
+#ifndef CLIENT_DLL
     DECLARE_DATADESC();
+#endif
 
 	CZMBaseWeapon();
 	~CZMBaseWeapon();
     
 #ifdef CLIENT_DLL
     virtual void Spawn() OVERRIDE;
+#else
+    virtual void Precache() OVERRIDE;
 #endif
     virtual bool Reload() OVERRIDE;
     // NOTE: Always use this to get the damage from .txt file.
@@ -43,6 +84,11 @@ public:
     virtual void SecondaryAttack() OVERRIDE;
     
     const CZMWeaponInfo& GetWpnData() const;
+
+    virtual int         GetMaxClip1() const OVERRIDE;
+	virtual const char* GetViewModel( int vmIndex = 0 ) const OVERRIDE;
+	virtual const char* GetWorldModel() const OVERRIDE;
+    virtual void        SetViewModel() OVERRIDE;
 
 #ifdef CLIENT_DLL
     virtual void    ClientThink() OVERRIDE;
@@ -67,6 +113,8 @@ public:
     virtual int GetMaxBurst( void ) OVERRIDE { return 1; };
     
 #ifndef CLIENT_DLL
+    virtual bool IsTemplate() OVERRIDE;
+
     virtual void Materialize( void ) OVERRIDE;
 #endif
     // Makes our weapons not cry about spawning.
@@ -122,4 +170,13 @@ protected:
 
     inline void SetSlotFlag( int flags ) { m_iSlotFlag = flags; };
     int m_iSlotFlag;
+
+private:
+#ifndef CLIENT_DLL
+    string_t        m_OverrideViewModel;
+    string_t        m_OverrideWorldModel;
+
+    int             m_nOverrideDamage;
+#endif
+    CNetworkVar( int, m_nOverrideClip1 );
 };

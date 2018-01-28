@@ -34,7 +34,14 @@ public:
     {
         CZMPlayer* pPlayer = GetPlayerOwner();
         if ( !pPlayer ) return;
-	    pPlayer->ViewPunch( QAngle( random->RandomFloat( 1.0f, 2.0f ), random->RandomFloat( -2.0f, -1.0f ), 0.0f ) );
+
+
+        QAngle ang;
+        ang.x = SharedRandomFloat( "impropax", 1.0f, 2.0f );
+        ang.y = SharedRandomFloat( "impropay", -2.0f, -1.0f );
+        ang.z = 0.0f;
+
+	    pPlayer->ViewPunch( ang );
     }
 };
 

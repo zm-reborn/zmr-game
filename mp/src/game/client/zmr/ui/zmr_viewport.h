@@ -1,6 +1,7 @@
 #pragma once
 
 
+class CZMLineTool;
 
 #include "zmr_boxselect.h"
 #include "zmr_cntrlpanel.h"
@@ -78,10 +79,12 @@ private:
 
     void FindZombiesInBox( int, int, int, int, bool );
     void FindZMObject( int, int, bool );
+    void DoMoveLine();
 
     void CloseChildMenus();
 
     CZMBoxSelect* m_BoxSelect;
+    CZMLineTool* m_LineTool;
     CZMHudControlPanel* m_pZMControl;
     CZMManiMenu* m_pManiMenu;
     CZMManiMenuNew* m_pManiMenuNew;

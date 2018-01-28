@@ -47,6 +47,10 @@ public:
     CZMPlayer*              GetSelector();
     void                    SetSelector( CZMPlayer* );
     void                    SetSelector( int );
+    ZombieClass_t           GetZombieClass();
+protected:
+    void                    SetZombieClass( ZombieClass_t zclass );
+public:
 
 
     inline int  GetGroup() { return m_iGroup; };
@@ -61,6 +65,7 @@ private:
     CNetworkVar( float, m_flHealthRatio );
 
     int m_iGroup;
+    ZombieClass_t m_iZombieClass;
 
     QAngle m_angEyeAttachment;
 };

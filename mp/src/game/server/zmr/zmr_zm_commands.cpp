@@ -954,3 +954,102 @@ void ZM_Cmd_CreateAmbush( const CCommand &args )
 }
 
 static ConCommand zm_cmd_createambush( "zm_cmd_createambush", ZM_Cmd_CreateAmbush, "" );
+
+
+/*
+    Move zombies to a line.
+*/
+void ZM_Cmd_MoveToLine( const CCommand &args )
+{
+    CZMPlayer* pPlayer = ToZMPlayer( UTIL_GetCommandClient() );
+
+    if ( !pPlayer ) return;
+    
+    if ( !pPlayer->IsZM() ) return;
+
+    if ( args.ArgC() < 7 ) return;
+
+    if ( !ZMUtil::GetSelectedZombieCount( pPlayer->entindex() ) )
+        return;
+    
+
+    int myindex = pPlayer->entindex();
+    Vector mypos = pPlayer->EyePosition();
+
+    Vector start, end;
+    start.x = atof( args.Arg( 1 ) );
+    start.y = atof( args.Arg( 2 ) );
+    start.z = atof( args.Arg( 3 ) );
+    end.x = atof( args.Arg( 4 ) );
+    end.y = atof( args.Arg( 5 ) );
+    end.z = atof( args.Arg( 6 ) );
+    
+    Vector dir = end - start;
+    float flLineLength = VectorNormalize( dir );
+    
+
+    // The line length is way too small to send the zombies into a line.
+    if ( flLineLength < 8.0f )
+    {
+        for ( int i = 0; i < g_pZombies->Count(); i++ )
+        {
+            CZMBaseZombie* pZombie = g_pZombies->Element( i );
+
+            if ( pZombie && pZombie->GetSelectorIndex() == myindex )
+                pZombie->Command( start, true );
+        }
+
+        return;
+    }
+
+
+    // Move selected zombies into a sorted list, from closest to farthest.
+    CUtlVector<CZMBaseZombie*> vZombies;
+
+    for ( int i = 0; i < g_pZombies->Count(); i++ )
+    {
+        CZMBaseZombie* pZombie = g_pZombies->Element( i );
+        if ( pZombie && pZombie->GetSelectorIndex() == myindex )
+        {
+            int j = 0;
+            int len = vZombies.Count();
+            for (; j < len; j++ )
+            {
+                // Is current zombie closer?
+                if ( pZombie->GetAbsOrigin().DistToSqr( start ) < vZombies[j]->GetAbsOrigin().DistToSqr( start ) )
+                    break;
+            }
+
+            if ( j != len )
+            {
+                vZombies.InsertBefore( j, pZombie );
+            }
+            else
+            {
+                vZombies.AddToTail( pZombie );
+            }
+        }
+    }
+
+
+    trace_t trace;
+    Vector walk = start;
+    Vector add = dir * ( flLineLength / vZombies.Count() );
+
+    for ( int i = 0; i < vZombies.Count(); i++ )
+    {
+        // Trace a line to find the exact spot we should be sending the unit.
+        // This fixes any troubles caused by displacements and other non-flat surfaces.
+        // ZMRTODO: Fix when issued outside the map.
+        UTIL_TraceLine( mypos, walk, MASK_SOLID, pPlayer, COLLISION_GROUP_NONE, &trace );
+
+        Vector command = ( trace.startsolid ) ? walk : trace.endpos;
+        command.z += 1.0f;
+
+        vZombies[i]->Command( command, true );
+
+        walk += add;
+    }
+}
+
+static ConCommand zm_cmd_moveline( "zm_cmd_moveline", ZM_Cmd_MoveToLine, "", FCVAR_HIDDEN );

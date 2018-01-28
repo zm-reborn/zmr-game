@@ -36,7 +36,7 @@ class CNPC_BurnZombie : public CAI_BlendingHost<CZMBaseZombie>
 {
     DECLARE_CLASS( CNPC_BurnZombie, CAI_BlendingHost<CZMBaseZombie> )
 	DECLARE_DATADESC()
-	//DECLARE_SERVERCLASS()
+	DECLARE_SERVERCLASS()
     DEFINE_CUSTOM_AI
 
 public:
@@ -117,6 +117,9 @@ private:
 	Vector				 m_vPositionCharged;
 };
 
+IMPLEMENT_SERVERCLASS_ST( CNPC_BurnZombie, DT_ZM_BurnZombie )
+END_SEND_TABLE()
+
 LINK_ENTITY_TO_CLASS( npc_burnzombie, CNPC_BurnZombie );
 
 //---------------------------------------------------------
@@ -172,9 +175,6 @@ BEGIN_DATADESC( CNPC_BurnZombie )
 	DEFINE_FIELD( m_vPositionCharged, FIELD_POSITION_VECTOR ),
 
 END_DATADESC()
-
-//IMPLEMENT_SERVERCLASS_ST( CNPC_BurnZombie, DT_NPC_BurnZombie )
-//END_SEND_TABLE()
 
 
 //-----------------------------------------------------------------------------

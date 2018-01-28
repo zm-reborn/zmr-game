@@ -24,6 +24,9 @@ public:
 
     CZMWeaponFists();
 
+
+    RECORD_PREDICTION_SEED;
+
 #ifdef CLIENT_DLL
     bool ShouldDrawPickup() OVERRIDE { return false; };
     bool ShouldDraw() OVERRIDE { return false; };
@@ -36,7 +39,14 @@ public:
     {
         CZMPlayer* pPlayer = GetPlayerOwner();
         if ( !pPlayer ) return;
-	    pPlayer->ViewPunch( QAngle( random->RandomFloat( 0.5f, 1.0f ), random->RandomFloat( -1.0f, -0.5f ), 0.0f ) );
+
+
+        QAngle ang;
+        ang.x = GetPredictedRandomFloat( -1.0f, 1.0f );
+        ang.y = GetPredictedRandomFloat( -1.0f, 1.0f );
+        ang.z = 0.0f;
+
+	    pPlayer->ViewPunch( ang );
     };
 
     float GetDamageForActivity( Activity act ) OVERRIDE { return 5.0f; };

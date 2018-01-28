@@ -1010,7 +1010,7 @@ protected:
     float			GetLoadPercentage();
 
     void	DryFire( void );
-    void	PrimaryFireEffect( void );
+    void	AddViewKick() OVERRIDE;
 
 #ifndef CLIENT_DLL
     // What happens when the physgun picks up something 
@@ -1309,16 +1309,20 @@ void CZMWeaponCarry::DryFire( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CZMWeaponCarry::PrimaryFireEffect( void )
+void CZMWeaponCarry::AddViewKick()
 {
-    CBasePlayer *pOwner = ToBasePlayer( GetOwner() );
-    
-    if ( pOwner == NULL )
-        return;
+    CZMPlayer* pOwner = GetPlayerOwner();
+    if ( !pOwner ) return;
 
-    pOwner->ViewPunch( QAngle( -0.2f, SharedRandomInt( "physcannonfire", -0.5f, 0.5f ), 0.0f ) );
 
-    //WeaponSound( SINGLE );
+    // ZMRCHANGES
+    // Lessed viewpunch.
+    QAngle ang;
+    ang.x = SharedRandomFloat( "physpax", 0.2f, 1.0f );
+    ang.y = SharedRandomFloat( "physpay", -0.5f, 0.5f );
+    ang.z = 0.0f;
+
+    pOwner->ViewPunch( ang );
 }
 
 void CZMWeaponCarry::PuntNonVPhysics( CBaseEntity *pEntity, const Vector &forward, trace_t &tr )
@@ -1345,7 +1349,7 @@ void CZMWeaponCarry::PuntNonVPhysics( CBaseEntity *pEntity, const Vector &forwar
 
 #endif
     
-    PrimaryFireEffect();
+    AddViewKick();
     SendWeaponAnim( ACT_VM_SECONDARYATTACK );
 
     m_nChangeState = ELEMENT_STATE_CLOSED;
@@ -1377,9 +1381,6 @@ void CZMWeaponCarry::Physgun_OnPhysGunPickup( CBaseEntity *pEntity, CBasePlayer 
 //-----------------------------------------------------------------------------
 void CZMWeaponCarry::PuntVPhysics( CBaseEntity *pEntity, const Vector &vecForward, trace_t &tr )
 {
-    CBasePlayer *pOwner = ToBasePlayer( GetOwner() );
-
-
     if ( m_hLastPuntedObject == pEntity && gpGlobals->curtime < m_flRepuntObjectTime )
         return;
 
@@ -1387,6 +1388,9 @@ void CZMWeaponCarry::PuntVPhysics( CBaseEntity *pEntity, const Vector &vecForwar
     m_flRepuntObjectTime = gpGlobals->curtime + 0.5f;
 
 #ifndef CLIENT_DLL
+    CBasePlayer* pOwner = GetPlayerOwner();
+    if ( !pOwner ) return;
+
     CTakeDamageInfo	info;
 
     Vector forward = vecForward;
@@ -1479,13 +1483,7 @@ void CZMWeaponCarry::PuntVPhysics( CBaseEntity *pEntity, const Vector &vecForwar
     }
 
 #endif
-    // Add recoil
-    QAngle	recoil = QAngle( random->RandomFloat( 1.0f, 2.0f ), random->RandomFloat( -1.0f, 1.0f ), 0 );
-    pOwner->ViewPunch( recoil );
 
-
-
-    PrimaryFireEffect();
     SendWeaponAnim( ACT_VM_SECONDARYATTACK );
 
     m_nChangeState = ELEMENT_STATE_CLOSED;
@@ -1494,6 +1492,10 @@ void CZMWeaponCarry::PuntVPhysics( CBaseEntity *pEntity, const Vector &vecForwar
 
     // Don't allow the gun to regrab a thrown object!!
     m_flNextSecondaryAttack = m_flNextPrimaryAttack = gpGlobals->curtime + 0.5f;
+
+
+    // Add recoil
+    AddViewKick();
 }
 
 //-----------------------------------------------------------------------------
@@ -1583,7 +1585,7 @@ void CZMWeaponCarry::PrimaryAttack( void )
 
         LaunchObject( forward, 1337.0f );
 
-        PrimaryFireEffect();
+        AddViewKick();
         SendWeaponAnim( ACT_VM_SECONDARYATTACK );
         return;
     }
