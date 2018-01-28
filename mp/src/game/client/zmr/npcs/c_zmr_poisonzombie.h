@@ -12,4 +12,7 @@ public:
 
     C_ZMPoisonZombie();
     ~C_ZMPoisonZombie();
+
+
+    virtual const char* GetZombieLocalization() OVERRIDE { return "#ZMClassHulk"; };
 };

@@ -33,6 +33,8 @@ public:
     virtual Vector          GetObserverCamOrigin() OVERRIDE { return WorldSpaceCenter(); };
     virtual const QAngle&   EyeAngles() OVERRIDE;
     virtual Vector          EyePosition() OVERRIDE;
+
+    virtual const char* GetZombieLocalization() { return ""; };
     
     //virtual void TraceAttack( const CTakeDamageInfo&, const Vector&, trace_t*,CDmgAccumulator* ) OVERRIDE;
     

@@ -12,4 +12,7 @@ public:
 
     C_ZMFastZombie();
     ~C_ZMFastZombie();
+
+
+    virtual const char* GetZombieLocalization() OVERRIDE { return "#ZMClassBanshee"; };
 };
