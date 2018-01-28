@@ -180,6 +180,9 @@ void CZMHudSpectatorUI::Update()
 
 bool CZMHudSpectatorUI::UpdateTargetText()
 {
+    if ( !g_PR ) return false;
+
+
     C_BasePlayer* pLocal = C_BasePlayer::GetLocalPlayer();
     C_BaseEntity* pEnt = pLocal->GetObserverTarget();
 
@@ -198,6 +201,7 @@ bool CZMHudSpectatorUI::UpdateTargetText()
 
     Color clr;
     const char* pszName = nullptr;
+    bool bLocalization = false;
 
     
     C_BasePlayer* pTargetPlayer = ToBasePlayer( pEnt );
@@ -216,8 +220,8 @@ bool CZMHudSpectatorUI::UpdateTargetText()
 
         if ( pZombie )
         {
-            // ZMRTODO: Get zombie type name.
-            pszName = "Zombie";
+            pszName = pZombie->GetZombieLocalization();
+            bLocalization = true;
         }
 
         clr = g_PR->GetTeamColor( ZMTEAM_ZM );
@@ -231,7 +235,15 @@ bool CZMHudSpectatorUI::UpdateTargetText()
     wchar_t buffer[162];
 
     // Name label.
-    g_pVGuiLocalize->ConvertANSIToUnicode( pszName, buffer, ARRAYSIZE( buffer ) );
+    if ( bLocalization )
+    {
+        Q_wcsncpy( buffer, g_pVGuiLocalize->Find( pszName ), sizeof( buffer ) );
+    }
+    else
+    {
+        g_pVGuiLocalize->ConvertANSIToUnicode( pszName, buffer, sizeof( buffer ) );
+    }
+    
     m_pNameLabel->SetText( buffer );
     m_pNameLabel->SetFgColor( clr );
 
