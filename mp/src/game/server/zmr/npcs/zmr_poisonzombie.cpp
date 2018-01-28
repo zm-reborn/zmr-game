@@ -139,6 +139,7 @@ extern ConVar zm_sk_hulk_dmg;
 class CNPC_PoisonZombie : public CAI_BlendingHost<CZMBaseZombie>
 {
 	DECLARE_CLASS( CNPC_PoisonZombie, CAI_BlendingHost<CZMBaseZombie> );
+    DECLARE_SERVERCLASS()
 
 public:
     CNPC_PoisonZombie::CNPC_PoisonZombie()
@@ -222,6 +223,9 @@ private:
 
 	bool m_bNearEnemy;
 };
+
+IMPLEMENT_SERVERCLASS_ST( CNPC_PoisonZombie, DT_ZM_PoisonZombie )
+END_SEND_TABLE()
 
 LINK_ENTITY_TO_CLASS( npc_poisonzombie, CNPC_PoisonZombie );
 

@@ -73,7 +73,7 @@ class CNPC_DragZombie : public CAI_BlendingHost<CZMBaseZombie>
 {
 public:
     DECLARE_CLASS( CNPC_DragZombie, CAI_BlendingHost<CZMBaseZombie> );
-    //DECLARE_SERVERCLASS()
+    DECLARE_SERVERCLASS()
     //DECLARE_DATADESC()
     DEFINE_CUSTOM_AI // Register the spit effect.
 
@@ -138,14 +138,14 @@ private:
 
 };
 
+IMPLEMENT_SERVERCLASS_ST( CNPC_DragZombie, DT_ZM_DragZombie )
+END_SEND_TABLE()
+
 LINK_ENTITY_TO_CLASS( npc_dragzombie, CNPC_DragZombie );
 
 
 //BEGIN_DATADESC( CNPC_DragZombie )
 //END_DATADESC()
-
-//IMPLEMENT_SERVERCLASS_ST( CNPC_DragZombie, DT_NPC_DragZombie )
-//END_SEND_TABLE()
 
 //-----------------------------------------------------------------------------
 // Purpose: 

@@ -185,6 +185,10 @@ ConVar zm_sv_flashlightrechargerate( "zm_sv_flashlightrechargerate", "0.1", 0, "
 
 void CZMPlayer::PreThink( void )
 {
+    // Erase our denied ammo.
+    m_vAmmoDenied.Purge();
+
+
     if ( m_afButtonLast != m_nButtons )
     {
         m_flLastActivity = gpGlobals->curtime;
@@ -515,6 +519,52 @@ void CZMPlayer::PickDefaultSpawnTeam()
     {
         ChangeTeam( ZMTEAM_SPECTATOR );
     }
+}
+
+// Override this function to stop AmmoDenied usermessage spam.
+int CZMPlayer::GiveAmmo( int nCount, int nAmmoIndex, bool bSuppressSound )
+{
+    // Don't try to give the player invalid ammo indices.
+    if ( nAmmoIndex < 0 )
+        return 0;
+
+    bool bCheckAutoSwitch = false;
+    if ( !HasAnyAmmoOfType( nAmmoIndex ) )
+    {
+        bCheckAutoSwitch = true;
+    }
+
+    int nAdd = CBasePlayer::GiveAmmo( nCount, nAmmoIndex, bSuppressSound );
+
+    // We've been denied the pickup, display a hud icon to show that.
+    // Make sure we don't send this usermessage multiple times a frame.
+    if ( nCount > 0 && nAdd == 0 && m_vAmmoDenied.Find( nAmmoIndex ) == m_vAmmoDenied.InvalidIndex() )
+    {
+        CSingleUserRecipientFilter user( this );
+        user.MakeReliable();
+        UserMessageBegin( user, "AmmoDenied" );
+            WRITE_SHORT( nAmmoIndex );
+        MessageEnd();
+
+
+        m_vAmmoDenied.AddToTail( nAmmoIndex );
+    }
+
+    //
+    // If I was dry on ammo for my best weapon and justed picked up ammo for it,
+    // autoswitch to my best weapon now.
+    //
+    if ( bCheckAutoSwitch )
+    {
+        CBaseCombatWeapon* pWeapon = g_pGameRules->GetNextBestWeapon( this, GetActiveWeapon() );
+
+        if ( pWeapon && pWeapon->GetPrimaryAmmoType() == nAmmoIndex )
+        {
+            SwitchToNextBestWeapon( GetActiveWeapon() );
+        }
+    }
+
+    return nAdd;
 }
 
 void CZMPlayer::GiveDefaultItems()
@@ -1126,6 +1176,9 @@ CBaseEntity* CZMPlayer::EntSelectSpawnPoint( void )
 
 
     // Didn't work, now just find any spot.
+    pEnt = gEntList.FindEntityByClassname( nullptr, pszSpawn );
+    if ( pEnt ) return pEnt;
+
     pEnt = gEntList.FindEntityByClassname( nullptr, pszFallback );
     if ( pEnt ) return pEnt;
 
@@ -1135,7 +1188,7 @@ CBaseEntity* CZMPlayer::EntSelectSpawnPoint( void )
 
     Warning( "Map has no spawnpoints! Returning world...\n" );
 
-    return UTIL_EntityByIndex( 0 );
+    return GetContainingEntity( INDEXENT( 0 ) );
 }
 
 void CZMPlayer::DeselectAllZombies()

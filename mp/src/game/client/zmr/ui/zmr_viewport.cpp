@@ -10,6 +10,7 @@
 #include "fx_quad.h"
 #include <vgui/IInput.h>
 
+#include "zmr_linetool.h"
 #include "zmr/c_zmr_zmvision.h"
 #include "zmr/zmr_player_shared.h"
 #include "zmr/zmr_gamerules.h"
@@ -140,6 +141,7 @@ CZMFrame::CZMFrame( const char* pElementName ) : CHudElement( pElementName ), Ba
 
 
     m_BoxSelect = new CZMBoxSelect( this );
+    m_LineTool = new CZMLineTool( this );
 
 	m_pZMControl = new CZMHudControlPanel();
 
@@ -254,9 +256,14 @@ CZMManiMenuBase* CZMFrame::GetManiMenu()
 
 void CZMFrame::OnCursorMoved( int x, int y )
 {
-    if ( m_MouseDragStatus == MOUSE_LEFT )
+    switch ( m_MouseDragStatus )
     {
+    case MOUSE_LEFT :
         m_BoxSelect->SetEnd( x, y );
+        break;
+    case MOUSE_RIGHT :
+        m_LineTool->SetEnd( x, y );
+        break;
     }
 }
 
@@ -624,10 +631,32 @@ void CZMFrame::OnRightClick()
 {
     m_BoxSelect->SetEnabled( false );
 
+    int mx, my;
+    ::input->GetFullscreenMousePos( &mx, &my );
+
+    m_LineTool->SetVisible( true );
+    m_LineTool->SetStart( mx, my );
+    m_LineTool->SetEnd( mx, my );
+}
+
+void CZMFrame::OnRightRelease()
+{
+    m_LineTool->SetVisible( false );
+
 
     int mx, my;
     ::input->GetFullscreenMousePos( &mx, &my );
-    
+
+    m_LineTool->SetEnd( mx, my );
+
+    // We were dragging, move units into a line.
+    if ( m_MouseDragStatus == MOUSE_RIGHT && m_LineTool->IsValidLine( 10 ) )
+    {
+        DoMoveLine();
+        return;
+    }
+
+    // We're just commanding zombies.
     trace_t trace;
     CTraceFilterNoNPCs filter( nullptr, COLLISION_GROUP_NONE );
     TraceScreenToWorld( mx, my, &trace, &filter, MASK_ZMTARGET );
@@ -701,11 +730,28 @@ void CZMFrame::OnRightClick()
                 0.4f, 
                 "effects/zm_ring",
                 (FXQUAD_BIAS_ALPHA) );
+
 }
 
-void CZMFrame::OnRightRelease()
+void CZMFrame::DoMoveLine()
 {
-    
+    int x1, y1, x2, y2;
+    Vector start, end;
+    trace_t trace;
+    CTraceFilterNoNPCs filter( nullptr, COLLISION_GROUP_NONE );
+
+    m_LineTool->GetLine( x1, y1, x2, y2 );
+
+    TraceScreenToWorld( x1, y1, &trace, &filter, MASK_ZMTARGET );
+    start = trace.endpos;
+
+    TraceScreenToWorld( x2, y2, &trace, &filter, MASK_ZMTARGET );
+    end = trace.endpos;
+
+    engine->ClientCmd( VarArgs( "zm_cmd_moveline %.1f %.1f %.1f %.1f %.1f %.1f",
+        start[0], start[1], start[2],
+        end[0], end[1], end[2] ) );
+        //clamp( (ZMClientUtil::GetSelectedZombieCount() - 1) * 2.5f, 0.0f, 92.0f ) ) );
 }
 
 void CZMFrame::FindZombiesInBox( int start_x, int start_y, int end_x, int end_y, bool bSticky )

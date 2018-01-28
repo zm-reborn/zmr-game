@@ -92,7 +92,7 @@ class CFastZombie : public CAI_BlendingHost<CZMBaseZombie>
 {
 public:
     DECLARE_CLASS( CFastZombie, CAI_BlendingHost<CZMBaseZombie> )
-    //DECLARE_SERVERCLASS()
+    DECLARE_SERVERCLASS()
     DECLARE_DATADESC()
     DEFINE_CUSTOM_AI
 
@@ -226,6 +226,9 @@ private:
     float	m_flLastClingCheck;
 };
 
+IMPLEMENT_SERVERCLASS_ST( CFastZombie, DT_ZM_FastZombie )
+END_SEND_TABLE()
+
 LINK_ENTITY_TO_CLASS( npc_fastzombie, CFastZombie );
 
 BEGIN_DATADESC( CFastZombie )
@@ -248,9 +251,6 @@ BEGIN_DATADESC( CFastZombie )
 //	DEFINE_SOUNDPATCH( m_pLayer2 ),
 
 END_DATADESC()
-
-//IMPLEMENT_SERVERCLASS_ST( CFastZombie, DT_FastZombie )
-//END_SEND_TABLE()
 
 const char *CFastZombie::pMoanSounds[] =
 {
