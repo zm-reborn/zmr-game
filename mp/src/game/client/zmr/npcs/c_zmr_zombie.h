@@ -23,6 +23,8 @@ public:
     C_ZMZombie();
     ~C_ZMZombie();
 
+    virtual const char* GetZombieLocalization() OVERRIDE { return "#ZMClassShambler"; };
+
 
     virtual CStudioHdr* OnNewModel() OVERRIDE;
     virtual C_BaseAnimating* BecomeRagdollOnClient() OVERRIDE;

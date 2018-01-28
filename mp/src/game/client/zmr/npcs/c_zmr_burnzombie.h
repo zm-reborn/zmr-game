@@ -12,4 +12,7 @@ public:
 
     C_ZMBurnZombie();
     ~C_ZMBurnZombie();
+
+
+    virtual const char* GetZombieLocalization() OVERRIDE { return "#ZMClassImmolator"; };
 };

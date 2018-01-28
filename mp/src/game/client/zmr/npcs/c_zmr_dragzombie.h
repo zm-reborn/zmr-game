@@ -12,4 +12,7 @@ public:
 
     C_ZMDragZombie();
     ~C_ZMDragZombie();
+
+
+    virtual const char* GetZombieLocalization() OVERRIDE { return "#ZMClassDrifter"; };
 };
