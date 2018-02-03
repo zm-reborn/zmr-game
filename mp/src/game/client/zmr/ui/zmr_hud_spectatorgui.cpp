@@ -110,7 +110,7 @@ void CZMHudSpectatorUI::PaintBar( int y, int h, bool bFlip )
     const int w = ScreenWidth();
 
 #define SIZE_X      512.0f
-#define SIZE_Y      512.0f
+#define SIZE_Y      256.0f
 
     float tx0 = 0.0f;
     float ty0 = 0.0f;
