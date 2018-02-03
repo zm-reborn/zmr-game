@@ -3,7 +3,6 @@
 #include "ienginevgui.h"
 #include "glow_outline_effect.h"
 
-#include "ui/zmr_spectator_ui.h"
 #include "ui/zmr_textwindow.h"
 #include "ui/zmr_scoreboard.h"
 #include "c_zmr_zmvision.h"
