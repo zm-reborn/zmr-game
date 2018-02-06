@@ -87,7 +87,7 @@ public:
 
 IViewPortPanel* CZMViewport::CreatePanelByName( const char* szPanelName )
 {
-    IViewPortPanel* newpanel = NULL;
+    IViewPortPanel* newpanel = nullptr;
 
     if ( Q_strcmp( PANEL_SCOREBOARD, szPanelName ) == 0 )
     {
@@ -100,10 +100,14 @@ IViewPortPanel* CZMViewport::CreatePanelByName( const char* szPanelName )
         newpanel = new CZMTextWindow( this );
         return newpanel;
     }
-    else if ( Q_strcmp( PANEL_SPECGUI, szPanelName ) == 0 )
+    else if ( Q_strcmp( PANEL_SPECGUI, szPanelName ) == 0 ) // Our spectator gui (black bars) are now hud elements.
     {
         //newpanel = new CZMHudSpectatorUI( this );
         return newpanel;
+    }
+    else if ( Q_strcmp( PANEL_SPECMENU, szPanelName ) == 0 ) // Never create spectator menu.
+    {
+        return nullptr;
     }
 
     
