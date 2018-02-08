@@ -445,9 +445,9 @@ void CZMClientScoreBoardDialog::GetPlayerScoreInfo( int playerIndex, KeyValues* 
     kv->SetString( "name", g_PR->GetPlayerName( playerIndex ) );
 
     // ZMRTODO: Add ZM kills.
-    kv->SetInt( "zmkills", g_PR->GetFrags( playerIndex ) );
+    kv->SetInt( "zmkills", g_PR->GetPlayerScore( playerIndex ) );
 
-    kv->SetInt( "frags", g_PR->GetFrags( playerIndex ) );
+    kv->SetInt( "frags", g_PR->GetPlayerScore( playerIndex ) );
 
 	kv->SetInt( "deaths", g_PR->GetDeaths( playerIndex ) );
 
