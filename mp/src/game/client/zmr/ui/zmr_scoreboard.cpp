@@ -34,7 +34,7 @@ using namespace vgui;
 static char g_szHostname[256];
 
 
-#define MAX_SCORE_HEIGHT            SCALE_HEIGHT( 450 )
+#define MAX_SCORE_HEIGHT            YRES( 450 )
 
 static bool SortHumanSection( KeyValues* kv1, KeyValues* kv2 )
 {
@@ -224,13 +224,13 @@ void CZMClientScoreBoardDialog::PerformLayout()
 {
     // Set size
     int max_h = MAX_SCORE_HEIGHT;
-    int min_h = SCALE_HEIGHT( 270 );
+    int min_h = YRES( 270 );
 
     int x, y, w, h;
     m_pList->GetBounds( x, y, w, h );
 
 
-    y += h + SCALE_HEIGHT( 32 );
+    y += h + YRES( 32 );
     if ( y < min_h )
         y = min_h;
     else if ( y > max_h )
@@ -260,8 +260,8 @@ void CZMClientScoreBoardDialog::PaintBackground()
     // Actual length of texture.
     const int nBorderTexLength = 512;
 
-    const int border_w = SCALE_WIDTH( 32 );
-    const int border_h = SCALE_HEIGHT( 32 );
+    const int border_w = XRES( 32 );
+    const int border_h = YRES( 32 );
 
 
     x = border_w;

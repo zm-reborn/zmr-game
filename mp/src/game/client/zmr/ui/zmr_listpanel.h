@@ -29,9 +29,6 @@ public:
     ~CZMImageList() { if ( GetImage( 0 ) ) delete GetImage( 0 ); };
 };
 
-#define SCALE_WIDTH(x)      ( (int)( x * (ScreenWidth() / (float)640) ) )
-#define SCALE_HEIGHT(y)     ( (int)( y * (ScreenHeight() / (float)480) ) )
-
 class CZMListRow : public vgui::Label
 {
 public:
