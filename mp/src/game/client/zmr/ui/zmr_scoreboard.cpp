@@ -118,13 +118,13 @@ CZMClientScoreBoardDialog::CZMClientScoreBoardDialog( IViewPort* pViewPort ) : E
     m_flNextUpdateTime = 0.0f;
 
     m_nTexBgSideId = surface()->CreateNewTextureID();
-    surface()->DrawSetTextureFile( m_nTexBgSideId, "zmr_effects/hud_bg_spec_side", true, false );
+    surface()->DrawSetTextureFile( m_nTexBgSideId, "zmr_effects/hud_bg_score_side", true, false );
 
     m_nTexBgTopId = surface()->CreateNewTextureID();
-    surface()->DrawSetTextureFile( m_nTexBgTopId, "zmr_effects/hud_bg_spec_top", true, false );
+    surface()->DrawSetTextureFile( m_nTexBgTopId, "zmr_effects/hud_bg_score_top", true, false );
 
     m_nTexBgCornerId = surface()->CreateNewTextureID();
-    surface()->DrawSetTextureFile( m_nTexBgCornerId, "zmr_effects/hud_bg_spec_corner", true, false );
+    surface()->DrawSetTextureFile( m_nTexBgCornerId, "zmr_effects/hud_bg_score_corner", true, false );
 
 
     LoadControlSettings( "resource/ui/zmscoreboard.res" );
