@@ -16,7 +16,13 @@
 	spawnflags(Flags) =
 	[
 		1 : "Start constrained" : 0
+		2 : "Is Template (used by item_item_crate)" : 0
 	]
+	
+	v_modeloverride(studio) : "Override View Model" : "" : "View model the weapon will use. If left empty, use default."
+	w_modeloverride(studio) : "Override World Model" : "" : "World model the weapon will use. If left empty, use default."
+	dmgoverride(integer) : "Override Damage" : -1 : "Amount of damage weapon will inflict. Use numbers less than zero to use default."
+	clip1override(integer) : "Override Clip" : -1 : "How big the weapon clip/magazine is. Use numbers less than zero to use default."
 
 	output OnPlayerUse(void) : "Fires when the player +uses this weapon"
 	output OnPlayerPickup(void) : "Fires when the player picks up this weapon"
@@ -42,10 +48,10 @@
 
 @PointClass base(BasePropPhysics, Targetname, Angles, DamageFilter, BaseFadeProp) studio("models/items/item_item_crate.mdl") = item_item_crate : "Item Crate"
 [
-	CrateType(choices) : "Crate Contains" : 0 =
-	[
-		0 : "Contains specified item"
-	]
+	//CrateType(choices) : "Crate Contains" : 0 =
+	//[
+	//	0 : "Contains specified item"
+	//]
 
 
 	//CrateAppearance(choices) : "Crate Appearance" : 0 =
@@ -54,10 +60,12 @@
 	//	1 : "Radar Beacon Crate"
 	//]
 
-	ItemClass(pointentityclass) : "Item Type" : "item_dynamic_resupply" : "Class name of the entity to spawn when the crate is broken"
+	ItemClass(pointentityclass) : "Item Type" : "weapon_zm_pistol" : "Class name of the entity to spawn when the crate is broken"
 	ItemCount(integer) : "Item Count" : 1 : "Number of items to emit upon breakage"
 	//SpecificResupply(target_destination) : "Specific resupply" : "" : "If item type is item_dynamic_resupply, specify a specific one to use instead of the master"
 
+	ItemTemplate(target_destination) : "Weapon Template To Use" : "" : "Template weapon that this maker should be creating clones of."
+	
 	// Inputs
 	input Kill(void) : "Remove the item crate"
 	input Break(void) : "Breaks the breakable."

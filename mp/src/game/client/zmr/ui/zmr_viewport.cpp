@@ -57,6 +57,56 @@ static int GetGroupByKey()
     return INVALID_GROUP_INDEX;
 }
 
+static void UTIL_TraceZMView( trace_t* trace, Vector endpos, int mask, CTraceFilterSimple* filter = nullptr, C_BaseEntity* pEnt = nullptr, int collisionGroup = COLLISION_GROUP_NONE )
+{
+    Vector pos = MainViewOrigin();
+
+    const bool startinside = (UTIL_PointContents( pos ) & CONTENTS_SOLID) == 0;
+
+    // If we started inside the world, only trace through nodraw surfaces.
+    // It is possible to be able to see some things behind the sky while inside the world but let's stay safe.
+    const unsigned short invalidsurfaces = startinside ? SURF_NODRAW : (SURF_SKY | SURF_NODRAW);
+
+    Vector dir = (endpos - pos).Normalized();
+
+    // Keep tracing until we hit something that the player can't see through.
+    while ( true )
+    {
+        // NOTE: You cannot rely on trace startsolid! This is why we check for point contents here.
+        // It only works if you start inside a brush leaf (yes, the outside world also has leafs), simply being outside is apparently not solid.
+        bool bOutsideWorld = (UTIL_PointContents( pos ) & CONTENTS_SOLID) != 0;
+
+        if ( filter )
+        {
+            UTIL_TraceLine( pos, endpos, mask, filter, trace );
+        }
+        else
+        {
+            UTIL_TraceLine( pos, endpos, mask, pEnt, collisionGroup, trace );
+        }
+
+        // Didn't hit anything.
+        if ( trace->fraction == 1.0f )
+            break;
+
+        // Didn't start outside world, should be a valid trace.
+        if ( !bOutsideWorld )
+        {
+            if ( !trace->DidHitWorld() || (trace->surface.flags & invalidsurfaces) == 0 )
+            {
+                break;
+            }
+        }
+
+        // Go to the next spot to start at.
+        // A bit hacky way of doing this. Trace endpos doesn't seem to be the pos where we left solid.
+        float dist = pos.DistTo( endpos );
+        float frac = trace->startsolid ? trace->fractionleftsolid : trace->fraction;
+
+        pos += dir * (frac * dist) + dir * 2.0f; // Add a bit of extra so we definitely don't hit the same wall again.
+    }
+}
+
 
 DECLARE_HUDELEMENT( CZMFrame );
 
@@ -485,7 +535,6 @@ void CZMFrame::TraceScreenToWorld( int mx, int my, trace_t* res, CTraceFilterSim
 
     if ( !pPlayer ) return;
 
-
     float fov = pPlayer->GetFOV();
 
     float dx, dy;
@@ -507,19 +556,9 @@ void CZMFrame::TraceScreenToWorld( int mx, int my, trace_t* res, CTraceFilterSim
     dist = c_x / tanf( M_PI_F * fov / 360.0f );
 
     Vector ray = (MainViewForward() * dist) + (MainViewRight() * dx) + (MainViewUp() * dy);
-
-
     VectorNormalize( ray );
 
-    
-    if ( filter )
-    {
-        UTIL_TraceLine( MainViewOrigin(), MainViewOrigin() + ray * MAX_TRACE_LENGTH, mask, filter, res );
-    }
-    else
-    {
-        UTIL_TraceLine( MainViewOrigin(), MainViewOrigin() + ray * MAX_TRACE_LENGTH, mask, pPlayer, COLLISION_GROUP_NONE, res );
-    }
+    UTIL_TraceZMView( res, MainViewOrigin() + ray * MAX_COORD_FLOAT, mask, filter, pPlayer );
 }
 
 void CZMFrame::OnLeftClick()
@@ -787,7 +826,7 @@ void CZMFrame::FindZombiesInBox( int start_x, int start_y, int end_x, int end_y,
         // Do we see the mad man?
         if ( !zm_cl_poweruser_boxselect.GetBool() )
         {
-            UTIL_TraceLine( MainViewOrigin(), pZombie->GetAbsOrigin() + Vector( 0, 0, 8 ), MASK_ZMVIEW, &filter, &trace );
+            UTIL_TraceZMView( &trace, pZombie->GetAbsOrigin() + Vector( 0, 0, 8 ), MASK_ZMVIEW, &filter );
 
             if ( trace.fraction != 1.0f && !trace.startsolid ) continue;
         }
