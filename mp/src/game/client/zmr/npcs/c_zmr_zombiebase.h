@@ -33,6 +33,8 @@ public:
     virtual Vector          GetObserverCamOrigin() OVERRIDE { return WorldSpaceCenter(); };
     virtual const QAngle&   EyeAngles() OVERRIDE;
     virtual Vector          EyePosition() OVERRIDE;
+
+    virtual const char* GetZombieLocalization() { return ""; };
     
     //virtual void TraceAttack( const CTakeDamageInfo&, const Vector&, trace_t*,CDmgAccumulator* ) OVERRIDE;
     
@@ -47,6 +49,10 @@ public:
     CZMPlayer*              GetSelector();
     void                    SetSelector( CZMPlayer* );
     void                    SetSelector( int );
+    ZombieClass_t           GetZombieClass();
+protected:
+    void                    SetZombieClass( ZombieClass_t zclass );
+public:
 
 
     inline int  GetGroup() { return m_iGroup; };
@@ -61,6 +67,7 @@ private:
     CNetworkVar( float, m_flHealthRatio );
 
     int m_iGroup;
+    ZombieClass_t m_iZombieClass;
 
     QAngle m_angEyeAttachment;
 };

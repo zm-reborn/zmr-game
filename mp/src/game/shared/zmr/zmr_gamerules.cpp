@@ -119,8 +119,10 @@ BEGIN_NETWORK_TABLE_NOBASE( CZMRules, DT_ZM_Rules )
 
     #ifdef CLIENT_DLL
         RecvPropInt( RECVINFO( m_nZombiePop ) ),
+        RecvPropInt( RECVINFO( m_nRounds ), SPROP_UNSIGNED ),
     #else
         SendPropInt( SENDINFO( m_nZombiePop ) ),
+        SendPropInt( SENDINFO( m_nRounds ), -1, SPROP_UNSIGNED ),
     #endif
 
 END_NETWORK_TABLE()
@@ -819,6 +821,7 @@ bool CZMRules::FAllowNPCs()
 
 ConVar zm_mp_roundlimit( "zm_mp_roundlimit", "0", FCVAR_NOTIFY, "How many rounds do we play before going into intermission. 0 = Disable" );
 ConVar zm_sv_roundintermissiontime( "zm_sv_roundintermissiontime", "5", FCVAR_NOTIFY, "How many seconds of wait there is before another round begins." );
+ConVar zm_sv_roundmintime( "zm_sv_roundmintime", "20", FCVAR_NOTIFY, "Minimum amount of time that is considered as a full round." );
 
 void CZMRules::EndRound( ZMRoundEndReason_t reason )
 {
@@ -836,10 +839,14 @@ void CZMRules::EndRound( ZMRoundEndReason_t reason )
     // Tell clients we don't want to show objectives anymore.
     CZMEntObjectivesManager::ResetObjectives();
 
-    // Check round limit.
-    ++m_nRounds;
 
-    if ( zm_mp_roundlimit.GetInt() > 0 && m_nRounds > zm_mp_roundlimit.GetInt() )
+    if ( (gpGlobals->curtime - m_flRoundStartTime) > zm_sv_roundmintime.GetFloat() && reason != ZMROUND_GAMEBEGIN )
+    {
+        ++m_nRounds;
+    }
+
+    // Check round limit.
+    if ( zm_mp_roundlimit.GetInt() > 0 && m_nRounds >= zm_mp_roundlimit.GetInt() )
     {
         GoToIntermission();
     }

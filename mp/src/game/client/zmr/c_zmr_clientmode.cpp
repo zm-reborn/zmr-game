@@ -3,7 +3,6 @@
 #include "ienginevgui.h"
 #include "glow_outline_effect.h"
 
-#include "ui/zmr_spectator_ui.h"
 #include "ui/zmr_textwindow.h"
 #include "ui/zmr_scoreboard.h"
 #include "c_zmr_zmvision.h"
@@ -88,7 +87,7 @@ public:
 
 IViewPortPanel* CZMViewport::CreatePanelByName( const char* szPanelName )
 {
-    IViewPortPanel* newpanel = NULL;
+    IViewPortPanel* newpanel = nullptr;
 
     if ( Q_strcmp( PANEL_SCOREBOARD, szPanelName ) == 0 )
     {
@@ -101,10 +100,14 @@ IViewPortPanel* CZMViewport::CreatePanelByName( const char* szPanelName )
         newpanel = new CZMTextWindow( this );
         return newpanel;
     }
-    else if ( Q_strcmp( PANEL_SPECGUI, szPanelName ) == 0 )
+    else if ( Q_strcmp( PANEL_SPECGUI, szPanelName ) == 0 ) // Our spectator gui (black bars) are now hud elements.
     {
-        newpanel = new CZMSpectatorGUI( this );	
+        //newpanel = new CZMHudSpectatorUI( this );
         return newpanel;
+    }
+    else if ( Q_strcmp( PANEL_SPECMENU, szPanelName ) == 0 ) // Never create spectator menu.
+    {
+        return nullptr;
     }
 
     

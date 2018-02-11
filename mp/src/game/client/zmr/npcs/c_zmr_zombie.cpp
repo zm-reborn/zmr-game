@@ -84,6 +84,7 @@ bool C_ZMHolidayHat::Parent( const char* pszAttachment )
 
 C_ZMZombie::C_ZMZombie()
 {
+    SetZombieClass( ZMCLASS_SHAMBLER );
     m_pHat = nullptr;
 }
 

@@ -129,3 +129,13 @@ void CZMBaseZombie::SetSelector( int index )
 {
     m_iSelectorIndex = index;
 }
+
+ZombieClass_t CZMBaseZombie::GetZombieClass()
+{
+    return m_iZombieClass;
+}
+
+void CZMBaseZombie::SetZombieClass( ZombieClass_t zclass )
+{
+    m_iZombieClass = zclass;
+}

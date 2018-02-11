@@ -144,6 +144,7 @@ public:
 #endif
 
     inline int GetZombiePop() { return m_nZombiePop; };
+    inline int GetRoundsPlayed() { return m_nRounds; };
 
     static int GetServerParticipationFlags();
 
@@ -153,7 +154,7 @@ public:
 
 private:
     CNetworkVar( int, m_nZombiePop );
-
+    CNetworkVar( int, m_nRounds );
 
     
 
@@ -167,7 +168,6 @@ private:
     int m_flRoundRestartTime;
     int m_flRoundStartTime;
     bool m_bInRoundEnd;
-    int m_nRounds;
     int m_nRoundMaxHumansAlive;
 
 
