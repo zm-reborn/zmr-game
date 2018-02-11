@@ -23,7 +23,7 @@
 		"autoResize"	"0"
 		"visible"		"1"
 		"enabled"		"1"
-		"labelText"		"ROUND COUNT"
+		"labelText"		"ROUND N/A"
 		"font"		"ZMScoreboardItemBig"
 		"textAlignment"		"north-west"
 	}
