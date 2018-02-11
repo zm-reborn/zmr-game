@@ -329,12 +329,6 @@ int CZMClientScoreBoardDialog::FindPlayerItem( int playerIndex )
 
 void CZMClientScoreBoardDialog::UpdateStats()
 {
-    //Label* pRoundLabel = dynamic_cast<Label*>( FindChildByName( "RoundLabel" ) );
-    //if ( pRoundLabel )
-    //{
-    //    ZMRules()->GetRoundCount()
-    //}
-
     Label* pInfo = dynamic_cast<Label*>( FindChildByName( "MinorInfo" ) );
     if ( pInfo )
     {
@@ -358,9 +352,26 @@ void CZMClientScoreBoardDialog::UpdateStats()
     }
 }
 
+void CZMClientScoreBoardDialog::UpdateMapStats()
+{
+    Label* pRoundLabel = dynamic_cast<Label*>( FindChildByName( "RoundLabel" ) );
+    if ( pRoundLabel )
+    {
+        wchar_t buf[64];
+        wchar_t round[16];
+
+        V_snwprintf( round, sizeof( round ), L"%i", ZMRules()->GetRoundsPlayed() + 1 );
+
+        g_pVGuiLocalize->ConstructString( buf, sizeof( buf ), g_pVGuiLocalize->Find( "#ZMRoundCount" ), 1, round );
+
+        pRoundLabel->SetText( buf );
+    }
+}
+
 void CZMClientScoreBoardDialog::UpdateScoreboard()
 {
     UpdatePlayerInfo();
+    UpdateMapStats();
 }
 
 int CZMClientScoreBoardDialog::TeamToSection( int iTeam )

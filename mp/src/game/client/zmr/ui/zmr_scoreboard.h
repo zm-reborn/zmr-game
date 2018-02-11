@@ -71,7 +71,8 @@ public:
     MESSAGE_FUNC_PARAMS( OnListLayout, "OnListLayout", kv );
 
 private:
-    void UpdateStats();
+    void UpdateStats(); // Stuff that is static and doesn't change during the map.
+    void UpdateMapStats(); // Stuff that may change while we're playing.
 
     int FindPlayerItem( int playerIndex );
     int TeamToSection( int iTeam );
