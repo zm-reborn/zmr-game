@@ -1764,6 +1764,29 @@ Activity CZMBaseZombie::NPC_TranslateActivity( Activity baseAct )
     return BaseClass::NPC_TranslateActivity( baseAct );
 }
 
+// How much do we tolerate the delta between goal position and actual goal.
+// Change this for zombies since the original 120 units is WWWWAAAAAAYYYYY too much at very close ranges.
+float CZMBaseZombie::GetGoalRepathTolerance( CBaseEntity* pGoalEnt, GoalType_t type, const Vector& curGoal, const Vector& curTargetPos )
+{
+    // We only care about enemies.
+    if ( type != GOALTYPE_ENEMY )
+        return BaseClass::GetGoalRepathTolerance( pGoalEnt, type, curGoal, curTargetPos );
+
+    // Target pos is LKP.
+    // ZMRTODO: Factor in path length.
+    float distToGoal = (GetAbsOrigin() - curTargetPos).Length();
+    float min = GetHullWidth();
+    float max = 256.0f;
+
+    float distInSec = MAX( GetSmoothedVelocity().Length2D(), 16.0f );
+    float timeToGoal = MAX( distToGoal / distInSec, 1.0f );
+
+    float tolerance = SimpleSplineRemapValClamped( timeToGoal, 2.0f, 20.0f, min, max );
+
+
+    return tolerance;
+}
+
 bool CZMBaseZombie::IsValidEnemy( CBaseEntity* pEnt )
 {
     CZMPlayer* pPlayer = ToZMPlayer( pEnt );

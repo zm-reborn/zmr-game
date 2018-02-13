@@ -153,6 +153,7 @@ public:
     virtual bool    CanSwatPhysicsObjects() { return false; };
     bool            FindNearestPhysicsObject( int iMaxMass );
     
+    virtual float   GetGoalRepathTolerance( CBaseEntity* pGoalEnt, GoalType_t type, const Vector& curGoal, const Vector& curTargetPos ) OVERRIDE;
     virtual float   GetReactionDelay( CBaseEntity* pEnemy ) OVERRIDE { return 0.0; };
     virtual bool    IsValidEnemy( CBaseEntity* ) OVERRIDE;
     // Always classify as a zombie. The AI relationships depend on it.
