@@ -40,8 +40,7 @@ Scheme
 		"ZMFgColorCrit"		"200 0 0 255" // ZMR - When something is low.
 		"ZMHudBgColor"		"70 0 0 150" // ZMR - Hud background color (hp, ammo, etc.)
 		
-		"ZMScoreboardBg"	"0 0 0 192"
-		"ZMScoreboardBorder""255 0 0 32"
+		"ZMScoreboardBg"	"50 0 0 150"
 		
 		//"FgColor"			"255 220 0 100"
 		"FgColor"			"255 255 255 100"
@@ -753,6 +752,51 @@ Scheme
 				"antialias" "1"
 				"additive"	"0"
 				"custom"	"1"
+			}
+		}
+		ZMScoreboardHeaderBig
+		{
+			"1"
+			{
+				"name"		"Built Titling Rg"
+				"tall"		"22"
+				"weight"	"0"
+				"antialias" "1"
+				"additive"	"1"
+				"custom"	"1"
+			}
+		}
+		ZMScoreboardHeaderSmall
+		{
+			"1"
+			{
+				"name"		"Verdana"
+				"tall"		"10"
+				"weight"	"900"
+				"antialias" "1"
+				"additive"	"0"
+			}
+		}
+		ZMScoreboardItemBig
+		{
+			"1"
+			{
+				"name"		"Verdana"
+				"tall"		"15"
+				"weight"	"900"
+				"antialias" "1"
+				"additive"	"0"
+			}
+		}
+		ZMScoreboardItemNormal
+		{
+			"1"
+			{
+				"name"		"Verdana"
+				"tall"		"12"
+				"weight"	"600"
+				"antialias" "1"
+				"additive"	"0"
 			}
 		}
 		ZMHudSpecUI18
