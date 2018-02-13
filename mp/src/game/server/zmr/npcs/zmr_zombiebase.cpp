@@ -1862,6 +1862,9 @@ void CZMBaseZombie::Command( const Vector& pos, bool bPlayerCommanded, float tol
     m_vecLastCommandPos = pos;
     m_bCommanded = true;
     m_flAddGoalTolerance = tolerance;
+
+    // Don't wait, move instantly.
+    m_flMoveWaitFinished = gpGlobals->curtime;
 }
 
 bool CZMBaseZombie::Swat( CBaseEntity* pTarget, bool bBreakable )
