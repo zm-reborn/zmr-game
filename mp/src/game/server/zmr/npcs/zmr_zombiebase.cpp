@@ -737,6 +737,14 @@ void CZMBaseZombie::RunTask( const Task_t* pTask )
         TaskComplete();
         break;
 
+    case TASK_MOVE_AWAY_PATH : // This is a quick dirty fix for CAI_Pathfinder::IsLinkUsable crash. (caused by task interrupt 2, FindCoverNode)
+        BaseClass::RunTask( pTask );
+
+        // Interrupt 2 will try FindCoverNode, which finds cover in a 1024 unit radius. This is ridiculous and isn't useful at all.
+        // Might as well fail.
+        if ( !TaskIsComplete() && GetTaskInterrupt() > 1 )
+            TaskFail( FAIL_NO_ROUTE );
+
     default:
         BaseClass::RunTask( pTask );
         break;
