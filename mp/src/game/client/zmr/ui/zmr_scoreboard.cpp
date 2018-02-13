@@ -49,6 +49,8 @@ static bool SortHumanSection( KeyValues* kv1, KeyValues* kv2 )
         // Spectators go last.
         if ( g_PR->GetTeam( p1 ) > g_PR->GetTeam( p2 ) )
             return true;
+        else if ( g_PR->GetTeam( p1 ) < g_PR->GetTeam( p2 ) )
+            return false;
     }
 
     // We have more score?
