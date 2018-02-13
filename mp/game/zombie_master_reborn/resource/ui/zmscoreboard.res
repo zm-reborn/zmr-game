@@ -118,7 +118,7 @@
 					"1"
 					{
 						"name"		"Name"
-						"zmkills"		"Kills"
+						"zmkills"		"Score"
 						"ping"		"Latency"
 					}
 				}
