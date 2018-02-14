@@ -108,6 +108,9 @@ CZMWeaponShotgun::CZMWeaponShotgun()
 
 void CZMWeaponShotgun::PrimaryAttack( void )
 {
+    if ( !CanAct() ) return;
+
+
     CZMPlayer* pPlayer = GetPlayerOwner();
 
     if ( !pPlayer ) return;
