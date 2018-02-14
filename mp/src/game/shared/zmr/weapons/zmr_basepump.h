@@ -13,6 +13,7 @@
 #define RELOADSTATE_START       1
 #define RELOADSTATE_RELOADING   2
 
+// ZMRTODO: Separate pump and single reload weapon classes.
 class CZMBasePumpWeapon : public CZMBaseWeapon
 {
 public:
@@ -25,8 +26,11 @@ public:
 
 
     virtual bool Holster( CBaseCombatWeapon* pSwitchTo ) OVERRIDE;
+    virtual void PrimaryAttack( void ) OVERRIDE;
+    virtual	void CheckReload( void ) OVERRIDE;
     virtual bool Reload( void ) OVERRIDE;
     virtual void ItemPostFrame( void ) OVERRIDE;
+    virtual void StopReload();
     virtual void FinishReload( void ) OVERRIDE;
 
     virtual Activity GetReloadStartAct() { return ACT_VM_RELOAD_START;};

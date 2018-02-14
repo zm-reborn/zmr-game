@@ -49,6 +49,16 @@ bool CZMBasePumpWeapon::Holster( CBaseCombatWeapon* pSwitchTo )
     return res;
 }
 
+void CZMBasePumpWeapon::PrimaryAttack( void )
+{
+    if ( !CanAct() ) return;
+
+
+    m_bNeedPump = true;
+
+    BaseClass::PrimaryAttack();
+}
+
 void CZMBasePumpWeapon::ItemPostFrame( void )
 {
     if ( m_bNeedPump && m_flNextPrimaryAttack <= gpGlobals->curtime )
@@ -68,9 +78,6 @@ void CZMBasePumpWeapon::ItemPostFrame( void )
 
 void CZMBasePumpWeapon::Pump()
 {
-    if ( !CanAct() ) return;
-
-
     CZMPlayer* pOwner = GetPlayerOwner();
     if ( !pOwner ) return;
 
@@ -85,6 +92,19 @@ void CZMBasePumpWeapon::Pump()
     float delay = SequenceDuration();
     pOwner->m_flNextAttack = gpGlobals->curtime + delay;
     m_flNextPrimaryAttack = gpGlobals->curtime + delay;
+}
+
+void CZMBasePumpWeapon::CheckReload( void )
+{
+    if ( !CanAct() )
+    {
+        if ( m_bInReload )
+            StopReload();
+
+        return;
+    }
+
+    BaseClass::CheckReload();
 }
 
 void CZMBasePumpWeapon::StartReload( void )
@@ -118,11 +138,8 @@ void CZMBasePumpWeapon::StartReload( void )
     m_iReloadState = RELOADSTATE_START;
 }
 
-void CZMBasePumpWeapon::FinishReload( void )
+void CZMBasePumpWeapon::StopReload()
 {
-    BaseClass::FinishReload();
-
-
     SendWeaponAnim( GetReloadEndAct() );
 
     float nextattack = gpGlobals->curtime + SequenceDuration();
@@ -137,6 +154,16 @@ void CZMBasePumpWeapon::FinishReload( void )
 
     
     m_iReloadState = RELOADSTATE_NONE;
+
+    m_bInReload = false;
+}
+
+void CZMBasePumpWeapon::FinishReload( void )
+{
+    BaseClass::FinishReload();
+
+
+    StopReload();
 }
 
 bool CZMBasePumpWeapon::Reload( void )
@@ -151,7 +178,6 @@ bool CZMBasePumpWeapon::Reload( void )
             return false;
         }
     }
-
 
     bool res = BaseClass::Reload();
 

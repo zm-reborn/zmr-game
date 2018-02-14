@@ -57,7 +57,6 @@ public:
     virtual float GetFireRate( void ) OVERRIDE { return 0.9f; };
 
 
-    virtual void PrimaryAttack( void ) OVERRIDE;
     virtual bool Holster( CBaseCombatWeapon* pSwitchTo = nullptr ) OVERRIDE;
     virtual void Drop( const Vector& ) OVERRIDE;
     virtual void ItemPostFrame( void ) OVERRIDE;
@@ -138,14 +137,6 @@ CZMWeaponRifle::CZMWeaponRifle()
 CZMWeaponRifle::~CZMWeaponRifle()
 {
     CheckUnZoom();
-}
-
-void CZMWeaponRifle::PrimaryAttack( void )
-{
-    m_bNeedPump = true;
-
-
-    BaseClass::PrimaryAttack();
 }
 
 void CZMWeaponRifle::ItemPostFrame( void )
