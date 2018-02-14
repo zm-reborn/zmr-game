@@ -172,7 +172,7 @@ $Project "Server (ZMR)"
 			$File	"hl2\npc_crow.h"
 			//$File	"hl2\npc_dog.cpp"
 			//$File	"hl2\npc_eli.cpp"
-			//$File	"hl2\npc_enemyfinder.cpp"
+			$File	"hl2\npc_enemyfinder.cpp" // Apparently this is used.
 			//$File	"hl2\npc_fisherman.cpp"
 			//$File	"hl2\npc_gman.cpp"
 			//$File	"hl2\npc_headcrab.cpp"
