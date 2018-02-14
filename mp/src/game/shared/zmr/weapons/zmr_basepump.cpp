@@ -1,4 +1,5 @@
 #include "cbase.h"
+#include "in_buttons.h"
 
 #ifndef CLIENT_DLL
 #include "items.h"
@@ -100,6 +101,52 @@ void CZMBasePumpWeapon::CheckReload( void )
     {
         if ( m_bInReload )
             StopReload();
+
+        return;
+    }
+
+    // Override singly reload mechanic.
+    if ( m_bReloadsSingly && m_bInReload && (m_flNextPrimaryAttack <= gpGlobals->curtime) )
+    {
+        CZMPlayer* pOwner = GetPlayerOwner();
+        if ( !pOwner )
+            return;
+
+
+        // If out of ammo, end reload
+        if ( pOwner->GetAmmoCount( m_iPrimaryAmmoType ) <= 0 )
+        {
+            FinishReload();
+        }
+        // If clip not full, reload again
+        else if ( m_iClip1 < GetMaxClip1() )
+        {
+            // Add them to the clip
+            m_iClip1 += 1;
+            pOwner->RemoveAmmo( 1, m_iPrimaryAmmoType );
+
+            Reload();
+
+
+            if ( pOwner->m_nButtons & (IN_ATTACK | IN_ATTACK2) && m_iClip1 > 0 )
+            {
+                // Make sure we don't attack instantly when stopping the reload.
+                StopReload();
+
+                // Add a bit more time.
+                m_flNextPrimaryAttack += 0.1f;
+                m_flNextSecondaryAttack += 0.1f;
+
+                return;
+            }
+        }
+        // Clip full, stop reloading
+        else
+        {
+            FinishReload();
+            m_flNextPrimaryAttack	= gpGlobals->curtime;
+            m_flNextSecondaryAttack = gpGlobals->curtime;
+        }
 
         return;
     }
