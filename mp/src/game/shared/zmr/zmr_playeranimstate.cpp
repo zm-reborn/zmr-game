@@ -304,9 +304,18 @@ void CZMPlayerAnimState::DoAnimationEvent( PlayerAnimEvent_t playerAnim, int nDa
 //-----------------------------------------------------------------------------
 bool CZMPlayerAnimState::HandleSwimming( Activity &idealActivity )
 {
-    bool bInWater = BaseClass::HandleSwimming( idealActivity );
+    //bool bInWater = BaseClass::HandleSwimming( idealActivity );
+    //
+    //return bInWater;
 
-    return bInWater;
+    // ZMRCHANGE: We don't have any swimming animations.
+    if ( GetBasePlayer()->GetWaterLevel() >= WL_Waist )
+    {
+        idealActivity = ACT_MP_JUMP;
+        return true; 
+    }
+    
+    return false;
 }
 
 //-----------------------------------------------------------------------------
