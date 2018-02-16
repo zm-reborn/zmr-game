@@ -10,6 +10,7 @@
 #include "zmr/zmr_shareddefs.h"
 
 
+#define MAX_GROUP_INDEX             9
 #define INVALID_GROUP_INDEX         -1
 
 

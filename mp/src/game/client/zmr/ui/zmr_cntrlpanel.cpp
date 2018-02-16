@@ -1,12 +1,12 @@
 #include "cbase.h"
 
-#include "vgui_controls/ComboBox.h"
+#include <vgui_controls/ComboBox.h>
 #include "spectatorgui.h"
 #include "iclientmode.h"
 #include "vgui_bitmapbutton.h"
 
 
-
+#include "zmr_global_shared.h"
 #include "zmr_viewport.h"
 #include "zmr_cntrlpanel.h"
 
@@ -141,7 +141,7 @@ void CZMHudControlPanel::LoadButtons()
         "MODE_SELECT_ALL",
         "MODE_AMBUSH_CREATE",
         "MODE_CREATE_GROUP",
-        "MODE_GOTO_GROUP",
+        "MODE_SELECT_GROUP",
         "MODE_POWER_SPOTCREATE", //spot create
         "MODE_POWER_DELETEZOMBIES",
         "MODE_JUMP_CEILING",
@@ -156,8 +156,8 @@ void CZMHudControlPanel::LoadButtons()
         "zmmenu_defend",
         "zmmenu_selectall",
         "zmmenu_ambush",
-        "zmmenu_createsquad",
-        "zmmenu_selectsquad",
+        "zmmenu_creategroup",
+        "zmmenu_selectgroup",
         "zmmenu_createhidden",
         "zmmenu_delete",
         "zmmenu_bansheeceil"
@@ -171,8 +171,8 @@ void CZMHudControlPanel::LoadButtons()
         true,
         true,
         true,
-        false,
-        false,
+        true,
+        true,
         true,
         true,
         true
@@ -253,7 +253,7 @@ void CZMHudControlPanel::LoadButtons()
     {
         true,
         true,
-        false
+        true
     };
 
     //load tab buttons
@@ -311,69 +311,114 @@ void CZMHudControlPanel::RemoveButtons()
 
 void CZMHudControlPanel::GroupsListUpdate()
 {
-/*    //qck: Keep track of groups inside of our combo box. No duplicates.	
-    C_BasePlayer* pPlayer = C_BasePlayer::GetLocalPlayer();
-    if(pPlayer)
-    {
-        for(int i=0; i < pPlayer->m_ZombieGroupSerial.Count(); i++)
-        {
-            int serialNumber = pPlayer->m_ZombieGroupSerial[i];
-             
-            if( m_ComboBoxItems.Find( serialNumber ) == -1)
-            {
-                char groupName[ 16 ];
-                Q_snprintf( groupName, sizeof( groupName ), "Group %i", i );
+    if ( m_iActiveTab != TAB_ZEDS ) return;
 
-                KeyValues* kv = new KeyValues("group"); //qck: Associate entity serial number with its menu listing under key "serial"
-                if (!kv || !m_pZombieGroups) return;
+
+    //qck: Keep track of groups inside of our combo box. No duplicates.	
+    C_BasePlayer* pPlayer = C_BasePlayer::GetLocalPlayer();
+    if ( !pPlayer ) return;
+
+
+    CUtlVector<int> vGroups;
+
+    for ( int i = 0; i < g_pZombies->Count(); i++ )
+    {
+        C_ZMBaseZombie* pZombie = g_pZombies->Element( i );
+             
+        if ( !pZombie ) continue;
+
+
+        int group = pZombie->GetGroup();
+
+        if ( group > INVALID_GROUP_INDEX && vGroups.Find( group ) == -1 )
+        {
+            vGroups.AddToTail( group );
+
+            if ( m_ComboBoxItems.Find( group ) == -1 )
+            {
+                char groupName[16];
+                Q_snprintf( groupName, sizeof( groupName ), "Group %i", group );
+
+                KeyValues* kv = new KeyValues( "group" ); //qck: Associate entity serial number with its menu listing under key "serial"
+                if ( !kv || !m_pZombieGroups ) return;
                 
-                kv->SetInt("serial", serialNumber);
-                m_pZombieGroups->AddItem(groupName, kv); 
+                kv->SetInt( "groupnum", group );
+                m_pZombieGroups->AddItem( groupName, kv ); 
                 kv->deleteThis();
 
-                m_ComboBoxItems.AddToTail( serialNumber );
-
-                DevMsg("Number of groups: %i\n", (i + 1));
+                m_ComboBoxItems.AddToTail( group );
             }
         }
     }
-    */
-}
 
-//--------------------------------------------------------------
-// TGB: remove a group from the dropdown list
-//--------------------------------------------------------------
-void CZMHudControlPanel::RemoveGroup(int serial)
-{
-    /*
-    Menu *dropdown = m_pZombieGroups->GetMenu();
-    if (!dropdown) return;
 
-    // removing based purely on a bit of userdata turns out to be a hassle
-    for (int i = 0; dropdown->GetItemCount(); i++)
+    Menu* dropdown = m_pZombieGroups->GetMenu();
+    if ( !dropdown ) return;
+
+
+    for ( int i = 0; i < dropdown->GetItemCount(); i++ )
     {
-        int index = dropdown->GetMenuID(i);
+        int index = dropdown->GetMenuID( i );
 
-        KeyValues *kv = dropdown->GetItemUserData(index);
-        if (kv && kv->GetInt("serial") == serial)
+        KeyValues* kv = dropdown->GetItemUserData( index );
+
+        if ( !kv ) continue;
+
+        int group = kv->GetInt( "groupnum", INVALID_GROUP_INDEX );
+        if ( group != INVALID_GROUP_INDEX && vGroups.Find( group ) == -1 )
         {
-            dropdown->DeleteItem(index);
-            DevMsg("Removed zombie group from menu\n");
-            break;
+            dropdown->DeleteItem( index );
+            m_ComboBoxItems.FindAndRemove( group );
+
+            --i;
+
+            //
+            if ( !dropdown->GetItemCount() )
+            {
+                m_pZombieGroups->SetText( "None" );
+                return;
+            }
         }
     }
+}
 
-    //more clearing up from the various tracking lists
-    m_ComboBoxItems.FindAndRemove(serial);
+void CZMHudControlPanel::CreateGroup()
+{
+    // Find empty group.
+    int newgroup = 1;
 
-    C_BasePlayer* pPlayer = C_BasePlayer::GetLocalPlayer();
-    if(pPlayer)
-        pPlayer->m_ZombieGroupSerial.FindAndRemove(serial);
+    for ( int i = 0; i < g_pZombies->Count(); )
+    {
+        C_ZMBaseZombie* pZombie = g_pZombies->Element( i );
 
+        if ( pZombie && pZombie->GetGroup() == newgroup )
+        {
+            i = 0;
+            ++newgroup;
 
-    //reset the text area of the combobox
-    m_pZombieGroups->SetText("None");
-    */
+            continue;
+        }
+
+        ++i;
+    }
+
+    if ( newgroup <= MAX_GROUP_INDEX )
+    {
+        ZMClientUtil::SetSelectedGroup( newgroup );
+    }
+}
+
+void CZMHudControlPanel::SelectGroup()
+{
+    if ( m_pZombieGroups )
+    {
+        KeyValues* kv = m_pZombieGroups->GetActiveItemUserData();
+
+        if ( kv )
+        {
+            ZMClientUtil::SelectGroup( kv->GetInt( "groupnum", INVALID_GROUP_INDEX ) );
+        }
+    }
 }
 
 void CZMHudControlPanel::PositionButtons()
