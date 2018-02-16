@@ -394,6 +394,16 @@ void CZMFrame::OnCommand( const char* command )
     {
         g_ZMVision.Toggle();
     }
+    else if ( Q_stricmp( command, "MODE_SELECT_GROUP" ) == 0 )
+    {
+        if ( m_pZMControl )
+            m_pZMControl->SelectGroup();
+    }
+    else if ( Q_stricmp( command, "MODE_CREATE_GROUP" ) == 0 )
+    {
+        if ( m_pZMControl )
+            m_pZMControl->CreateGroup();
+    }
 
     BaseClass::OnCommand( command );
 }
@@ -458,6 +468,11 @@ void CZMFrame::OnThink()
         return;
     }
 
+
+    if ( m_pZMControl )
+    {
+        m_pZMControl->GroupsListUpdate();
+    }
 
     if ( pPlayer->m_nButtons & IN_SCORE && zm_cl_hidemouseinscore.GetBool() )
     {

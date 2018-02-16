@@ -32,7 +32,8 @@ public:
 
 
     void GroupsListUpdate();
-    void RemoveGroup( int serial );
+    void CreateGroup();
+    void SelectGroup();
     
 
     void UpdateTabs( int activatedTab = -1 );

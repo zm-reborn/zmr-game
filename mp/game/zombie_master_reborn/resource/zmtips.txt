@@ -71,6 +71,8 @@
 		"msg"			"#ZMMenuZMSelAll"
 		"time"			"10"
 		"team"			"3"
+		
+		"param1"		"key@zm_cmd_selectall"
 	}
 	"zmmenu_ambush"
 	{
@@ -78,15 +80,17 @@
 		"time"			"10"
 		"team"			"3"
 	}
-	"zmmenu_createsquad"
+	"zmmenu_creategroup"
 	{
-		"msg"			"#ZMMenuZMSquadCre"
+		"msg"			"#ZMMenuZMGroupCre"
 		"time"			"10"
 		"team"			"3"
+		
+		"param1"		"key@+duck"
 	}
-	"zmmenu_selectsquad"
+	"zmmenu_selectgroup"
 	{
-		"msg"			"#ZMMenuZMSquadSel"
+		"msg"			"#ZMMenuZMGroupSel"
 		"time"			"10"
 		"team"			"3"
 	}
@@ -101,6 +105,8 @@
 		"msg"			"#ZMMenuZMDelete"
 		"time"			"10"
 		"team"			"3"
+		
+		"param1"		"key@zm_cmd_delete"
 	}
 	"zmmenu_bansheeceil"
 	{
