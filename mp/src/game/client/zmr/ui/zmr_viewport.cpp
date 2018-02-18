@@ -185,6 +185,16 @@ CZMFrame::CZMFrame( const char* pElementName ) : CHudElement( pElementName ), Ba
     
     SetHiddenBits( HIDEHUD_WEAPONSELECTION );
 
+
+    // Completely hide the close button.
+    Button* pButton = dynamic_cast<Button*>( FindChildByName( "frame_close" ) );
+    if ( pButton )
+    {
+        pButton->SetEnabled( false ); // Can't be clicked.
+        pButton->SetPaintBorderEnabled( false ); // Hide border.
+        pButton->SetPaintEnabled( false ); // For some reason if we have it disabled, it'll draw a cross. Thanks, Valve.
+    }
+
     
     m_MouseDragStatus = BUTTON_CODE_INVALID;
     SetClickMode( ZMCLICKMODE_NORMAL );
