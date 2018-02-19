@@ -154,7 +154,7 @@ void CZMHudSpectatorUI::PaintBorder( int border_y, int border_height, bool bFlip
 
 void CZMHudSpectatorUI::Paint()
 {
-    const int bar_height = ScreenHeight() * 0.1f;
+    const int bar_height = ScreenHeight() * 0.05f;
     const int border_height = 64;
 
     // Top
