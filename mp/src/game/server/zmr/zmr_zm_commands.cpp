@@ -976,13 +976,15 @@ void ZM_Cmd_MoveToLine( const CCommand &args )
     int myindex = pPlayer->entindex();
     Vector mypos = pPlayer->EyePosition();
 
+    bool bIsOutsideWorld = (UTIL_PointContents( mypos ) & CONTENTS_SOLID) != 0;
+
     Vector start, end;
     start.x = atof( args.Arg( 1 ) );
     start.y = atof( args.Arg( 2 ) );
-    start.z = atof( args.Arg( 3 ) );
+    start.z = atof( args.Arg( 3 ) ) + 1.0f;
     end.x = atof( args.Arg( 4 ) );
     end.y = atof( args.Arg( 5 ) );
-    end.z = atof( args.Arg( 6 ) );
+    end.z = atof( args.Arg( 6 ) ) + 1.0f;
     
     Vector dir = end - start;
     float flLineLength = VectorNormalize( dir );
@@ -1038,13 +1040,21 @@ void ZM_Cmd_MoveToLine( const CCommand &args )
 
     for ( int i = 0; i < vZombies.Count(); i++ )
     {
+        Vector command = walk;
+
         // Trace a line to find the exact spot we should be sending the unit.
         // This fixes any troubles caused by displacements and other non-flat surfaces.
-        // ZMRTODO: Fix when issued outside the map.
-        UTIL_TraceLine( mypos, walk, MASK_SOLID, pPlayer, COLLISION_GROUP_NONE, &trace );
+        if ( !bIsOutsideWorld )
+        {
+            // Previous mask would hit players/zombies, etc.
+            const unsigned int mask = CONTENTS_SOLID | CONTENTS_GRATE | CONTENTS_MONSTERCLIP;
 
-        Vector command = ( trace.startsolid ) ? walk : trace.endpos;
-        command.z += 1.0f;
+            UTIL_TraceLine( mypos, walk, mask, pPlayer, COLLISION_GROUP_NONE, &trace );
+
+            if ( !trace.startsolid )
+                command = trace.endpos + Vector( 0.0f, 0.0f, 1.0f );
+        }
+
 
         vZombies[i]->Command( command, true );
 
