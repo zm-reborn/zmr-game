@@ -755,6 +755,22 @@ bool CZMPlayer::ValidatePlayerModel( const char* szModelName )
     return false;
 }
 
+void CZMPlayer::UpdatePlayerFOV()
+{
+    const char* szFov = engine->GetClientConVarValue( entindex(), "zm_cl_fov" );
+
+
+    int newFov = szFov ? atoi( szFov ) : 0;
+
+    newFov = clamp( newFov > 0 ? newFov : g_pGameRules->DefaultFOV(), ZM_MIN_FOV, MAX_FOV );
+
+
+    if ( newFov != GetDefaultFOV() )
+    {
+        SetDefaultFOV( newFov );
+    }
+}
+
 void CZMPlayer::Spawn()
 {
     m_iSpawnInterpCounter = (m_iSpawnInterpCounter + 1) % 8;
@@ -768,7 +784,6 @@ void CZMPlayer::Spawn()
     // Spawnpoint look-up depend on the fact that player's are solid which is done before setting player's collision group...
     SetCollisionGroup( COLLISION_GROUP_PLAYER );
 
-    //BaseClass::Spawn();
     CBasePlayer::Spawn();
 
 

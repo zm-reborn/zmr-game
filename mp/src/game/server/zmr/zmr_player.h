@@ -87,6 +87,7 @@ public:
     virtual void    SetAnimation( PLAYER_ANIM playerAnim ) OVERRIDE;
     void            SetPlayerModel( void );
     bool            ValidatePlayerModel( const char* );
+    void            UpdatePlayerFOV();
 
     virtual void    FlashlightTurnOn() OVERRIDE;
     virtual void    FlashlightTurnOff() OVERRIDE;

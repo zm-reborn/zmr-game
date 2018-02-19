@@ -42,6 +42,10 @@ ConVar zm_cl_mwheelmovereverse( "zm_cl_mwheelmovereverse", "1", FCVAR_ARCHIVE, "
 ConVar zm_cl_mwheelmovespd( "zm_cl_mwheelmovespd", "400", FCVAR_ARCHIVE );
 
 
+// Yes, unfortunately because of how FOV is used, we need to change it on the server.
+ConVar zm_cl_fov( "zm_cl_fov", "90", FCVAR_USERINFO | FCVAR_ARCHIVE, "What is our default field of view when playing.", true, ZM_MIN_FOV, true, MAX_FOV );
+
+
 
 #undef CZMPlayer // We need to undefine it so we can get the server class.
 IMPLEMENT_CLIENTCLASS_DT( C_ZMPlayer, DT_ZM_Player, CZMPlayer )
