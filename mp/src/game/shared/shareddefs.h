@@ -234,7 +234,11 @@ enum CastVote
 
 #define MAX_PLACE_NAME_LENGTH		18
 
+#ifdef ZMR // ZMRCHANGE: SO MUCH GIRTH
+#define MAX_FOV						120
+#else
 #define MAX_FOV						90
+#endif
 
 //===================================================================================================================
 // Team Defines
