@@ -487,6 +487,13 @@ QAngle CGrabController::TransformAnglesToPlayerSpace( const QAngle &anglesIn, CB
 
 QAngle CGrabController::TransformAnglesFromPlayerSpace( const QAngle &anglesIn, CBasePlayer *pPlayer )
 {
+#ifdef ZMR // ZMRCHANGE: Fixes client and server held object angle inconsistency.
+    matrix3x4_t test;
+    QAngle angleTest = pPlayer->EyeAngles();
+    //angleTest.x = 0;
+    AngleMatrix( angleTest, test );
+    return TransformAnglesToWorldSpace( anglesIn, test );
+#else
     if ( m_bIgnoreRelativePitch )
     {
         matrix3x4_t test;
@@ -496,6 +503,7 @@ QAngle CGrabController::TransformAnglesFromPlayerSpace( const QAngle &anglesIn, 
         return TransformAnglesToWorldSpace( anglesIn, test );
     }
     return TransformAnglesToWorldSpace( anglesIn, pPlayer->EntityToWorldTransform() );
+#endif
 }
 
 
