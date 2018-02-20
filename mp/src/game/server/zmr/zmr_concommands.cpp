@@ -7,6 +7,7 @@
 #include "zmr/weapons/zmr_base.h"
 #include "zmr/zmr_shareddefs.h"
 #include "zmr_player.h"
+#include "zmr/zmr_global_shared.h"
 #include "zmr/zmr_gamerules.h"
 
 
@@ -161,8 +162,12 @@ void ZM_ObserveZombie( const CCommand &args )
     else
     {
         // No argument, trace a line.
+        CBaseEntity* pIgnore = (pPlayer->GetObserverTarget() && pPlayer->GetObserverMode() != OBS_MODE_ROAMING)
+            ? pPlayer->GetObserverTarget()
+            : pPlayer;
+
         trace_t tr;
-        UTIL_TraceLine( pPlayer->EyePosition(), pPlayer->EyeDirection3D() * MAX_COORD_FLOAT, MASK_NPCSOLID, pPlayer, COLLISION_GROUP_NPC, &tr );
+        UTIL_TraceLine( pPlayer->EyePosition(), pPlayer->EyeDirection3D() * MAX_COORD_FLOAT, MASK_NPCSOLID, pIgnore, COLLISION_GROUP_NPC, &tr );
 
         if ( tr.m_pEnt && tr.m_pEnt->MyNPCPointer() )
         {
@@ -170,12 +175,43 @@ void ZM_ObserveZombie( const CCommand &args )
         }
     }
 
-    if ( !pZombie ) return;
 
-    if ( !pZombie->IsAlive() ) return;
+    CBaseCombatCharacter* pCharacter = pZombie;
+
+    // No valid zombie found. Try a random one.
+    if ( !pCharacter || !pCharacter->IsAlive() )
+    {
+        int i;
+        CUtlVector<CBaseCombatCharacter*> vChars;
+        CBaseEntity* pCurTarget = pPlayer->GetObserverTarget();
+        
+        // Flip from players to zombies and vice versa.
+        if ( !pCurTarget || pCurTarget->IsPlayer() )
+        {
+            for ( i = 0; i < g_pZombies->Count(); i++ )
+            {
+                CZMBaseZombie* pZombie = g_pZombies->Element( i );
+
+                if ( pZombie && pZombie->IsAlive() )
+                    vChars.AddToTail( pZombie );
+            }
+        }
+        else
+        {
+            for ( i = 1; i <= gpGlobals->maxClients; i++ )
+            {
+                CBasePlayer* pLoop = UTIL_PlayerByIndex( i );
+
+                if ( pLoop && pLoop->IsAlive() )
+                    vChars.AddToTail( pLoop );
+            }
+        }
+
+        pCharacter = vChars[random->RandomInt( 0, vChars.Count() - 1 )];
+    }
 
 
-    if ( pPlayer->SetObserverTarget( pZombie ) )
+    if ( pPlayer->SetObserverTarget( pCharacter ) )
     {
         pPlayer->SetObserverMode( OBS_MODE_CHASE );
     }
