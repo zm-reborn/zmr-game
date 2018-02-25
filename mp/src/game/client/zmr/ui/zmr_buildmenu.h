@@ -11,6 +11,7 @@
 #include <game/client/iviewport.h>
 
 
+#include "zmr_buildmenu_base.h"
 #include "zmr/c_zmr_entities.h"
 #include "zmr/zmr_shareddefs.h"
 
@@ -19,62 +20,30 @@
 #define TYPE_TOTAL 5
 #define BM_QUEUE_SIZE 10
 
-class CZMBuildMenu : public vgui::Frame, public IViewPortPanel
+class CZMBuildMenu : public CZMBuildMenuBase
 {
 public:
-    DECLARE_CLASS_SIMPLE( CZMBuildMenu, vgui::Frame );
+    DECLARE_CLASS_SIMPLE( CZMBuildMenu, CZMBuildMenuBase );
 
 
     CZMBuildMenu( vgui::Panel* pParent );
     ~CZMBuildMenu();
 
-	void OnThink( void );
-	void OnClose();
 
+    virtual void ShowPanel( bool state ) OVERRIDE;
+	void OnThink( void );
 
     virtual const char* GetName() OVERRIDE { return "ZMBuildMenu"; };
 
+    
 
-    virtual void ShowPanel( bool state ) OVERRIDE;
-    virtual void SetData( KeyValues *data ) OVERRIDE {};
-    virtual void Reset() OVERRIDE {};
-    virtual void Update() OVERRIDE {};
-    virtual bool NeedsUpdate( void ) OVERRIDE { return false; };
-    virtual bool HasInputElements( void ) OVERRIDE { return true; };
-    virtual vgui::VPANEL GetVPanel( void ) OVERRIDE { return BaseClass::GetVPanel(); };
-    virtual bool IsVisible() OVERRIDE { return BaseClass::IsVisible(); };
-    virtual void SetParent( vgui::VPANEL parent ) OVERRIDE { BaseClass::SetParent( parent ); };
-
-    void OnCommand( const char *command ) OVERRIDE;
-
-
-    virtual void ShowMenu( C_ZMEntZombieSpawn* pSpawn )
-    {
-        SetSpawnIndex( pSpawn->entindex() );
-        SetZombieFlags( pSpawn->GetZombieFlags() );
-        ShowPanel( true );
-    }
-
-    inline int GetLastSpawnIndex() { return m_iLastSpawnIndex; };
-    inline int GetSpawnIndex() { return m_iSpawnIndex; };
-    inline void SetSpawnIndex( int entindex ) { m_iSpawnIndex = entindex; };
-
-    inline int GetZombieFlags() { return m_fSpawnZombieFlags; };
-    inline void SetZombieFlags( int flags ) { m_fSpawnZombieFlags = flags; };
-
-private:
-    int m_iLastSpawnIndex;
-    int m_iSpawnIndex;
-    int m_fSpawnZombieFlags;
-
-public:
 
 	void CalculateButtonState();
 
 	void AutoAssign();
 	int m_iLastFlags;
 	
-	void UpdateQueue(const int q[], int size = BM_QUEUE_SIZE);
+	virtual void UpdateQueue( const int q[], int size ) OVERRIDE;
 
 protected:
 
