@@ -373,7 +373,7 @@ void CZMRadialPanel::OnMousePressed( MouseCode code )
     {
         Panel* parent = GetParent();
 
-        if ( parent && button && button->GetCommand() && *button->GetCommand() )
+        if ( parent && button && !button->IsDisabled() && button->GetCommand() && *button->GetCommand() )
         {
             parent->OnCommand( button->GetCommand() );
         }
