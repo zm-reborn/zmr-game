@@ -555,6 +555,8 @@ bool CZMHudTooltip::CanDisplay()
 
 void CZMHudTooltip::HideTooltip()
 {
+    // Need to stop it immediately.
+    g_pClientMode->GetViewportAnimationController()->StopAnimationSequence( g_pClientMode->GetViewportAnimationController()->GetParent(), "ZMTooltipShow" );
     g_pClientMode->GetViewportAnimationController()->StartAnimationSequence( "ZMTooltipHide" );
     
     m_iCurIndex = 0;
@@ -656,7 +658,8 @@ bool CZMHudTooltip::SetMessage( const char* msg, int index, float displaytime, b
 
     SetText( msg );
 
-
+    // Need to stop it immediately.
+    g_pClientMode->GetViewportAnimationController()->StopAnimationSequence( g_pClientMode->GetViewportAnimationController()->GetParent(), "ZMTooltipHide" );
     g_pClientMode->GetViewportAnimationController()->StartAnimationSequence( "ZMTooltipShow" );
 
 
