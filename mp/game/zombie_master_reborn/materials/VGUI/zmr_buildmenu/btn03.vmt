@@ -1,0 +1,6 @@
+UnlitGeneric
+{
+	$basetexture	vgui\zmr_buildmenu\btn03
+	$ignorez	1
+	$translucent	1
+}
