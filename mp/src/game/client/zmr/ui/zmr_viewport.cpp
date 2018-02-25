@@ -281,6 +281,9 @@ void CZMFrame::SetClickMode( ZMClickMode_t mode, bool print )
     {
         switch ( mode )
         {
+        case ZMCLICKMODE_TRAP :
+            ZMClientUtil::PrintNotify( "#ZMClickModeTrap", ZMCHATNOTIFY_ZM );
+            break;
         case ZMCLICKMODE_HIDDEN :
             ZMClientUtil::PrintNotify( "#ZMClickModeHidden", ZMCHATNOTIFY_ZM );
             break;
