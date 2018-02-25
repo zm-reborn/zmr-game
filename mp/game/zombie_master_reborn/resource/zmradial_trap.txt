@@ -1,0 +1,42 @@
+// NOTE: Images are relative to materials/vgui
+"Radial"
+{
+	"ActivateRadial"
+	{
+		"img_over"		"zmr_manimenu/act_over"
+		"size"		"180"
+		"offset"		"0"
+		"startfrac"		"0"
+		"endfrac"		"0.75"
+		"command"		"manipulate"
+		
+		"label"
+		{
+			"name"		"Activate" // To update label.
+			"center"		"1"
+			"centerwrap"		"1"
+			"wide"		"0.75"
+			"tall"		"0.333"
+			"font"		"ZMVerdanaOutlineBold10"
+		}
+	}
+	"TrapRadial"
+	{
+		"img_over"		"zmr_manimenu/trap_over"
+		"size"		"180"
+		"offset"		"180"
+		"startfrac"		"0"
+		"endfrac"		"0.75"
+		"command"		"trap"
+		
+		"label"
+		{
+			"name"		"Trap"
+			"center"		"1"
+			"centerwrap"		"1"
+			"wide"		"0.75"
+			"tall"		"0.4"
+			"font"		"ZMVerdanaOutlineBold10"
+		}
+	}
+}

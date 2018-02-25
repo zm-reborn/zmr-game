@@ -6,41 +6,26 @@
 #include <vgui_controls/Label.h>
 
 
-using namespace vgui;
-
-class CZMRadialButton : public Panel
+class CZMRadialButton : public vgui::Panel
 {
 public:
-    DECLARE_CLASS_SIMPLE( CZMRadialButton, Panel );
+    DECLARE_CLASS_SIMPLE( CZMRadialButton, vgui::Panel );
 
 
-    CZMRadialButton( Panel* parent, const char* name );
+    CZMRadialButton( vgui::Panel* parent, const char* name );
     ~CZMRadialButton();
 
 
-    inline void SetImage( IImage* image ) { m_pImage = image; if ( !m_pCurImage ) m_pCurImage = image; };
-    inline void SetImageFocus( IImage* image ) { m_pImageFocus = image; if ( !m_pCurImage ) m_pCurImage = image; };
+    inline void SetImage( vgui::IImage* image );
+    inline void SetImageFocus( vgui::IImage* image );
+    inline void SetImageDisabled( vgui::IImage* image );
 
-    void SetFocus( bool state )
-    {
-        if ( state )
-        {
-            m_pCurImage = m_pImageFocus;
-        }
-        else
-        {
-            m_pCurImage = m_pImage;
-        }
-    }
+    void SetFocus( bool state );
+
+    void SetDisabled( bool state );
 
     inline const char* GetCommand() { return m_pszCommand; };
-    void SetCommand( const char* sz )
-    {
-        int len = Q_strlen( sz ) + 1;
-        delete[] m_pszCommand;
-        m_pszCommand = new char[len];
-        Q_strncpy( m_pszCommand, sz, len );
-    }
+    void SetCommand( const char* sz );
 
     inline float GetSize() { return m_flSize; };
     inline void SetSize( float size ) { m_flSize = AngleNormalize( size ); };
@@ -51,11 +36,18 @@ public:
     inline float GetEndFrac() { return m_flEndFrac; };
     inline void SetEndFrac( float frac ) { m_flEndFrac = frac; };
 
+    inline vgui::Label* GetLabel() { return m_pTextLabel; };
     inline void SetLabelText( const char* txt ) { m_pTextLabel->SetText( txt ); };
+    KeyValues* GetLabelData() { return m_pTextKvData; };
+    void SetLabelData( KeyValues* kv );
+    void ApplyLabelData();
 
+    virtual void PerformLayout() OVERRIDE;
     void Paint( int w, int h );
 
 private:
+    void CenterLabelToButton();
+
     float m_flOffset;
     float m_flStartFrac;
     float m_flEndFrac;
@@ -63,31 +55,35 @@ private:
 
     char* m_pszCommand;
 
-    IImage* m_pCurImage;
+    // NOTE: Images are relative to materials/vgui
+    vgui::IImage* m_pCurImage;
 
-    IImage* m_pImage;
-    IImage* m_pImageFocus;
-    IImage* m_pImageDisabled;
-    Label* m_pTextLabel;
+    vgui::IImage* m_pImage;
+    vgui::IImage* m_pImageFocus;
+    vgui::IImage* m_pImageDisabled;
+    vgui::Label* m_pTextLabel;
+    KeyValues* m_pTextKvData;
+    bool m_bDisabled;
 };
 
-class ZMRadialPanel : public Panel
+class CZMRadialPanel : public vgui::Panel
 {
 public:
-    DECLARE_CLASS_SIMPLE( ZMRadialPanel, Panel );
+    DECLARE_CLASS_SIMPLE( CZMRadialPanel, vgui::Panel );
 
-    ZMRadialPanel( Panel *parent, const char *name );
-    ~ZMRadialPanel();
+    CZMRadialPanel( vgui::Panel* parent, const char* name );
+    ~CZMRadialPanel();
 
 
-    void AddButton( const char* image, const char* imagefocus, float size, float offset, float start = 0.0f, float end = 1.0f, const char* command = "" );
-    void LoadFromFile( const char* file );
+    void                            AddButton( KeyValues* kv );
+    void                            LoadFromFile( const char* file );
+    CUtlVector<CZMRadialButton*>*   GetButtons() { return &m_Buttons; };
 
-    void SetBackgroundImage( const char* );
+    void SetBackgroundImage( const char* image );
 
     
-    virtual void OnMouseReleased( MouseCode ) OVERRIDE;
-    virtual void OnCursorMoved( int, int ) OVERRIDE;
+    virtual void OnMousePressed( vgui::MouseCode code ) OVERRIDE;
+    virtual void OnThink() OVERRIDE;
     virtual void ApplySettings( KeyValues* inResourceData ) OVERRIDE;
 
 protected:
@@ -95,13 +91,14 @@ protected:
     virtual const char* GetDescription() OVERRIDE;
     
     virtual void PaintBackground() OVERRIDE;
-    //virtual void OnSizeChanged(int newWide, int newTall);
-    //virtual void ApplySchemeSettings( IScheme *pScheme );
+    virtual void Paint() OVERRIDE;
 
 private:
     CZMRadialButton* GetButton( int x, int y );
-    void UpdateButtonFocus( CZMRadialButton* );
+    void UpdateButtonFocus( CZMRadialButton* button );
 
     CUtlVector<CZMRadialButton*> m_Buttons;
-    IImage* m_pBgImage;
+    vgui::IImage* m_pBgImage;
+
+    CZMRadialButton* m_pLastButton;
 };
