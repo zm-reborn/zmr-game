@@ -181,6 +181,9 @@ void ZM_ObserveZombie( const CCommand &args )
     // No valid zombie found. Try a random one.
     if ( !pCharacter || !pCharacter->IsAlive() )
     {
+        pCharacter = nullptr;
+
+
         int i;
         CUtlVector<CBaseCombatCharacter*> vChars;
         CBaseEntity* pCurTarget = pPlayer->GetObserverTarget();
@@ -207,11 +210,13 @@ void ZM_ObserveZombie( const CCommand &args )
             }
         }
 
-        pCharacter = vChars[random->RandomInt( 0, vChars.Count() - 1 )];
+
+        if ( vChars.Count() > 0 )
+            pCharacter = vChars[random->RandomInt( 0, vChars.Count() - 1 )];
     }
 
 
-    if ( pPlayer->SetObserverTarget( pCharacter ) )
+    if ( pCharacter && pPlayer->SetObserverTarget( pCharacter ) )
     {
         pPlayer->SetObserverMode( OBS_MODE_CHASE );
     }
