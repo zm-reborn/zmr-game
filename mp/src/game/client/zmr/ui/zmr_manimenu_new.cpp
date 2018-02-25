@@ -1,26 +1,11 @@
 #include "cbase.h"
+#include <vgui/ILocalize.h>
 
-#include <vgui/IVGui.h>
-#include <vgui/IScheme.h>
-#include <vgui_controls/ImagePanel.h>
-#include <vgui_controls/Label.h>
-#include <vgui_controls/Button.h>
-#include <vgui_controls/Image.h>
-
-#include "iclientmode.h"
-
-
+#include "zmr_radial.h"
 #include "zmr_manimenu_new.h"
-#include "zmr/zmr_gamerules.h"
-#include "zmr/zmr_player_shared.h"
-#include "zmr/npcs/c_zmr_zombiebase.h"
-#include "zmr_viewport.h"
-#include "zmr/c_zmr_util.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
-
-
 
 
 using namespace vgui;
@@ -38,16 +23,23 @@ CZMManiMenuNew::CZMManiMenuNew( Panel* pParent ) : CZMManiMenuBase( "ZMManiMenu"
     SetSizeable( false );
     SetKeyBoardInputEnabled( false );
     SetMouseInputEnabled( true );
-    SetProportional( false );
+    SetProportional( true );
     SetMoveable( false );
 
 
-	SetScheme( vgui::scheme()->LoadSchemeFromFile( "resource/ZombieMaster.res", "ZombieMaster" ) );
+	//SetScheme( vgui::scheme()->LoadSchemeFromFile( "resource/ZombieMaster.res", "ZombieMaster" ) );
 
 	LoadControlSettings( "resource/ui/zmmanimenunew.res" );
 
+    m_pRadial = dynamic_cast<CZMRadialPanel*>( FindChildByName( "ZMRadialPanel1" ) );
+    Assert( m_pRadial );
+    m_pRadial->LoadFromFile( "resource/zmradial_trap.txt" );
+    m_pRadial->SetBackgroundImage( "zmr_manimenu/bg" );
 
-    vgui::ivgui()->AddTickSignal( GetVPanel(), 150 );
+
+    m_pDescLabel = dynamic_cast<Label*>( FindChildByName( "Description" ) );
+    Assert( m_pDescLabel );
+    m_pDescLabel->SetMouseInputEnabled( false );
 }
 
 CZMManiMenuNew::~CZMManiMenuNew()
@@ -63,22 +55,29 @@ void CZMManiMenuNew::ShowPanel( bool state )
     SetVisible( state );
 }
 
+void CZMManiMenuNew::OnMousePressed( MouseCode code )
+{
+    // This is only called when we didn't click any element.
+    if ( code == MOUSE_LEFT )
+    {
+        ShowPanel( false );
+    }
+}
+
 void CZMManiMenuNew::SetDescription( const char* desc )
 {
-    Label* entry = dynamic_cast<Label*>( FindChildByName( "Description" ) );
-    
-    if ( entry )
-    {
-        entry->SetText( desc );
-    }
+    m_pDescLabel->SetText( desc );
 }
 
 void CZMManiMenuNew::SetCost( int cost )
 {
-    char buffer[128];
-    Q_snprintf( buffer, sizeof( buffer ), "Activate for %i.",  cost );
+    wchar_t buffer[128];
+    wchar_t wcost[32];
 
-    Label* entry = dynamic_cast<Label*>( FindChildByName( "Activate" ) );
+    V_snwprintf( wcost, sizeof( wcost ), L"%i", cost );
+    g_pVGuiLocalize->ConstructString( buffer, sizeof( buffer ), g_pVGuiLocalize->Find( "#ZMManiActivate" ), 1, wcost );
+
+    Label* entry = dynamic_cast<Label*>( FindChildByName( "Activate", true ) );
     
     if ( entry )
     {
@@ -90,20 +89,23 @@ void CZMManiMenuNew::SetCost( int cost )
 
 void CZMManiMenuNew::SetTrapCost( int cost )
 {
-    char buffer[128];
+    wchar_t buffer[128];
 
     if ( cost > 0 )
     {
-        Q_snprintf( buffer, sizeof( buffer ), "Trap for %i.",  cost );
+        wchar_t wcost[32];
+
+        V_snwprintf( wcost, sizeof( wcost ), L"%i", cost );
+        g_pVGuiLocalize->ConstructString( buffer, sizeof( buffer ), g_pVGuiLocalize->Find( "#ZMManiTrap" ), 1, wcost );
     }
     else
     {
         // Are traps gay?
-        Q_snprintf( buffer, sizeof( buffer ), "Trap disabled." );
+        g_pVGuiLocalize->ConstructString( buffer, sizeof( buffer ), g_pVGuiLocalize->Find( "#ZMManiTrapDisabled" ), 0 );
     }
     
 
-    Label* entry = dynamic_cast<Label*>( FindChildByName( "Trap" ) );
+    Label* entry = dynamic_cast<Label*>( FindChildByName( "Trap", true ) );
     
     if ( entry )
     {
@@ -116,8 +118,18 @@ void CZMManiMenuNew::SetTrapCost( int cost )
 void CZMManiMenuNew::ShowMenu( C_ZMEntManipulate* pMani )
 {
     SetWorldPos( pMani->GetAbsOrigin() );
-    SetOffset( GetWide() / 2.0f, GetTall() - GetTall() / 3.0f );
-    SetLimits( 50, 30, GetWide() - 50, GetTall() - 15 );
+
+
+    
+
+    SetOffset(
+        m_pRadial->GetXPos() + m_pRadial->GetWide() / 2.0f,
+        m_pRadial->GetYPos() + m_pRadial->GetTall() / 2.0f );
+    SetLimits(
+        m_pRadial->GetXPos(),
+        0,
+        m_pRadial->GetXPos() + m_pRadial->GetWide(),
+        m_pRadial->GetYPos() + m_pRadial->GetTall() );
 
     BaseClass::ShowMenu( pMani );
 }
@@ -136,9 +148,11 @@ void CZMManiMenuNew::OnThink()
         return;
 	}
 
+    CUtlVector<CZMRadialButton*>* pButtons = m_pRadial->GetButtons();
+    Assert( pButtons->Count() >= 2 );
 
-    SetControlEnabled( "Activate", ( pPlayer->GetResources() >= m_nCost ) );
-    SetControlEnabled( "Trap", ( m_nTrapCost > 0 && pPlayer->GetResources() >= m_nTrapCost ) );
+    pButtons->Element( 0 )->SetDisabled( pPlayer->GetResources() < m_nCost );
+    pButtons->Element( 1 )->SetDisabled( m_nTrapCost <= 0 && pPlayer->GetResources() < m_nTrapCost );
 
 
     int x, y;

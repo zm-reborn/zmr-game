@@ -1,0 +1,244 @@
+// NOTE: Images are relative to materials/vgui
+"Radial"
+{
+	"Shambler"
+	{
+		"img"		"zmr_buildmenu/btn01"
+		"img_over"		"zmr_buildmenu/btn01_over"
+		"size"		"72"
+		"offset"		"54"
+		"startfrac"		"0.25"
+		"endfrac"		"0.75"
+		"command"		"zm_cmd_queue %i 0"
+		
+		"label"
+		{
+			"center"		"1"
+			"centerwrap"		"1"
+			"wide"		"0.313"
+			"tall"		"0.333"
+			"font"		"ZMVerdanaOutline10"
+			"visible"		"0"
+			"tooltip"		"zmdesc_shambler"
+			"zombieclass"		"npc_zombie" // To get the right pop and cost.
+		}
+	}
+	"Banshee"
+	{
+		"img"		"zmr_buildmenu/btn02"
+		"img_over"		"zmr_buildmenu/btn02_over"
+		"size"		"72"
+		"offset"		"126"
+		"startfrac"		"0.25"
+		"endfrac"		"0.75"
+		"command"		"zm_cmd_queue %i 1"
+		
+		"label"
+		{
+			"center"		"1"
+			"centerwrap"		"1"
+			"wide"		"0.313"
+			"tall"		"0.333"
+			"font"		"ZMVerdanaOutline10"
+			"visible"		"0"
+			"tooltip"		"zmdesc_banshee"
+			"zombieclass"		"npc_fastzombie"
+		}
+	}
+	"Hulk"
+	{
+		"img"		"zmr_buildmenu/btn03"
+		"img_over"		"zmr_buildmenu/btn03_over"
+		"size"		"72"
+		"offset"		"-162"
+		"startfrac"		"0.25"
+		"endfrac"		"0.75"
+		"command"		"zm_cmd_queue %i 2"
+		
+		"label"
+		{
+			"center"		"1"
+			"centerwrap"		"1"
+			"wide"		"0.313"
+			"tall"		"0.333"
+			"font"		"ZMVerdanaOutline10"
+			"visible"		"0"
+			"tooltip"		"zmdesc_hulk"
+			"zombieclass"		"npc_poisonzombie"
+		}
+	}
+	"Drifter"
+	{
+		"img"		"zmr_buildmenu/btn04"
+		"img_over"		"zmr_buildmenu/btn04_over"
+		"size"		"72"
+		"offset"		"-18"
+		"startfrac"		"0.25"
+		"endfrac"		"0.75"
+		"command"		"zm_cmd_queue %i 3"
+		
+		"label"
+		{
+			"center"		"1"
+			"centerwrap"		"1"
+			"wide"		"0.313"
+			"tall"		"0.333"
+			"font"		"ZMVerdanaOutline10"
+			"visible"		"0"
+			"tooltip"		"zmdesc_drifter"
+			"zombieclass"		"npc_dragzombie"
+		}
+	}
+	"Immolator"
+	{
+		"img"		"zmr_buildmenu/btn05"
+		"img_over"		"zmr_buildmenu/btn05_over"
+		"size"		"72"
+		"offset"		"-90"
+		"startfrac"		"0.25"
+		"endfrac"		"0.75"
+		"command"		"zm_cmd_queue %i 4"
+		
+		"label"
+		{
+			"center"		"1"
+			"centerwrap"		"1"
+			"wide"		"0.313"
+			"tall"		"0.333"
+			"font"		"ZMVerdanaOutline10"
+			"visible"		"0"
+			"tooltip"		"zmdesc_immolator"
+			"zombieclass"		"npc_burnzombie"
+		}
+	}
+	"Shambler5"
+	{
+		"img_over"		"zmr_buildmenu/btn01_5_over"
+		"size"		"72"
+		"offset"		"54"
+		"startfrac"		"0.0625"
+		"endfrac"		"0.25"
+		"command"		"zm_cmd_queue %i 0 5"
+		
+		"label"
+		{
+			"center"		"1"
+			"centerwrap"		"1"
+			"text"		"5x"
+			"wide"		"0.16"
+			"tall"		"0.16"
+			"font"		"ZMVerdanaOutline10"
+			"visible"		"0"
+		}
+	}
+	"Banshee5"
+	{
+		"img_over"		"zmr_buildmenu/btn02_5_over"
+		"size"		"72"
+		"offset"		"126"
+		"startfrac"		"0.0625"
+		"endfrac"		"0.25"
+		"command"		"zm_cmd_queue %i 1 5"
+		
+		"label"
+		{
+			"center"		"1"
+			"centerwrap"		"1"
+			"text"		"5x"
+			"wide"		"0.16"
+			"tall"		"0.16"
+			"font"		"ZMVerdanaOutline10"
+			"visible"		"0"
+		}
+	}
+	"Hulk5"
+	{
+		"img_over"		"zmr_buildmenu/btn03_5_over"
+		"size"		"72"
+		"offset"		"-162"
+		"startfrac"		"0.0625"
+		"endfrac"		"0.25"
+		"command"		"zm_cmd_queue %i 2 5"
+		
+		"label"
+		{
+			"center"		"1"
+			"centerwrap"		"1"
+			"text"		"5x"
+			"wide"		"0.16"
+			"tall"		"0.16"
+			"font"		"ZMVerdanaOutline10"
+			"visible"		"0"
+		}
+	}
+	"Drifter5"
+	{
+		"img_over"		"zmr_buildmenu/btn04_5_over"
+		"size"		"72"
+		"offset"		"-18"
+		"startfrac"		"0.0625"
+		"endfrac"		"0.25"
+		"command"		"zm_cmd_queue %i 3 5"
+		
+		"label"
+		{
+			"center"		"1"
+			"centerwrap"		"1"
+			"text"		"5x"
+			"wide"		"0.16"
+			"tall"		"0.16"
+			"font"		"ZMVerdanaOutline10"
+			"visible"		"0"
+		}
+	}
+	"Immolator5"
+	{
+		"img_over"		"zmr_buildmenu/btn05_5_over"
+		"size"		"72"
+		"offset"		"-90"
+		"startfrac"		"0.0625"
+		"endfrac"		"0.25"
+		"command"		"zm_cmd_queue %i 4 5"
+		
+		"label"
+		{
+			"center"		"1"
+			"centerwrap"		"1"
+			"text"		"5x"
+			"wide"		"0.16"
+			"tall"		"0.16"
+			"font"		"ZMVerdanaOutline10"
+			"visible"		"0"
+		}
+	}
+	"SetRallyPoint"
+	{
+		"img_over"		"zmr_buildmenu/rally_over"
+		"size"		"36"
+		"offset"		"54"
+		"startfrac"		"0.75"
+		"endfrac"		"0.9"
+		"command"		"createrally"
+		
+		"label"
+		{
+			"visible"		"0"
+			"tooltip"		"zmsetrallypoint"
+		}
+	}
+	"ClearQueue"
+	{
+		"img_over"		"zmr_buildmenu/clear_over"
+		"size"		"36"
+		"offset"		"90"
+		"startfrac"		"0.75"
+		"endfrac"		"0.9"
+		"command"		"zm_cmd_queueclear %i -1 1"
+		
+		"label"
+		{
+			"visible"		"0"
+			"tooltip"		"zmclearqueue"
+		}
+	}
+}

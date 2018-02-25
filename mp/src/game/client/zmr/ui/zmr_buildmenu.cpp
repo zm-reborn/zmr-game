@@ -65,7 +65,7 @@ const char *TypeToQueueImage[ZMCLASS_MAX] = {
 #define FASTIE_FLAG 2
 #define SHAMBLIE_FLAG 1
 
-CZMBuildMenu::CZMBuildMenu( Panel* pParent ) : Frame( g_pClientMode->GetViewport(), "ZMBuildMenu" )
+CZMBuildMenu::CZMBuildMenu( Panel* pParent ) : CZMBuildMenuBase( "ZMBuildMenu" )
 {
     SetParent( pParent->GetVPanel() );
 
@@ -188,35 +188,6 @@ void CZMBuildMenu::ShowPanel( bool state )
     SetVisible( state );
 }
 
-void CZMBuildMenu::OnCommand( const char *command )
-{
-	if ( Q_strnicmp( command, "zm_cmd_queue", 12 ) == 0 )
-	{
-		char buffer[128];
-		Q_snprintf( buffer, sizeof( buffer ), command, GetSpawnIndex() );
-		engine->ClientCmd( const_cast<char *>( buffer ) );
-	}
-	else if ( Q_strnicmp( command, "zm_cmd_queueclear", 17 ) == 0 )
-	{
-		char buffer[128];
-		Q_snprintf( buffer, sizeof( buffer ), command, GetSpawnIndex() );
-		engine->ClientCmd( const_cast<char *>( buffer ) );
-	}
-    else if ( Q_stricmp( command, "createrally" ) == 0 )
-    {
-        if ( g_pZMView )
-            g_pZMView->SetClickMode( ZMCLICKMODE_RALLYPOINT );
-
-        Close();
-    }
-	else if ( Q_stricmp( command, "vguicancel" ) == 0 )
-	{
-		Close();
-	}
-
-	BaseClass::OnCommand( command );
-}
-
 void CZMBuildMenu::OnThink()
 {
 	if ( !IsVisible() ) return;
@@ -325,7 +296,7 @@ void CZMBuildMenu::ShowZombieInfo( int type )
 //--------------------------------------------------------------
 // Update the queue images to reflect the types in the given array 
 //--------------------------------------------------------------
-void CZMBuildMenu::UpdateQueue( const int q[], int size /*= TYPE_TOTAL*/ )
+void CZMBuildMenu::UpdateQueue( const int q[], int size )
 {
 	bool zombies_present = false;
 	for ( int i = 0; i < size; i++ )
@@ -363,57 +334,3 @@ void CZMBuildMenu::UpdateQueue( const int q[], int size /*= TYPE_TOTAL*/ )
 		clearqueue->SetEnabled(zombies_present);
 	
 }
-
-void CZMBuildMenu::OnClose()
-{
-    // Notify server we've closed this menu.
-    engine->ClientCmd( VarArgs( "zm_cmd_closebuildmenu %i", GetSpawnIndex() ) );
-
-
-    m_iLastSpawnIndex = GetSpawnIndex();
-	//SetSpawnIndex( 0 );
-
-
-	BaseClass::OnClose();
-}
-
-//--------------------------------------------------------------
-// TGB: usermessage for updating the buildmenu
-//--------------------------------------------------------------
-void __MsgFunc_ZMBuildMenuUpdate( bf_read &msg )
-{
-    if ( !g_pZMView || !g_pZMView->GetBuildMenu() ) return;
-
-
-    CZMBuildMenu* pMenu = g_pZMView->GetBuildMenu();
-
-
-	//read spawn entindex
-	int spawnidx = msg.ReadShort();
-
-    // We don't care about this spawn since we don't have it open...
-    if ( spawnidx != pMenu->GetSpawnIndex() ) return;
-
-
-
-	bool force_open = msg.ReadOneBit() == 1;
-
-	//read queue from usermessage
-	int queue[BM_QUEUE_SIZE];
-	for ( int i = 0; i < BM_QUEUE_SIZE; i++ )
-	{
-		//every type was increased by 1 so that type_invalid could be 0 (byte is unsigned)
-		queue[i] = ( msg.ReadByte() - 1 );
-	}
-
-	if ( force_open )
-	{
-		//if we weren't visible, this is also an opening message
-		gViewPortInterface->ShowPanel( pMenu, true );
-	}
-
-
-	pMenu->UpdateQueue( queue );
-}
-
-USER_MESSAGE_REGISTER( ZMBuildMenuUpdate );

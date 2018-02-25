@@ -114,4 +114,46 @@
 		"time"			"10"
 		"team"			"3"
 	}
+	"zmdesc_shambler"
+	{
+		"msg"			"#ZMDescShambler"
+		"time"			"10"
+		"team"			"3"
+	}
+	"zmdesc_banshee"
+	{
+		"msg"			"#ZMDescBanshee"
+		"time"			"10"
+		"team"			"3"
+	}
+	"zmdesc_hulk"
+	{
+		"msg"			"#ZMDescHulk"
+		"time"			"10"
+		"team"			"3"
+	}
+	"zmdesc_drifter"
+	{
+		"msg"			"#ZMDescDrifter"
+		"time"			"10"
+		"team"			"3"
+	}
+	"zmdesc_immolator"
+	{
+		"msg"			"#ZMDescImmolator"
+		"time"			"10"
+		"team"			"3"
+	}
+	"zmclearqueue"
+	{
+		"msg"			"#ZMClearQueueAll"
+		"time"			"10"
+		"team"			"3"
+	}
+	"zmsetrallypoint"
+	{
+		"msg"			"#ZMSetRallyPoint"
+		"time"			"10"
+		"team"			"3"
+	}
 }
