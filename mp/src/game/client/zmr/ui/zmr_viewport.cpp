@@ -111,9 +111,6 @@ static void UTIL_TraceZMView( trace_t* trace, Vector endpos, int mask, CTraceFil
 DECLARE_HUDELEMENT( CZMFrame );
 
 
-extern CZMBuildMenu* g_pBuildMenu;
-
-
 extern IViewPort* gViewPortInterface;
 
 CZMFrame* g_pZMView = nullptr;
@@ -208,6 +205,7 @@ CZMFrame::CZMFrame( const char* pElementName ) : CHudElement( pElementName ), Ba
 	m_pManiMenu = new CZMManiMenu( this ); 
 	m_pManiMenuNew = new CZMManiMenuNew( this ); 
 	m_pBuildMenu = new CZMBuildMenu( this ); 
+	m_pBuildMenuNew = new CZMBuildMenuNew( this ); 
 }
 
 CZMFrame::~CZMFrame()
@@ -219,6 +217,7 @@ CZMFrame::~CZMFrame()
     delete m_pManiMenu;
     delete m_pManiMenuNew;
     delete m_pBuildMenu;
+    delete m_pBuildMenuNew;
 }
 
 void CZMFrame::ApplySchemeSettings( IScheme* pScheme )
@@ -299,6 +298,19 @@ void CZMFrame::SetClickMode( ZMClickMode_t mode, bool print )
 
 
     m_iClickMode = mode;
+}
+
+CZMBuildMenuBase* CZMFrame::GetBuildMenu()
+{
+    // Tertiary tries to make me cast... pshh, I'll just use good ol' if's. 
+    if ( zm_cl_usenewmenus.GetBool() )
+    {
+        return m_pBuildMenuNew;
+    }
+    else
+    {
+        return m_pBuildMenu;
+    }
 }
 
 CZMManiMenuBase* CZMFrame::GetManiMenu()
@@ -958,6 +970,11 @@ void CZMFrame::CloseChildMenus()
     if ( m_pBuildMenu && m_pBuildMenu->IsVisible() )
     {
         m_pBuildMenu->Close();
+    }
+
+    if ( m_pBuildMenuNew && m_pBuildMenuNew->IsVisible() )
+    {
+        m_pBuildMenuNew->Close();
     }
 
     if ( m_pManiMenu && m_pManiMenu->IsVisible() )

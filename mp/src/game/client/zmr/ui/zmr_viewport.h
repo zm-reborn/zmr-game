@@ -6,6 +6,7 @@ class CZMLineTool;
 #include "zmr_boxselect.h"
 #include "zmr_cntrlpanel.h"
 #include "zmr_buildmenu.h"
+#include "zmr_buildmenu_new.h"
 #include "zmr_manimenu.h"
 #include "zmr_manimenu_new.h"
 
@@ -62,7 +63,7 @@ public:
     void SetClickMode( ZMClickMode_t, bool print = true );
 
 
-    CZMBuildMenu* GetBuildMenu() { return m_pBuildMenu; }; // ZMRTODO: Do same thing as mani menu.
+    CZMBuildMenuBase* GetBuildMenu();
     CZMManiMenuBase* GetManiMenu();
 
     inline bool IsDoubleClickLeft() { return ( gpGlobals->curtime - m_flLastLeftClick ) < DOUBLECLICK_DELTA; };
@@ -89,6 +90,7 @@ private:
     CZMManiMenu* m_pManiMenu;
     CZMManiMenuNew* m_pManiMenuNew;
     CZMBuildMenu* m_pBuildMenu;
+    CZMBuildMenuNew* m_pBuildMenuNew;
 
     MouseCode m_MouseDragStatus;
 
