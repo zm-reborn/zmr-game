@@ -22,6 +22,7 @@ public:
 
     void SetFocus( bool state );
 
+    bool IsDisabled() { return m_bDisabled; };
     void SetDisabled( bool state );
 
     inline const char* GetCommand() { return m_pszCommand; };

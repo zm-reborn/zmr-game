@@ -152,7 +152,7 @@ void CZMManiMenuNew::OnThink()
     Assert( pButtons->Count() >= 2 );
 
     pButtons->Element( 0 )->SetDisabled( pPlayer->GetResources() < m_nCost );
-    pButtons->Element( 1 )->SetDisabled( m_nTrapCost <= 0 && pPlayer->GetResources() < m_nTrapCost );
+    pButtons->Element( 1 )->SetDisabled( m_nTrapCost <= 0 || pPlayer->GetResources() < m_nTrapCost );
 
 
     int x, y;
