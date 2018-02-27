@@ -70,6 +70,9 @@ END_PREDICTION_DATA()
 #endif
 
 LINK_ENTITY_TO_CLASS( weapon_zm_shotgun, CZMWeaponShotgun );
+#ifndef CLIENT_DLL
+LINK_ENTITY_TO_CLASS( weapon_shotgun, CZMWeaponShotgun ); // Some shit maps may spawn weapon_shotgun.
+#endif
 PRECACHE_WEAPON_REGISTER( weapon_zm_shotgun );
 
 acttable_t CZMWeaponShotgun::m_acttable[] = 
