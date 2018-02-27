@@ -363,7 +363,11 @@ public:
 	int								GetHitboxSetCount( void );
 	void							DrawClientHitboxes( float duration = 0.0f, bool monocolor = false );
 
+#ifdef ZMR // ZMRCHANGE: We have to make this a virtual so we can override it in our viewmodel class.
+    virtual C_BaseAnimating*        FindFollowedEntity();
+#else
 	C_BaseAnimating*				FindFollowedEntity();
+#endif
 
 	virtual bool					IsActivityFinished( void ) { return m_bSequenceFinished; }
 	inline bool						IsSequenceFinished( void );

@@ -4,6 +4,7 @@
 
 
 #include "zmr/zmr_gamerules.h"
+#include "zmr/zmr_viewmodel.h"
 #include "zmr/weapons/zmr_base.h"
 #include "zmr/zmr_shareddefs.h"
 
@@ -236,6 +237,54 @@ void CZMBaseWeapon::SecondaryAttack( void )
     BaseClass::SecondaryAttack();
 }
 
+void CZMBaseWeapon::SetWeaponVisible( bool visible )
+{
+    CBaseViewModel* vm = nullptr;
+    CZMViewModel* vmhands = nullptr;
+
+    CZMPlayer* pOwner = GetPlayerOwner();
+    if ( pOwner )
+    {
+        vm = pOwner->GetViewModel( VMINDEX_WEP );
+        vmhands = static_cast<CZMViewModel*>( pOwner->GetViewModel( VMINDEX_HANDS ) );
+
+#ifndef CLIENT_DLL
+        Assert( vm == pOwner->GetViewModel( m_nViewModelIndex ) );
+#endif
+    }
+
+    if ( visible )
+    {
+        RemoveEffects( EF_NODRAW );
+
+        if ( vm ) vm->RemoveEffects( EF_NODRAW );
+        if ( vmhands )
+        {
+            if ( GetWpnData().m_bUseHands )
+            {
+                vmhands->RemoveEffects( EF_NODRAW );
+#ifdef CLIENT_DLL // Let client override this if they are using a custom viewmodel that doesn't use the new hands system.
+                vmhands->SetDrawVM( true );
+#endif
+            }
+            else
+            {
+#ifdef CLIENT_DLL
+                vmhands->SetDrawVM( false );
+#endif
+            }
+
+        }
+    }
+    else
+    {
+        AddEffects( EF_NODRAW );
+
+        if ( vm ) vm->AddEffects( EF_NODRAW );
+        if ( vmhands ) vmhands->AddEffects( EF_NODRAW );
+    }
+}
+
 #ifndef CLIENT_DLL
 void CZMBaseWeapon::Precache()
 {
@@ -392,7 +441,7 @@ const char* CZMBaseWeapon::GetWorldModel() const
 
 void CZMBaseWeapon::SetViewModel()
 {
-    CBasePlayer* pOwner = GetPlayerOwner();
+    CZMPlayer* pOwner = GetPlayerOwner();
     if ( !pOwner ) return;
 
     CBaseViewModel* vm = pOwner->GetViewModel( m_nViewModelIndex, false );

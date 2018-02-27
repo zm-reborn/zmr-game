@@ -49,6 +49,35 @@ public:
     void (CZMPlayer::*pfnPreThink)(); // Do a PreThink() in this state.
 };
 
+class CZMPlayerModelData
+{
+public:
+    CZMPlayerModelData( KeyValues* kv, bool bIsCustom = false )
+    {
+        Assert( kv );
+        m_kvData = kv->MakeCopy();
+        m_szModelName = m_kvData->GetString( "model" );
+
+        m_bIsCustom = bIsCustom;
+    }
+
+    ~CZMPlayerModelData()
+    {
+        if ( m_kvData )
+            m_kvData->deleteThis();
+        m_kvData = nullptr;
+    }
+
+    const char* GetModelName() { return m_szModelName; };
+    KeyValues*  GetModelData() { return m_kvData; };
+    bool        IsCustom() { return m_bIsCustom; };
+
+private:
+    const char* m_szModelName;
+    KeyValues* m_kvData;
+    bool m_bIsCustom;
+};
+
 class CZMPlayer : public CHL2_Player
 {
 public:
@@ -67,8 +96,14 @@ public:
         return static_cast<CZMPlayer*>( CreateEntityByName( className ) );
     }
 
+    // All valid and precached player models.
+    static CUtlVector<CZMPlayerModelData*> m_PlayerModels;
 
+
+    static void     AddDefaultPlayerModels( KeyValues* kv );
+    static int      PrecachePlayerModels( KeyValues* kv );
     virtual void    Precache() OVERRIDE;
+
     virtual void    Spawn() OVERRIDE;
     virtual void    UpdateOnRemove() OVERRIDE;
     virtual void    PreThink() OVERRIDE;
@@ -85,9 +120,14 @@ public:
     virtual int     ShouldTransmit( const CCheckTransmitInfo* ) OVERRIDE;
 
     virtual void    SetAnimation( PLAYER_ANIM playerAnim ) OVERRIDE;
-    void            SetPlayerModel( void );
-    bool            ValidatePlayerModel( const char* );
+    bool            SetPlayerModel();
+    static int      FindPlayerModel( const char* model );
     void            UpdatePlayerFOV();
+    KeyValues*      GetPlayerModelData( const char* model );
+    void            SetHandsModel( const char* model );
+    void            SetHandsData( KeyValues* kv );
+    virtual void    CreateViewModel( int index = 0 ) OVERRIDE;
+
 
     virtual void    FlashlightTurnOn() OVERRIDE;
     virtual void    FlashlightTurnOff() OVERRIDE;
@@ -95,7 +135,6 @@ public:
     virtual bool    BecomeRagdollOnClient( const Vector& force ) OVERRIDE;
     void            CreateRagdollEntity();
 
-    virtual void CreateViewModel( int viewmodelindex = 0 ) OVERRIDE;
     virtual bool Weapon_Lower() OVERRIDE { return false; };
     
     virtual void PickupObject( CBaseEntity *pObject, bool bLimitMassAndSize ) OVERRIDE;
@@ -189,6 +228,7 @@ public:
     Vector              GetAttackSpread( CBaseCombatWeapon* pWeapon, CBaseEntity* pTarget = nullptr ) OVERRIDE;
     Vector              GetAutoaimVector( float flScale ) OVERRIDE;
     void                DoAnimationEvent( PlayerAnimEvent_t playerAnim, int nData = 0 );
+    KeyValues*          LoadPlayerModels();
 
 
     CZMBaseWeapon*  GetWeaponOfHighestSlot();
