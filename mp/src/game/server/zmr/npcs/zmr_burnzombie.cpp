@@ -121,6 +121,7 @@ IMPLEMENT_SERVERCLASS_ST( CNPC_BurnZombie, DT_ZM_BurnZombie )
 END_SEND_TABLE()
 
 LINK_ENTITY_TO_CLASS( npc_burnzombie, CNPC_BurnZombie );
+PRECACHE_REGISTER( npc_burnzombie );
 
 //---------------------------------------------------------
 //---------------------------------------------------------
@@ -182,6 +183,12 @@ END_DATADESC()
 //-----------------------------------------------------------------------------
 void CNPC_BurnZombie::Precache( void )
 {
+    // Only allow precache register.
+    // Templates would precache us multiple times when restarting the round.
+    if ( !IsPrecacheAllowed() )
+        return;
+
+
 	BaseClass::Precache();
 
 	PrecacheModel( "models/zombie/burnzie.mdl" );
@@ -261,8 +268,6 @@ void CNPC_BurnZombie::HandleAnimEvent( animevent_t* pEvent )
 //-----------------------------------------------------------------------------
 void CNPC_BurnZombie::Spawn( void )
 {
-	Precache();
-
 	m_iHealth			= zm_sk_burnzombie_health.GetInt();
 	//TGB: 0.2 is about 80 degrees to either side
 //	m_flFieldOfView		= 0.2;

@@ -20,6 +20,14 @@
 static ConVar zm_sv_spawndelay( "zm_sv_spawndelay", "0.6", FCVAR_NOTIFY );
 
 
+#define MODEL_MANIPULATE        "models/manipulatable.mdl"
+#define MODEL_ZOMBIESPAWN       "models/zombiespawner.mdl"
+#define MODEL_RALLYPOINT        "models/rallypoint.mdl"
+#define MODEL_SPAWNNODE         "models/spawnnode.mdl"
+#define MODEL_AMBUSHTRIGGER     "models/trap.mdl"
+#define MODEL_MANITRIGGER       "models/trap.mdl"
+
+
 /*
     func_win
 */
@@ -145,6 +153,7 @@ BEGIN_DATADESC( CZMEntZombieSpawn )
 END_DATADESC()
 
 LINK_ENTITY_TO_CLASS( info_zombiespawn, CZMEntZombieSpawn );
+PRECACHE_REGISTER( info_zombiespawn );
 
 
 CZMEntZombieSpawn::CZMEntZombieSpawn()
@@ -155,15 +164,14 @@ CZMEntZombieSpawn::CZMEntZombieSpawn()
 
 void CZMEntZombieSpawn::Precache()
 {
-    PrecacheModel( "models/zombiespawner.mdl" );
+    PrecacheModel( MODEL_ZOMBIESPAWN );
 }
 
 void CZMEntZombieSpawn::Spawn()
 {
     BaseClass::Spawn();
 
-    Precache();
-    SetModel( "models/zombiespawner.mdl" );
+    SetModel( MODEL_ZOMBIESPAWN );
 
 
     //if ( m_nSpawnQueueCapacity < 1 )
@@ -590,16 +598,17 @@ BEGIN_DATADESC( CZMEntSpawnNode )
 END_DATADESC()
 
 LINK_ENTITY_TO_CLASS( info_spawnnode, CZMEntSpawnNode );
+PRECACHE_REGISTER( info_spawnnode );
+
 
 void CZMEntSpawnNode::Precache()
 {
-    PrecacheModel( "models/spawnnode.mdl" );
+    PrecacheModel( MODEL_SPAWNNODE );
 }
 
 void CZMEntSpawnNode::Spawn()
 {
-    Precache();
-    SetModel( "models/spawnnode.mdl" );
+    SetModel( MODEL_SPAWNNODE );
 
     SetSolid( SOLID_NONE );
 }
@@ -612,23 +621,24 @@ BEGIN_DATADESC( CZMEntRallyPoint )
 END_DATADESC()
 
 LINK_ENTITY_TO_CLASS( info_rallypoint, CZMEntRallyPoint );
+PRECACHE_REGISTER( info_rallypoint );
+
 
 void CZMEntRallyPoint::Precache()
 {
-    PrecacheModel( "models/rallypoint.mdl" );
+    PrecacheModel( MODEL_RALLYPOINT );
 }
 
 void CZMEntRallyPoint::Spawn()
 { 
-    Precache();
-    SetModel( "models/rallypoint.mdl" );
+    SetModel( MODEL_RALLYPOINT );
 
     SetSolid( SOLID_NONE );
 }
 
 
 /*
-    Trap trigger
+    Manipulate trigger
 */
 //IMPLEMENT_SERVERCLASS_ST( CZMEntManipulateTrigger, DT_ZM_EntManipulateTrigger )
 //END_SEND_TABLE()
@@ -638,6 +648,8 @@ BEGIN_DATADESC( CZMEntManipulateTrigger )
 END_DATADESC()
 
 LINK_ENTITY_TO_CLASS( info_manipulate_trigger, CZMEntManipulateTrigger );
+PRECACHE_REGISTER( info_manipulate_trigger );
+
 
 CZMEntManipulateTrigger::CZMEntManipulateTrigger()
 {
@@ -656,13 +668,12 @@ CZMEntManipulateTrigger::~CZMEntManipulateTrigger()
 
 void CZMEntManipulateTrigger::Precache()
 {
-    PrecacheModel( "models/trap.mdl" );
+    PrecacheModel( MODEL_MANITRIGGER );
 }
 
 void CZMEntManipulateTrigger::Spawn()
 { 
-    Precache();
-    SetModel( "models/trap.mdl" );
+    SetModel( MODEL_MANITRIGGER );
 
     SetSolid( SOLID_NONE );
 
@@ -711,6 +722,8 @@ BEGIN_DATADESC( CZMEntAmbushTrigger )
 END_DATADESC()
 
 LINK_ENTITY_TO_CLASS( info_ambush_trigger, CZMEntAmbushTrigger );
+PRECACHE_REGISTER( info_ambush_trigger );
+
 
 CZMEntAmbushTrigger::CZMEntAmbushTrigger()
 {
@@ -724,13 +737,12 @@ CZMEntAmbushTrigger::~CZMEntAmbushTrigger()
 
 void CZMEntAmbushTrigger::Precache()
 {
-    PrecacheModel( "models/trap.mdl" );
+    PrecacheModel( MODEL_AMBUSHTRIGGER );
 }
 
 void CZMEntAmbushTrigger::Spawn()
 { 
-    Precache();
-    SetModel( "models/trap.mdl" );
+    SetModel( MODEL_AMBUSHTRIGGER );
 
     SetSolid( SOLID_NONE );
 
@@ -803,7 +815,7 @@ void CZMEntAmbushTrigger::ScanThink()
 
 
 /*
-    Trap
+    Manipulate orb
 */
 IMPLEMENT_SERVERCLASS_ST( CZMEntManipulate, DT_ZM_EntManipulate )
     SendPropInt( SENDINFO( m_nCost ) ),
@@ -822,6 +834,7 @@ BEGIN_DATADESC( CZMEntManipulate )
 END_DATADESC()
 
 LINK_ENTITY_TO_CLASS( info_manipulate, CZMEntManipulate );
+PRECACHE_REGISTER( info_manipulate );
 
 
 CZMEntManipulate::CZMEntManipulate()
@@ -837,9 +850,7 @@ CZMEntManipulate::~CZMEntManipulate()
 
 void CZMEntManipulate::Precache()
 {
-    PrecacheModel( "models/manipulatable.mdl" );
-
-    UTIL_PrecacheOther( "info_manipulate_trigger" );
+    PrecacheModel( MODEL_MANIPULATE );
 }
 
 void CZMEntManipulate::Spawn()
@@ -851,8 +862,7 @@ void CZMEntManipulate::Spawn()
     if ( m_nTrapCost <= 0 ) m_nTrapCost = m_nCost * 1.5;
 
 
-    Precache();
-    SetModel( "models/manipulatable.mdl" );
+    SetModel( MODEL_MANIPULATE );
 }
 
 void CZMEntManipulate::InputToggle( inputdata_t &inputdata )
@@ -1685,6 +1695,8 @@ BEGIN_DATADESC( CZMPhysExplosion )
 END_DATADESC()
 
 LINK_ENTITY_TO_CLASS( env_delayed_physexplosion, CZMPhysExplosion );
+PRECACHE_REGISTER( env_delayed_physexplosion );
+
 
 CZMPhysExplosion::CZMPhysExplosion()
 {
@@ -1702,8 +1714,6 @@ CZMPhysExplosion::~CZMPhysExplosion()
 void CZMPhysExplosion::Spawn()
 {
     BaseClass::Spawn();
-
-    Precache();
 }
 
 void CZMPhysExplosion::Precache()

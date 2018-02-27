@@ -190,7 +190,7 @@ IMPLEMENT_SERVERCLASS_ST( CZMZombie, DT_ZM_ClassicZombie )
 END_SEND_TABLE()
 
 LINK_ENTITY_TO_CLASS( npc_zombie, CZMZombie );
-//LINK_ENTITY_TO_CLASS( npc_zombie_torso, CZMZombie );
+PRECACHE_REGISTER( npc_zombie );
 
 //---------------------------------------------------------
 //---------------------------------------------------------
@@ -255,6 +255,12 @@ END_DATADESC()
 //-----------------------------------------------------------------------------
 void CZMZombie::Precache( void )
 {
+    // Only allow precache register.
+    // Templates would precache us multiple times when restarting the round.
+    if ( !IsPrecacheAllowed() )
+        return;
+
+
 	BaseClass::Precache();
 
     for ( int i = 0; i < ARRAYSIZE( g_szZombieModels ); i++ )
@@ -285,8 +291,6 @@ void CZMZombie::Precache( void )
 //-----------------------------------------------------------------------------
 void CZMZombie::Spawn( void )
 {
-	Precache();
-
 	m_iHealth			= zm_sk_shambler_health.GetFloat();
 	m_flFieldOfView		= 0.1f;
 

@@ -142,6 +142,7 @@ IMPLEMENT_SERVERCLASS_ST( CNPC_DragZombie, DT_ZM_DragZombie )
 END_SEND_TABLE()
 
 LINK_ENTITY_TO_CLASS( npc_dragzombie, CNPC_DragZombie );
+PRECACHE_REGISTER( npc_dragzombie );
 
 
 //BEGIN_DATADESC( CNPC_DragZombie )
@@ -152,6 +153,12 @@ LINK_ENTITY_TO_CLASS( npc_dragzombie, CNPC_DragZombie );
 //-----------------------------------------------------------------------------
 void CNPC_DragZombie::Precache( void )
 {
+    // Only allow precache register.
+    // Templates would precache us multiple times when restarting the round.
+    if ( !IsPrecacheAllowed() )
+        return;
+
+
     PrecacheModel("models/humans/zm_draggy.mdl");
     m_nSquidSpitSprite = PrecacheModel("sprites/laserdot.vmt"); // client side spittle.
     PrecacheScriptSound( "NPC_DragZombie.Die" );
@@ -178,9 +185,6 @@ void CNPC_DragZombie::Precache( void )
 //-----------------------------------------------------------------------------
 void CNPC_DragZombie::Spawn( void )
 {
-    Precache();
-
-
     SetBloodColor( BLOOD_COLOR_RED );
     m_iHealth = zm_sk_dragzombie_health.GetFloat();
     m_flFieldOfView = 0.1f;
