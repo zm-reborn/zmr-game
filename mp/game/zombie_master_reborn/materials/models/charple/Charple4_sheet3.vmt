@@ -1,0 +1,9 @@
+"VertexLitGeneric"
+{
+	"$baseTexture" "Models/Charple/Charple4_sheet3"
+	"$bumpmap" "Models/Charple/Charple4_normal3"
+	"$envmap" "env_cubemap"	
+	"$normalmapalphaenvmapmask" 1
+	"$envmapcontrast" 1
+	"$halflambert" 1
+}

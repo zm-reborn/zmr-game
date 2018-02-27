@@ -1,0 +1,9 @@
+"VertexLitGeneric"
+{
+	"$baseTexture" "Models/Zombie_Poison/PoisonZombie_sheet"
+	"$envmap" "env_cubemap"
+	"$bumpmap" "Models/Zombie_Poison/PoisonZombie_sheet_normal"
+	"$normalmapalphaenvmapmask" 1
+	"$envmapcontrast" 1
+	"$halflambert" 1
+}

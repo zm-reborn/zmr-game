@@ -1,0 +1,5 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models\Zombie_Classic\OffcGrn_sheet"
+	"$halflambert" 1
+}
