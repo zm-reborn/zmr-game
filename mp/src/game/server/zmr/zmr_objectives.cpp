@@ -10,6 +10,7 @@ void CObjLine::WriteEmptyDisplayUserMsg()
 {
     WRITE_BYTE( 0 );
     WRITE_BYTE( 0 );
+    WRITE_FLOAT( 0.0f );
 }
 
 void CObjLine::WriteArg()
