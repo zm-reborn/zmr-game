@@ -990,7 +990,7 @@ bool CZMBaseZombie::OnObstructionPreSteer( AILocalMoveGoal_t* pMoveGoal, float d
     // If we're being obstructed by an NPC that's not doing anything, tell them to move.
     if ( !IsCloseToCommandPos() && (pMoveGoal->directTrace.flTotalDist - pMoveGoal->directTrace.flDistObstructed) < GetHullWidth() * 1.5f )
     {
-        CZMBaseZombie* pBlocker = dynamic_cast<CZMBaseZombie*>( pMoveGoal->directTrace.pObstruction->MyNPCPointer() );
+        CZMBaseZombie* pBlocker = ToZMBaseZombie( pMoveGoal->directTrace.pObstruction->MyNPCPointer() );
 
         if ( pBlocker && !pBlocker->IsMoving() && !pBlocker->IsCloseToCommandPos() && pBlocker->ConditionInterruptsCurSchedule( COND_GIVE_WAY ) )
         {
@@ -1965,7 +1965,7 @@ bool CZMBaseZombie::ShouldTryScheduleAgain( int failedSched, int failedTask, AI_
         if ( failedTask == TASK_GET_PATH_TO_LASTPOSITION )
         {
             // If we were simply blocked by another NPC, keep trying. No reason to be ashamed.
-            CZMBaseZombie* pBlocker = GetNavigator()->GetBlockingEntity() ? dynamic_cast<CZMBaseZombie*>( GetNavigator()->GetBlockingEntity()->MyNPCPointer() ) : nullptr;
+            CZMBaseZombie* pBlocker = GetNavigator()->GetBlockingEntity() ? ToZMBaseZombie( GetNavigator()->GetBlockingEntity()->MyNPCPointer() ) : nullptr;
 
 
             if ( pBlocker && !pBlocker->IsCloseToCommandPos() )

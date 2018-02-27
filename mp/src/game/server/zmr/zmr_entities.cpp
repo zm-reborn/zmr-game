@@ -1469,7 +1469,7 @@ void CZMEntLoadout::GiveWeapon( CZMPlayer* pPlayer, int loadout_wep )
     }
 
 
-    CZMBaseWeapon* pWeapon = static_cast<CZMBaseWeapon*>( pPlayer->Weapon_Create( wepname ) );
+    CZMBaseWeapon* pWeapon = ToZMBaseWeapon( pPlayer->Weapon_Create( wepname ) );
 
     if ( !pWeapon )
     {

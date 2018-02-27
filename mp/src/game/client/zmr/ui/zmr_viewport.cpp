@@ -952,7 +952,7 @@ void CZMFrame::FindZMObject( int x, int y, bool bSticky )
         }
 
 
-        pZombie = dynamic_cast<C_ZMBaseZombie*>( list[i] );
+        pZombie = ToZMBaseZombie( list[i] );
 
         if ( pZombie )
         {

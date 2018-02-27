@@ -24,7 +24,7 @@ void ZM_DropAmmo( const CCommand &args )
 
 
 
-    CZMBaseWeapon* pWeapon = dynamic_cast<CZMBaseWeapon*>( pPlayer->GetActiveWeapon() );
+    CZMBaseWeapon* pWeapon = ToZMBaseWeapon( pPlayer->GetActiveWeapon() );
 
     if ( !pWeapon ) return;
 
@@ -96,19 +96,10 @@ void ZM_DropWeapon( const CCommand &args )
     if ( !pPlayer->IsHuman() || !pPlayer->IsAlive() ) return;
 
 
-    CZMBaseWeapon* pWeapon = dynamic_cast<CZMBaseWeapon*>( pPlayer->GetActiveWeapon() );
+    CZMBaseWeapon* pWeapon = ToZMBaseWeapon( pPlayer->GetActiveWeapon() );
 
     if ( !pWeapon )
     {
-        // If we're a stock weapon then just remove us.
-        CBaseCombatWeapon* pBase = pPlayer->GetActiveWeapon();
-
-        if ( pBase )
-        {
-            pPlayer->Weapon_Drop( pBase, nullptr, nullptr );
-            UTIL_Remove( pBase );
-        }
-
         return;
     }
 
@@ -157,7 +148,7 @@ void ZM_ObserveZombie( const CCommand &args )
     CZMBaseZombie* pZombie = nullptr;
     if ( args.ArgC() > 1 )
     {
-        pZombie = dynamic_cast<CZMBaseZombie*>( UTIL_EntityByIndex( atoi( args.Arg( 1 ) ) ) );
+        pZombie = ToZMBaseZombie( UTIL_EntityByIndex( atoi( args.Arg( 1 ) ) ) );
     }
     else
     {
@@ -171,7 +162,7 @@ void ZM_ObserveZombie( const CCommand &args )
 
         if ( tr.m_pEnt && tr.m_pEnt->MyNPCPointer() )
         {
-            pZombie = dynamic_cast<CZMBaseZombie*>( tr.m_pEnt );
+            pZombie = ToZMBaseZombie( tr.m_pEnt );
         }
     }
 

@@ -238,7 +238,7 @@ void ZM_Cmd_CreateHidden( const CCommand &args )
 
 
 
-    CZMBaseZombie* pZombie = dynamic_cast<CZMBaseZombie*>( CreateEntityByName( CZMBaseZombie::ClassToName( ZMCLASS_SHAMBLER ) ) );
+    CZMBaseZombie* pZombie = static_cast<CZMBaseZombie*>( CreateEntityByName( CZMBaseZombie::ClassToName( ZMCLASS_SHAMBLER ) ) );
 
     if ( !pZombie ) return;
 
@@ -422,7 +422,7 @@ void ZM_Cmd_Select( const CCommand &args )
     }
 
 
-    CZMBaseZombie* pZombie = dynamic_cast<CZMBaseZombie*>( pEnt );
+    CZMBaseZombie* pZombie = ToZMBaseZombie( pEnt );
 
     if ( pZombie )
     {
@@ -463,7 +463,7 @@ void ZM_Cmd_SelectMult( const CCommand &args )
 
     for ( int i = 2; i < args.ArgC(); i++ )
     {
-        pZombie = dynamic_cast<CZMBaseZombie*>( UTIL_EntityByIndex( atoi( args.Arg( i ) ) ) );
+        pZombie = ToZMBaseZombie( UTIL_EntityByIndex( atoi( args.Arg( i ) ) ) );
 
         if ( pZombie )
         {

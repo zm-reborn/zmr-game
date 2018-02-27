@@ -236,7 +236,7 @@ CZMBaseWeapon* CZMEntItemCrate::CreateTemplateItem()
         return nullptr;
     }
 
-    CZMBaseWeapon* pWeapon = dynamic_cast<CZMBaseWeapon*>( pEntity );
+    CZMBaseWeapon* pWeapon = ToZMBaseWeapon( pEntity );
 
     if ( !pWeapon )
     {

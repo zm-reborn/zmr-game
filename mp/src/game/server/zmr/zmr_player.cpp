@@ -493,7 +493,7 @@ CBaseEntity* CZMPlayer::FindNextObserverTarget( bool bReverse )
     CZMBaseZombie* pZombie;
     if (GetObserverTarget()
     &&  GetObserverMode() != OBS_MODE_ROAMING
-    &&  (pZombie = dynamic_cast<CZMBaseZombie*>( GetObserverTarget()->MyNPCPointer() )) != nullptr )
+    &&  (pZombie = static_cast<CZMBaseZombie*>( GetObserverTarget()->MyNPCPointer() )) != nullptr )
     {
         int i;
         CZMBaseZombie* pLoop;
@@ -1442,7 +1442,7 @@ CZMBaseWeapon* CZMPlayer::GetWeaponOfHighestSlot()
         return pWep;
 
     // Just default to fists.
-    return static_cast<CZMBaseWeapon*>( Weapon_OwnsThisType( "weapon_zm_fists" ) );
+    return ToZMBaseWeapon( Weapon_OwnsThisType( "weapon_zm_fists" ) );
 }
 
 CZMBaseWeapon* CZMPlayer::GetWeaponOfSlot( int slot )
@@ -1456,7 +1456,7 @@ CZMBaseWeapon* CZMPlayer::GetWeaponOfSlot( int slot )
 
     for ( int i = 0; i < MAX_WEAPONS; i++ ) 
     {
-        pWep = dynamic_cast<CZMBaseWeapon*>( m_hMyWeapons[i].Get() );
+        pWep = ToZMBaseWeapon( m_hMyWeapons[i].Get() );
 
         if ( pWep && pWep->GetSlotFlag() & slot )
         {

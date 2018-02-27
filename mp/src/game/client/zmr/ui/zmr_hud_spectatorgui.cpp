@@ -216,7 +216,7 @@ bool CZMHudSpectatorUI::UpdateTargetText()
     }
     else
     {
-        C_ZMBaseZombie* pZombie = dynamic_cast<C_ZMBaseZombie*>( pEnt );
+        C_ZMBaseZombie* pZombie = ToZMBaseZombie( pEnt );
 
         if ( pZombie )
         {

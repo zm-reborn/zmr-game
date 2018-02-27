@@ -318,3 +318,18 @@ private:
     CNetworkVar( int, m_iSelectorIndex );
     CNetworkVar( float, m_flHealthRatio ); // For humans we can use health/maxhealth
 };
+
+inline CZMBaseZombie* ToZMBaseZombie( CBaseEntity* pEnt )
+{
+    if ( !pEnt || !pEnt->IsNPC() )
+        return nullptr;
+
+    // We have to dynamic cast due to npc_crow, etc.
+    return dynamic_cast<CZMBaseZombie*>( pEnt );
+}
+
+inline CZMBaseZombie* ToZMBaseZombie( CAI_BaseNPC* pEnt )
+{
+    // We have to dynamic cast due to npc_crow, etc.
+    return dynamic_cast<CZMBaseZombie*>( pEnt );
+}

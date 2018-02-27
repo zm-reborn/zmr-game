@@ -72,3 +72,19 @@ private:
 
     QAngle m_angEyeAttachment;
 };
+
+inline C_ZMBaseZombie* ToZMBaseZombie( C_BaseEntity* pEnt )
+{
+    if ( !pEnt || !pEnt->IsNPC() )
+        return nullptr;
+
+    // We have to dynamic cast due to npc_crow, etc.
+    return dynamic_cast<C_ZMBaseZombie*>( pEnt );
+}
+
+inline C_ZMBaseZombie* ToZMBaseZombie( C_AI_BaseNPC* pEnt )
+{
+    // We have to dynamic cast due to npc_crow, etc.
+    return dynamic_cast<C_ZMBaseZombie*>( pEnt );
+}
+

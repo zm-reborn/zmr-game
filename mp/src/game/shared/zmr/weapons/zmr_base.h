@@ -182,3 +182,16 @@ private:
 #endif
     CNetworkVar( int, m_nOverrideClip1 );
 };
+
+inline CZMBaseWeapon* ToZMBaseWeapon( CBaseEntity* pEnt )
+{
+    if ( !pEnt || !pEnt->IsBaseCombatWeapon() )
+        return nullptr;
+
+    return static_cast<CZMBaseWeapon*>( pEnt );
+}
+
+inline CZMBaseWeapon* ToZMBaseWeapon( CBaseCombatWeapon* pEnt )
+{
+    return static_cast<CZMBaseWeapon*>( pEnt );
+}
