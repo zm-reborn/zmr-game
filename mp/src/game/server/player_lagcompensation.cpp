@@ -1029,7 +1029,7 @@ void CLagCompensationManager::BacktrackEntity( CZMBaseZombie *pEntity, float flT
 			else
 			{
                 
-				CZMBaseZombie* pHitEntity = dynamic_cast<CZMBaseZombie*>( tr.m_pEnt );
+				CZMBaseZombie* pHitEntity = ToZMBaseZombie( tr.m_pEnt );
 				if ( pHitEntity )
 				{
 					CZMBaseZombie* pNPC = NULL;

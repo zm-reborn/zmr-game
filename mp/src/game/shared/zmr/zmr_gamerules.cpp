@@ -512,14 +512,14 @@ bool CZMRules::CanHaveAmmo( CBaseCombatCharacter* pPlayer, int iAmmoIndex )
 
     // Do we have a weapon to use the ammo with?
     // Using dynamic cast until hl2mp weapons are removed.
-    CZMBaseWeapon* pWep = dynamic_cast<CZMBaseWeapon*>( pZMPlayer->Weapon_GetWpnForAmmo( iAmmoIndex ) );
+    CZMBaseWeapon* pWep = ToZMBaseWeapon( pZMPlayer->Weapon_GetWpnForAmmo( iAmmoIndex ) );
     if ( !pWep )
     {
         return false;
     }
     
     // Don't allow ammo pickup when reloading (singly reloading weps).
-    CZMBaseWeapon* pActive = dynamic_cast<CZMBaseWeapon*>( pZMPlayer->GetActiveWeapon() );
+    CZMBaseWeapon* pActive = ToZMBaseWeapon( pZMPlayer->GetActiveWeapon() );
     if ( pActive && !pActive->CanPickupAmmo() )
         return false;
 
@@ -543,7 +543,7 @@ bool CZMRules::CanHavePlayerItem( CBasePlayer* pPlayer, CBaseCombatWeapon* pBase
     // Do we already have this slot's weapon?
     CZMPlayer* pZMPlayer = ToZMPlayer( pPlayer );
 
-    CZMBaseWeapon* pWep = dynamic_cast<CZMBaseWeapon*>( pBaseWeapon );
+    CZMBaseWeapon* pWep = ToZMBaseWeapon( pBaseWeapon );
 
     if ( pZMPlayer && pWep )
     {
