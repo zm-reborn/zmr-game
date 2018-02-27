@@ -1,0 +1,48 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/weapons/c_arms_citizen/c_arms_citizen_sleeves"
+	"$bumpmap"     "models/weapons/c_arms_citizen/c_arms_citizen_sleeves_normal"
+
+	"$phong" "1"
+	"$phongboost" "1"
+	"$phongexponent" "4"		
+	"$phongfresnelranges"	"[0.2 0.5 0.7]"
+	
+	"$rimlight" "1"
+	"$rimlightboost" "1"
+	"$rimlightexponent" "6"
+	
+	"$phongexponenttexture" "models/weapons/c_arms_citizen/c_arms_citizen_sleeves_normal"
+	"$rimmask" "1"
+	
+	// Tinting
+	
+	"$blendtintbybasealpha" "1" 
+ 	"$blendtintcoloroverbase" "0"
+	
+	
+	// $FixPhongTint "{0.0001 0.0001 0.0001}"
+	
+	Proxies
+	{
+		ViewModelColor // NOTE: Only use on arms!!
+		{
+			resultVar	$color2
+			default		1 1 1
+		}
+		Clamp
+		{
+			min 0.2
+			max 0.5
+			srcVar1 "$color2"
+			resultVar "$phongtint"
+		}
+		Clamp
+		{
+			min 0.01
+			max 1.50
+			srcVar1 "$color2"
+			resultVar "$color2"
+		}
+	}
+}
