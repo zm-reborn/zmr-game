@@ -250,7 +250,7 @@ bool CZMHudSpectatorUI::UpdateTargetText()
     // Info label.
     if ( health > 0 )
     {
-        V_snwprintf( buffer, ARRAYSIZE( buffer ), L"%i", health );
+        V_snwprintf( buffer, ARRAYSIZE( buffer ), L"(%i)", health );
     }
     else
     {
