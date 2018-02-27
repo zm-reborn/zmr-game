@@ -1,0 +1,39 @@
+==============================
+Zombie Master: Reborn Credits:
+==============================
+Mehis			-- Lead developer, code/maps/textures/models
+Yeckoh			-- Various models, model edits
+The Renegadist	-- Item crate textures
+MaxOfS2D		-- Viewmodel hands (c-arms, model and textures)
+-Rusty-			-- Zombie textures
+Marphy Black	-- Zombie textures, model edits
+Forrest Mark X	-- Viewmodel c-arm edits
+Tony Sergi		-- Multiplayer friendly animations code
+PazerOP			-- Glow outline performance + feature fixes
+Game Zombie		-- Model edits
+
+========================================
+Original Zombie Master was developed by:
+========================================
+Angry Lawyer	-- Founder, coder, various maps/models/textures/bits.
+DjArcas			-- Sound
+Ficcy			-- Models, textures
+Pi|Mu|Rho		-- Mapper, various models/textures.
+qckles			-- Coder
+theGreenBunny	-- Coder, various models/textures, website, various sounds.
+-------------
+Contributors:
+-------------
+Barnz			-- Shotgun ammo box model edit
+Edcrab			-- Writing
+Flyingdebris	-- "Zombie Hunter" concept art (used in loading screen)
+Marphy Black	-- Various environment and object textures, other minor fixes
+Mechagodzilla	-- Concept art
+racer445		-- Pistol and rifle textures
+-Rusty-			-- Survivor textures
+Sinistar		-- Immolator animations
+Suicide42		-- Concept art, writing
+Tannerbondy		-- Weapon selection icons
+
+
+If you feel left out or you're not happy that we're using your work, please contact Mehis anywhere or through email at totally.mehis@gmail.com .
