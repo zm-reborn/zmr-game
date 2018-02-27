@@ -3,69 +3,90 @@
 	"Female #1"
 	{
 		"model"		"models/humans/group02/female_01.mdl"
+		"handscolor"		"100 163 168"
 	}
 	"Female #2"
 	{
 		"model"		"models/humans/group02/female_02.mdl"
+		"handscolor"		"87 95 73"
 	}
 	"Female #3"
 	{
 		"model"		"models/humans/group02/female_03.mdl"
+		"handscolor"		"131 167 115"
+		"handsskin"		"1"
 	}
 	"Female #4"
 	{
 		"model"		"models/humans/group02/female_04.mdl"
+		"handscolor"		"93 85 75"
 	}
 	"Female #5"
 	{
 		"model"		"models/humans/group02/female_06.mdl"
+		"handscolor"		"152 57 63"
 	}
 	"Female #6"
 	{
 		"model"		"models/humans/group02/female_07.mdl"
+		"handscolor"		"106 70 96"
+		"handsskin"		"1"
 	}
 	"Male #1"
 	{
 		"model"		"models/humans/group02/male_01.mdl"
+		"handscolor"		"155 161 163"
+		"handsskin"		"1"
 	}
 	"Male #2"
 	{
 		"model"		"models/humans/group02/male_02.mdl"
+		"handscolor"		"74 75 74"
 	}
 	"Male #3"
 	{
 		"model"		"models/humans/group02/male_03.mdl"
+		"handscolor"		"164 76 19"
+		"handsskin"		"1"
 	}
 	"Male #4"
 	{
 		"model"		"models/humans/group02/male_04.mdl"
+		"handscolor"		"110 41 30"
 	}
 	"Male #5"
 	{
 		"model"		"models/humans/group02/male_05.mdl"
+		"handscolor"		"119 120 119"
 	}
 	"Male #6"
 	{
 		"model"		"models/humans/group02/male_06.mdl"
+		"handscolor"		"47 54 37"
 	}
 	"Male #7"
 	{
 		"model"		"models/humans/group02/male_07.mdl"
+		"handscolor"		"17 13 9"
 	}
 	"Male #8"
 	{
 		"model"		"models/humans/group02/male_08.mdl"
+		"handscolor"		"61 77 90"
 	}
 	"Male #9"
 	{
 		"model"		"models/humans/group02/male_09.mdl"
+		"handscolor"		"50 54 74"
 	}
 	"Pi"
 	{
 		"model"		"models/male_pi.mdl"
+		"handscolor"		"40 39 31"
 	}
 	"Lawyer"
 	{
 		"model"		"models/male_lawyer.mdl"
+		"handscolor"		"93 92 93"
 	}
 }
