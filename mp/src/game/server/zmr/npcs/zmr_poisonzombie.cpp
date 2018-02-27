@@ -228,6 +228,7 @@ IMPLEMENT_SERVERCLASS_ST( CNPC_PoisonZombie, DT_ZM_PoisonZombie )
 END_SEND_TABLE()
 
 LINK_ENTITY_TO_CLASS( npc_poisonzombie, CNPC_PoisonZombie );
+PRECACHE_REGISTER( npc_poisonzombie );
 
 
 BEGIN_DATADESC( CNPC_PoisonZombie )
@@ -250,6 +251,12 @@ END_DATADESC()
 //-----------------------------------------------------------------------------
 void CNPC_PoisonZombie::Precache( void )
 {
+    // Only allow precache register.
+    // Templates would precache us multiple times when restarting the round.
+    if ( !IsPrecacheAllowed() )
+        return;
+
+
 	PrecacheModel( "models/zombie/hulk.mdl" );
 
 	PrecacheScriptSound( "NPC_PoisonZombie.Die" );
@@ -277,8 +284,6 @@ void CNPC_PoisonZombie::Precache( void )
 //-----------------------------------------------------------------------------
 void CNPC_PoisonZombie::Spawn( void )
 {
-	Precache();
-
 #ifdef HL2_EPISODIC
 	SetBloodColor( BLOOD_COLOR_ZOMBIE );
 #else

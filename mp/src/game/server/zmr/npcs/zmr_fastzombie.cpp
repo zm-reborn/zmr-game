@@ -230,6 +230,7 @@ IMPLEMENT_SERVERCLASS_ST( CFastZombie, DT_ZM_FastZombie )
 END_SEND_TABLE()
 
 LINK_ENTITY_TO_CLASS( npc_fastzombie, CFastZombie );
+PRECACHE_REGISTER( npc_fastzombie );
 
 BEGIN_DATADESC( CFastZombie )
 
@@ -280,6 +281,12 @@ CFastZombie::~CFastZombie()
 //-----------------------------------------------------------------------------
 void CFastZombie::Precache( void )
 {
+    // Only allow precache register.
+    // Templates would precache us multiple times when restarting the round.
+    if ( !IsPrecacheAllowed() )
+        return;
+
+
     PrecacheModel("models/zombie/zm_fast.mdl");
     
     PrecacheScriptSound( "NPC_FastZombie.LeapAttack" );
@@ -511,8 +518,6 @@ void CFastZombie::SetAngrySoundState( void )
 //-----------------------------------------------------------------------------
 void CFastZombie::Spawn( void )
 {
-    Precache();
-
     m_bClinging = false;
     m_vClingJumpStart = Vector(0, 0, 0);
     m_flLastClingCheck = 0;

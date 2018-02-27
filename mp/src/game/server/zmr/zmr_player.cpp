@@ -207,13 +207,6 @@ void CZMPlayer::Precache()
 
     BaseClass::Precache();
 
-    // Can't be in gamerules object.
-    UTIL_PrecacheOther( "npc_zombie" );
-    UTIL_PrecacheOther( "npc_fastzombie" );
-    UTIL_PrecacheOther( "npc_poisonzombie" );
-    UTIL_PrecacheOther( "npc_dragzombie" );
-    UTIL_PrecacheOther( "npc_burnzombie" );
-
 
     PrecacheModel( VMHANDS_FALLBACKMODEL );
 
