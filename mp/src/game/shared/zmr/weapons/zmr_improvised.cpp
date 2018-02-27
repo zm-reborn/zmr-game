@@ -56,6 +56,9 @@ END_PREDICTION_DATA()
 #endif
 
 LINK_ENTITY_TO_CLASS( weapon_zm_improvised, CZMWeaponImprovised );
+#ifndef CLIENT_DLL
+LINK_ENTITY_TO_CLASS( weapon_crowbar, CZMWeaponImprovised ); // // Some shit maps may spawn weapon_crowbar.
+#endif
 PRECACHE_WEAPON_REGISTER( weapon_zm_improvised );
 
 acttable_t	CZMWeaponImprovised::m_acttable[] = 
