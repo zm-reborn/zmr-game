@@ -5,7 +5,8 @@ WeaponData
 
 	// Weapon data is loaded by both the Game and Client DLLs.
 	"printname"	"Rifle"
-	"viewmodel"				"models/weapons/rifle_zm.mdl"
+	"viewmodel"				"models/weapons/c_rifle_zm.mdl"
+	"usenewhands"			"1"
 	"playermodel"			"models/weapons/rifle_zm_3rd.mdl"
 	"anim_prefix"			"rifle"
 	"bucket"				"3"

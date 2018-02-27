@@ -5,7 +5,8 @@ WeaponData
 
 	// Weapon data is loaded by both the Game and Client DLLs.
 	"printname"	"Revolver"
-	"viewmodel"			"models/weapons/v_revolver_zm.mdl"
+	"viewmodel"			"models/weapons/c_revolver_zm.mdl"
+	"usenewhands"		"1"
 	"playermodel"		"models/weapons/w_357.mdl" //FIXME: No world model yet!
 	"anim_prefix"		"pistol"
 	"bucket"			"1"

@@ -2,7 +2,8 @@ WeaponData
 {
 	// Weapon data is loaded by both the Game and Client DLLs.
 	"printname"	"Molotovs"
-	"viewmodel"				"models/weapons/molotov_zm.mdl"
+	"viewmodel"				"models/weapons/c_molotov_zm.mdl"
+	"usenewhands"			"1"
 	"playermodel"			"models/weapons/molotov3rd_zm.mdl"
 	"anim_prefix"			"Grenade"
 	"bucket"				"4"

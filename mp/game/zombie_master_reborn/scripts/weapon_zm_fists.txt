@@ -8,7 +8,8 @@ WeaponData
 //	"viewmodel"				"models/weapons/sledgehammer_zm.mdl"
 //	"playermodel"			"models/weapons/sledgehammer3rd_zm.mdl" //LAWYER:  Debugging
 
-	"viewmodel"				"models/weapons/fists_zm.mdl"
+	"viewmodel"				"models/weapons/c_fists_zm.mdl"
+	"usenewhands"		"1"
 	"playermodel"			"models/weapons/w_null.mdl"
 	"anim_prefix"			"fists"
 	"bucket"				"0"

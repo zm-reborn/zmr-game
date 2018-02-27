@@ -4,7 +4,8 @@ WeaponData
 {
 	// Weapon data is loaded by both the Game and Client DLLs.
 	"printname"	"Improvised/C-bar"
-	"viewmodel"				"models/weapons/improvised_zm.mdl"
+	"viewmodel"				"models/weapons/c_improvised_zm.mdl"
+	"usenewhands"			"1"
 //	"viewmodel"				"models/weapons/v_crowbar.mdl"
 	"playermodel"			"models/weapons/w_crowbar.mdl"
 //	"playermodel"			"models/weapons/sledgehammer3rd_zm.mdl"

@@ -4,7 +4,8 @@ WeaponData
 {
 	// Weapon data is loaded by both the Game and Client DLLs.
 	"printname"	"Sledgehammer"
-	"viewmodel"				"models/weapons/sledgehammer_zm.mdl"
+	"viewmodel"				"models/weapons/c_sledgehammer_zm.mdl"
+	"usenewhands"			"1"
 	"playermodel"			"models/weapons/sledgehammer3rd_zm.mdl"
 
 	"anim_prefix"			"sledge"
