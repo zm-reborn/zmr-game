@@ -105,6 +105,7 @@ static const char* g_PreserveEnts[] =
     "info_loadout",
 
     "zm_objectives_manager",
+    "zm_viewmodel",
 
     "vote_controller",
 

@@ -13,6 +13,7 @@ FileWeaponInfo_t* CreateWeaponInfo()
 CZMWeaponInfo::CZMWeaponInfo()
 {
 	m_flDamage = 0.0f;
+    m_bUseHands = false;
 }
 
 void CZMWeaponInfo::Parse( KeyValues *pKeyValuesData, const char *szWeaponName )
@@ -20,4 +21,5 @@ void CZMWeaponInfo::Parse( KeyValues *pKeyValuesData, const char *szWeaponName )
 	BaseClass::Parse( pKeyValuesData, szWeaponName );
 
     m_flDamage = pKeyValuesData->GetFloat( "damage", 0.0f );
+    m_bUseHands = pKeyValuesData->GetBool( "usenewhands", false );
 }

@@ -160,3 +160,6 @@ enum ZMChatNotifyType_t
 
 #define ZM_MIN_FOV          75 // Not the absolute minimum. GetMinFOV will not use this.
 
+// m_hViewModel
+#define VMINDEX_WEP         0
+#define VMINDEX_HANDS       1

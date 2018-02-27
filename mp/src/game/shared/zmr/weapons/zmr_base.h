@@ -104,6 +104,8 @@ public:
 #endif
     virtual bool IsPredicted() const OVERRIDE { return true; };
 
+    virtual void SetWeaponVisible( bool visible ) OVERRIDE;
+
     void WeaponSound( WeaponSound_t, float soundtime = 0.0f ) OVERRIDE;
 
     void DoMachineGunKick( float, float, float, float );

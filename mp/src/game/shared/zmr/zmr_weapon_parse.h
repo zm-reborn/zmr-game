@@ -22,4 +22,5 @@ public:
 
 
 	float m_flDamage;
+    bool m_bUseHands;
 };

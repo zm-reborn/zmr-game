@@ -6,15 +6,23 @@
 
 #include "ilagcompensationmanager.h"
 #include "predicted_viewmodel.h"
-
+#include "filesystem.h"
 
 #include "npcs/zmr_zombiebase.h"
 #include "zmr_player_ragdoll.h"
+#include "zmr/zmr_viewmodel.h"
 #include "zmr_entities.h"
 #include "zmr/zmr_gamerules.h"
 #include "zmr/zmr_global_shared.h"
 #include "weapons/zmr_carry.h"
 #include "zmr_player.h"
+
+
+
+
+#define VMHANDS_FALLBACKMODEL   "models/weapons/c_arms_citizen.mdl"
+#define DEF_PLAYER_MODEL        "models/male_pi.mdl"
+
 
 
 static ConVar zm_sv_randomplayermodel( "zm_sv_randomplayermodel", "1", FCVAR_NOTIFY | FCVAR_ARCHIVE, "If player has an invalid model, use a random one. Temporary 'fix' for model choosing not working." );
@@ -24,6 +32,9 @@ ConVar zm_sv_antiafk( "zm_sv_antiafk", "90", FCVAR_NOTIFY | FCVAR_ARCHIVE, "If t
 
 
 static ConVar zm_sv_npcheadpushoff( "zm_sv_npcheadpushoff", "200", FCVAR_NOTIFY | FCVAR_ARCHIVE, "How much force is applied to the player when standing on an NPC." );
+
+
+CUtlVector<CZMPlayerModelData*> CZMPlayer::m_PlayerModels;
 
 
 IMPLEMENT_SERVERCLASS_ST( CZMPlayer, DT_ZM_Player )
@@ -121,41 +132,107 @@ CZMPlayer::~CZMPlayer( void )
     m_pPlayerAnimState->Release();
 }
 
-void CZMPlayer::Precache( void )
+void CZMPlayer::AddDefaultPlayerModels( KeyValues* kv )
 {
-    // For now also precache the HL2DM stuff...
+    KeyValues* pNewKey = new KeyValues( "" );
+
+    KeyValues* pSub = pNewKey->FindKey( "_DefaultModel", true );
+    pSub->SetString( "model", DEF_PLAYER_MODEL );
+
+    kv->AddSubKey( pNewKey );
+}
+
+int CZMPlayer::PrecachePlayerModels( KeyValues* kv )
+{
+    if ( !kv ) return 0;
+
+
+    int num = 0;
+
+    KeyValues* pKey = kv->GetFirstSubKey();
+
+    while ( pKey )
+    {
+        const char* name = pKey->GetName();
+        const char* model = pKey->GetString( "model" );
+
+        if ( *model )
+        {
+            if ( PrecacheModel( model ) != -1 ) // Valid model?
+            {
+                ++num;
+
+
+                const char* hands = pKey->GetString( "handsmodel" );
+                if ( *hands && PrecacheModel( model ) == -1 )
+                {
+                    pKey->SetString( "handsmodel", "" );
+
+                    Warning( "Invalid hand model path '%s' ('%s')!\n", hands, name );
+                }
+
+
+                m_PlayerModels.AddToTail( new CZMPlayerModelData( pKey ) );
+            }
+            else
+            {
+                Warning( "Invalid model path '%s' ('%s')!\n", model, name );
+
+                KeyValues* oldKey = pKey;
+
+                pKey = pKey->GetNextKey();
+
+                kv->RemoveSubKey( oldKey );
+                oldKey->deleteThis();
+
+                continue;
+            }
+        }
+        else
+        {
+            Warning( "No model path for '%s'!\n", name );
+        }
+
+        pKey = pKey->GetNextKey();
+    }
+
+    return num;
+}
+
+void CZMPlayer::Precache()
+{
+    // Precache register makes sure we are already precached.
+    if ( !IsPrecacheAllowed() ) return;
+
+
     BaseClass::Precache();
-    //CBasePlayer::Precache();
 
-    //PrecacheModel ( "sprites/glow01.vmt" );
-
-#ifndef CLIENT_DLL
     // Can't be in gamerules object.
     UTIL_PrecacheOther( "npc_zombie" );
     UTIL_PrecacheOther( "npc_fastzombie" );
     UTIL_PrecacheOther( "npc_poisonzombie" );
     UTIL_PrecacheOther( "npc_dragzombie" );
     UTIL_PrecacheOther( "npc_burnzombie" );
-#endif
 
 
+    PrecacheModel( VMHANDS_FALLBACKMODEL );
 
-#define DEF_PLAYER_MODEL    "models/male_pi.mdl"
 
+    m_PlayerModels.PurgeAndDeleteElements();
 
-    PrecacheModel( DEF_PLAYER_MODEL );
+    KeyValues* kv = LoadPlayerModels();
 
-    for ( int i = 0 ; i < ARRAYSIZE( g_ZMPlayerModels ); i++ )
+    // Make sure at least one model gets precached.
+    if ( !kv )
+        AddDefaultPlayerModels( (kv = new KeyValues( "" )) );
+
+    if ( !PrecachePlayerModels( kv ) )
     {
-        PrecacheModel( g_ZMPlayerModels[i] );
+        Warning( "WARNING: No player models precached! Crash inbound!\n" );
     }
 
-
-    //PrecacheFootStepSounds();
-
-    //PrecacheScriptSound( "NPC_MetroPolice.Die" );
-    //PrecacheScriptSound( "NPC_CombineS.Die" );
-    //PrecacheScriptSound( "NPC_Citizen.die" );
+    if ( kv )
+        kv->deleteThis();
 }
 
 void CZMPlayer::UpdateOnRemove()
@@ -253,7 +330,7 @@ void CZMPlayer::PreThink( void )
 
     BaseClass::PreThink();
 
-    SetMaxSpeed( 190 );
+    SetMaxSpeed( ZM_WALK_SPEED );
     State_PreThink();
 
     // Reset bullet force accumulator, only lasts one frame
@@ -663,9 +740,13 @@ void CZMPlayer::RemoveAllItems( bool removeSuit )
 
     // ZMRTODO: See if this has any side-effects.
     // HACK: To stop ZM having a viewmodel. Just hide our viewmodel.
-    if ( GetViewModel() )
+    if ( GetViewModel( VMINDEX_WEP ) )
     {
         GetViewModel()->AddEffects( EF_NODRAW );
+    }
+    if ( GetViewModel( VMINDEX_HANDS ) )
+    {
+        GetViewModel( VMINDEX_HANDS )->AddEffects( EF_NODRAW );
     }
 }
 
@@ -693,10 +774,32 @@ void CZMPlayer::SetAnimation( PLAYER_ANIM playerAnim )
     // CBasePlayer may still call this.
 }
 
-void CZMPlayer::SetPlayerModel()
+KeyValues* CZMPlayer::LoadPlayerModels()
 {
+    KeyValues* kv = new KeyValues( "PlayerModels" );
+    if ( !kv->LoadFromFile( filesystem, "resource/zmoptions_playermodels.txt", "MOD" ) )
+    {
+        kv->deleteThis();
+        return nullptr;
+    }
+
+    return kv;
+}
+
+bool CZMPlayer::SetPlayerModel()
+{
+    if ( !m_PlayerModels.Count() )
+    {
+        Assert( 0 );
+        Warning( "No player models to select from! RIP\n" );
+        return false;
+    }
+
+
+    bool changed = false;
+
     const char* pszFallback = zm_sv_randomplayermodel.GetBool() ?
-        g_ZMPlayerModels[random->RandomInt( 0, ARRAYSIZE( g_ZMPlayerModels ) - 1 )] :
+        m_PlayerModels[random->RandomInt( 0, m_PlayerModels.Count() - 1 )]->GetModelName() :
         DEF_PLAYER_MODEL;
 
     const char* szModelName = nullptr;
@@ -710,10 +813,10 @@ void CZMPlayer::SetPlayerModel()
     int modelIndex = modelinfo->GetModelIndex( szModelName );
 
 
-    if ( modelIndex == -1 || !ValidatePlayerModel( szModelName ) )
+    if ( modelIndex == -1 || FindPlayerModel( szModelName ) == -1 )
     {
         if (modelIndexCurrent == -1
-        ||  !ValidatePlayerModel( pszCurrentModelName )
+        ||  FindPlayerModel( pszCurrentModelName ) == -1
         ||  zm_sv_randomplayermodel.GetBool() )
         {
             pszCurrentModelName = pszFallback;
@@ -736,23 +839,32 @@ void CZMPlayer::SetPlayerModel()
     if ( modelIndexCurrent == -1 || modelIndex != modelIndexCurrent )
     {
         SetModel( szModelName );
+        changed = true;
     }
 
 
+    if ( changed )
+    {
+        SetHandsData( GetPlayerModelData( szModelName ) );
+    }
+
     m_flNextModelChangeTime = gpGlobals->curtime + zm_sv_modelchangedelay.GetFloat();
+
+    return changed;
 }
 
-bool CZMPlayer::ValidatePlayerModel( const char* szModelName )
+int CZMPlayer::FindPlayerModel( const char* model )
 {
-    for ( int i = 0; i < ARRAYSIZE( g_ZMPlayerModels ); ++i )
+    int len = m_PlayerModels.Count();
+    for ( int i = 0; i < len; ++i )
     {
-        if ( Q_stricmp( g_ZMPlayerModels[i], szModelName ) == 0 )
+        if ( Q_stricmp( m_PlayerModels[i]->GetModelName(), model ) == 0 )
         {
-            return true;
+            return i;
         }
     }
 
-    return false;
+    return -1;
 }
 
 void CZMPlayer::UpdatePlayerFOV()
@@ -1079,23 +1191,105 @@ void CZMPlayer::PickupObject( CBaseEntity *pObject, bool bLimitMassAndSize )
     PlayerAttemptPickup( this, pObject );
 }
 
+KeyValues* CZMPlayer::GetPlayerModelData( const char* model )
+{
+    int len = m_PlayerModels.Count();
+    for ( int i = 0; i < len; ++i )
+    {
+        if ( Q_strcmp( model, m_PlayerModels[i]->GetModelName() ) == 0 )
+        {
+            return m_PlayerModels[i]->GetModelData();
+        }
+    }
+
+    return nullptr;
+}
+
+void CZMPlayer::SetHandsModel( const char* model )
+{
+    if ( !model || !(*model) ) return;
+
+    CBaseViewModel* pVM = GetViewModel( VMINDEX_HANDS );
+    if ( !pVM ) return;
+
+    pVM->SetModel( model );
+}
+
+void CZMPlayer::SetHandsData( KeyValues* kv )
+{
+    if ( !kv ) return;
+
+    CZMViewModel* pVM = static_cast<CZMViewModel*>( GetViewModel( VMINDEX_HANDS ) );
+    if ( !pVM ) return;
+
+
+    const char* szHands = kv->GetString( "handsmodel" );
+    if ( *szHands )
+    {
+        int iHands = modelinfo->GetModelIndex( szHands );
+        if ( iHands != -1 && pVM->GetModelIndex() != iHands )
+        {
+            pVM->SetModelIndex( iHands );
+        }
+    }
+
+    int skin = kv->GetInt( "handsskin", 0 );
+    if ( skin >= 0 && skin < MAXSTUDIOSKINS )
+    {
+        pVM->m_nSkin = skin;
+    }
+
+    Color clr = kv->GetColor( "handscolor" );
+    if ( clr[0] != 0 || clr[1] != 0 || clr[2] != 0 )
+    {
+        pVM->SetModelColor2( clr[0] / 255.0f, clr[1] / 255.0f, clr[2] / 255.0f );
+    }
+}
+
 void CZMPlayer::CreateViewModel( int index )
 {
-    Assert( index >= 0 && index < MAX_VIEWMODELS );
+    // We should never create more than the first index.
+    Assert( index == 0 );
 
-    if ( GetViewModel( index ) )
+
+    if ( GetViewModel( VMINDEX_WEP ) != nullptr )
+    {
+        if ( GetViewModel( VMINDEX_HANDS ) == nullptr )
+        {
+            Warning( "Weapon viewmodel exists but hands don't!!\n" );
+        }
+
         return;
+    }
 
-    CPredictedViewModel* vm = (CPredictedViewModel*)CreateEntityByName( "predicted_viewmodel" );
+
+    CBaseViewModel* vm = static_cast<CBaseViewModel*>( CreateEntityByName( "predicted_viewmodel" ) );
+    
     if ( vm )
     {
         vm->SetAbsOrigin( GetAbsOrigin() );
         vm->SetOwner( this );
-        vm->SetIndex( index );
+        vm->SetIndex( VMINDEX_WEP );
         DispatchSpawn( vm );
         vm->FollowEntity( this, false );
-        m_hViewModel.Set( index, vm );
+        m_hViewModel.Set( VMINDEX_WEP, vm );
+
+
+        CZMViewModel* vmhands = static_cast<CZMViewModel*>( CreateEntityByName( "zm_viewmodel" ) );
+    
+        if ( vmhands )
+        {
+            vmhands->SetAbsOrigin( GetAbsOrigin() );
+            vmhands->SetOwner( this );
+            vmhands->SetIndex( VMINDEX_HANDS );
+            DispatchSpawn( vmhands );
+            vmhands->FollowEntity( vm, true ); // Sets moveparent.
+            m_hViewModel.Set( VMINDEX_HANDS, vmhands );
+        }
     }
+
+    SetHandsModel( VMHANDS_FALLBACKMODEL );
+    SetHandsData( GetPlayerModelData( STRING( GetModelName() ) ) );
 }
 
 bool CZMPlayer::BumpWeapon( CBaseCombatWeapon *pWeapon )
