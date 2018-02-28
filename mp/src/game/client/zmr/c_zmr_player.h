@@ -38,7 +38,7 @@ public:
     virtual ShadowType_t    ShadowCastType() OVERRIDE;
     virtual bool            ShouldReceiveProjectedTextures( int flags ) OVERRIDE;
     virtual bool            ShouldDraw() OVERRIDE;
-    virtual int             DrawModel( int ) OVERRIDE;
+    virtual int             DrawModel( int flags ) OVERRIDE;
     virtual const QAngle&   GetRenderAngles() OVERRIDE;
     virtual const QAngle&   EyeAngles() OVERRIDE;
     virtual float           GetFOV() OVERRIDE;
@@ -78,18 +78,18 @@ public:
     static C_ZMPlayer* GetLocalPlayer();
 
     // Implemented in zm_player_shared
-    bool                    HasEnoughResToSpawn( ZombieClass_t );
-    bool                    HasEnoughRes( int );
+    bool                    HasEnoughResToSpawn( ZombieClass_t zclass );
+    bool                    HasEnoughRes( int cost );
     int                     GetWeaponSlotFlags();
     int                     GetResources();
-    void                    IncResources( int, bool bLimit = false );
-    void                    SetResources( int );
+    void                    IncResources( int res, bool bLimit = false );
+    void                    SetResources( int res );
     float                   GetFlashlightBattery();
-    void                    SetFlashlightBattery( float );
-    bool                    Weapon_CanSwitchTo( C_BaseCombatWeapon* ) OVERRIDE;
+    void                    SetFlashlightBattery( float battery );
+    bool                    Weapon_CanSwitchTo( C_BaseCombatWeapon* pWeapon ) OVERRIDE;
     Participation_t         GetParticipation();
     static Participation_t  GetLocalParticipation();
-    static void             SetLocalParticipation( Participation_t );
+    static void             SetLocalParticipation( Participation_t part );
     virtual void            PlayStepSound( Vector& vecOrigin, surfacedata_t* psurface, float fvol, bool force ) OVERRIDE;
     C_BaseCombatWeapon*     GetWeaponForAmmo( int iAmmoType );
     Vector                  GetAttackSpread( C_BaseCombatWeapon* pWeapon, C_BaseEntity* pTarget = nullptr );

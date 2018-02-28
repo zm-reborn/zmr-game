@@ -36,7 +36,7 @@ protected:
 
     // Lets dead players accelerate or otherwise spectators can't move in roaming mode. Thanks Valve.
     virtual bool CanAccelerate() OVERRIDE { return !(player->GetWaterJumpTime()); };
-    virtual void Accelerate( Vector&, float, float ) OVERRIDE;
+    virtual void Accelerate( Vector& wishdir, float wishspeed, float accel ) OVERRIDE;
 
     /*
         Ladder stuff copied from hl2/hl_gamemovement

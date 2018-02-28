@@ -9,12 +9,12 @@ public:
 
     void Draw();
 
-    void SetSize( float );
-    void SetMaterial( const char* );
-    void SetPos( const Vector& );
-    void SetColor( float, float, float );
-    void SetAlpha( float );
-    void SetYaw( float );
+    void SetSize( float size );
+    void SetMaterial( const char* name );
+    void SetPos( const Vector& origin );
+    void SetColor( float r, float g, float b );
+    void SetAlpha( float a );
+    void SetYaw( float yaw );
     
 protected:
     float m_flSize;

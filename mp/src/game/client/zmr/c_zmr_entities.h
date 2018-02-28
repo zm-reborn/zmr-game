@@ -29,7 +29,7 @@ public:
 
 
     virtual bool ShouldDraw() OVERRIDE;
-    virtual int DrawModel( int ) OVERRIDE;
+    virtual int DrawModel( int flags ) OVERRIDE;
 
 protected:
     virtual void InitSpriteMat() {};
