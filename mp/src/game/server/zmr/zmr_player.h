@@ -114,7 +114,7 @@ public:
     virtual void    ChangeTeam( int iTeam ) OVERRIDE;
     bool            ShouldSpawn();
 
-    virtual bool            IsValidObserverTarget( CBaseEntity* ) OVERRIDE;
+    virtual bool            IsValidObserverTarget( CBaseEntity* pEnt ) OVERRIDE;
     virtual CBaseEntity*    FindNextObserverTarget( bool bReverse ) OVERRIDE;
 
     virtual int     ShouldTransmit( const CCheckTransmitInfo* ) OVERRIDE;
@@ -142,12 +142,12 @@ public:
 
     // Lag compensation stuff...
     void FireBullets( const FireBulletsInfo_t& ) OVERRIDE;
-    bool WantsLagCompensationOnNPC( const CZMBaseZombie* a, const CUserCmd* b, const CBitVec<MAX_EDICTS>* c ) const;
+    bool WantsLagCompensationOnNPC( const CZMBaseZombie* pZombie, const CUserCmd* pCmd, const CBitVec<MAX_EDICTS>* pEntityTransmitBits ) const;
     void NoteWeaponFired();
 
     virtual void    DeathSound( const CTakeDamageInfo& info ) OVERRIDE;
-    virtual void    Event_Killed( const CTakeDamageInfo& ) OVERRIDE;
-    virtual int     OnTakeDamage( const CTakeDamageInfo& ) OVERRIDE;
+    virtual void    Event_Killed( const CTakeDamageInfo& info ) OVERRIDE;
+    virtual int     OnTakeDamage( const CTakeDamageInfo& info ) OVERRIDE;
 	virtual void    CommitSuicide( bool bExplode = false, bool bForce = false ) OVERRIDE;
 	virtual void    CommitSuicide( const Vector &vecForce, bool bExplode = false, bool bForce = false ) OVERRIDE;
 
@@ -158,7 +158,7 @@ public:
 
     virtual int     GiveAmmo( int nCount, int nAmmoIndex, bool bSuppressSound ) OVERRIDE;
     void            GiveDefaultItems( void );
-    virtual void    EquipSuit( bool = false ) OVERRIDE;
+    virtual void    EquipSuit( bool bPlayEffects = false ) OVERRIDE;
     virtual void    RemoveAllItems( bool removeSuit ) OVERRIDE;
 
     virtual void PlayerUse( void ) OVERRIDE;
@@ -213,21 +213,22 @@ public:
 
 
     // Implemented in zm_player_shared
-    bool                HasEnoughResToSpawn( ZombieClass_t );
-    bool                HasEnoughRes( int );
+    bool                HasEnoughResToSpawn( ZombieClass_t zclass );
+    bool                HasEnoughRes( int cost );
     int                 GetWeaponSlotFlags();
     int                 GetResources();
-    void                IncResources( int, bool bLimit = false );
-    void                SetResources( int );
+    void                IncResources( int res, bool bLimit = false );
+    void                SetResources( int res );
     float               GetFlashlightBattery();
-    void                SetFlashlightBattery( float );
-    bool                Weapon_CanSwitchTo( CBaseCombatWeapon* ) OVERRIDE;
+    void                SetFlashlightBattery( float battery );
+    bool                Weapon_CanSwitchTo( CBaseCombatWeapon* pWeapon ) OVERRIDE;
     Participation_t     GetParticipation();
     virtual void        PlayStepSound( Vector& vecOrigin, surfacedata_t* psurface, float fvol, bool force ) OVERRIDE;
     CBaseCombatWeapon*  GetWeaponForAmmo( int iAmmoType );
-    Vector              GetAttackSpread( CBaseCombatWeapon* pWeapon, CBaseEntity* pTarget = nullptr ) OVERRIDE;
-    Vector              GetAutoaimVector( float flScale ) OVERRIDE;
+    virtual Vector      GetAttackSpread( CBaseCombatWeapon* pWeapon, CBaseEntity* pTarget = nullptr ) OVERRIDE;
+    virtual Vector      GetAutoaimVector( float flScale ) OVERRIDE;
     void                DoAnimationEvent( PlayerAnimEvent_t playerAnim, int nData = 0 );
+
     KeyValues*          LoadPlayerModels();
 
 

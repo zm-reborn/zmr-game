@@ -227,19 +227,19 @@ public:
 
 
     // Implemented in zmr_zombiebase_shared
-    static bool             IsValidClass( ZombieClass_t );
-    static ZombieClass_t    NameToClass( const char* );
-    static const char*      ClassToName( ZombieClass_t );
-    static int              GetPopCost( ZombieClass_t );
-    static int              GetCost( ZombieClass_t );
-    static bool             HasEnoughPopToSpawn( ZombieClass_t );
+    static bool             IsValidClass( ZombieClass_t zclass );
+    static ZombieClass_t    NameToClass( const char* name );
+    static const char*      ClassToName( ZombieClass_t zclass );
+    static int              GetPopCost( ZombieClass_t zclass );
+    static int              GetCost( ZombieClass_t zclass );
+    static bool             HasEnoughPopToSpawn( ZombieClass_t zclass );
     int                     GetSelectorIndex();
     CZMPlayer*              GetSelector();
-    void                    SetSelector( CZMPlayer* );
-    void                    SetSelector( int );
+    void                    SetSelector( CZMPlayer* pPlayer );
+    void                    SetSelector( int index );
     ZombieClass_t           GetZombieClass();
 protected:
-    void                    SetZombieClass( ZombieClass_t );
+    void                    SetZombieClass( ZombieClass_t zclass );
 public:
 
 
