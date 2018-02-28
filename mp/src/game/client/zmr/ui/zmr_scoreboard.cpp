@@ -54,8 +54,12 @@ static bool SortHumanSection( KeyValues* kv1, KeyValues* kv2 )
     }
 
     // We have more score?
-    if ( kv1->GetInt( "frags" ) > kv2->GetInt( "frags" ) )
+    int f1 = kv1->GetInt( "frags" );
+    int f2 = kv2->GetInt( "frags" );
+    if ( f1 > f2 )
         return true;
+    else if ( f1 < f2 )
+        return false;
 
     // We have less deaths?
     if ( kv1->GetInt( "deaths" ) < kv2->GetInt( "deaths" ) )
