@@ -299,7 +299,7 @@ $Project "Server (ZMR)"
 				$File	"glowstencil\glowbase.cpp"
 				$File	"glowstencil\glowbase.h"
 			}
-			$Folder "Multiplayer"
+			$Folder "MP AnimState"
 			{
 				$File	"$SRCDIR\game\shared\Multiplayer\multiplayer_animstate.cpp"
 				$File	"$SRCDIR\game\shared\Multiplayer\multiplayer_animstate.h"
