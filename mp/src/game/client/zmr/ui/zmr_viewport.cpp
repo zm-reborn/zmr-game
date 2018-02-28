@@ -914,7 +914,7 @@ void CZMFrame::FindZMObject( int x, int y, bool bSticky )
         {
             C_ZMEntZombieSpawn* pSpawn = dynamic_cast<C_ZMEntZombieSpawn*>( pUsable );
 
-            if ( pSpawn )
+            if ( pSpawn && !pSpawn->IsEffectActive( EF_NODRAW ) )
             {
                 if ( GetBuildMenu() )
                 {
@@ -928,7 +928,7 @@ void CZMFrame::FindZMObject( int x, int y, bool bSticky )
 
             C_ZMEntManipulate* pTrap = dynamic_cast<C_ZMEntManipulate*> ( pUsable );
 
-            if ( pTrap )
+            if ( pTrap && !pTrap->IsEffectActive( EF_NODRAW ) )
             {
                 if ( GetManiMenu() )
                 {
