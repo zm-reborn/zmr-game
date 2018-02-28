@@ -1,0 +1,6 @@
+UnlitGeneric
+{
+	$basetexture	vgui\zmr_manimenu\trap
+	$ignorez	1
+	$translucent	1
+}

@@ -3,10 +3,11 @@
 {
 	"ActivateRadial"
 	{
+		"img"		"zmr_manimenu/act"
 		"img_over"		"zmr_manimenu/act_over"
 		"size"		"180"
 		"offset"		"0"
-		"startfrac"		"0"
+		"startfrac"		"0.1875"
 		"endfrac"		"0.75"
 		"command"		"manipulate"
 		
@@ -22,10 +23,11 @@
 	}
 	"TrapRadial"
 	{
+		"img"		"zmr_manimenu/trap"
 		"img_over"		"zmr_manimenu/trap_over"
 		"size"		"180"
 		"offset"		"180"
-		"startfrac"		"0"
+		"startfrac"		"0.1875"
 		"endfrac"		"0.75"
 		"command"		"trap"
 		
