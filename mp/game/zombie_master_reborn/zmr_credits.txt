@@ -11,6 +11,7 @@ Forrest Mark X	-- Viewmodel c-arm edits
 Tony Sergi		-- Multiplayer friendly animations code
 PazerOP			-- Glow outline performance + feature fixes
 Game Zombie		-- Model edits
+Asg_alligator	-- Model edits
 
 ========================================
 Original Zombie Master was developed by:
