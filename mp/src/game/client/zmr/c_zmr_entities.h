@@ -14,6 +14,9 @@ public:
 
     virtual bool ShouldDraw() OVERRIDE;
     virtual ShadowType_t ShadowCastType() OVERRIDE { return SHADOWS_NONE; };
+#ifdef _DEBUG
+    virtual void OnDataChanged( DataUpdateType_t type ) OVERRIDE;
+#endif
 
     // Never go dormant, so we can render it even outside the world.
     // For now use dormant until we get this rolling. Disabled spawns/traps would show.

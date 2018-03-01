@@ -24,6 +24,21 @@ bool C_ZMEntBaseSimple::ShouldDraw()
     return BaseClass::ShouldDraw();
 }
 
+#ifdef _DEBUG
+void C_ZMEntBaseSimple::OnDataChanged( DataUpdateType_t type )
+{
+    BaseClass::OnDataChanged( type );
+
+    if ( type == DATA_UPDATE_CREATED )
+    {
+        DevMsg( "ZM ent %i created!\n", entindex() );
+    }
+    else
+    {
+        DevMsg( "ZM ent %i changed! (%i)\n", entindex(), type );
+    }
+}
+#endif
 
 /*
     Base usable
