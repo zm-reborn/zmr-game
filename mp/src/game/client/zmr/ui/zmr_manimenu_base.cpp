@@ -32,34 +32,3 @@ void CZMManiMenuBase::ShowMenu( C_ZMEntManipulate* pMani )
     SetTrapCost( pMani->GetTrapCost() );
     ShowPanel( true );
 }
-
-void __MsgFunc_ZMManiMenuUpdate( bf_read &msg )
-{
-    if ( !g_pZMView || !g_pZMView->GetManiMenu() ) return;
-
-
-    CZMManiMenuBase* pMenu = g_pZMView->GetManiMenu();
-
-    // The button will allocate memory.
-    char desc[256];
-    msg.ReadString( desc, sizeof( desc ), true );
-
-    int index = pMenu->GetTrapIndex();
-
-    if ( index > 0 )
-    {
-        IHandleEntity* pHandle = cl_entitylist->LookupEntityByNetworkIndex( index );
-
-        if ( pHandle )
-        {
-            C_ZMEntManipulate* pMani = dynamic_cast<C_ZMEntManipulate*>( EntityFromEntityHandle( pHandle ) );
-
-            if ( pMani )
-                pMani->SetDescription( desc );
-        }
-    }
-
-    pMenu->SetDescription( desc );
-}
-
-USER_MESSAGE_REGISTER( ZMManiMenuUpdate );

@@ -2,6 +2,8 @@
 
 #include "cbase.h"
 
+#include "zmr/zmr_shareddefs.h"
+
 
 abstract_class C_ZMEntBaseSimple : public C_BaseAnimating
 {
@@ -74,13 +76,12 @@ public:
     inline int GetCost() { return m_nCost; };
     inline int GetTrapCost() { return m_nTrapCost; };
 
-    inline const char* GetDescription() { return szDescription; };
-    inline void SetDescription( const char* pSrc ) { Q_strncpy( szDescription, pSrc, sizeof( szDescription ) ); };
+    inline const char* GetDescription() { return m_sDescription; };
 
 protected:
     virtual void InitSpriteMat() OVERRIDE;
 
-    char szDescription[256];
+    char m_sDescription[ZM_MAX_MANI_DESC];
 
 private:
     CNetworkVar( int, m_nCost );

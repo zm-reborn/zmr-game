@@ -237,12 +237,12 @@ public:
     COutputEvent m_OnPressed;
 
 
-    inline const char* GetDescription() { return m_sDescription.ToCStr(); };
+    inline const char* GetDescription() { return m_sDescription.Get().ToCStr(); };
     inline int GetTrapCost() { return m_nTrapCost; };
     inline int GetCost() { return m_nCost; };
 
 private:
-    string_t m_sDescription;
+    CNetworkVar( string_t, m_sDescription );
 
     CNetworkVar( int, m_nCost );
     CNetworkVar( int, m_nTrapCost );

@@ -686,44 +686,6 @@ void ZM_Cmd_CloseBuildMenu( const CCommand &args )
 static ConCommand zm_cmd_closebuildmenu( "zm_cmd_closebuildmenu", ZM_Cmd_CloseBuildMenu, "", FCVAR_HIDDEN );
 
 
-
-/*
-    Open manipulate menu
-*/
-void ZM_Cmd_OpenManiMenu( const CCommand &args )
-{
-    CZMPlayer* pPlayer = ToZMPlayer( UTIL_GetCommandClient() );
-
-    if ( !pPlayer ) return;
-    
-    if ( !pPlayer->IsZM() ) return;
-
-    if ( args.ArgC() < 2 ) return;
-
-
-    int entindex = atoi( args.Arg( 1 ) );
-
-    if ( entindex < 1 ) return;
-
-
-
-    CZMEntManipulate* pTrap = dynamic_cast<CZMEntManipulate*>( UTIL_EntityByIndex( entindex ) );
-
-    if ( pTrap && pTrap->GetDescription()[0] )
-    {
-		CSingleUserRecipientFilter filter( pPlayer );
-		filter.MakeReliable();
-
-
-		UserMessageBegin( filter, "ZMManiMenuUpdate" );
-			WRITE_STRING( pTrap->GetDescription() );
-		MessageEnd();
-    }
-}
-
-static ConCommand zm_cmd_openmanimenu( "zm_cmd_openmanimenu", ZM_Cmd_OpenManiMenu, "", FCVAR_HIDDEN );
-
-
 /*
     Open manipulate menu
 */
