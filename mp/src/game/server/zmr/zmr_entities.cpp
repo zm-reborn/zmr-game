@@ -129,6 +129,24 @@ void CZMEntBaseUsable::UpdateUsable()
 IMPLEMENT_SERVERCLASS_ST( CZMEntBaseSimple, DT_ZM_EntBaseSimple )
 END_SEND_TABLE()
 
+int CZMEntBaseSimple::ShouldTransmit( const CCheckTransmitInfo* pInfo )
+{
+    CZMPlayer* pPlayer = static_cast<CZMPlayer*>( CBaseEntity::Instance( pInfo->m_pClientEnt ) );
+
+    if ( pPlayer && pPlayer->IsZM() )
+    {
+        return FL_EDICT_ALWAYS;
+    }
+
+    return FL_EDICT_DONTSEND;
+}
+
+int CZMEntBaseSimple::UpdateTransmitState()
+{
+    return FL_EDICT_FULLCHECK;
+}
+
+
 /*
     Zombie spawn
 */

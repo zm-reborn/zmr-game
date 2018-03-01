@@ -25,6 +25,9 @@ abstract_class CZMEntBaseSimple : public CBaseAnimating
 public:
 	DECLARE_CLASS( CZMEntBaseSimple, CBaseAnimating )
     DECLARE_SERVERCLASS()
+
+    virtual int ShouldTransmit( const CCheckTransmitInfo* pInfo ) OVERRIDE;
+    virtual int UpdateTransmitState() OVERRIDE;
 };
 
 
