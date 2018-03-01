@@ -820,6 +820,7 @@ void CZMEntAmbushTrigger::ScanThink()
 IMPLEMENT_SERVERCLASS_ST( CZMEntManipulate, DT_ZM_EntManipulate )
     SendPropInt( SENDINFO( m_nCost ) ),
     SendPropInt( SENDINFO( m_nTrapCost ) ),
+    SendPropStringT( SENDINFO( m_sDescription ) ),
 END_SEND_TABLE()
 
 BEGIN_DATADESC( CZMEntManipulate )
@@ -840,7 +841,6 @@ PRECACHE_REGISTER( info_manipulate );
 CZMEntManipulate::CZMEntManipulate()
 {
     m_vTriggers.Purge();
-    //m_sDescription[0] = 0;
 }
 
 CZMEntManipulate::~CZMEntManipulate()

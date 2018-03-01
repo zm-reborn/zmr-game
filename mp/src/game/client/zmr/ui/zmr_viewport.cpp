@@ -933,10 +933,6 @@ void CZMFrame::FindZMObject( int x, int y, bool bSticky )
                 if ( GetManiMenu() )
                 {
                     GetManiMenu()->ShowMenu( pTrap );
-
-                    // Tell server we've opened this menu to get the real trap description.
-                    if ( !*pTrap->GetDescription() )
-                        engine->ClientCmd( VarArgs( "zm_cmd_openmanimenu %i", pTrap->entindex() ) );
                 }
 
                 bHit = true;

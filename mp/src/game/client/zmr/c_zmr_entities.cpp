@@ -108,6 +108,7 @@ void C_ZMEntZombieSpawn::InitSpriteMat()
 IMPLEMENT_CLIENTCLASS_DT( C_ZMEntManipulate, DT_ZM_EntManipulate, CZMEntManipulate )
     RecvPropInt( RECVINFO( m_nCost ) ),
     RecvPropInt( RECVINFO( m_nTrapCost ) ),
+    RecvPropString( RECVINFO( m_sDescription ) ),
 END_RECV_TABLE()
 
 BEGIN_DATADESC( C_ZMEntManipulate )
@@ -118,8 +119,7 @@ C_ZMEntManipulate::C_ZMEntManipulate()
 {
     m_nCost = 10;
     m_nTrapCost = 15;
-
-    szDescription[0] = 0;
+    m_sDescription[0] = 0;
 }
 
 void C_ZMEntManipulate::Precache()
