@@ -5,7 +5,7 @@ FBOBJCOPY=/usr/bin/objcopy
 # It isn't guaranteed that this is set.
 if [ -n "$STEAM_RUNTIME_PATH" ]; then
 	OBJCOPY=$STEAM_RUNTIME_PATH/bin/objcopy
-	if [ ! -f $FBOBJCOPY ]; then
+	if [ ! -f "$OBJCOPY" ]; then
 		OBJCOPY=$FBOBJCOPY
 	fi
 else
