@@ -53,6 +53,10 @@
 [
 	input Win(void) : "Human Win"
 	input Lose(void) : "Zombie Master Win!"
+	
+	output OnWin(void) : "When humans win."
+	output OnLose(void) : "When humans lose. Either failing objectives or every human dying."
+	output OnSubmit(void) : "When Zombie Master submits."
 ]
 
 @PointClass base(Targetname, Parentname, Origin, Angles) = func_giveresources :
