@@ -637,6 +637,11 @@ void CZMBaseZombie::StartTask( const Task_t* pTask )
         TaskComplete();
         break;
 
+    case TASK_ZM_SET_ATTACK_TOLERANCE_DISTANCE :
+        GetNavigator()->SetGoalTolerance( pTask->flTaskData + GetClawAttackRange() );
+        TaskComplete();
+        break;
+
     case TASK_ZOMBIE_GET_PATH_TO_PHYSOBJ :
     {
         if ( m_hPhysicsEnt.Get() == nullptr )
@@ -884,6 +889,9 @@ int CZMBaseZombie::SelectSchedule( void )
             }
         }*/
 
+        // IMPORTANT: We need to make sure we're attacking ASAP. No time to waste.
+        if ( HasCondition( COND_CAN_MELEE_ATTACK1 ) )
+            return SCHED_ZOMBIE_MELEE_ATTACK1;
 
         // Try to swat before thinking the enemy is unreachable.
         if( HasCondition( COND_ZOMBIE_CAN_SWAT_ATTACK ) )
@@ -1194,22 +1202,26 @@ bool CZMBaseZombie::FindNearestPhysicsObject( int iMaxMass )
 
 int CZMBaseZombie::MeleeAttack1Conditions( float flDot, float flDist )
 {
-    if (flDist > GetClawAttackRange() )
+    // Give a bit more distance to more accurately simulate the real attack hull.
+    if ( flDist > (GetClawAttackRange() + GetHullWidth() / 2.0f) )
     {
         return COND_TOO_FAR_TO_ATTACK;
     }
     
-    if ( flDot < 0.7 )
-    {
-        return COND_NOT_FACING_ATTACK;
-    }
+    // We shouldn't care if we're not facing the enemy or not.
+    //if ( flDot < 0.7 )
+    //{
+    //    return COND_NOT_FACING_ATTACK;
+    //}
 
 
     Vector vecMins, vecMaxs;
     GetAttackHull( vecMins, vecMaxs );
 
-    Vector forward;
-    GetVectors( &forward, NULL, NULL );
+    Vector forward = GetEnemy()->WorldSpaceCenter() - WorldSpaceCenter();
+    //GetVectors( &forward, NULL, NULL );
+    forward.NormalizeInPlace();
+
 
     trace_t	tr;
     CTraceFilterNav traceFilter( this, false, this, COLLISION_GROUP_NONE );
@@ -1764,6 +1776,17 @@ Activity CZMBaseZombie::NPC_TranslateActivity( Activity baseAct )
     return BaseClass::NPC_TranslateActivity( baseAct );
 }
 
+bool CZMBaseZombie::FCanCheckAttacks() // We need to override this so we can check attack even when we're not facing the enemy.
+{
+    if ( GetNavType() == NAV_CLIMB || GetNavType() == NAV_JUMP )
+        return false;
+
+    if ( HasCondition( COND_ENEMY_TOO_FAR ) )
+        return false;
+
+    return true;
+}
+
 // How much do we tolerate the delta between goal position and actual goal.
 // Change this for zombies since the original 120 units is WWWWAAAAAAYYYYY too much at very close ranges.
 float CZMBaseZombie::GetGoalRepathTolerance( CBaseEntity* pGoalEnt, GoalType_t type, const Vector& curGoal, const Vector& curTargetPos )
@@ -2040,6 +2063,7 @@ AI_BEGIN_CUSTOM_NPC( zmbase_zombie, CZMBaseZombie )
 
     DECLARE_TASK( TASK_ZM_DEFEND_PATH_TO_DEFPOS );
     DECLARE_TASK( TASK_ZM_SET_TOLERANCE_DISTANCE );
+    DECLARE_TASK( TASK_ZM_SET_ATTACK_TOLERANCE_DISTANCE );
 
 
     DECLARE_ACTIVITY( ACT_ZOM_SWATLEFTMID )
@@ -2080,12 +2104,12 @@ AI_BEGIN_CUSTOM_NPC( zmbase_zombie, CZMBaseZombie )
         SCHED_ZOMBIE_CHASE_ENEMY,
 
         "	Tasks"
-        "		 TASK_SET_FAIL_SCHEDULE			SCHEDULE:SCHED_CHASE_ENEMY_FAILED"
-        "		 TASK_SET_TOLERANCE_DISTANCE	24"
-        "		 TASK_GET_CHASE_PATH_TO_ENEMY	600"
-        "		 TASK_RUN_PATH					0"
-        "		 TASK_WAIT_FOR_MOVEMENT			0"
-        "		 TASK_FACE_ENEMY				0"
+        "		 TASK_SET_FAIL_SCHEDULE			        SCHEDULE:SCHED_CHASE_ENEMY_FAILED"
+        "		 TASK_ZM_SET_ATTACK_TOLERANCE_DISTANCE	0"
+        "		 TASK_GET_CHASE_PATH_TO_ENEMY	        600"
+        "		 TASK_RUN_PATH					        0"
+        "		 TASK_WAIT_FOR_MOVEMENT			        0"
+        //"		 TASK_FACE_ENEMY				        0" // Wastes time.
         "	"
         "	Interrupts"
         "		COND_ZM_DEFEND_ENEMY_TOOFAR" // ZMRCHANGE
@@ -2267,7 +2291,7 @@ AI_BEGIN_CUSTOM_NPC( zmbase_zombie, CZMBaseZombie )
 
         "	Tasks"
         "		TASK_STOP_MOVING		0"
-        "		TASK_FACE_ENEMY			0"
+        //"		TASK_FACE_ENEMY			0" // We'll be trying to face the enemy WHILE we're attacking anyway.
         "		TASK_ANNOUNCE_ATTACK	1"	// 1 = primary attack
         "		TASK_MELEE_ATTACK1		0"
         "		TASK_SET_SCHEDULE		SCHEDULE:SCHED_ZOMBIE_POST_MELEE_WAIT"

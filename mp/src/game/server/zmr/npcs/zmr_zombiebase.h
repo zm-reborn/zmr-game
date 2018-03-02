@@ -80,6 +80,7 @@ enum
 
     TASK_ZM_DEFEND_PATH_TO_DEFPOS,
     TASK_ZM_SET_TOLERANCE_DISTANCE,
+    TASK_ZM_SET_ATTACK_TOLERANCE_DISTANCE,
 
     LAST_BASE_ZOMBIE_TASK,
 };
@@ -153,6 +154,7 @@ public:
     virtual bool    CanSwatPhysicsObjects() { return false; };
     bool            FindNearestPhysicsObject( int iMaxMass );
     
+    virtual bool    FCanCheckAttacks() OVERRIDE;
     virtual float   GetGoalRepathTolerance( CBaseEntity* pGoalEnt, GoalType_t type, const Vector& curGoal, const Vector& curTargetPos ) OVERRIDE;
     virtual float   GetReactionDelay( CBaseEntity* pEnemy ) OVERRIDE { return 0.0; };
     virtual bool    IsValidEnemy( CBaseEntity* ) OVERRIDE;
