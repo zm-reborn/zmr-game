@@ -50,6 +50,7 @@ static ConVar zm_sv_reward_zombiekill( "zm_sv_reward_zombiekill", "200", FCVAR_N
 static ConVar zm_sv_reward_kill( "zm_sv_reward_kill", "100", FCVAR_NOTIFY | FCVAR_ARCHIVE, "How many points ZM gets when a human dies." );
 #endif
 
+ConVar zm_sv_spawndelay( "zm_sv_spawndelay", "0.6", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE, "How frequently zombie spawns spawn zombies." );
 
 ConVar zm_sv_happyzombies( "zm_sv_happyzombies", "0", FCVAR_REPLICATED, "Happy, happy zombies :)" );
 

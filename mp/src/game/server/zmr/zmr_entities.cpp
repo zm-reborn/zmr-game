@@ -17,7 +17,7 @@
 #include "zmr_entities.h"
 
 
-static ConVar zm_sv_spawndelay( "zm_sv_spawndelay", "0.6", FCVAR_NOTIFY );
+extern ConVar zm_sv_spawndelay;
 
 
 #define MODEL_MANIPULATE        "models/manipulatable.mdl"
