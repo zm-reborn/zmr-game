@@ -31,24 +31,57 @@ static ConVar zm_sv_spawndelay( "zm_sv_spawndelay", "0.6", FCVAR_NOTIFY );
 /*
     func_win
 */
-class CZMEntWin : public CServerOnlyPointEntity
-{
-public:
-	DECLARE_CLASS( CZMEntWin, CServerOnlyPointEntity )
-    DECLARE_DATADESC()
-
-    void Spawn() OVERRIDE;
-
-    void InputHumanWin( inputdata_t &inputdata );
-    void InputHumanLose( inputdata_t &inputdata );
-};
-
 BEGIN_DATADESC( CZMEntWin )
     DEFINE_INPUTFUNC( FIELD_VOID, "Win", InputHumanWin ),
     DEFINE_INPUTFUNC( FIELD_VOID, "Lose", InputHumanLose ),
+
+    DEFINE_OUTPUT( m_OnWin, "OnWin" ),
+    DEFINE_OUTPUT( m_OnLose, "OnLose" ),
+    DEFINE_OUTPUT( m_OnSubmit, "OnSubmit" ),
 END_DATADESC()
 
 LINK_ENTITY_TO_CLASS( func_win, CZMEntWin );
+
+
+void CZMEntWin::OnRoundEnd( ZMRoundEndReason_t reason )
+{
+    // Fire outputs for all func_wins.
+    bool output = false;
+
+    switch ( reason )
+    {
+    case ZMROUND_HUMANLOSE :
+    case ZMROUND_HUMANDEAD :
+    case ZMROUND_HUMANWIN :
+    case ZMROUND_ZMSUBMIT : output = true; break;
+    default : break;
+    }
+
+    if ( !output ) return;
+
+
+    CZMEntWin* pWin;
+    COutputEvent* pEvent;
+    CBaseEntity* pEnt = nullptr;
+    
+    while ( (pEnt = gEntList.FindEntityByClassname( pEnt, "func_win" )) != nullptr )
+    {
+        pWin = dynamic_cast<CZMEntWin*>( pEnt );
+        if ( !pWin ) continue;
+
+
+        switch ( reason )
+        {
+        case ZMROUND_HUMANLOSE :
+        case ZMROUND_HUMANDEAD : pEvent = &(pWin->m_OnLose); break;
+        case ZMROUND_HUMANWIN : pEvent = &(pWin->m_OnWin); break;
+        case ZMROUND_ZMSUBMIT :
+        default : pEvent = &(pWin->m_OnSubmit); break;
+        }
+
+        pEvent->FireOutput( nullptr, nullptr );
+    }
+}
 
 void CZMEntWin::Spawn()
 { 

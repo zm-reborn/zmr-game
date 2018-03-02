@@ -15,6 +15,30 @@ class CZMBaseZombie;
 class CZMEntSpawnNode;
 class CZMEntRallyPoint;
 
+
+/*
+    func_win
+*/
+class CZMEntWin : public CServerOnlyPointEntity
+{
+public:
+	DECLARE_CLASS( CZMEntWin, CServerOnlyPointEntity )
+    DECLARE_DATADESC()
+
+
+    static void OnRoundEnd( ZMRoundEndReason_t reason );
+
+    void Spawn() OVERRIDE;
+
+    void InputHumanWin( inputdata_t &inputdata );
+    void InputHumanLose( inputdata_t &inputdata );
+
+
+    COutputEvent m_OnWin;
+    COutputEvent m_OnLose;
+    COutputEvent m_OnSubmit;
+};
+
 /*
     ZMRTODO: Make networking these ents lighter?
 

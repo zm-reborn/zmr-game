@@ -863,6 +863,10 @@ void CZMRules::EndRound( ZMRoundEndReason_t reason )
 
         gameeventmanager->FireEvent( pEvent, false );
     }
+
+
+    // Send round end outputs for mappers.
+    CZMEntWin::OnRoundEnd( reason );
 }
 
 void CZMRules::RewardResources( int res, bool bLimit )
