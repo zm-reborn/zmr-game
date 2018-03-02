@@ -12,6 +12,12 @@ Tony Sergi		-- Multiplayer friendly animations code
 PazerOP			-- Glow outline performance + feature fixes
 Game Zombie		-- Model edits
 Asg_alligator	-- Model edits
+----------
+Thanks to:
+----------
+Tannerbondy		-- Ideas & inspiration
+ZMR Discord		-- Keeping the game alive
+YOU				-- For playing ;)
 
 ========================================
 Original Zombie Master was developed by:
