@@ -75,12 +75,13 @@ void ZM_Cmd_Target( const CCommand &args )
 
 
     // ZM wants to break it.
-    bool bForceBreakable = atoi( args.Arg( 2 ) ) ? true : false;
+    bool bForceBreak = atoi( args.Arg( 2 ) ) ? true : false;
 
 
     bool bTarget = false; // Just target an enemy.
     bool bSwat = false; // Just swat the object away/towards an enemy.
     bool bBreak = false; // Tell zombie to break this object.
+    bool bIsBreakable = false;
     bool bCanBeDamaged = pTarget->GetHealth() > 0 && pTarget->m_takedamage == DAMAGE_YES;
 
     if ( pTarget->IsPlayer() )
@@ -101,7 +102,8 @@ void ZM_Cmd_Target( const CCommand &args )
             // If we're a physics object and we can't be moved, force to break.
             CBreakable* pBreak = dynamic_cast<CBreakable*>( pTarget );
 
-            bBreak = (phys && !phys->IsMotionEnabled()) || (pBreak && pBreak->IsBreakable());
+            bIsBreakable = pBreak && pBreak->IsBreakable();
+            bBreak = (phys && !phys->IsMotionEnabled()) || bIsBreakable;
         }
     }
 
@@ -123,12 +125,14 @@ void ZM_Cmd_Target( const CCommand &args )
         if ( pZombie->GetSelector() != pPlayer ) continue;
 
 
-        if ( (pZombie->CanSwatPhysicsObjects() && bSwat) || bBreak )
-        {
-            // If we're allowed to swat and we're forced to break it, break it.
-            bool bForcedBreak = pZombie->CanSwatPhysicsObjects() && bForceBreakable;
+        bool bCanSwat = bSwat && pZombie->CanSwatPhysicsObjects();
+        bool bCanBreak = bCanBeDamaged && ( pZombie->CanSwatPhysicsObjects() || bIsBreakable );
 
-            pZombie->Swat( pTarget, bCanBeDamaged && (bBreak || bForcedBreak) );
+        if ( bCanSwat || bCanBreak )
+        {
+            // If we can swat, we need to be forced to break.
+            // If we can't swat, we'll break it!
+            pZombie->Swat( pTarget, (bCanSwat && bForceBreak && bCanBreak) || !bCanSwat );
         }
         else
         {

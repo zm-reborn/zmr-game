@@ -348,9 +348,11 @@ void CZMFrame::OnMouseReleased( MouseCode code )
     {
     case MOUSE_RIGHT :
         OnRightRelease();
+        m_flLastRightClick = gpGlobals->curtime;
         break;
     case MOUSE_LEFT :
         OnLeftRelease();
+        m_flLastLeftClick = gpGlobals->curtime;
         break;
     default : break;
     }
@@ -442,11 +444,9 @@ void CZMFrame::OnMousePressed( MouseCode code )
     {
     case MOUSE_RIGHT :
         OnRightClick();
-        m_flLastRightClick = gpGlobals->curtime;
         break;
     case MOUSE_LEFT :
         OnLeftClick();
-        m_flLastLeftClick = gpGlobals->curtime;
         break;
     default : break;
     }
@@ -764,9 +764,11 @@ void CZMFrame::OnRightRelease()
 
         if ( bObj )
         {
+            bool bForceBreak = IsDoubleClickRight();
+
             engine->ClientCmd( VarArgs( "zm_cmd_target %i %i %.1f %.1f %.1f",
                 pTarget->entindex(),
-                IsDoubleClickRight() ? 1 : 0, // Forced break?
+                bForceBreak ? 1 : 0,
                 end[0], end[1], end[2] ) );
 
 
