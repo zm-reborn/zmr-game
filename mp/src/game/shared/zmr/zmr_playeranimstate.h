@@ -24,6 +24,7 @@ public:
 	void InitZMAnimState( CZMPlayer* pPlayer );
 	CZMPlayer* GetZMPlayer() { return m_pZMPlayer; };
 
+    virtual bool ShouldUpdateAnimState() OVERRIDE;
 	virtual void ClearAnimationState() OVERRIDE;
 	virtual Activity TranslateActivity( Activity actDesired ) OVERRIDE;
 	virtual void Update( float eyeYaw, float eyePitch ) OVERRIDE;
