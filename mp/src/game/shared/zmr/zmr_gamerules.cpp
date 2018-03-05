@@ -636,6 +636,9 @@ void CZMRules::OnClientFinishedPutInServer( CZMPlayer* pPlayer )
     if ( latespawn )
     {
         pPlayer->ChangeTeam( ZMTEAM_HUMAN );
+
+        // Increase pick priority here as well.
+        pPlayer->SetPickPriority( pPlayer->GetPickPriority() + 1 );
     }
 }
 
