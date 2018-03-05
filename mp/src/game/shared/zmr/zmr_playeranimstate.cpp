@@ -11,10 +11,8 @@
 #include "zmr_playeranimstate.h"
 
 #include "zmr_player_shared.h"
+#include "zmr/zmr_shareddefs.h"
 
-#define HL2MP_RUN_SPEED				320.0f
-#define HL2MP_WALK_SPEED			75.0f
-#define HL2MP_CROUCHWALK_SPEED		110.0f
 
 // Don't let the head spass out.
 #define ZM_LOOKAT_UPDATE_TIME       0.1f
@@ -33,8 +31,8 @@ CZMPlayerAnimState* CreateZMPlayerAnimState( CZMPlayer* pPlayer )
     // Setup the movement data.
     MultiPlayerMovementData_t movementData;
     movementData.m_flBodyYawRate = 720.0f;
-    movementData.m_flRunSpeed = HL2MP_RUN_SPEED;
-    movementData.m_flWalkSpeed = HL2MP_WALK_SPEED;
+    movementData.m_flRunSpeed = ZM_WALK_SPEED;
+    movementData.m_flWalkSpeed = ZM_WALK_SPEED;
     movementData.m_flSprintSpeed = -1.0f;
 
     // Create animation state for this player.
@@ -91,6 +89,25 @@ void CZMPlayerAnimState::InitZMAnimState( CZMPlayer* pPlayer )
     m_flLastBodyYaw = 0.0f;
     m_flCurrentHeadYaw = 0.0f;
     m_flCurrentHeadPitch = 0.0f;
+}
+
+
+bool CZMPlayerAnimState::ShouldUpdateAnimState()
+{
+    // Being ZM != EF_NODRAW.
+    if ( m_pZMPlayer->IsEffectActive( EF_NODRAW ) )
+        return false;
+
+    if ( m_pZMPlayer->IsZM() || m_pZMPlayer->IsObserver() )
+        return false;
+
+    // Why would we update anims if we're not getting updates from server
+#ifdef CLIENT_DLL
+    if ( m_pZMPlayer->IsDormant() )
+        return false;
+#endif
+
+    return m_pZMPlayer->IsAlive() || m_bDying;
 }
 
 //-----------------------------------------------------------------------------
@@ -252,7 +269,7 @@ void CZMPlayerAnimState::DoAnimationEvent( PlayerAnimEvent_t playerAnim, int nDa
     case PLAYERANIMEVENT_RELOAD:
         {
             // Weapon reload.
-            if ( GetBasePlayer()->GetFlags() & FL_DUCKING )
+            if ( m_pZMPlayer->GetFlags() & FL_DUCKING )
                 RestartGesture( GESTURE_SLOT_ATTACK_AND_RELOAD, ACT_MP_RELOAD_CROUCH );
             else
                 RestartGesture( GESTURE_SLOT_ATTACK_AND_RELOAD, ACT_MP_RELOAD_STAND );
@@ -261,7 +278,7 @@ void CZMPlayerAnimState::DoAnimationEvent( PlayerAnimEvent_t playerAnim, int nDa
     case PLAYERANIMEVENT_RELOAD_LOOP:
         {
             // Weapon reload.
-            if ( GetBasePlayer()->GetFlags() & FL_DUCKING )
+            if ( m_pZMPlayer->GetFlags() & FL_DUCKING )
                 RestartGesture( GESTURE_SLOT_ATTACK_AND_RELOAD, ACT_MP_RELOAD_CROUCH_LOOP );
             else
                 RestartGesture( GESTURE_SLOT_ATTACK_AND_RELOAD, ACT_MP_RELOAD_STAND_LOOP );
@@ -270,7 +287,7 @@ void CZMPlayerAnimState::DoAnimationEvent( PlayerAnimEvent_t playerAnim, int nDa
     case PLAYERANIMEVENT_RELOAD_END:
         {
             // Weapon reload.
-            if ( GetBasePlayer()->GetFlags() & FL_DUCKING )
+            if ( m_pZMPlayer->GetFlags() & FL_DUCKING )
                 RestartGesture( GESTURE_SLOT_ATTACK_AND_RELOAD, ACT_MP_RELOAD_CROUCH_END );
             else
                 RestartGesture( GESTURE_SLOT_ATTACK_AND_RELOAD, ACT_MP_RELOAD_STAND_END );
@@ -311,7 +328,7 @@ bool CZMPlayerAnimState::HandleSwimming( Activity &idealActivity )
     //return bInWater;
 
     // ZMRCHANGE: We don't have any swimming animations.
-    if ( GetBasePlayer()->GetWaterLevel() >= WL_Waist )
+    if ( m_pZMPlayer->GetWaterLevel() >= WL_Waist )
     {
         idealActivity = ACT_MP_JUMP;
         return true; 
@@ -431,32 +448,32 @@ bool CZMPlayerAnimState::SetupPoseParameters( CStudioHdr *pStudioHdr )
         return false;
 
     // Tony; just set them both to the same for now.
-    m_PoseParameterData.m_iMoveX = GetBasePlayer()->LookupPoseParameter( pStudioHdr, "move_yaw" );
-    m_PoseParameterData.m_iMoveY = GetBasePlayer()->LookupPoseParameter( pStudioHdr, "move_yaw" );
+    m_PoseParameterData.m_iMoveX = m_pZMPlayer->LookupPoseParameter( pStudioHdr, "move_yaw" );
+    m_PoseParameterData.m_iMoveY = m_pZMPlayer->LookupPoseParameter( pStudioHdr, "move_yaw" );
     if ( ( m_PoseParameterData.m_iMoveX < 0 ) || ( m_PoseParameterData.m_iMoveY < 0 ) )
         return false;
 
     // Look for the aim pitch blender.
-    m_PoseParameterData.m_iAimPitch = GetBasePlayer()->LookupPoseParameter( pStudioHdr, "aim_pitch" );
+    m_PoseParameterData.m_iAimPitch = m_pZMPlayer->LookupPoseParameter( pStudioHdr, "aim_pitch" );
     if ( m_PoseParameterData.m_iAimPitch < 0 )
         return false;
 
     // Look for aim yaw blender.
-    m_PoseParameterData.m_iAimYaw = GetBasePlayer()->LookupPoseParameter( pStudioHdr, "aim_yaw" );
+    m_PoseParameterData.m_iAimYaw = m_pZMPlayer->LookupPoseParameter( pStudioHdr, "aim_yaw" );
     if ( m_PoseParameterData.m_iAimYaw < 0 )
         return false;
 
 #ifdef CLIENT_DLL
     // ZMR
-    m_headYawPoseParam = GetBasePlayer()->LookupPoseParameter( "head_yaw" );
+    m_headYawPoseParam = m_pZMPlayer->LookupPoseParameter( "head_yaw" );
     if ( m_headYawPoseParam < 0 )
         return false;
-    GetBasePlayer()->GetPoseParameterRange( m_headYawPoseParam, m_headYawMin, m_headYawMax );
+    m_pZMPlayer->GetPoseParameterRange( m_headYawPoseParam, m_headYawMin, m_headYawMax );
 
-    m_headPitchPoseParam = GetBasePlayer()->LookupPoseParameter( "head_pitch" );
+    m_headPitchPoseParam = m_pZMPlayer->LookupPoseParameter( "head_pitch" );
     if ( m_headPitchPoseParam < 0 )
         return false;
-    GetBasePlayer()->GetPoseParameterRange( m_headPitchPoseParam, m_headPitchMin, m_headPitchMax );
+    m_pZMPlayer->GetPoseParameterRange( m_headPitchPoseParam, m_headPitchMin, m_headPitchMax );
 #endif
 
     m_bPoseParameterInit = true;
@@ -509,7 +526,9 @@ void CZMPlayerAnimState::EstimateYaw()
     // Get the player's velocity and angles.
     Vector vecEstVelocity;
     GetOuterAbsVelocity( vecEstVelocity );
-    QAngle angles = GetBasePlayer()->GetLocalAngles();
+    // ZMRCHANGE: Use eye yaw.
+    //QAngle angles = GetBasePlayer()->GetLocalAngles();
+    QAngle angles = QAngle( 0.0f, m_flEyeYaw, 0.0f );
 
     if ( vecEstVelocity.y == 0 && vecEstVelocity.x == 0 )
     {
@@ -614,7 +633,7 @@ void CZMPlayerAnimState::ComputePoseParam_MoveYaw( CStudioHdr *pStudioHdr )
     }
 
     //Tony; oops, i inverted this previously above.
-    GetBasePlayer()->SetPoseParameter( pStudioHdr, m_PoseParameterData.m_iMoveY, flYaw );
+    m_pZMPlayer->SetPoseParameter( pStudioHdr, m_PoseParameterData.m_iMoveY, flYaw );
 
 #endif
     
@@ -629,7 +648,7 @@ void CZMPlayerAnimState::ComputePoseParam_AimPitch( CStudioHdr *pStudioHdr )
     float flAimPitch = m_flEyePitch;
 
     // Set the aim pitch pose parameter and save.
-    GetBasePlayer()->SetPoseParameter( pStudioHdr, m_PoseParameterData.m_iAimPitch, flAimPitch );
+    m_pZMPlayer->SetPoseParameter( pStudioHdr, m_PoseParameterData.m_iAimPitch, flAimPitch );
     m_DebugAnimData.m_flAimPitch = flAimPitch;
 }
 
@@ -698,7 +717,7 @@ void CZMPlayerAnimState::ComputePoseParam_AimYaw( CStudioHdr *pStudioHdr )
     flAimYaw = AngleNormalize( flAimYaw );
 
     // Set the aim yaw and save.
-    GetBasePlayer()->SetPoseParameter( pStudioHdr, m_PoseParameterData.m_iAimYaw, flAimYaw );
+    m_pZMPlayer->SetPoseParameter( pStudioHdr, m_PoseParameterData.m_iAimYaw, flAimYaw );
     m_DebugAnimData.m_flAimYaw	= flAimYaw;
     m_flCurrentAimYaw = flAimYaw;
 
@@ -706,10 +725,10 @@ void CZMPlayerAnimState::ComputePoseParam_AimYaw( CStudioHdr *pStudioHdr )
     m_bForceAimYaw = false;
 
 #ifndef CLIENT_DLL
-    QAngle angle = GetBasePlayer()->GetAbsAngles();
+    QAngle angle = m_pZMPlayer->GetAbsAngles();
     angle[YAW] = m_flCurrentFeetYaw;
 
-    GetBasePlayer()->SetAbsAngles( angle );
+    m_pZMPlayer->SetAbsAngles( angle );
 #endif
 }
 
@@ -835,13 +854,13 @@ void CZMPlayerAnimState::ComputePoseParam_Head( CStudioHdr* hdr )
 //-----------------------------------------------------------------------------
 float CZMPlayerAnimState::GetCurrentMaxGroundSpeed()
 {
-    CStudioHdr *pStudioHdr = GetBasePlayer()->GetModelPtr();
+    CStudioHdr *pStudioHdr = m_pZMPlayer->GetModelPtr();
 
     if ( pStudioHdr == NULL )
         return 1.0f;
 
 //	float prevX = GetBasePlayer()->GetPoseParameter( m_PoseParameterData.m_iMoveX );
-    float prevY = GetBasePlayer()->GetPoseParameter( m_PoseParameterData.m_iMoveY );
+    float prevY = m_pZMPlayer->GetPoseParameter( m_PoseParameterData.m_iMoveY );
 
     float d = sqrt( /*prevX * prevX + */prevY * prevY );
     float newY;//, newX;
@@ -857,12 +876,12 @@ float CZMPlayerAnimState::GetCurrentMaxGroundSpeed()
     }
 
 //	GetBasePlayer()->SetPoseParameter( pStudioHdr, m_PoseParameterData.m_iMoveX, newX );
-    GetBasePlayer()->SetPoseParameter( pStudioHdr, m_PoseParameterData.m_iMoveY, newY );
+    m_pZMPlayer->SetPoseParameter( pStudioHdr, m_PoseParameterData.m_iMoveY, newY );
 
-    float speed = GetBasePlayer()->GetSequenceGroundSpeed( GetBasePlayer()->GetSequence() );
+    float speed = m_pZMPlayer->GetSequenceGroundSpeed( m_pZMPlayer->GetSequence() );
 
 //	GetBasePlayer()->SetPoseParameter( pStudioHdr, m_PoseParameterData.m_iMoveX, prevX );
-    GetBasePlayer()->SetPoseParameter( pStudioHdr, m_PoseParameterData.m_iMoveY, prevY );
+    m_pZMPlayer->SetPoseParameter( pStudioHdr, m_PoseParameterData.m_iMoveY, prevY );
 
     return speed;
 }
