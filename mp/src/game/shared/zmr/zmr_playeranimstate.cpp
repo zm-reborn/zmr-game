@@ -18,6 +18,8 @@
 
 // Don't let the head spass out.
 #define ZM_LOOKAT_UPDATE_TIME       0.1f
+#define ZM_LOOKAT_DIST              100.0f
+#define ZM_LOOKAT_DOT               0.5f // < 0 is way too big of an angle.
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -698,6 +700,7 @@ void CZMPlayerAnimState::ComputePoseParam_AimYaw( CStudioHdr *pStudioHdr )
     // Set the aim yaw and save.
     GetBasePlayer()->SetPoseParameter( pStudioHdr, m_PoseParameterData.m_iAimYaw, flAimYaw );
     m_DebugAnimData.m_flAimYaw	= flAimYaw;
+    m_flCurrentAimYaw = flAimYaw;
 
     // Turn off a force aim yaw - either we have already updated or we don't need to.
     m_bForceAimYaw = false;
@@ -751,13 +754,12 @@ void CZMPlayerAnimState::UpdateLookAt()
 
         Vector vDir = vTargetOrigin - vMyOrigin;
         
-        if ( vDir.Length() > 192.0f ) 
+        if ( vDir.LengthSqr() > (ZM_LOOKAT_DIST*ZM_LOOKAT_DIST) ) 
             continue;
 
         VectorNormalize( vDir );
 
-        // < 0 is way too big of an angle.
-        if ( DotProduct( vForward, vDir ) < 0.5f )
+        if ( DotProduct( vForward, vDir ) < ZM_LOOKAT_DOT )
                 continue;
 
         m_vLookAtTarget = pPlayer->EyePosition();
@@ -804,7 +806,8 @@ void CZMPlayerAnimState::ComputePoseParam_Head( CStudioHdr* hdr )
     
 
     // Set the head's yaw.
-    float desired = AngleNormalize( desiredAngles[YAW] - bodyAngles[YAW] );
+    // Take into account aim yaw.
+    float desired = AngleNormalize( desiredAngles[YAW] - bodyAngles[YAW] - m_flCurrentAimYaw );
     desired = clamp( desired, m_headYawMin, m_headYawMax );
     m_flCurrentHeadYaw = ApproachAngle( desired, m_flCurrentHeadYaw, 130 * gpGlobals->frametime );
 
