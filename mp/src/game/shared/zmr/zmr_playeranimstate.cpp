@@ -727,7 +727,7 @@ void CZMPlayerAnimState::UpdateLookAt()
     bool bFoundViewTarget = false;
     
     Vector vForward;
-    AngleVectors( m_pZMPlayer->GetLocalAngles(), &vForward );
+    AngleVectors( m_pZMPlayer->EyeAngles(), &vForward );
 
     Vector vMyOrigin = m_pZMPlayer->GetAbsOrigin();
 
