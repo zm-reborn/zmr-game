@@ -1270,14 +1270,24 @@ bool CZMRules::IsSpawnPointValid( CBaseEntity* pSpot, CBasePlayer* pPlayer )
             if ( pEntity == pPass )
                 return false;
 
-            if ( pEntity && pEntity->IsPlayer() )
+            if ( pEntity )
             {
-                if ( pEntity->IsEffectActive( EF_NODRAW ) )
+                if ( pEntity->IsPlayer() )
+                {
+                    if ( pEntity->IsEffectActive( EF_NODRAW ) )
+                        return false;
+
+
+                    return true;
+                }
+
+                // HACK: Some map that shall remain unnamed uses func_brush to freeze players at round start.
+                if ( pEntity->IsBSPModel() )
+                {
                     return false;
-
-
-                return true;
+                }
             }
+
 
             return CTraceFilterSimple::ShouldHitEntity( pHandleEntity, contentsMask );
         }
