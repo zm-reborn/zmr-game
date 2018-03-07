@@ -19,9 +19,10 @@
 
 #include "voice_status.h"
 #include "vgui_avatarimage.h"
+#include "inputsystem/iinputsystem.h"
+#include "clientmode_shared.h"
 
 #include "zmr/zmr_shareddefs.h"
-
 #include "zmr/zmr_gamerules.h"
 
 #include "zmr_listpanel.h"
@@ -106,7 +107,8 @@ int CZMAvatarList::FindAvatarBySteamId( CSteamID id )
 }
 
 
-CZMClientScoreBoardDialog::CZMClientScoreBoardDialog( IViewPort* pViewPort ) : EditablePanel( nullptr, PANEL_SCOREBOARD )
+// NOTE: We have to be a frame to enable mouse input.
+CZMClientScoreBoardDialog::CZMClientScoreBoardDialog( IViewPort* pViewPort ) : Frame( nullptr, PANEL_SCOREBOARD )
 {
     // Has to be set to load fonts correctly.
     SetScheme( vgui::scheme()->LoadSchemeFromFile( "resource/ClientScheme.res", "ClientScheme" ) );
@@ -118,6 +120,9 @@ CZMClientScoreBoardDialog::CZMClientScoreBoardDialog( IViewPort* pViewPort ) : E
     ListenForGameEvent( "server_spawn" );
 
 
+    SetCloseButtonVisible( false );
+    SetKeyBoardInputEnabled( false );
+    SetMouseInputEnabled( false );
     SetProportional( true );
 
 
@@ -135,6 +140,17 @@ CZMClientScoreBoardDialog::CZMClientScoreBoardDialog( IViewPort* pViewPort ) : E
 
     LoadControlSettings( "resource/ui/zmscoreboard.res" );
 
+
+    // Completely hide the close button.
+    Button* pButton = dynamic_cast<Button*>( FindChildByName( "frame_close" ) );
+    if ( pButton )
+    {
+        pButton->SetEnabled( false ); // Can't be clicked.
+        pButton->SetPaintBorderEnabled( false ); // Hide border.
+        pButton->SetPaintEnabled( false ); // For some reason if we have it disabled, it'll draw a cross. Thanks, Valve.
+    }
+
+
     m_pList = dynamic_cast<CZMListPanel*>( FindChildByName( "PlayerList" ) );
     Assert( m_pList );
 
@@ -144,6 +160,14 @@ CZMClientScoreBoardDialog::CZMClientScoreBoardDialog( IViewPort* pViewPort ) : E
 
     m_pList->SetSectionSortingFunc( m_iSectionZM, SortZMSection );
     m_pList->SetSectionSortingFunc( m_iSectionHuman, SortHumanSection );
+
+    m_pList->SetMouseInputEnabled( true );
+    m_pList->SetSectionMouseInputEnabled( m_iSectionHuman, true );
+    m_pList->SetSectionMouseInputEnabled( m_iSectionZM, true );
+
+
+    m_iVoiceOff = m_pList->AddImage( scheme()->GetImage( "zmr_misc/voice_off", true ) );
+    m_iVoiceOn = m_pList->AddImage( scheme()->GetImage( "zmr_misc/voice_on", true ) );
 }
 
 CZMClientScoreBoardDialog::~CZMClientScoreBoardDialog()
@@ -185,6 +209,31 @@ void CZMClientScoreBoardDialog::OnListLayout( KeyValues* kv )
     PerformLayout();
 }
 
+void CZMClientScoreBoardDialog::OnRowItemPressed( KeyValues* kv )
+{
+#ifdef _DEBUG
+    DevMsg( "On Row Item Pressed (Scoreboard)\n" );
+#endif
+    //if ( kv->GetInt( "pressed_index" ) )
+    ToggleVoiceMute( kv->GetInt( m_iPlayerIndexSymbol ) );
+}
+
+void CZMClientScoreBoardDialog::OnThink()
+{
+    BaseClass::OnThink();
+    
+
+    // HACK: Enable mouse input on right click.
+    if ( IsVisible() && g_pInputSystem->IsButtonDown( MOUSE_RIGHT ) && (gpGlobals->curtime - m_flLastMouseToggle) > 0.2f )
+    {
+        bool toggle = !IsMouseInputEnabled();
+
+        SetMouseInputEnabled( toggle );
+
+        m_flLastMouseToggle = gpGlobals->curtime;
+    }
+}
+
 void CZMClientScoreBoardDialog::Reset()
 {
     Update();
@@ -222,7 +271,8 @@ void CZMClientScoreBoardDialog::ShowPanel( bool bShow )
     {
         SetVisible( false );
         SetMouseInputEnabled( false );
-        SetKeyBoardInputEnabled( false );
+
+        m_flLastMouseToggle = 0.0f;
     }
 }
 
@@ -326,6 +376,11 @@ void CZMClientScoreBoardDialog::PaintBackground()
 
     // Actual background.
     surface()->DrawFilledRect( x, y, x + w, y + h );
+}
+
+void CZMClientScoreBoardDialog::ToggleVoiceMute( int playerIndex )
+{
+    GetClientVoiceMgr()->SetPlayerBlockedState( playerIndex, !GetClientVoiceMgr()->IsPlayerBlocked( playerIndex ) );
 }
 
 int CZMClientScoreBoardDialog::FindPlayerItem( int playerIndex )
@@ -468,10 +523,26 @@ void CZMClientScoreBoardDialog::GetPlayerScoreInfo( int playerIndex, KeyValues* 
 
 	kv->SetInt( "deaths", g_PR->GetDeaths( playerIndex ) );
 
-    if ( g_PR->IsFakePlayer( playerIndex ) )
+
+    bool bIsLocal = GetLocalPlayerIndex() == playerIndex;
+    bool bIsBot = g_PR->IsFakePlayer( playerIndex );
+
+    if ( bIsBot )
         kv->SetString( "ping", "BOT" );
     else
         kv->SetInt( "ping", g_PR->GetPing( playerIndex ) );
+
+
+    int iMuteIcon = -1;
+#ifdef _DEBUG // For testing
+    if ( bIsLocal == bIsLocal )
+#else
+    if ( !bIsLocal && !bIsBot )
+#endif
+        iMuteIcon = GetClientVoiceMgr()->IsPlayerBlocked( playerIndex ) ? m_iVoiceOff : m_iVoiceOn;
+
+
+    kv->SetInt( "mutestatus", iMuteIcon );
 }
 
 void CZMClientScoreBoardDialog::UpdatePlayerAvatar( int playerIndex, KeyValues* kv )

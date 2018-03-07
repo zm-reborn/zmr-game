@@ -37,10 +37,10 @@ private:
 
 
 
-class CZMClientScoreBoardDialog : public vgui::EditablePanel, public IViewPortPanel, public CGameEventListener
+class CZMClientScoreBoardDialog : public vgui::Frame, public IViewPortPanel, public CGameEventListener
 {
 private:
-    DECLARE_CLASS_SIMPLE( CZMClientScoreBoardDialog, vgui::EditablePanel );
+    DECLARE_CLASS_SIMPLE( CZMClientScoreBoardDialog, vgui::Frame );
     
 public:
     CZMClientScoreBoardDialog( IViewPort* pViewPort );
@@ -60,8 +60,8 @@ public:
 
     virtual void        ApplySchemeSettings( vgui::IScheme* pScheme ) OVERRIDE;
     virtual void        FireGameEvent( IGameEvent* event ) OVERRIDE;
-
-
+    
+    virtual void        OnThink() OVERRIDE;
     virtual void        Reset() OVERRIDE;
     virtual void        Update() OVERRIDE;
     virtual bool        NeedsUpdate() OVERRIDE;
@@ -69,13 +69,15 @@ public:
 
 
     MESSAGE_FUNC_PARAMS( OnListLayout, "OnListLayout", kv );
+    MESSAGE_FUNC_PARAMS( OnRowItemPressed, "OnRowItemPressed", kv );
 
 private:
     void UpdateStats(); // Stuff that is static and doesn't change during the map.
     void UpdateMapStats(); // Stuff that may change while we're playing.
 
-    int FindPlayerItem( int playerIndex );
-    int TeamToSection( int iTeam );
+    void    ToggleVoiceMute( int playerIndex );
+    int     FindPlayerItem( int playerIndex );
+    int     TeamToSection( int iTeam );
 
     void UpdateScoreboard();
 
@@ -88,6 +90,7 @@ private:
 
     int     m_iPlayerIndexSymbol;
     float   m_flNextUpdateTime;
+    float   m_flLastMouseToggle;
 
     int     m_iSectionZM;
     int     m_iSectionHuman;
@@ -98,4 +101,6 @@ private:
 
     
     CZMAvatarList  m_Avatars;
+    int m_iVoiceOff;
+    int m_iVoiceOn;
 };

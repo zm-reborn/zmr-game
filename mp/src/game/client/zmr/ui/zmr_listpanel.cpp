@@ -16,7 +16,7 @@ using namespace vgui;
 /*
     Item
 */
-CZMListRow::CZMListRow( CZMListSection* parent, int itemId, KeyValues* kv ) : vgui::Label( parent, nullptr, "<unset constructor>" )
+CZMListRow::CZMListRow( CZMListSection* parent, int itemId, KeyValues* kv ) : vgui::Panel( parent, "" )
 {
     m_pParentSection = parent;
 
@@ -31,6 +31,7 @@ CZMListRow::CZMListRow( CZMListSection* parent, int itemId, KeyValues* kv ) : vg
 
 
     SetPaintBackgroundEnabled( false );
+    SetMouseInputEnabled( true );
 }
 
 CZMListRow::~CZMListRow()
@@ -44,6 +45,8 @@ CZMListRow::~CZMListRow()
         m_pKvData->deleteThis();
         m_pKvData = nullptr;
     }
+
+    m_vChildren.PurgeAndDeleteElements();
 }
 
 void CZMListRow::SetData( KeyValues* kv )
@@ -99,13 +102,62 @@ int CZMListRow::GetItemColumnCount()
     return ( GetSection()->GetNumColumns() > 0 ) ? GetSection()->GetNumColumns() : 1;
 }
 
+void CZMListRow::OnMousePressed( vgui::MouseCode code )
+{
+    if ( m_iLastHovered == -1 )
+        return;
+
+#ifdef _DEBUG
+    DevMsg( "On Row Item Pressed\n" );
+#endif
+
+
+    KeyValues* kv = nullptr;
+    if ( m_pKvData )
+    {
+        kv = m_pKvData->MakeCopy();
+        kv->SetName( "OnRowItemPressed" );
+    }
+    else
+    {
+        kv = new KeyValues( "OnRowItemPressed" );
+    }
+
+    kv->SetInt( "pressed_index", m_iLastHovered );
+
+    Panel* pParent = GetSection()->GetParent()->GetParent();
+    PostMessage( pParent, kv );
+}
+
+void CZMListRow::OnCursorMoved( int x, int y )
+{
+    int nCols = GetItemColumnCount();
+
+    for ( int i = 0; i < nCols; i++ )
+    {
+        if ( GetSection()->GetColumnFlags( i ) & COLUMN_CLICKABLE )
+        {
+            Panel* pChild = m_vChildren[i];
+
+            if ( pChild->IsCursorOver() )
+            {
+                SetCursor( dc_hand );
+                m_iLastHovered = i;
+
+                return;
+            }
+        }
+    }
+
+    SetCursor( dc_arrow );
+    m_iLastHovered = -1;
+}
+
 void CZMListRow::PerformLayout()
 {
     if ( !m_pKvData )
     {
         Assert( 0 );
-
-        SetText( "<no kv>" );
 
         BaseClass::PerformLayout();
         return;
@@ -114,8 +166,6 @@ void CZMListRow::PerformLayout()
     if ( GetItemColumnCount() < 1 )
     {
         Assert( 0 );
-
-        SetText( "<no cols>" );
 
         BaseClass::PerformLayout();
         return;
@@ -133,69 +183,89 @@ void CZMListRow::LayoutColumnData()
 {
     int nCols = GetItemColumnCount();
 
+    for ( int i = 0; i < nCols; i++ )
+    {
+        if ( i >= m_vChildren.Count() )
+        {
+            CreateNewChild( i );
+        }
 
+        Panel* pChild = m_vChildren[i];
+        pChild->SetMouseInputEnabled( false );
+
+        Label* pLabel = dynamic_cast<Label*>( pChild );
+
+        if ( pLabel )
+        {
+            ColumnDataLabel( i, pLabel );
+        }
+    }
+}
+
+void CZMListRow::ColumnDataLabel( int column, Label* pLabel )
+{
     Color clr = GetItemColor();
     if ( clr[3] < 1 )
         clr = GetFgColor();
 
-
-    HFont usefont = GetFont();
+    HFont usefont = GetSection()->GetDefaultFont();
     if ( GetItemFont() > NULL )
         usefont = GetItemFont();
-    else if ( GetSection()->GetDefaultFont() > NULL )
-        usefont = GetSection()->GetDefaultFont();
 
 
-    SetFgColor( clr );
-    SetFont( usefont );
 
-    for ( int i = 0; i < nCols; i++ )
-    {
-        TextImage* pTextImage = nullptr;
-        IImage* pImage = GetImageAtIndex( i );
+    if ( usefont > NULL )
+        pLabel->SetFont( usefont );
 
-        const bool bIsImg = ( GetSection()->GetColumnFlags( i ) & COLUMN_IMG ) != 0;
+    pLabel->SetFgColor( clr );
+
+
+    TextImage* pTextImage = nullptr;
+    IImage* pImage = pLabel->GetImageAtIndex( 0 );
+
+    const bool bIsImg = ( GetSection()->GetColumnFlags( column ) & COLUMN_IMG ) != 0;
         
-        const char* colName = GetSection()->GetColumnName( i );
+    const char* colName = GetSection()->GetColumnName( column );
 
 
-        pTextImage = ( pImage || bIsImg ) ? dynamic_cast<TextImage*>( pImage ) : (new TextImage( "" ));
+    pTextImage = ( pImage || bIsImg ) ? dynamic_cast<TextImage*>( pImage ) : (new TextImage( "" ));
 
-        if ( bIsImg )
-        {
-            // First image is always a text image. Remove it if we want an image there.
-            if ( pTextImage )
-            {
-                delete pTextImage;
-                pTextImage = nullptr;
-            }
-
-            pImage = nullptr;
-
-
-            // Find the image and set it.
-            int index = m_pKvData->GetInt( colName, -1 );
-
-            ImageList* list = GetSection()->GetListPanel()->GetImageList();
-            if ( list && list->IsValidIndex( index ) )
-            {
-                pImage = list->GetImage( index );
-                SetImageAtIndex( i, pImage, 0 );
-            }
-        }
-
+    if ( bIsImg )
+    {
+        // First image is always a text image. Remove it if we want an image there.
         if ( pTextImage )
         {
-            pTextImage->SetText( m_pKvData->GetString( colName, "" ) );
-            pTextImage->SetColor( clr );
-            pTextImage->SetFont( usefont );
+            //delete pTextImage; // Can't delete it because label destructor will do it for us.
+            pLabel->SetImageAtIndex( 0, nullptr, 0 );
 
-            pImage = pTextImage;
+            pTextImage = nullptr;
         }
 
+        pImage = nullptr;
 
-        SetImageAtIndex( i, pImage, 0 );
+
+        // Find the image and set it.
+        int index = m_pKvData->GetInt( colName, -1 );
+
+        ImageList* list = GetSection()->GetListPanel()->GetImageList();
+        if ( list && list->IsValidIndex( index ) )
+        {
+            pImage = list->GetImage( index );
+            pLabel->SetImageAtIndex( 0, pImage, 0 );
+        }
     }
+
+    if ( pTextImage )
+    {
+        pTextImage->SetText( m_pKvData->GetString( colName, "" ) );
+        pTextImage->SetColor( clr );
+        pTextImage->SetFont( usefont );
+
+        pImage = pTextImage;
+    }
+
+
+    pLabel->SetImageAtIndex( 0, pImage, 0 );
 }
 
 void CZMListRow::LayoutColumns()
@@ -231,9 +301,14 @@ void CZMListRow::LayoutColumns()
 void CZMListRow::LayoutColumn( int i, int& x, int lastx )
 {
     int xpos = x;
+    Panel* pChild = m_vChildren[i];
+    Label* pLabel = dynamic_cast<Label*>( pChild );
 
 
-    IImage* pImage = GetImageAtIndex( i );
+    IImage* pImage = nullptr;
+    if ( pLabel )
+        pImage = pLabel->GetImageAtIndex( 0 );
+
     TextImage* pTextImage = dynamic_cast<TextImage*>( pImage );
     
     int colWidth = GetColumnWidth( i );
@@ -291,7 +366,37 @@ void CZMListRow::LayoutColumn( int i, int& x, int lastx )
         pTextImage->ResizeImageToContentMaxWidth( wide );
     }
     
-    SetImageBounds( i, xpos + offset, wide );
+
+    pChild->SetBounds( xpos, 0, wide, GetTall() );
+
+    if ( pLabel )
+        pLabel->SetImageBounds( 0, offset, wide );
+}
+
+void CZMListRow::CreateNewChild( int index, int type )
+{
+    if ( m_vChildren.IsValidIndex( index ) || index < 0 )
+        return;
+
+
+    while ( !m_vChildren.IsValidIndex( index ) )
+    {
+        m_vChildren.AddToTail( nullptr );
+    }
+
+    Panel* pChild = nullptr;
+
+    // Add shit here if need be.
+    switch ( type )
+    {
+    case 0 :
+    default :
+        pChild = new Label( this, "", L"" );
+    }
+
+    
+
+    m_vChildren[index] = pChild;
 }
 
 int CZMListRow::GetColumnWidth( int col )
@@ -527,6 +632,7 @@ CZMListPanel::CZMListPanel( Panel* parent, const char* name ) : BaseClass( paren
     m_pImageList = new CZMImageList();
 
 
+    SetMouseInputEnabled( false );
     SetPaintBackgroundEnabled( false );
 
     // Has to be set to load fonts correctly.
@@ -597,6 +703,7 @@ void CZMListPanel::ApplySettings( KeyValues* inKv )
             flags |= ( col->GetInt( "colalign_right" ) ? COLUMN_IMGALIGN_RIGHT : 0 );
             flags |= ( col->GetInt( "is_image" ) ? COLUMN_IMG : 0 );
             flags |=  ( col->GetInt( "stretch_right" ) ? COLUMN_STRETCH_RIGHT : 0 );
+            flags |= ( col->GetInt( "clickable" ) ? COLUMN_CLICKABLE : 0 );
 
             AddColumn(
                 iSection,
@@ -740,6 +847,19 @@ void CZMListPanel::SetSectionTopMargin( int section, int margin )
 void CZMListPanel::SetSectionBottomMargin( int section, int margin )
 {
     m_vSections[section]->SetBottomMargin( margin );
+}
+
+void CZMListPanel::SetSectionMouseInputEnabled( int section, bool state )
+{
+    auto* pSection = m_vSections[section];
+    pSection->SetMouseInputEnabled( state );
+    /*
+    int nItems = pSection->GetNumItems();
+    for ( int i = 0; i < nItems; i++ )
+    {
+        pSection->GetItem( i )->SetMouseInputEnabled( state );
+    }
+    */
 }
 
 int CZMListPanel::AddColumn( int section, const char* name, int width, int flags, int xoffset )

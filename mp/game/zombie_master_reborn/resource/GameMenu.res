@@ -12,29 +12,29 @@
 		"command" "Disconnect"
 		"OnlyInGame" "1"
 	}
+	//"3"
+	//{
+	//	"label" "#GameUI_GameMenu_PlayerList"
+	//	"command" "OpenPlayerListDialog"
+	//	"OnlyInGame" "1"
+	//}
 	"3"
-	{
-		"label" "#GameUI_GameMenu_PlayerList"
-		"command" "OpenPlayerListDialog"
-		"OnlyInGame" "1"
-	}
-	"4"
 	{
 		"label" ""
 		"command" ""
 		"OnlyInGame" "1"
 	}
-	"5"
+	"4"
 	{
 		"label" "#GameUI_GameMenu_FindServers"
 		"command" "OpenServerBrowser"
 	}
-	"6"
+	"5"
 	{
 		"label" "#GameUI_GameMenu_CreateServer"
 		"command" "OpenCreateMultiplayerGameDialog"
 	}
-	"7"
+	"6"
 	{
 		"label" "#GameUI_GameMenu_ActivateVR"
 		"command" "engine vr_activate"
@@ -42,7 +42,7 @@
 		"OnlyWhenVREnabled" "1"
 		"OnlyWhenVRInactive" "1"
 	}
-	"8"
+	"7"
 	{
 		"label" "#GameUI_GameMenu_DeactivateVR"
 		"command" "engine vr_deactivate"
@@ -50,17 +50,17 @@
 		"OnlyWhenVREnabled" "1"
 		"OnlyWhenVRActive" "1"
 	}
-	"9"
+	"8"
 	{
 		"label" "#GameUI_GameMenu_Options"
 		"command" "OpenOptionsDialog"
 	}
-	"10"
+	"9"
 	{
 		"label" "ZM OPTIONS"
 		"command" "engine ToggleZMOptions"
 	}
-	"11"
+	"10"
 	{
 		"label" "#GameUI_GameMenu_Quit"
 		"command" "Quit"

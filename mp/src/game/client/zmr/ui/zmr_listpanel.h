@@ -18,7 +18,9 @@ enum
     COLUMN_IMG = ( 1 << 3 ),
 
     // Stretch this column to the first column aligned to the right.
-    COLUMN_STRETCH_RIGHT = ( 1 << 4 )
+    COLUMN_STRETCH_RIGHT = ( 1 << 4 ),
+
+    COLUMN_CLICKABLE = ( 1 << 5 )
 };
 
 // Fixes a small stupid leak.
@@ -29,15 +31,17 @@ public:
     ~CZMImageList() { if ( GetImage( 0 ) ) delete GetImage( 0 ); };
 };
 
-class CZMListRow : public vgui::Label
+class CZMListRow : public vgui::Panel
 {
 public:
-    DECLARE_CLASS_SIMPLE( CZMListRow, vgui::Label );
+    DECLARE_CLASS_SIMPLE( CZMListRow, vgui::Panel );
 
     CZMListRow( CZMListSection* pParentSection, int itemId, KeyValues* kv );
     ~CZMListRow();
 
 
+    virtual void OnMousePressed( vgui::MouseCode code ) OVERRIDE;
+    virtual void OnCursorMoved( int x, int y ) OVERRIDE;
     virtual void PerformLayout() OVERRIDE;
 
 
@@ -71,9 +75,12 @@ public:
     void            SetSection( CZMListSection* pSection ) { m_pParentSection = pSection; };
 
 protected:
+    void    CreateNewChild( int index, int type = 0 );
+
     int     GetColumnWidth( int col );
 
     void    LayoutColumnData();
+    void    ColumnDataLabel( int column, vgui::Label* pLabel );
 
     void    LayoutColumns();
     void    LayoutColumn( int i, int& x, int lastx );
@@ -86,6 +93,9 @@ protected:
     int             m_nItemWidth;
     vgui::HFont     m_hItemFont;
     Color           m_ItemColor;
+
+    CUtlVector<vgui::Panel*> m_vChildren;
+    int m_iLastHovered;
 };
 
 
@@ -98,6 +108,7 @@ public:
 
     CZMListSection( CZMListPanel* parent, const char* name );
     ~CZMListSection();
+
 
 
     void    ReSortItems();
@@ -182,7 +193,6 @@ public:
     CZMListPanel( vgui::Panel* parent, const char* name );
     ~CZMListPanel();
 
-
     virtual void    ApplySettings( KeyValues* inKv ) OVERRIDE;
     virtual void    PerformLayout() OVERRIDE;
 
@@ -196,6 +206,7 @@ public:
     void    SetSectionSortingFunc( int section, ZMSectionSortFunc_t func );
     void    SetSectionTopMargin( int section, int margin );
     void    SetSectionBottomMargin( int section, int margin );
+    void    SetSectionMouseInputEnabled( int section, bool state );
 
     int     AddColumn( int section, const char* name, int width = 0, int flags = 0, int xoffset = 0 );
 

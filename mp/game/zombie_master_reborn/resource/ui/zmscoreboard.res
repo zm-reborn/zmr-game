@@ -1,4 +1,4 @@
-"resource/ui/scoreboard.res"
+"resource/ui/zmscoreboard.res"
 {
 	"scores"
 	{
@@ -6,7 +6,7 @@
 		"fieldName"		"scores"
 		"xpos"		"140"
 		"ypos"		"42"
-		"wide"		"360"
+		"wide"		"380"
 		"tall"		"450"
 		"autoResize"		"0"
 		"visible"		"0"
@@ -59,7 +59,7 @@
 		"fieldName"		"PlayerList"
 		"xpos"		"32"
 		"ypos"		"60"
-		"wide"		"296"
+		"wide"		"316"
 		"tall"		"270"
 		"autoResize"		"0"
 		"visible"		"1"
@@ -112,6 +112,11 @@
 						"align_center"		"1"
 						"colalign_right"		"1"
 					}
+					"mutestatus"
+					{
+						"width"		"24"
+						"colalign_right"		"1"
+					}
 				}
 				"Items"
 				{
@@ -152,6 +157,13 @@
 						"width"		"50"
 						"align_center"		"1"
 						"colalign_right"		"1"
+					}
+					"mutestatus"
+					{
+						"width"		"24"
+						"colalign_right"		"1"
+						"clickable"		"1"
+						"is_image"		"1"
 					}
 				}
 			}
@@ -207,6 +219,11 @@
 						"align_center"		"1"
 						"colalign_right"		"1"
 					}
+					"mutestatus"
+					{
+						"width"		"24"
+						"colalign_right"		"1"
+					}
 				}
 				"Items"
 				{
@@ -254,6 +271,13 @@
 						"width"		"50"
 						"align_center"		"1"
 						"colalign_right"		"1"
+					}
+					"mutestatus"
+					{
+						"width"		"24"
+						"colalign_right"		"1"
+						"clickable"		"1"
+						"is_image"		"1"
 					}
 				}
 			}
