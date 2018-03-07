@@ -33,17 +33,14 @@ CZMHudSpectatorUI::CZMHudSpectatorUI( const char *pElementName ) : CHudElement( 
 
 
     SetProportional( true );
-}
 
-void CZMHudSpectatorUI::ApplySchemeSettings( IScheme* pScheme )
-{
-    BaseClass::ApplySchemeSettings( pScheme );
 
     LoadControlSettings( "resource/ui/zmspectatorui.res" );
 
-
     m_pNameLabel = dynamic_cast<Label*>( FindChildByName( "ObservedTargetName" ) );
+    Assert( m_pNameLabel );
     m_pInfoLabel = dynamic_cast<Label*>( FindChildByName( "ObservedTargetInfo" ) );
+    Assert( m_pInfoLabel );
 }
 
 void CZMHudSpectatorUI::Init()
@@ -78,6 +75,17 @@ void CZMHudSpectatorUI::LevelInit()
 void CZMHudSpectatorUI::Reset()
 {
     SetBounds( 0, 0, ScreenWidth(), ScreenHeight() );
+
+
+    // Center our labels because widescreens suck.
+    int width = GetWide();
+    int w;
+
+    w = m_pNameLabel->GetWide();
+    m_pNameLabel->SetPos( width / 2 - w / 2, m_pNameLabel->GetYPos() );
+
+    w = m_pInfoLabel->GetWide();
+    m_pInfoLabel->SetPos( width / 2 - w / 2, m_pInfoLabel->GetYPos() );
 }
 
 bool CZMHudSpectatorUI::IsVisible()

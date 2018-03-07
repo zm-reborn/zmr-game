@@ -26,8 +26,6 @@ public:
 
     virtual bool IsVisible() OVERRIDE;
 
-    virtual void ApplySchemeSettings( vgui::IScheme* pScheme ) OVERRIDE;
-
 protected:
     void PaintBar( int y, int h, bool bFlip );
     void PaintBorder( int border_y, int border_height, bool bFlip );
