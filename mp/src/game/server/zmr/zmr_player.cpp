@@ -693,7 +693,8 @@ void CZMPlayer::CheatImpulseCommands( int iImpulse )
 
         break;
     }
-    default : BaseClass::CheatImpulseCommands( iImpulse ); break;
+    // HL2 class has some stuff we don't want or need.
+    default : CBasePlayer::CheatImpulseCommands( iImpulse ); break;
     }
 }
 
