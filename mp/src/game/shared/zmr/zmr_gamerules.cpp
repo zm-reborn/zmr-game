@@ -46,8 +46,11 @@ static ConVar zm_sv_participation( "zm_sv_participation", "0", FCVAR_REPLICATED 
 ConVar zm_sv_glow_item_enabled( "zm_sv_glow_item_enabled", "1", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE, "Is item (weapon/ammo) glow allowed?" );
 
 #ifndef CLIENT_DLL
-static ConVar zm_sv_reward_zombiekill( "zm_sv_reward_zombiekill", "200", FCVAR_NOTIFY | FCVAR_ARCHIVE, "How many points ZM gets for killing a human with a zombie." );
-static ConVar zm_sv_reward_kill( "zm_sv_reward_kill", "100", FCVAR_NOTIFY | FCVAR_ARCHIVE, "How many points ZM gets when a human dies." );
+static ConVar zm_sv_reward_points_zombiekill( "zm_sv_reward_points_zombiekill", "5", FCVAR_NOTIFY | FCVAR_ARCHIVE, "How many points ZM gets for killing a human with a zombie." );
+static ConVar zm_sv_reward_points_kill( "zm_sv_reward_points_kill", "1", FCVAR_NOTIFY | FCVAR_ARCHIVE, "How many points ZM gets when a human dies." );
+
+static ConVar zm_sv_reward_zombiekill( "zm_sv_reward_zombiekill", "200", FCVAR_NOTIFY | FCVAR_ARCHIVE, "How many resources ZM gets for killing a human with a zombie." );
+static ConVar zm_sv_reward_kill( "zm_sv_reward_kill", "100", FCVAR_NOTIFY | FCVAR_ARCHIVE, "How many resources ZM gets when a human dies." );
 #endif
 
 ConVar zm_sv_spawndelay( "zm_sv_spawndelay", "0.6", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE, "How frequently zombie spawns spawn zombies." );
@@ -589,9 +592,16 @@ void CZMRules::PlayerKilled( CBasePlayer* pVictim, const CTakeDamageInfo& info )
 
     if ( pPlayer->IsHuman() )
     {
-        RewardResources( ( info.GetAttacker() && info.GetAttacker()->IsNPC() ) ?
+        // ZMRTODO: Use lambdas or some shit to make this more streamlined.
+        bool bIsZombieKill = info.GetAttacker() && info.GetAttacker()->IsNPC();
+
+        RewardResources( bIsZombieKill ?
             zm_sv_reward_zombiekill.GetInt() :
             zm_sv_reward_kill.GetInt() );
+
+        RewardScoreZM( bIsZombieKill ?
+            zm_sv_reward_points_zombiekill.GetInt() :
+            zm_sv_reward_points_kill.GetInt() );
     }
 
     // Don't use team player count since we haven't been switched to spectator yet.
@@ -885,6 +895,20 @@ void CZMRules::RewardResources( int res, bool bLimit )
         if ( pPlayer->IsZM() )
         {
             pPlayer->IncResources( res, bLimit );
+        }
+    }
+}
+
+void CZMRules::RewardScoreZM( int points )
+{
+    CZMPlayer* pPlayer;
+    for ( int i = 1; i <= gpGlobals->maxClients; i++ )
+    {
+        pPlayer = ToZMPlayer( UTIL_PlayerByIndex( i ) );
+
+        if ( pPlayer && pPlayer->IsZM() )
+        {
+            pPlayer->IncrementFragCount( points );
         }
     }
 }

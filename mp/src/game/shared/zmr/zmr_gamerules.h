@@ -150,6 +150,7 @@ public:
 
 #ifndef CLIENT_DLL
     static void RewardResources( int, bool bLimit = false );
+    static void RewardScoreZM( int points );
 #endif
 
 private:
