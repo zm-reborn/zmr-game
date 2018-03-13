@@ -194,6 +194,7 @@ CZMFrame::CZMFrame( const char* pElementName ) : CHudElement( pElementName ), Ba
 CZMFrame::~CZMFrame()
 {
     delete m_BoxSelect;
+    delete m_LineTool;
 
     delete m_pZMControl;
 
