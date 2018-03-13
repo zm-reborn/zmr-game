@@ -11,7 +11,6 @@
 #include <vgui/IInput.h>
 
 #include "zmr_linetool.h"
-#include "zmr/c_zmr_zmvision.h"
 #include "zmr/zmr_player_shared.h"
 #include "zmr/zmr_gamerules.h"
 #include "zmr/zmr_global_shared.h"
@@ -169,28 +168,12 @@ CZMFrame::CZMFrame( const char* pElementName ) : CHudElement( pElementName ), Ba
 
     SetVisible( false );
     SetProportional( false );
-    SetSizeable( false );
-    SetMoveable( false );
-    SetCloseButtonVisible( false );
-    SetTitleBarVisible( false );
-    SetMaximizeButtonVisible( false );
-    SetMinimizeButtonVisible( false );
     SetBorder( nullptr );
-    SetAlpha( 255 );
+    //SetAlpha( 255 );
     SetPaintBackgroundEnabled( false );
-    SetZPos( -1337 );
+    //SetZPos( -1337 );
     
     SetHiddenBits( HIDEHUD_WEAPONSELECTION );
-
-
-    // Completely hide the close button.
-    Button* pButton = dynamic_cast<Button*>( FindChildByName( "frame_close" ) );
-    if ( pButton )
-    {
-        pButton->SetEnabled( false ); // Can't be clicked.
-        pButton->SetPaintBorderEnabled( false ); // Hide border.
-        pButton->SetPaintEnabled( false ); // For some reason if we have it disabled, it'll draw a cross. Thanks, Valve.
-    }
 
     
     m_MouseDragStatus = BUTTON_CODE_INVALID;
@@ -200,7 +183,7 @@ CZMFrame::CZMFrame( const char* pElementName ) : CHudElement( pElementName ), Ba
     m_BoxSelect = new CZMBoxSelect( this );
     m_LineTool = new CZMLineTool( this );
 
-	m_pZMControl = new CZMHudControlPanel();
+	m_pZMControl = new CZMHudControlPanel( this );
 
 	m_pManiMenu = new CZMManiMenu( this ); 
 	m_pManiMenuNew = new CZMManiMenuNew( this ); 
@@ -220,40 +203,9 @@ CZMFrame::~CZMFrame()
     delete m_pBuildMenuNew;
 }
 
-void CZMFrame::ApplySchemeSettings( IScheme* pScheme )
-{
-    BaseClass::ApplySchemeSettings( pScheme );
-
-    if ( m_pZMControl )
-    {
-        m_pZMControl->SetBgColor( GetSchemeColor( "ZMHudBgColor", pScheme ) );
-        m_pZMControl->SetFgColor( GetSchemeColor( "ZMFgColor", pScheme ) );
-    }
-}
-
-void CZMFrame::Init()
-{
-    Reset();
-}
-
-void CZMFrame::VidInit()
-{
-    Reset();
-}
-
 void CZMFrame::LevelInit()
 {
     m_flLastLeftClick = m_flLastRightClick = 0.0f;
-}
-
-void CZMFrame::Reset()
-{
-    //m_pZMControl = GET_HUDELEMENT( CZMHudControlPanel );
-    if ( m_pZMControl )
-    {
-        m_pZMControl->PositionButtons();
-        m_pZMControl->PositionComboBox();
-    }
 }
 
 void CZMFrame::SetVisible( bool state )
@@ -264,12 +216,6 @@ void CZMFrame::SetVisible( bool state )
     engine->ClientCmd( "-right" );
     engine->ClientCmd( "-lookup" );
     engine->ClientCmd( "-lookdown" );
-}
-
-void CZMFrame::Paint()
-{
-    if ( m_pZMControl )
-        m_pZMControl->Paint();
 }
 
 void CZMFrame::SetClickMode( ZMClickMode_t mode, bool print )
@@ -371,70 +317,6 @@ void CZMFrame::OnMouseWheeled( int delta )
         pPlayer->SetMouseWheelMove( (float)delta );
 }
 
-void CZMFrame::OnCommand( const char* command )
-{
-    if ( Q_stricmp( command, "TAB_POWERS" ) == 0 )
-    {
-        if ( m_pZMControl ) m_pZMControl->UpdateTabs( CZMHudControlPanel::TAB_POWERS );
-    }
-    else if ( Q_stricmp( command, "TAB_MODES" ) == 0 )
-    {
-        if ( m_pZMControl ) m_pZMControl->UpdateTabs( CZMHudControlPanel::TAB_MODES );
-    }
-    else if ( Q_stricmp( command, "TAB_ZEDS" ) == 0 )
-    {
-        if ( m_pZMControl ) m_pZMControl->UpdateTabs( CZMHudControlPanel::TAB_ZEDS );
-    }
-    else if ( Q_stricmp( command, "MODE_SELECT_ALL" ) == 0 )
-    {
-        ZMClientUtil::SelectAllZombies();
-    }
-    else if ( Q_stricmp( command, "MODE_DEFENSIVE" ) == 0 )
-    {
-        engine->ClientCmd( VarArgs( "zm_cmd_zombiemode %i", ZOMBIEMODE_DEFEND ) );
-    }
-    else if ( Q_stricmp( command, "MODE_OFFENSIVE" ) == 0 )
-    {
-        engine->ClientCmd( VarArgs( "zm_cmd_zombiemode %i", ZOMBIEMODE_OFFENSIVE ) );
-    }
-    else if ( Q_stricmp( command, "MODE_POWER_DELETEZOMBIES" ) == 0 )
-    {
-        engine->ClientCmd( "zm_cmd_delete" );
-    }
-    else if ( Q_stricmp( command, "MODE_POWER_SPOTCREATE" ) == 0 )
-    {
-        if ( g_pZMView ) g_pZMView->SetClickMode( ZMCLICKMODE_HIDDEN );
-    }
-    else if ( Q_stricmp( command, "MODE_POWER_PHYSEXP" ) == 0 )
-    {
-        if ( g_pZMView ) g_pZMView->SetClickMode( ZMCLICKMODE_PHYSEXP );
-    }
-    else if ( Q_stricmp( command, "MODE_AMBUSH_CREATE" ) == 0 )
-    {
-        if ( g_pZMView ) g_pZMView->SetClickMode( ZMCLICKMODE_AMBUSH );
-    }
-    else if ( Q_stricmp( command, "MODE_JUMP_CEILING" ) == 0 )
-    {
-        engine->ClientCmd( "zm_cmd_bansheeceiling" );
-    }
-    else if ( Q_stricmp( command, "MODE_POWER_NIGHTVISION" ) == 0 )
-    {
-        g_ZMVision.Toggle();
-    }
-    else if ( Q_stricmp( command, "MODE_SELECT_GROUP" ) == 0 )
-    {
-        if ( m_pZMControl )
-            m_pZMControl->SelectGroup();
-    }
-    else if ( Q_stricmp( command, "MODE_CREATE_GROUP" ) == 0 )
-    {
-        if ( m_pZMControl )
-            m_pZMControl->CreateGroup();
-    }
-
-    BaseClass::OnCommand( command );
-}
-
 void CZMFrame::OnMousePressed( MouseCode code )
 {
     CloseChildMenus();
@@ -493,11 +375,6 @@ void CZMFrame::OnThink()
         return;
     }
 
-
-    if ( m_pZMControl )
-    {
-        m_pZMControl->GroupsListUpdate();
-    }
 
     if ( pPlayer->m_nButtons & IN_SCORE && zm_cl_hidemouseinscore.GetBool() )
     {

@@ -240,6 +240,7 @@ $Project "Client (ZMR)"
 					$File	"zmr\ui\zmr_viewport.h"
 				}
 				
+				$File	"zmr\ui\zmr_framepanel.h"
 				$File	"zmr\ui\zmr_hud_ammo.cpp"
 				$File	"zmr\ui\zmr_hud_blackbars.cpp"
 				$File	"zmr\ui\zmr_hud_centertext.cpp"

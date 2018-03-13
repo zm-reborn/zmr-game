@@ -108,7 +108,7 @@ int CZMAvatarList::FindAvatarBySteamId( CSteamID id )
 
 
 // NOTE: We have to be a frame to enable mouse input.
-CZMClientScoreBoardDialog::CZMClientScoreBoardDialog( IViewPort* pViewPort ) : Frame( nullptr, PANEL_SCOREBOARD )
+CZMClientScoreBoardDialog::CZMClientScoreBoardDialog( IViewPort* pViewPort ) : CZMFramePanel( nullptr, PANEL_SCOREBOARD )
 {
     // Has to be set to load fonts correctly.
     SetScheme( vgui::scheme()->LoadSchemeFromFile( "resource/ClientScheme.res", "ClientScheme" ) );
@@ -120,7 +120,6 @@ CZMClientScoreBoardDialog::CZMClientScoreBoardDialog( IViewPort* pViewPort ) : F
     ListenForGameEvent( "server_spawn" );
 
 
-    SetCloseButtonVisible( false );
     SetKeyBoardInputEnabled( false );
     SetMouseInputEnabled( false );
     SetProportional( true );
@@ -139,16 +138,6 @@ CZMClientScoreBoardDialog::CZMClientScoreBoardDialog( IViewPort* pViewPort ) : F
 
 
     LoadControlSettings( "resource/ui/zmscoreboard.res" );
-
-
-    // Completely hide the close button.
-    Button* pButton = dynamic_cast<Button*>( FindChildByName( "frame_close" ) );
-    if ( pButton )
-    {
-        pButton->SetEnabled( false ); // Can't be clicked.
-        pButton->SetPaintBorderEnabled( false ); // Hide border.
-        pButton->SetPaintEnabled( false ); // For some reason if we have it disabled, it'll draw a cross. Thanks, Valve.
-    }
 
 
     m_pList = dynamic_cast<CZMListPanel*>( FindChildByName( "PlayerList" ) );

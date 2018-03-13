@@ -9,6 +9,7 @@ class CZMLineTool;
 #include "zmr_buildmenu_new.h"
 #include "zmr_manimenu.h"
 #include "zmr_manimenu_new.h"
+#include "zmr_framepanel.h"
 
 
 enum ZMClickMode_t
@@ -25,21 +26,18 @@ enum ZMClickMode_t
 
 #define DOUBLECLICK_DELTA           0.4f
 
-class CZMFrame : public CHudElement, public vgui::Frame
+class CZMFrame : public CHudElement, public CZMFramePanel
 
 {
 public:
-    DECLARE_CLASS_SIMPLE( CZMFrame, vgui::Frame );
+    DECLARE_CLASS_SIMPLE( CZMFrame, CZMFramePanel );
 
 
     CZMFrame( const char* pElementName );
     ~CZMFrame();
 
-    virtual void ApplySchemeSettings( vgui::IScheme* pScheme ) OVERRIDE;
-    virtual void Init() OVERRIDE;
-    virtual void VidInit() OVERRIDE;
+
     virtual void LevelInit() OVERRIDE;
-    virtual void Reset() OVERRIDE;
     //virtual bool ShouldDraw() OVERRIDE;
     virtual void OnMouseReleased( MouseCode code ) OVERRIDE;
     //virtual void OnMouseMoved( MouseCode code ) OVERRIDE;
@@ -48,12 +46,10 @@ public:
     //virtual void OnMouseDoublePressed( MouseCode code ) OVERRIDE;
     bool ShouldDraw() OVERRIDE { return IsVisible(); };
     virtual void OnThink() OVERRIDE;
-    virtual void Paint() OVERRIDE;
     //virtual void PaintBackground() OVERRIDE;
     virtual void SetVisible( bool ) OVERRIDE;
 
     virtual void OnMouseWheeled( int ) OVERRIDE;
-    virtual void OnCommand( const char* ) OVERRIDE;
     //virtual void ShowPanel( const char* name ) OVERRIDE;
     //virtual void ShowPanel( bool state ) OVERRIDE;
 
