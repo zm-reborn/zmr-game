@@ -23,6 +23,7 @@ CZMManiMenuNew::CZMManiMenuNew( Panel* pParent ) : CZMManiMenuBase( "ZMManiMenu"
     SetSizeable( false );
     SetKeyBoardInputEnabled( false );
     SetMouseInputEnabled( true );
+    DisableMouseInputForThisPanel( true ); // Only THIS panel can't be clicked. Children work fine.
     SetProportional( true );
     SetMoveable( false );
 
@@ -53,15 +54,6 @@ void CZMManiMenuNew::ShowPanel( bool state )
 
 
     SetVisible( state );
-}
-
-void CZMManiMenuNew::OnMousePressed( MouseCode code )
-{
-    // This is only called when we didn't click any element.
-    if ( code == MOUSE_LEFT )
-    {
-        ShowPanel( false );
-    }
 }
 
 void CZMManiMenuNew::SetDescription( const char* desc )
