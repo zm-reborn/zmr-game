@@ -5,27 +5,25 @@
 #include "zmr_bitmapbutton.h"
 
 
-class CZMHudControlPanel// : public CHudElement, public vgui::Frame
+class CZMHudControlPanel : public vgui::Panel
 {
 public:
-    //DECLARE_CLASS_SIMPLE( CZMHudControlPanel, vgui::Frame );
+    DECLARE_CLASS_SIMPLE( CZMHudControlPanel, vgui::Panel );
 
-    CZMHudControlPanel();
-    //CZMHudControlPanel( const char* );
+    CZMHudControlPanel( vgui::Panel* pParent );
     ~CZMHudControlPanel();
 
 
     
-    //virtual void Init() OVERRIDE;
-    //virtual void VidInit() OVERRIDE;
-    //virtual void Paint() OVERRIDE;
-    //virtual void OnCommand( const char* command ) OVERRIDE;
-    //virtual void OnThink() OVERRIDE;
-    //virtual void Reset() OVERRIDE;
+    virtual void ApplySchemeSettings( vgui::IScheme* pScheme ) OVERRIDE;
+
+    virtual void OnScreenSizeChanged( int oldw, int oldh ) OVERRIDE;
+    virtual void OnThink() OVERRIDE;
+    virtual void OnCommand( const char* command ) OVERRIDE;
     
     void SetBgColor( const Color& clr );
     void SetFgColor( const Color& clr );
-    void Paint();
+    virtual void PaintBackground() OVERRIDE;
 
     void PositionButtons();
     void PositionComboBox();

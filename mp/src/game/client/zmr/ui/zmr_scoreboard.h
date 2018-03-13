@@ -1,7 +1,7 @@
 #pragma once
 
 #include <clientscoreboarddialog.h>
-//#include "zmr_listpanel.h"
+#include "zmr_framepanel.h"
 
 class CZMListRow;
 class CZMListSection;
@@ -37,10 +37,10 @@ private:
 
 
 
-class CZMClientScoreBoardDialog : public vgui::Frame, public IViewPortPanel, public CGameEventListener
+class CZMClientScoreBoardDialog : public CZMFramePanel, public IViewPortPanel, public CGameEventListener
 {
 private:
-    DECLARE_CLASS_SIMPLE( CZMClientScoreBoardDialog, vgui::Frame );
+    DECLARE_CLASS_SIMPLE( CZMClientScoreBoardDialog, CZMFramePanel );
     
 public:
     CZMClientScoreBoardDialog( IViewPort* pViewPort );
