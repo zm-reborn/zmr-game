@@ -49,6 +49,7 @@ CZMBuildMenuNew::CZMBuildMenuNew( Panel* pParent ) : CZMBuildMenuBase( "ZMBuildM
 	SetMoveable( false );
     SetKeyBoardInputEnabled( false );
     SetMouseInputEnabled( true );
+    DisableMouseInputForThisPanel( true ); // Only THIS panel can't be clicked. Children work fine.
 
 
     m_iCurTooltip = -1;
@@ -214,15 +215,6 @@ void CZMBuildMenuNew::OnRadialLeave( KeyValues* kv )
     {
         ZMClientUtil::HideTooltip( m_iCurTooltip );
         m_iCurTooltip = -1;
-    }
-}
-
-void CZMBuildMenuNew::OnMousePressed( MouseCode code )
-{
-    // This is only called when we didn't click any element.
-    if ( code == MOUSE_LEFT )
-    {
-        ShowPanel( false );
     }
 }
 

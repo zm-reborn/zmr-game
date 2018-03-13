@@ -30,8 +30,6 @@ public:
     virtual void ShowPanel( bool state ) OVERRIDE;
 	virtual void OnThink() OVERRIDE;
 
-    virtual void OnMousePressed( vgui::MouseCode code ) OVERRIDE;
-
 
     
     MESSAGE_FUNC_PARAMS( OnImageRowPressed, "OnImageRowPressed", kv );

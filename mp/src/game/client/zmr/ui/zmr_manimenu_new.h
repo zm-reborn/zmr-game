@@ -21,8 +21,6 @@ public:
     virtual void ShowPanel( bool state ) OVERRIDE;
 	virtual void OnThink( void ) OVERRIDE;
 
-    virtual void OnMousePressed( vgui::MouseCode code ) OVERRIDE;
-
 
     virtual void ShowMenu( C_ZMEntManipulate* pMani ) OVERRIDE;
     virtual void SetDescription( const char* ) OVERRIDE;
