@@ -160,24 +160,9 @@ CZMFrame::CZMFrame( const char* pElementName ) : CHudElement( pElementName ), Ba
 {
     g_pZMView = this;
 
-    SetKeyBoardInputEnabled( false );
-    SetMouseInputEnabled( true );
-    
 
-    SetBounds( 0, 0, ScreenWidth(), ScreenHeight() );
-
-    SetVisible( false );
     SetProportional( false );
-    SetBorder( nullptr );
-    //SetAlpha( 255 );
-    SetPaintBackgroundEnabled( false );
-    //SetZPos( -1337 );
-    
-    SetHiddenBits( HIDEHUD_WEAPONSELECTION );
-
-    
-    m_MouseDragStatus = BUTTON_CODE_INVALID;
-    SetClickMode( ZMCLICKMODE_NORMAL );
+    SetBounds( 0, 0, ScreenWidth(), ScreenHeight() );
 
 
     m_BoxSelect = new CZMBoxSelect( this );
@@ -189,6 +174,24 @@ CZMFrame::CZMFrame( const char* pElementName ) : CHudElement( pElementName ), Ba
 	m_pManiMenuNew = new CZMManiMenuNew( this ); 
 	m_pBuildMenu = new CZMBuildMenu( this ); 
 	m_pBuildMenuNew = new CZMBuildMenuNew( this ); 
+
+
+    SetKeyBoardInputEnabled( false );
+    SetMouseInputEnabled( true );
+    
+
+    
+
+    SetVisible( false );
+    SetBorder( nullptr );
+    SetPaintBackgroundEnabled( false );
+    
+
+    SetHiddenBits( HIDEHUD_WEAPONSELECTION );
+
+    
+    m_MouseDragStatus = BUTTON_CODE_INVALID;
+    SetClickMode( ZMCLICKMODE_NORMAL );
 }
 
 CZMFrame::~CZMFrame()
@@ -220,6 +223,9 @@ void CZMFrame::SetVisible( bool state )
     engine->ClientCmd( "-right" );
     engine->ClientCmd( "-lookup" );
     engine->ClientCmd( "-lookdown" );
+
+
+    HideMouseTools();
 }
 
 void CZMFrame::SetClickMode( ZMClickMode_t mode, bool print )
@@ -251,6 +257,15 @@ void CZMFrame::SetClickMode( ZMClickMode_t mode, bool print )
 
 
     m_iClickMode = mode;
+}
+
+void CZMFrame::HideMouseTools()
+{
+    if ( m_BoxSelect )
+        m_BoxSelect->SetVisible( false );
+
+    if ( m_LineTool )
+        m_LineTool->SetVisible( false );
 }
 
 CZMBuildMenuBase* CZMFrame::GetBuildMenu()
@@ -488,7 +503,7 @@ void CZMFrame::OnLeftClick()
     ::input->GetFullscreenMousePos( &mx, &my );
 
 
-    m_BoxSelect->SetEnabled( true );
+    m_BoxSelect->SetVisible( true );
     m_BoxSelect->SetStart( mx, my );
 
 
@@ -561,7 +576,7 @@ void CZMFrame::OnLeftClick()
 
 void CZMFrame::OnLeftRelease()
 {
-    m_BoxSelect->SetEnabled( false );
+    m_BoxSelect->SetVisible( false );
 
 
     int mx, my;
@@ -589,7 +604,7 @@ void CZMFrame::OnLeftRelease()
 
 void CZMFrame::OnRightClick()
 {
-    m_BoxSelect->SetEnabled( false );
+    m_BoxSelect->SetVisible( false );
 
     int mx, my;
     ::input->GetFullscreenMousePos( &mx, &my );

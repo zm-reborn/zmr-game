@@ -78,6 +78,7 @@ private:
     void FindZMObject( int, int, bool );
     void DoMoveLine();
 
+    void HideMouseTools();
     void CloseChildMenus();
 
     CZMBoxSelect* m_BoxSelect;
