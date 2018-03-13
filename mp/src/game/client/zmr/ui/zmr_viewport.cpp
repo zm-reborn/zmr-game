@@ -206,6 +206,9 @@ CZMFrame::~CZMFrame()
 void CZMFrame::LevelInit()
 {
     m_flLastLeftClick = m_flLastRightClick = 0.0f;
+
+    // So we don't draw a menu from last map...
+    CloseChildMenus();
 }
 
 void CZMFrame::SetVisible( bool state )
