@@ -27,8 +27,6 @@ using namespace vgui;
 
 CZMBoxSelect::CZMBoxSelect( Panel* pParent ) : Panel( g_pClientMode->GetViewport(), "ZMBoxSelect" )
 {
-    //SetEnabled( false );
-    
     SetParent( pParent->GetVPanel() );
 
     SetPaintBackgroundEnabled( false );
@@ -41,9 +39,6 @@ CZMBoxSelect::CZMBoxSelect( Panel* pParent ) : Panel( g_pClientMode->GetViewport
 
 void CZMBoxSelect::Paint()
 {
-    if ( !IsEnabled() ) return;
-
-
     int lefttop_x, lefttop_y;
     int rightbot_x, rightbot_y;
 
