@@ -3427,6 +3427,9 @@ float CBaseCombatCharacter::GetFogObscuredRatio( float range ) const
 //-----------------------------------------------------------------------------
 void CBaseCombatCharacter::UpdateLastKnownArea( void )
 {
+#if defined(ZMR) && !defined(NEXT_BOT) // ZMRCHANGE: Allow updating of nav area.
+#define NEXT_BOT
+#endif
 #ifdef NEXT_BOT
 	if ( TheNavMesh->IsGenerating() )
 	{
