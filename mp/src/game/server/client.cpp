@@ -1214,8 +1214,10 @@ void CC_God_f (void)
 		   return;
    }
 #else
+#ifndef ZMR // ZMRCHANGE: Allow some useful cheat commands.
 	if ( gpGlobals->deathmatch )
 		return;
+#endif // ZMR
 #endif
 
 	pPlayer->ToggleFlag( FL_GODMODE );
@@ -1383,8 +1385,10 @@ void CC_Notarget_f (void)
 	if ( !pPlayer )
 		return;
 
+#ifndef ZMR // ZMRCHANGE: Allow some useful cheat commands.
 	if ( gpGlobals->deathmatch )
 		return;
+#endif
 
 	pPlayer->ToggleFlag( FL_NOTARGET );
 	if ( !(pPlayer->GetFlags() & FL_NOTARGET ) )
