@@ -1626,4 +1626,7 @@ void CZMPlayer::State_PreThink_ACTIVE()
 {
     //we don't really need to do anything here. 
     //This state_prethink structure came over from CS:S and was doing an assert check that fails the way hl2dm handles death
+
+
+    UpdateLastKnownArea();
 }
