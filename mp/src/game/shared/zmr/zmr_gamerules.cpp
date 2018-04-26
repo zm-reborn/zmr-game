@@ -593,7 +593,7 @@ void CZMRules::PlayerKilled( CBasePlayer* pVictim, const CTakeDamageInfo& info )
     if ( pPlayer->IsHuman() )
     {
         // ZMRTODO: Use lambdas or some shit to make this more streamlined.
-        bool bIsZombieKill = info.GetAttacker() && info.GetAttacker()->IsNPC();
+        bool bIsZombieKill = info.GetAttacker() && info.GetAttacker()->IsBaseZombie();
 
         RewardResources( bIsZombieKill ?
             zm_sv_reward_zombiekill.GetInt() :

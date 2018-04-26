@@ -279,7 +279,7 @@ void CZMPlayer::PreThink( void )
         }
 
         // Force player off the NPCs head!
-        if ( zm_sv_npcheadpushoff.GetFloat() != 0.0f && GetGroundEntity() && !GetGroundEntity()->IsStandable() && GetGroundEntity()->IsNPC() )
+        if ( zm_sv_npcheadpushoff.GetFloat() != 0.0f && GetGroundEntity() && !GetGroundEntity()->IsStandable() && GetGroundEntity()->IsBaseZombie() )
         {
             // A hack to keep pushing the player in the same direction they're looking at.
             // People wanting to crowd surf will get angry otherwise.
@@ -416,7 +416,7 @@ bool CZMPlayer::IsValidObserverTarget( CBaseEntity* pEnt )
     // ZMRTODO: Allow zombie spectating, etc.
     if ( !pEnt->IsPlayer() )
     {
-        if ( pEnt->MyNPCPointer() != nullptr )
+        if ( pEnt->IsBaseZombie() )
             return true;
 
         return false;
@@ -462,23 +462,23 @@ CBaseEntity* CZMPlayer::FindNextObserverTarget( bool bReverse )
     CZMBaseZombie* pZombie;
     if (GetObserverTarget()
     &&  GetObserverMode() != OBS_MODE_ROAMING
-    &&  (pZombie = static_cast<CZMBaseZombie*>( GetObserverTarget()->MyNPCPointer() )) != nullptr )
+    &&  (pZombie = dynamic_cast<CZMBaseZombie*>( GetObserverTarget() )) != nullptr )
     {
-        int i;
         CZMBaseZombie* pLoop;
 
         int origin = -1;
-        int len = g_pZombies->Count();
+        int len = g_ZombieManager.GetNumZombies();
         
-
-        for ( i = 0; i < len; i++ )
+        g_ZombieManager.ForEachZombieRet( [ &origin, pZombie ]( int index, CZMBaseZombie* pLoopZombie )
         {
-            if ( g_pZombies->Element( i ) == pZombie )
+            if ( pZombie == pLoopZombie )
             {
-                origin = i;
-                break;
+                origin = index;
+                return true;
             }
-        }
+
+            return false;
+        } );
 
         if ( origin != -1 )
         {
@@ -496,8 +496,8 @@ CBaseEntity* CZMPlayer::FindNextObserverTarget( bool bReverse )
                 if ( i == origin )
                     break;
 
-
-                pLoop = g_pZombies->Element( i );
+                
+                pLoop = g_ZombieManager.GetZombieByIndex( i );
                 if ( pLoop && pLoop->IsAlive() )
                 {
                     return pLoop;
@@ -1372,17 +1372,10 @@ CBaseEntity* CZMPlayer::EntSelectSpawnPoint( void )
 
 void CZMPlayer::DeselectAllZombies()
 {
-    CZMBaseZombie* pZombie;
-    
-    for ( int i = 0; i < g_pZombies->Count(); i++ )
+    g_ZombieManager.ForEachSelectedZombie( this, []( CZMBaseZombie* pZombie )
     {
-        pZombie = g_pZombies->Element( i );
-
-        if ( pZombie && pZombie->GetSelector() == this )
-        {
-            pZombie->SetSelector( 0 );
-        }
-    }
+        pZombie->SetSelector( 0 );
+    } );
 }
 
 void CZMPlayer::PlayerUse( void )

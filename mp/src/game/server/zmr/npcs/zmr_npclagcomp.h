@@ -6,7 +6,7 @@ struct LayerRecordNPC
     float m_cycle;
     float m_weight;
     int m_order;
- 
+
     LayerRecordNPC()
     {
         m_sequence = 0;
@@ -14,7 +14,7 @@ struct LayerRecordNPC
         m_weight = 0;
         m_order = 0;
     }
- 
+
     LayerRecordNPC( const LayerRecordNPC& src )
     {
         m_sequence = src.m_sequence;
@@ -23,7 +23,7 @@ struct LayerRecordNPC
         m_order = src.m_order;
     }
 };
- 
+
 struct LagRecordNPC
 {
 public:
@@ -38,7 +38,7 @@ public:
         m_masterSequence = 0;
         m_masterCycle = 0;
     }
- 
+
     LagRecordNPC( const LagRecordNPC& src )
     {
         m_fFlags = src.m_fFlags;
@@ -54,22 +54,22 @@ public:
         m_masterSequence = src.m_masterSequence;
         m_masterCycle = src.m_masterCycle;
     }
- 
+
     // Did NPC die this frame
-    int						m_fFlags;
- 
+    int                 m_fFlags;
+
     // NPC position, orientation and bbox
-    Vector					m_vecOrigin;
-    QAngle					m_vecAngles;
-    Vector					m_vecMins;
-    Vector					m_vecMaxs;
- 
-    float					m_flSimulationTime;	
- 
+    Vector              m_vecOrigin;
+    QAngle              m_vecAngles;
+    Vector              m_vecMins;
+    Vector              m_vecMaxs;
+
+    float               m_flSimulationTime;    
+
     // NPC animation details, so we can get the legs in the right spot.
-    LayerRecordNPC			m_layerRecords[CBaseAnimatingOverlay::MAX_OVERLAYS];
-    int						m_masterSequence;
-    float					m_masterCycle;
+    LayerRecordNPC      m_layerRecords[CBaseAnimatingOverlay::MAX_OVERLAYS];
+    int                 m_masterSequence;
+    float               m_masterCycle;
 };
 
 abstract_class CZMNPCLagCompensation

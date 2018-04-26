@@ -414,6 +414,74 @@ void CNPCMaker::MakeNPC( void )
 	if (!CanMakeNPC())
 		return;
 
+#ifdef ZMR // ZMRCHANGE: Allow NPCR npcs.
+	CBaseEntity* pEnt = CreateEntityByName( STRING( m_iszNPCClassname ) );
+
+	if ( !pEnt )
+	{
+		Warning( "NULL ent in NPCMaker!\n" );
+		return;
+	}
+
+    CBaseCombatCharacter* pChar = pEnt->MyCombatCharacterPointer();
+    CAI_BaseNPC* pNPC = pEnt->MyNPCPointer();
+
+
+	if ( pNPC == nullptr && pEnt->MyNPCRPointer() == nullptr )
+	{
+        UTIL_RemoveImmediate( pEnt );
+		Warning( "None NPC classname '%s' in NPCMaker!\n", STRING( m_iszNPCClassname ) );
+		return;
+	}
+
+    
+    
+
+	// ------------------------------------------------
+	//  Intialize spawned NPC's relationships
+	// ------------------------------------------------
+	pChar->SetRelationshipString( m_RelationshipString );
+
+	m_OnSpawnNPC.Set( pEnt, pEnt, this );
+
+	pEnt->SetAbsOrigin( GetAbsOrigin() );
+
+	// Strip pitch and roll from the spawner's angles. Pass only yaw to the spawned NPC.
+	QAngle angles = GetAbsAngles();
+	angles.x = 0.0;
+	angles.z = 0.0;
+	pEnt->SetAbsAngles( angles );
+
+	pEnt->AddSpawnFlags( SF_NPC_FALL_TO_GROUND );
+
+	if ( m_spawnflags & SF_NPCMAKER_FADE )
+	{
+		pEnt->AddSpawnFlags( SF_NPC_FADE_CORPSE );
+	}
+
+    if ( pNPC )
+    {
+	    pNPC->m_spawnEquipment	= m_spawnEquipment;
+	    pNPC->SetSquadName( m_SquadName );
+	    pNPC->SetHintGroup( m_strHintGroup );
+
+    
+	    ChildPreSpawn( pNPC );
+    }
+
+	DispatchSpawn( pEnt );
+	pEnt->SetOwnerEntity( this );
+	DispatchActivate( pEnt );
+
+	if ( m_ChildTargetName != NULL_STRING )
+	{
+		// if I have a netname (overloaded), give the child NPC that name as a targetname
+		pEnt->SetName( m_ChildTargetName );
+	}
+
+    if ( pNPC )
+	    ChildPostSpawn( pNPC );
+#else
 	CAI_BaseNPC	*pent = (CAI_BaseNPC*)CreateEntityByName( STRING(m_iszNPCClassname) );
 
 	if ( !pent )
@@ -461,6 +529,7 @@ void CNPCMaker::MakeNPC( void )
 	}
 
 	ChildPostSpawn( pent );
+#endif
 
 	m_nLiveChildren++;// count this NPC
 

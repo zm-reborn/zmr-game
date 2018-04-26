@@ -199,6 +199,7 @@ $Project "Client (ZMR)"
 				
 				// Shared
 				$File	"$SRCDIR\game\shared\zmr\npcs\zmr_zombiebase_shared.cpp"
+				$File	"$SRCDIR\game\shared\zmr\npcs\zmr_zombiebase_shared.h"
 			}
 			$Folder "UI"
 			{

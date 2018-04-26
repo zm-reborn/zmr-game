@@ -84,6 +84,12 @@ class CSkyCamera;
 class CEntityMapData;
 class INextBot;
 class IHasAttributes;
+#ifdef ZMR
+namespace NPCR
+{
+	class CBaseNPC;
+}
+#endif
 
 typedef CUtlVector< CBaseEntity* > EntityList_t;
 
@@ -926,7 +932,11 @@ public:
 	virtual bool			IsNPC( void ) const { return false; }
 	CAI_BaseNPC				*MyNPCPointer( void ); 
 	virtual CBaseCombatCharacter *MyCombatCharacterPointer( void ) { return NULL; }
+#ifdef ZMR // ZMRCHANGE: Replace the nextbot shit to not change the vtable.
+	virtual NPCR::CBaseNPC*	MyNPCRPointer() { return nullptr; }
+#else
 	virtual INextBot		*MyNextBotPointer( void ) { return NULL; }
+#endif
 	virtual float			GetDelay( void ) { return 0; }
 	virtual bool			IsMoving( void );
 	bool					IsWorld() { return entindex() == 0; }
@@ -951,7 +961,11 @@ public:
 	virtual bool	IsCombatItem( void ) const { return false; }
 
 	virtual bool	IsBaseCombatWeapon( void ) const { return false; }
+#ifdef ZMR // ZMRCHANGE: Hijacking unused virtuals to use as our own. Don't change vtable, pls.
+	virtual bool	IsBaseZombie() const { return false; }
+#else
 	virtual bool	IsWearable( void ) const { return false; }
+#endif
 	virtual CBaseCombatWeapon *MyCombatWeaponPointer( void ) { return NULL; }
 
 	// If this is a vehicle, returns the vehicle interface

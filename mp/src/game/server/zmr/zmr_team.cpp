@@ -33,7 +33,7 @@ bool CZMTeam::ShouldTransmitToPlayer( CBasePlayer* pRecipient, CBaseEntity* pEnt
             return true;
 
         // Always transmit zombies.
-        if ( pEntity->IsNPC() )
+        if ( pEntity->IsBaseZombie() )
             return true;
         
         float dist = zm_sv_transmitdistance.GetFloat();
