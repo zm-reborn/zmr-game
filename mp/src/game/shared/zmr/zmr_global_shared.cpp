@@ -5,8 +5,6 @@
 
 CZMGlobalLists::CZMGlobalLists()
 {
-    m_Zombies.Purge();
-
 #ifndef CLIENT_DLL
     m_BlockHidden.Purge();
     m_BlockPhysExp.Purge();
@@ -15,8 +13,6 @@ CZMGlobalLists::CZMGlobalLists()
 
 CZMGlobalLists::~CZMGlobalLists()
 {
-    m_Zombies.Purge();
-
 #ifndef CLIENT_DLL
     m_BlockHidden.Purge();
     m_BlockPhysExp.Purge();
@@ -24,8 +20,6 @@ CZMGlobalLists::~CZMGlobalLists()
 }
 
 CZMGlobalLists* g_pZMGlobals = new CZMGlobalLists();
-
-ZombieList_t* g_pZombies = &(g_pZMGlobals->m_Zombies);
 
 
 #ifndef CLIENT_DLL

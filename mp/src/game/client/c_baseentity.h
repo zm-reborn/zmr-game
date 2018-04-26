@@ -1008,7 +1008,11 @@ public:
 	virtual C_BaseCombatCharacter	*MyCombatCharacterPointer( void ) { return NULL; }
 	virtual bool					IsNPC( void ) { return false; }
 	C_AI_BaseNPC					*MyNPCPointer( void ); 
+#ifdef ZMR // Replace nextbot shit to not change vtable.
+	virtual bool					IsNPCR() const { return false; }
+#else
 	virtual bool					IsNextBot() { return false; }
+#endif
 	// TF2 specific
 	virtual bool					IsBaseObject( void ) const { return false; }
 	virtual bool					IsBaseCombatWeapon( void ) const { return false; }

@@ -16,8 +16,7 @@
 
 #ifdef ZMR
 #include "zmr_player_shared.h"
-#include "zmr/npcs/zmr_zombiebase.h"
-#include "zmr_global_shared.h"
+#include "zmr/npcs/zmr_zombiebase_shared.h"
 #endif
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -372,11 +371,11 @@ void CLagCompensationManager::FrameUpdatePostEntityThink()
 
 
 #ifdef ZMR
-    int nAIs = g_pZombies->Count();
+    int nZombies = g_ZombieManager.GetNumZombies();
  
-    for ( int i = 0; i < nAIs; i++ )
+    for ( int i = 0; i < nZombies; i++ )
     {
-	    CZMBaseZombie *pNPC = g_pZombies->Element( i );
+	    CZMBaseZombie *pNPC = g_ZombieManager.GetZombieByIndex( i );
 	    if ( !pNPC )
 		    continue;
  
@@ -473,9 +472,9 @@ void CLagCompensationManager::StartLagCompensation( CBasePlayer *player, CUserCm
 		return;
 
 
-    int nAIs = g_pZombies->Count();
-    for (int i=0; i<nAIs; i++)
-	    g_pZombies->Element( i )->FlagForLagCompensation(false);
+    int nZombies = g_ZombieManager.GetNumZombies();
+    for ( int i = 0; i < nZombies; i++ )
+	    g_ZombieManager.GetZombieByIndex( i )->FlagForLagCompensation( false );
 #endif
 
 	// Assume no players need to be restored
@@ -563,9 +562,9 @@ void CLagCompensationManager::StartLagCompensation( CBasePlayer *player, CUserCm
     CZMPlayer* pZMPlayer = ToZMPlayer( player );
 
     // also iterate all monsters
-    for ( int i = 0; i < nAIs; i++ )
+    for ( int i = 0; i < nZombies; i++ )
     {
-	    CZMBaseZombie *pNPC = g_pZombies->Element( i );
+	    CZMBaseZombie *pNPC = g_ZombieManager.GetZombieByIndex( i );
 	    // Custom checks for if things should lag compensate
 	    if ( !pNPC ) continue;
 
@@ -1033,10 +1032,10 @@ void CLagCompensationManager::BacktrackEntity( CZMBaseZombie *pEntity, float flT
 				if ( pHitEntity )
 				{
 					CZMBaseZombie* pNPC = NULL;
-					int nAIs = g_pZombies->Count();
-					for ( int i = 0; i < nAIs; i++ ) // we'll have to find this entity's index though :(
+					int nZombies = g_ZombieManager.GetNumZombies();
+					for ( int i = 0; i < nZombies; i++ ) // we'll have to find this entity's index though :(
 					{
-						pNPC = g_pZombies->Element( i );
+						pNPC = g_ZombieManager.GetZombieByIndex( i );
 						if ( pNPC == pHitEntity )
 							break;
 					}
@@ -1349,10 +1348,10 @@ void CLagCompensationManager::FinishLagCompensation( CBasePlayer *player )
 
 
 #ifdef ZMR
-    int nAIs = g_pZombies->Count();
-    for ( int i = 0; i < nAIs; i++ )
+    int nZombies = g_ZombieManager.GetNumZombies();
+    for ( int i = 0; i < nZombies; i++ )
     {
-	    CZMBaseZombie* pNPC = g_pZombies->Element( i );
+	    CZMBaseZombie* pNPC = g_ZombieManager.GetZombieByIndex( i );
  
 	    if ( !pNPC->IsLagFlagged() )
 	    {
