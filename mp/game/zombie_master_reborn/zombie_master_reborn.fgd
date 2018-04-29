@@ -251,6 +251,17 @@
 	Revolvers(integer) : "Revolvers" : 0 : "Max Revolvers to hand out"
 ]
 
+@FilterClass base(BaseFilter) iconsprite("editor/filter_name.vmt") = filter_activator_team :
+	"A filter that filters by the name of the activator."
+[
+	filterteam(choices) : "Filter Team Number" : 2 : "The team number to filter by.  If the filter mode is Allow, only entities whose "+
+		"team number matches the given team will pass the filter. If the filter mode is Disallow, "+
+		"all entities EXCEPT those whose team number matches the given team will pass the filter." =
+	[
+		2: "Survivor"
+		3: "Zombie Master"
+	]
+]
 
 @SolidClass base(Trigger, Targetname) = trigger_givepoints :
 	"A trigger volume that gives points to players."
