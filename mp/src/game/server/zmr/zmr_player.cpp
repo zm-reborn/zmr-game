@@ -183,6 +183,8 @@ void CZMPlayer::Precache()
 
     BaseClass::Precache();
 
+    // Needs to be precached for thirdperson flashlight beam.
+    PrecacheModel ( "sprites/glow01.vmt" );
 
     PrecacheModel( VMHANDS_FALLBACKMODEL );
 
