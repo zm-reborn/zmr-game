@@ -159,4 +159,8 @@ void CZMWeaponShotgun::PrimaryAttack( void )
     AddViewKick();
 
     m_flNextPrimaryAttack = gpGlobals->curtime + GetFireRate();
+
+#ifndef CLIENT_DLL
+    PlayAISound();
+#endif
 }

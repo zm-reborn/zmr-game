@@ -220,6 +220,10 @@ void CZMBaseMeleeWeapon::Swing( bool bSecondary, const bool bUseAnimationEvent )
     m_flNextSecondaryAttack = gpGlobals->curtime + SequenceDuration();
 
     AddViewKick();
+
+#ifndef CLIENT_DLL
+    PlayAISound();
+#endif
 }
 
 void CZMBaseMeleeWeapon::ChooseIntersectionPoint( trace_t &hitTrace, const Vector &mins, const Vector &maxs, CBasePlayer *pOwner )

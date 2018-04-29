@@ -115,6 +115,11 @@ public:
     virtual int GetMaxBurst( void ) OVERRIDE { return 1; };
     
 #ifndef CLIENT_DLL
+    // Volume = distance
+    virtual float   GetAISoundVolume() const { return 1024.0f; }
+    virtual void    PlayAISound() const;
+
+
     virtual bool IsTemplate() OVERRIDE;
 
     virtual void Materialize( void ) OVERRIDE;
