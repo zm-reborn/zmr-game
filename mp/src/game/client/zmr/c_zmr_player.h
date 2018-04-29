@@ -99,6 +99,11 @@ public:
     void SetMouseWheelMove( float dir );
 
 protected:
+    bool ShouldUseLocalFlashlight() const;
+    void UpdateLocalFlashlight();
+    void UpdateOtherFlashlight();
+
+
     CZMCharCircle* m_fxInner;
     CZMCharCircle* m_fxHealth;
 
@@ -119,8 +124,11 @@ private:
 
     int m_iIDEntIndex;
 
-    void ReleaseFlashlight();
+    void ReleaseOtherFlashlight();
     Beam_t* m_pFlashlightBeam;
+
+    void ReleaseLocalFlashlight();
+    CFlashlightEffect* m_pLocalFlashlight;
 
 
     // Only used locally.
