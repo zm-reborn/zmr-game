@@ -227,7 +227,18 @@ void CZMBaseWeapon::PrimaryAttack( void )
 
     // Add our view kick in
     AddViewKick();
+
+#ifndef CLIENT_DLL
+    PlayAISound();
+#endif
 }
+
+#ifndef CLIENT_DLL
+void CZMBaseWeapon::PlayAISound() const
+{
+    CSoundEnt::InsertSound( SOUND_COMBAT, GetOwner()->GetAbsOrigin(), GetAISoundVolume(), 0.25f, GetOwner() );
+}
+#endif
 
 void CZMBaseWeapon::SecondaryAttack( void )
 {
