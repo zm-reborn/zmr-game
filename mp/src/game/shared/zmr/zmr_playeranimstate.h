@@ -49,6 +49,8 @@ private:
 #ifdef CLIENT_DLL
     void            ComputePoseParam_Head( CStudioHdr* pStudioHdr );
 
+    void            FixUnusedPoseParams( CStudioHdr* pStudioHdr );
+
     void            UpdateLookAt();
 #endif
 

@@ -19,6 +19,10 @@
 #define ZM_LOOKAT_DIST              100.0f
 #define ZM_LOOKAT_DOT               0.5f // < 0 is way too big of an angle.
 
+#ifdef CLIENT_DLL
+ConVar zm_cl_fix_unusedposeparameters( "zm_cl_fix_unusedposeparameters", "1", FCVAR_ARCHIVE );
+#endif
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Input  : *pPlayer - 
@@ -192,6 +196,9 @@ void CZMPlayerAnimState::Update( float eyeYaw, float eyePitch )
         // IIRC pose parameters aren't lag compensated anyway.
 #ifdef CLIENT_DLL
         ComputePoseParam_Head( pStudioHdr );
+
+        // Possible workaround to pose parameter crash.
+        FixUnusedPoseParams( pStudioHdr );
 #endif
     }
 
@@ -202,6 +209,38 @@ void CZMPlayerAnimState::Update( float eyeYaw, float eyePitch )
     }
 #endif
 }
+
+#ifdef CLIENT_DLL
+void CZMPlayerAnimState::FixUnusedPoseParams( CStudioHdr* pStudioHdr )
+{
+    if ( !zm_cl_fix_unusedposeparameters.GetBool() )
+        return;
+
+    int num = pStudioHdr->GetNumPoseParameters();
+    for ( int i = 0; i < num; i++ )
+    {
+        if ( m_PoseParameterData.m_iMoveX == i )
+            continue;
+        if ( m_PoseParameterData.m_iMoveY == i )
+            continue;
+        if ( m_PoseParameterData.m_iAimPitch == i )
+            continue;
+        if ( m_PoseParameterData.m_iAimYaw == i )
+            continue;
+        if ( m_headYawPoseParam == i )
+            continue;
+        if ( m_headPitchPoseParam == i )
+            continue;
+
+        float curval = m_pZMPlayer->GetPoseParameter( i );
+        if ( abs( curval ) > 1.0f )
+        {
+            Warning( "Poseparameter %s out of range! (%.3f) Resetting...", pStudioHdr->pPoseParameter( i ).pszName(), curval );
+            m_pZMPlayer->SetPoseParameter( i, 0.0f );
+        }
+    }
+}
+#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: 
