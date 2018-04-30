@@ -158,8 +158,12 @@ void CZMBaseMeleeWeapon::Hit( trace_t& traceHit, Activity nHitActivity )
         pPlayer->EyeVectors( &hitDirection, NULL, NULL );
         VectorNormalize( hitDirection );
 
-
-        CTakeDamageInfo info( GetOwner(), GetOwner(), this, GetDamageForActivity( nHitActivity ), DMG_CLUB, 0 );
+#ifdef CLIENT_DLL
+        int dmg = GetDamageForActivity( nHitActivity );
+#else
+        int dmg = GetOverrideDamage() > -1 ? GetOverrideDamage() : GetDamageForActivity( nHitActivity );
+#endif
+        CTakeDamageInfo info( GetOwner(), GetOwner(), this, dmg, DMG_CLUB, 0 );
 
         //if( pHitEntity->IsNPC() )
         //{

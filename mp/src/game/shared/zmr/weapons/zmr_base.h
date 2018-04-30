@@ -173,6 +173,9 @@ protected:
     void TransferReserveAmmo( CBaseCombatCharacter* );
     // No support for secondary ammo since we'll never use it anyway, RIGHT?
     int m_nReserveAmmo;
+
+
+    inline int GetOverrideDamage() const { return m_nOverrideDamage; }
 #endif
 
     inline void SetSlotFlag( int flags ) { m_iSlotFlag = flags; }
