@@ -46,6 +46,7 @@ void CZMSystem::PostInit()
 #ifdef CLIENT_DLL
     ListenForGameEvent( "round_end_post" );
     ListenForGameEvent( "round_restart_post" );
+    ListenForGameEvent( "player_spawn" );
 #endif
 
     // Server Steam API hasn't been initialized yet.
@@ -142,6 +143,15 @@ void CZMSystem::FireGameEvent( IGameEvent* pEvent )
                 // This will make them fade out.
                 pRagdoll->SUB_Remove();
             }
+        }
+    }
+    else if ( Q_strcmp( pEvent->GetName(), "player_spawn" ) == 0 )
+    {
+        // Tell the player they've spawned.
+        C_ZMPlayer* pPlayer = ToZMPlayer( UTIL_PlayerByUserId( pEvent->GetInt( "userid", -1 ) ) );
+        if ( pPlayer )
+        {
+            pPlayer->OnSpawn();
         }
     }
 #endif
