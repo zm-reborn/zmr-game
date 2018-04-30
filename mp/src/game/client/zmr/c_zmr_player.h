@@ -30,8 +30,11 @@ public:
     virtual void Spawn() OVERRIDE;
     virtual void ClientThink() OVERRIDE;
     virtual void PreThink() OVERRIDE;
-    virtual void TeamChange( int ) OVERRIDE;
     virtual bool CreateMove( float delta, CUserCmd* cmd ) OVERRIDE;
+
+    void            OnSpawn();
+    virtual void    TeamChange( int ) OVERRIDE;
+
 
     virtual void            Simulate() OVERRIDE;
     virtual void            CreateLightEffects() OVERRIDE {};

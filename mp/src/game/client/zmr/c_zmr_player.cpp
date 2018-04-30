@@ -15,6 +15,7 @@
 
 #include "npcs/c_zmr_zombiebase.h"
 #include "zmr/zmr_global_shared.h"
+#include "zmr/zmr_viewmodel.h"
 #include "c_zmr_entities.h"
 #include "c_zmr_player_ragdoll.h"
 
@@ -256,6 +257,18 @@ void C_ZMPlayer::CalculateIKLocks( float currentTime )
 
     C_BaseEntity::PopEnableAbsRecomputations();
     partition->SuppressLists( curSuppressed, true );
+}
+
+void C_ZMPlayer::OnSpawn()
+{
+    if ( IsLocalPlayer() )
+    {
+        // By default display hands.
+        // This hack has to be here because SetWeaponVisible isn't called on client when the player spawns.
+        C_ZMViewModel* pHands = static_cast<C_ZMViewModel*>( GetViewModel( VMINDEX_HANDS, false ) );
+        if ( pHands )
+            pHands->SetDrawVM( true );
+    }
 }
 
 void C_ZMPlayer::TeamChange( int iNewTeam )
