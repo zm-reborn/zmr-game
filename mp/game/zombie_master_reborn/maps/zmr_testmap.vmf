@@ -2,7 +2,7 @@ versioninfo
 {
 	"editorversion" "400"
 	"editorbuild" "7538"
-	"mapversion" "103"
+	"mapversion" "105"
 	"formatversion" "100"
 	"prefab" "0"
 }
@@ -20,7 +20,7 @@ viewsettings
 world
 {
 	"id" "1"
-	"mapversion" "103"
+	"mapversion" "105"
 	"classname" "worldspawn"
 	"detailmaterial" "detail/detailsprites"
 	"detailvbsp" "detail.vbsp"
@@ -9011,6 +9011,48 @@ entity
 		"visgroupshown" "1"
 		"visgroupautoshown" "1"
 		"logicalpos" "[0 500]"
+	}
+}
+entity
+{
+	"id" "6770"
+	"classname" "item_item_crate"
+	"angles" "0 0 0"
+	"fademindist" "-1"
+	"fadescale" "1"
+	"glowcolor" "255 255 255"
+	"inertiaScale" "1.0"
+	"ItemClass" "weapon_zm_pistol"
+	"ItemCount" "3"
+	"ItemTemplate" "templatecrowbar"
+	"modelscale" "1.0"
+	"physdamagescale" "0.1"
+	"spawnflags" "256"
+	"origin" "-928 -640 2"
+	editor
+	{
+		"color" "220 30 220"
+		"visgroupshown" "1"
+		"visgroupautoshown" "1"
+		"logicalpos" "[0 0]"
+	}
+}
+entity
+{
+	"id" "6777"
+	"classname" "weapon_zm_improvised"
+	"angles" "0 0 0"
+	"clip1override" "-1"
+	"dmgoverride" "200"
+	"spawnflags" "2"
+	"targetname" "templatecrowbar"
+	"origin" "-928 -640 30"
+	editor
+	{
+		"color" "0 0 200"
+		"visgroupshown" "1"
+		"visgroupautoshown" "1"
+		"logicalpos" "[0 0]"
 	}
 }
 cameras
