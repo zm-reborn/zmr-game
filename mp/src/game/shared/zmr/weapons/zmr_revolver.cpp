@@ -29,8 +29,8 @@ public:
 
 
 #ifndef CLIENT_DLL
-    const char* GetDropAmmoName() OVERRIDE { return "item_ammo_revolver"; };
-    int GetDropAmmoAmount() OVERRIDE { return SIZE_ZMAMMO_REVOLVER; };
+    const char* GetDropAmmoName() const OVERRIDE { return "item_ammo_revolver"; }
+    int GetDropAmmoAmount() const OVERRIDE { return SIZE_ZMAMMO_REVOLVER; }
 #endif
 
     virtual const Vector& GetBulletSpread( void ) OVERRIDE
@@ -46,7 +46,7 @@ public:
 
     void Shoot();
     
-    virtual float GetFireRate( void ) OVERRIDE { return 1.0f; };
+    virtual float GetFireRate( void ) OVERRIDE { return 1.0f; }
 
     void ItemPostFrame() OVERRIDE;
 

@@ -21,10 +21,10 @@ public:
 
     void ItemPostFrame() OVERRIDE;
 
-    virtual float GetRange() { return 10.0f; };
-    virtual	float GetDamageForActivity( Activity hitActivity ) { return	1.0f; };
-    virtual Activity GetPrimaryAttackActivity( void ) OVERRIDE { return ACT_VM_HITCENTER; };
-	virtual Activity GetSecondaryAttackActivity( void ) OVERRIDE { return ACT_VM_HITCENTER2; };
+    virtual float GetRange() const { return 10.0f; }
+    virtual	float GetDamageForActivity( Activity hitActivity ) const { return 1.0f; }
+    virtual Activity GetPrimaryAttackActivity( void ) OVERRIDE { return ACT_VM_HITCENTER; }
+	virtual Activity GetSecondaryAttackActivity( void ) OVERRIDE { return ACT_VM_HITCENTER2; }
 
 #ifndef CLIENT_DLL
     // Lower the sound distance a bit.
@@ -36,10 +36,10 @@ protected:
     virtual void HandleAnimEventMeleeHit();
     virtual void Hit( trace_t&, Activity );
 
-    void ChooseIntersectionPoint( trace_t&, const Vector&, const Vector&, CBasePlayer* );
+    void ChooseIntersectionPoint( trace_t& tr, const Vector& mins, const Vector& maxs );
 
-    virtual void TraceMeleeAttack( trace_t& );
+    virtual void TraceMeleeAttack( trace_t& tr );
 
-    void ImpactEffect( trace_t& );
-    bool ImpactWater( const Vector&, const Vector& );
+    void ImpactEffect( trace_t& tr );
+    bool ImpactWater( const Vector& vecStart, const Vector& vecEnd );
 };

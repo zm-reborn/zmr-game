@@ -28,8 +28,8 @@ public:
 
 
 #ifndef CLIENT_DLL
-    const char* GetDropAmmoName() OVERRIDE { return "item_ammo_smg1"; };
-    int GetDropAmmoAmount() OVERRIDE { return SIZE_AMMO_SMG1; };
+    const char* GetDropAmmoName() const OVERRIDE { return "item_ammo_smg1"; }
+    int GetDropAmmoAmount() const OVERRIDE { return SIZE_AMMO_SMG1; }
 #endif
 
 

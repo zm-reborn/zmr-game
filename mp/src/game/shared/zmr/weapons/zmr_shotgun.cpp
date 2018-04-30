@@ -23,8 +23,8 @@ public:
 
 
 #ifndef CLIENT_DLL
-    const char* GetDropAmmoName() OVERRIDE { return "item_box_buckshot"; };
-    int GetDropAmmoAmount() OVERRIDE { return SIZE_AMMO_BUCKSHOT; };
+    const char* GetDropAmmoName() const OVERRIDE { return "item_box_buckshot"; }
+    int GetDropAmmoAmount() const OVERRIDE { return SIZE_AMMO_BUCKSHOT; }
 #endif
 
     virtual const Vector& GetBulletSpread( void ) OVERRIDE
@@ -49,14 +49,14 @@ public:
         pPlayer->ViewPunch( viewPunch );
     }
     
-    virtual float GetFireRate( void ) OVERRIDE { return 0.55f; };
+    virtual float GetFireRate( void ) OVERRIDE { return 0.55f; }
 
     virtual void PrimaryAttack( void ) OVERRIDE;
 
 
-    virtual Activity GetReloadStartAct() OVERRIDE { return ACT_SHOTGUN_RELOAD_START; };
-    virtual Activity GetReloadEndAct() OVERRIDE { return ACT_SHOTGUN_RELOAD_FINISH; };
-    virtual Activity GetPumpAct() OVERRIDE { return ACT_SHOTGUN_PUMP; };
+    virtual Activity GetReloadStartAct() OVERRIDE { return ACT_SHOTGUN_RELOAD_START; }
+    virtual Activity GetReloadEndAct() OVERRIDE { return ACT_SHOTGUN_RELOAD_FINISH; }
+    virtual Activity GetPumpAct() OVERRIDE { return ACT_SHOTGUN_PUMP; }
 };
 
 IMPLEMENT_NETWORKCLASS_ALIASED( ZMWeaponShotgun, DT_ZM_WeaponShotgun )

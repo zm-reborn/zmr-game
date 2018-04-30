@@ -26,9 +26,9 @@ public:
 
     void ItemPostFrame( void ) OVERRIDE;
 
-    float GetRange() OVERRIDE { return 50.0f; };
-    float GetFireRate() OVERRIDE { return 1.0f; };
-    float GetDamageForActivity( Activity hitActivity ) OVERRIDE { return 20.0f; };
+    float GetRange() const OVERRIDE { return 50.0f; }
+    float GetFireRate() OVERRIDE { return 1.0f; }
+    float GetDamageForActivity( Activity hitActivity ) const OVERRIDE { return 20.0f; }
 
     void AddViewKick() OVERRIDE
     {

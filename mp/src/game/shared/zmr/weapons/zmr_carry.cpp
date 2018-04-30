@@ -1061,7 +1061,7 @@ private:
 
     // Our stuff
 public:
-    bool CanBeDropped() OVERRIDE { return false; };
+    bool CanBeDropped() const OVERRIDE { return false; }
 };
 
 IMPLEMENT_NETWORKCLASS_ALIASED( ZMWeaponCarry, DT_ZM_WeaponCarry )

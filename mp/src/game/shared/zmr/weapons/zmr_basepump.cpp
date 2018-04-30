@@ -236,7 +236,7 @@ bool CZMBasePumpWeapon::Reload( void )
     return res;
 }
 
-bool CZMBasePumpWeapon::IsInReload()
+bool CZMBasePumpWeapon::IsInReload() const
 {
     if ( m_iReloadState != RELOADSTATE_NONE )
         return true;
