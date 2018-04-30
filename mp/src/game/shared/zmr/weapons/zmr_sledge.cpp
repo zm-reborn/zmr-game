@@ -27,9 +27,9 @@ public:
 
     RECORD_PREDICTION_SEED;
 
-    float GetRange() OVERRIDE { return 60.0f; };
-    float GetFireRate() OVERRIDE { return 2.9f; };
-    float GetDamageForActivity( Activity act ) OVERRIDE
+    float GetRange() const OVERRIDE { return 60.0f; }
+    float GetFireRate() OVERRIDE { return 2.9f; }
+    float GetDamageForActivity( Activity act ) const OVERRIDE
     {
         // ZMRTODO: Stop using random values.
         float damage = 50.0f;
@@ -62,7 +62,7 @@ public:
         ang.z = 0.0f;
 
 	    pPlayer->ViewPunch( ang );
-    };
+    }
 
 
 #ifndef CLIENT_DLL

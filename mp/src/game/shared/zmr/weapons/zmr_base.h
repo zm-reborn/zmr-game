@@ -111,8 +111,8 @@ public:
     void DoMachineGunKick( float, float, float, float );
 
 
-    virtual int GetMinBurst( void ) OVERRIDE { return 1; };
-    virtual int GetMaxBurst( void ) OVERRIDE { return 1; };
+    virtual int GetMinBurst( void ) OVERRIDE { return 1; }
+    virtual int GetMaxBurst( void ) OVERRIDE { return 1; }
     
 #ifndef CLIENT_DLL
     // Volume = distance
@@ -131,7 +131,7 @@ public:
     virtual bool CanBeSelected( void ) OVERRIDE;
     // Never let anybody tell you're not beautiful even without any ammo, alright?
     // Let us always select this weapon even when we don't have any ammo for it.
-    virtual bool AllowsAutoSwitchFrom( void ) const OVERRIDE { return false; };
+    virtual bool AllowsAutoSwitchFrom( void ) const OVERRIDE { return false; }
     virtual void Drop( const Vector& ) OVERRIDE;
 
     // Add weapon slot flag.
@@ -148,23 +148,23 @@ public:
     static const WeaponProficiencyInfo_t*   GetDefaultProficiencyValues();
     
     // Our stuff
-    CZMPlayer*      GetPlayerOwner();
-    virtual bool    CanBeDropped() { return true; };
-    virtual bool    CanPickupAmmo() { return true; };
-    virtual bool    IsInReload() { return CanReload() && m_bInReload; };
-    virtual bool    CanAct(); // Can we reload/attack?
+    CZMPlayer*    GetPlayerOwner() const;
+    virtual bool    CanBeDropped() const { return true; }
+    virtual bool    CanPickupAmmo() const { return true; }
+    virtual bool    IsInReload() const { return const_cast<CZMBaseWeapon*>( this )->CanReload() && m_bInReload; }
+    virtual bool    CanAct() const; // Can we reload/attack?
 
 
-    inline int GetSlotFlag() { return m_iSlotFlag; };
+    inline int GetSlotFlag() const { return m_iSlotFlag; }
 #ifndef CLIENT_DLL
     void                FreeWeaponSlot();
 
 
-    virtual const char* GetDropAmmoName() { return nullptr; };
-    virtual int         GetDropAmmoAmount() { return 1; };
+    virtual const char* GetDropAmmoName() const { return nullptr; }
+    virtual int         GetDropAmmoAmount() const { return 1; }
 
-    inline int          GetReserveAmmo( ) { return m_nReserveAmmo; };
-    inline void         SetReserveAmmo( int ammo ) { m_nReserveAmmo = ammo; };
+    inline int          GetReserveAmmo() const { return m_nReserveAmmo; }
+    inline void         SetReserveAmmo( int ammo ) { m_nReserveAmmo = ammo; }
 #endif
     
 protected:
@@ -175,7 +175,7 @@ protected:
     int m_nReserveAmmo;
 #endif
 
-    inline void SetSlotFlag( int flags ) { m_iSlotFlag = flags; };
+    inline void SetSlotFlag( int flags ) { m_iSlotFlag = flags; }
     int m_iSlotFlag;
 
 private:

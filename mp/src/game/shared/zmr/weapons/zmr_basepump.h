@@ -33,14 +33,14 @@ public:
     virtual void StopReload();
     virtual void FinishReload( void ) OVERRIDE;
 
-    virtual Activity GetReloadStartAct() { return ACT_VM_RELOAD_START;};
-    virtual Activity GetReloadEndAct() { return ACT_VM_RELOAD_FINISH; };
-    virtual Activity GetPumpAct() { return ACT_SHOTGUN_PUMP; };
+    virtual Activity GetReloadStartAct() { return ACT_VM_RELOAD_START;}
+    virtual Activity GetReloadEndAct() { return ACT_VM_RELOAD_FINISH; }
+    virtual Activity GetPumpAct() { return ACT_SHOTGUN_PUMP; }
     virtual void StartReload( void );
     virtual void Pump();
 
-    virtual bool CanPickupAmmo() OVERRIDE { return !IsInReload(); };
-    virtual bool IsInReload() OVERRIDE;
+    virtual bool CanPickupAmmo() const OVERRIDE { return !IsInReload(); }
+    virtual bool IsInReload() const OVERRIDE;
     
 protected:
     CNetworkVar( bool, m_bNeedPump );

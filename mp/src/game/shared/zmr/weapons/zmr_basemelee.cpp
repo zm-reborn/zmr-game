@@ -138,7 +138,7 @@ void CZMBaseMeleeWeapon::TraceMeleeAttack( trace_t& traceHit )
             }
             else
             {
-                ChooseIntersectionPoint( traceHit, g_bludgeonMins, g_bludgeonMaxs, pOwner );
+                ChooseIntersectionPoint( traceHit, g_bludgeonMins, g_bludgeonMaxs );
             }
         }
     }
@@ -226,7 +226,7 @@ void CZMBaseMeleeWeapon::Swing( bool bSecondary, const bool bUseAnimationEvent )
 #endif
 }
 
-void CZMBaseMeleeWeapon::ChooseIntersectionPoint( trace_t &hitTrace, const Vector &mins, const Vector &maxs, CBasePlayer *pOwner )
+void CZMBaseMeleeWeapon::ChooseIntersectionPoint( trace_t& hitTrace, const Vector& mins, const Vector& maxs )
 {
     int         i, j, k;
     float       distance;
@@ -234,9 +234,11 @@ void CZMBaseMeleeWeapon::ChooseIntersectionPoint( trace_t &hitTrace, const Vecto
     trace_t     tmpTrace;
     Vector      vecHullEnd = hitTrace.endpos;
     Vector      vecEnd;
+    CBaseCombatCharacter* pOwner = GetOwner();
 
     distance = 1e6f;
     Vector vecSrc = hitTrace.startpos;
+
 
     vecHullEnd = vecSrc + ((vecHullEnd - vecSrc)*2);
     UTIL_TraceLine( vecSrc, vecHullEnd, MASK_MELEE, pOwner, COLLISION_GROUP_NONE, &tmpTrace );

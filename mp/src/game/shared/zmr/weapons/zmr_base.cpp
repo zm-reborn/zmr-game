@@ -393,7 +393,7 @@ bool CZMBaseWeapon::ShouldPredict()
 }
 #endif
 
-CZMPlayer* CZMBaseWeapon::GetPlayerOwner()
+CZMPlayer* CZMBaseWeapon::GetPlayerOwner() const
 {
     return ToZMPlayer( CBaseCombatWeapon::GetOwner() );
 }
@@ -918,7 +918,7 @@ void CZMBaseWeapon::TransferReserveAmmo( CBaseCombatCharacter* pOwner )
 }
 #endif
 
-bool CZMBaseWeapon::CanAct()
+bool CZMBaseWeapon::CanAct() const
 {
     CBaseCombatCharacter* pOwner = GetOwner();
 

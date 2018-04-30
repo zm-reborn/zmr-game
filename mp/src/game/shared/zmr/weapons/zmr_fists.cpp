@@ -28,12 +28,12 @@ public:
     RECORD_PREDICTION_SEED;
 
 #ifdef CLIENT_DLL
-    bool ShouldDrawPickup() OVERRIDE { return false; };
-    bool ShouldDraw() OVERRIDE { return false; };
+    bool ShouldDrawPickup() OVERRIDE { return false; }
+    bool ShouldDraw() OVERRIDE { return false; }
 #endif
 
-    float GetRange() OVERRIDE { return 45.0f; };
-    float GetFireRate() OVERRIDE { return 0.65f; };
+    float GetRange() const OVERRIDE { return 45.0f; }
+    float GetFireRate() OVERRIDE { return 0.65f; }
 
     void AddViewKick() OVERRIDE
     {
@@ -47,13 +47,13 @@ public:
         ang.z = 0.0f;
 
 	    pPlayer->ViewPunch( ang );
-    };
+    }
 
-    float GetDamageForActivity( Activity act ) OVERRIDE { return 5.0f; };
+    float GetDamageForActivity( Activity act ) const OVERRIDE { return 5.0f; }
 
 
 #ifndef CLIENT_DLL
-    bool CanBeDropped() OVERRIDE { return false; };
+    bool CanBeDropped() const OVERRIDE { return false; }
 
 
     void Operator_HandleAnimEvent( animevent_t*, CBaseCombatCharacter* ) OVERRIDE;

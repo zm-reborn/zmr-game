@@ -27,8 +27,8 @@ public:
 
 
 #ifndef CLIENT_DLL
-    const char* GetDropAmmoName() OVERRIDE { return "item_ammo_357"; };
-    int GetDropAmmoAmount() OVERRIDE { return SIZE_AMMO_357; };
+    const char* GetDropAmmoName() const OVERRIDE { return "item_ammo_357"; }
+    int GetDropAmmoAmount() const OVERRIDE { return SIZE_AMMO_357; }
 #endif
 
 
@@ -54,7 +54,7 @@ public:
         pPlayer->ViewPunch( viewPunch );
     }
     
-    virtual float GetFireRate( void ) OVERRIDE { return 0.9f; };
+    virtual float GetFireRate( void ) OVERRIDE { return 0.9f; }
 
 
     virtual bool Holster( CBaseCombatWeapon* pSwitchTo = nullptr ) OVERRIDE;
@@ -62,11 +62,11 @@ public:
     virtual void ItemPostFrame( void ) OVERRIDE;
 
 
-    virtual Activity GetReloadStartAct() OVERRIDE { return ACT_RIFLE_RELOAD_START; };
-    virtual Activity GetReloadEndAct() OVERRIDE { return ACT_RIFLE_RELOAD_FINISH; };
-    virtual Activity GetPumpAct() OVERRIDE { return ACT_RIFLE_LEVER; };
+    virtual Activity GetReloadStartAct() OVERRIDE { return ACT_RIFLE_RELOAD_START; }
+    virtual Activity GetReloadEndAct() OVERRIDE { return ACT_RIFLE_RELOAD_FINISH; }
+    virtual Activity GetPumpAct() OVERRIDE { return ACT_RIFLE_LEVER; }
 
-    inline bool IsZoomed() { return m_bInZoom; };
+    inline bool IsZoomed() { return m_bInZoom; }
     void CheckToggleZoom();
     void CheckUnZoom();
     void ToggleZoom();
