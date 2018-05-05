@@ -357,7 +357,9 @@ void NPCR::CBaseMotor::Approach( const Vector& vecDesiredGoal )
 void NPCR::CBaseMotor::FaceTowards( const Vector& vecPos )
 {
     QAngle ang;
-    VectorAngles( vecPos - GetNPC()->GetPosition(), ang );
+    VectorAngles( vecPos - GetOuter()->EyePosition(), ang );
+    ang.x = AngleNormalize( ang.x );
+    ang.y = AngleNormalize( ang.y );
 
     FaceTowards( ang );
 }
@@ -369,9 +371,9 @@ void NPCR::CBaseMotor::FaceTowards( const QAngle& angGoal )
     
     float dx = UTIL_AngleDiff( angGoal.x, curAngles.x );
     float dy = UTIL_AngleDiff( angGoal.y, curAngles.y );
-    
-    float mx = GetPitchRate() * time;
-    float my = GetYawRate() * time;
+
+    float mx = GetPitchRate( dx ) * time;
+    float my = GetYawRate( dy ) * time;
     
     if ( UsePitch() )
     {
@@ -402,7 +404,7 @@ void NPCR::CBaseMotor::FaceTowards( float yaw )
     
     float dy = UTIL_AngleDiff( yaw, ang.y );
 
-    float my = GetYawRate() * time;
+    float my = GetYawRate( dy ) * time;
 
     if ( dy < -my )
         ang.y -= my;
@@ -418,7 +420,9 @@ void NPCR::CBaseMotor::FaceTowards( float yaw )
 bool NPCR::CBaseMotor::IsFacing( const Vector& vecPos, float grace ) const
 {
     QAngle angGoal;
-    VectorAngles( vecPos - GetNPC()->GetPosition(), angGoal );
+    VectorAngles( vecPos - GetOuter()->EyePosition(), angGoal );
+    angGoal.x = AngleNormalize( angGoal.x );
+    angGoal.y = AngleNormalize( angGoal.y );
 
     return IsFacing( angGoal, grace );
 }

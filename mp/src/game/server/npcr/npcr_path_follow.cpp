@@ -232,7 +232,6 @@ void NPCR::CFollowNavPath::FollowPath( CBaseNPC* pNPC )
 
 
     // Keep moving towards current goal
-    pNPC->GetMotor()->FaceTowards( vecGoal );
     pNPC->GetMotor()->Approach( vecGoal );
 }
 

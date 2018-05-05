@@ -50,6 +50,7 @@ namespace NPCR
         virtual bool CanSee( const Vector& vecPos ) const;
         virtual bool HasLOS( const Vector& vecPos ) const; // Doesn't check for cone
 
+        virtual int GetSoundMask() const;
         virtual bool CanHearSound( CSound* pSound ) const;
 
         virtual float GetVisionDistance() const { return 4096.0f; }
