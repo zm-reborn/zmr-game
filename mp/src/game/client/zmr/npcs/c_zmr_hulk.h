@@ -3,15 +3,15 @@
 
 class C_ZMBaseZombie;
 
-class C_ZMPoisonZombie : public C_ZMBaseZombie
+class C_ZMHulk : public C_ZMBaseZombie
 {
 public:
-    DECLARE_CLASS( C_ZMPoisonZombie, C_ZMBaseZombie )
+    DECLARE_CLASS( C_ZMHulk, C_ZMBaseZombie )
     DECLARE_CLIENTCLASS()
 
 
-    C_ZMPoisonZombie();
-    ~C_ZMPoisonZombie();
+    C_ZMHulk();
+    ~C_ZMHulk();
 
 
     virtual const char* GetZombieLocalization() OVERRIDE { return "#ZMClassHulk"; };

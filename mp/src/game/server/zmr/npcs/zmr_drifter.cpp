@@ -21,6 +21,8 @@ int CZMDrifter::AE_DRAGGY_SICK;
 LINK_ENTITY_TO_CLASS( npc_dragzombie, CZMDrifter );
 PRECACHE_REGISTER( npc_dragzombie );
 
+IMPLEMENT_SERVERCLASS_ST( CZMDrifter, DT_ZM_Drifter )
+END_SEND_TABLE()
 
 CZMDrifter::CZMDrifter()
 {

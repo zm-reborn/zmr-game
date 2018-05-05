@@ -15,6 +15,8 @@ extern ConVar zm_sk_hulk_dmg;
 LINK_ENTITY_TO_CLASS( npc_poisonzombie, CZMHulk );
 PRECACHE_REGISTER( npc_poisonzombie );
 
+IMPLEMENT_SERVERCLASS_ST( CZMHulk, DT_ZM_Hulk )
+END_SEND_TABLE()
 
 CZMHulk::CZMHulk()
 {

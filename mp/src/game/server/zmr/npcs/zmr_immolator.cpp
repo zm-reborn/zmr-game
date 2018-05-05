@@ -19,6 +19,8 @@ extern ConVar zm_sk_burnzombie_dmg;
 LINK_ENTITY_TO_CLASS( npc_burnzombie, CZMImmolator );
 PRECACHE_REGISTER( npc_burnzombie );
 
+IMPLEMENT_SERVERCLASS_ST( CZMImmolator, DT_ZM_Immolator )
+END_SEND_TABLE()
 
 CZMImmolator::CZMImmolator()
 {

@@ -42,6 +42,9 @@ extern ConVar zm_sk_banshee_dmg_claw;
 extern ConVar zm_sk_banshee_health;
 
 
+IMPLEMENT_SERVERCLASS_ST( CZMBanshee, DT_ZM_Banshee )
+END_SEND_TABLE()
+
 CZMBanshee::CZMBanshee()
 {
     SetZombieClass( ZMCLASS_BANSHEE );

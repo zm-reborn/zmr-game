@@ -2,7 +2,7 @@
 #include "gamestringpool.h"
 
 
-#include "c_zmr_zombie.h"
+#include "c_zmr_shambler.h"
 
 
 #define ZOMBIE_SANTAHAT     "models/props/misc/zombie_santahat01.mdl"
@@ -14,7 +14,7 @@ ConVar zm_cl_happyzombies_chance( "zm_cl_happyzombies_chance", "0.2", FCVAR_ARCH
 
 
 
-IMPLEMENT_CLIENTCLASS_DT( C_ZMZombie, DT_ZM_ClassicZombie, CZMZombie )
+IMPLEMENT_CLIENTCLASS_DT( C_ZMShambler, DT_ZM_Shambler, CZMShambler )
 END_RECV_TABLE()
 
 // ZMRTODO: Put this somewhere nice.
@@ -82,18 +82,18 @@ bool C_ZMHolidayHat::Parent( const char* pszAttachment )
     return true;
 }
 
-C_ZMZombie::C_ZMZombie()
+C_ZMShambler::C_ZMShambler()
 {
     SetZombieClass( ZMCLASS_SHAMBLER );
     m_pHat = nullptr;
 }
 
-C_ZMZombie::~C_ZMZombie()
+C_ZMShambler::~C_ZMShambler()
 {
     ReleaseHat();
 }
 
-CStudioHdr* C_ZMZombie::OnNewModel()
+CStudioHdr* C_ZMShambler::OnNewModel()
 {
     CStudioHdr* hdr = BaseClass::OnNewModel();
     
@@ -110,7 +110,7 @@ CStudioHdr* C_ZMZombie::OnNewModel()
     return hdr;
 }
 
-C_BaseAnimating* C_ZMZombie::BecomeRagdollOnClient()
+C_BaseAnimating* C_ZMShambler::BecomeRagdollOnClient()
 {
     C_BaseAnimating* pRagdoll = BaseClass::BecomeRagdollOnClient();
 
@@ -119,7 +119,7 @@ C_BaseAnimating* C_ZMZombie::BecomeRagdollOnClient()
     return pRagdoll;
 }
 
-void C_ZMZombie::UpdateVisibility()
+void C_ZMShambler::UpdateVisibility()
 {
     BaseClass::UpdateVisibility();
 
@@ -133,7 +133,7 @@ void C_ZMZombie::UpdateVisibility()
     }
 }
 
-void C_ZMZombie::CreateHat()
+void C_ZMShambler::CreateHat()
 {
     ReleaseHat();
 
@@ -156,7 +156,7 @@ void C_ZMZombie::CreateHat()
     }
 }
 
-void C_ZMZombie::MakeHappy()
+void C_ZMShambler::MakeHappy()
 {
     SetFlexWeightSafe( "smile", 1.0f );
     SetFlexWeightSafe( "jaw_clench", 1.0f );
@@ -165,7 +165,7 @@ void C_ZMZombie::MakeHappy()
     SetFlexWeightSafe( "left_lowerer", 1.0f );
 }
 
-LocalFlexController_t C_ZMZombie::GetFlexControllerNumByName( const char* pszName )
+LocalFlexController_t C_ZMShambler::GetFlexControllerNumByName( const char* pszName )
 {
     for ( LocalFlexController_t i = (LocalFlexController_t)1; i < GetNumFlexControllers(); i++ )
     {
@@ -178,7 +178,7 @@ LocalFlexController_t C_ZMZombie::GetFlexControllerNumByName( const char* pszNam
     return (LocalFlexController_t)0;
 }
 
-void C_ZMZombie::SetFlexWeightSafe( const char* pszName, float value )
+void C_ZMShambler::SetFlexWeightSafe( const char* pszName, float value )
 {
     LocalFlexController_t cntrl = GetFlexControllerNumByName( pszName );
 
@@ -189,7 +189,7 @@ void C_ZMZombie::SetFlexWeightSafe( const char* pszName, float value )
     SetFlexWeight( cntrl, value );
 }
 
-void C_ZMZombie::ReleaseHat()
+void C_ZMShambler::ReleaseHat()
 {
     if ( m_pHat )
     {
