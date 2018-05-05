@@ -14,5 +14,5 @@ public:
     ~C_ZMImmolator();
 
 
-    virtual const char* GetZombieLocalization() OVERRIDE { return "#ZMClassImmolator"; };
+    virtual const char* GetZombieLocalization() const OVERRIDE { return "#ZMClassImmolator"; }
 };

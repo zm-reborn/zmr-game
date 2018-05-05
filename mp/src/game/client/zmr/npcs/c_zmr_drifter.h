@@ -14,5 +14,5 @@ public:
     ~C_ZMDrifter();
 
 
-    virtual const char* GetZombieLocalization() OVERRIDE { return "#ZMClassDrifter"; };
+    virtual const char* GetZombieLocalization() const OVERRIDE { return "#ZMClassDrifter"; }
 };

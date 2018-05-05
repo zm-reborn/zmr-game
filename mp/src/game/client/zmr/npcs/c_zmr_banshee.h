@@ -14,5 +14,5 @@ public:
     ~C_ZMBanshee();
 
 
-    virtual const char* GetZombieLocalization() OVERRIDE { return "#ZMClassBanshee"; };
+    virtual const char* GetZombieLocalization() const OVERRIDE { return "#ZMClassBanshee"; }
 };

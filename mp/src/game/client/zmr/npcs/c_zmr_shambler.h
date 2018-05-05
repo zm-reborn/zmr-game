@@ -23,7 +23,7 @@ public:
     C_ZMShambler();
     ~C_ZMShambler();
 
-    virtual const char* GetZombieLocalization() OVERRIDE { return "#ZMClassShambler"; };
+    virtual const char* GetZombieLocalization() const OVERRIDE { return "#ZMClassShambler"; }
 
 
     virtual CStudioHdr* OnNewModel() OVERRIDE;
