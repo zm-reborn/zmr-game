@@ -4,7 +4,7 @@
 //#include "npcr_events.h"
 
 
-enum ZombieCommandType_t;
+enum ZombieCommandType_t : unsigned char;
 
 class CBaseCombatCharacter;
 

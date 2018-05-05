@@ -10,6 +10,8 @@ extern ConVar npcr_debug_schedules;
 
 namespace NPCR
 {
+    class CScheduleInterface;
+
     enum ScheduleState_t
     {
         SCHED_INSTART = 0, // We haven't started yet.
