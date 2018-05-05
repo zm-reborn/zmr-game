@@ -1,0 +1,15 @@
+"Tips"
+{
+	"zmintro"
+	{
+		"shown"		"2"
+	}
+	"zmmoving"
+	{
+		"shown"		"3"
+	}
+	"zmvision"
+	{
+		"shown"		"0"
+	}
+}

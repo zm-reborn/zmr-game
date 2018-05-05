@@ -32,7 +32,7 @@
 
 
 // Half-Life Server Configuration Layout Script (stores last settings chosen, too)
-// File generated:  Tue Aug 22 11:53:28 AM
+// File generated:  Wed May 02 02:13:27 PM
 //
 //
 // Cvar	-	Setting
@@ -68,4 +68,5 @@ DESCRIPTION SERVER_OPTIONS
 		{ NUMBER 0 -1 }
 		{ "0" }
 	}
+
 }
