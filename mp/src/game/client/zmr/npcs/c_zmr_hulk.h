@@ -14,5 +14,5 @@ public:
     ~C_ZMHulk();
 
 
-    virtual const char* GetZombieLocalization() OVERRIDE { return "#ZMClassHulk"; };
+    virtual const char* GetZombieLocalization() const OVERRIDE { return "#ZMClassHulk"; }
 };
