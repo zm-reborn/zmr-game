@@ -73,8 +73,6 @@ server_blacklist.txt
 *.db
 *.prt
 *.vmx
-serverconfig.vdf
-settings.scr
 *.mdmp
 mp/game/zmr/custom/*
 !mp/game/zmr/custom/readme.txt
