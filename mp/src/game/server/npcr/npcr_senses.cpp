@@ -39,7 +39,7 @@ void NPCR::CBaseSenses::UpdateHearing()
 {
     if ( 1 /*&& !(GetOuter()->HasSpawnFlags(SF_NPC_WAIT_TILL_SEEN))*/ )
     {
-        const int iSoundMask = SOUND_WORLD | SOUND_COMBAT | SOUND_PLAYER | SOUND_BULLET_IMPACT;
+        const int iSoundMask = GetSoundMask();
     
         int	iSound = CSoundEnt::ActiveList();
         while ( iSound != SOUNDLIST_EMPTY )
@@ -65,6 +65,11 @@ void NPCR::CBaseSenses::UpdateHearing()
     }
 
     m_NextHearingTimer.Start( 0.1f );
+}
+
+int NPCR::CBaseSenses::GetSoundMask() const
+{
+    return SOUND_WORLD | SOUND_COMBAT | SOUND_PLAYER | SOUND_BULLET_IMPACT;
 }
 
 bool NPCR::CBaseSenses::CanHearSound( CSound* pSound ) const

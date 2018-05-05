@@ -41,9 +41,9 @@ namespace NPCR
         virtual float GetSlopeLimit() const { return 0.45f; }
         virtual float GetGravity() const { return 800.0f; }
         virtual float GetStepHeight() const { return 16.0f; }
-        virtual float GetPitchRate() const { return 0.0f; }
+        virtual float GetPitchRate( float delta ) const { return 0.0f; }
         virtual bool UsePitch() const { return false; }
-        virtual float GetYawRate() const { return 300.0f; }
+        virtual float GetYawRate( float delta ) const { return 300.0f; }
 
 
         virtual CBaseEntity*    GetGroundEntity() const { return m_hGroundEnt.Get(); }

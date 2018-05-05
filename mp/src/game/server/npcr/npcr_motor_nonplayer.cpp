@@ -28,6 +28,13 @@ bool NPCR::CNonPlayerMotor::ShouldApplyGroundMove() const
     return GetGroundNormal().z > GetSlopeLimit();
 }
 
+void NPCR::CNonPlayerMotor::Approach( const Vector& vecDesiredGoal )
+{
+    FaceTowards( vecDesiredGoal );
+
+    BaseClass::Approach( vecDesiredGoal );
+}
+
 void NPCR::CNonPlayerMotor::Update()
 {
     if ( GetOuter()->GetMoveType() == MOVETYPE_CUSTOM )

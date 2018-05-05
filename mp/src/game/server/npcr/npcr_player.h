@@ -2,13 +2,72 @@
 
 #include "npcr/npcr_basenpc.h"
 
+
+// Uncomment if bot_* commands are defined somewhere else.
+#define NPCR_BOT_CMDS
+
+
 namespace NPCR
 {
-    template<typename PlayerClass>
-    class CPlayer : public PlayerClass, public NPCR::CBaseNPC
+    class CPlayerMotor;
+
+    abstract_class CPlayerCmdHandler : public NPCR::CBaseNPC
     {
     public:
-        CPlayer() : NPCR::CBaseNPC( this )
+        CPlayerCmdHandler( CBaseCombatCharacter* pNPC );
+        ~CPlayerCmdHandler();
+
+#define DECLARE_BTN(name)           void name( float hold = 0.0f ); \
+                                    void Un##name(); \
+                                    bool IsIn##name() const; \
+                                private: \
+                                    CountdownTimer m_##name; \
+                                public:
+
+#define DEFINE_BTN(clss,name)       void clss::name( float hold ) \
+                                    { \
+                                        m_##name.Start( hold ); \
+                                    } \
+                                    void clss::Un##name() \
+                                    { \
+                                        m_##name.Invalidate(); \
+                                    } \
+                                    bool clss::IsIn##name() const \
+                                    { \
+                                        return m_##name.HasStarted(); \
+                                    }
+
+#define HANDLE_BTN(name,inflag,cmd) if ( m_##name.HasStarted() ) \
+                                    { \
+                                        cmd.buttons |= inflag; \
+                                         \
+                                        if ( m_##name.IsElapsed() ) \
+                                            m_##name.Invalidate(); \
+                                    }
+
+        //
+        DECLARE_BTN( PressFire1 )
+        DECLARE_BTN( PressFire2 )
+        DECLARE_BTN( PressDuck )
+        DECLARE_BTN( PressReload )
+        DECLARE_BTN( PressUse )
+        //
+
+
+        CPlayerMotor* GetPlayerMotor() const;
+
+        virtual CBaseMotor* CreateMotor() OVERRIDE;
+
+
+
+        virtual void BuildPlayerCmd( CUserCmd& cmd );
+    };
+
+    template<typename PlayerClass>
+    class CPlayer : public PlayerClass, public CPlayerCmdHandler
+    {
+    public:
+        CPlayer() : CPlayerCmdHandler( this )
         {
         }
         
@@ -22,8 +81,6 @@ namespace NPCR
 
             CBaseNPC::PostConstructor();
         }
-        
-        //CPlayerMotor* GetPlayerMotor() const { return static_cast<CPlayerMotor*>( CBaseNPC::GetMotor() ); }
 
 
         virtual bool IsNetClient() const OVERRIDE { return false; }
@@ -32,7 +89,7 @@ namespace NPCR
 
         virtual CBaseNPC* MyNPCRPointer() OVERRIDE { return this; }
 
-        
+
         template<typename BotClass>
         static PlayerClass* CreateBot( const char* playername )
         {
@@ -52,7 +109,6 @@ namespace NPCR
             return pPlayer;
         }
         
-        
         virtual bool RemoveNPC() OVERRIDE
         {
             // We can't be removed as an entity. Kick instead.
@@ -68,7 +124,7 @@ namespace NPCR
 
 
         // Return true if you've overridden the user cmd.
-        virtual bool OverrideUserCmd( CUserCmd* pCom ) { return false; }
+        virtual bool OverrideUserCmd( CUserCmd& com ) { return false; }
 
 
         virtual void PhysicsSimulate() OVERRIDE
@@ -80,10 +136,13 @@ namespace NPCR
             cmd.Reset();
             cmd.command_number = gpGlobals->tickcount;
 
-            if ( !OverrideUserCmd( &cmd ) /*&& !GetPlayerMotor()->GetBuiltUserCmd( &cmd )*/ )
+            if ( !OverrideUserCmd( cmd ) )
             {
-                ;
+                BuildPlayerCmd( cmd );
             }
+
+            cmd.viewangles = PlayerClass::EyeAngles();
+
 
             PlayerClass::ProcessUsercmds( &cmd, 1, 1, 0, false );
 

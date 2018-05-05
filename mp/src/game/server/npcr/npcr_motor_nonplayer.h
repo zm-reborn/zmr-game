@@ -27,6 +27,7 @@ namespace NPCR
         virtual void SetVelocity( const Vector& vecVel ) OVERRIDE { m_vecVelocity = vecVel; BaseClass::SetVelocity( vecVel ); }
 
 
+        virtual void Approach( const Vector& vecDesiredGoal ) OVERRIDE;
 
         // Applied when moving
         virtual float GetFrictionSideways() const { return 5.0f; }
