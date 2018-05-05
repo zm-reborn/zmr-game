@@ -22,6 +22,7 @@ public:
     typedef CZMBanshee ThisClass;
     typedef CZMBaseZombie BaseClass;
     //DECLARE_CLASS( CZMBanshee, CZMBaseZombie );
+    DECLARE_SERVERCLASS();
 
     CZMBanshee();
     ~CZMBanshee();

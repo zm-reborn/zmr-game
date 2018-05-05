@@ -10,6 +10,7 @@ public:
     typedef CZMDrifter ThisClass;
     typedef CZMBaseZombie BaseClass;
     //DECLARE_CLASS( CZMDrifter, CZMBaseZombie );
+    DECLARE_SERVERCLASS();
 
     CZMDrifter();
     ~CZMDrifter();

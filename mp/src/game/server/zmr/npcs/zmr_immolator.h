@@ -9,6 +9,7 @@ public:
     typedef CZMImmolator ThisClass;
     typedef CZMBaseZombie BaseClass;
     //DECLARE_CLASS( CZMImmolator, CZMBaseZombie );
+    DECLARE_SERVERCLASS();
 
     CZMImmolator();
     ~CZMImmolator();

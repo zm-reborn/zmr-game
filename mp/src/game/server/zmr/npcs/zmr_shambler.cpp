@@ -35,6 +35,8 @@ Activity CZMShambler::ACT_ZOM_SWATRIGHTLOW = ACT_INVALID;
 LINK_ENTITY_TO_CLASS( npc_zombie, CZMShambler );
 PRECACHE_REGISTER( npc_zombie );
 
+IMPLEMENT_SERVERCLASS_ST( CZMShambler, DT_ZM_Shambler )
+END_SEND_TABLE()
 
 CZMShambler::CZMShambler()
 {

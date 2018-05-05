@@ -10,6 +10,7 @@ public:
     typedef CZMShambler ThisClass;
     typedef CZMBaseZombie BaseClass;
     //DECLARE_CLASS( CZMShambler, CZMBaseZombie );
+    DECLARE_SERVERCLASS();
 
     CZMShambler();
     ~CZMShambler();

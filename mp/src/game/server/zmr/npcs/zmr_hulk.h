@@ -22,6 +22,7 @@ public:
     typedef CZMHulk ThisClass;
     typedef CZMBaseZombie BaseClass;
     //DECLARE_CLASS( CZMHulk, CZMBaseZombie );
+    DECLARE_SERVERCLASS();
 
     CZMHulk();
     ~CZMHulk();

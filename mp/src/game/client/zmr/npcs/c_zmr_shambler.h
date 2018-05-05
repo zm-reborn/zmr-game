@@ -13,15 +13,15 @@ public:
     virtual bool Parent( const char* pszAttachment );
 };
 
-class C_ZMZombie : public C_ZMBaseZombie
+class C_ZMShambler : public C_ZMBaseZombie
 {
 public:
-    DECLARE_CLASS( C_ZMZombie, C_ZMBaseZombie )
+    DECLARE_CLASS( C_ZMShambler, C_ZMBaseZombie )
 	DECLARE_CLIENTCLASS()
 
 
-    C_ZMZombie();
-    ~C_ZMZombie();
+    C_ZMShambler();
+    ~C_ZMShambler();
 
     virtual const char* GetZombieLocalization() OVERRIDE { return "#ZMClassShambler"; };
 
