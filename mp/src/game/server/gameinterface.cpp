@@ -130,6 +130,10 @@ extern ConVar tf_mm_servermode;
 #include "replay/ireplaysystem.h"
 #endif
 
+#ifdef ZMR
+#include "npcr_manager.h"
+#endif
+
 extern IToolFrameworkServer *g_pToolFrameworkServer;
 extern IParticleSystemQuery *g_pParticleSystemQuery;
 
@@ -1230,6 +1234,10 @@ void CServerGameDLL::GameFrame( bool simulating )
 
 #ifdef NEXT_BOT
 	TheNextBots().Update();
+#endif
+
+#ifdef ZMR // ZMRCHANGE: Update our npcs!
+    NPCR::g_NPCManager.OnGameFrame();
 #endif
 
 	gamestatsuploader->UpdateConnection();

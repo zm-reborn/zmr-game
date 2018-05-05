@@ -7,7 +7,7 @@
 #include "zmr/zmr_player_shared.h"
 #include "zmr/zmr_global_shared.h"
 #include "zmr/c_zmr_zmvision.h"
-#include "c_zmr_zombiebase.h"
+#include "zmr/npcs/zmr_zombiebase_shared.h"
 
 
 extern bool g_bRenderPostProcess;
@@ -16,6 +16,7 @@ extern bool g_bRenderPostProcess;
 static ConVar zm_cl_zombiefadein( "zm_cl_zombiefadein", "0.55", FCVAR_ARCHIVE, "How fast zombie fades.", true, 0.0f, true, 2.0f );
 
 
+#undef CZMBaseZombie
 IMPLEMENT_CLIENTCLASS_DT( C_ZMBaseZombie, DT_ZM_BaseZombie, CZMBaseZombie )
 	RecvPropInt( RECVINFO( m_iSelectorIndex ) ),
 	RecvPropFloat( RECVINFO( m_flHealthRatio ) ),
@@ -44,7 +45,7 @@ CLIENTEFFECT_REGISTER_END()
 
 C_ZMBaseZombie::C_ZMBaseZombie()
 {
-    g_pZombies->AddToTail( this );
+    g_ZombieManager.AddZombie( this );
 
 
     m_fxHealth = nullptr;
@@ -67,7 +68,7 @@ C_ZMBaseZombie::C_ZMBaseZombie()
 
 C_ZMBaseZombie::~C_ZMBaseZombie()
 {
-    g_pZombies->FindAndRemove( this );
+    g_ZombieManager.RemoveZombie( this );
 
     delete m_fxHealth;
     delete m_fxInner;

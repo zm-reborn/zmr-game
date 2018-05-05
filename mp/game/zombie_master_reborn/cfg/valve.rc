@@ -15,6 +15,9 @@ mat_bloomscale			0.4
 
 ai_frametime_limit 0.1
 
+// A bit more tolerance for slopes.
+nav_slope_limit 0.4
+
 
 //
 // stuff command line statements

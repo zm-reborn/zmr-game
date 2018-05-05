@@ -1,6 +1,6 @@
 #pragma once
 
-#include "c_ai_basenpc.h"
+#include "c_basecombatcharacter.h"
 
 
 
@@ -15,10 +15,10 @@
 
 
 // ZMRTODO: Predict selector index.
-class C_ZMBaseZombie : public C_AI_BaseNPC
+class C_ZMBaseZombie : public C_BaseCombatCharacter
 {
 public:
-	DECLARE_CLASS( C_ZMBaseZombie, C_AI_BaseNPC )
+	DECLARE_CLASS( C_ZMBaseZombie, C_BaseCombatCharacter )
 	DECLARE_CLIENTCLASS()
 	DECLARE_PREDICTABLE();
     DECLARE_DATADESC()
@@ -31,11 +31,16 @@ public:
     virtual int     DrawModel( int flags ) OVERRIDE;
     int             DrawModelAndEffects( int flags );
 
-    virtual Vector          GetObserverCamOrigin() OVERRIDE { return WorldSpaceCenter(); };
+
+    virtual bool    IsNPCR() const OVERRIDE { return true; }
+
+
+
+    virtual Vector          GetObserverCamOrigin() OVERRIDE { return WorldSpaceCenter(); }
     virtual const QAngle&   EyeAngles() OVERRIDE;
     virtual Vector          EyePosition() OVERRIDE;
 
-    virtual const char* GetZombieLocalization() { return ""; };
+    virtual const char* GetZombieLocalization() const { return ""; }
     
     //virtual void TraceAttack( const CTakeDamageInfo&, const Vector&, trace_t*,CDmgAccumulator* ) OVERRIDE;
     
@@ -46,17 +51,19 @@ public:
     static int              GetPopCost( ZombieClass_t zclass );
     static int              GetCost( ZombieClass_t zclass );
     static bool             HasEnoughPopToSpawn( ZombieClass_t zclass );
-    int                     GetSelectorIndex();
-    C_ZMPlayer*             GetSelector();
+    int                     GetSelectorIndex() const;
+    C_ZMPlayer*             GetSelector() const;
     void                    SetSelector( C_ZMPlayer* pPlayer );
     void                    SetSelector( int index );
-    ZombieClass_t           GetZombieClass();
+    ZombieClass_t           GetZombieClass() const;
+    int                     GetPopCost() const;
+    int                     GetCost() const;
 protected:
     void                    SetZombieClass( ZombieClass_t zclass );
 public:
 
 
-    inline int  GetGroup() { return m_iGroup; };
+    inline int  GetGroup() const { return m_iGroup; };
     inline void SetGroup( int group ) { m_iGroup = group; };
 
 protected:
@@ -75,16 +82,9 @@ private:
 
 inline C_ZMBaseZombie* ToZMBaseZombie( C_BaseEntity* pEnt )
 {
-    if ( !pEnt || !pEnt->IsNPC() )
-        return nullptr;
+    //if ( !pEnt || !pEnt->IsNPC() )
+    //    return nullptr;
 
     // We have to dynamic cast due to npc_crow, etc.
     return dynamic_cast<C_ZMBaseZombie*>( pEnt );
 }
-
-inline C_ZMBaseZombie* ToZMBaseZombie( C_AI_BaseNPC* pEnt )
-{
-    // We have to dynamic cast due to npc_crow, etc.
-    return dynamic_cast<C_ZMBaseZombie*>( pEnt );
-}
-

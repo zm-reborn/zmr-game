@@ -342,13 +342,8 @@ void CZMHudControlPanel::GroupsListUpdate()
 
     CUtlVector<int> vGroups;
 
-    for ( int i = 0; i < g_pZombies->Count(); i++ )
+    g_ZombieManager.ForEachZombie( [ &vGroups, this ]( C_ZMBaseZombie* pZombie )
     {
-        C_ZMBaseZombie* pZombie = g_pZombies->Element( i );
-             
-        if ( !pZombie ) continue;
-
-
         int group = pZombie->GetGroup();
 
         if ( group > INVALID_GROUP_INDEX && vGroups.Find( group ) == -1 )
@@ -370,7 +365,7 @@ void CZMHudControlPanel::GroupsListUpdate()
                 m_ComboBoxItems.AddToTail( group );
             }
         }
-    }
+    } );
 
 
     Menu* dropdown = m_pZombieGroups->GetMenu();
@@ -407,12 +402,12 @@ void CZMHudControlPanel::CreateGroup()
 {
     // Find empty group.
     int newgroup = 1;
-
-    for ( int i = 0; i < g_pZombies->Count(); )
+    
+    for ( int i = 0; i < g_ZombieManager.GetNumZombies(); )
     {
-        C_ZMBaseZombie* pZombie = g_pZombies->Element( i );
+        C_ZMBaseZombie* pZombie = g_ZombieManager.GetZombieByIndex( i );
 
-        if ( pZombie && pZombie->GetGroup() == newgroup )
+        if ( pZombie->GetGroup() == newgroup )
         {
             i = 0;
             ++newgroup;
@@ -422,6 +417,7 @@ void CZMHudControlPanel::CreateGroup()
 
         ++i;
     }
+
 
     if ( newgroup <= MAX_GROUP_INDEX )
     {

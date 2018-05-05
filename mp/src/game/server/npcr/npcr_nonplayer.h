@@ -1,0 +1,92 @@
+#pragma once
+
+
+#include "basecombatcharacter.h"
+#include "ai_basenpc.h"
+
+#include "npcr_basenpc.h"
+//#include "npcr_motor_nonplayer.h"
+
+
+namespace NPCR
+{
+    class CNonPlayerMotor;
+
+    // An NPC that simulates its own movement and relies on animation activities and events. Ie. like the Source NPCs.
+    class CBaseNonPlayer : public CBaseCombatCharacter, public CBaseNPC
+    {
+    public:
+        typedef CBaseCombatCharacter BaseClass;
+        typedef CBaseNonPlayer ThisClass;
+        //DECLARE_CLASS( CBaseNonPlayer, CBaseCombatCharacter );
+
+        CBaseNonPlayer();
+        ~CBaseNonPlayer();
+
+        virtual CBaseMotor* CreateMotor() OVERRIDE;
+
+        virtual void PostConstructor( const char* szClassname ) OVERRIDE;
+        virtual void Spawn() OVERRIDE;
+
+
+        virtual CBaseNPC* MyNPCRPointer() OVERRIDE { return this; }
+        //virtual bool IsNPC() const OVERRIDE { return true; }
+        virtual bool IsTemplate() OVERRIDE { return HasSpawnFlags( SF_NPC_TEMPLATE ); }
+
+        // Just outright remove us.
+        virtual bool RemoveNPC() OVERRIDE { UTIL_Remove( this ); return true; }
+
+
+        virtual void VPhysicsUpdate( IPhysicsObject* pPhys ) OVERRIDE;
+        virtual void PerformCustomPhysics( Vector* pNewPosition, Vector* pNewVelocity, QAngle* pNewAngles, QAngle* pNewAngVelocity ) OVERRIDE;
+        virtual void VPhysicsCollision( int index, gamevcollisionevent_t *pEvent ) OVERRIDE;
+
+
+        virtual void HandleAnimEvent( animevent_t* pEvent ) OVERRIDE;
+
+        virtual int OnTakeDamage_Alive( const CTakeDamageInfo& info ) OVERRIDE;
+
+
+        bool            HasActivity( Activity act );
+
+
+        // Don't mind the odd name, it's to avoid confusion between move activity ground speed and "move speed"
+        virtual float GetMoveActivityMovementSpeed();
+
+
+
+        virtual bool    IsEnemy( CBaseEntity* pEnt ) const OVERRIDE { return pEnt && pEnt->IsPlayer(); }
+        virtual bool    IsTargetedEnemy( CBaseEntity* pEnt ) const OVERRIDE { return pEnt && GetEnemy() == pEnt; }
+
+
+        
+
+        // We shouldn't send this anim event to base classes.
+        void HandledAnimEvent() { m_bHandledAnimEvent = true; }
+
+
+        CBaseEntity*    GetEnemy() const { return m_hEnemy.Get(); }
+        void            SetEnemy( CBaseEntity* pEnt ) { m_hEnemy.Set( pEnt ); }
+
+
+        Activity        GetActivity() const { return m_iCurActivity; }
+        bool            SetActivity( Activity act );
+
+
+    protected:
+        void NPCThink();
+
+        void SetDefaultEyeOffset();
+
+    private:
+        CHandle<CBaseEntity> m_hEnemy; // The enemy we're trying to attack.
+
+
+        bool        m_bHandledAnimEvent;
+
+        Activity    m_iCurActivity;
+        Activity    m_iLastActivity;
+        Activity    m_iLastLoopActivity; // For making sure we don't call OnActivityFinished multiple times.
+        bool        m_bCurActivityLoops;
+    };
+}

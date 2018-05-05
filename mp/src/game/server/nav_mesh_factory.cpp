@@ -24,6 +24,10 @@
 #include "cstrike/cs_nav_mesh.h"
 #endif
 
+#ifdef ZMR
+#include "zmr/nav/zmr_nav_mesh.h"
+#endif
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -39,6 +43,10 @@ CNavMesh *NavMeshFactory( void )
 
 #ifdef CSTRIKE_DLL
 	return new CSNavMesh;
+#endif
+
+#ifdef ZMR // ZMRCHANGE: Use our own nav mesh.
+	return new CZMRNavMesh;
 #endif
 
 	return new CNavMesh;
