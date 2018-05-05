@@ -6,7 +6,7 @@
 
 $Macro SRCDIR		"..\.."
 $Macro GAMENAME 	"zmr" [!$SOURCESDK]
-$Macro GAMENAME 	"zombie_master_reborn" [$SOURCESDK]
+$Macro GAMENAME 	"zmr" [$SOURCESDK]
 
 $Include "$SRCDIR\game\client\client_base.vpc"
 
