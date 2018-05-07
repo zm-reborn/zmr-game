@@ -129,6 +129,19 @@ void NPCR::CNonPlayerMotor::Move()
         }
     }
 
+
+    // Velocity needs to be clamped.
+    // See k_flMaxVelocity
+    const float flAbsMaxVel = 2000.0f;
+    if (abs( m_vecVelocity.x ) > flAbsMaxVel
+    ||  abs( m_vecVelocity.y ) > flAbsMaxVel
+    ||  abs( m_vecVelocity.z ) > flAbsMaxVel)
+    {
+        m_vecVelocity.NormalizeInPlace();
+        m_vecVelocity *= flAbsMaxVel;
+    }
+
+
     SetVelocity( m_vecVelocity );
 
 
