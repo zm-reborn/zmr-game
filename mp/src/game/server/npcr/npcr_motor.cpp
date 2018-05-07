@@ -237,6 +237,8 @@ Vector NPCR::CBaseMotor::HandleCollisions( const Vector& vecGoal )
     
     float halfhull = GetHullWidth() / 2.0f;
 
+    bool bTrySmallerBox = true;
+
     // If we're on ground, ignore step height.
     // This is important, because it is very easy to get stuck on slopes, etc.
     Vector mins( -halfhull, -halfhull, IsOnGround() ? GetStepHeight() : 0.0f );
@@ -251,7 +253,7 @@ Vector NPCR::CBaseMotor::HandleCollisions( const Vector& vecGoal )
     Vector goalPos = vecGoal;
 
     trace_t tr;
-    while ( limit > 0 )
+    while ( limit-- > 0 )
     {
         CMoveFilter filter( GetNPC(), COLLISION_GROUP_NPC );
         UTIL_TraceHull( startPos, goalPos, mins, maxs, MASK_NPCSOLID, &filter, &tr );
@@ -305,6 +307,16 @@ Vector NPCR::CBaseMotor::HandleCollisions( const Vector& vecGoal )
                     }
                 }
             }
+            // HACK: it is incredibly easy to get stuck on ceilings.
+            else if ( bTrySmallerBox )
+            {
+                maxs.z -= 4.0f;
+                if ( maxs.z <= mins.z )
+                    maxs.z = mins.z + 1.0f;
+
+                bTrySmallerBox = false;
+                continue;
+            }
 
             Assert( validPos != m_vecLastValidPos );
             validPos = m_vecLastValidPos;
@@ -316,8 +328,9 @@ Vector NPCR::CBaseMotor::HandleCollisions( const Vector& vecGoal )
         Vector fullMove = goalPos - startPos;
         Vector leftToMove = fullMove * ( 1.0f - tr.fraction );
 
-        if (tr.plane.normal.z < GetSlopeLimit() && 
-            fullMove.z > 0.0f )
+        if (tr.plane.normal.z < GetSlopeLimit()
+        &&  IsOnGround()
+        &&  fullMove.z > 0.0f )
         {
             fullMove.z = 0.0f;
             tr.plane.normal.z = 0.0f;
@@ -336,10 +349,9 @@ Vector NPCR::CBaseMotor::HandleCollisions( const Vector& vecGoal )
 
 
         goalPos = remainingMove;
-        --limit;
     }
 
-    if ( !tr.startsolid )
+    if ( !tr.startsolid && bTrySmallerBox )
     {
         m_vecLastValidPos = validPos;
     }
