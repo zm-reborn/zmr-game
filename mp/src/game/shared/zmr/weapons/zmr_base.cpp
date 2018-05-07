@@ -236,7 +236,13 @@ void CZMBaseWeapon::PrimaryAttack( void )
 #ifndef CLIENT_DLL
 void CZMBaseWeapon::PlayAISound() const
 {
-    CSoundEnt::InsertSound( SOUND_COMBAT, GetOwner()->GetAbsOrigin(), GetAISoundVolume(), 0.25f, GetOwner() );
+    // Our owner is not guaranteed.
+    // This may be called after we damage an explosive, owner dies and drops the weapon.
+    CBaseEntity* pSrc = GetOwner();
+    if ( !pSrc )
+        pSrc = const_cast<CZMBaseWeapon*>( this );
+
+    CSoundEnt::InsertSound( SOUND_COMBAT, pSrc->GetAbsOrigin(), GetAISoundVolume(), 0.25f, pSrc );
 }
 #endif
 
