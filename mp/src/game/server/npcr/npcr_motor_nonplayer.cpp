@@ -54,6 +54,17 @@ void NPCR::CNonPlayerMotor::Move()
     
 
     CBaseEntity* pNewGround = UpdateGround();
+
+    if ( !pOldGround && pNewGround )
+    {
+        GetNPC()->OnLandedGround( pNewGround );
+    }
+    else if ( pOldGround && !pNewGround )
+    {
+        GetNPC()->OnLeftGround( pOldGround );
+    }
+
+
     bool bIsOnGround = pNewGround != nullptr;
 
     if ( !bIsOnGround )
@@ -143,17 +154,6 @@ void NPCR::CNonPlayerMotor::Move()
 
 
     SetVelocity( m_vecVelocity );
-
-
-
-    if ( !pOldGround && pNewGround )
-    {
-        GetNPC()->OnLandedGround( pNewGround );
-    }
-    else if ( pOldGround && !pNewGround )
-    {
-        GetNPC()->OnLeftGround( pOldGround );
-    }
 }
 
 bool NPCR::CNonPlayerMotor::GroundMove()
