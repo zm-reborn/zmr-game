@@ -4,7 +4,7 @@
 #include "cbase.h"
 
 
-enum ZombieCommandType_t
+enum ZombieCommandType_t : unsigned char
 {
     COMMAND_NONE = 0,
 
