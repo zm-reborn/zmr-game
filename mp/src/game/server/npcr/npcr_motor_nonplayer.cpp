@@ -203,7 +203,7 @@ bool NPCR::CNonPlayerMotor::GroundMove()
     // Decelerate when we are nearing the goal.
     auto* pPath = GetNPC()->GetCurrentPath();
 
-    if ( pPath && pPath->ShouldDecelerateToGoal() )
+    if ( m_bDoDecelerate && pPath && pPath->ShouldDecelerateToGoal() )
     {
         const float flMinDecDist = pPath->GetGoalTolerance() + 16.0f;
 
