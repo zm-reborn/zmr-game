@@ -189,8 +189,8 @@ void NPCR::CBaseNonPlayer::PerformCustomPhysics( Vector* pNewPosition, Vector* p
         VPhysicsGetObject()->UpdateShadow( *pNewPosition, vec3_angle, true, 0.0f );
         
         // This will not apply any force to objects nearby.
-        // Will get players stuck
-        //VPhysicsGetObject()->SetPosition( *pNewPosition, vec3_angle, true );
+        // Will get players stuck (if called alone?)
+        VPhysicsGetObject()->SetPosition( *pNewPosition, vec3_angle, true );
     }
 }
 
