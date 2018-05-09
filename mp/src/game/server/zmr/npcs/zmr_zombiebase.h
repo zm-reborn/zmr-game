@@ -63,6 +63,8 @@ public:
 
     virtual NPCR::CSchedule<CZMBaseZombie>* OverrideCombatSchedule() const { return nullptr; }
 
+    virtual NPCR::CFollowNavPath* GetFollowPath() const;
+
 
     // Damage/death related
     virtual void    Extinguish() OVERRIDE;

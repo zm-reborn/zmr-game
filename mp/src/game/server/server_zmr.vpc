@@ -354,6 +354,8 @@ $Project "Server (ZMR)"
 				}
 				$Folder "Misc"
 				{
+					$File	"zmr\npcs\zmr_banshee_path.cpp"
+					$File	"zmr\npcs\zmr_banshee_path.h"
 					$File	"zmr\npcs\zmr_blockerfinder.cpp"
 					$File	"zmr\npcs\zmr_blockerfinder.h"
 					$File	"zmr\npcs\zmr_cmd_queue.h"

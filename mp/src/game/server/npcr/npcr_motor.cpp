@@ -145,7 +145,7 @@ void NPCR::CBaseMotor::Jump()
     m_vecGroundNormal.z = 0.0f;
 }
 
-void NPCR::CBaseMotor::NavJump( const Vector& vecGoal )
+void NPCR::CBaseMotor::NavJump( const Vector& vecGoal, float flOverrideHeight )
 {
     GetNPC()->OnLeftGround( nullptr );
     m_bDoStepDownTrace = false;
@@ -156,6 +156,9 @@ void NPCR::CBaseMotor::NavJump( const Vector& vecGoal )
     GetNPC()->SetPosition( pos );
 
     float minheight = vecGoal.z - pos.z + GetHullHeight();
+    if ( flOverrideHeight > 0.0f )
+        minheight = flOverrideHeight;
+
     minheight = MAX( 8.0f, minheight );
 
     Vector apex;
