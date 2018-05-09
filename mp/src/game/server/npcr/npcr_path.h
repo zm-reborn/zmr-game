@@ -50,10 +50,10 @@ namespace NPCR
 
 
 
-        bool Compute( const Vector& vecStart, const Vector& vecGoal, CNavArea* pStartArea, CNavArea* pGoalArea, const CBasePathCost& cost );
-        bool Compute( const Vector& vecStart, const Vector& vecGoal, const CBasePathCost& cost, float maxDistanceToArea = 10000.0f );
-        bool Compute( CBaseCombatCharacter* pNPC, CBaseCombatCharacter* pTarget, const CBasePathCost& cost );
-        bool Compute( CBaseCombatCharacter* pNPC, CBaseEntity* pTarget, const CBasePathCost& cost, float maxDistanceToArea = 10000.0f );
+        virtual bool Compute( const Vector& vecStart, const Vector& vecGoal, CNavArea* pStartArea, CNavArea* pGoalArea, const CBasePathCost& cost );
+        virtual bool Compute( const Vector& vecStart, const Vector& vecGoal, const CBasePathCost& cost, float maxDistanceToArea = 10000.0f );
+        virtual bool Compute( CBaseCombatCharacter* pNPC, CBaseCombatCharacter* pTarget, const CBasePathCost& cost );
+        virtual bool Compute( CBaseCombatCharacter* pNPC, CBaseEntity* pTarget, const CBasePathCost& cost, float maxDistanceToArea = 10000.0f );
 
         virtual bool ComputePathDetails( int count, const Vector& vecStart, CNavArea* pLastArea, const Vector& vecGoal, const CBasePathCost& cost );
 

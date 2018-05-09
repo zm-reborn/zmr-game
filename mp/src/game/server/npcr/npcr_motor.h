@@ -53,7 +53,7 @@ namespace NPCR
         virtual void OnLeftGround( CBaseEntity* pOldGround ) OVERRIDE;
 
         virtual void Jump();
-        virtual void NavJump( const Vector& vecGoal );
+        virtual void NavJump( const Vector& vecGoal, float flOverrideHeight = 0.0f );
         virtual void Climb();
 
         static Vector CalcJumpLaunchVelocity( const Vector& startPos, const Vector& endPos, float flGravity, float* pminHeight, float maxHorzVelocity, Vector* pvecApex );

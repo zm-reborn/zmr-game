@@ -84,32 +84,23 @@ void NPCR::CFollowNavPath::Invalidate()
     m_nStuckTimes = 0;
     m_StuckTimer.Invalidate();
     m_flStuckAngle = STUCK_ANGLE_START;
+
+
+    m_JumpStatus = JUMP_BEGIN;
 }
 
-bool NPCR::CFollowNavPath::CheckGoal( CBaseNPC* pNPC )
+NPCR::PathRes_t NPCR::CFollowNavPath::CheckGoal( CBaseNPC* pNPC ) const
 {
     if ( !m_pGoal )
-        return false;
+        return PATH_OK;
 
 
     Vector vecMyPos = pNPC->GetPosition();
 
     if ( m_pCurLink && m_pCurLink->navTravel == TRAVEL_NAVJUMP )
     {
-        bool bOnGround = pNPC->GetMotor()->IsOnGround();
-        
-        // We're not on groud yet.
-        if ( !bOnGround )
-            return false;
-
-
-        // We seemingly failed our jump.
-        if ( (m_pGoal->pos.z-8.0f) > vecMyPos.z )
-        {
-            OnPathFailed();
-            pNPC->OnMoveFailed( this );
-            return false;
-        }
+        if ( ShouldFailNavJump( pNPC ) )
+            return PATH_FAILED;
     }
 
 
@@ -139,7 +130,7 @@ bool NPCR::CFollowNavPath::CheckGoal( CBaseNPC* pNPC )
     // We close enough to goal?
     if ( distToGoalSqr < (tolerance*tolerance) )
     {
-        return true;
+        return PATH_SUCCESS;
     }
 
 
@@ -148,14 +139,14 @@ bool NPCR::CFollowNavPath::CheckGoal( CBaseNPC* pNPC )
     {
         // It's pretty much just a straight line to the next one, we can ignore this one then.
         if ( m_pGoal->fwd_dot > 0.9f )
-            return true;
+            return PATH_SUCCESS;
 
 
         dirToMe.NormalizeInPlace();
 
         // We're literally on the path to the next goal.
         if ( m_pGoal->fwd.Dot( dirToMe ) > 0.8f )
-            return true;
+            return PATH_SUCCESS;
 
         // Only if it isn't terribly curved.
         if ( m_pGoal->fwd_dot > 0.6f )
@@ -166,9 +157,31 @@ bool NPCR::CFollowNavPath::CheckGoal( CBaseNPC* pNPC )
             goalToNextSqr *= goalToNextSqr;
             if ( distToNextSqr < distToGoalSqr || distToNextSqr < goalToNextSqr )
             {
-                return true;
+                return PATH_SUCCESS;
             }
         }
+    }
+
+    return PATH_OK;
+}
+
+bool NPCR::CFollowNavPath::ShouldFailNavJump( CBaseNPC* pNPC ) const
+{
+    if ( m_JumpStatus == JUMP_BEGIN )
+        return false;
+
+
+    bool bOnGround = pNPC->GetMotor()->IsOnGround();
+        
+    // We're not on groud yet.
+    if ( !bOnGround )
+        return false;
+
+
+    // We seemingly failed our jump.
+    if ( (m_pGoal->pos.z-8.0f) > pNPC->GetPosition().z )
+    {
+        return true;
     }
 
     return false;
@@ -177,9 +190,11 @@ bool NPCR::CFollowNavPath::CheckGoal( CBaseNPC* pNPC )
 void NPCR::CFollowNavPath::FollowPath( CBaseNPC* pNPC )
 {
     // Check if we've reached the goal.
+    PathRes_t res = PATH_OK;
     while ( m_pGoal )
     {
-        if ( !CheckGoal( pNPC ) )
+        res = CheckGoal( pNPC );
+        if ( res != PATH_SUCCESS )
             break;
 
 
@@ -194,14 +209,30 @@ void NPCR::CFollowNavPath::FollowPath( CBaseNPC* pNPC )
     }
 
     // No more goal, we must've finished.
-    if ( !m_pGoal )
+    if ( res == PATH_SUCCESS )
     {
         OnPathSuccess();
         pNPC->OnMoveSuccess( this );
         return;
     }
+    else if ( res == PATH_FAILED )
+    {
+        OnPathFailed();
+        pNPC->OnMoveFailed( this );
+        return;
+    }
 
 
+    UpdateMove( pNPC );
+}
+
+void NPCR::CFollowNavPath::UpdateMove( CBaseNPC* pNPC )
+{
+    GroundMove( pNPC );
+}
+
+void NPCR::CFollowNavPath::GroundMove( CBaseNPC* pNPC )
+{
     if ( !pNPC->GetMotor()->IsOnGround() )
         return;
 
@@ -250,10 +281,13 @@ void NPCR::CFollowNavPath::Update( CBaseNPC* pNPC )
 
 void NPCR::CFollowNavPath::OnNewGoal( CBaseNPC* pNPC )
 {
+    m_JumpStatus = JUMP_BEGIN;
+
     // Start nav jump
     if ( GetCurLink() && GetCurLink()->navTravel == TRAVEL_NAVJUMP )
     {
         pNPC->GetMotor()->NavJump( GetGoalLink()->pos );
+        m_JumpStatus = JUMP_IN_AIR;
     }
 }
 

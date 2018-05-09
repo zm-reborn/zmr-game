@@ -6,6 +6,20 @@
 
 namespace NPCR
 {
+    enum PathRes_t
+    {
+        PATH_FAILED = 0,
+        PATH_OK,
+        PATH_SUCCESS
+    };
+
+    enum JumpStatus_t
+    {
+        JUMP_BEGIN = 0,
+        JUMP_IN_AIR,
+        JUMP_DONE
+    };
+
     class CFollowNavPath : public CBaseNavPath
     {
     public:
@@ -59,10 +73,15 @@ namespace NPCR
         virtual bool ShouldDecelerateToGoal() const OVERRIDE;
 
     protected:
-        void            FollowPath( CBaseNPC* pNPC );
-        virtual bool    CheckGoal( CBaseNPC* pNPC );
-        int             CheckAvoid( CBaseNPC* pNPC, Vector& vecGoalPos );
-        int             CheckStuck( CBaseNPC* pNPC, Vector& vecGoalPos );
+        virtual void    UpdateMove( CBaseNPC* pNPC );
+        void            GroundMove( CBaseNPC* pNPC );
+
+        void                FollowPath( CBaseNPC* pNPC );
+        virtual PathRes_t   CheckGoal( CBaseNPC* pNPC ) const;
+        int                 CheckAvoid( CBaseNPC* pNPC, Vector& vecGoalPos );
+        int                 CheckStuck( CBaseNPC* pNPC, Vector& vecGoalPos );
+
+        virtual bool        ShouldFailNavJump( CBaseNPC* pNPC ) const;
 
         void ClearAvoidState()
         {
@@ -74,6 +93,8 @@ namespace NPCR
         const NavLink_t* m_pGoal; // The link we are going towards.
         float m_flGoalTolerance; // The last link tolerance.
         float m_flMoveTolerance; // Everything else.
+
+        JumpStatus_t m_JumpStatus;
 
     private:
         float m_flLastSide;

@@ -4,14 +4,13 @@
 
 #include "zmr_zombiebase.h"
 
+
 class CZMBansheeMotor : public NPCR::CNonPlayerMotor
 {
 public:
-    CZMBansheeMotor( CZMBaseZombie* pOuter ) : NPCR::CNonPlayerMotor( pOuter )
-    {
-    }
+    CZMBansheeMotor( CZMBaseZombie* pOuter );
 
-    virtual float GetHullHeight() const OVERRIDE { return 52.0f; }
+    virtual float GetHullHeight() const OVERRIDE;
 
     //virtual float GetFrictionForward() const OVERRIDE { return IsAttemptingToMove() ? 0.0f : 0.2f; }
 };
@@ -55,6 +54,7 @@ public:
 
 
     virtual NPCR::CPathCostGroundOnly* GetPathCost() const OVERRIDE;
+    virtual NPCR::CFollowNavPath* GetFollowPath() const OVERRIDE;
 
 
     float GetNextLeapAttack() const { return m_flNextLeapAttack; }
@@ -66,7 +66,9 @@ public:
 
     virtual float GetClawAttackRange() const OVERRIDE { return 50.0f; }
 
-
+    static float GetBansheeHullHeight() { return 52.0f; }
+    static float GetMaxNavJumpDist() { return 512.0f; }
+    static float GetMaxNavJumpHeight() { return 768.0f; }
     static float GetMinLeapAttackSpeed() { return 100.0f; }
     static float GetMaxLeapSpeed() { return 900.0f; }
 

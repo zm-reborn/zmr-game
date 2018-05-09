@@ -5,6 +5,7 @@
 
 #include "zmr_gamerules.h"
 #include "zmr/npcs/zmr_zombiebase.h"
+#include "zmr_banshee_path.h"
 #include "zmr_banshee.h"
 #include "zmr/npcs/sched/zmr_zombie_banshee_ceil_ambush.h"
 #include "zmr/npcs/sched/zmr_zombie_banshee_leap.h"
@@ -40,6 +41,17 @@ int CZMBanshee::AE_FASTZOMBIE_LEAP = AE_INVALID;
 
 extern ConVar zm_sk_banshee_dmg_claw;
 extern ConVar zm_sk_banshee_health;
+
+
+
+CZMBansheeMotor::CZMBansheeMotor( CZMBaseZombie* pOuter ) : NPCR::CNonPlayerMotor( pOuter )
+{
+}
+
+float CZMBansheeMotor::GetHullHeight() const
+{
+    return CZMBanshee::GetBansheeHullHeight();
+}
 
 
 IMPLEMENT_SERVERCLASS_ST( CZMBanshee, DT_ZM_Banshee )
@@ -128,15 +140,20 @@ NPCR::CPathCostGroundOnly* CZMBanshee::GetPathCost() const
     static NPCR::CPathCostGroundOnly* cost = nullptr;
     if ( !cost )
     {
-        const float MAX_JUMP_RISE       = 512.0f; // 220.0f
+        //const float MAX_JUMP_RISE       = 512.0f; // 220.0f
         //const float MAX_JUMP_DISTANCE   = 512.0f;
         //const float MAX_JUMP_DROP       = 1024.0f; // 384.0f
 
         cost = new NPCR::CPathCostGroundOnly;
-        cost->SetMaxHeightChange( MAX_JUMP_RISE );
+        cost->SetMaxHeightChange( GetMaxNavJumpHeight() );
     }
 
     return cost;
+}
+
+NPCR::CFollowNavPath* CZMBanshee::GetFollowPath() const
+{
+    return new CZMBansheeFollowPath;
 }
 
 void CZMBanshee::OnNavJump()

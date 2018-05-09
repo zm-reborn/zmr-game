@@ -984,6 +984,11 @@ bool CZMBaseZombie::ShouldUpdate() const
     return BaseClass::ShouldUpdate();
 }
 
+NPCR::CFollowNavPath* CZMBaseZombie::GetFollowPath() const
+{
+    return new NPCR::CFollowNavPath;
+}
+
 NPCR::QueryResult_t CZMBaseZombie::ShouldTouch( CBaseEntity* pEnt ) const
 {
     if ( pEnt->IsBaseZombie() )
