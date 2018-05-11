@@ -57,13 +57,30 @@ ConVar zm_cl_fov( "zm_cl_fov", "90", FCVAR_USERINFO | FCVAR_ARCHIVE, "What is ou
 
 
 #undef CZMPlayer // We need to undefine it so we can get the server class.
-IMPLEMENT_CLIENTCLASS_DT( C_ZMPlayer, DT_ZM_Player, CZMPlayer )
-    RecvPropDataTable( RECVINFO_DT( m_ZMLocal ), 0, &REFERENCE_RECV_TABLE( DT_ZM_PlyLocal ) ),
+
+BEGIN_RECV_TABLE_NOBASE( C_ZMPlayer, DT_ZMLocalPlayerExclusive )
+    RecvPropVector( RECVINFO_NAME( m_vecNetworkOrigin, m_vecOrigin ) ),
+
+    //RecvPropFloat( RECVINFO( m_angEyeAngles[0] ) ),
+END_RECV_TABLE()
+
+BEGIN_RECV_TABLE_NOBASE( C_ZMPlayer, DT_ZMNonLocalPlayerExclusive )
+    RecvPropVector( RECVINFO_NAME( m_vecNetworkOrigin, m_vecOrigin ) ),
 
     RecvPropFloat( RECVINFO( m_angEyeAngles[0] ) ),
     RecvPropFloat( RECVINFO( m_angEyeAngles[1] ) ),
+END_RECV_TABLE()
+
+IMPLEMENT_CLIENTCLASS_DT( C_ZMPlayer, DT_ZM_Player, CZMPlayer )
+    RecvPropDataTable( "zmlocaldata", 0, 0, &REFERENCE_RECV_TABLE(DT_ZMLocalPlayerExclusive) ),
+    RecvPropDataTable( "zmnonlocaldata", 0, 0, &REFERENCE_RECV_TABLE(DT_ZMNonLocalPlayerExclusive) ),
+
+    RecvPropDataTable( RECVINFO_DT( m_ZMLocal ), 0, &REFERENCE_RECV_TABLE( DT_ZM_PlyLocal ) ),
+
     RecvPropInt( RECVINFO( m_iSpawnInterpCounter ) ),
     RecvPropEHandle( RECVINFO( m_hRagdoll ) ),
+
+    RecvPropInt( RECVINFO( m_nWaterLevel ) ),
 END_RECV_TABLE()
 
 BEGIN_PREDICTION_DATA( C_ZMPlayer )
