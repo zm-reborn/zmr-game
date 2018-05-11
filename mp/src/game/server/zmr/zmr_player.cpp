@@ -64,9 +64,6 @@ END_SEND_TABLE()
 IMPLEMENT_SERVERCLASS_ST( CZMPlayer, DT_ZM_Player )
     SendPropDataTable( SENDINFO_DT( m_ZMLocal ), &REFERENCE_SEND_TABLE( DT_ZM_PlyLocal ), SendProxy_SendLocalDataTable ),
 
-    // send a lo-res origin to other players
-    //SendPropVector	(SENDINFO( m_vecOrigin ), -1, SPROP_COORD_MP_LOWPRECISION|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_Origin ),
-
     SendPropInt( SENDINFO( m_iSpawnInterpCounter ), 4 ),
     SendPropEHandle( SENDINFO( m_hRagdoll ) ),
 
@@ -87,7 +84,7 @@ IMPLEMENT_SERVERCLASS_ST( CZMPlayer, DT_ZM_Player )
     SendPropExclude( "DT_BaseEntity", "m_angRotation" ),
     SendPropExclude( "DT_BaseAnimatingOverlay", "overlay_vars" ),
 
-    //SendPropExclude( "DT_BaseEntity", "m_vecOrigin" ),
+    SendPropExclude( "DT_BaseEntity", "m_vecOrigin" ),
 
     // playeranimstate and clientside animation takes care of these on the client
     SendPropExclude( "DT_ServerAnimationData" , "m_flCycle" ),	
