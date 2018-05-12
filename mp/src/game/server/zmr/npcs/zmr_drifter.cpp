@@ -40,8 +40,6 @@ void CZMDrifter::Precache()
         return;
 
 
-    PrecacheModel( ZOMBIE_MODEL );
-
     PrecacheScriptSound( "NPC_DragZombie.Die" );
     PrecacheScriptSound( "NPC_DragZombie.Idle" );
     PrecacheScriptSound( "NPC_DragZombie.Pain" );
@@ -62,8 +60,6 @@ void CZMDrifter::Precache()
 
 void CZMDrifter::Spawn()
 {
-    SetModel( ZOMBIE_MODEL );
-
     SetMaxHealth( zm_sk_dragzombie_health.GetInt() );
 
 

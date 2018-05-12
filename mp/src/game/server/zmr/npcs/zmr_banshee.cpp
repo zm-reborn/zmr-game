@@ -82,8 +82,6 @@ void CZMBanshee::Precache()
         return;
 
 
-    PrecacheModel( ZOMBIE_MODEL );
-
     PrecacheScriptSound( "NPC_FastZombie.LeapAttack" );
     PrecacheScriptSound( "NPC_FastZombie.FootstepRight" );
     PrecacheScriptSound( "NPC_FastZombie.FootstepLeft" );
@@ -127,8 +125,6 @@ void CZMBanshee::Precache()
 
 void CZMBanshee::Spawn()
 {
-    SetModel( ZOMBIE_MODEL );
-
     SetMaxHealth( zm_sk_banshee_health.GetInt() );
 
 

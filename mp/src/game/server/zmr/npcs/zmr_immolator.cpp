@@ -38,9 +38,6 @@ void CZMImmolator::Precache()
         return;
 
 
-    PrecacheModel( ZOMBIE_MODEL );
-
-
     PrecacheScriptSound( "Zombie.AttackHit" );
     PrecacheScriptSound( "Zombie.AttackMiss" );
     PrecacheScriptSound( "NPC_BurnZombie.Pain" );
@@ -56,8 +53,6 @@ void CZMImmolator::Precache()
 
 void CZMImmolator::Spawn()
 {
-    SetModel( ZOMBIE_MODEL );
-
     SetMaxHealth( zm_sk_burnzombie_health.GetInt() );
 
 

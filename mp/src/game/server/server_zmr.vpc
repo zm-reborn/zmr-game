@@ -369,6 +369,8 @@ $Project "Server (ZMR)"
 					$File	"zmr\npcs\zmr_blockerfinder.h"
 					$File	"zmr\npcs\zmr_cmd_queue.h"
 					$File	"zmr\npcs\zmr_npclagcomp.h"
+					$File	"zmr\npcs\zmr_zombiemodelgroups.cpp"
+					$File	"zmr\npcs\zmr_zombiemodelgroups.h"
 				}
 				
 				$File	"zmr\npcs\zmr_banshee.cpp"
