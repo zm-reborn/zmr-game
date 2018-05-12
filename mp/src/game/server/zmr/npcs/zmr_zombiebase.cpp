@@ -8,6 +8,7 @@
 
 #include "npcr_manager.h"
 
+#include "zmr_zombiemodelgroups.h"
 #include "zmr_gamerules.h"
 #include "zmr_blockerfinder.h"
 #include "zmr/npcs/zmr_zombieanimstate.h"
@@ -157,6 +158,9 @@ IMPLEMENT_SERVERCLASS_ST( CZMBaseZombie, DT_ZM_BaseZombie )
     SendPropExclude( "DT_BaseFlex", "m_viewtarget" ),
 END_SEND_TABLE()
 
+BEGIN_DATADESC( CZMBaseZombie )
+    DEFINE_KEYFIELD( m_strModelGroup, FIELD_STRING, "modelgroup" ),
+END_DATADESC()
 
 CZMBaseZombie::CZMBaseZombie()
 {
@@ -180,6 +184,9 @@ CZMBaseZombie::CZMBaseZombie()
 
     m_flBurnDamage = 0.0f;
     m_flBurnDamageTime = 0.0f;
+
+
+    m_strModelGroup = NULL_STRING;
 
 
     g_ZombieManager.AddZombie( this );
@@ -269,6 +276,9 @@ void CZMBaseZombie::Precache()
 
 void CZMBaseZombie::Spawn()
 {
+    g_ZombieModelGroups.OnZombieSpawn( this );
+
+
     BaseClass::Spawn();
 
     SetThink( &CZMBaseZombie::ZombieThink );

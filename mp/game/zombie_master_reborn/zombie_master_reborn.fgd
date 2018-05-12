@@ -98,6 +98,8 @@
 
 	rallyname(target_destination) : "Rallyname" : "" : "Targetname of the rallypoint this aims at."
 	nodename(target_destination) : "Nodename" : "" : "Targetname of the first spawn node, if any, in the chain of spawn nodes."
+	
+	modelgroup(string) : "Model Group" : "" : "Leave empty to use default model group (DefaultModels if not overriden). See scripts/zombiemodelgroups.txt"
 ]
 
 

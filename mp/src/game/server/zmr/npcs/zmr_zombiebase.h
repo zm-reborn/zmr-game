@@ -28,6 +28,7 @@ public:
     typedef NPCR::CBaseNonPlayer BaseClass;
     //DECLARE_CLASS( CZMBaseZombie, NPCR::CBaseNonPlayer );
     DECLARE_SERVERCLASS();
+    DECLARE_DATADESC();
 
 
     CZMBaseZombie();
@@ -180,6 +181,13 @@ public:
 
     CZMCommandQueue*    GetCommandQueue() const { return const_cast<CZMCommandQueue*>( &m_CmdQueue ); }
 
+
+    const char* GetZombieModelGroupName() const { return STRING( m_strModelGroup ); }
+    void SetZombieModelGroupName( string_t name ) { m_strModelGroup = name; }
+    //void SetZombieModelGroupName( const char* name ) { m_strModelGroup = AllocPooledString( name ); }
+private:
+    string_t m_strModelGroup;
+public:
 
 
     float   GetNextMove() const { return m_flNextMove; }

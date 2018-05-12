@@ -200,6 +200,8 @@ BEGIN_DATADESC( CZMEntZombieSpawn )
     DEFINE_KEYFIELD( m_sRallyName, FIELD_STRING, "rallyname" ),
     DEFINE_KEYFIELD( m_sFirstNodeName, FIELD_STRING, "nodename" ),
 
+    DEFINE_KEYFIELD( m_sZombieModelGroup, FIELD_STRING, "modelgroup" ),
+
     DEFINE_THINKFUNC( SpawnThink ),
 END_DATADESC()
 
@@ -499,6 +501,8 @@ bool CZMEntZombieSpawn::CreateZombie( ZombieClass_t zclass )
 
     // Don't drop to floor since npcs seem to get stuck on displacements.
     //UTIL_DropToFloor( pZombie, MASK_NPCSOLID );
+
+    pZombie->SetZombieModelGroupName( m_sZombieModelGroup );
 
 
     // We can be marked for deletion...

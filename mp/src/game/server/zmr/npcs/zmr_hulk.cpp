@@ -34,9 +34,6 @@ void CZMHulk::Precache()
         return;
 
 
-    PrecacheModel( ZOMBIE_MODEL );
-
-
     PrecacheScriptSound( "NPC_PoisonZombie.Die" );
     PrecacheScriptSound( "NPC_PoisonZombie.Idle" );
     PrecacheScriptSound( "NPC_PoisonZombie.Pain" );
@@ -53,8 +50,6 @@ void CZMHulk::Precache()
 
 void CZMHulk::Spawn()
 {
-    SetModel( ZOMBIE_MODEL );
-
     SetMaxHealth( zm_sk_hulk_health.GetInt() );
 
 

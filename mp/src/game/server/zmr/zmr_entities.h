@@ -122,6 +122,7 @@ public:
 
 
     inline int GetZombieFlags() { return m_fZombieFlags; };
+    const char* GetZombieModelGroup() const { return STRING( m_sZombieModelGroup ); }
 
 private:
     void StartSpawning();
@@ -139,6 +140,7 @@ private:
 
 
     //int m_nSpawnQueueCapacity;
+    string_t m_sZombieModelGroup;
     string_t m_sRallyName;
     string_t m_sFirstNodeName;
 
