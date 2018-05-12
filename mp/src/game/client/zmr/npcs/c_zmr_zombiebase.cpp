@@ -18,6 +18,11 @@ static ConVar zm_cl_zombiefadein( "zm_cl_zombiefadein", "0.55", FCVAR_ARCHIVE, "
 
 #undef CZMBaseZombie
 IMPLEMENT_CLIENTCLASS_DT( C_ZMBaseZombie, DT_ZM_BaseZombie, CZMBaseZombie )
+    // See server -> zmr_zombiebase.cpp
+    RecvPropVector( RECVINFO_NAME( m_vecNetworkOrigin, m_vecOrigin ) ),
+
+    RecvPropFloat( RECVINFO_NAME( m_angNetworkAngles[1], m_angRotation[1] ) ),
+
 	RecvPropInt( RECVINFO( m_iSelectorIndex ) ),
 	RecvPropFloat( RECVINFO( m_flHealthRatio ) ),
 END_RECV_TABLE()

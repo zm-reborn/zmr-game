@@ -150,6 +150,20 @@ ConVar zm_sv_debug_zombieattack( "zm_sv_debug_zombieattack", "0" );
 
 
 IMPLEMENT_SERVERCLASS_ST( CZMBaseZombie, DT_ZM_BaseZombie )
+    // Send low-resolution
+    SendPropVector( SENDINFO( m_vecOrigin ), -1, SPROP_COORD_MP_LOWPRECISION | SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_Origin ),
+    SendPropExclude( "DT_BaseEntity", "m_vecOrigin" ),
+
+    // Only send yaw.
+    SendPropAngle( SENDINFO_VECTORELEM( m_angRotation, 1 ), 10, SPROP_CHANGES_OFTEN ),
+    SendPropExclude( "DT_BaseEntity", "m_angRotation" ),
+
+    // Don't need these
+    SendPropExclude( "DT_BCCLocalPlayerExclusive", "m_flNextAttack" ),
+    SendPropExclude( "DT_BaseCombatCharacter", "m_hActiveWeapon" ),
+    SendPropExclude( "DT_BaseCombatCharacter", "m_hMyWeapons" ),
+
+
     SendPropInt( SENDINFO( m_iSelectorIndex ) ),
     SendPropFloat( SENDINFO( m_flHealthRatio ) ),
 
