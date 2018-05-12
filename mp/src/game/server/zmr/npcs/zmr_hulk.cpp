@@ -54,6 +54,12 @@ void CZMHulk::Spawn()
 
 
     BaseClass::Spawn();
+
+    // Hulk's hitboxes go beyond its collision bounds, by default this means they cannot be hit by rays.
+    // We have to specify the surrounding bounds in order to get hit in these hitboxes!
+    Vector mins( -32.0f, -32.0f, 0.0f );
+    Vector maxs( 32.0f, 32.0f, 90.0f );
+    CollisionProp()->SetSurroundingBoundsType( USE_SPECIFIED_BOUNDS, &mins, &maxs );
 }
 
 NPCR::CPathCostGroundOnly* CZMHulk::GetPathCost() const
