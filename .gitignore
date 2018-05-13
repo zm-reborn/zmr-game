@@ -82,3 +82,6 @@ settings.scr
 *.ain
 *.csv
 mp/game/zombie_master_reborn/resource/zmtips_used.txt
+# Tool (vbsp/vvis/vrad) compilation output
+*.dll
+*.exe
