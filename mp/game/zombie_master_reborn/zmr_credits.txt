@@ -10,6 +10,9 @@ Marphy Black	-- Zombie textures, model edits
 Forrest Mark X	-- Viewmodel c-arm edits
 Tony Sergi		-- Multiplayer friendly animations code
 PazerOP			-- Glow outline performance + feature fixes
+wouterpleizier	-- VBSP/VVIS/VRAD edits
+ryandmaclean	-- VRAD optimization
+tgnottingham	-- VBSP smoothing group fix
 Game Zombie		-- Model edits
 Asg_alligator	-- Model edits
 ----------
