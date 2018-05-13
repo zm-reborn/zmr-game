@@ -6592,3 +6592,8 @@
 
 	input ApplyImpulse(void)  : "Apply impulse to touching entities"
 ]
+
+@SolidClass base(Targetname) = func_detail_blocker : 
+	"A brush entity that prevents detail sprites from being placed inside its volume."
+[
+]
