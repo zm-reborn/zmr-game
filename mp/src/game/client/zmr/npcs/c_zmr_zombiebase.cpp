@@ -170,61 +170,96 @@ int C_ZMBaseZombie::DrawModelAndEffects( int flags )
         return BaseClass::DrawModel( flags );
 
 
-    float fadein = zm_cl_zombiefadein.GetFloat();
+    // Turn off lighting if we're using zm vision.
+    const bool bNoLight = g_ZMVision.IsOn();
+    if ( bNoLight )
+    {
+        const Vector clr( 1.0f, 0.0f, 0.0f );
 
-    if ( fadein <= EQUAL_EPSILON )
-        return BaseClass::DrawModel( flags );
+        static const Vector lightlvl[6] = 
+        {
+            Vector( 0.7f, 0.7f, 0.7f ),
+            Vector( 0.7f, 0.7f, 0.7f ),
+            Vector( 0.7f, 0.7f, 0.7f ),
+            Vector( 0.7f, 0.7f, 0.7f ),
+            Vector( 0.7f, 0.7f, 0.7f ),
+            Vector( 0.7f, 0.7f, 0.7f ),
+        };
 
+        g_pStudioRender->SetAmbientLightColors( lightlvl );
+        g_pStudioRender->SetLocalLights( 0, NULL );
 
+        render->SetColorModulation( clr.Base() );
+        modelrender->SuppressEngineLighting( true );
+    }
 
-    float delta = gpGlobals->curtime - SpawnTime();
-
-    if ( delta > fadein )
-        return BaseClass::DrawModel( flags );
-
-    delta /= fadein;
-
-    const float l = delta * delta;
-    const Vector clr( 1.0f, l, l );
-
-
-    CMatRenderContextPtr pRenderContext( materials );
-    
-    // Pop into existence.
-    const Vector down( 0.0f, 0.0f, -1.0f );
-
-    Vector mins, maxs;
-    GetRenderBounds( mins, maxs );
-
-    Vector pos = GetAbsOrigin();
-    pos += maxs.z * delta;
-
-    const Vector4D plane( down.x, down.y, down.z, down.Dot( pos ) );
-    pRenderContext->EnableClipping( true );
-    pRenderContext->PushCustomClipPlane( plane.Base() );
-    
-    // Color it a bit.
-    float blend = delta;
-
-    // Don't go above our fx blend. Some zombies may have custom fx.
-    float fxblend = GetFxBlend() / 255.0f;
-
-    if ( blend > fxblend )
-        blend = fxblend;
-
-    render->SetBlend( blend );
-    render->SetColorModulation( clr.Base() );
-
-
-    int ret = BaseClass::DrawModel( flags );
-
-
-    pRenderContext->PopCustomClipPlane();
-    pRenderContext->EnableClipping( false );
 
     const Vector reset( 1.0f, 1.0f, 1.0f );
-    render->SetBlend( 1.0f );
-    render->SetColorModulation( reset.Base() );
+
+
+    int ret = 0;
+
+
+    float fadein = zm_cl_zombiefadein.GetFloat();
+    float delta = gpGlobals->curtime - SpawnTime();
+
+    if ( fadein > EQUAL_EPSILON && delta < fadein )
+    {
+        delta /= fadein;
+
+        const float l = delta * delta;
+        const Vector clr( 1.0f, l, l );
+
+
+        CMatRenderContextPtr pRenderContext( materials );
+    
+        // Pop into existence.
+        const Vector down( 0.0f, 0.0f, -1.0f );
+
+        Vector mins, maxs;
+        GetRenderBounds( mins, maxs );
+
+        Vector pos = GetAbsOrigin();
+        pos += maxs.z * delta;
+
+        const Vector4D plane( down.x, down.y, down.z, down.Dot( pos ) );
+        pRenderContext->EnableClipping( true );
+        pRenderContext->PushCustomClipPlane( plane.Base() );
+    
+        // Color it a bit.
+        float blend = delta;
+
+        // Don't go above our fx blend. Some zombies may have custom fx.
+        float fxblend = GetFxBlend() / 255.0f;
+
+        if ( blend > fxblend )
+            blend = fxblend;
+
+        render->SetBlend( blend );
+        render->SetColorModulation( clr.Base() );
+
+
+        ret = BaseClass::DrawModel( flags );
+
+
+        pRenderContext->PopCustomClipPlane();
+        pRenderContext->EnableClipping( false );
+
+        
+        render->SetBlend( 1.0f );
+        render->SetColorModulation( reset.Base() );
+    }
+    else
+    {
+        ret = BaseClass::DrawModel( flags );
+    }
+
+    if ( bNoLight )
+    {
+        modelrender->SuppressEngineLighting( false );
+        render->SetColorModulation( reset.Base() );
+    }
+
 
     return ret;
 }
