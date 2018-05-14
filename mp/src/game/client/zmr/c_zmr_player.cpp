@@ -578,7 +578,50 @@ int C_ZMPlayer::DrawModel( int flags )
     }
 
 
-    return BaseClass::DrawModel( flags );
+    return DrawModelAndEffects( flags );
+}
+
+int C_ZMPlayer::DrawModelAndEffects( int flags )
+{
+    // Turn off lighting if we're using zm vision.
+    const bool bNoLight = !g_bRenderPostProcess && g_ZMVision.IsOn();
+    if ( bNoLight )
+    {
+        const Vector clr( 1.0f, 0.0f, 0.0f );
+
+        static const Vector lightlvl[6] = 
+        {
+            Vector( 0.7f, 0.7f, 0.7f ),
+            Vector( 0.7f, 0.7f, 0.7f ),
+            Vector( 0.7f, 0.7f, 0.7f ),
+            Vector( 0.7f, 0.7f, 0.7f ),
+            Vector( 0.7f, 0.7f, 0.7f ),
+            Vector( 0.7f, 0.7f, 0.7f ),
+        };
+
+        g_pStudioRender->SetAmbientLightColors( lightlvl );
+        g_pStudioRender->SetLocalLights( 0, NULL );
+
+        render->SetColorModulation( clr.Base() );
+        modelrender->SuppressEngineLighting( true );
+    }
+
+
+    int ret = 0;
+
+    const Vector reset( 1.0f, 1.0f, 1.0f );
+
+
+    ret = BaseClass::DrawModel( flags );
+
+
+    if ( bNoLight )
+    {
+        modelrender->SuppressEngineLighting( false );
+        render->SetColorModulation( reset.Base() );
+    }
+
+    return ret;
 }
 
 ShadowType_t C_ZMPlayer::ShadowCastType() 

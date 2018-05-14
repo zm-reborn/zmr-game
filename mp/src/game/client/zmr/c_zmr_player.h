@@ -42,6 +42,7 @@ public:
     virtual bool            ShouldReceiveProjectedTextures( int flags ) OVERRIDE;
     virtual bool            ShouldDraw() OVERRIDE;
     virtual int             DrawModel( int flags ) OVERRIDE;
+    int                     DrawModelAndEffects( int flags );
     virtual const QAngle&   GetRenderAngles() OVERRIDE;
     virtual const QAngle&   EyeAngles() OVERRIDE;
     virtual float           GetFOV() OVERRIDE;
