@@ -24,13 +24,16 @@ public:
     CZMWeaponImprovised();
 
 
-    void ItemPostFrame( void ) OVERRIDE;
+    virtual bool UsesAnimEvent( bool bSecondary ) const OVERRIDE { return false; }
 
-    float GetRange() const OVERRIDE { return 50.0f; }
-    float GetFireRate() OVERRIDE { return 1.0f; }
-    float GetDamageForActivity( Activity hitActivity ) const OVERRIDE { return 20.0f; }
+    virtual bool CanSecondaryAttack() const OVERRIDE { return false; }
 
-    void AddViewKick() OVERRIDE
+
+    virtual float GetRange() const OVERRIDE { return 50.0f; }
+    virtual float GetFireRate() OVERRIDE { return 1.0f; }
+    virtual float GetDamageForActivity( Activity hitActivity ) const OVERRIDE { return 20.0f; }
+
+    virtual void AddViewKick() OVERRIDE
     {
         CZMPlayer* pPlayer = GetPlayerOwner();
         if ( !pPlayer ) return;
@@ -88,21 +91,4 @@ IMPLEMENT_ACTTABLE( CZMWeaponImprovised );
 CZMWeaponImprovised::CZMWeaponImprovised()
 {
     SetSlotFlag( ZMWEAPONSLOT_MELEE );
-}
-
-void CZMWeaponImprovised::ItemPostFrame()
-{
-    CZMPlayer* pPlayer = GetPlayerOwner();
-    if ( !pPlayer ) return;
-
-
-    if ( pPlayer->m_nButtons & IN_ATTACK && m_flNextPrimaryAttack <= gpGlobals->curtime )
-    {
-        // You fucking idiots. The crowbar doesn't fire any animation events. Thanks.
-        Swing( false, false );
-    }
-    else
-    {
-        WeaponIdle();
-    }
 }

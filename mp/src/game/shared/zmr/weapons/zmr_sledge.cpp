@@ -25,11 +25,19 @@ public:
     CZMWeaponSledge();
 
 
-    RECORD_PREDICTION_SEED;
+    virtual void PrimaryAttack() OVERRIDE;
+    virtual void SecondaryAttack() OVERRIDE;
 
-    float GetRange() const OVERRIDE { return 60.0f; }
-    float GetFireRate() OVERRIDE { return 2.9f; }
-    float GetDamageForActivity( Activity act ) const OVERRIDE
+
+    virtual bool CanSecondaryAttack() const OVERRIDE { return true; }
+    virtual WeaponSound_t GetSecondaryAttackSound() const { return SPECIAL1; }
+
+    virtual bool UsesAnimEvent( bool bSecondary ) const OVERRIDE { return true; }
+
+
+    virtual float GetRange() const OVERRIDE { return 60.0f; }
+    virtual float GetFireRate() OVERRIDE { return 2.9f; }
+    virtual float GetDamageForActivity( Activity act ) const OVERRIDE
     {
         // ZMRTODO: Stop using random values.
         float damage = 50.0f;
@@ -46,39 +54,39 @@ public:
         return damage;
     };
 
-    void Hit( trace_t&, Activity ) OVERRIDE;
-    void Swing( bool bSecondary, const bool bUseAnimationEvent = true ) OVERRIDE;
+    virtual void Hit( trace_t& traceHit, Activity iHitActivity ) OVERRIDE;
 
 
-    void AddViewKick() OVERRIDE
+    virtual void AddViewKick() OVERRIDE
     {
         CZMPlayer* pPlayer = GetPlayerOwner();
         if ( !pPlayer ) return;
 
-        // ZMRTODO: This isn't called on client.
+
         QAngle ang;
-        ang.x = GetPredictedRandomFloat( 5.0f, 10.0f );
-        ang.y = GetPredictedRandomFloat( -2.0f, -1.0f );
+        ang.x = SharedRandomFloat( "sledgex", 5.0f, 10.0f );
+        ang.y = SharedRandomFloat( "sledgey", -2.0f, -1.0f );
         ang.z = 0.0f;
 
 	    pPlayer->ViewPunch( ang );
     }
-
-
-#ifndef CLIENT_DLL
-    void Operator_HandleAnimEvent( animevent_t*, CBaseCombatCharacter* ) OVERRIDE;
-#else
-    bool OnFireEvent( C_BaseViewModel*, const Vector&, const QAngle&, int event, const char* ) OVERRIDE;
-#endif
 };
 
 IMPLEMENT_NETWORKCLASS_ALIASED( ZMWeaponSledge, DT_ZM_WeaponSledge )
 
+
+// We use animation events, so we need to network the attack time.
 BEGIN_NETWORK_TABLE( CZMWeaponSledge, DT_ZM_WeaponSledge )
+#ifdef CLIENT_DLL
+    RecvPropTime( RECVINFO( m_flAttackHitTime ) ),
+#else
+    SendPropTime( SENDINFO( m_flAttackHitTime ) ),
+#endif
 END_NETWORK_TABLE()
 
 #ifdef CLIENT_DLL
 BEGIN_PREDICTION_DATA( CZMWeaponSledge )
+    DEFINE_PRED_FIELD_TOL( m_flAttackHitTime, FIELD_FLOAT, FTYPEDESC_INSENDTABLE, TD_MSECTOLERANCE ),
 END_PREDICTION_DATA()
 #endif
 
@@ -114,63 +122,42 @@ CZMWeaponSledge::CZMWeaponSledge()
     SetSlotFlag( ZMWEAPONSLOT_MELEE );
 }
 
-void CZMWeaponSledge::Hit( trace_t& traceHit, Activity nHitActivity )
+void CZMWeaponSledge::Hit( trace_t& traceHit, Activity iHitActivity )
 {
-    // Override the default activity.
-    Activity act = GetActivity();
-
-    BaseClass::Hit( traceHit, act );
+    BaseClass::Hit( traceHit, iHitActivity );
 
 
     AddViewKick();
-}
-
-void CZMWeaponSledge::Swing( bool bSecondary, const bool bUseAnimationEvent )
-{
-    CZMPlayer* pPlayer = GetPlayerOwner();
-    if ( !pPlayer ) return;
-
-
-    SendWeaponAnim( bSecondary ? ACT_VM_HITCENTER2 : ACT_VM_HITCENTER );
-    WeaponSound( SPECIAL1 );
-
-    pPlayer->SetAnimation( PLAYER_ATTACK1 );
-
-    if ( bSecondary )
-    {
-        m_flNextPrimaryAttack = gpGlobals->curtime + GetFireRate() * 1.5f;
-        m_flNextSecondaryAttack = gpGlobals->curtime + GetFireRate() * 1.8f;
-    }
-    else
-    {
-        m_flNextPrimaryAttack = gpGlobals->curtime + GetFireRate();
-        m_flNextSecondaryAttack = gpGlobals->curtime + GetFireRate() * 1.1f;
-    }
-}
 
 #ifndef CLIENT_DLL
-void CZMWeaponSledge::Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCharacter *pOperator )
-{
-	switch( pEvent->event )
-	{
-	case AE_ZM_MELEEHIT:
-		HandleAnimEventMeleeHit();
-		break;
-
-	default:
-		BaseClass::Operator_HandleAnimEvent( pEvent, pOperator );
-		break;
-	}
-}
-#else
-bool CZMWeaponSledge::OnFireEvent( C_BaseViewModel* pViewModel, const Vector& origin, const QAngle& angles, int event, const char* options )
-{
-    if ( event == AE_ZM_MELEEHIT )
-    {
-        HandleAnimEventMeleeHit();
-        return true;
-    }
-
-    return false;
-}
+    PlayAISound();
 #endif
+}
+
+void CZMWeaponSledge::PrimaryAttack()
+{
+    if ( !CanPrimaryAttack() )
+        return;
+
+
+    Swing( false );
+
+
+    // Setup our next attack times
+    m_flNextPrimaryAttack = gpGlobals->curtime + GetFireRate();
+    m_flNextSecondaryAttack = gpGlobals->curtime + GetFireRate() * 1.1f;
+}
+
+void CZMWeaponSledge::SecondaryAttack()
+{
+    if ( !CanSecondaryAttack() )
+        return;
+
+        
+    Swing( true );
+
+
+    // Setup our next attack times
+    m_flNextPrimaryAttack = gpGlobals->curtime + GetFireRate() * 1.5f;
+    m_flNextSecondaryAttack = gpGlobals->curtime + GetFireRate() * 1.8f;
+}
