@@ -2,6 +2,9 @@
 
 #include "npcevent.h"
 #include "eventlist.h"
+#ifdef CLIENT_DLL
+#include "prediction.h"
+#endif
 
 #include "in_buttons.h"
 
@@ -28,6 +31,9 @@ public:
     CZMWeaponRevolver();
 
 
+    virtual bool Deploy() OVERRIDE;
+
+
 #ifndef CLIENT_DLL
     const char* GetDropAmmoName() const OVERRIDE { return "item_ammo_revolver"; }
     int GetDropAmmoAmount() const OVERRIDE { return SIZE_ZMAMMO_REVOLVER; }
@@ -42,9 +48,10 @@ public:
     virtual void AddViewKick( void ) OVERRIDE;
 
     virtual void PrimaryAttack() OVERRIDE;
+    virtual void PrimaryAttackEffects() OVERRIDE;
     virtual void SecondaryAttack() OVERRIDE;
 
-    void Shoot();
+    virtual void Shoot() OVERRIDE;
     
     virtual float GetFireRate( void ) OVERRIDE { return 1.0f; }
 
@@ -57,15 +64,24 @@ public:
 #else
     bool OnFireEvent( C_BaseViewModel*, const Vector&, const QAngle&, int event, const char* ) OVERRIDE;
 #endif
+
+protected:
+    CNetworkVar( float, m_flShootTime );
 };
 
 IMPLEMENT_NETWORKCLASS_ALIASED( ZMWeaponRevolver, DT_ZM_WeaponRevolver )
 
 BEGIN_NETWORK_TABLE( CZMWeaponRevolver, DT_ZM_WeaponRevolver )
+#ifdef CLIENT_DLL
+    RecvPropTime( RECVINFO( m_flShootTime ) ),
+#else
+    SendPropTime( SENDINFO( m_flShootTime ) ),
+#endif
 END_NETWORK_TABLE()
 
 #ifdef CLIENT_DLL
 BEGIN_PREDICTION_DATA( CZMWeaponRevolver )
+    DEFINE_PRED_FIELD_TOL( m_flShootTime, FIELD_FLOAT, FTYPEDESC_INSENDTABLE, TD_MSECTOLERANCE ),
 END_PREDICTION_DATA()
 #endif
 
@@ -98,6 +114,9 @@ IMPLEMENT_ACTTABLE( CZMWeaponRevolver );
 
 CZMWeaponRevolver::CZMWeaponRevolver()
 {
+    m_flShootTime = 0.0f;
+
+
     m_fMinRange1 = m_fMinRange2 = 0.0f;
     m_fMaxRange1 = m_fMaxRange2 = 1500.0f;
 
@@ -106,8 +125,23 @@ CZMWeaponRevolver::CZMWeaponRevolver()
     SetSlotFlag( ZMWEAPONSLOT_SIDEARM );
 }
 
+bool CZMWeaponRevolver::Deploy()
+{
+    bool res = BaseClass::Deploy();
+
+    if ( res )
+    {
+        m_flShootTime = 0.0f;
+    }
+
+    return res;
+}
+
 void CZMWeaponRevolver::PrimaryAttack()
 {
+    if ( !CanAct() )
+        return;
+
 	if ( UsesClipsForAmmo1() && !Clip1() ) 
 	{
 		Reload();
@@ -115,7 +149,13 @@ void CZMWeaponRevolver::PrimaryAttack()
 	}
 
 
+
     SendWeaponAnim( ACT_VM_PRIMARYATTACK );
+
+    float waittime = GetFirstInstanceOfAnimEventTime( GetSequence(), AE_ZM_REVOLVERSHOOT );
+    if ( waittime >= 0.0f )
+        m_flShootTime = gpGlobals->curtime + waittime;
+
 
     m_flNextPrimaryAttack = gpGlobals->curtime + 1.1f;
     m_flNextSecondaryAttack = gpGlobals->curtime + 1.0f;
@@ -123,13 +163,22 @@ void CZMWeaponRevolver::PrimaryAttack()
 
 void CZMWeaponRevolver::SecondaryAttack()
 {
+    if ( !CanAct() )
+        return;
+
 	if ( UsesClipsForAmmo1() && !Clip1() ) 
 	{
 		Reload();
 		return;
 	}
 
+
     SendWeaponAnim( ACT_VM_SECONDARYATTACK );
+
+    float waittime = GetFirstInstanceOfAnimEventTime( GetSequence(), AE_ZM_REVOLVERSHOOT );
+    if ( waittime >= 0.0f )
+        m_flShootTime = gpGlobals->curtime + waittime;
+
 
     m_flNextPrimaryAttack = gpGlobals->curtime + 0.4f;
     m_flNextSecondaryAttack = gpGlobals->curtime + 0.3f;
@@ -137,90 +186,47 @@ void CZMWeaponRevolver::SecondaryAttack()
 
 void CZMWeaponRevolver::ItemPostFrame()
 {
-    //CZMPlayer* pPlayer = GetPlayerOwner();
-    //if ( !pPlayer ) return;
-
     BaseClass::ItemPostFrame();
 
-    SetLastPredictionSeed( CBaseEntity::GetPredictionRandomSeed() );
+
+    if ( m_flShootTime != 0.0f && m_flShootTime <= gpGlobals->curtime )
+    {
+        Shoot();
+
+        m_flShootTime = 0.0f;
+    }
 }
 
-// ZMRTODO: Use base class for this shit.
 void CZMWeaponRevolver::Shoot()
 {
-	// If my clip is empty (and I use clips) start reload
-	if ( UsesClipsForAmmo1() && !Clip1() ) 
-	{
-		Reload();
-		return;
-	}
+    BaseClass::Shoot();
+}
 
-	// Only the player fires this way so we can cast
-	CBasePlayer *pPlayer = ToBasePlayer( GetOwner() );
+void CZMWeaponRevolver::PrimaryAttackEffects()
+{
+    CZMPlayer* pPlayer = GetPlayerOwner();
+    if ( !pPlayer )
+        return;
 
-	if (!pPlayer)
-	{
-		return;
-	}
-
-
-	pPlayer->DoMuzzleFlash();
-
-#ifndef CLIENT_DLL // Client already fires this sound.
-    WeaponSound( SINGLE );
+#ifdef CLIENT_DLL
+    if ( prediction->IsFirstTimePredicted() )
 #endif
+    {
+        pPlayer->DoMuzzleFlash();
 
-	// player "shoot" animation
-	pPlayer->SetAnimation( PLAYER_ATTACK1 );
-    
+        // We don't want this one... -_-
+        //SendWeaponAnim( GetPrimaryAttackActivity() );
 
-	FireBulletsInfo_t info;
-	info.m_vecSrc = pPlayer->Weapon_ShootPosition( );
-	
-	info.m_vecDirShooting = pPlayer->GetAutoaimVector( AUTOAIM_SCALE_DEFAULT );
+        pPlayer->DoAnimationEvent( PLAYERANIMEVENT_ATTACK_PRIMARY );
 
-
-	info.m_iShots = 1;
-
-	// Make sure we don't fire more than the amount in the clip
-	if ( UsesClipsForAmmo1() )
-	{
-		info.m_iShots = MIN( info.m_iShots, m_iClip1 );
-		m_iClip1 -= info.m_iShots;
-	}
-	else
-	{
-		info.m_iShots = MIN( info.m_iShots, pPlayer->GetAmmoCount( m_iPrimaryAmmoType ) );
-		pPlayer->RemoveAmmo( info.m_iShots, m_iPrimaryAmmoType );
-	}
-
-	info.m_flDistance = MAX_TRACE_LENGTH;
-	info.m_iAmmoType = m_iPrimaryAmmoType;
-	info.m_iTracerFreq = 2;
-
-#if !defined( CLIENT_DLL )
-	// Fire the bullets
-	info.m_vecSpread = pPlayer->GetAttackSpread( this );
-#else
-	//!!!HACKHACK - what does the client want this function for? 
-	info.m_vecSpread = GetActiveWeapon()->GetBulletSpread();
-#endif // CLIENT_DLL
-
-	FireBullets( info );
-
-	if (!m_iClip1 && pPlayer->GetAmmoCount(m_iPrimaryAmmoType) <= 0)
-	{
-		// HEV suit - indicate out of ammo condition
-		pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0); 
-	}
-
-	//Add our view kick in
-	AddViewKick();
+        // ZMRTODO: Right now fires twice. Remove fire sound from model(?)
+        WeaponSound( SINGLE, m_flNextPrimaryAttack );
+    }
 }
 
 void CZMWeaponRevolver::HandleAnimEventRevolver()
 {
-    Shoot();
+    //Shoot();
 }
 
 #ifndef CLIENT_DLL
@@ -258,17 +264,16 @@ void CZMWeaponRevolver::AddViewKick()
 
     Activity act = GetActivity();
 
-    // ZMRTODO: This isn't called on client.
     if ( act == ACT_VM_SECONDARYATTACK )
     {
         // Disorient the player.
         QAngle angles = pPlayer->GetLocalAngles();
 
-        angles.x += GetPredictedRandomFloat( -2, 2 );
-        angles.y += GetPredictedRandomFloat( 2, 4 );
+        angles.x += SharedRandomFloat( "revolverx", -2, 2 );
+        angles.y += SharedRandomFloat( "revolvery", 2, 4 );
 
 #ifdef CLIENT_DLL
-        pPlayer->SetLocalAngles( angles );
+        //pPlayer->SetLocalAngles( angles );
 #else
         pPlayer->SnapEyeAngles( angles );
 #endif
@@ -281,12 +286,12 @@ void CZMWeaponRevolver::AddViewKick()
     if ( act == ACT_VM_PRIMARYATTACK ) // Slow
     {
         ang.x = -8.0f;
-        ang.y = GetPredictedRandomFloat( -1, 1 );
+        ang.y = SharedRandomFloat( "revolvery", -1, 1 );
     }
     else // Fast
     {
-        ang.x = GetPredictedRandomFloat( -8, 2 );
-        ang.y = GetPredictedRandomFloat( -2, 2 );
+        ang.x = SharedRandomFloat( "revolverx", -8, 2 );
+        ang.y = SharedRandomFloat( "revolvery", -2, 2 );
     }
 
     pPlayer->ViewPunch( ang );
