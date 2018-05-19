@@ -58,6 +58,32 @@ ConVar zm_sv_spawndelay( "zm_sv_spawndelay", "0.6", FCVAR_REPLICATED | FCVAR_NOT
 ConVar zm_sv_happyzombies( "zm_sv_happyzombies", "0", FCVAR_REPLICATED, "Happy, happy zombies :)" );
 
 
+static CZMViewVectors g_ZMViewVectors(
+    Vector( 0, 0, 64 ),         //VEC_VIEW (m_vView) 
+                              
+    Vector(-16, -16, 0 ),       //VEC_HULL_MIN (m_vHullMin)
+    Vector( 16,  16,  72 ),     //VEC_HULL_MAX (m_vHullMax)
+                                                
+    Vector(-16, -16, 0 ),       //VEC_DUCK_HULL_MIN (m_vDuckHullMin)
+    Vector( 16,  16,  36 ),     //VEC_DUCK_HULL_MAX	(m_vDuckHullMax)
+    Vector( 0, 0, 28 ),         //VEC_DUCK_VIEW		(m_vDuckView)
+                                                
+    Vector(-10, -10, -10 ),     //VEC_OBS_HULL_MIN	(m_vObsHullMin)
+    Vector( 10,  10,  10 ),     //VEC_OBS_HULL_MAX	(m_vObsHullMax)
+                                                
+    Vector( 0, 0, 14 ),         //VEC_DEAD_VIEWHEIGHT (m_vDeadViewHeight)
+
+    Vector(-16, -16, 0 ),       //VEC_CROUCH_TRACE_MIN (m_vCrouchTraceMin)
+    Vector( 16,  16,  60 ),     //VEC_CROUCH_TRACE_MAX (m_vCrouchTraceMax)
+    
+
+
+    // To keep things like before, we need to keep the view offset the same.
+    Vector( -16, -16, 48 ),    //VEC_ZM_HULL_MIN (vZMHullMin)
+    Vector( 16, 16, 80 ),       //VEC_ZM_HULL_MAX (vZMHullMax)
+    Vector( 0, 0, 64 )          //VEC_ZM_VIEW (vZMView)
+);
+
 
 #ifndef CLIENT_DLL
 static const char* g_PreserveEnts[] =
@@ -365,6 +391,16 @@ void CZMRules::DeathNotice( CBasePlayer* pVictim, const CTakeDamageInfo& info )
         gameeventmanager->FireEvent( event );
     }
 #endif
+}
+
+const CViewVectors* CZMRules::GetViewVectors() const
+{
+	return &g_ZMViewVectors;
+}
+
+const CZMViewVectors* CZMRules::GetZMViewVectors() const
+{
+	return &g_ZMViewVectors;
 }
 
 #ifndef CLIENT_DLL
