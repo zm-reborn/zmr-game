@@ -298,6 +298,16 @@ Vector CZMGameMovement::GetPlayerViewOffset( bool ducked ) const
     return CGameMovement::GetPlayerViewOffset( ducked );
 }
 
+unsigned int CZMGameMovement::PlayerSolidMask( bool brushOnly )
+{
+    if ( GetZMPlayer()->IsZM() )
+    {
+        return CONTENTS_TEAM1;
+    }
+
+    return CGameMovement::PlayerSolidMask();
+}
+
 void CZMGameMovement::CategorizePosition()
 {
 	Vector point;
@@ -564,13 +574,33 @@ void CZMGameMovement::FullZMMove( float factor, float maxacceleration )
 	// Just move ( don't clip or anything )
 	Vector out;
 	VectorMA( mv->GetAbsOrigin(), gpGlobals->frametime, mv->m_vecVelocity, out );
-	mv->SetAbsOrigin( out );
+
+    trace_t pm;
+    TracePlayerBBox( mv->GetAbsOrigin(), out, PlayerSolidMask(), COLLISION_GROUP_NONE, pm );
+
+    if ( pm.fraction == 1.0f || pm.startsolid )
+    {
+        mv->SetAbsOrigin( out );
+    }
+    else
+    {
+        TryPlayerMove( &out, &pm );
+    }
+
 
 	// Zero out velocity if in noaccel mode
 	if ( maxacceleration < 0.0f )
 	{
 		mv->m_vecVelocity.Init();
 	}
+}
+
+void CZMGameMovement::PlayerRoughLandingEffects( float fvol )
+{
+    if ( GetZMPlayer()->IsZM() )
+        return;
+
+    CGameMovement::PlayerRoughLandingEffects( fvol );
 }
 
 bool CZMGameMovement::LadderMove( void )

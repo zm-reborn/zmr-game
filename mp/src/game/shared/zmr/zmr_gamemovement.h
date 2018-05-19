@@ -35,6 +35,7 @@ protected:
     virtual Vector GetPlayerMaxs() const OVERRIDE;
     virtual Vector GetPlayerMaxs( bool ducked ) const OVERRIDE;
     virtual Vector GetPlayerViewOffset( bool ducked ) const OVERRIDE;
+    virtual unsigned int PlayerSolidMask( bool brushOnly = false ) OVERRIDE;
 
     virtual void CategorizePosition() OVERRIDE;
 
@@ -47,6 +48,9 @@ protected:
     // Lets dead players accelerate or otherwise spectators can't move in roaming mode. Thanks Valve.
     virtual bool CanAccelerate() OVERRIDE { return !(player->GetWaterJumpTime()); };
     virtual void Accelerate( Vector& wishdir, float wishspeed, float accel ) OVERRIDE;
+
+
+    virtual void PlayerRoughLandingEffects( float fvol ) OVERRIDE;
 
     /*
         Ladder stuff copied from hl2/hl_gamemovement
