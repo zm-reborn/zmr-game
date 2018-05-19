@@ -560,6 +560,8 @@ void CZMPlayer::SetTeamSpecificProps()
 
         // HACK: UpdatePlayerSound will make NPCs hear our "footsteps" even as a ZM when we're "on the ground".
         RemoveFlag( FL_ONGROUND );
+        SetGroundEntity( nullptr ); // ZM's ground entity doesn't get updated, must reset it here or the view can act up
+
         AddFlag( FL_NOTARGET );
 
         if ( IsZM() )
@@ -573,6 +575,9 @@ void CZMPlayer::SetTeamSpecificProps()
             // Client will simply not render the ZM.
             // This allows the ZM movement to be interpolated.
             //AddEffects( EF_NODRAW );
+
+            // I'm not sure if the vphysics object does anything in ZM's case, but let's see what happens with this.
+            VPhysicsDestroyObject();
         }
         else
         {
