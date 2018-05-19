@@ -165,3 +165,9 @@ enum ZMChatNotifyType_t
 // m_hViewModel
 #define VMINDEX_WEP         0
 #define VMINDEX_HANDS       1
+
+
+
+#define VEC_ZM_HULL_MIN     (ZMRules()->GetZMViewVectors()->m_vZMHullMin)
+#define VEC_ZM_HULL_MAX     (ZMRules()->GetZMViewVectors()->m_vZMHullMax)
+#define VEC_ZM_VIEW         (ZMRules()->GetZMViewVectors()->m_vZMView)

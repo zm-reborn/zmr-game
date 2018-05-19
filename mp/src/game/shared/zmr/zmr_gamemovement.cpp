@@ -5,10 +5,14 @@
 
 #ifndef CLIENT_DLL
 #include "player.h"
+
+#include "env_player_surface_trigger.h"
 #else
 #include "c_baseplayer.h"
 #endif
 
+
+#include "zmr_gamerules.h"
 
 #ifndef CLIENT_DLL
 #include "zmr/zmr_player.h"
@@ -241,6 +245,181 @@ void CZMGameMovement::PlayerMove( void )
 		default:
 			DevMsg( 1, "Bogus pmove player movetype %i on (%i) 0=cl 1=sv\n", player->GetMoveType(), player->IsServer());
 			break;
+	}
+}
+
+Vector CZMGameMovement::GetPlayerMins() const
+{
+    if ( GetZMPlayer()->IsZM() )
+    {
+        return VEC_ZM_HULL_MIN;
+    }
+
+    return CGameMovement::GetPlayerMins();
+}
+
+Vector CZMGameMovement::GetPlayerMins( bool ducked ) const
+{
+    if ( GetZMPlayer()->IsZM() )
+    {
+        return VEC_ZM_HULL_MIN;
+    }
+
+    return CGameMovement::GetPlayerMins( ducked );
+}
+
+Vector CZMGameMovement::GetPlayerMaxs() const
+{
+    if ( GetZMPlayer()->IsZM() )
+    {
+        return VEC_ZM_HULL_MAX;
+    }
+
+    return CGameMovement::GetPlayerMaxs();
+}
+
+Vector CZMGameMovement::GetPlayerMaxs( bool ducked ) const
+{
+    if ( GetZMPlayer()->IsZM() )
+    {
+        return VEC_ZM_HULL_MAX;
+    }
+
+    return CGameMovement::GetPlayerMaxs( ducked );
+}
+
+Vector CZMGameMovement::GetPlayerViewOffset( bool ducked ) const
+{
+    if ( GetZMPlayer()->IsZM() )
+    {
+        return VEC_ZM_VIEW;
+    }
+
+    return CGameMovement::GetPlayerViewOffset( ducked );
+}
+
+void CZMGameMovement::CategorizePosition()
+{
+	Vector point;
+	trace_t pm;
+
+	// Reset this each time we-recategorize, otherwise we have bogus friction when we jump into water and plunge downward really quickly
+	player->m_surfaceFriction = 1.0f;
+
+	// if the player hull point one unit down is solid, the player
+	// is on ground
+	
+	// see if standing on something solid	
+
+	// Doing this before we move may introduce a potential latency in water detection, but
+	// doing it after can get us stuck on the bottom in water if the amount we move up
+	// is less than the 1 pixel 'threshold' we're about to snap to.	Also, we'll call
+	// this several times per frame, so we really need to avoid sticking to the bottom of
+	// water on each call, and the converse case will correct itself if called twice.
+	CheckWater();
+
+	// observers don't have a ground entity
+	if ( player->IsObserver() )
+		return;
+
+    // ZMRCHANGE: No need to update ground entity for ZM.
+    if ( ToZMPlayer( player )->IsZM() )
+        return;
+
+	float flOffset = 2.0f;
+
+	point[0] = mv->GetAbsOrigin()[0];
+	point[1] = mv->GetAbsOrigin()[1];
+	point[2] = mv->GetAbsOrigin()[2] - flOffset;
+
+	Vector bumpOrigin;
+	bumpOrigin = mv->GetAbsOrigin();
+
+	// Shooting up really fast.  Definitely not on ground.
+	// On ladder moving up, so not on ground either
+	// NOTE: 145 is a jump.
+#define NON_JUMP_VELOCITY 140.0f
+
+	float zvel = mv->m_vecVelocity[2];
+	bool bMovingUp = zvel > 0.0f;
+	bool bMovingUpRapidly = zvel > NON_JUMP_VELOCITY;
+	float flGroundEntityVelZ = 0.0f;
+	if ( bMovingUpRapidly )
+	{
+		// Tracker 73219, 75878:  ywb 8/2/07
+		// After save/restore (and maybe at other times), we can get a case where we were saved on a lift and 
+		//  after restore we'll have a high local velocity due to the lift making our abs velocity appear high.  
+		// We need to account for standing on a moving ground object in that case in order to determine if we really 
+		//  are moving away from the object we are standing on at too rapid a speed.  Note that CheckJump already sets
+		//  ground entity to NULL, so this wouldn't have any effect unless we are moving up rapidly not from the jump button.
+		CBaseEntity *ground = player->GetGroundEntity();
+		if ( ground )
+		{
+			flGroundEntityVelZ = ground->GetAbsVelocity().z;
+			bMovingUpRapidly = ( zvel - flGroundEntityVelZ ) > NON_JUMP_VELOCITY;
+		}
+	}
+
+	// Was on ground, but now suddenly am not
+	if ( bMovingUpRapidly || 
+		( bMovingUp && player->GetMoveType() == MOVETYPE_LADDER ) )   
+	{
+		SetGroundEntity( NULL );
+	}
+	else
+	{
+		// Try and move down.
+		TryTouchGround( bumpOrigin, point, GetPlayerMins(), GetPlayerMaxs(), MASK_PLAYERSOLID, COLLISION_GROUP_PLAYER_MOVEMENT, pm );
+		
+		// Was on ground, but now suddenly am not.  If we hit a steep plane, we are not on ground
+		if ( !pm.m_pEnt || pm.plane.normal[2] < 0.7 )
+		{
+			// Test four sub-boxes, to see if any of them would have found shallower slope we could actually stand on
+			TryTouchGroundInQuadrants( bumpOrigin, point, MASK_PLAYERSOLID, COLLISION_GROUP_PLAYER_MOVEMENT, pm );
+
+			if ( !pm.m_pEnt || pm.plane.normal[2] < 0.7 )
+			{
+				SetGroundEntity( NULL );
+				// probably want to add a check for a +z velocity too!
+				if ( ( mv->m_vecVelocity.z > 0.0f ) && 
+					( player->GetMoveType() != MOVETYPE_NOCLIP ) )
+				{
+					player->m_surfaceFriction = 0.25f;
+				}
+			}
+			else
+			{
+				SetGroundEntity( &pm );
+			}
+		}
+		else
+		{
+			SetGroundEntity( &pm );  // Otherwise, point to index of ent under us.
+		}
+
+#ifndef CLIENT_DLL
+		
+		//Adrian: vehicle code handles for us.
+		if ( player->IsInAVehicle() == false )
+		{
+			// If our gamematerial has changed, tell any player surface triggers that are watching
+			IPhysicsSurfaceProps *physprops = MoveHelper()->GetSurfaceProps();
+			surfacedata_t *pSurfaceProp = physprops->GetSurfaceData( pm.surface.surfaceProps );
+			char cCurrGameMaterial = pSurfaceProp->game.material;
+			if ( !player->GetGroundEntity() )
+			{
+				cCurrGameMaterial = 0;
+			}
+
+			// Changed?
+			if ( player->m_chPreviousTextureType != cCurrGameMaterial )
+			{
+				CEnvPlayerSurfaceTrigger::SetPlayerSurface( player, cCurrGameMaterial );
+			}
+
+			player->m_chPreviousTextureType = cCurrGameMaterial;
+		}
+#endif
 	}
 }
 
@@ -1345,6 +1524,14 @@ void CZMGameMovement::FullLadderMove()
         }
     }
 #endif
+}
+
+void CZMGameMovement::Duck()
+{
+    if ( GetZMPlayer()->IsZM() )
+        return;
+
+    CGameMovement::Duck();
 }
 
 bool CZMGameMovement::CheckJumpButton( void )

@@ -29,8 +29,18 @@ protected:
     virtual void PlayerMove() OVERRIDE;
     virtual bool LadderMove() OVERRIDE;
 
+
+    virtual Vector GetPlayerMins() const OVERRIDE;
+    virtual Vector GetPlayerMins( bool ducked ) const OVERRIDE;
+    virtual Vector GetPlayerMaxs() const OVERRIDE;
+    virtual Vector GetPlayerMaxs( bool ducked ) const OVERRIDE;
+    virtual Vector GetPlayerViewOffset( bool ducked ) const OVERRIDE;
+
+    virtual void CategorizePosition() OVERRIDE;
+
     virtual void FullLadderMove() OVERRIDE;
     void FullZMMove( float factor, float maxacceleration );
+    virtual void Duck() OVERRIDE;
 
     virtual bool CheckJumpButton() OVERRIDE;
 
@@ -77,7 +87,7 @@ protected:
         return p->GetLadderMove();
     }
 
-    inline CZMPlayer* GetZMPlayer() { return static_cast<CZMPlayer*>( player ); };
+    inline CZMPlayer* GetZMPlayer() const { return static_cast<CZMPlayer*>( player ); };
 
     inline CHL2_Player* GetHL2Player() { return static_cast<CHL2_Player*>( player ); };
 
