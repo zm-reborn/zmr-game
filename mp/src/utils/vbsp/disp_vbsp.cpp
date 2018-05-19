@@ -160,7 +160,11 @@ void DispMapToCoreDispInfo( mapdispinfo_t *pMapDisp, CCoreDispInfo *pCoreDispInf
 
 	// init material contents
 	pMapDisp->contents = pMapDisp->face.contents;
+#ifdef ZMR
+    if (!(pMapDisp->contents & (ALL_VISIBLE_CONTENTS | CONTENTS_PLAYERCLIP|CONTENTS_MONSTERCLIP|CONTENTS_TEAM1) ) )
+#else
 	if (!(pMapDisp->contents & (ALL_VISIBLE_CONTENTS | CONTENTS_PLAYERCLIP|CONTENTS_MONSTERCLIP) ) )
+#endif
 	{
 		pMapDisp->contents |= CONTENTS_SOLID;
 	}

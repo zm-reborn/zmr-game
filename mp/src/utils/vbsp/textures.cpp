@@ -124,6 +124,14 @@ int	FindMiptex (const char *name)
 		textureref[i].contents |= CONTENTS_PLAYERCLIP;
 		textureref[i].flags |= SURF_NODRAW | SURF_NOLIGHT;
 	}
+#ifdef ZMR
+	else if ( ( propVal = GetMaterialVar( matID, "%zmclip" ) ) &&
+		StringIsTrue( propVal ) )
+	{
+		textureref[i].contents |= CONTENTS_TEAM1;
+		textureref[i].flags |= SURF_NODRAW | SURF_NOLIGHT;
+	}
+#endif
 	// handle npc clip brushes
 	else if ( ( propVal = GetMaterialVar( matID, "%compileNpcClip" ) ) &&
 		StringIsTrue( propVal ) )

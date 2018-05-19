@@ -2716,7 +2716,11 @@ ChunkFileResult_t CMapFile::LoadSideCallback(CChunkFile *pFile, LoadSide_t *pSid
 		side->surf |= pSideInfo->nBaseFlags;
 		pSideInfo->td.flags |= pSideInfo->nBaseFlags;
 
+#ifdef ZMR
+        if (side->contents & (CONTENTS_PLAYERCLIP|CONTENTS_MONSTERCLIP|CONTENTS_TEAM1) )
+#else
 		if (side->contents & (CONTENTS_PLAYERCLIP|CONTENTS_MONSTERCLIP) )
+#endif
 		{
 			side->contents |= CONTENTS_DETAIL;
 		}
@@ -2726,7 +2730,11 @@ ChunkFileResult_t CMapFile::LoadSideCallback(CChunkFile *pFile, LoadSide_t *pSid
 			side->contents &= ~CONTENTS_DETAIL;
 		}
 		
+#ifdef ZMR
+        if (!(side->contents & (ALL_VISIBLE_CONTENTS | CONTENTS_PLAYERCLIP|CONTENTS_MONSTERCLIP|CONTENTS_TEAM1)  ) )
+#else
 		if (!(side->contents & (ALL_VISIBLE_CONTENTS | CONTENTS_PLAYERCLIP|CONTENTS_MONSTERCLIP)  ) )
+#endif
 		{
 			side->contents |= CONTENTS_SOLID;
 		}
@@ -3030,7 +3038,11 @@ ChunkFileResult_t CMapFile::LoadSolidCallback(CChunkFile *pFile, LoadEntity_t *p
 		//
 		if ( b->entitynum == 0 )
 		{
+#ifdef ZMR
+            if (b->contents & (CONTENTS_PLAYERCLIP|CONTENTS_MONSTERCLIP|CONTENTS_TEAM1) )
+#else
 			if (b->contents & (CONTENTS_PLAYERCLIP|CONTENTS_MONSTERCLIP) )
+#endif
 			{
 				if ( g_ClipTexinfo < 0 )
 				{
