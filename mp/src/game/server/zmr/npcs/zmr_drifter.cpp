@@ -9,8 +9,6 @@
 #define ZOMBIE_MODEL            "models/humans/zm_draggy.mdl"
 
 
-#define DRAGZOMBIE_SPITRANGE    120.0f
-
 extern ConVar zm_sk_dragzombie_health;
 extern ConVar zm_sk_dragzombie_dmg;
 
