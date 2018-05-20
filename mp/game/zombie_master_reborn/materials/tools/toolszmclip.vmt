@@ -1,0 +1,9 @@
+UnlitGeneric
+{
+	$basetexture	tools\toolszmclip
+	//srgb?$basetexture	tools\toolszmclip-dx10
+	$translucent	1
+	//%compilenodraw	1
+	//%compilepassbullets	1
+	%zmclip	1
+}

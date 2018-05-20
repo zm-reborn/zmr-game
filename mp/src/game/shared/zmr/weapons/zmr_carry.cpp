@@ -941,6 +941,8 @@ public:
 #ifdef CLIENT_DLL
     bool ShouldDrawPickup() OVERRIDE { return false; };
     bool ShouldDraw() OVERRIDE { return false; };
+
+    virtual bool ShouldDrawCrosshair() OVERRIDE { return false; }
 #endif
     
     virtual void	OnRestore();

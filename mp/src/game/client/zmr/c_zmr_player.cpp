@@ -57,16 +57,36 @@ ConVar zm_cl_fov( "zm_cl_fov", "90", FCVAR_USERINFO | FCVAR_ARCHIVE, "What is ou
 
 
 #undef CZMPlayer // We need to undefine it so we can get the server class.
-IMPLEMENT_CLIENTCLASS_DT( C_ZMPlayer, DT_ZM_Player, CZMPlayer )
-    RecvPropDataTable( RECVINFO_DT( m_ZMLocal ), 0, &REFERENCE_RECV_TABLE( DT_ZM_PlyLocal ) ),
+
+BEGIN_RECV_TABLE_NOBASE( C_ZMPlayer, DT_ZMLocalPlayerExclusive )
+    RecvPropVector( RECVINFO_NAME( m_vecNetworkOrigin, m_vecOrigin ) ),
+
+    //RecvPropFloat( RECVINFO( m_angEyeAngles[0] ) ),
+END_RECV_TABLE()
+
+BEGIN_RECV_TABLE_NOBASE( C_ZMPlayer, DT_ZMNonLocalPlayerExclusive )
+    RecvPropVector( RECVINFO_NAME( m_vecNetworkOrigin, m_vecOrigin ) ),
 
     RecvPropFloat( RECVINFO( m_angEyeAngles[0] ) ),
     RecvPropFloat( RECVINFO( m_angEyeAngles[1] ) ),
+END_RECV_TABLE()
+
+IMPLEMENT_CLIENTCLASS_DT( C_ZMPlayer, DT_ZM_Player, CZMPlayer )
+    RecvPropDataTable( "zmlocaldata", 0, 0, &REFERENCE_RECV_TABLE(DT_ZMLocalPlayerExclusive) ),
+    RecvPropDataTable( "zmnonlocaldata", 0, 0, &REFERENCE_RECV_TABLE(DT_ZMNonLocalPlayerExclusive) ),
+
+    RecvPropDataTable( RECVINFO_DT( m_ZMLocal ), 0, &REFERENCE_RECV_TABLE( DT_ZM_PlyLocal ) ),
+
     RecvPropInt( RECVINFO( m_iSpawnInterpCounter ) ),
     RecvPropEHandle( RECVINFO( m_hRagdoll ) ),
+
+    RecvPropInt( RECVINFO( m_nWaterLevel ) ),
 END_RECV_TABLE()
 
 BEGIN_PREDICTION_DATA( C_ZMPlayer )
+    DEFINE_PRED_FIELD_TOL( m_ZMLocal.m_flAccuracyRatio, FIELD_FLOAT, FTYPEDESC_INSENDTABLE, 0.01f ),
+
+
     DEFINE_PRED_FIELD( m_flCycle, FIELD_FLOAT, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
     //DEFINE_PRED_FIELD( m_fIsWalking, FIELD_BOOLEAN, FTYPEDESC_INSENDTABLE ),
     DEFINE_PRED_FIELD( m_nSequence, FIELD_INTEGER, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
@@ -151,6 +171,31 @@ void C_ZMPlayer::ClientThink()
 
 void C_ZMPlayer::PreThink()
 {
+    // Put here so we get predicted properly.
+    if ( IsLocalPlayer() )
+    {
+        /*
+        // Simulate our spectator target.
+        if ( !IsAlive() )
+        {
+            C_ZMPlayer* pObserved = ( GetObserverMode() == OBS_MODE_IN_EYE ) ? ToZMPlayer( GetObserverTarget() ) : nullptr;
+
+            if ( pObserved )
+                pObserved->UpdateAccuracyRatio();
+        }
+        else
+        {
+            UpdateAccuracyRatio();
+        }
+        */
+
+        if ( IsAlive() )
+        {
+            UpdateAccuracyRatio();
+        }
+    }
+
+
     // Don't let base class change our max speed (sprinting)
     float spd = MaxSpeed();
 
@@ -561,7 +606,50 @@ int C_ZMPlayer::DrawModel( int flags )
     }
 
 
-    return BaseClass::DrawModel( flags );
+    return DrawModelAndEffects( flags );
+}
+
+int C_ZMPlayer::DrawModelAndEffects( int flags )
+{
+    // Turn off lighting if we're using zm vision.
+    const bool bNoLight = !g_bRenderPostProcess && g_ZMVision.IsOn();
+    if ( bNoLight )
+    {
+        const Vector clr( 1.0f, 0.0f, 0.0f );
+
+        static const Vector lightlvl[6] = 
+        {
+            Vector( 0.7f, 0.7f, 0.7f ),
+            Vector( 0.7f, 0.7f, 0.7f ),
+            Vector( 0.7f, 0.7f, 0.7f ),
+            Vector( 0.7f, 0.7f, 0.7f ),
+            Vector( 0.7f, 0.7f, 0.7f ),
+            Vector( 0.7f, 0.7f, 0.7f ),
+        };
+
+        g_pStudioRender->SetAmbientLightColors( lightlvl );
+        g_pStudioRender->SetLocalLights( 0, NULL );
+
+        render->SetColorModulation( clr.Base() );
+        modelrender->SuppressEngineLighting( true );
+    }
+
+
+    int ret = 0;
+
+    const Vector reset( 1.0f, 1.0f, 1.0f );
+
+
+    ret = BaseClass::DrawModel( flags );
+
+
+    if ( bNoLight )
+    {
+        modelrender->SuppressEngineLighting( false );
+        render->SetColorModulation( reset.Base() );
+    }
+
+    return ret;
 }
 
 ShadowType_t C_ZMPlayer::ShadowCastType() 
@@ -602,6 +690,12 @@ const QAngle& C_ZMPlayer::GetRenderAngles()
 const QAngle& C_ZMPlayer::EyeAngles()
 {
     return IsLocalPlayer() ? BaseClass::EyeAngles() : m_angEyeAngles;
+}
+
+void C_ZMPlayer::SetLocalAngles( const QAngle& angles )
+{
+    m_angEyeAngles = angles;
+    BaseClass::SetLocalAngles( angles );
 }
 
 float C_ZMPlayer::GetFOV()

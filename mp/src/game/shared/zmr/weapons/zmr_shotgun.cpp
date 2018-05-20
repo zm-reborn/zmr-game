@@ -21,6 +21,10 @@ public:
 
     CZMWeaponShotgun();
 
+#ifdef CLIENT_DLL
+    virtual CZMBaseCrosshair* GetWeaponCrosshair() const OVERRIDE { return ZMGetCrosshair( "Shotgun" ); }
+#endif
+
 
 #ifndef CLIENT_DLL
     const char* GetDropAmmoName() const OVERRIDE { return "item_box_buckshot"; }
@@ -49,9 +53,9 @@ public:
         pPlayer->ViewPunch( viewPunch );
     }
     
-    virtual float GetFireRate( void ) OVERRIDE { return 0.55f; }
 
-    virtual void PrimaryAttack( void ) OVERRIDE;
+    virtual int GetBulletsPerShot() const OVERRIDE { return 7; }
+    virtual float GetFireRate( void ) OVERRIDE { return 0.55f; }
 
 
     virtual Activity GetReloadStartAct() OVERRIDE { return ACT_SHOTGUN_RELOAD_START; }
@@ -107,60 +111,4 @@ CZMWeaponShotgun::CZMWeaponShotgun()
     m_bFiresUnderwater = false;
 
     SetSlotFlag( ZMWEAPONSLOT_LARGE );
-}
-
-void CZMWeaponShotgun::PrimaryAttack( void )
-{
-    if ( !CanAct() ) return;
-
-
-    CZMPlayer* pPlayer = GetPlayerOwner();
-
-    if ( !pPlayer ) return;
-
-
-    m_bNeedPump = true;
-
-
-    // MUST call sound before removing a round from the clip of a CMachineGun
-    WeaponSound( SINGLE );
-
-    pPlayer->DoMuzzleFlash();
-
-    SendWeaponAnim( ACT_VM_PRIMARYATTACK );
-
-    // Don't fire again until fire animation has completed
-    m_flNextPrimaryAttack = gpGlobals->curtime + SequenceDuration();
-    m_iClip1 -= 1;
-
-    // player "shoot" animation
-    pPlayer->SetAnimation( PLAYER_ATTACK1 );
-
-
-    FireBulletsInfo_t info(
-        7,
-        pPlayer->Weapon_ShootPosition(),
-        ((CBasePlayer*)pPlayer)->GetAutoaimVector( AUTOAIM_10DEGREES ),
-        GetBulletSpread(),
-        MAX_TRACE_LENGTH,
-        m_iPrimaryAmmoType );
-
-    info.m_pAttacker = pPlayer;
-    
-    // Fire the bullets, and force the first shot to be perfectly accuracy
-    FireBullets( info );
-
-    if (!m_iClip1 && pPlayer->GetAmmoCount(m_iPrimaryAmmoType) <= 0)
-    {
-        // HEV suit - indicate out of ammo condition
-        pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0); 
-    }
-
-    AddViewKick();
-
-    m_flNextPrimaryAttack = gpGlobals->curtime + GetFireRate();
-
-#ifndef CLIENT_DLL
-    PlayAISound();
-#endif
 }

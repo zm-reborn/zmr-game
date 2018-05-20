@@ -37,16 +37,45 @@ static ConVar zm_sv_npcheadpushoff( "zm_sv_npcheadpushoff", "200", FCVAR_NOTIFY 
 CUtlVector<CZMPlayerModelData*> CZMPlayer::m_PlayerModels;
 
 
-IMPLEMENT_SERVERCLASS_ST( CZMPlayer, DT_ZM_Player )
-    SendPropDataTable( SENDINFO_DT( m_ZMLocal ), &REFERENCE_SEND_TABLE( DT_ZM_PlyLocal ), SendProxy_SendLocalDataTable ),
 
-    // send a lo-res origin to other players
-    //SendPropVector	(SENDINFO( m_vecOrigin ), -1, SPROP_COORD_MP_LOWPRECISION|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_Origin ),
+void* SendProxy_SendNonLocalDataTable( const SendProp* pProp, const void* pStruct, const void* pVarData, CSendProxyRecipients* pRecipients, int objectID )
+{
+    pRecipients->SetAllRecipients();
+    pRecipients->ClearRecipient( objectID - 1 );
+    return (void*)pVarData;
+}
+
+BEGIN_SEND_TABLE_NOBASE( CZMPlayer, DT_ZMLocalPlayerExclusive )
+    // Send high-resolution for local
+    SendPropVector( SENDINFO( m_vecOrigin ), -1,  SPROP_NOSCALE | SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_Origin ),
+
+    // Is there any point to sending pitch to local and not yaw?
+    //SendPropFloat( SENDINFO_VECTORELEM( m_angEyeAngles, 0 ), 8, SPROP_CHANGES_OFTEN, -90.0f, 90.0f ),
+END_SEND_TABLE()
+
+BEGIN_SEND_TABLE_NOBASE( CZMPlayer, DT_ZMNonLocalPlayerExclusive )
+    // Send low-resolution for non-local
+    SendPropVector( SENDINFO( m_vecOrigin ), -1, SPROP_COORD_MP_LOWPRECISION | SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_Origin ),
 
     SendPropFloat( SENDINFO_VECTORELEM( m_angEyeAngles, 0 ), 8, SPROP_CHANGES_OFTEN, -90.0f, 90.0f ),
     SendPropAngle( SENDINFO_VECTORELEM( m_angEyeAngles, 1 ), 10, SPROP_CHANGES_OFTEN ),
+END_SEND_TABLE()
+
+IMPLEMENT_SERVERCLASS_ST( CZMPlayer, DT_ZM_Player )
+    SendPropDataTable( SENDINFO_DT( m_ZMLocal ), &REFERENCE_SEND_TABLE( DT_ZM_PlyLocal ), SendProxy_SendLocalDataTable ),
+
     SendPropInt( SENDINFO( m_iSpawnInterpCounter ), 4 ),
     SendPropEHandle( SENDINFO( m_hRagdoll ) ),
+
+    // Data that only gets sent to the local player.
+    SendPropDataTable( "zmlocaldata", 0, &REFERENCE_SEND_TABLE(DT_ZMLocalPlayerExclusive), SendProxy_SendLocalDataTable ),
+    // Data that gets sent to all other players
+    SendPropDataTable( "zmnonlocaldata", 0, &REFERENCE_SEND_TABLE(DT_ZMNonLocalPlayerExclusive), SendProxy_SendNonLocalDataTable ),
+
+
+    // Other players' water level is networked for animations.
+    SendPropInt( SENDINFO( m_nWaterLevel ), 2, SPROP_UNSIGNED ),
+    SendPropExclude( "DT_LocalPlayerExclusive", "m_nWaterLevel" ),
 
     
     SendPropExclude( "DT_BaseAnimating", "m_flPoseParameter" ),
@@ -55,7 +84,7 @@ IMPLEMENT_SERVERCLASS_ST( CZMPlayer, DT_ZM_Player )
     SendPropExclude( "DT_BaseEntity", "m_angRotation" ),
     SendPropExclude( "DT_BaseAnimatingOverlay", "overlay_vars" ),
 
-    //SendPropExclude( "DT_BaseEntity", "m_vecOrigin" ),
+    SendPropExclude( "DT_BaseEntity", "m_vecOrigin" ),
 
     // playeranimstate and clientside animation takes care of these on the client
     SendPropExclude( "DT_ServerAnimationData" , "m_flCycle" ),	
@@ -260,6 +289,9 @@ void CZMPlayer::PreThink( void )
 
     if ( IsAlive() )
     {
+        UpdateAccuracyRatio();
+
+
         if ( FlashlightIsOn() )
         {
             SetFlashlightBattery( GetFlashlightBattery() - gpGlobals->frametime * zm_sv_flashlightdrainrate.GetFloat() );
@@ -531,6 +563,8 @@ void CZMPlayer::SetTeamSpecificProps()
 
         // HACK: UpdatePlayerSound will make NPCs hear our "footsteps" even as a ZM when we're "on the ground".
         RemoveFlag( FL_ONGROUND );
+        SetGroundEntity( nullptr ); // ZM's ground entity doesn't get updated, must reset it here or the view can act up
+
         AddFlag( FL_NOTARGET );
 
         if ( IsZM() )
@@ -544,6 +578,9 @@ void CZMPlayer::SetTeamSpecificProps()
             // Client will simply not render the ZM.
             // This allows the ZM movement to be interpolated.
             //AddEffects( EF_NODRAW );
+
+            // I'm not sure if the vphysics object does anything in ZM's case, but let's see what happens with this.
+            VPhysicsDestroyObject();
         }
         else
         {

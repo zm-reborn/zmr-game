@@ -237,8 +237,8 @@ $Project "Server (ZMR)"
 				//$File	"hl2\npc_missiledefense.cpp"
 				//$File	"hl2\vehicle_apc.cpp"
 				$File	"hl2\weapon_cguard.cpp"
-				//$File	"hl2\weapon_flaregun.cpp"
-				//$File	"hl2\weapon_flaregun.h"
+				$File	"hl2\weapon_flaregun.cpp" // Includes env_flare which some maps use
+				$File	"hl2\weapon_flaregun.h"
 			}
 		}
 

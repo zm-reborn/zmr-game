@@ -1,0 +1,77 @@
+"Crosshairs"
+{
+	// name					- Name in menu
+	// type					- font/crosshair/dotonly/none
+	// dot					- Size of dot in pixels
+	// outline				- Outline size in pixels
+	// isdynamic			- Whether the crosshair is dynamic...
+	// offsetfromcenter		- How much empty space there is in the center.
+	// width				- Width of cross (left->right, Y)
+	// length				- Length of cross (left->right, X)
+	// dynamicmove			- How many pixels dynamic crosshair is allowed to move
+	// circlecolor			- Color of circle (only used in circle type)
+	// displayinmenu		- What do you think?
+	"Shotgun"
+	{
+		"name"	"Shotgun"
+		"type"	"font"
+		"fontchar"	"a"
+		"dot"	"2"
+		"outline"	"1"
+		"fontcolor"	"255 255 255 40"
+		"color"	"255 255 255 255"
+		"outlinecolor"	"0 0 0 255"
+	}
+	"Mac10"
+	{
+		"name"	"Mac-10"
+		"type"	"font"
+		"fontchar"	"b"
+		"dot"	"2"
+		"outline"	"1"
+		"fontcolor"	"255 255 255 40"
+		"color"	"255 255 255 255"
+		"outlinecolor"	"0 0 0 255"
+	}
+	"Accurate" // Rifle & revolver
+	{
+		"name"	"Accurate"
+		"type"	"dynamiccrosshair"
+		"dot"	"2"
+		"outline"	"1"
+		"offsetfromcenter"	"10"
+		"width"		"2"
+		"length"	"15"
+		"dynamicmove"	"20"
+		"color"	"255 255 255 255"
+		"outlinecolor"	"0 0 0 255"
+	}
+	"Pistol"
+	{
+		"name"	"Pistol"
+		"type"	"dotonly"
+		"dot"	"2"
+		"outline"	"1"
+		"color"	"255 255 255 255"
+		"outlinecolor"	"0 0 0 255"
+	}
+	"Melee"
+	{
+		"name"	"Melee"
+		"type"	"none"
+	}
+	"Throwable"
+	{
+		"name"	"Throwable"
+		"type"	"none"
+	}
+	"ZM"
+	{
+		"name"	"ZM"
+		"type"	"dotonly"
+		"dot"	"2"
+		"outline"	"1"
+		"color"	"255 255 255 255"
+		"outlinecolor"	"0 0 0 255"
+	}
+}

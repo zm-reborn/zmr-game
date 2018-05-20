@@ -1316,6 +1316,9 @@ static void BuildWorldPhysModel( CUtlVector<CPhysCollisionEntry *> &collisionLis
 	ConvertWorldBrushesToPhysCollide( collisionList, shrinkSize, mergeTolerance, MASK_SOLID );
 	ConvertWorldBrushesToPhysCollide( collisionList, shrinkSize, mergeTolerance, CONTENTS_PLAYERCLIP );
 	ConvertWorldBrushesToPhysCollide( collisionList, shrinkSize, mergeTolerance, CONTENTS_MONSTERCLIP );
+#ifdef ZMR
+    ConvertWorldBrushesToPhysCollide( collisionList, shrinkSize, mergeTolerance, CONTENTS_TEAM1 );
+#endif
 
 	if ( !g_bNoVirtualMesh && Disp_HasPower4Displacements() )
 	{
@@ -1532,7 +1535,11 @@ void EmitPhysCollision()
 		}
 		else
 		{
+#ifdef ZMR
+            ConvertModelToPhysCollide( collisionList[i], i, MASK_SOLID|CONTENTS_PLAYERCLIP|CONTENTS_MONSTERCLIP|MASK_WATER|CONTENTS_TEAM1, VPHYSICS_SHRINK, VPHYSICS_MERGE );
+#else
 			ConvertModelToPhysCollide( collisionList[i], i, MASK_SOLID|CONTENTS_PLAYERCLIP|CONTENTS_MONSTERCLIP|MASK_WATER, VPHYSICS_SHRINK, VPHYSICS_MERGE );
+#endif
 		}
 		
 		pTextBuffer[i] = NULL;

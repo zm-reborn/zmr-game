@@ -9,10 +9,12 @@
 #include "zmr/zmr_playeranimstate.h"
 #include "zmr/zmr_shareddefs.h"
 
+#include "weapons/zmr_base.h"
 #include "zmr/zmr_playerlocaldata.h"
 
 
 class C_ZMRagdoll;
+class C_ZMBaseWeapon;
 
 
 class C_ZMPlayer : public C_BaseHLPlayer
@@ -42,8 +44,10 @@ public:
     virtual bool            ShouldReceiveProjectedTextures( int flags ) OVERRIDE;
     virtual bool            ShouldDraw() OVERRIDE;
     virtual int             DrawModel( int flags ) OVERRIDE;
+    int                     DrawModelAndEffects( int flags );
     virtual const QAngle&   GetRenderAngles() OVERRIDE;
     virtual const QAngle&   EyeAngles() OVERRIDE;
+    void                    SetLocalAngles( const QAngle& angles );
     virtual float           GetFOV() OVERRIDE;
     virtual float           GetMinFOV() const OVERRIDE { return 5.0f; };
 
@@ -98,6 +102,8 @@ public:
     Vector                  GetAttackSpread( C_BaseCombatWeapon* pWeapon, C_BaseEntity* pTarget = nullptr );
     Vector                  GetAutoaimVector( float flScale ) OVERRIDE;
     void                    DoAnimationEvent( PlayerAnimEvent_t playerAnim, int nData = 0 );
+    float                   GetAccuracyRatio() const;
+    void                    UpdateAccuracyRatio();
 
     void SetMouseWheelMove( float dir );
 

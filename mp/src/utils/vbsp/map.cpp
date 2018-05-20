@@ -1597,6 +1597,14 @@ ChunkFileResult_t CMapFile::LoadEntityCallback(CChunkFile *pFile, int nParam)
 			return(ChunkFile_Ok);
 		}
 
+		// func_detail_blocker is added to a list that's used when placing
+		// detail props. The entity doesn't get written to the BSP.
+		if ( !strcmp( "func_detail_blocker" , pClassName ) )
+		{
+			AddDetailBlocker(mapent);
+			return(ChunkFile_Ok);
+		}
+
 		//
 		// func_ladder brushes are moved into the world entity.  We convert the func_ladder to an info_ladder
 		// that holds the ladder's mins and maxs, and leave the entity.  This helps the bots figure out ladders.
@@ -2708,7 +2716,11 @@ ChunkFileResult_t CMapFile::LoadSideCallback(CChunkFile *pFile, LoadSide_t *pSid
 		side->surf |= pSideInfo->nBaseFlags;
 		pSideInfo->td.flags |= pSideInfo->nBaseFlags;
 
+#ifdef ZMR
+        if (side->contents & (CONTENTS_PLAYERCLIP|CONTENTS_MONSTERCLIP|CONTENTS_TEAM1) )
+#else
 		if (side->contents & (CONTENTS_PLAYERCLIP|CONTENTS_MONSTERCLIP) )
+#endif
 		{
 			side->contents |= CONTENTS_DETAIL;
 		}
@@ -2718,7 +2730,11 @@ ChunkFileResult_t CMapFile::LoadSideCallback(CChunkFile *pFile, LoadSide_t *pSid
 			side->contents &= ~CONTENTS_DETAIL;
 		}
 		
+#ifdef ZMR
+        if (!(side->contents & (ALL_VISIBLE_CONTENTS | CONTENTS_PLAYERCLIP|CONTENTS_MONSTERCLIP|CONTENTS_TEAM1)  ) )
+#else
 		if (!(side->contents & (ALL_VISIBLE_CONTENTS | CONTENTS_PLAYERCLIP|CONTENTS_MONSTERCLIP)  ) )
+#endif
 		{
 			side->contents |= CONTENTS_SOLID;
 		}
@@ -3022,7 +3038,11 @@ ChunkFileResult_t CMapFile::LoadSolidCallback(CChunkFile *pFile, LoadEntity_t *p
 		//
 		if ( b->entitynum == 0 )
 		{
+#ifdef ZMR
+            if (b->contents & (CONTENTS_PLAYERCLIP|CONTENTS_MONSTERCLIP|CONTENTS_TEAM1) )
+#else
 			if (b->contents & (CONTENTS_PLAYERCLIP|CONTENTS_MONSTERCLIP) )
+#endif
 			{
 				if ( g_ClipTexinfo < 0 )
 				{

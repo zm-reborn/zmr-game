@@ -41,6 +41,48 @@ enum
 };
 
 
+class CZMViewVectors : public HL2MPViewVectors
+{
+public:
+    CZMViewVectors( 
+        Vector vView,
+        Vector vHullMin,
+        Vector vHullMax,
+        Vector vDuckHullMin,
+        Vector vDuckHullMax,
+        Vector vDuckView,
+        Vector vObsHullMin,
+        Vector vObsHullMax,
+        Vector vDeadViewHeight,
+        Vector vCrouchTraceMin,
+        Vector vCrouchTraceMax,
+        Vector vZMHullMin,
+        Vector vZMHullMax,
+        Vector vZMView ) :
+            HL2MPViewVectors( 
+                vView,
+                vHullMin,
+                vHullMax,
+                vDuckHullMin,
+                vDuckHullMax,
+                vDuckView,
+                vObsHullMin,
+                vObsHullMax,
+                vDeadViewHeight,
+                vCrouchTraceMin,
+                vCrouchTraceMax )
+    {
+        m_vZMHullMin = vZMHullMin;
+        m_vZMHullMax = vZMHullMax;
+        m_vZMView = vZMView;
+    }
+
+    Vector m_vZMHullMin;
+    Vector m_vZMHullMax;
+    Vector m_vZMView;
+};
+
+
 class CZMGameRulesProxy : public CGameRulesProxy // CGameRulesProxy CHL2MPGameRulesProxy
 {
 public:
@@ -69,6 +111,10 @@ public:
     virtual bool ShouldCollide( int, int ) OVERRIDE;
 
     virtual void DeathNotice( CBasePlayer*, const CTakeDamageInfo& ) OVERRIDE;
+
+
+    virtual const CViewVectors* GetViewVectors() const;
+    const CZMViewVectors* GetZMViewVectors() const;
 
 #ifndef CLIENT_DLL
     virtual void CreateStandardEntities() OVERRIDE;
