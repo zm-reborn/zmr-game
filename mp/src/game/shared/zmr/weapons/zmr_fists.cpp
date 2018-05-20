@@ -25,50 +25,62 @@ public:
     CZMWeaponFists();
 
 
-    RECORD_PREDICTION_SEED;
+    virtual bool UsesAnimEvent( bool bSecondary ) const OVERRIDE { return true; }
 
 #ifdef CLIENT_DLL
-    bool ShouldDrawPickup() OVERRIDE { return false; }
-    bool ShouldDraw() OVERRIDE { return false; }
+    virtual bool ShouldDrawPickup() OVERRIDE { return false; }
+    virtual bool ShouldDraw() OVERRIDE { return false; }
 #endif
 
-    float GetRange() const OVERRIDE { return 45.0f; }
-    float GetFireRate() OVERRIDE { return 0.65f; }
+    virtual float GetRange() const OVERRIDE { return 45.0f; }
+    virtual float GetFireRate() OVERRIDE { return 0.65f; }
 
-    void AddViewKick() OVERRIDE
+    virtual void AddViewKick() OVERRIDE
     {
         CZMPlayer* pPlayer = GetPlayerOwner();
         if ( !pPlayer ) return;
 
 
         QAngle ang;
-        ang.x = GetPredictedRandomFloat( -1.0f, 1.0f );
-        ang.y = GetPredictedRandomFloat( -1.0f, 1.0f );
+        ang.x = SharedRandomFloat( "fistsx", -1.0f, 1.0f );
+        ang.y = SharedRandomFloat( "fistsy", -1.0f, 1.0f );
         ang.z = 0.0f;
 
 	    pPlayer->ViewPunch( ang );
     }
 
-    float GetDamageForActivity( Activity act ) const OVERRIDE { return 5.0f; }
+    virtual void PrimaryAttack() OVERRIDE;
+    virtual void SecondaryAttack() OVERRIDE;
+
+    virtual bool CanSecondaryAttack() const { return true; }
+    virtual Activity GetPrimaryAttackActivity() OVERRIDE { return ACT_VM_HITCENTER; }
+	virtual Activity GetSecondaryAttackActivity() OVERRIDE { return ACT_VM_HITCENTER; }
+
+    virtual float GetDamageForActivity( Activity act ) const OVERRIDE { return 5.0f; }
+
+
+    virtual void Hit( trace_t& traceHit, Activity iHitActivity ) OVERRIDE;
 
 
 #ifndef CLIENT_DLL
-    bool CanBeDropped() const OVERRIDE { return false; }
-
-
-    void Operator_HandleAnimEvent( animevent_t*, CBaseCombatCharacter* ) OVERRIDE;
-#else
-    bool OnFireEvent( C_BaseViewModel*, const Vector&, const QAngle&, int event, const char* ) OVERRIDE;
+    virtual bool CanBeDropped() const OVERRIDE { return false; }
 #endif
 };
 
 IMPLEMENT_NETWORKCLASS_ALIASED( ZMWeaponFists, DT_ZM_WeaponFists )
 
+// We use animation events, so we need to network the attack time.
 BEGIN_NETWORK_TABLE( CZMWeaponFists, DT_ZM_WeaponFists )
+#ifdef CLIENT_DLL
+    RecvPropTime( RECVINFO( m_flAttackHitTime ) ),
+#else
+    SendPropTime( SENDINFO( m_flAttackHitTime ) ),
+#endif
 END_NETWORK_TABLE()
 
 #ifdef CLIENT_DLL
 BEGIN_PREDICTION_DATA( CZMWeaponFists )
+    DEFINE_PRED_FIELD_TOL( m_flAttackHitTime, FIELD_FLOAT, FTYPEDESC_INSENDTABLE, TD_MSECTOLERANCE ),
 END_PREDICTION_DATA()
 #endif
 
@@ -104,29 +116,40 @@ CZMWeaponFists::CZMWeaponFists()
     SetSlotFlag( ZMWEAPONSLOT_NONE );
 }
 
+void CZMWeaponFists::PrimaryAttack()
+{
+    if ( !CanPrimaryAttack() )
+        return;
+
+
+    Swing( false );
+
+
+    m_flNextPrimaryAttack = gpGlobals->curtime + GetFireRate();
+    m_flNextSecondaryAttack = gpGlobals->curtime + GetFireRate();
+}
+
+void CZMWeaponFists::SecondaryAttack()
+{
+    if ( !CanSecondaryAttack() )
+        return;
+
+        
+    Swing( true );
+
+
+    m_flNextPrimaryAttack = gpGlobals->curtime + GetFireRate();
+    m_flNextSecondaryAttack = gpGlobals->curtime + GetFireRate();
+}
+
+void CZMWeaponFists::Hit( trace_t& traceHit, Activity iHitActivity )
+{
+    BaseClass::Hit( traceHit, iHitActivity );
+
+
+    AddViewKick();
+
 #ifndef CLIENT_DLL
-void CZMWeaponFists::Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCharacter *pOperator )
-{
-	switch( pEvent->event )
-	{
-	case AE_ZM_MELEEHIT:
-		HandleAnimEventMeleeHit();
-		break;
-
-	default:
-		BaseClass::Operator_HandleAnimEvent( pEvent, pOperator );
-		break;
-	}
-}
-#else
-bool CZMWeaponFists::OnFireEvent( C_BaseViewModel* pViewModel, const Vector& origin, const QAngle& angles, int event, const char* options )
-{
-    if ( event == AE_ZM_MELEEHIT )
-    {
-        HandleAnimEventMeleeHit();
-        return true;
-    }
-
-    return false;
-}
+    PlayAISound();
 #endif
+}

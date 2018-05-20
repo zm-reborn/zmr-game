@@ -228,6 +228,8 @@ public:
     virtual Vector      GetAttackSpread( CBaseCombatWeapon* pWeapon, CBaseEntity* pTarget = nullptr ) OVERRIDE;
     virtual Vector      GetAutoaimVector( float flScale ) OVERRIDE;
     void                DoAnimationEvent( PlayerAnimEvent_t playerAnim, int nData = 0 );
+    float               GetAccuracyRatio() const;
+    void                UpdateAccuracyRatio();
 
     KeyValues*          LoadPlayerModels();
 
@@ -264,7 +266,6 @@ private:
     float               m_flNextModelChangeTime;
 
     CZMPlayerAnimState* m_pPlayerAnimState;
-
 
     int m_iBuildSpawnIndex; // To update build menu.
     //Participation_t m_iParticipation;

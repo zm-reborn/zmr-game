@@ -3,8 +3,14 @@
 #include "itempents.h"
 #include "in_buttons.h"
 #include "takedamageinfo.h"
+#include "npcevent.h"
+#include "eventlist.h"
 
-#ifndef CLIENT_DLL
+
+
+#ifdef CLIENT_DLL
+#include "prediction.h"
+#else
 #include "ilagcompensationmanager.h"
 #endif
 
@@ -22,13 +28,17 @@
 void DispatchEffect( const char *pName, const CEffectData &data );
 
 
+
+
 IMPLEMENT_NETWORKCLASS_ALIASED( ZMBaseMeleeWeapon, DT_ZM_BaseMeleeWeapon )
 
 BEGIN_NETWORK_TABLE( CZMBaseMeleeWeapon, DT_ZM_BaseMeleeWeapon )
 END_NETWORK_TABLE()
 
+#ifdef CLIENT_DLL
 BEGIN_PREDICTION_DATA( CZMBaseMeleeWeapon )
 END_PREDICTION_DATA()
+#endif
 
 BEGIN_DATADESC( CZMBaseMeleeWeapon )
 END_DATADESC()
@@ -53,6 +63,9 @@ CZMBaseMeleeWeapon::CZMBaseMeleeWeapon()
 #ifndef CLIENT_DLL
     SetSlotFlag( ZMWEAPONSLOT_MELEE );
 #endif
+
+
+    m_flAttackHitTime = 0.0f;
 }
 
 void CZMBaseMeleeWeapon::ItemPostFrame()
@@ -63,19 +76,66 @@ void CZMBaseMeleeWeapon::ItemPostFrame()
     // We have to go around the ammo requirement.
     if ( pPlayer->m_nButtons & IN_ATTACK && m_flNextPrimaryAttack <= gpGlobals->curtime )
     {
-        Swing( false );
+        PrimaryAttack();
     }
     else if ( pPlayer->m_nButtons & IN_ATTACK2 && m_flNextSecondaryAttack <= gpGlobals->curtime )
     {
-        Swing( true );
+        SecondaryAttack();
     }
     else
     {
         WeaponIdle();
     }
+
+    // It's time to attack!
+    if ( m_flAttackHitTime != 0.0f && m_flAttackHitTime <= gpGlobals->curtime )
+    {
+        StartHit( nullptr, GetActivity() );
+        m_flAttackHitTime = 0.0f;
+    }
 }
 
-void CZMBaseMeleeWeapon::HandleAnimEventMeleeHit()
+bool CZMBaseMeleeWeapon::Deploy()
+{
+    bool res = BaseClass::Deploy();
+
+    if ( res )
+    {
+        m_flAttackHitTime = 0.0f;
+    }
+
+    return res;
+}
+
+void CZMBaseMeleeWeapon::PrimaryAttack()
+{
+    if ( !CanPrimaryAttack() )
+        return;
+
+
+    Swing( false );
+
+
+    // Setup our next attack times
+    m_flNextPrimaryAttack = gpGlobals->curtime + GetFireRate();
+    m_flNextSecondaryAttack = gpGlobals->curtime + SequenceDuration();
+}
+
+void CZMBaseMeleeWeapon::SecondaryAttack()
+{
+    if ( !CanSecondaryAttack() )
+        return;
+
+        
+    Swing( true );
+
+
+    // Setup our next attack times
+    m_flNextPrimaryAttack = gpGlobals->curtime + GetFireRate();
+    m_flNextSecondaryAttack = gpGlobals->curtime + SequenceDuration();
+}
+
+void CZMBaseMeleeWeapon::StartHit( trace_t* traceRes, Activity iActivityDamage )
 {
     CZMPlayer* pPlayer = GetPlayerOwner();
     if ( !pPlayer ) return;
@@ -88,11 +148,16 @@ void CZMBaseMeleeWeapon::HandleAnimEventMeleeHit()
     trace_t traceHit;
     TraceMeleeAttack( traceHit );
 
-    Hit( traceHit, ACT_VM_HITCENTER );
+    Hit( traceHit, iActivityDamage );
 
 #ifndef CLIENT_DLL
     lagcompensation->FinishLagCompensation( pPlayer );
 #endif
+
+    if ( traceRes )
+    {
+        *traceRes = traceHit;
+    }
 }
 
 void CZMBaseMeleeWeapon::TraceMeleeAttack( trace_t& traceHit )
@@ -152,6 +217,14 @@ void CZMBaseMeleeWeapon::Hit( trace_t& traceHit, Activity nHitActivity )
     CBaseEntity* pHitEntity = traceHit.m_pEnt;
 
 
+    const bool bRunEffects =
+#ifdef CLIENT_DLL
+    prediction->IsFirstTimePredicted();
+#else
+    true;
+#endif
+
+
     if ( pHitEntity )
     {
         Vector hitDirection;
@@ -184,31 +257,32 @@ void CZMBaseMeleeWeapon::Hit( trace_t& traceHit, Activity nHitActivity )
         WeaponSound( MELEE_HIT );
     }
 
-    // Apply an impact effect
-    ImpactEffect( traceHit );
+
+    if ( bRunEffects )
+    {
+        // Apply an impact effect
+        ImpactEffect( traceHit );
+    }
 }
 
-void CZMBaseMeleeWeapon::Swing( bool bSecondary, const bool bUseAnimationEvent )
+void CZMBaseMeleeWeapon::Swing( bool bSecondary )
 {
     CZMPlayer* pOwner = GetPlayerOwner();
     if ( !pOwner ) return;
 
 
-    Activity nHitActivity = ACT_VM_HITCENTER;
 
-    if ( !bUseAnimationEvent )
+    const bool bUseAnimEvent = UsesAnimEvent( bSecondary );
+
+
+
+    Activity nHitActivity = bSecondary ? GetSecondaryAttackActivity() : GetPrimaryAttackActivity();
+
+    if ( !bUseAnimEvent )
     {
-#ifndef CLIENT_DLL
-        lagcompensation->StartLagCompensation( pOwner, pOwner->GetCurrentCommand() );
-#endif
         trace_t traceHit;
-        TraceMeleeAttack( traceHit );
-
-        Hit( traceHit, nHitActivity );
-
-#ifndef CLIENT_DLL
-        lagcompensation->FinishLagCompensation( pOwner );
-#endif
+        traceHit.fraction = 1.0f;
+        StartHit( &traceHit, nHitActivity );
 
         if ( traceHit.fraction == 1.0f ) nHitActivity = bSecondary ? ACT_VM_MISSCENTER2 : ACT_VM_MISSCENTER;
     }
@@ -216,18 +290,28 @@ void CZMBaseMeleeWeapon::Swing( bool bSecondary, const bool bUseAnimationEvent )
     // Send the anim
     SendWeaponAnim( nHitActivity );
 
-    WeaponSound( SINGLE );
+
+    if ( bUseAnimEvent )
+    {
+        // Currently, only supports firstperson
+        float waittime = GetFirstInstanceOfAnimEventTime( GetSequence(), AE_ZM_MELEEHIT );
+        if ( waittime >= 0.0f )
+            m_flAttackHitTime = gpGlobals->curtime + waittime;
+    }
+
+
+    WeaponSound( bSecondary ? GetSecondaryAttackSound() : GetPrimaryAttackSound() );
     pOwner->DoAnimationEvent( PLAYERANIMEVENT_ATTACK_PRIMARY );
 
-    //Setup our next attack times
-    m_flNextPrimaryAttack = gpGlobals->curtime + GetFireRate();
-    m_flNextSecondaryAttack = gpGlobals->curtime + SequenceDuration();
 
-    AddViewKick();
+    if ( !bUseAnimEvent )
+    {
+        AddViewKick();
 
 #ifndef CLIENT_DLL
-    PlayAISound();
+        PlayAISound();
 #endif
+    }
 }
 
 void CZMBaseMeleeWeapon::ChooseIntersectionPoint( trace_t& hitTrace, const Vector& mins, const Vector& maxs )
@@ -325,3 +409,29 @@ void CZMBaseMeleeWeapon::ImpactEffect( trace_t& traceHit )
     if ( traceHit.m_pEnt )
         UTIL_ImpactTrace( &traceHit, DMG_CLUB );
 }
+
+#ifndef CLIENT_DLL
+void CZMBaseMeleeWeapon::Operator_HandleAnimEvent( animevent_t* pEvent, CBaseCombatCharacter* pOperator )
+{
+	switch( pEvent->event )
+	{
+	case AE_ZM_MELEEHIT:
+		break;
+
+	default:
+		BaseClass::Operator_HandleAnimEvent( pEvent, pOperator );
+		break;
+	}
+}
+#else
+bool CZMBaseMeleeWeapon::OnFireEvent( C_BaseViewModel* pViewModel, const Vector& origin, const QAngle& angles, int event, const char* options )
+{
+    if ( event == AE_ZM_MELEEHIT )
+    {
+        return true;
+    }
+
+    return false;
+}
+#endif
+
