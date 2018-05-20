@@ -340,6 +340,8 @@ void CZMPlayerAnimState::DoAnimationEvent( PlayerAnimEvent_t playerAnim, int nDa
     }
 
 #ifdef CLIENT_DLL
+    // ZMRCHANGE: This only gets in the way. We send weapon animations ourselves.
+    /*
     // Make the weapon play the animation as well
     if ( iGestureActivity != ACT_INVALID )
     {
@@ -353,6 +355,7 @@ void CZMPlayerAnimState::DoAnimationEvent( PlayerAnimEvent_t playerAnim, int nDa
             pWeapon->DoAnimationEvents( pWeapon->GetModelPtr() );
         }
     }
+    */
 #endif
 }
 

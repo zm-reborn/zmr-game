@@ -5,7 +5,9 @@
 //#include "hl2mp/weapon_hl2mpbase.h"
 //#include "hl2mp/hl2mp_weapon_parse.h"
 
-
+#ifdef CLIENT_DLL
+#include "zmr/c_zmr_crosshair.h"
+#endif
 #include "zmr/zmr_weapon_parse.h"
 
 #include "zmr/zmr_player_shared.h"
@@ -22,44 +24,10 @@
     You must add custom animation events in eventlist.h && eventlist.cpp
 */
 
-class CZMPredictionSeed
-{
-public:
-    CZMPredictionSeed()
-    {
-        m_nLastPredictionSeed = -1;
-    }
-    
-    void    SetLastPredictionSeed( int seed ) { m_nLastPredictionSeed = seed; };
-    int     GetLastPredictionSeed() { return m_nLastPredictionSeed; };
-
-
-    // This function doesn't hash like SharedRandomFloat does, but it gets the job done.
-    float GetPredictedRandomFloat( float flMinVal, float flMaxVal )
-    {
-        int seed = ( CBaseEntity::GetPredictionRandomSeed() == -1 ) ?
-            GetLastPredictionSeed() :
-            CBaseEntity::GetPredictionRandomSeed();
-
-        RandomSeed( seed );
-        return RandomFloat( flMinVal, flMaxVal );
-    }
-
-private:
-    int m_nLastPredictionSeed;
-};
-
-#define RECORD_PREDICTION_SEED  void ItemPostFrame() OVERRIDE \
-                                { \
-                                    BaseClass::ItemPostFrame(); \
-                                    SetLastPredictionSeed( CBaseEntity::GetPredictionRandomSeed() ); \
-                                } \
-
-
 // 1 is constrained.
 #define SF_ZMWEAPON_TEMPLATE        ( 1 << 1 )
 
-class CZMBaseWeapon : public CBaseCombatWeapon, public CZMPredictionSeed
+class CZMBaseWeapon : public CBaseCombatWeapon
 {
 public:
 	DECLARE_CLASS( CZMBaseWeapon, CBaseCombatWeapon );
@@ -80,7 +48,10 @@ public:
     virtual bool Reload() OVERRIDE;
     // NOTE: Always use this to get the damage from .txt file.
     virtual void FireBullets( const FireBulletsInfo_t &info ) OVERRIDE;
+    virtual void FireBullets( int numShots, int iAmmoType );
     virtual void PrimaryAttack() OVERRIDE;
+    virtual void Shoot();
+    virtual void PrimaryAttackEffects();
     virtual void SecondaryAttack() OVERRIDE;
     
     const CZMWeaponInfo& GetWpnData() const;
@@ -110,6 +81,12 @@ public:
 
     void DoMachineGunKick( float, float, float, float );
 
+#ifdef CLIENT_DLL
+    virtual CZMBaseCrosshair* GetWeaponCrosshair() const { return nullptr; }
+#endif
+
+    // How many bullets we fire per one "bullet", or clip "unit".
+    virtual int GetBulletsPerShot() const { return 1; }
 
     virtual int GetMinBurst( void ) OVERRIDE { return 1; }
     virtual int GetMaxBurst( void ) OVERRIDE { return 1; }
@@ -153,6 +130,12 @@ public:
     virtual bool    CanPickupAmmo() const { return true; }
     virtual bool    IsInReload() const { return const_cast<CZMBaseWeapon*>( this )->CanReload() && m_bInReload; }
     virtual bool    CanAct() const; // Can we reload/attack?
+
+
+    virtual float   GetAccuracyIncreaseRate() const { return 2.0f; }
+    virtual float   GetAccuracyDecreaseRate() const { return 2.0f; }
+
+    float           GetFirstInstanceOfAnimEventTime( int iSeq, int iAnimEvent ) const;
 
 
     inline int GetSlotFlag() const { return m_iSlotFlag; }

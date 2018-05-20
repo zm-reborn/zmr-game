@@ -95,6 +95,9 @@ Scheme
 		// Blank space to leave beneath the menu on the main screen
 		"Main.BottomBorder"	"32"
 
+		
+		// ZMR
+		CZMPanelCrosshair.BgColor		"TransparentBlack"
 
 ///HERE
 				// vgui_controls color specifications
@@ -859,6 +862,18 @@ Scheme
 				"weight"	"600" // Can't be too high or it looks fucked up.
 				"antialias" "1"
 				"outline"	"1"
+			}
+		}
+		ZMCrosshairSmall
+		{
+			"1"
+			{
+				"name"		"zmcrosshairs"
+				"tall"		"60"
+				"weight"	"0"
+				"antialias" "1"
+				"additive"	"0"
+				"custom"	"1"
 			}
 		}
 		HudNumbersSmall
@@ -1919,6 +1934,7 @@ Scheme
 		"1"		"resource/ZM.ttf" // ZMR
 		"1"		"resource/MONOFONT.ttf" // ZMR
 		"1"		"resource/built titling bd.ttf" // ZMR
+		"2"		"resource/zmcrosshairs.ttf" // ZMR
 	}
 
 }

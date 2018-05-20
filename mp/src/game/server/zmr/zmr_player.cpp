@@ -289,6 +289,9 @@ void CZMPlayer::PreThink( void )
 
     if ( IsAlive() )
     {
+        UpdateAccuracyRatio();
+
+
         if ( FlashlightIsOn() )
         {
             SetFlashlightBattery( GetFlashlightBattery() - gpGlobals->frametime * zm_sv_flashlightdrainrate.GetFloat() );

@@ -1,4 +1,7 @@
 #include "cbase.h"
+#ifdef CLIENT_DLL
+#include "prediction.h"
+#endif
 
 #include <vphysics/constraints.h>
 
@@ -142,39 +145,17 @@ void CZMBaseWeapon::FireBullets( const FireBulletsInfo_t &info )
     GetOwner()->FireBullets( modinfo );
 }
 
-void CZMBaseWeapon::PrimaryAttack( void )
+void CZMBaseWeapon::FireBullets( int numShots, int iAmmoType )
 {
-    if ( !CanAct() ) return;
-
-
-    // If my clip is empty (and I use clips) start reload
-    if ( UsesClipsForAmmo1() && !m_iClip1 ) 
-    {
-        Reload();
-        return;
-    }
-
-
     CZMPlayer* pPlayer = GetPlayerOwner();
-    if ( !pPlayer ) return;
-
-
-    pPlayer->DoMuzzleFlash();
-
-    SendWeaponAnim( GetPrimaryAttackActivity() );
-    pPlayer->DoAnimationEvent( PLAYERANIMEVENT_ATTACK_PRIMARY );
+    if ( !pPlayer )
+        return;
 
 
     FireBulletsInfo_t info;
-    info.m_vecSrc	 = pPlayer->Weapon_ShootPosition();
-    
-    info.m_vecDirShooting = pPlayer->CBasePlayer::GetAutoaimVector( AUTOAIM_SCALE_DEFAULT );
-
-
-    info.m_iShots = 1;
-
-    WeaponSound( SINGLE, m_flNextPrimaryAttack );
-    m_flNextPrimaryAttack = m_flNextPrimaryAttack + GetFireRate();
+    info.m_vecSrc           = pPlayer->Weapon_ShootPosition();
+    info.m_vecDirShooting   = pPlayer->CBasePlayer::GetAutoaimVector( AUTOAIM_SCALE_DEFAULT );
+    info.m_iShots           = numShots;
 
     // ZMRTODO: See if this has any truth to it.
     // To make the firing framerate independent, we may have to fire more than one bullet here on low-framerate systems, 
@@ -191,20 +172,9 @@ void CZMBaseWeapon::PrimaryAttack( void )
             break;
     }*/
 
-    // Make sure we don't fire more than the amount in the clip
-    if ( UsesClipsForAmmo1() )
-    {
-        info.m_iShots = MIN( info.m_iShots, m_iClip1 );
-        m_iClip1 -= info.m_iShots;
-    }
-    else
-    {
-        info.m_iShots = MIN( info.m_iShots, pPlayer->GetAmmoCount( m_iPrimaryAmmoType ) );
-        pPlayer->RemoveAmmo( info.m_iShots, m_iPrimaryAmmoType );
-    }
 
     info.m_flDistance = MAX_TRACE_LENGTH;
-    info.m_iAmmoType = m_iPrimaryAmmoType;
+    info.m_iAmmoType = iAmmoType;
     info.m_iTracerFreq = 2;
 
 #ifndef CLIENT_DLL
@@ -217,9 +187,104 @@ void CZMBaseWeapon::PrimaryAttack( void )
     // Fire the bullets
     // Use our FireBullets to get the weapon damage from .txt file.
     FireBullets( info );
+}
+
+float CZMBaseWeapon::GetFirstInstanceOfAnimEventTime( int iSeq, int iAnimEvent ) const
+{
+    CZMBaseWeapon* me = const_cast<CZMBaseWeapon*>( this );
+
+    CStudioHdr* hdr = me->GetModelPtr();
+    if ( !hdr )
+        return -1.0f;
+
+    mstudioseqdesc_t& seqdesc = hdr->pSeqdesc( iSeq );
+    if ( !seqdesc.numevents )
+        return -1.0f;
 
 
-    if ( !m_iClip1 && pPlayer->GetAmmoCount(m_iPrimaryAmmoType) <= 0 )
+    mstudioevent_t* pevent = seqdesc.pEvent( 0 );
+
+    if ( !pevent )
+    {
+        return -1.0f;
+    }
+
+    for ( int i = 0; i < (int)seqdesc.numevents; i++ )
+    {
+        if ( pevent[i].event == iAnimEvent )
+        {
+            return pevent[i].cycle * me->SequenceDuration( hdr, iSeq );
+        }
+    }
+
+    return -1.0f;
+}
+
+
+void CZMBaseWeapon::PrimaryAttack( void )
+{
+    if ( !CanAct() ) return;
+
+
+    // If my clip is empty (and I use clips) start reload
+    if ( UsesClipsForAmmo1() && !m_iClip1 ) 
+    {
+        Reload();
+        return;
+    }
+
+
+    m_flNextPrimaryAttack = m_flNextPrimaryAttack + GetFireRate();
+    Shoot();
+}
+
+void CZMBaseWeapon::Shoot()
+{
+    CZMPlayer* pPlayer = GetPlayerOwner();
+    if ( !pPlayer ) return;
+
+
+
+    // Effects need to be called AFTER setting next primary attack(?)
+    PrimaryAttackEffects();
+
+
+    // ZMRTODO: Add burst firing here.
+    int shots = 1;
+
+
+    // Make sure we don't fire more than the amount in the clip
+    if ( UsesClipsForAmmo1() )
+    {
+        shots = MIN( shots, m_iClip1 );
+        m_iClip1 -= shots;
+    }
+    else
+    {
+        shots = MIN( shots, pPlayer->GetAmmoCount( m_iPrimaryAmmoType ) );
+        pPlayer->RemoveAmmo( shots, m_iPrimaryAmmoType );
+    }
+
+    Assert( shots > 0 );
+
+    
+    // I still barely understand how you're suppose to handle prediction.
+    // You cannot put the ENTIRE method behind this, because then none of the predictable variables seem to change on the client.
+    // If you don't check this, then this will get called multiple times, in this case firing bullets multiple times.
+    // It seems like you NEED to get called multiple times to set the predictable variables again.
+    // But you put everything non-predictable behind this condition.
+    // Problem is, almost everything is a predictable on the client.
+#ifdef CLIENT_DLL
+    if ( prediction->IsFirstTimePredicted() )
+#endif
+    {
+        int numBullets = GetBulletsPerShot();
+        Assert( numBullets > 0 );
+
+        FireBullets( numBullets, m_iPrimaryAmmoType );
+    }
+
+    if ( !m_iClip1 && pPlayer->GetAmmoCount( m_iPrimaryAmmoType ) <= 0 )
     {
         // HEV suit - indicate out of ammo condition
         pPlayer->SetSuitUpdate( "!HEV_AMO0", FALSE, 0 ); 
@@ -231,6 +296,28 @@ void CZMBaseWeapon::PrimaryAttack( void )
 #ifndef CLIENT_DLL
     PlayAISound();
 #endif
+}
+
+void CZMBaseWeapon::PrimaryAttackEffects()
+{
+    CZMPlayer* pPlayer = GetPlayerOwner();
+    if ( !pPlayer )
+        return;
+
+
+    // IMPORTANT: Always needs to be called
+    SendWeaponAnim( GetPrimaryAttackActivity() );
+
+#ifdef CLIENT_DLL
+    if ( prediction->IsFirstTimePredicted() )
+#endif
+    {
+        pPlayer->DoMuzzleFlash();
+
+        pPlayer->DoAnimationEvent( PLAYERANIMEVENT_ATTACK_PRIMARY );
+
+        WeaponSound( SINGLE, m_flNextPrimaryAttack );
+    }
 }
 
 #ifndef CLIENT_DLL
