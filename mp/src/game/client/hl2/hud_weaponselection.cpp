@@ -9,7 +9,7 @@
 #include "iclientmode.h"
 #include "history_resource.h"
 #include "input.h"
-#include "../hud_crosshair.h"
+//#include "../hud_crosshair.h"
 
 #include "VGuiMatSurface/IMatSystemSurface.h"
 #include <KeyValues.h>
@@ -586,6 +586,7 @@ void CHudWeaponSelection::Paint()
 		}
 	break;
 
+/*
 	case HUDTYPE_PLUS:
 		{
 			float fCenterX, fCenterY;
@@ -659,6 +660,7 @@ void CHudWeaponSelection::Paint()
 			}
 		}
 	break;
+*/
 
 	case HUDTYPE_BUCKETS:
 		{

@@ -26,6 +26,11 @@ public:
     ~CZMWeaponRifle();
 
 
+#ifdef CLIENT_DLL
+    virtual CZMBaseCrosshair* GetWeaponCrosshair() const OVERRIDE { return ZMGetCrosshair( "Accurate" ); }
+#endif
+
+
 #ifndef CLIENT_DLL
     const char* GetDropAmmoName() const OVERRIDE { return "item_ammo_357"; }
     int GetDropAmmoAmount() const OVERRIDE { return SIZE_AMMO_357; }
@@ -34,10 +39,29 @@ public:
 
     virtual const Vector& GetBulletSpread( void ) OVERRIDE
     {
-        static Vector cone( 0, 0, 0 );
+        static Vector cone( 0.0f, 0.0f, 0.0f );
+
+        CZMPlayer* pOwner = GetPlayerOwner();
+        if ( pOwner )
+        {
+            float ratio = 1.0f - pOwner->GetAccuracyRatio();
+            ratio *= ratio;
+
+            float max = VECTOR_CONE_10DEGREES.x;
+            cone.x = ratio * max;
+            cone.y = ratio * max;
+            cone.z = ratio * max;
+        }
+
+
         return cone;
     }
+
+    virtual float GetAccuracyIncreaseRate() const OVERRIDE { return 1.7f; }
+    virtual float GetAccuracyDecreaseRate() const OVERRIDE { return 4.2f; }
     
+
+
     virtual void AddViewKick( void ) OVERRIDE
     {
         CZMPlayer* pPlayer = ToZMPlayer( GetOwner() );

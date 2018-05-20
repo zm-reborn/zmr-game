@@ -84,6 +84,9 @@ IMPLEMENT_CLIENTCLASS_DT( C_ZMPlayer, DT_ZM_Player, CZMPlayer )
 END_RECV_TABLE()
 
 BEGIN_PREDICTION_DATA( C_ZMPlayer )
+    DEFINE_PRED_FIELD_TOL( m_ZMLocal.m_flAccuracyRatio, FIELD_FLOAT, FTYPEDESC_INSENDTABLE, 0.01f ),
+
+
     DEFINE_PRED_FIELD( m_flCycle, FIELD_FLOAT, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
     //DEFINE_PRED_FIELD( m_fIsWalking, FIELD_BOOLEAN, FTYPEDESC_INSENDTABLE ),
     DEFINE_PRED_FIELD( m_nSequence, FIELD_INTEGER, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
@@ -168,6 +171,31 @@ void C_ZMPlayer::ClientThink()
 
 void C_ZMPlayer::PreThink()
 {
+    // Put here so we get predicted properly.
+    if ( IsLocalPlayer() )
+    {
+        /*
+        // Simulate our spectator target.
+        if ( !IsAlive() )
+        {
+            C_ZMPlayer* pObserved = ( GetObserverMode() == OBS_MODE_IN_EYE ) ? ToZMPlayer( GetObserverTarget() ) : nullptr;
+
+            if ( pObserved )
+                pObserved->UpdateAccuracyRatio();
+        }
+        else
+        {
+            UpdateAccuracyRatio();
+        }
+        */
+
+        if ( IsAlive() )
+        {
+            UpdateAccuracyRatio();
+        }
+    }
+
+
     // Don't let base class change our max speed (sprinting)
     float spd = MaxSpeed();
 
@@ -662,6 +690,12 @@ const QAngle& C_ZMPlayer::GetRenderAngles()
 const QAngle& C_ZMPlayer::EyeAngles()
 {
     return IsLocalPlayer() ? BaseClass::EyeAngles() : m_angEyeAngles;
+}
+
+void C_ZMPlayer::SetLocalAngles( const QAngle& angles )
+{
+    m_angEyeAngles = angles;
+    BaseClass::SetLocalAngles( angles );
 }
 
 float C_ZMPlayer::GetFOV()

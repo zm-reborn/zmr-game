@@ -203,3 +203,55 @@ void CZMPlayer::DoAnimationEvent( PlayerAnimEvent_t playerAnim, int nData )
     TE_PlayerAnimEvent( this, playerAnim, nData );
 #endif
 }
+
+float CZMPlayer::GetAccuracyRatio() const
+{
+    return m_ZMLocal.m_flAccuracyRatio;
+}
+
+void CZMPlayer::UpdateAccuracyRatio()
+{
+    CZMBaseWeapon* pWep = static_cast<CZMBaseWeapon*>( GetActiveWeapon() );
+
+
+    float cur = m_ZMLocal.m_flAccuracyRatio;
+
+    float goalacc = 0.0f;
+
+    if ( GetFlags() & FL_ONGROUND )
+    {
+        float maxspd = MAX( 1.0f, MaxSpeed() );
+
+        float curspd = GetAbsVelocity().Length2D();
+
+
+        if ( curspd < 0.1f )
+            curspd = 0.0f;
+
+
+        float spdratio = MIN( 1.0f, curspd / maxspd );
+
+        goalacc = 1.0f - spdratio;
+    }
+
+    float min = 0.0f;
+    float max = 1.0f;
+
+    float add = 0.0f;
+    if ( goalacc < cur )
+    {
+        float f = pWep ? pWep->GetAccuracyDecreaseRate() : 2.0f;
+
+        add = -(f * gpGlobals->frametime);
+        min = goalacc;
+    }
+    else if ( goalacc > cur )
+    {
+        float f = pWep ? pWep->GetAccuracyIncreaseRate() : 2.0f;
+
+        add = (f * gpGlobals->frametime);
+        max = goalacc;
+    }
+
+    m_ZMLocal.m_flAccuracyRatio = clamp( cur + add, min, max );
+}
