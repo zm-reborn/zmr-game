@@ -26,7 +26,7 @@ public:
     virtual void ScaleDamageByHitgroup( int iHitGroup, CTakeDamageInfo& info ) const OVERRIDE {}
 
 
-    virtual float GetClawAttackRange() const OVERRIDE { return 120.0f; }
+    virtual float GetClawAttackRange() const OVERRIDE { return 112.0f; }
     virtual void GetAttackHull( Vector& mins, Vector& maxs ) const OVERRIDE;
     virtual float GetAttackLowest() const OVERRIDE { return -20.0f; }
 
