@@ -34,6 +34,10 @@ public:
     virtual bool Deploy() OVERRIDE;
 
 
+#ifdef CLIENT_DLL
+    virtual CZMBaseCrosshair* GetWeaponCrosshair() const OVERRIDE { return ZMGetCrosshair( "Accurate" ); }
+#endif
+
 #ifndef CLIENT_DLL
     const char* GetDropAmmoName() const OVERRIDE { return "item_ammo_revolver"; }
     int GetDropAmmoAmount() const OVERRIDE { return SIZE_ZMAMMO_REVOLVER; }
@@ -42,8 +46,45 @@ public:
     virtual const Vector& GetBulletSpread( void ) OVERRIDE
     {
         static Vector cone = Vector( 0.0f, 0.0f, 0.0f );
+
+
+        CZMPlayer* pOwner = GetPlayerOwner();
+
+        if ( pOwner )
+        {
+            float ratio = 1.0f - pOwner->GetAccuracyRatio();
+            ratio *= ratio;
+            
+#ifndef VECTOR_CONE_45DEGREES
+#define VECTOR_CONE_45DEGREES       Vector( 0.38268f, 0.38268f, 0.38268f )
+#endif
+            
+            // 18 degrees
+#define     SECONDARY_MIN_RATIO         0.4f
+
+            const bool bIsSecondary = GetActivity() == ACT_VM_SECONDARYATTACK;
+
+            // Secondary punishes moving a lot more.
+            float max = bIsSecondary ? VECTOR_CONE_45DEGREES.x : VECTOR_CONE_15DEGREES.x;
+
+            // Secondary is not perfectly accurate.
+            if ( bIsSecondary )
+                ratio = MAX( SECONDARY_MIN_RATIO, ratio );
+
+
+
+            cone.x = ratio * max;
+            cone.y = ratio * max;
+            cone.z = ratio * max;
+        }
+
         return cone;
     }
+
+
+    virtual float GetAccuracyIncreaseRate() const OVERRIDE { return 1.5f; }
+    virtual float GetAccuracyDecreaseRate() const OVERRIDE { return 5.1f; }
+
     
     virtual void AddViewKick( void ) OVERRIDE;
 

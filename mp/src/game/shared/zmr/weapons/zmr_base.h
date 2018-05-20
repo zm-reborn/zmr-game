@@ -81,6 +81,10 @@ public:
 
     void DoMachineGunKick( float, float, float, float );
 
+#ifdef CLIENT_DLL
+    virtual CZMBaseCrosshair* GetWeaponCrosshair() const { return nullptr; }
+#endif
+
     // How many bullets we fire per one "bullet", or clip "unit".
     virtual int GetBulletsPerShot() const { return 1; }
 
@@ -127,6 +131,9 @@ public:
     virtual bool    IsInReload() const { return const_cast<CZMBaseWeapon*>( this )->CanReload() && m_bInReload; }
     virtual bool    CanAct() const; // Can we reload/attack?
 
+
+    virtual float   GetAccuracyIncreaseRate() const { return 2.0f; }
+    virtual float   GetAccuracyDecreaseRate() const { return 2.0f; }
 
     float           GetFirstInstanceOfAnimEventTime( int iSeq, int iAnimEvent ) const;
 
