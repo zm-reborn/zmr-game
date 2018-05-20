@@ -14,6 +14,13 @@ ConVar zm_sk_banshee_dmg_leap_ceilambush( "zm_sk_banshee_dmg_leap_ceilambush", "
 ConVar zm_sk_hulk_health( "zm_sk_hulk_health", "150" );
 ConVar zm_sk_hulk_dmg( "zm_sk_hulk_dmg", "50" );
 
+ConVar zm_sk_hulk_hitmult_legs( "zm_sk_hulk_hitmult_legs", "1" );
+ConVar zm_sk_hulk_hitmult_head( "zm_sk_hulk_hitmult_head", "0.9" );
+ConVar zm_sk_hulk_hitmult_stomach( "zm_sk_hulk_hitmult_stomach", "0.65" );
+ConVar zm_sk_hulk_hitmult_chest( "zm_sk_hulk_hitmult_chest", "0.5" );
+ConVar zm_sk_hulk_hitmult_arms( "zm_sk_hulk_hitmult_arms", "0.2" );
+
+
 ConVar zm_sk_dragzombie_health( "zm_sk_dragzombie_health", "60" );
 ConVar zm_sk_dragzombie_dmg( "zm_sk_dragzombie_dmg", "3" );
 
