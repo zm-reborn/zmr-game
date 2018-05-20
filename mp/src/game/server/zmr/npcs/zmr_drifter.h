@@ -22,6 +22,10 @@ public:
     virtual void HandleAnimEvent( animevent_t* pEvent ) OVERRIDE;
 
 
+    // Drifter doesn't get any damage changes.
+    virtual void ScaleDamageByHitgroup( int iHitGroup, CTakeDamageInfo& info ) const OVERRIDE {}
+
+
     virtual float GetClawAttackRange() const OVERRIDE { return 120.0f; }
     virtual void GetAttackHull( Vector& mins, Vector& maxs ) const OVERRIDE;
     virtual float GetAttackLowest() const OVERRIDE { return -20.0f; }

@@ -699,7 +699,16 @@ void CZMBaseZombie::TraceAttack( const CTakeDamageInfo& inputInfo, const Vector&
     }
 
 
-    int iHitGroup = pTrace->hitgroup;
+
+    ScaleDamageByHitgroup( pTrace->hitgroup, info );
+
+
+
+    BaseClass::TraceAttack( info, vecDir, pTrace, pAccumulator );
+}
+
+void CZMBaseZombie::ScaleDamageByHitgroup( int iHitGroup, CTakeDamageInfo& info ) const
+{
     switch( iHitGroup )
     {
     case HITGROUP_HEAD :
@@ -729,10 +738,7 @@ void CZMBaseZombie::TraceAttack( const CTakeDamageInfo& inputInfo, const Vector&
             }
         }
     }
-
-    BaseClass::TraceAttack( info, vecDir, pTrace, pAccumulator );
 }
-
 
 void CZMBaseZombie::Event_Killed( const CTakeDamageInfo& info )
 {

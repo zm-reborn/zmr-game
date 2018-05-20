@@ -11,6 +11,12 @@
 extern ConVar zm_sk_hulk_health;
 extern ConVar zm_sk_hulk_dmg;
 
+extern ConVar zm_sk_hulk_hitmult_legs;
+extern ConVar zm_sk_hulk_hitmult_head;
+extern ConVar zm_sk_hulk_hitmult_stomach;
+extern ConVar zm_sk_hulk_hitmult_chest;
+extern ConVar zm_sk_hulk_hitmult_arms;
+
 
 LINK_ENTITY_TO_CLASS( npc_poisonzombie, CZMHulk );
 PRECACHE_REGISTER( npc_poisonzombie );
@@ -93,6 +99,31 @@ void CZMHulk::HandleAnimEvent( animevent_t* pEvent )
 	}
 
     BaseClass::HandleAnimEvent( pEvent );
+}
+
+void CZMHulk::ScaleDamageByHitgroup( int iHitGroup, CTakeDamageInfo& info ) const
+{
+    switch ( iHitGroup )
+    {
+    case HITGROUP_LEFTARM :
+    case HITGROUP_RIGHTARM :
+        info.ScaleDamage( zm_sk_hulk_hitmult_arms.GetFloat() );
+        break;
+    case HITGROUP_CHEST :
+        info.ScaleDamage( zm_sk_hulk_hitmult_chest.GetFloat() );
+        break;
+    case HITGROUP_STOMACH :
+        info.ScaleDamage( zm_sk_hulk_hitmult_stomach.GetFloat() );
+        break;
+    case HITGROUP_HEAD :
+        info.ScaleDamage( zm_sk_hulk_hitmult_head.GetFloat() );
+        break;
+    case HITGROUP_LEFTLEG :
+    case HITGROUP_RIGHTLEG :
+    default :
+        info.ScaleDamage( zm_sk_hulk_hitmult_legs.GetFloat() );
+        break;
+    }
 }
 
 void CZMHulk::AlertSound()
