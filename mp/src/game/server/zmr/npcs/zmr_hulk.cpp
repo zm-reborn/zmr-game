@@ -11,6 +11,12 @@
 extern ConVar zm_sk_hulk_health;
 extern ConVar zm_sk_hulk_dmg;
 
+extern ConVar zm_sk_hulk_hitmult_legs;
+extern ConVar zm_sk_hulk_hitmult_head;
+extern ConVar zm_sk_hulk_hitmult_stomach;
+extern ConVar zm_sk_hulk_hitmult_chest;
+extern ConVar zm_sk_hulk_hitmult_arms;
+
 
 LINK_ENTITY_TO_CLASS( npc_poisonzombie, CZMHulk );
 PRECACHE_REGISTER( npc_poisonzombie );
@@ -34,9 +40,6 @@ void CZMHulk::Precache()
         return;
 
 
-    PrecacheModel( ZOMBIE_MODEL );
-
-
     PrecacheScriptSound( "NPC_PoisonZombie.Die" );
     PrecacheScriptSound( "NPC_PoisonZombie.Idle" );
     PrecacheScriptSound( "NPC_PoisonZombie.Pain" );
@@ -53,12 +56,16 @@ void CZMHulk::Precache()
 
 void CZMHulk::Spawn()
 {
-    SetModel( ZOMBIE_MODEL );
-
     SetMaxHealth( zm_sk_hulk_health.GetInt() );
 
 
     BaseClass::Spawn();
+
+    // Hulk's hitboxes go beyond its collision bounds, by default this means they cannot be hit by rays.
+    // We have to specify the surrounding bounds in order to get hit in these hitboxes!
+    Vector mins( -32.0f, -32.0f, 0.0f );
+    Vector maxs( 32.0f, 32.0f, 90.0f );
+    CollisionProp()->SetSurroundingBoundsType( USE_SPECIFIED_BOUNDS, &mins, &maxs );
 }
 
 NPCR::CPathCostGroundOnly* CZMHulk::GetPathCost() const
@@ -92,6 +99,31 @@ void CZMHulk::HandleAnimEvent( animevent_t* pEvent )
 	}
 
     BaseClass::HandleAnimEvent( pEvent );
+}
+
+void CZMHulk::ScaleDamageByHitgroup( int iHitGroup, CTakeDamageInfo& info ) const
+{
+    switch ( iHitGroup )
+    {
+    case HITGROUP_LEFTARM :
+    case HITGROUP_RIGHTARM :
+        info.ScaleDamage( zm_sk_hulk_hitmult_arms.GetFloat() );
+        break;
+    case HITGROUP_CHEST :
+        info.ScaleDamage( zm_sk_hulk_hitmult_chest.GetFloat() );
+        break;
+    case HITGROUP_STOMACH :
+        info.ScaleDamage( zm_sk_hulk_hitmult_stomach.GetFloat() );
+        break;
+    case HITGROUP_HEAD :
+        info.ScaleDamage( zm_sk_hulk_hitmult_head.GetFloat() );
+        break;
+    case HITGROUP_LEFTLEG :
+    case HITGROUP_RIGHTLEG :
+    default :
+        info.ScaleDamage( zm_sk_hulk_hitmult_legs.GetFloat() );
+        break;
+    }
 }
 
 void CZMHulk::AlertSound()

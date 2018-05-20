@@ -11,23 +11,28 @@
 // Our NPCs.
 //
 // -----------------------
-@NPCClass base(BaseNPC) studio("models/zombie/zm_classic.mdl") = npc_zombie : "Shambler"
+@BaseClass = ZMBaseZombie
+[
+	modelgroup(string) : "Model Group" : "" : "Leave empty to use default model group (DefaultModels if not overriden). See scripts/zombiemodelgroups.txt"
+]
+
+@NPCClass base(BaseNPC,ZMBaseZombie) studio("models/zombie/zm_classic.mdl") = npc_zombie : "Shambler"
 [
 ]
 
-@NPCClass base(BaseNPC) studio("models/zombie/zm_fast.mdl") = npc_fastzombie : "Banshee"
+@NPCClass base(BaseNPC,ZMBaseZombie) studio("models/zombie/zm_fast.mdl") = npc_fastzombie : "Banshee"
 [
 ]
 
-@NPCClass base(BaseNPC) studio("models/zombie/hulk.mdl") = npc_poisonzombie : "Hulk"
+@NPCClass base(BaseNPC,ZMBaseZombie) studio("models/zombie/hulk.mdl") = npc_poisonzombie : "Hulk"
 [
 ]
 
-@NPCClass base(BaseNPC) studio("models/humans/zm_draggy.mdl") = npc_dragzombie : "Drifter"
+@NPCClass base(BaseNPC,ZMBaseZombie) studio("models/humans/zm_draggy.mdl") = npc_dragzombie : "Drifter"
 [
 ]
 
-@NPCClass base(BaseNPC) studio("models/zombie/burnzie.mdl") = npc_burnzombie : "Immolator"
+@NPCClass base(BaseNPC,ZMBaseZombie) studio("models/zombie/burnzie.mdl") = npc_burnzombie : "Immolator"
 [
 ]
 

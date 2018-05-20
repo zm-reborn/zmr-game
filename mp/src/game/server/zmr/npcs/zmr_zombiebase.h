@@ -28,6 +28,7 @@ public:
     typedef NPCR::CBaseNonPlayer BaseClass;
     //DECLARE_CLASS( CZMBaseZombie, NPCR::CBaseNonPlayer );
     DECLARE_SERVERCLASS();
+    DECLARE_DATADESC();
 
 
     CZMBaseZombie();
@@ -63,6 +64,8 @@ public:
 
     virtual NPCR::CSchedule<CZMBaseZombie>* OverrideCombatSchedule() const { return nullptr; }
 
+    virtual NPCR::CFollowNavPath* GetFollowPath() const;
+
 
     // Damage/death related
     virtual void    Extinguish() OVERRIDE;
@@ -72,6 +75,7 @@ public:
     virtual void            Event_Killed( const CTakeDamageInfo& info ) OVERRIDE;
     virtual int             OnTakeDamage_Alive( const CTakeDamageInfo& inputInfo ) OVERRIDE;
     virtual void            TraceAttack( const CTakeDamageInfo& inputInfo, const Vector& vecDir, trace_t* pTrace, CDmgAccumulator* pAccumulator ) OVERRIDE;
+    virtual void            ScaleDamageByHitgroup( int iHitGroup, CTakeDamageInfo& info ) const;
 
 
     virtual bool            Event_Gibbed( const CTakeDamageInfo& info ) OVERRIDE;
@@ -178,6 +182,13 @@ public:
 
     CZMCommandQueue*    GetCommandQueue() const { return const_cast<CZMCommandQueue*>( &m_CmdQueue ); }
 
+
+    const char* GetZombieModelGroupName() const { return STRING( m_strModelGroup ); }
+    void SetZombieModelGroupName( string_t name ) { m_strModelGroup = name; }
+    //void SetZombieModelGroupName( const char* name ) { m_strModelGroup = AllocPooledString( name ); }
+private:
+    string_t m_strModelGroup;
+public:
 
 
     float   GetNextMove() const { return m_flNextMove; }

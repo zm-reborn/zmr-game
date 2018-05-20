@@ -16,7 +16,7 @@ extern ConVar zm_sv_defense_goal_tolerance;
 class MoveSchedule : public NPCR::CSchedule<CZMBaseZombie>
 {
 private:
-    NPCR::CFollowNavPath m_Path;
+    NPCR::CFollowNavPath* m_pPath;
     NPCR::CPathCostGroundOnly m_PathCost;
     Vector m_vecCurrentGoal;
     bool m_bHasGoal;
@@ -26,6 +26,7 @@ private:
 public:
     MoveSchedule()
     {
+        m_pPath = nullptr;
         m_bHasGoal = false;
         m_vecCurrentGoal = vec3_origin;
         m_pGotoSwatSched = new GotoSwatObjSched;
@@ -34,6 +35,7 @@ public:
     ~MoveSchedule()
     {
         delete m_pGotoSwatSched;
+        delete m_pPath;
     }
 
     virtual const char* GetName() const OVERRIDE { return "ZombieControlMonitor"; }
@@ -42,15 +44,22 @@ public:
 
     virtual void OnStart() OVERRIDE
     {
+        delete m_pPath;
+        m_pPath = GetOuter()->GetFollowPath();
         m_PathCost = *GetOuter()->GetPathCost();
     }
+
+    //virtual void OnEnd() OVERRIDE
+    //{
+    //    delete m_pPath;
+    //}
 
     virtual void OnUpdate() OVERRIDE
     {
         CZMBaseZombie* pOuter = GetOuter();
 
             
-        if ( m_Path.IsValid() )
+        if ( m_pPath->IsValid() )
         {
             // See if we have anything blocking us.
             if ( m_BlockerTimer.IsElapsed() && pOuter->GetBlockerFinder()->GetTimesBlocked() > 1 && pOuter->GetBlockerFinder()->GetBlocker() )
@@ -77,7 +86,7 @@ public:
 
             if ( pOuter->CanMove() )
             {
-                m_Path.Update( pOuter );
+                m_pPath->Update( pOuter );
             }
         }
         else if ( pOuter->GetZombieMode() == ZOMBIEMODE_DEFEND )
@@ -130,7 +139,7 @@ public:
 
     virtual void OnChase( CBaseEntity* pEnt ) OVERRIDE
     {
-        m_Path.Invalidate();
+        m_pPath->Invalidate();
     }
 
     virtual NPCR::QueryResult_t ShouldChase( CBaseEntity* pEnemy ) const OVERRIDE
@@ -187,13 +196,13 @@ public:
             flMinTolerance,
             flMaxTolerance );
             
-        m_Path.SetGoalTolerance( tolerance );
+        m_pPath->SetGoalTolerance( tolerance );
 
 
-        m_Path.Compute( vecMyPos, vecPos, pStart, pGoal, m_PathCost );
+        m_pPath->Compute( vecMyPos, vecPos, pStart, pGoal, m_PathCost );
 
-        if ( m_Path.IsValid() )
-            pOuter->SetCurrentPath( &m_Path );
+        if ( m_pPath->IsValid() )
+            pOuter->SetCurrentPath( m_pPath );
 
         pOuter->OnCommanded( COMMAND_MOVE );
 
@@ -221,7 +230,7 @@ public:
         if ( IsIntercepted() )
         {
             // We have no use for the path anymore.
-            m_Path.Invalidate();
+            m_pPath->Invalidate();
         }
 
         return true;

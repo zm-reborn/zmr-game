@@ -8,6 +8,7 @@
 
 #include "npcr_manager.h"
 
+#include "zmr_zombiemodelgroups.h"
 #include "zmr_gamerules.h"
 #include "zmr_blockerfinder.h"
 #include "zmr/npcs/zmr_zombieanimstate.h"
@@ -149,6 +150,20 @@ ConVar zm_sv_debug_zombieattack( "zm_sv_debug_zombieattack", "0" );
 
 
 IMPLEMENT_SERVERCLASS_ST( CZMBaseZombie, DT_ZM_BaseZombie )
+    // Send low-resolution
+    SendPropVector( SENDINFO( m_vecOrigin ), -1, SPROP_COORD_MP_LOWPRECISION | SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_Origin ),
+    SendPropExclude( "DT_BaseEntity", "m_vecOrigin" ),
+
+    // Only send yaw.
+    SendPropAngle( SENDINFO_VECTORELEM( m_angRotation, 1 ), 10, SPROP_CHANGES_OFTEN ),
+    SendPropExclude( "DT_BaseEntity", "m_angRotation" ),
+
+    // Don't need these
+    SendPropExclude( "DT_BCCLocalPlayerExclusive", "m_flNextAttack" ),
+    SendPropExclude( "DT_BaseCombatCharacter", "m_hActiveWeapon" ),
+    SendPropExclude( "DT_BaseCombatCharacter", "m_hMyWeapons" ),
+
+
     SendPropInt( SENDINFO( m_iSelectorIndex ) ),
     SendPropFloat( SENDINFO( m_flHealthRatio ) ),
 
@@ -157,6 +172,9 @@ IMPLEMENT_SERVERCLASS_ST( CZMBaseZombie, DT_ZM_BaseZombie )
     SendPropExclude( "DT_BaseFlex", "m_viewtarget" ),
 END_SEND_TABLE()
 
+BEGIN_DATADESC( CZMBaseZombie )
+    DEFINE_KEYFIELD( m_strModelGroup, FIELD_STRING, "modelgroup" ),
+END_DATADESC()
 
 CZMBaseZombie::CZMBaseZombie()
 {
@@ -180,6 +198,9 @@ CZMBaseZombie::CZMBaseZombie()
 
     m_flBurnDamage = 0.0f;
     m_flBurnDamageTime = 0.0f;
+
+
+    m_strModelGroup = NULL_STRING;
 
 
     g_ZombieManager.AddZombie( this );
@@ -269,6 +290,9 @@ void CZMBaseZombie::Precache()
 
 void CZMBaseZombie::Spawn()
 {
+    g_ZombieModelGroups.OnZombieSpawn( this );
+
+
     BaseClass::Spawn();
 
     SetThink( &CZMBaseZombie::ZombieThink );
@@ -675,7 +699,16 @@ void CZMBaseZombie::TraceAttack( const CTakeDamageInfo& inputInfo, const Vector&
     }
 
 
-    int iHitGroup = pTrace->hitgroup;
+
+    ScaleDamageByHitgroup( pTrace->hitgroup, info );
+
+
+
+    BaseClass::TraceAttack( info, vecDir, pTrace, pAccumulator );
+}
+
+void CZMBaseZombie::ScaleDamageByHitgroup( int iHitGroup, CTakeDamageInfo& info ) const
+{
     switch( iHitGroup )
     {
     case HITGROUP_HEAD :
@@ -705,10 +738,7 @@ void CZMBaseZombie::TraceAttack( const CTakeDamageInfo& inputInfo, const Vector&
             }
         }
     }
-
-    BaseClass::TraceAttack( info, vecDir, pTrace, pAccumulator );
 }
-
 
 void CZMBaseZombie::Event_Killed( const CTakeDamageInfo& info )
 {
@@ -982,6 +1012,11 @@ bool CZMBaseZombie::ShouldUpdate() const
         return false;
 
     return BaseClass::ShouldUpdate();
+}
+
+NPCR::CFollowNavPath* CZMBaseZombie::GetFollowPath() const
+{
+    return new NPCR::CFollowNavPath;
 }
 
 NPCR::QueryResult_t CZMBaseZombie::ShouldTouch( CBaseEntity* pEnt ) const

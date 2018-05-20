@@ -11,20 +11,6 @@ extern ConVar zm_sk_shambler_dmg_oneslash;
 extern ConVar zm_sk_shambler_dmg_bothslash;
 
 
-// ZMRTODO: Use configs or something for this shit
-static const char* g_szZombieModels[] = {
-    "models/zombie/zm_classic_01.mdl",
-    "models/zombie/zm_classic_02.mdl",
-    "models/zombie/zm_classic_03.mdl",
-    "models/zombie/zm_classic_04.mdl",
-    "models/zombie/zm_classic_05.mdl",
-    "models/zombie/zm_classic_06.mdl",
-    "models/zombie/zm_classic_07.mdl",
-    "models/zombie/zm_classic_08.mdl",
-    "models/zombie/zm_classic_09.mdl",
-};
-
-
 
 Activity CZMShambler::ACT_ZOM_SWATLEFTMID = ACT_INVALID;
 Activity CZMShambler::ACT_ZOM_SWATLEFTLOW = ACT_INVALID;
@@ -52,12 +38,6 @@ void CZMShambler::Precache()
 {
     if ( !IsPrecacheAllowed() )
         return;
-
-
-    for ( int i = 0; i < ARRAYSIZE( g_szZombieModels ); i++ )
-    {
-        PrecacheModel( g_szZombieModels[i] );
-    }
     
 
     PrecacheScriptSound( "Zombie.FootstepRight" );
@@ -88,8 +68,6 @@ void CZMShambler::Precache()
 
 void CZMShambler::Spawn()
 {
-    SetModel( g_szZombieModels[random->RandomInt( 0, ARRAYSIZE( g_szZombieModels ) - 1 )] );
-
     SetMaxHealth( zm_sk_shambler_health.GetInt() );
 
 

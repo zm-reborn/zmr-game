@@ -9,8 +9,6 @@
 #define ZOMBIE_MODEL            "models/humans/zm_draggy.mdl"
 
 
-#define DRAGZOMBIE_SPITRANGE    120.0f
-
 extern ConVar zm_sk_dragzombie_health;
 extern ConVar zm_sk_dragzombie_dmg;
 
@@ -40,8 +38,6 @@ void CZMDrifter::Precache()
         return;
 
 
-    PrecacheModel( ZOMBIE_MODEL );
-
     PrecacheScriptSound( "NPC_DragZombie.Die" );
     PrecacheScriptSound( "NPC_DragZombie.Idle" );
     PrecacheScriptSound( "NPC_DragZombie.Pain" );
@@ -62,8 +58,6 @@ void CZMDrifter::Precache()
 
 void CZMDrifter::Spawn()
 {
-    SetModel( ZOMBIE_MODEL );
-
     SetMaxHealth( zm_sk_dragzombie_health.GetInt() );
 
 

@@ -54,6 +54,17 @@ void NPCR::CNonPlayerMotor::Move()
     
 
     CBaseEntity* pNewGround = UpdateGround();
+
+    if ( !pOldGround && pNewGround )
+    {
+        GetNPC()->OnLandedGround( pNewGround );
+    }
+    else if ( pOldGround && !pNewGround )
+    {
+        GetNPC()->OnLeftGround( pOldGround );
+    }
+
+
     bool bIsOnGround = pNewGround != nullptr;
 
     if ( !bIsOnGround )
@@ -129,18 +140,20 @@ void NPCR::CNonPlayerMotor::Move()
         }
     }
 
+
+    // Velocity needs to be clamped.
+    // See k_flMaxVelocity
+    const float flAbsMaxVel = 2000.0f;
+    if (abs( m_vecVelocity.x ) > flAbsMaxVel
+    ||  abs( m_vecVelocity.y ) > flAbsMaxVel
+    ||  abs( m_vecVelocity.z ) > flAbsMaxVel)
+    {
+        m_vecVelocity.NormalizeInPlace();
+        m_vecVelocity *= flAbsMaxVel;
+    }
+
+
     SetVelocity( m_vecVelocity );
-
-
-
-    if ( !pOldGround && pNewGround )
-    {
-        GetNPC()->OnLandedGround( pNewGround );
-    }
-    else if ( pOldGround && !pNewGround )
-    {
-        GetNPC()->OnLeftGround( pOldGround );
-    }
 }
 
 bool NPCR::CNonPlayerMotor::GroundMove()
@@ -190,7 +203,7 @@ bool NPCR::CNonPlayerMotor::GroundMove()
     // Decelerate when we are nearing the goal.
     auto* pPath = GetNPC()->GetCurrentPath();
 
-    if ( pPath && pPath->ShouldDecelerateToGoal() )
+    if ( m_bDoDecelerate && pPath && pPath->ShouldDecelerateToGoal() )
     {
         const float flMinDecDist = pPath->GetGoalTolerance() + 16.0f;
 
