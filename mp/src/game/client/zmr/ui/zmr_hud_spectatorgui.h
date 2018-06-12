@@ -16,6 +16,8 @@ public:
     CZMHudSpectatorUI( const char* pElementName );
 
 
+    virtual void ApplySchemeSettings( vgui::IScheme* pScheme ) OVERRIDE;
+
     virtual void Init() OVERRIDE;
     virtual void VidInit() OVERRIDE;
     virtual void LevelInit() OVERRIDE;

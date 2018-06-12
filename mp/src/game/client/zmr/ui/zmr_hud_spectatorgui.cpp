@@ -35,6 +35,14 @@ CZMHudSpectatorUI::CZMHudSpectatorUI( const char *pElementName ) : CHudElement( 
     SetProportional( true );
 
 
+    m_pNameLabel = nullptr;
+    m_pInfoLabel = nullptr;
+}
+
+void CZMHudSpectatorUI::ApplySchemeSettings( vgui::IScheme* pScheme )
+{
+    BaseClass::ApplySchemeSettings( pScheme );
+
     LoadControlSettings( "resource/ui/zmspectatorui.res" );
 
     m_pNameLabel = dynamic_cast<Label*>( FindChildByName( "ObservedTargetName" ) );
@@ -81,11 +89,17 @@ void CZMHudSpectatorUI::Reset()
     int width = GetWide();
     int w;
 
-    w = m_pNameLabel->GetWide();
-    m_pNameLabel->SetPos( width / 2 - w / 2, m_pNameLabel->GetYPos() );
+    if ( m_pNameLabel )
+    {
+        w = m_pNameLabel->GetWide();
+        m_pNameLabel->SetPos( width / 2 - w / 2, m_pNameLabel->GetYPos() );
+    }
 
-    w = m_pInfoLabel->GetWide();
-    m_pInfoLabel->SetPos( width / 2 - w / 2, m_pInfoLabel->GetYPos() );
+    if ( m_pInfoLabel )
+    {
+        w = m_pInfoLabel->GetWide();
+        m_pInfoLabel->SetPos( width / 2 - w / 2, m_pInfoLabel->GetYPos() );
+    }
 }
 
 bool CZMHudSpectatorUI::IsVisible()
