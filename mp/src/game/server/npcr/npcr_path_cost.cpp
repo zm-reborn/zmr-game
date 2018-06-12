@@ -73,6 +73,10 @@ float NPCR::CPathCostGroundOnly::operator()( CNavArea* area, CNavArea* fromArea,
         length += m_vecEnd.DistTo( pos );
     }
 
+    // This must be a jump, increase the cost.
+    if ( height > GetStepHeight() )
+        length *= 2.0f;
+
     float cost = length + fromArea->GetCostSoFar();
 
     return cost;
