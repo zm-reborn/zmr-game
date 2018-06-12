@@ -117,6 +117,8 @@ public:
     const CZMViewVectors* GetZMViewVectors() const;
 
 #ifndef CLIENT_DLL
+    void ExecuteMapConfigs();
+
     virtual void CreateStandardEntities() OVERRIDE;
     virtual void LevelInitPostEntity() OVERRIDE;
 
