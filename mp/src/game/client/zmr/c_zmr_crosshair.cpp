@@ -126,7 +126,10 @@ void CZMCrosshairSystem::ReadCrosshairs( KeyValues* kv )
 
     do
     {
-        AddCrosshair( crosshair );
+        if ( AddCrosshair( crosshair ) == -1 )
+        {
+            Warning( "Couldn't init crosshair of type: '%s'!\n", crosshair->GetString( "type", "N/A" ) );
+        }
     }
     while( (crosshair = crosshair->GetNextTrueSubKey()) != nullptr );
 }
@@ -169,15 +172,38 @@ using namespace vgui;
 //
 CZMBaseCrosshair::CZMBaseCrosshair()
 {
+    m_szName = nullptr;
+    m_szMenuName = nullptr;
+
     m_flOverrideCenterX = m_flOverrideCenterY = -1.0f;
+}
+
+CZMBaseCrosshair::~CZMBaseCrosshair()
+{
+    delete[] m_szName;
+    m_szName = nullptr;
+    delete[] m_szMenuName;
+    m_szMenuName = nullptr;
 }
 
 void CZMBaseCrosshair::LoadValues( KeyValues* kv )
 {
-    m_sName = AllocPooledString( kv->GetName() );
+    int len;
+
+    // AllocPooledString causes invalid strings so we have to do this ourselves.
+    const char* name = kv->GetName();
+    len = strlen( name ) + 1;
+    m_szName = new char[len];
+    Q_strncpy( m_szName, name, len );
+    
+
+    const char* menuname = kv->GetString( "name" );
+    len = strlen( menuname ) + 1;
+    m_szMenuName = new char[len];
+    Q_strncpy( m_szMenuName, menuname, len );
+
 
     m_bDisplayInMenu = kv->GetBool( "displayinmenu", true );
-    m_sMenuName = AllocPooledString( kv->GetString( "name" ) );
 
     m_flOutlineSize = kv->GetFloat( "outline" );
     m_flOffsetFromCenter = kv->GetFloat( "offsetfromcenter" );
@@ -190,7 +216,7 @@ void CZMBaseCrosshair::LoadValues( KeyValues* kv )
 void CZMBaseCrosshair::WriteValues( KeyValues* kv ) const
 {
     kv->SetBool( "displayinmenu", DisplayInMenu() );
-    kv->SetString( "name", STRING( GetMenuName() ) );
+    kv->SetString( "name", GetMenuName() );
 
     kv->SetInt( "outline", GetOutlineWidth() );
     kv->SetInt( "offsetfromcenter", GetOffsetFromCenter() );
@@ -270,7 +296,7 @@ void CZMEmptyCrosshair::WriteValues( KeyValues* kv ) const
     kv->SetString( "type", "none" );
 }
 
-void CZMEmptyCrosshair::Draw() const
+void CZMEmptyCrosshair::Draw()
 {
 
 }
@@ -285,7 +311,7 @@ void CZMDotCrosshair::WriteValues( KeyValues* kv ) const
     kv->SetString( "type", "dot" );
 }
 
-void CZMDotCrosshair::Draw() const
+void CZMDotCrosshair::Draw()
 {
     DrawDot();
 }
@@ -320,7 +346,7 @@ void CZMPistolCrosshair::LoadValues( KeyValues* kv )
     CZMBaseCrosshair::LoadValues( kv );
 }
 
-void CZMPistolCrosshair::Draw() const
+void CZMPistolCrosshair::Draw()
 {
     /*
     const Color clr = GetCrosshairColor();
@@ -398,6 +424,11 @@ void CZMPistolCrosshair::Draw() const
 
 
 //
+CZMFontCrosshair::CZMFontCrosshair()
+{
+    m_hFont = NULL;
+}
+
 void CZMFontCrosshair::LoadValues( KeyValues* kv )
 {
     CZMBaseCrosshair::LoadValues( kv );
@@ -421,7 +452,7 @@ void CZMFontCrosshair::WriteValues( KeyValues* kv ) const
     kv->SetColor( "fontcolor", m_FontColor );
 }
 
-void CZMFontCrosshair::Draw() const
+void CZMFontCrosshair::Draw()
 {
     const Color circleclr = GetFontColor();
 
@@ -429,29 +460,27 @@ void CZMFontCrosshair::Draw() const
     GetDrawPosition( cx, cy );
 
 
-    //float offset = GetOffsetFromCenter();
-
-    HFont font = scheme()->GetIScheme( scheme()->GetScheme( "ClientScheme" ) )->GetFont( "ZMCrosshairSmall", false );
-    
-    if ( !font )
+    if ( m_hFont == NULL )
     {
-        return;
+        m_hFont = scheme()->GetIScheme( scheme()->GetScheme( "ClientScheme" ) )->GetFont( "ZMCrosshairSmall", false );
+
+        if ( !m_hFont )
+        {
+            //Warning( "Couldn't find crosshair font!\n" );
+            return;
+        }
     }
 
 
-    //surface()->SetFontGlyphSet( font, "zmcrosshairs", offset * 2, 0, 0, 0, ISurface::FONTFLAG_CUSTOM | ISurface::FONTFLAG_ANTIALIAS );
-
-
-
-    int h = surface()->GetFontTall( font );
+    int h = surface()->GetFontTall( m_hFont );
 
     surface()->DrawSetTextColor( circleclr );
     surface()->DrawSetTextPos( cx - h / 2, cy - h / 2 );
-    surface()->DrawSetTextFont( font );
+    surface()->DrawSetTextFont( m_hFont );
     surface()->DrawUnicodeChar( m_wChar );
 
     /*
-    
+    float offset = GetOffsetFromCenter();
 
     //int segs = 48;
     int segs = 32;
@@ -519,7 +548,7 @@ float CZMAccuracyCrosshair::GetDynamicMoveScale() const
     return 0.0f;
 }
 
-void CZMAccuracyCrosshair::Draw() const
+void CZMAccuracyCrosshair::Draw()
 {
     const Color clr = GetMainColor();
     const Color outlineclr = GetOutlineColor();
