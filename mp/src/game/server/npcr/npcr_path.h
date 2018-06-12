@@ -72,6 +72,11 @@ namespace NPCR
         virtual bool BuildSimplePath( const Vector& vecStart, const Vector& vecGoal, CNavArea* pStartArea, CNavArea* pGoalArea );
 
 
+        bool CheckSimpleLOS( const Vector& vecStart, const Vector& vecEnd, trace_t& tr ) const;
+
+
+
+
         bool ShouldDraw();
         virtual void Draw();
 

@@ -14,7 +14,7 @@ float NPCR::CPathCostGroundOnly::operator()( CNavArea* area, CNavArea* fromArea,
 
     // No ladders or elevators for now.
     if ( ladder || elevator )
-        return -1.0f;
+        return PATHCOST_INVALID;
 
 
     // ZMRTODO: The updates are very slow. Have to try updating the block status here?
@@ -24,14 +24,14 @@ float NPCR::CPathCostGroundOnly::operator()( CNavArea* area, CNavArea* fromArea,
 
         //if ( area->IsBlocked( TEAM_ANY ) )
             //return -1.0f;
-        return -1.0f;
+        return PATHCOST_INVALID;
     }
             
     // The step up is too high.
     float height = fromArea->ComputeAdjacentConnectionHeightChange( area );
     if ( height > GetMaxHeightChange() )
     {
-        return -1.0f;
+        return PATHCOST_INVALID;
     }
 
     // ZMRTODO: Add something to check for height.
