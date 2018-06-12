@@ -395,11 +395,11 @@ bool NPCR::CBaseNavPath::BuildNavPath( const Vector& vecStart, const Vector& vec
     {
         // Check if we have LOS.
         trace_t tr;
-        CTraceFilterWorldOnly filter;
-        UTIL_TraceLine(
+        CheckSimpleLOS(
             vecStart + Vector( 0.0f, 0.0f, 1.0f ), // Lift off the ground a bit
             vecGoal + Vector( 0.0f, 0.0f, 1.0f ),
-            MASK_OPAQUE, &filter, &tr );
+            tr );
+
         float delta_z = abs( vecGoal.z - vecStart.z );
         if ( delta_z < 72.0f && tr.fraction > 0.95f )
         {
@@ -523,6 +523,17 @@ bool NPCR::CBaseNavPath::BuildGraphPath( const Vector& vecStart, const Vector& v
     OnPathCreated();
 
     return true;
+}
+
+bool NPCR::CBaseNavPath::CheckSimpleLOS( const Vector& vecStart, const Vector& vecEnd, trace_t& tr ) const
+{
+    CTraceFilterWorldOnly filter;
+    UTIL_TraceLine(
+        vecStart,
+        vecEnd,
+        MASK_OPAQUE, &filter, &tr );
+
+    return tr.fraction == 1.0f;
 }
 
 bool NPCR::CBaseNavPath::ShouldDraw()
