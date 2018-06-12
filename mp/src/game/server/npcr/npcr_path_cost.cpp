@@ -3,6 +3,7 @@
 #include "npcr_path_cost.h"
 
 
+// NAV path cost
 float NPCR::CPathCostGroundOnly::operator()( CNavArea* area, CNavArea* fromArea, const CNavLadder* ladder, const CFuncElevator* elevator, float length ) const
 {
     // This is the first area, initial cost is 0.
@@ -75,4 +76,33 @@ float NPCR::CPathCostGroundOnly::operator()( CNavArea* area, CNavArea* fromArea,
     float cost = length + fromArea->GetCostSoFar();
 
     return cost;
+}
+
+// AI Graph path cost
+float NPCR::CPathCostGroundOnly::operator()( const Vector& vecNodePos, const Vector& vecTestPos, int fCapBitMask ) const
+{
+    // This path isn't possible for our hull / it's disabled.
+    if ( !fCapBitMask )
+        return PATHCOST_INVALID;
+
+
+    Vector dir = vecTestPos - vecNodePos;
+
+
+
+
+    float dist = (vecNodePos - vecTestPos).Length();
+
+
+    if ( fCapBitMask & bits_CAP_MOVE_JUMP )
+    {
+        // The step up is too high.
+        if ( dir.z > GetMaxHeightChange() )
+            return PATHCOST_INVALID;
+
+        dist *= 2.0f;
+    }
+
+
+    return dist;
 }
