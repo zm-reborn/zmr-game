@@ -246,6 +246,10 @@ CZMRules::CZMRules()
 
         g_Teams.AddToTail( pTeam );
     }
+
+
+
+    ExecuteMapConfigs();
 #endif
 }
 
@@ -257,6 +261,32 @@ CZMRules::~CZMRules( void )
 }
 
 #ifndef CLIENT_DLL
+void CZMRules::ExecuteMapConfigs()
+{
+    const char* mapcfg = STRING( gpGlobals->mapname );
+    if ( !mapcfg || !(*mapcfg) )
+        return;
+    
+
+    const char* premapcfg = "mapconfig_pre";
+    const char* postmapcfg = "mapconfig_post";
+
+
+    Log( "Executing map config files: %s, %s and %s\n", premapcfg, mapcfg, postmapcfg );
+
+
+    
+
+    // Execute the pre- map config.
+    engine->ServerCommand( UTIL_VarArgs( "exec %s\n", premapcfg ) );
+
+    // Execute the map config.
+    engine->ServerCommand( UTIL_VarArgs( "exec %s\n", mapcfg ) );
+
+    // Execute the post- map config.
+    engine->ServerCommand( UTIL_VarArgs( "exec %s\n", postmapcfg ) );
+}
+
 void CZMRules::CreateStandardEntities()
 {
     DevMsg( "Creating standard entities...\n" );
