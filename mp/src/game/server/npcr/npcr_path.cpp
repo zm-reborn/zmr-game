@@ -5,6 +5,8 @@
 
 ConVar npcr_debug_path( "npcr_debug_path", "0" );
 
+ConVar npcr_preferred_navbuildmethod( "npcr_preferred_navbuildmethod", "0", 0, "Preferred build method. 0 = Nav mesh, 1 = AI Graph" );
+
 
 NPCR::CBaseNavPath::CBaseNavPath()
 {
@@ -14,6 +16,20 @@ NPCR::CBaseNavPath::CBaseNavPath()
 
 NPCR::CBaseNavPath::~CBaseNavPath()
 {
+}
+
+NPCR::NavBuildMethod_t NPCR::CBaseNavPath::GetBuildMethod()
+{
+    bool bNavMesh = TheNavMesh->IsLoaded();
+    bool bGraph = HasAIGraph();
+
+    if ( !bNavMesh && bGraph )
+        return BUILD_AIGRAPH;
+    if ( bNavMesh && !bGraph )
+        return BUILD_NAVMESH;
+
+    // If we have both, use the preferred.
+    return (NavBuildMethod_t)npcr_preferred_navbuildmethod.GetInt();
 }
 
 void NPCR::CBaseNavPath::OnPathSuccess()
@@ -31,54 +47,40 @@ bool NPCR::CBaseNavPath::Compute( const Vector& vecStart, const Vector& vecGoal,
     Invalidate();
 
 
-    if ( !pStartArea || !pGoalArea )
+    bool bPathResult;
+
+
+    const NavBuildMethod_t buildMethod = GetBuildMethod();
+
+    switch ( buildMethod )
     {
-        // Check if we have LOS.
-        trace_t tr;
-        CTraceFilterWorldOnly filter;
-        UTIL_TraceLine(
-            vecStart + Vector( 0.0f, 0.0f, 1.0f ), // Lift off the ground a bit
-            vecGoal + Vector( 0.0f, 0.0f, 1.0f ),
-            MASK_OPAQUE, &filter, &tr );
-        float delta_z = abs( vecGoal.z - vecStart.z );
-        if ( delta_z < 72.0f && tr.fraction > 0.95f )
+    case BUILD_DIRECT :
+        if ( ShouldDraw() )
         {
-            return BuildSimplePath( vecStart, vecGoal, true );
+            DevMsg( "Building direct path...\n" );
         }
-        else
+
+        bPathResult = BuildSimplePath( vecStart, vecGoal, true );
+        break;
+    case BUILD_AIGRAPH :
+        if ( ShouldDraw() )
         {
-            return false;
+            DevMsg( "Building AI graph path...\n" );
         }
+
+        bPathResult = BuildGraphPath( vecStart, vecGoal, cost );
+        break;
+    case BUILD_NAVMESH :
+    default :
+        if ( ShouldDraw() )
+        {
+            DevMsg( "Building nav mesh path...\n" );
+        }
+
+        bPathResult = BuildNavPath( vecStart, vecGoal, pStartArea, pGoalArea, cost );
+        break;
     }
-
-
-    if ( pStartArea == pGoalArea )
-    {
-        return BuildSimplePath( vecStart, vecGoal, pStartArea, pGoalArea );
-    }
-
-    // Does most of the heavy lifting and builds the actual path.
-    CNavArea* closestArea = nullptr;
-    bool bPathResult = NavAreaBuildPath( pStartArea, pGoalArea, &vecGoal, cost, &closestArea, cost.GetMaxPathLength() );
-
-    if ( !closestArea )
-        return false;
-
-
-    // Get count of segments we're going to go through.
-    int count = 0;
-
-    CNavArea* area;
-    for ( area = closestArea; area; area = area->GetParent() )
-    {
-        ++count;
-
-        if ( area == pStartArea )
-            break;
-    }
-
-    if ( !ComputePathDetails( count, vecStart, closestArea, vecGoal, cost ) )
-        return false;
+    
 
     return bPathResult;
 }
@@ -200,7 +202,7 @@ bool NPCR::CBaseNavPath::BuildSimplePath( const Vector& vecStart, const Vector& 
     return true;
 }
 
-bool NPCR::CBaseNavPath::ComputePathDetails( int count, const Vector& vecStart, CNavArea* pLastArea, const Vector& vecGoal, const NPCR::CBasePathCost& cost )
+bool NPCR::CBaseNavPath::ComputeNavPathDetails( int count, const Vector& vecStart, CNavArea* pLastArea, const Vector& vecGoal, const NPCR::CBasePathCost& cost )
 {
     if ( count >= MAX_PATH_LINKS-1 )
     {
@@ -379,6 +381,142 @@ bool NPCR::CBaseNavPath::ComputePathDetails( int count, const Vector& vecStart, 
             jumpstart->area->GetClosestPointOnArea( jumpstart->pos, &jumpstart->pos );
         }
     }
+
+
+
+    OnPathCreated();
+
+    return true;
+}
+
+bool NPCR::CBaseNavPath::BuildNavPath( const Vector& vecStart, const Vector& vecGoal, CNavArea* pStartArea, CNavArea* pGoalArea, const CBasePathCost& cost )
+{
+    if ( !pStartArea || !pGoalArea )
+    {
+        // Check if we have LOS.
+        trace_t tr;
+        CTraceFilterWorldOnly filter;
+        UTIL_TraceLine(
+            vecStart + Vector( 0.0f, 0.0f, 1.0f ), // Lift off the ground a bit
+            vecGoal + Vector( 0.0f, 0.0f, 1.0f ),
+            MASK_OPAQUE, &filter, &tr );
+        float delta_z = abs( vecGoal.z - vecStart.z );
+        if ( delta_z < 72.0f && tr.fraction > 0.95f )
+        {
+            return BuildSimplePath( vecStart, vecGoal, true );
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+
+    if ( pStartArea == pGoalArea )
+    {
+        return BuildSimplePath( vecStart, vecGoal, pStartArea, pGoalArea );
+    }
+
+    // Does most of the heavy lifting and builds the actual path.
+    CNavArea* closestArea = nullptr;
+    bool bPathResult = NavAreaBuildPath( pStartArea, pGoalArea, &vecGoal, cost, &closestArea, cost.GetMaxPathLength() );
+
+    if ( !closestArea )
+        return false;
+
+
+    // Get count of segments we're going to go through.
+    int count = 0;
+
+    CNavArea* area;
+    for ( area = closestArea; area; area = area->GetParent() )
+    {
+        ++count;
+
+        if ( area == pStartArea )
+            break;
+    }
+
+
+    if ( !ComputeNavPathDetails( count, vecStart, closestArea, vecGoal, cost ) )
+        return false;
+
+
+    return bPathResult;
+}
+
+// Builds a very basic ai graph path.
+bool NPCR::CBaseNavPath::BuildGraphPath( const Vector& vecStart, const Vector& vecGoal, const CBasePathCost& cost )
+{
+    int startID = FindAINodeOfPosition( vecStart );
+    int endID = FindAINodeOfPosition( vecGoal );
+
+    // Just build a straight path.
+    if ( startID == endID )
+    {
+        return BuildSimplePath( vecStart, vecGoal, true );
+    }
+
+
+    AI_Waypoint_t* first = FindGraphPath( startID, endID, cost );
+
+    if ( !first )
+        return false;
+
+
+    // Init links
+    m_nLinkCount = 0;
+    m_Links[0].fwd_dot = 1.0f;
+
+
+    // Translate waypoints to links.
+    
+    int i = 0;
+    AI_Waypoint_t* cur = first;
+    do
+    {
+        // Ground only supported for now
+        Assert( cur->NavType() <= NAV_JUMP );
+
+        m_Links[i].area = nullptr;
+        m_Links[i].pos = cur->GetPos();
+        m_Links[i].navTravel = cur->NavType() != NAV_JUMP ? TRAVEL_ONGROUND : TRAVEL_NAVJUMP;
+        //m_Links[i].navTraverse = GO_NORTH;
+        
+
+        ++i;
+        ++m_nLinkCount;
+
+        // We need one free extra space for the actual goal pos.
+        if ( m_nLinkCount >= (MAX_PATH_LINKS-1) ) 
+            break;
+    }
+    while ( (cur = cur->GetNext()) != nullptr );
+
+
+    // Delete all waypoints. We don't need them anymore.
+    DeleteAll( first );
+
+
+    // Add last 
+    ++m_nLinkCount;
+    int last = m_nLinkCount - 1;
+    m_Links[last].area = nullptr;
+    m_Links[last].pos = vecGoal;
+
+
+    // Set links' vectors.
+    int prev = 0;
+    for ( int cur = 1; cur < m_nLinkCount; cur++ )
+    {
+        prev = cur - 1;
+        m_Links[prev].fwd = m_Links[cur].pos - m_Links[prev].pos;
+        m_Links[prev].length = m_Links[prev].fwd.NormalizeInPlace();
+    }
+
+    m_Links[last].fwd = m_Links[last].pos - m_Links[prev].pos;
+    m_Links[last].length = m_Links[last].fwd.NormalizeInPlace();
+
 
 
 
