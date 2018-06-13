@@ -53,6 +53,9 @@ public:
         CNavArea* pStart = pOuter->GetLastKnownArea();
         CNavArea* pGoal = nullptr;
         int n = random->RandomInt( 0, TheNavMesh->GetNavAreaCount() - 1 );
+
+        // GCC doesn't like lambdas.
+        /*
         TheNavMesh->ForAllAreas( [ &n, &pGoal ]( CNavArea* area )
         {
             if ( --n <= 0 )
@@ -63,6 +66,39 @@ public:
 
             return true;
         } );
+        */
+        // Put me somewhere nice. I'll be useful in the future.
+        class CAreaPick
+        {
+        public:
+            CAreaPick( int n )
+            {
+                m_nCount = n;
+                m_pArea = nullptr;
+            }
+
+            bool operator()( CNavArea* pArea )
+            {
+                if ( --m_nCount < 0 )
+                {
+                    m_pArea = pArea;
+                    return false;
+                }
+
+                return true;
+            }
+
+            CNavArea* GetArea() const { return m_pArea; }
+
+        private:
+            CNavArea* m_pArea;
+            int m_nCount;
+        };
+
+        CAreaPick pick( n );
+        TheNavMesh->ForAllAreas( pick );
+
+        pGoal = pick.GetArea();
 
         if ( !pGoal )
             return;

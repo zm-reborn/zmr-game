@@ -112,7 +112,7 @@ namespace NPCR
         virtual bool RemoveNPC() OVERRIDE
         {
             // We can't be removed as an entity. Kick instead.
-            int userid = GetUserID();
+            int userid = PlayerClass::GetUserID();
             if ( userid != -1 )
             {
                 engine->ServerCommand( UTIL_VarArgs( "kickid %i", userid ) );
