@@ -165,3 +165,17 @@ enum ZMChatNotifyType_t
 // m_hViewModel
 #define VMINDEX_WEP         0
 #define VMINDEX_HANDS       1
+
+
+
+enum HappyZombieEvent_t
+{
+    HZEVENT_INVALID = 0,
+
+    HZEVENT_CHRISTMAS,
+    HZEVENT_HULKAMANIA,
+
+    HZEVENT_MAX
+};
+
+

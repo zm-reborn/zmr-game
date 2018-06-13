@@ -57,6 +57,8 @@ C_ZMBaseZombie::C_ZMBaseZombie()
     m_fxInner = nullptr;
 
     m_iGroup = INVALID_GROUP_INDEX;
+
+    m_pHat = nullptr;
     
 
     // Always create FX.
@@ -77,6 +79,8 @@ C_ZMBaseZombie::~C_ZMBaseZombie()
 
     delete m_fxHealth;
     delete m_fxInner;
+
+    ReleaseHat();
 
     g_ZMVision.RemoveSilhouette( this );
 }
@@ -239,3 +243,81 @@ int C_ZMBaseZombie::DrawModelAndEffects( int flags )
 {
     BaseClass::TraceAttack( info, vecDir, ptr, pAccumulator );
 }*/
+
+extern ConVar zm_sv_happyzombies;
+ConVar zm_cl_happyzombies_disable( "zm_cl_happyzombies_disable", "0", 0, "No fun :(" );
+ConVar zm_cl_happyzombies_chance( "zm_cl_happyzombies_chance", "0.2", FCVAR_ARCHIVE );
+
+
+CStudioHdr* C_ZMBaseZombie::OnNewModel()
+{
+    CStudioHdr* hdr = BaseClass::OnNewModel();
+    
+
+    HappyZombieEvent_t iEvent = (HappyZombieEvent_t)zm_sv_happyzombies.GetInt();
+
+    if (iEvent > HZEVENT_INVALID
+    &&  !zm_cl_happyzombies_disable.GetBool()
+    &&  IsAffectedByEvent( iEvent )
+    &&  random->RandomFloat( 0.0f, 1.0f ) <= zm_cl_happyzombies_chance.GetFloat())
+    {
+        CreateEventAccessories();
+    }
+
+    return hdr;
+}
+
+C_BaseAnimating* C_ZMBaseZombie::BecomeRagdollOnClient()
+{
+    C_BaseAnimating* pRagdoll = BaseClass::BecomeRagdollOnClient();
+
+    ReleaseHat();
+
+    return pRagdoll;
+}
+
+void C_ZMBaseZombie::UpdateVisibility()
+{
+    BaseClass::UpdateVisibility();
+
+    // Stay parented, silly.
+    if ( m_pHat )
+    {
+        //m_pHat->UpdateVisibility();
+
+        if ( !IsDormant() )
+        {
+            m_pHat->AttachToEntity( this );
+        }
+    }
+}
+
+bool C_ZMBaseZombie::CreateEventAccessories()
+{
+    const char* model = GetEventHatModel( (HappyZombieEvent_t)zm_sv_happyzombies.GetInt() );
+    if ( !model || !(*model) )
+        return false;
+
+
+    ReleaseHat();
+
+    m_pHat = new C_ZMHolidayHat();
+
+
+    if ( !m_pHat || !m_pHat->Initialize( this, model )/* || !m_pHat->Parent( "eyes" )*/ )
+    {
+        ReleaseHat();
+        return false;
+    }
+
+    return true;
+}
+
+void C_ZMBaseZombie::ReleaseHat()
+{
+    if ( m_pHat )
+    {
+        m_pHat->Release();
+        m_pHat = nullptr;
+    }
+}
