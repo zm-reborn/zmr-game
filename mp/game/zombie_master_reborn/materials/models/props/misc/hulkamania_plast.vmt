@@ -1,0 +1,5 @@
+VertexlitGeneric
+{
+	$basetexture models\props\misc\hulkamania_plast
+	$model 1
+}
