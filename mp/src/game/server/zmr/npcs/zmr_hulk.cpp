@@ -101,30 +101,32 @@ void CZMHulk::HandleAnimEvent( animevent_t* pEvent )
     BaseClass::HandleAnimEvent( pEvent );
 }
 
-void CZMHulk::ScaleDamageByHitgroup( int iHitGroup, CTakeDamageInfo& info ) const
+bool CZMHulk::ScaleDamageByHitgroup( int iHitGroup, CTakeDamageInfo& info ) const
 {
     switch ( iHitGroup )
     {
     case HITGROUP_LEFTARM :
     case HITGROUP_RIGHTARM :
         info.ScaleDamage( zm_sk_hulk_hitmult_arms.GetFloat() );
-        break;
+        return true;
     case HITGROUP_CHEST :
         info.ScaleDamage( zm_sk_hulk_hitmult_chest.GetFloat() );
-        break;
+        return true;
     case HITGROUP_STOMACH :
         info.ScaleDamage( zm_sk_hulk_hitmult_stomach.GetFloat() );
-        break;
+        return true;
     case HITGROUP_HEAD :
         info.ScaleDamage( zm_sk_hulk_hitmult_head.GetFloat() );
-        break;
+        return true;
     case HITGROUP_LEFTLEG :
     case HITGROUP_RIGHTLEG :
         info.ScaleDamage( zm_sk_hulk_hitmult_legs.GetFloat() );
-        break;
+        return true;
     default :
         break;
     }
+
+    return false;
 }
 
 void CZMHulk::AlertSound()
