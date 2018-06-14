@@ -146,6 +146,8 @@ ConVar zm_sv_defense_goal_tolerance( "zm_sv_defense_goal_tolerance", "64", FCVAR
 ConVar zm_sv_debug_zombieattack( "zm_sv_debug_zombieattack", "0" );
 
 
+extern ConVar zm_sk_default_hitmult_head;
+
 
 
 
@@ -707,22 +709,27 @@ void CZMBaseZombie::TraceAttack( const CTakeDamageInfo& inputInfo, const Vector&
     BaseClass::TraceAttack( info, vecDir, pTrace, pAccumulator );
 }
 
-void CZMBaseZombie::ScaleDamageByHitgroup( int iHitGroup, CTakeDamageInfo& info ) const
+bool CZMBaseZombie::ScaleDamageByHitgroup( int iHitGroup, CTakeDamageInfo& info ) const
 {
-    switch( iHitGroup )
+    // Don't scale explosive damage.
+    if ( info.GetDamageType() & DMG_BLAST )
+        return true;
+
+
+    switch ( iHitGroup )
     {
     case HITGROUP_HEAD :
         {
-            if( info.GetDamageType() & DMG_BUCKSHOT )
+            if ( info.GetDamageType() & DMG_BUCKSHOT )
             {
-                float flDist = FLT_MAX;
+                float flDistSqr = FLT_MAX;
 
-                if( info.GetAttacker() )
+                if ( info.GetAttacker() )
                 {
-                    flDist = ( GetAbsOrigin() - info.GetAttacker()->GetAbsOrigin() ).Length();
+                    flDistSqr = ( GetAbsOrigin() - info.GetAttacker()->GetAbsOrigin() ).LengthSqr();
                 }
 
-                if( flDist <= ZOMBIE_BUCKSHOT_TRIPLE_DAMAGE_DIST )
+                if ( flDistSqr <= (ZOMBIE_BUCKSHOT_TRIPLE_DAMAGE_DIST*ZOMBIE_BUCKSHOT_TRIPLE_DAMAGE_DIST) )
                 {
                     info.ScaleDamage( 3.0f );
                 }
@@ -734,10 +741,14 @@ void CZMBaseZombie::ScaleDamageByHitgroup( int iHitGroup, CTakeDamageInfo& info 
             }
             else
             {
-                info.ScaleDamage( 2.0f );
+                info.ScaleDamage( zm_sk_default_hitmult_head.GetFloat() );
             }
+
+            return true;
         }
     }
+
+    return false;
 }
 
 void CZMBaseZombie::Event_Killed( const CTakeDamageInfo& info )

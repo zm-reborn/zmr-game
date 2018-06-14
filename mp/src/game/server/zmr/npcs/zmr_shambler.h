@@ -25,6 +25,9 @@ public:
     virtual Activity    GetSwatActivity( CBaseEntity* pEnt, bool bBreak = true ) const OVERRIDE;
 
 
+    virtual bool ScaleDamageByHitgroup( int iHitGroup, CTakeDamageInfo& info ) const OVERRIDE;
+
+
     virtual void AlertSound() OVERRIDE;
     virtual void AttackSound() OVERRIDE;
     virtual void DeathSound() OVERRIDE;
