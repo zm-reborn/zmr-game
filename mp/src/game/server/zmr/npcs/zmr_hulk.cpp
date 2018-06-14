@@ -120,8 +120,9 @@ void CZMHulk::ScaleDamageByHitgroup( int iHitGroup, CTakeDamageInfo& info ) cons
         break;
     case HITGROUP_LEFTLEG :
     case HITGROUP_RIGHTLEG :
-    default :
         info.ScaleDamage( zm_sk_hulk_hitmult_legs.GetFloat() );
+        break;
+    default :
         break;
     }
 }
