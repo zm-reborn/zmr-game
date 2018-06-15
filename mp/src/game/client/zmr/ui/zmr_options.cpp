@@ -86,7 +86,7 @@ CZMOptionsMenu::CZMOptionsMenu( VPANEL parent ) : BaseClass( nullptr, "ZMOptions
 
     AddPage( new CZMOptionsSubGeneral( this ), "General" );
     AddPage( new CZMOptionsSubGraphics( this ), "Video" );
-    //AddPage( new CZMOptionsSubCrosshair( this ), "Crosshair" );
+    AddPage( new CZMOptionsSubCrosshair( this ), "Crosshair" );
     AddPage( new CZMOptionsSubMisc( this ), "Misc" );
 
 
