@@ -327,6 +327,15 @@ bool CTraceFilterOnlyNPCsAndPlayer::ShouldHitEntity( IHandleEntity *pHandleEntit
 			return true; // CS hostages are CLASS_PLAYER_ALLY but not IsNPC()
 #endif // !CLIENT_DLL
 #endif // CSTRIKE_DLL
+#ifdef ZMR // ZMRCHANGE: Account for NPCRs.
+#if defined(CLIENT_DLL)
+		if ( pEntity->IsNPCR() )
+			return true;
+#else
+		if ( pEntity->MyNPCRPointer() != nullptr )
+			return true;
+#endif
+#endif
 		return (pEntity->IsNPC() || pEntity->IsPlayer());
 	}
 	return false;
@@ -346,6 +355,15 @@ bool CTraceFilterNoNPCsOrPlayer::ShouldHitEntity( IHandleEntity *pHandleEntity, 
 		if ( pEntity->Classify() == CLASS_PLAYER_ALLY )
 			return false; // CS hostages are CLASS_PLAYER_ALLY but not IsNPC()
 #endif
+#ifdef ZMR // ZMRCHANGE: Account NPCRs.
+#if defined(CLIENT_DLL)
+		if ( pEntity->IsNPCR() )
+			return false;
+#else
+		if ( pEntity->MyNPCRPointer() != nullptr )
+			return false;
+#endif
+#endif // ZMR
 		return (!pEntity->IsNPC() && !pEntity->IsPlayer());
 	}
 	return false;

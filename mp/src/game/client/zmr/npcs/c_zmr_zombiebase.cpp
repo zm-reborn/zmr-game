@@ -7,7 +7,7 @@
 #include "zmr/zmr_player_shared.h"
 #include "zmr/zmr_global_shared.h"
 #include "zmr/c_zmr_zmvision.h"
-#include "c_zmr_zombiebase.h"
+#include "zmr/npcs/zmr_zombiebase_shared.h"
 
 
 extern bool g_bRenderPostProcess;
@@ -16,7 +16,13 @@ extern bool g_bRenderPostProcess;
 static ConVar zm_cl_zombiefadein( "zm_cl_zombiefadein", "0.55", FCVAR_ARCHIVE, "How fast zombie fades.", true, 0.0f, true, 2.0f );
 
 
+#undef CZMBaseZombie
 IMPLEMENT_CLIENTCLASS_DT( C_ZMBaseZombie, DT_ZM_BaseZombie, CZMBaseZombie )
+    // See server -> zmr_zombiebase.cpp
+    RecvPropVector( RECVINFO_NAME( m_vecNetworkOrigin, m_vecOrigin ) ),
+
+    RecvPropFloat( RECVINFO_NAME( m_angNetworkAngles[1], m_angRotation[1] ) ),
+
 	RecvPropInt( RECVINFO( m_iSelectorIndex ) ),
 	RecvPropFloat( RECVINFO( m_flHealthRatio ) ),
 END_RECV_TABLE()
@@ -44,13 +50,15 @@ CLIENTEFFECT_REGISTER_END()
 
 C_ZMBaseZombie::C_ZMBaseZombie()
 {
-    g_pZombies->AddToTail( this );
+    g_ZombieManager.AddZombie( this );
 
 
     m_fxHealth = nullptr;
     m_fxInner = nullptr;
 
     m_iGroup = INVALID_GROUP_INDEX;
+
+    m_pHat = nullptr;
     
 
     // Always create FX.
@@ -67,10 +75,12 @@ C_ZMBaseZombie::C_ZMBaseZombie()
 
 C_ZMBaseZombie::~C_ZMBaseZombie()
 {
-    g_pZombies->FindAndRemove( this );
+    g_ZombieManager.RemoveZombie( this );
 
     delete m_fxHealth;
     delete m_fxInner;
+
+    ReleaseHat();
 
     g_ZMVision.RemoveSilhouette( this );
 }
@@ -268,3 +278,81 @@ int C_ZMBaseZombie::DrawModelAndEffects( int flags )
 {
     BaseClass::TraceAttack( info, vecDir, ptr, pAccumulator );
 }*/
+
+extern ConVar zm_sv_happyzombies;
+ConVar zm_cl_happyzombies_disable( "zm_cl_happyzombies_disable", "0", 0, "No fun :(" );
+ConVar zm_cl_happyzombies_chance( "zm_cl_happyzombies_chance", "0.2", FCVAR_ARCHIVE );
+
+
+CStudioHdr* C_ZMBaseZombie::OnNewModel()
+{
+    CStudioHdr* hdr = BaseClass::OnNewModel();
+    
+
+    HappyZombieEvent_t iEvent = (HappyZombieEvent_t)zm_sv_happyzombies.GetInt();
+
+    if (iEvent > HZEVENT_INVALID
+    &&  !zm_cl_happyzombies_disable.GetBool()
+    &&  IsAffectedByEvent( iEvent )
+    &&  random->RandomFloat( 0.0f, 1.0f ) <= zm_cl_happyzombies_chance.GetFloat())
+    {
+        CreateEventAccessories();
+    }
+
+    return hdr;
+}
+
+C_BaseAnimating* C_ZMBaseZombie::BecomeRagdollOnClient()
+{
+    C_BaseAnimating* pRagdoll = BaseClass::BecomeRagdollOnClient();
+
+    ReleaseHat();
+
+    return pRagdoll;
+}
+
+void C_ZMBaseZombie::UpdateVisibility()
+{
+    BaseClass::UpdateVisibility();
+
+    // Stay parented, silly.
+    if ( m_pHat )
+    {
+        //m_pHat->UpdateVisibility();
+
+        if ( !IsDormant() )
+        {
+            m_pHat->AttachToEntity( this );
+        }
+    }
+}
+
+bool C_ZMBaseZombie::CreateEventAccessories()
+{
+    const char* model = GetEventHatModel( (HappyZombieEvent_t)zm_sv_happyzombies.GetInt() );
+    if ( !model || !(*model) )
+        return false;
+
+
+    ReleaseHat();
+
+    m_pHat = new C_ZMHolidayHat();
+
+
+    if ( !m_pHat || !m_pHat->Initialize( this, model )/* || !m_pHat->Parent( "eyes" )*/ )
+    {
+        ReleaseHat();
+        return false;
+    }
+
+    return true;
+}
+
+void C_ZMBaseZombie::ReleaseHat()
+{
+    if ( m_pHat )
+    {
+        m_pHat->Release();
+        m_pHat = nullptr;
+    }
+}

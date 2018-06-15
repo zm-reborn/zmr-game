@@ -1,19 +1,18 @@
 #include "cbase.h"
 
-#ifdef CLIENT_DLL
-#include "zmr/npcs/c_zmr_zombiebase.h"
-#else
-#include "zmr/npcs/zmr_zombiebase.h"
-#endif
+
+#include "zmr_zombiebase_shared.h"
 
 #include "zmr/zmr_player_shared.h"
 #include "zmr/zmr_gamerules.h"
 #include "zmr/zmr_shareddefs.h"
 
 
-#ifdef CLIENT_DLL
-#define CZMBaseZombie C_ZMBaseZombie
-#endif
+
+
+CZMZombieManager g_ZombieManager;
+
+
 
 ZombieClass_t CZMBaseZombie::NameToClass( const char* name )
 {
@@ -105,12 +104,12 @@ bool CZMBaseZombie::HasEnoughPopToSpawn( ZombieClass_t zclass )
     return (curpop + GetPopCost( zclass )) <= zm_sv_zombiemax.GetInt();
 }
 
-CZMPlayer* CZMBaseZombie::GetSelector()
+CZMPlayer* CZMBaseZombie::GetSelector() const
 {
     return ToZMPlayer( UTIL_PlayerByIndex( m_iSelectorIndex ) );
 }
 
-int CZMBaseZombie::GetSelectorIndex()
+int CZMBaseZombie::GetSelectorIndex() const
 {
     return m_iSelectorIndex;
 }
@@ -130,7 +129,7 @@ void CZMBaseZombie::SetSelector( int index )
     m_iSelectorIndex = index;
 }
 
-ZombieClass_t CZMBaseZombie::GetZombieClass()
+ZombieClass_t CZMBaseZombie::GetZombieClass() const
 {
     return m_iZombieClass;
 }
@@ -138,4 +137,14 @@ ZombieClass_t CZMBaseZombie::GetZombieClass()
 void CZMBaseZombie::SetZombieClass( ZombieClass_t zclass )
 {
     m_iZombieClass = zclass;
+}
+
+int CZMBaseZombie::GetPopCost() const
+{
+    return GetPopCost( GetZombieClass() );
+}
+
+int CZMBaseZombie::GetCost() const
+{
+    return GetCost( GetZombieClass() );
 }

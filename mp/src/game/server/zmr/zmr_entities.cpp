@@ -10,7 +10,7 @@
 #include "zmr/zmr_gamerules.h"
 #include "zmr/zmr_player.h"
 #include "zmr/zmr_shareddefs.h"
-#include "zmr/npcs/zmr_zombiebase.h"
+#include "npcs/zmr_zombiebase_shared.h"
 #include "zmr/zmr_global_shared.h"
 #include "zmr/weapons/zmr_base.h"
 
@@ -199,6 +199,8 @@ BEGIN_DATADESC( CZMEntZombieSpawn )
     //DEFINE_KEYFIELD( m_nSpawnQueueCapacity, FIELD_INTEGER, "spawnqueuecapacity" ),
     DEFINE_KEYFIELD( m_sRallyName, FIELD_STRING, "rallyname" ),
     DEFINE_KEYFIELD( m_sFirstNodeName, FIELD_STRING, "nodename" ),
+
+    DEFINE_KEYFIELD( m_sZombieModelGroup, FIELD_STRING, "modelgroup" ),
 
     DEFINE_THINKFUNC( SpawnThink ),
 END_DATADESC()
@@ -499,6 +501,8 @@ bool CZMEntZombieSpawn::CreateZombie( ZombieClass_t zclass )
 
     // Don't drop to floor since npcs seem to get stuck on displacements.
     //UTIL_DropToFloor( pZombie, MASK_NPCSOLID );
+
+    pZombie->SetZombieModelGroupName( m_sZombieModelGroup );
 
 
     // We can be marked for deletion...
@@ -823,25 +827,18 @@ void CZMEntAmbushTrigger::RemoveZombieFromAmbush()
 
 void CZMEntAmbushTrigger::Trigger( CBaseEntity* pActivator )
 {
-    CZMBaseZombie* pZombie;
-    for ( int i = 0; i < g_pZombies->Count(); i++ )
+    g_ZombieManager.ForEachAliveZombie( [ this, pActivator ]( CZMBaseZombie* pZombie )
     {
-        pZombie = g_pZombies->Element( i );
-
-        if ( pZombie && pZombie->IsAlive() && pZombie->GetAmbushTrigger() == this )
+        if ( pZombie->GetAmbushTrigger() == this )
         {
-            pZombie->RemoveFromAmbush( true, false );
+            pZombie->RemoveFromAmbush( false );
 
-            if ( pZombie->GetState() <= NPC_STATE_IDLE ) // We need some kind of state!
+            if ( !pZombie->GetEnemy() )
             {
-                pZombie->SetState( NPC_STATE_ALERT );
-            }
-
-            // Make them see the enemy but only if they have no enemy.
-            if ( !pZombie->HasCondition( COND_SEE_ENEMY ) && !pZombie->GetEnemy() )
                 pZombie->SetEnemy( pActivator );
+            }
         }
-    }
+    } );
 }
 
 void CZMEntAmbushTrigger::ScanThink()
@@ -1281,7 +1278,7 @@ void CZMEntTriggerEntityCount::InputCount( inputdata_t &inputData )
         }
         case SF_ENTCOUNT_NPCS :
         {
-            CAI_BaseNPC* pNPC = dynamic_cast<CAI_BaseNPC*>( pEnt );
+            CZMBaseZombie* pNPC = ToZMBaseZombie( pEnt );
 
             if ( pNPC && pNPC->IsAlive() )
             {

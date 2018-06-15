@@ -5572,6 +5572,9 @@ void CNavArea::ComputeVisToArea( CNavArea *&pOtherArea )
 	}
 }
 
+#ifdef ZMR
+static ConVar zm_nav_computevisibility_threaded( "zm_nav_computevisibility_threaded", "1" );
+#endif
 
 //--------------------------------------------------------------------------------------------------------
 /**
@@ -5610,7 +5613,21 @@ void CNavArea::ComputeVisibilityToMesh( void )
 	SetupPVS();
 
 	g_pCurVisArea = this;
+#ifdef ZMR // ZMRCHANGE: The game can crash here (zm_desert_skystation_rc1). Traces to engine. Not using threaded mode stops this crash. 
+	if ( !zm_nav_computevisibility_threaded.GetBool() )
+	{
+		FOR_EACH_VEC( collector.m_area, it )
+		{
+			ComputeVisToArea( collector.m_area[it] );
+		}
+	}
+	else
+	{
+		ParallelProcess( "CNavArea::ComputeVisibilityToMesh", collector.m_area.Base(), collector.m_area.Count(), &ComputeVisToArea );
+	}
+#else
 	ParallelProcess( "CNavArea::ComputeVisibilityToMesh", collector.m_area.Base(), collector.m_area.Count(), &ComputeVisToArea );
+#endif
 
 	m_potentiallyVisibleAreas.EnsureCapacity( g_ComputedVis.Count() );
 	while ( g_ComputedVis.Count() )

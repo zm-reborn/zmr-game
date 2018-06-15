@@ -7,7 +7,7 @@
 #include "zmr_shareddefs.h"
 
 #ifndef CLIENT_DLL
-#include "zmr/npcs/zmr_zombiebase.h"
+#include "npcs/zmr_zombiebase_shared.h"
 #include "zmr/zmr_entities.h"
 #include "zmr/zmr_obj_manager.h"
 #endif

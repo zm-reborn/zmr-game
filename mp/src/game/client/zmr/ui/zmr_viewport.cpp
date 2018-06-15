@@ -144,7 +144,7 @@ public:
 		    if ( !pEntity )
 			    return false;
 
-		    return !pEntity->IsNPC();
+		    return !pEntity->IsNPCR();
 	    }
 
 	    return false;
@@ -733,7 +733,6 @@ void CZMFrame::DoMoveLine()
 
 void CZMFrame::FindZombiesInBox( int start_x, int start_y, int end_x, int end_y, bool bSticky )
 {
-    C_ZMBaseZombie* pZombie;
     Vector screen;
     int i;
     int x, y;
@@ -757,26 +756,24 @@ void CZMFrame::FindZombiesInBox( int start_x, int start_y, int end_x, int end_y,
         end_y = i;
     }
 
-    for ( i = 0; i < g_pZombies->Count(); i++ )
+    g_ZombieManager.ForEachAliveZombie( [ &vZombies, &trace, &filter, &screen, &x, &y, start_x, start_y, end_x, end_y ]( C_ZMBaseZombie* pZombie )
     {
-        pZombie = g_pZombies->Element( i );
-
         // Do we see the mad man?
         if ( !zm_cl_poweruser_boxselect.GetBool() )
         {
             UTIL_TraceZMView( &trace, pZombie->GetAbsOrigin() + Vector( 0, 0, 8 ), MASK_ZMVIEW, &filter );
 
-            if ( trace.fraction != 1.0f && !trace.startsolid ) continue;
+            if ( trace.fraction != 1.0f && !trace.startsolid ) return;
         }
 
         if ( !ZMClientUtil::WorldToScreen( pZombie->GetAbsOrigin(), screen, x, y ) )
-            continue;
+            return;
 
         if ( x > start_x && x < end_x && y > start_y && y < end_y )
         {
             vZombies.AddToTail( pZombie );
         }
-    }
+    } );
 
 
     ZMClientUtil::SelectZombies( vZombies, bSticky );

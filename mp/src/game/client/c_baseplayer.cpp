@@ -1540,12 +1540,14 @@ void C_BasePlayer::CalcChaseCamView(Vector& eyeOrigin, QAngle& eyeAngles, float&
 		}
 	}
 
+#ifndef ZMR // ZMRCHANGE: IsNextBot is no more.
 	if ( target && !target->IsPlayer() && target->IsNextBot() )
 	{
 		// if this is a boss, we want to be back a little further so we can see more of it
 		flMaxDistance *= 2.5f;
 		m_flObserverChaseDistance = flMaxDistance;
 	}
+#endif
 
 	m_flObserverChaseDistance = clamp( m_flObserverChaseDistance, flMinDistance, flMaxDistance );
 	

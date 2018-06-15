@@ -7,8 +7,9 @@
 #include "envspark.h"
 
 
-#include "npcs/zmr_zombiebase.h"
-#include "npcs/zmr_fastzombie.h"
+#include "npcs/zmr_zombiebase_shared.h"
+#include "npcs/zmr_banshee.h"
+//#include "npcs/zmr_fastzombie.h"
 #include "zmr/zmr_global_shared.h"
 #include "zmr/zmr_util.h"
 
@@ -34,22 +35,8 @@ void ZM_Cmd_Move( const CCommand &args )
     pos.x = atof( args.Arg( 1 ) );
     pos.y = atof( args.Arg( 2 ) );
     pos.z = atof( args.Arg( 3 ) );
-    
 
-    float tolerance = atof( args.Arg( 4 ) );
-
-
-    CZMBaseZombie* pZombie;
-
-    for ( int i = 0; i < g_pZombies->Count(); i++ )
-    {
-        pZombie = g_pZombies->Element( i );
-
-        if ( pZombie && pZombie->GetSelector() == pPlayer )
-        {
-            pZombie->Command( pos, true, tolerance );
-        }
-    }
+    ZMUtil::MoveSelectedZombies( pPlayer->entindex(), pos );
 }
 
 static ConCommand zm_cmd_move( "zm_cmd_move", ZM_Cmd_Move, "Move da zombies!", FCVAR_HIDDEN );
@@ -80,30 +67,21 @@ void ZM_Cmd_Target( const CCommand &args )
 
     bool bTarget = false; // Just target an enemy.
     bool bSwat = false; // Just swat the object away/towards an enemy.
-    bool bBreak = false; // Tell zombie to break this object.
     bool bIsBreakable = false;
     bool bCanBeDamaged = pTarget->GetHealth() > 0 && pTarget->m_takedamage == DAMAGE_YES;
-
+    
     if ( pTarget->IsPlayer() )
     {
         bTarget = true;
     }
     else
     {
-        // If we're a physics object then swat.
-        IPhysicsObject* phys = pTarget->VPhysicsGetObject();
-
-        bSwat = phys && phys->IsMoveable();
-
+        bSwat = CZMBaseZombie::CanSwatObject( pTarget );
 
         if ( bCanBeDamaged )
         {
-            // If we're breakable (func_breakable, etc.) then force to break.
-            // If we're a physics object and we can't be moved, force to break.
             CBreakable* pBreak = dynamic_cast<CBreakable*>( pTarget );
-
             bIsBreakable = pBreak && pBreak->IsBreakable();
-            bBreak = (phys && !phys->IsMotionEnabled()) || bIsBreakable;
         }
     }
 
@@ -112,19 +90,19 @@ void ZM_Cmd_Target( const CCommand &args )
     pos.x = atof( args.Arg( 3 ) );
     pos.y = atof( args.Arg( 4 ) );
     pos.z = atof( args.Arg( 5 ) );
-    
 
-    CZMBaseZombie* pZombie;
-    
-    for ( int i = 0; i < g_pZombies->Count(); i++ )
+
+    // Can't really do anything here, just move.
+    if ( !bTarget && !bCanBeDamaged && !bSwat )
     {
-        pZombie = g_pZombies->Element( i );
+        ZMUtil::MoveSelectedZombies( pPlayer->entindex(), pos );
+        return;
+    }
+    
 
-        if ( !pZombie ) continue;
-        
-        if ( pZombie->GetSelector() != pPlayer ) continue;
 
-
+    g_ZombieManager.ForEachSelectedZombie( pPlayer, [ bSwat, bCanBeDamaged, bIsBreakable, bForceBreak, bTarget, pTarget, &pos ]( CZMBaseZombie* pZombie )
+    {
         bool bCanSwat = bSwat && pZombie->CanSwatPhysicsObjects();
         bool bCanBreak = bCanBeDamaged && ( pZombie->CanSwatPhysicsObjects() || bIsBreakable );
 
@@ -138,14 +116,14 @@ void ZM_Cmd_Target( const CCommand &args )
         {
             if ( bTarget )
             {
-                pZombie->TargetEnemy( pTarget );
+                //pZombie->TargetEnemy( pTarget );
             }
             else
             {
                 pZombie->Command( pos );
             }
         }
-    }
+    } );
 }
 
 static ConCommand zm_cmd_target( "zm_cmd_target", ZM_Cmd_Target, "Selected zombies target given entity.", FCVAR_HIDDEN );
@@ -251,11 +229,20 @@ void ZM_Cmd_CreateHidden( const CCommand &args )
     
     const Vector findground( 0.0f, 0.0f, 2.0f );
 
+    Vector mins, maxs;
+    maxs.x = pZombie->GetMotor()->GetHullWidth() / 2.0f;
+    maxs.y = maxs.x;
+    maxs.z = pZombie->GetMotor()->GetHullHeight();
+
+    mins.x = mins.y = -maxs.x;
+    mins.z = 0.0f;
+
+
     // Trace down to get ground position.
     UTIL_TraceHull(
         pos + Vector( 0.0f, 0.0f, 8.0f ),
         pos - findground,
-        pZombie->GetHullMins(), pZombie->GetHullMaxs(),
+        mins, maxs,
         MASK_NPCSOLID, pZombie, COLLISION_GROUP_NONE, &trace );
     
     const Vector up = Vector( 0.0f, 0.0f, 1.0f );
@@ -361,22 +348,15 @@ void ZM_Cmd_SelectAll( const CCommand &args )
     
     if ( !pPlayer->IsZM() ) return;
 
-    // No zombies to select...
-    if ( g_pZombies->Count() < 1 ) return;
+    if ( g_ZombieManager.GetNumZombies() < 1 ) return;
 
 
     int entindex = pPlayer->entindex();
 
-    CZMBaseZombie* pZombie;
-    for ( int i = 0; i < g_pZombies->Count(); i++ )
+    g_ZombieManager.ForEachAliveZombie( [ entindex ]( CZMBaseZombie* pZombie )
     {
-        pZombie = g_pZombies->Element( i );
-
-        if ( pZombie )
-        {
-            pZombie->SetSelector( entindex );
-        }
-    }
+        pZombie->SetSelector( entindex );
+    } );
 
     ZMUtil::PrintNotify( pPlayer, ZMCHATNOTIFY_ZM, "#ZMSelectAll" );
 }
@@ -496,26 +476,20 @@ void ZM_Cmd_DeleteZombies( const CCommand &args )
     int dmgtype = zm_sv_gibdelete.GetBool() ? DMG_ALWAYSGIB : DMG_GENERIC;
 
 
-    CZMBaseZombie* pZombie;
-    for ( int i = 0; i < g_pZombies->Count(); i++ )
+    g_ZombieManager.ForEachSelectedZombie( pPlayer, [ &dmg, dmgtype, pPlayer ]( CZMBaseZombie* pZombie )
     {
-        pZombie = g_pZombies->Element( i );
+        dmg.SetDamageType( dmgtype );
 
-        if ( pZombie && pZombie->GetSelector() == pPlayer )
-        {
-            dmg.SetDamageType( dmgtype );
+        dmg.SetAttacker( pPlayer );
+        dmg.SetInflictor( pZombie );
 
-            dmg.SetAttacker( pPlayer );
-            dmg.SetInflictor( pZombie );
-
-            dmg.SetDamage( pZombie->GetHealth() * 2 );
-            dmg.SetDamagePosition( pZombie->GetAbsOrigin() );
-            dmg.SetDamageForce( Vector( 0, 0, -10 ) );
+        dmg.SetDamage( pZombie->GetHealth() * 2 );
+        dmg.SetDamagePosition( pZombie->GetAbsOrigin() );
+        dmg.SetDamageForce( Vector( 0, 0, -10 ) );
 
 
-            pZombie->TakeDamage( dmg );
-        }
-    }
+        pZombie->TakeDamage( dmg );
+    } );
 }
 
 static ConCommand zm_cmd_delete( "zm_cmd_delete", ZM_Cmd_DeleteZombies, "Delete selected zombies." );
@@ -793,16 +767,16 @@ void ZM_Cmd_SetZombieMode( const CCommand &args )
     if ( mode <= ZOMBIEMODE_INVALID || mode >= ZOMBIEMODE_MAX )
         return;
 
-    CZMBaseZombie* pZombie;
-    for ( int i = 0; i < g_pZombies->Count(); i++ )
-    {
-        pZombie = g_pZombies->Element( i );
 
-        if ( pZombie && pZombie->GetSelector() == pPlayer )
+    g_ZombieManager.ForEachSelectedZombie( pPlayer, [ mode ]( CZMBaseZombie* pZombie )
+    {
+        if ( pZombie->GetZombieMode() == ZOMBIEMODE_AMBUSH )
         {
-            pZombie->SetZombieMode( mode );
+            pZombie->RemoveFromAmbush();
         }
-    }
+
+        pZombie->SetZombieMode( mode );
+    } );
 
 
     ZMUtil::PrintNotify( pPlayer, ZMCHATNOTIFY_ZM,
@@ -826,25 +800,16 @@ void ZM_Cmd_SetBansheeCeil( const CCommand &args )
 
     bool bSet = false;
 
-    CZMBaseZombie* pZombie;
-    for ( int i = 0; i < g_pZombies->Count(); i++ )
+    g_ZombieManager.ForEachSelectedZombie( pPlayer, [ &bSet ]( CZMBaseZombie* pZombie )
     {
-        pZombie = g_pZombies->Element( i );
-
-        if ( !pZombie ) continue;
-
-        if ( pZombie->GetSelector() != pPlayer && pZombie->GetZombieClass() != ZMCLASS_BANSHEE )
-            continue;
+        if ( pZombie->GetZombieClass() != ZMCLASS_BANSHEE )
+            return;
 
 
-        if (!pZombie->IsCurSchedule( SCHED_FASTZOMBIE_CEILING_JUMP ) &&
-            !pZombie->IsCurSchedule( SCHED_FASTZOMBIE_CEILING_CLING ))
-        {
-            pZombie->SetSchedule( SCHED_FASTZOMBIE_CEILING_JUMP );
+        bSet = true;
 
-            bSet = true;
-        }
-    }
+        static_cast<CZMBanshee*>( pZombie )->StartCeilingAmbush();
+    } );
 
     ZMUtil::PrintNotify( pPlayer, ZMCHATNOTIFY_ZM, bSet ? "#ZMBansheeCeilSet" : "#ZMBansheeCeilNoSel" );
 }
@@ -892,25 +857,15 @@ void ZM_Cmd_CreateAmbush( const CCommand &args )
 
     int count = 0;
 
-    CZMBaseZombie* pZombie;
-    for ( int i = 0; i < g_pZombies->Count(); i++ )
+    g_ZombieManager.ForEachSelectedZombie( pPlayer, [ &count, pTrigger ]( CZMBaseZombie* pZombie )
     {
-        pZombie = g_pZombies->Element( i );
-
-        if ( !pZombie ) continue;
-
-        if ( pZombie->GetSelector() != pPlayer )
-            continue;
-
-
         ++count;
 
 
-        pZombie->RemoveFromAmbush( false );
+        pZombie->RemoveFromAmbush();
 
         pZombie->SetAmbush( pTrigger );
-    }
-
+    } );
 
     pTrigger->SetAmbushZombies( count );
 
@@ -935,11 +890,12 @@ void ZM_Cmd_MoveToLine( const CCommand &args )
 
     if ( args.ArgC() < 7 ) return;
 
-    if ( !ZMUtil::GetSelectedZombieCount( pPlayer->entindex() ) )
+
+    int nSelected = ZMUtil::GetSelectedZombieCount( pPlayer->entindex() );
+    if ( !nSelected )
         return;
     
 
-    int myindex = pPlayer->entindex();
     Vector mypos = pPlayer->EyePosition();
 
     bool bIsOutsideWorld = (UTIL_PointContents( mypos ) & CONTENTS_SOLID) != 0;
@@ -957,16 +913,9 @@ void ZM_Cmd_MoveToLine( const CCommand &args )
     
 
     // The line length is way too small to send the zombies into a line.
-    if ( flLineLength < 8.0f )
+    if ( nSelected < 2 || flLineLength < 8.0f )
     {
-        for ( int i = 0; i < g_pZombies->Count(); i++ )
-        {
-            CZMBaseZombie* pZombie = g_pZombies->Element( i );
-
-            if ( pZombie && pZombie->GetSelectorIndex() == myindex )
-                pZombie->Command( start, true );
-        }
-
+        ZMUtil::MoveSelectedZombies( pPlayer->entindex(), start );
         return;
     }
 
@@ -974,30 +923,26 @@ void ZM_Cmd_MoveToLine( const CCommand &args )
     // Move selected zombies into a sorted list, from closest to farthest.
     CUtlVector<CZMBaseZombie*> vZombies;
 
-    for ( int i = 0; i < g_pZombies->Count(); i++ )
+    g_ZombieManager.ForEachSelectedZombie( pPlayer, [ &vZombies, &start ]( CZMBaseZombie* pZombie )
     {
-        CZMBaseZombie* pZombie = g_pZombies->Element( i );
-        if ( pZombie && pZombie->GetSelectorIndex() == myindex )
+        int j = 0;
+        int len = vZombies.Count();
+        for (; j < len; j++ )
         {
-            int j = 0;
-            int len = vZombies.Count();
-            for (; j < len; j++ )
-            {
-                // Is current zombie closer?
-                if ( pZombie->GetAbsOrigin().DistToSqr( start ) < vZombies[j]->GetAbsOrigin().DistToSqr( start ) )
-                    break;
-            }
-
-            if ( j != len )
-            {
-                vZombies.InsertBefore( j, pZombie );
-            }
-            else
-            {
-                vZombies.AddToTail( pZombie );
-            }
+            // Is current zombie closer?
+            if ( pZombie->GetAbsOrigin().DistToSqr( start ) < vZombies[j]->GetAbsOrigin().DistToSqr( start ) )
+                break;
         }
-    }
+
+        if ( j != len )
+        {
+            vZombies.InsertBefore( j, pZombie );
+        }
+        else
+        {
+            vZombies.AddToTail( pZombie );
+        }
+    } );
 
 
     trace_t trace;
@@ -1022,7 +967,7 @@ void ZM_Cmd_MoveToLine( const CCommand &args )
         }
 
 
-        vZombies[i]->Command( command, true );
+        vZombies[i]->Command( command );
 
         walk += add;
     }
