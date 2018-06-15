@@ -2393,7 +2393,7 @@ bool CZMWeaponCarry::CanPickupObject( CBaseEntity *pTarget )
         {
             for ( link = root->nextLink; link != root; link = link->nextLink )
             {
-                if ( link->entity && (link->entity->IsNPC() || link->entity->IsPlayer()) )
+                if ( link->entity && (link->entity->IsBaseZombie() || link->entity->IsPlayer()) )
                 {
                     return false;
                 }

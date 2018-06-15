@@ -160,7 +160,7 @@ void ZM_ObserveZombie( const CCommand &args )
         trace_t tr;
         UTIL_TraceLine( pPlayer->EyePosition(), pPlayer->EyeDirection3D() * MAX_COORD_FLOAT, MASK_NPCSOLID, pIgnore, COLLISION_GROUP_NPC, &tr );
 
-        if ( tr.m_pEnt && tr.m_pEnt->MyNPCPointer() )
+        if ( tr.m_pEnt )
         {
             pZombie = ToZMBaseZombie( tr.m_pEnt );
         }
@@ -182,13 +182,10 @@ void ZM_ObserveZombie( const CCommand &args )
         // Flip from players to zombies and vice versa.
         if ( !pCurTarget || pCurTarget->IsPlayer() )
         {
-            for ( i = 0; i < g_pZombies->Count(); i++ )
+            g_ZombieManager.ForEachAliveZombie( [ &vChars ]( CZMBaseZombie* pZombie )
             {
-                CZMBaseZombie* pZombie = g_pZombies->Element( i );
-
-                if ( pZombie && pZombie->IsAlive() )
-                    vChars.AddToTail( pZombie );
-            }
+                vChars.AddToTail( pZombie );
+            } );
         }
         else
         {

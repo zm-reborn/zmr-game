@@ -1,0 +1,36 @@
+// This file will override the game defaults when loading the map zmr_testmap.
+"ModelGroups"
+{
+	// Sets the default model group. If no entry exists for a zombie type, DefaultModels is assumed.
+	// This will affect:
+	// - Zombies spawned through hidden spawn
+	// - Zombies spawned from zombie spawns that don't have a model group defined.
+	// - Zombies spawned with npc_maker/npc_template_maker
+	"default_modelgroup"	"MyCustomGroup"
+	
+	"MyCustomGroup"
+	{
+		"Shambler"
+		{
+			"Model1"
+			{
+				"path"	"models/zombie/zm_classic_01.mdl"
+				"skin"	"0"
+			}
+		}
+	}
+	// You can edit pre-existing model groups.
+	// Do notice that this is only EDITING, not removing any entries.
+	"DefaultModels"
+	{
+		"Banshee"
+		{
+			// Edit the model named 'Model1', see zombiemodelgroups.txt for full list.
+			"Model1"
+			{
+				// Only use the first skin.
+				"skin"	"0"
+			}
+		}
+	}
+}

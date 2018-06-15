@@ -159,13 +159,10 @@ int ZMClientUtil::GetSelectedZombieCount()
 
     int num = 0;
 
-    for ( int i = 0; i < g_pZombies->Count(); i++ )
+    g_ZombieManager.ForEachSelectedZombie( myindex, [ &num ]( C_ZMBaseZombie* pZombie )
     {
-        if ( g_pZombies->Element( i )->GetSelectorIndex() == myindex )
-        {
-            ++num;
-        }
-    }
+        ++num;
+    } );
 
     return num;
 }
@@ -176,18 +173,11 @@ void ZMClientUtil::SelectAllZombies( bool bSendCommand )
     if ( !index ) return;
 
 
-    C_ZMBaseZombie* pZombie;
 
-    int len = g_pZombies->Count();
-    for ( int i = 0; i < len; i++ )
+    g_ZombieManager.ForEachZombie( [ index ]( C_ZMBaseZombie* pZombie )
     {
-        pZombie = g_pZombies->Element( i );
-
-        if ( pZombie )
-        {
-            pZombie->SetSelector( index );
-        }
-    }
+        pZombie->SetSelector( index );
+    } );
 
 
     if ( bSendCommand )
@@ -203,18 +193,11 @@ void ZMClientUtil::DeselectAllZombies( bool bSendCommand )
     if ( !index ) return;
 
 
-    C_ZMBaseZombie* pZombie;
 
-    int len = g_pZombies->Count();
-    for ( int i = 0; i < len; i++ )
+    g_ZombieManager.ForEachSelectedZombie( index, []( C_ZMBaseZombie* pZombie )
     {
-        pZombie = g_pZombies->Element( i );
-
-        if ( pZombie && pZombie->GetSelectorIndex() == index )
-        {
-            pZombie->SetSelector( 0 );
-        }
-    }
+        pZombie->SetSelector( 0 );
+    } );
 
 
     if ( bSendCommand )
@@ -281,23 +264,15 @@ void ZMClientUtil::SelectZombies( const CUtlVector<C_ZMBaseZombie*>& vZombies, b
 
 int ZMClientUtil::GetGroupZombieCount( int group )
 {
-    C_ZMBaseZombie* pZombie;
-
     int num = 0;
 
-
-    for ( int i = 0; i < g_pZombies->Count(); i++ )
+    g_ZombieManager.ForEachZombie( [ group, &num ]( C_ZMBaseZombie* pZombie )
     {
-        pZombie = g_pZombies->Element( i );
-
-        if ( !pZombie ) continue;
-
-
         if ( pZombie->GetGroup() == group )
         {
             ++num;
         }
-    }
+    } );
 
     return num;
 }
@@ -309,15 +284,8 @@ void ZMClientUtil::SetSelectedGroup( int group )
     if ( !index ) return;
 
 
-    C_ZMBaseZombie* pZombie;
-
-    for ( int i = 0; i < g_pZombies->Count(); i++ )
+    g_ZombieManager.ForEachZombie( [ group, index ]( C_ZMBaseZombie* pZombie )
     {
-        pZombie = g_pZombies->Element( i );
-
-        if ( !pZombie ) continue;
-
-
         if ( pZombie->GetSelectorIndex() == index )
         {
             pZombie->SetGroup( group );
@@ -326,7 +294,7 @@ void ZMClientUtil::SetSelectedGroup( int group )
         {
             pZombie->SetGroup( INVALID_GROUP_INDEX );
         }
-    }
+    } );
 }
 
 void ZMClientUtil::SelectGroup( int group, bool force )
@@ -336,7 +304,6 @@ void ZMClientUtil::SelectGroup( int group, bool force )
     if ( !index ) return;
 
 
-    C_ZMBaseZombie* pZombie;
     CUtlVector<C_ZMBaseZombie*> vSelect;
     vSelect.Purge();
 
@@ -347,22 +314,17 @@ void ZMClientUtil::SelectGroup( int group, bool force )
     // Don't send selection if we've already selected that group.
     bool bNew = false;
     
-    for ( int i = 0; i < g_pZombies->Count(); i++ )
+    g_ZombieManager.ForEachZombie( [ &bNew, &vSelect, group, index ]( C_ZMBaseZombie* pZombie )
     {
-        pZombie = g_pZombies->Element( i );
+        if ( pZombie->GetGroup() == group )
+            vSelect.AddToTail( pZombie );
 
-        if ( pZombie )
+        if ((pZombie->GetGroup() == group && pZombie->GetSelectorIndex() != index)
+        ||  (pZombie->GetGroup() != group && pZombie->GetSelectorIndex() == index))
         {
-            if ( pZombie->GetGroup() == group )
-                vSelect.AddToTail( pZombie );
-
-            if ((pZombie->GetGroup() == group && pZombie->GetSelectorIndex() != index)
-            ||  (pZombie->GetGroup() != group && pZombie->GetSelectorIndex() == index))
-            {
-                bNew = true;
-            }
+            bNew = true;
         }
-    }
+    } );
 
     if ( bNew )
     {

@@ -7,6 +7,7 @@
 namespace ZMUtil
 {
     int GetSelectedZombieCount( int iPlayerIndex );
+    void MoveSelectedZombies( int iPlayerIndex, const Vector& vecPos );
 
     void PrintNotify( CBasePlayer* pPlayer, ZMChatNotifyType_t type, const char* msg );
     void PrintNotifyAll( ZMChatNotifyType_t type, const char* msg );
