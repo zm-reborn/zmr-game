@@ -35,7 +35,7 @@ public:
 
 
 #ifdef CLIENT_DLL
-    virtual CZMBaseCrosshair* GetWeaponCrosshair() const OVERRIDE { return ZMGetCrosshair( "Accurate" ); }
+    virtual CZMBaseCrosshair* GetWeaponCrosshair() const OVERRIDE { return ZMGetCrosshair( "Revolver" ); }
 #endif
 
 #ifndef CLIENT_DLL
@@ -59,8 +59,8 @@ public:
 #define VECTOR_CONE_45DEGREES       Vector( 0.38268f, 0.38268f, 0.38268f )
 #endif
             
-            // 18 degrees
-#define     SECONDARY_MIN_RATIO         0.4f
+            // 2 degrees
+#define     SECONDARY_MIN_RATIO         0.05f
 
             const bool bIsSecondary = GetActivity() == ACT_VM_SECONDARYATTACK;
 

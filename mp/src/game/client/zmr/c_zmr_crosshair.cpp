@@ -49,10 +49,10 @@ CZMBaseCrosshair* CZMCrosshairSystem::CreateCrosshairFromData( KeyValues* kv )
     {
         return new CZMAccuracyCrosshair;
     }
-    else if ( Q_stricmp( type, "pistol" ) == 0 )
+    /*else if ( Q_stricmp( type, "pistol" ) == 0 )
     {
         return new CZMPistolCrosshair;
-    }
+    }*/
     else if ( Q_stricmp( type, "dotonly" ) == 0 )
     {
         return new CZMDotCrosshair;
@@ -101,7 +101,9 @@ void CZMCrosshairSystem::WriteCrosshairsToFile() const
 
     FOR_EACH_VEC( m_vCrosshairs, i )
     {
-        m_vCrosshairs[i]->WriteValues( kv );
+        KeyValues* mykv = kv->FindKey( m_vCrosshairs[i]->GetName(), true );
+
+        m_vCrosshairs[i]->WriteValues( mykv );
     }
 
 
@@ -218,12 +220,21 @@ void CZMBaseCrosshair::WriteValues( KeyValues* kv ) const
     kv->SetBool( "displayinmenu", DisplayInMenu() );
     kv->SetString( "name", GetMenuName() );
 
-    kv->SetInt( "outline", GetOutlineWidth() );
-    kv->SetInt( "offsetfromcenter", GetOffsetFromCenter() );
-    kv->SetInt( "dot", GetDotSize() );
+    kv->SetFloat( "outline", GetOutlineWidth() );
+    kv->SetFloat( "offsetfromcenter", GetOffsetFromCenter() );
+    kv->SetFloat( "dot", GetDotSize() );
 
-    kv->SetColor( "color", GetMainColor() );
-    kv->SetColor( "outlinecolor", GetOutlineColor() );
+
+    char temp[64];
+    Color clr;
+    
+    clr = GetMainColor();
+    Q_snprintf( temp, sizeof( temp ), "%i %i %i %i", (int)clr[0], (int)clr[1], (int)clr[2], (int)clr[3] );
+    kv->SetString( "color", temp );
+
+    clr = GetOutlineColor();
+    Q_snprintf( temp, sizeof( temp ), "%i %i %i %i", (int)clr[0], (int)clr[1], (int)clr[2], (int)clr[3] );
+    kv->SetString( "outlinecolor", temp );
 }
 
 const Color& CZMBaseCrosshair::GetMainColor() const
@@ -308,7 +319,7 @@ void CZMDotCrosshair::WriteValues( KeyValues* kv ) const
 {
     CZMBaseCrosshair::WriteValues( kv );
 
-    kv->SetString( "type", "dot" );
+    kv->SetString( "type", "dotonly" );
 }
 
 void CZMDotCrosshair::Draw()
@@ -449,7 +460,13 @@ void CZMFontCrosshair::WriteValues( KeyValues* kv ) const
 
     kv->SetString( "type", "font" );
     kv->SetString( "fontchar", c );
-    kv->SetColor( "fontcolor", m_FontColor );
+
+
+    char temp[64];
+    Color clr;
+    clr = m_FontColor;
+    Q_snprintf( temp, sizeof( temp ), "%i %i %i %i", (int)clr[0], (int)clr[1], (int)clr[2], (int)clr[3] );
+    kv->SetString( "fontcolor", temp );
 }
 
 void CZMFontCrosshair::Draw()
