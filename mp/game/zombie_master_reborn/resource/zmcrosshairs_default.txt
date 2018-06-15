@@ -33,9 +33,9 @@
 		"color"	"255 255 255 255"
 		"outlinecolor"	"0 0 0 255"
 	}
-	"Accurate" // Rifle & revolver
+	"Rifle"
 	{
-		"name"	"Accurate"
+		"name"	"Rifle"
 		"type"	"dynamiccrosshair"
 		"dot"	"2"
 		"outline"	"1"
@@ -43,6 +43,19 @@
 		"width"		"2"
 		"length"	"15"
 		"dynamicmove"	"20"
+		"color"	"255 255 255 255"
+		"outlinecolor"	"0 0 0 255"
+	}
+	"Revolver"
+	{
+		"name"	"Revolver"
+		"type"	"dynamiccrosshair"
+		"dot"	"2"
+		"outline"	"1"
+		"offsetfromcenter"	"10"
+		"width"		"2"
+		"length"	"15"
+		"dynamicmove"	"30"
 		"color"	"255 255 255 255"
 		"outlinecolor"	"0 0 0 255"
 	}
