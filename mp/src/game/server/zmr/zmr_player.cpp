@@ -1623,3 +1623,13 @@ void CZMPlayer::State_PreThink_ACTIVE()
 
     UpdateLastKnownArea();
 }
+
+int CZMPlayer::GetZMCommandInterruptFlags() const
+{
+    const char* val = engine->GetClientConVarValue( entindex(), "zm_cl_zmunitcommandinterrupt" );
+
+    if ( !val || !(*val) )
+        return 0;
+
+    return atoi( val );
+}

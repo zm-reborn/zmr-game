@@ -229,7 +229,7 @@ public:
         }
     }
 
-    virtual void OnQueuedCommand( ZombieCommandType_t com ) OVERRIDE
+    virtual void OnQueuedCommand( CBasePlayer* pPlayer, ZombieCommandType_t com ) OVERRIDE
     {
         if ( com == COMMAND_CEILINGAMBUSH && !IsDone() )
         {
