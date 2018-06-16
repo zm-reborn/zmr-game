@@ -574,6 +574,11 @@ CBaseEntity* CZMBaseZombie::ClawAttack( float flDist, float flDamage, const QAng
 
     ClawImpactSound( bHit );
 
+
+    // Tell our components we just attacked.
+    OnAttacked();
+
+
     return nullptr;
 }
 
@@ -845,7 +850,7 @@ bool CZMBaseZombie::ShouldIgnite( const CTakeDamageInfo& info )
     return false;
 }
 
-bool CZMBaseZombie::Swat( CBaseEntity* pSwat, bool bBreak )
+bool CZMBaseZombie::Swat( CZMPlayer* pZM, CBaseEntity* pSwat, bool bBreak )
 {
     if ( !pSwat ) return false;
 
@@ -858,7 +863,7 @@ bool CZMBaseZombie::Swat( CBaseEntity* pSwat, bool bBreak )
 
 
     m_CmdQueue.QueueCommand( new CZMCommandSwat( pSwat, bBreak ) );
-    OnQueuedCommand( COMMAND_SWAT );
+    OnQueuedCommand( pZM, COMMAND_SWAT );
 
     return true;
 }
@@ -922,7 +927,7 @@ bool CZMBaseZombie::SwatObject( CBaseEntity* pSwat )
     return true;
 }
 
-void CZMBaseZombie::Command( const Vector& vecPos, bool bPlayerCommanded, float flTolerance )
+void CZMBaseZombie::Command( CZMPlayer* pZM, const Vector& vecPos, float flTolerance )
 {
     /*m_vecLastPosition = vecPos;
 
@@ -974,7 +979,7 @@ void CZMBaseZombie::Command( const Vector& vecPos, bool bPlayerCommanded, float 
 
 
     m_CmdQueue.QueueCommand( new CZMCommandMove( vecPos ) );
-    OnQueuedCommand( COMMAND_MOVE );
+    OnQueuedCommand( pZM, COMMAND_MOVE );
 }
 
 bool CZMBaseZombie::CanSpawn( const Vector& vecPos ) const

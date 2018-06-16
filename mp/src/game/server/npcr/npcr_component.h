@@ -41,7 +41,8 @@ namespace NPCR
         virtual void OnNavJump() {}
         // Zombie events
         virtual void OnCommanded( ZombieCommandType_t com ) {}
-        virtual void OnQueuedCommand( ZombieCommandType_t com ) {}
+        virtual void OnQueuedCommand( CBasePlayer* pPlayer, ZombieCommandType_t com ) {}
+        virtual void OnAttacked() {}
 
 
         // Queries
@@ -167,7 +168,8 @@ namespace NPCR
         COMP_DISPATCH_2ARG( OnTouch, CBaseEntity*, pEnt, trace_t*, pTrace )
         // Zombie events
         COMP_DISPATCH_1ARG( OnCommanded, ZombieCommandType_t, com )
-        COMP_DISPATCH_1ARG( OnQueuedCommand, ZombieCommandType_t, com )
+        COMP_DISPATCH_2ARG( OnQueuedCommand, CBasePlayer*, pPlayer, ZombieCommandType_t, com )
+        COMP_DISPATCH( OnAttacked )
 
         // Queries
         COMP_DISPATCH_Q( IsBusy )

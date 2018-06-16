@@ -248,6 +248,8 @@ public:
 
     inline float    GetNextModelChangeTime() { return m_flNextModelChangeTime; };
 
+    int             GetZMCommandInterruptFlags() const;
+
 private:
     // Since I didn't get this at first either, this is only sent to THIS player.
     CNetworkVarEmbedded( CZMPlayerLocalData, m_ZMLocal );
