@@ -24,6 +24,11 @@ void ZMUtil::MoveSelectedZombies( int iPlayerIndex, const Vector& vecPos )
         return;
 
 
+    CZMPlayer* pPlayer = ToZMPlayer( UTIL_PlayerByIndex( iPlayerIndex ) );
+    if ( !pPlayer )
+        return;
+
+
     Vector vecTracePos = vecPos;
     vecTracePos.z += 4.0f;
 
@@ -50,7 +55,7 @@ void ZMUtil::MoveSelectedZombies( int iPlayerIndex, const Vector& vecPos )
 
     if ( vZombies.Count() == 1 )
     {
-        vZombies[0]->Command( vecPos );
+        vZombies[0]->Command( pPlayer, vecPos );
         return;
     }
 
@@ -94,7 +99,7 @@ void ZMUtil::MoveSelectedZombies( int iPlayerIndex, const Vector& vecPos )
         trace_t tr;
         UTIL_TraceLine( vecTracePos, pos, mask, nullptr, COLLISION_GROUP_NONE, &tr );
 
-        vZombies[i]->Command( tr.endpos );
+        vZombies[i]->Command( pPlayer, tr.endpos );
     }
 }
 

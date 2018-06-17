@@ -10,6 +10,7 @@ NPCR::CNonPlayerMotor::CNonPlayerMotor( NPCR::CBaseNonPlayer* pNPC ) : NPCR::CBa
 {
     m_vecAcceleration = vec3_origin;
     m_vecVelocity = vec3_origin;
+    m_vecLastBaseVelocity = vec3_origin;
 }
 
 NPCR::CNonPlayerMotor::~CNonPlayerMotor()
@@ -111,16 +112,47 @@ void NPCR::CNonPlayerMotor::Move()
 
 
     // Do the actual moving.
+
+
     m_vecVelocity += m_vecAcceleration * flUpdateInterval;
+
+
+
+    // Apply base velocity (from trigger_push, etc.)
+    Vector vecBaseVel = GetOuter()->GetBaseVelocity();
+    bool bApplyBaseVel = ( vecBaseVel.LengthSqr() > 1.0f ) ? true : false;
+    
+    // If we're currently applying the base velocity, we simply substract it after moving.
+    // If we're done with base velocity, we need to apply it to the velocity as to keep the velocity.
+    if ( bApplyBaseVel )
+    {
+        m_vecVelocity += vecBaseVel;
+        m_vecLastBaseVelocity = vecBaseVel;
+    }
+    else
+    {
+        m_vecVelocity += m_vecLastBaseVelocity;
+        m_vecLastBaseVelocity = vec3_origin;
+    }
 
     MoveTowards( vecOrigPos + m_vecVelocity * flUpdateInterval );
 
+    if ( bApplyBaseVel )
+    {
+        m_vecVelocity -= vecBaseVel;
+    }
 
     // Adjust our velocity based on how much we moved.
-    if ( ShouldAdjustVelocity() )
+    if ( ShouldAdjustVelocity() && !bApplyBaseVel )
     {
         m_vecVelocity = ( GetNPC()->GetPosition() - vecOrigPos ) / flUpdateInterval;
     }
+
+    // Base velocity needs to be substracted.
+    //if ( bApplyBaseVel )
+    //{
+    //    m_vecVelocity -= vecBaseVel;
+    //}
 
 
 

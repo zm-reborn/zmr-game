@@ -118,9 +118,9 @@ public:
 
 
     static float GetSwatMaxMass();
-    virtual bool Swat( CBaseEntity* pSwat, bool bBreak = false );
+    virtual bool Swat( CZMPlayer* pZM, CBaseEntity* pSwat, bool bBreak = false );
     virtual bool SwatObject( CBaseEntity* pSwat );
-    virtual void Command( const Vector& vecPos, bool bPlayerCommanded = true, float flTolerance = 0.0f );
+    virtual void Command( CZMPlayer* pZM, const Vector& vecPos, float flTolerance = 0.0f );
     virtual Activity GetSwatActivity( CBaseEntity* pEnt, bool bBreak = true ) const { return ACT_MELEE_ATTACK1; }
 
     static bool     CanSwatObject( CBaseEntity* pEnt );

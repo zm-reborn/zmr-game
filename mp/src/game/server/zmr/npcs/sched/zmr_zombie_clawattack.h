@@ -8,6 +8,7 @@ class ClawAttackSched : public NPCR::CSchedule<CZMBaseZombie>
 private:
     CountdownTimer m_FinishTimer;
     Vector m_vecLastFacing;
+    bool m_bDidAttack;
 public:
     ClawAttackSched()
     {
@@ -23,6 +24,9 @@ public:
 
     virtual void OnStart() OVERRIDE
     {
+        m_bDidAttack = false;
+
+
         CZMBaseZombie* pOuter = GetOuter();
 
         CBaseEntity* pEnemy = pOuter->GetEnemy();
@@ -85,5 +89,32 @@ public:
     virtual NPCR::QueryResult_t ShouldChase( CBaseEntity* pEnemy ) const OVERRIDE
     {
         return (!IsDone()) ? NPCR::RES_NO : NPCR::RES_NONE;
+    }
+
+    virtual void OnAttacked() OVERRIDE
+    {
+        m_bDidAttack = true;
+    }
+
+    virtual void OnQueuedCommand( CBasePlayer* pPlayer, ZombieCommandType_t com ) OVERRIDE
+    {
+        // ZM wants us to do something else.
+
+        if ( !m_bDidAttack && pPlayer )
+        {
+            // Check if ZM wants for our attack to be interrupted.
+            int flags = ToZMPlayer( pPlayer )->GetZMCommandInterruptFlags();
+
+            if ( !(flags & ZCO_ATTACK) )
+                return;
+        }
+
+
+        TryEnd( "We were commanded to do something else!" );
+
+        if ( GetOuter()->GetActivity() == ACT_MELEE_ATTACK1 )
+        {
+            GetOuter()->SetActivity( ACT_IDLE );
+        }
     }
 };

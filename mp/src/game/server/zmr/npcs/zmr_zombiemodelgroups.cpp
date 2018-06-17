@@ -370,7 +370,12 @@ void CZMZombieModelGroupSystem::OnZombieSpawn( CZMBaseZombie* pZombie )
     {
         Warning( "Failed to find model group for zombie!\n" );
 
-        pZombie->SetModel( "models/error.mdl" );
+#define ERROR_MODEL     "models/error.mdl"
+
+        if ( CBaseEntity::PrecacheModel( ERROR_MODEL ) )
+        {
+            pZombie->SetModel( ERROR_MODEL );
+        }
     }
 }
 

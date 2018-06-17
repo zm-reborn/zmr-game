@@ -174,7 +174,7 @@ bool CZMBanshee::IsAttacking() const
 void CZMBanshee::StartCeilingAmbush()
 {
     GetCommandQueue()->QueueCommand( new CZMCommandCeilingAmbush );
-    OnQueuedCommand( COMMAND_CEILINGAMBUSH );
+    OnQueuedCommand( nullptr, COMMAND_CEILINGAMBUSH );
 }
 
 bool CZMBanshee::LeapAttack( const QAngle& angPunch, const Vector& vecPunchVel, float flDamage )

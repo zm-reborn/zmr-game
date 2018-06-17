@@ -28,12 +28,19 @@ class SwatObjSched : public NPCR::CSchedule<CZMBaseZombie>, public CZMSwatInt
 private:
     Vector m_vecFaceTowards;
     CountdownTimer m_FinishTimer;
+    Activity m_SwatAct;
+    bool m_bDidSwat;
+    CHandle<CBaseEntity> m_hSwatObject;
 public:
     virtual const char* GetName() const OVERRIDE { return "ZombieSwatObj"; }
 
 
     virtual void OnStart() OVERRIDE
     {
+        m_SwatAct = ACT_INVALID;
+        m_bDidSwat = false;
+
+
         CZMBaseZombie* pOuter = GetOuter();
 
         CBaseEntity* pSwat = pOuter->GetSwatObject();
@@ -44,7 +51,10 @@ public:
         }
 
 
-        if ( !pOuter->SetActivity( pOuter->GetSwatActivity( pSwat, DoBreakObject() ) ) )
+        m_hSwatObject.Set( pSwat );
+
+        m_SwatAct = pOuter->GetSwatActivity( pSwat, DoBreakObject() );
+        if ( !pOuter->SetActivity( m_SwatAct ) )
         {
             End( "Couldn't set swatting activity!" );
             return;
@@ -83,6 +93,8 @@ public:
             GetOuter()->HandledAnimEvent();
 
             DoSwatting();
+
+            m_bDidSwat = true;
         }
     }
 
@@ -92,10 +104,33 @@ public:
         return (!IsDone()) ? NPCR::RES_NO : NPCR::RES_NONE;
     }
 
+    virtual void OnQueuedCommand( CBasePlayer* pPlayer, ZombieCommandType_t com ) OVERRIDE
+    {
+        // ZM wants us to do something else.
+
+        // Allow by default if we finished swatting.
+        if ( !m_bDidSwat && pPlayer )
+        {
+            // Check if ZM wants for our swat to be interrupted.
+            int flags = ToZMPlayer( pPlayer )->GetZMCommandInterruptFlags();
+
+            if ( !(flags & ZCO_SWAT) )
+                return;
+        }
+
+
+        TryEnd( "We were commanded to do something else!" );
+
+        if ( GetOuter()->GetActivity() == m_SwatAct )
+        {
+            GetOuter()->SetActivity( ACT_IDLE );
+        }
+    }
+
     void DoSwatting()
     {
         CZMBaseZombie* pOuter = GetOuter();
-        if ( pOuter->SwatObject( pOuter->GetSwatObject() ) )
+        if ( pOuter->SwatObject( m_hSwatObject.Get() ) )
         {
             pOuter->EmitSound( "NPC_BaseZombie.Swat" );
         }

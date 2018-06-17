@@ -181,3 +181,12 @@ enum HappyZombieEvent_t
 
     HZEVENT_MAX
 };
+
+// What actions ZM is allowed to interrupt
+enum ZombieCommandInterrupt_t
+{
+    ZCO_NONE = 0,
+
+    ZCO_SWAT = ( 1 << 0 ),
+    ZCO_ATTACK = ( 1 << 1 )
+};
