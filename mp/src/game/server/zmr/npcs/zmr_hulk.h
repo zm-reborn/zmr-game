@@ -40,10 +40,10 @@ public:
     virtual NPCR::CPathCostGroundOnly*  GetPathCost() const OVERRIDE;
 
 
-    virtual void ScaleDamageByHitgroup( int iHitGroup, CTakeDamageInfo& info ) const OVERRIDE;
+    virtual bool ScaleDamageByHitgroup( int iHitGroup, CTakeDamageInfo& info ) const OVERRIDE;
 
 
-    virtual float GetClawAttackRange() const OVERRIDE { return 100.0f; }
+    virtual float GetClawAttackRange() const OVERRIDE { return 80.0f; }
     virtual float GetAttackHeight() const OVERRIDE { return CollisionProp()->OBBMaxs().z + 10.0f; }
 
 

@@ -17,6 +17,11 @@ Activity CZMShambler::ACT_ZOM_SWATLEFTLOW = ACT_INVALID;
 Activity CZMShambler::ACT_ZOM_SWATRIGHTMID = ACT_INVALID;
 Activity CZMShambler::ACT_ZOM_SWATRIGHTLOW = ACT_INVALID;
 
+extern ConVar zm_sk_shambler_hitmult_legs;
+extern ConVar zm_sk_shambler_hitmult_stomach;
+extern ConVar zm_sk_shambler_hitmult_chest;
+extern ConVar zm_sk_shambler_hitmult_arms;
+
 
 LINK_ENTITY_TO_CLASS( npc_zombie, CZMShambler );
 PRECACHE_REGISTER( npc_zombie );
@@ -183,6 +188,36 @@ Activity CZMShambler::GetSwatActivity( CBaseEntity* pEnt, bool bBreak ) const
 
         return ACT_ZOM_SWATLEFTLOW;
     }
+}
+
+bool CZMShambler::ScaleDamageByHitgroup( int iHitGroup, CTakeDamageInfo& info ) const
+{
+    bool res = BaseClass::ScaleDamageByHitgroup( iHitGroup, info );
+    if ( res )
+        return res;
+
+
+    switch ( iHitGroup )
+    {
+    case HITGROUP_LEFTARM :
+    case HITGROUP_RIGHTARM :
+        info.ScaleDamage( zm_sk_shambler_hitmult_arms.GetFloat() );
+        return true;
+    case HITGROUP_CHEST :
+        info.ScaleDamage( zm_sk_shambler_hitmult_chest.GetFloat() );
+        return true;
+    case HITGROUP_STOMACH :
+        info.ScaleDamage( zm_sk_shambler_hitmult_stomach.GetFloat() );
+        return true;
+    case HITGROUP_LEFTLEG :
+    case HITGROUP_RIGHTLEG :
+        info.ScaleDamage( zm_sk_shambler_hitmult_legs.GetFloat() );
+        return true;
+    default :
+        break;
+    }
+
+    return false;
 }
 
 void CZMShambler::AlertSound()

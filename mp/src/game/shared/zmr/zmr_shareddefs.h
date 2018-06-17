@@ -2,7 +2,7 @@
 
 
 #define ZMR_NAME        "Zombie Master: Reborn"
-#define ZMR_VERSION     "b1"
+#define ZMR_VERSION     "b2"
 
 
 #define ZMR_GAMEDESC    (ZMR_NAME" "ZMR_VERSION)
@@ -171,3 +171,22 @@ enum ZMChatNotifyType_t
 #define VEC_ZM_HULL_MIN     (ZMRules()->GetZMViewVectors()->m_vZMHullMin)
 #define VEC_ZM_HULL_MAX     (ZMRules()->GetZMViewVectors()->m_vZMHullMax)
 #define VEC_ZM_VIEW         (ZMRules()->GetZMViewVectors()->m_vZMView)
+
+enum HappyZombieEvent_t
+{
+    HZEVENT_INVALID = 0,
+
+    HZEVENT_CHRISTMAS,
+    HZEVENT_HULKAMANIA,
+
+    HZEVENT_MAX
+};
+
+// What actions ZM is allowed to interrupt
+enum ZombieCommandInterrupt_t
+{
+    ZCO_NONE = 0,
+
+    ZCO_SWAT = ( 1 << 0 ),
+    ZCO_ATTACK = ( 1 << 1 )
+};

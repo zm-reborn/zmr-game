@@ -3,12 +3,20 @@
 #include "nav_mesh.h"
 #include "nav_pathfind.h"
 
+#include "npcr_path_aigraph.h"
 #include "npcr_path_cost.h"
 
 namespace NPCR
 {
 #define MAX_PATH_LINKS   128
 
+
+    enum NavBuildMethod_t
+    {
+        BUILD_NAVMESH = 0,
+        BUILD_AIGRAPH,
+        BUILD_DIRECT
+    };
 
     enum NavTravel_t
     {
@@ -31,11 +39,14 @@ namespace NPCR
         float portalHalfWidth;
     };
 
-    class CBaseNavPath
+    class CBaseNavPath : public CAIGraphPath
     {
     public:
         CBaseNavPath();
         virtual ~CBaseNavPath();
+
+
+        virtual NavBuildMethod_t GetBuildMethod();
 
 
         // We must at least have 2 segments. (start & end)
@@ -49,17 +60,21 @@ namespace NPCR
         virtual void OnPathFailed();
 
 
-
         virtual bool Compute( const Vector& vecStart, const Vector& vecGoal, CNavArea* pStartArea, CNavArea* pGoalArea, const CBasePathCost& cost );
         virtual bool Compute( const Vector& vecStart, const Vector& vecGoal, const CBasePathCost& cost, float maxDistanceToArea = 10000.0f );
         virtual bool Compute( CBaseCombatCharacter* pNPC, CBaseCombatCharacter* pTarget, const CBasePathCost& cost );
         virtual bool Compute( CBaseCombatCharacter* pNPC, CBaseEntity* pTarget, const CBasePathCost& cost, float maxDistanceToArea = 10000.0f );
 
-        virtual bool ComputePathDetails( int count, const Vector& vecStart, CNavArea* pLastArea, const Vector& vecGoal, const CBasePathCost& cost );
+        virtual bool ComputeNavPathDetails( int count, const Vector& vecStart, CNavArea* pLastArea, const Vector& vecGoal, const CBasePathCost& cost );
 
         // Builds a simple straight path with 2 links.
         virtual bool BuildSimplePath( const Vector& vecStart, const Vector& vecGoal, bool bNoNavArea = false, float maxDistanceToArea = 10000.0f );
         virtual bool BuildSimplePath( const Vector& vecStart, const Vector& vecGoal, CNavArea* pStartArea, CNavArea* pGoalArea );
+
+
+        bool CheckSimpleLOS( const Vector& vecStart, const Vector& vecEnd, trace_t& tr ) const;
+
+
 
 
         bool ShouldDraw();
@@ -81,6 +96,10 @@ namespace NPCR
 
     protected:
         virtual void DrawSegment( const NavLink_t* from, const NavLink_t* to );
+
+
+        virtual bool BuildNavPath( const Vector& vecStart, const Vector& vecGoal, CNavArea* pStartArea, CNavArea* pGoalArea, const CBasePathCost& cost );
+        virtual bool BuildGraphPath( const Vector& vecStart, const Vector& vecGoal, const CBasePathCost& cost );
 
 
         int m_nLinkCount;

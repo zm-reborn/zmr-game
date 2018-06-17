@@ -7,11 +7,12 @@ abstract_class CZMBaseCrosshair
 {
 public:
     CZMBaseCrosshair();
+    ~CZMBaseCrosshair();
 
     virtual void LoadValues( KeyValues* kv );
     virtual void WriteValues( KeyValues* kv ) const;
 
-    virtual void Draw() const = 0;
+    virtual void Draw() = 0;
     virtual void GetDrawPosition( float& flPosX, float& flPosY ) const;
 
 
@@ -33,8 +34,8 @@ public:
 
 
     bool DisplayInMenu() const { return m_bDisplayInMenu; }
-    string_t GetName() const { return m_sName; }
-    string_t GetMenuName() const { return m_sMenuName; }
+    const char* GetName() const { return m_szName; }
+    const char* GetMenuName() const { return m_szMenuName; }
 
 protected:
     virtual void DrawDot() const;
@@ -46,8 +47,8 @@ protected:
 
 private:
     bool m_bDisplayInMenu;
-    string_t m_sName;
-    string_t m_sMenuName;
+    char* m_szName;
+    char* m_szMenuName;
     float m_flOutlineSize;
     float m_flOffsetFromCenter;
     float m_flDotSize;
@@ -61,7 +62,7 @@ class CZMEmptyCrosshair : public CZMBaseCrosshair
 {
 public:
     virtual void WriteValues( KeyValues* kv ) const OVERRIDE;
-    virtual void Draw() const OVERRIDE;
+    virtual void Draw() OVERRIDE;
 
 };
 //
@@ -97,7 +98,7 @@ class CZMDotCrosshair : public CZMBaseCrosshair
 public:
     virtual void WriteValues( KeyValues* kv ) const OVERRIDE;
 
-    virtual void Draw() const OVERRIDE;
+    virtual void Draw() OVERRIDE;
 };
 //
 
@@ -106,10 +107,13 @@ public:
 class CZMFontCrosshair : public CZMBaseCrosshair
 {
 public:
+    CZMFontCrosshair();
+
+
     virtual void LoadValues( KeyValues* kv ) OVERRIDE;
     virtual void WriteValues( KeyValues* kv ) const OVERRIDE;
 
-    virtual void Draw() const OVERRIDE;
+    virtual void Draw() OVERRIDE;
 
 
     const Color& GetFontColor() const { return m_FontColor; }
@@ -117,6 +121,7 @@ public:
 protected:
     Color m_FontColor;
     wchar_t m_wChar;
+    vgui::HFont m_hFont;
 };
 //
 
@@ -127,7 +132,7 @@ class CZMPistolCrosshair : public CZMBaseCrosshair
 public:
     virtual void LoadValues( KeyValues* kv ) OVERRIDE;
 
-    virtual void Draw() const OVERRIDE;
+    virtual void Draw() OVERRIDE;
 };
 //
 
@@ -140,7 +145,7 @@ public:
     virtual void WriteValues( KeyValues* kv ) const OVERRIDE;
 
 
-    virtual void Draw() const OVERRIDE;
+    virtual void Draw() OVERRIDE;
 
     virtual float GetWidth() const;
     virtual float GetLength() const;
@@ -190,6 +195,11 @@ static CZMBaseCrosshair* ZMGetCrosshair( const char* name )
     if ( !crosshair )
     {
         crosshair = g_ZMCrosshairs.GetCrosshairByName( name );
+
+        if ( !crosshair )
+        {
+            DevWarning( "Crosshair %s can't be found!\n", name );
+        }
     }
 
     return crosshair;

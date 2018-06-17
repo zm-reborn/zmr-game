@@ -146,7 +146,7 @@ public:
         TryEnd( "We were commanded to do something else!" );
     }
 
-    virtual void OnQueuedCommand( ZombieCommandType_t com ) OVERRIDE
+    virtual void OnQueuedCommand( CBasePlayer* pPlayer, ZombieCommandType_t com ) OVERRIDE
     {
         TryEnd( "We were commanded to do something else!" );
     }

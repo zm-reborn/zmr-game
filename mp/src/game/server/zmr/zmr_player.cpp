@@ -33,6 +33,9 @@ ConVar zm_sv_antiafk( "zm_sv_antiafk", "90", FCVAR_NOTIFY | FCVAR_ARCHIVE, "If t
 
 static ConVar zm_sv_npcheadpushoff( "zm_sv_npcheadpushoff", "200", FCVAR_NOTIFY | FCVAR_ARCHIVE, "How much force is applied to the player when standing on an NPC." );
 
+// This is for maps that use the OnBreak trick to name the ZM. This does not work in ZMR anymore.
+static ConVar zm_sv_comp_zmtargetname( "zm_sv_comp_zmtargetname", "", 0, "Gives the ZM a targetname on spawn. This is for compatibility with old maps!!!" );
+
 
 CUtlVector<CZMPlayerModelData*> CZMPlayer::m_PlayerModels;
 
@@ -557,7 +560,17 @@ void CZMPlayer::SetTeamSpecificProps()
     switch ( GetTeamNumber() )
     {
     case ZMTEAM_ZM :
+    {
         m_Local.m_iHideHUD |= HIDEHUD_HEALTH;
+
+        // This is for maps that use the OnBreak trick to name the ZM. This does not work in ZMR anymore.
+        const char* targetname = zm_sv_comp_zmtargetname.GetString();
+        if ( targetname && *targetname )
+        {
+            SetName( AllocPooledString( targetname ) );
+        }
+
+    }
     case ZMTEAM_SPECTATOR :
         RemoveAllItems( true );
 
@@ -1661,4 +1674,14 @@ void CZMPlayer::State_PreThink_ACTIVE()
 
 
     UpdateLastKnownArea();
+}
+
+int CZMPlayer::GetZMCommandInterruptFlags() const
+{
+    const char* val = engine->GetClientConVarValue( entindex(), "zm_cl_zmunitcommandinterrupt" );
+
+    if ( !val || !(*val) )
+        return 0;
+
+    return atoi( val );
 }

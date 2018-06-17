@@ -64,17 +64,27 @@ void CZMSystem::CheckSpecialDates()
         return;
 
 
-    ConVarRef pHappyZombies( "zm_sv_happyzombies" );
-
     time_t curtime;
     time( &curtime );
     tm* t = localtime( &curtime );
 
-    if (t->tm_mon == 11
-    /*||  */)
-    {
-        pHappyZombies.SetValue( 1 );
+    HappyZombieEvent_t iEvent = HZEVENT_INVALID;
 
+    // Christmas
+    if ( t->tm_mon == 11 )
+    {
+        iEvent = HZEVENT_CHRISTMAS;
+    }
+    // Hulkamania
+    else if ( t->tm_mon == 5 )
+    {
+        iEvent = HZEVENT_HULKAMANIA;
+    }
+
+
+    if ( iEvent != HZEVENT_INVALID )
+    {
+        ConVarRef( "zm_sv_happyzombies" ).SetValue( (int)iEvent );
         DevMsg( "Happy zombies activated by date!\n" );
     }
 }

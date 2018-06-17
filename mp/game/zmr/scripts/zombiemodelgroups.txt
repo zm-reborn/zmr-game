@@ -73,7 +73,7 @@
 		{
 			"Model1"
 			{
-				"path"	"models/humans/zm_dr4ggy.mdl"
+				"path"	"models/humans/zm_draggy.mdl"
 				"randomskin"	"1"
 			}
 		}

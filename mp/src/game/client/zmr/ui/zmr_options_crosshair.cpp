@@ -6,37 +6,38 @@
 
 CZMOptionsSubCrosshair::CZMOptionsSubCrosshair( Panel* parent ) : BaseClass( parent )
 {
+    m_iCurCrosshair = -1;
+
+
     LoadControlSettings( "resource/ui/zmoptionssubcrosshair.res" );
 
 
     LoadItem( &m_pCrosshairPanel, "CrosshairDraw" );
     LoadItem( &m_pCrosshairCombo, "CrosshairCombo" );
-    LoadItem( &m_pColorRed, "ColorRed" );
-    LoadItem( &m_pColorGreen, "ColorGreen" );
-    LoadItem( &m_pColorBlue, "ColorBlue" );
-    LoadItem( &m_pColorAlpha, "ColorAlpha" );
-    LoadItem( &m_pOutlineColorRed, "OutlineColorRed" );
-    LoadItem( &m_pOutlineColorGreen, "OutlineColorGreen" );
-    LoadItem( &m_pOutlineColorBlue, "OutlineColorBlue" );
-    LoadItem( &m_pOutlineColorAlpha, "OutlineColorAlpha" );
+    LoadItem( &m_pSlider_ColorR, "SliderColorR" );
+    LoadItem( &m_pSlider_ColorG, "SliderColorG" );
+    LoadItem( &m_pSlider_ColorB, "SliderColorB" );
+    LoadItem( &m_pSlider_ColorA, "SliderColorA" );
     LoadItem( &m_pOutlineSize, "OutlineSize" );
-    LoadItem( &m_pCrossType, "CrossType" );
+    LoadItem( &m_pDotSize, "DotSize" );
     LoadItem( &m_pDynMove, "DynMove" );
     LoadItem( &m_pOffsetFromCenter, "OffsetFromCenter" );
 
     if ( FailedLoad() ) return;
 
 
+    m_pSlider_ColorR->SetRange( 0, 255 );
+    m_pSlider_ColorG->SetRange( 0, 255 );
+    m_pSlider_ColorB->SetRange( 0, 255 );
+    m_pSlider_ColorA->SetRange( 0, 255 );
+
+
+    // Copy the crosshairs, so we can safely edit the values without changing the real in-game crosshair.
     KeyValues* tempkv = new KeyValues( "data" );
     CUtlVector<CZMBaseCrosshair*>* crosses = g_ZMCrosshairs.GetCrosshairs();
     for ( int i = 0; i < crosses->Count(); i++ )
     {
-        if ( !crosses->Element( i )->DisplayInMenu() )
-            continue;
-
-
-        KeyValues* kv = new KeyValues( "Crosshairs" );
-        KeyValues* crossdata = kv->FindKey( STRING( crosses->Element( i )->GetName() ), true );
+        KeyValues* crossdata = new KeyValues( crosses->Element( i )->GetName() );
         crosses->Element( i )->WriteValues( crossdata );
 
         CZMBaseCrosshair* pOurCross = CZMCrosshairSystem::CreateCrosshairFromData( crossdata );
@@ -45,19 +46,29 @@ CZMOptionsSubCrosshair::CZMOptionsSubCrosshair( Panel* parent ) : BaseClass( par
             pOurCross->LoadValues( crossdata );
 
             int index = m_vCrosshairs.AddToTail( pOurCross );
-            tempkv->SetInt( "index", index );
-            m_pCrosshairCombo->AddItem( crosses->Element( i )->GetMenuName(), tempkv );
+            tempkv->SetInt( "crosshairindex", index );
+
+            if ( pOurCross->DisplayInMenu() )
+            {
+                m_pCrosshairCombo->AddItem( crosses->Element( i )->GetMenuName(), tempkv );
+            }
         }
 
-        kv->deleteThis();
+        crossdata->deleteThis();
     }
 
     tempkv->deleteThis();
 
+
+    // Init the panel
     if ( m_vCrosshairs.IsValidIndex( 0 ) )
     {
         m_pCrosshairCombo->ActivateItemByRow( 0 );
         m_pCrosshairPanel->SetCrosshairToDraw( m_vCrosshairs[0] );
+
+
+        m_iCurCrosshair = 0;
+        UpdateSettings();
     }
 }
 
@@ -76,32 +87,90 @@ void CZMOptionsSubCrosshair::OnApplyChanges()
 {
     if ( FailedLoad() ) return;
 
+
+    // We want these changes, copy our data over to the in-game crosshairs.
+    CUtlVector<CZMBaseCrosshair*>* crosses = g_ZMCrosshairs.GetCrosshairs();
+    Assert( crosses->Count() == m_vCrosshairs.Count() );
+
+
+    FOR_EACH_VEC( m_vCrosshairs, i )
+    {
+        KeyValues* tempkv = new KeyValues( m_vCrosshairs[i]->GetName() );
+
+        m_vCrosshairs[i]->WriteValues( tempkv );
+
+        crosses->Element( i )->LoadValues( tempkv );
+
+        tempkv->deleteThis();
+    }
+
+    // Write the changes to our config file.
+    g_ZMCrosshairs.WriteCrosshairsToFile();
 }
 
 void CZMOptionsSubCrosshair::OnResetData()
 {
     if ( FailedLoad() ) return;
 
+    
+
+    // Reset our to the in-game equivalent
+
+    CUtlVector<CZMBaseCrosshair*>* crosses = g_ZMCrosshairs.GetCrosshairs();
+    if ( crosses->Count() != m_vCrosshairs.Count() )
+        return;
+
+
+    for ( int i = 0; i < crosses->Count(); i++ )
+    {
+        KeyValues* tempkv = new KeyValues( crosses->Element( i )->GetName() );
+
+        crosses->Element( i )->WriteValues( tempkv );
+
+        m_vCrosshairs[i]->LoadValues( tempkv );
+
+        tempkv->deleteThis();
+    }
 }
 
-void CZMOptionsSubCrosshair::OnComboChanged( KeyValues* kv )
+void CZMOptionsSubCrosshair::OnComboChanged( Panel* panel )
 {
-    if ( !FailedLoad() )
+    if ( FailedLoad() )
+        return;
+
+
+    // Something changed...
+
+    if ( panel == m_pCrosshairCombo )
     {
-        KeyValues* kv = m_pCrosshairCombo->GetActiveItemUserData();
-        int i = kv->GetInt( "index", -1 );
+        KeyValues* mykv = m_pCrosshairCombo->GetActiveItemUserData();
 
-        if ( m_vCrosshairs.IsValidIndex( i ) )
+        int i = mykv->GetInt( "crosshairindex", -1 );
+
+        if ( m_iCurCrosshair != i && m_vCrosshairs.IsValidIndex( i ) )
         {
-            
-
             m_pCrosshairPanel->SetCrosshairToDraw( m_vCrosshairs[i] );
+            m_iCurCrosshair = i;
+
+            UpdateSettings();
         }
-        else
-        {
-            UpdateCrosshair( i );
-        }
+
+        return;
     }
+
+
+
+    UpdateCrosshair();
+}
+
+void CZMOptionsSubCrosshair::OnSliderMoved( Panel* panel )
+{
+    if ( FailedLoad() ) return;
+
+
+    // Something changed...
+
+    UpdateCrosshair();
 }
 
 void CZMOptionsSubCrosshair::UpdateSettings( int index )
@@ -109,42 +178,39 @@ void CZMOptionsSubCrosshair::UpdateSettings( int index )
     if ( FailedLoad() )
         return;
 
+    if ( !m_vCrosshairs.IsValidIndex( index ) )
+    {
+        index = m_iCurCrosshair;
+        if ( !m_vCrosshairs.IsValidIndex( index ) ) return;
+    }
+
+
+    // Update the ui elements to fit the crosshair data.
+
 
     CZMBaseCrosshair* pCross = m_vCrosshairs[index];
 
 
-    KeyValues* kv = new KeyValues( "data" );
-
+    KeyValues* kv = new KeyValues( pCross->GetName() );
     pCross->WriteValues( kv );
 
-    char temp[64];
+
     Color clr;
 
     clr = kv->GetColor( "color" );
-    Q_snprintf( temp, sizeof( temp ), "%i", clr[0] );
-    m_pColorRed->SetText( temp );
-    Q_snprintf( temp, sizeof( temp ), "%i", clr[1] );
-    m_pColorGreen->SetText( temp );
-    Q_snprintf( temp, sizeof( temp ), "%i", clr[2] );
-    m_pColorBlue->SetText( temp );
-    Q_snprintf( temp, sizeof( temp ), "%i", clr[3] );
-    m_pColorAlpha->SetText( temp );
+    m_pSlider_ColorR->SetValue( clr[0], false );
+    m_pSlider_ColorG->SetValue( clr[1], false );
+    m_pSlider_ColorB->SetValue( clr[2], false );
+    m_pSlider_ColorA->SetValue( clr[3], false );
 
 
-    clr = kv->GetColor( "outlinecolor" );
-    Q_snprintf( temp, sizeof( temp ), "%i", clr[0] );
-    m_pOutlineColorRed->SetText( temp );
-    Q_snprintf( temp, sizeof( temp ), "%i", clr[1] );
-    m_pOutlineColorGreen->SetText( temp );
-    Q_snprintf( temp, sizeof( temp ), "%i", clr[2] );
-    m_pOutlineColorBlue->SetText( temp );
-    Q_snprintf( temp, sizeof( temp ), "%i", clr[3] );
-    m_pOutlineColorAlpha->SetText( temp );
+    m_pOutlineSize->SetValue( kv->GetFloat( "outline" ), false );
 
-    Q_snprintf( temp, sizeof( temp ), "%i", kv->GetFloat( "outline" ) );
-    m_pOutlineSize->SetText( temp );
+    m_pDotSize->SetValue( kv->GetFloat( "dot" ), false );
 
+    m_pOffsetFromCenter->SetValue( kv->GetFloat( "offsetfromcenter" ), false );
 
+    m_pDynMove->SetValue( kv->GetFloat( "dynamicmove" ), false );
 
     pCross->LoadValues( kv );
 
@@ -158,37 +224,38 @@ void CZMOptionsSubCrosshair::UpdateCrosshair( int index )
     if ( FailedLoad() )
         return;
 
+    if ( !m_vCrosshairs.IsValidIndex( index ) )
+    {
+        index = m_iCurCrosshair;
+        if ( !m_vCrosshairs.IsValidIndex( index ) ) return;
+    }
+
+
+    // Update the display crosshair to fit the settings.
 
     CZMBaseCrosshair* pCross = m_vCrosshairs[index];
 
 
-    KeyValues* kv = new KeyValues( STRING( pCross->GetName() ) );
-
+    KeyValues* kv = new KeyValues( pCross->GetName() );
     pCross->WriteValues( kv );
 
 
     Color clr;
 
-    
 
-    clr[0] = m_pColorRed->GetValueAsInt();
-    clr[1] = m_pColorGreen->GetValueAsInt();
-    clr[2] = m_pColorBlue->GetValueAsInt();
-    clr[3] = m_pColorAlpha->GetValueAsInt();
+    clr[0] = m_pSlider_ColorR->GetValue();
+    clr[1] = m_pSlider_ColorG->GetValue();
+    clr[2] = m_pSlider_ColorB->GetValue();
+    clr[3] = m_pSlider_ColorA->GetValue();
 
     kv->SetColor( "color", clr );
 
+    kv->SetFloat( "outline", m_pOutlineSize->GetValue() );
 
-    clr[0] = m_pOutlineColorRed->GetValueAsInt();
-    clr[1] = m_pOutlineColorGreen->GetValueAsInt();
-    clr[2] = m_pOutlineColorBlue->GetValueAsInt();
-    clr[3] = m_pOutlineColorAlpha->GetValueAsInt();
-    kv->SetColor( "outlinecolor", clr );
+    kv->SetFloat( "dot", m_pDotSize->GetValue() );
 
-
-    kv->SetFloat( "outline", m_pOutlineSize->GetValueAsInt() );
-
-
+    kv->SetFloat( "offsetfromcenter", m_pOffsetFromCenter->GetValue() );
+    kv->SetFloat( "dynamicmove", m_pDynMove->GetValue() );
 
 
     pCross->LoadValues( kv );

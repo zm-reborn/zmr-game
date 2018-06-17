@@ -125,6 +125,11 @@ void CZMDrifter::HandleAnimEvent( animevent_t* pEvent )
 
         EmitSound( "NPC_DragZombie.MeleeAttack" );
 
+
+        // Tell our components we just attacked.
+        OnAttacked();
+
+
         return;
     }
 

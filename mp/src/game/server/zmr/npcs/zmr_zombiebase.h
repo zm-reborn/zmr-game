@@ -75,7 +75,7 @@ public:
     virtual void            Event_Killed( const CTakeDamageInfo& info ) OVERRIDE;
     virtual int             OnTakeDamage_Alive( const CTakeDamageInfo& inputInfo ) OVERRIDE;
     virtual void            TraceAttack( const CTakeDamageInfo& inputInfo, const Vector& vecDir, trace_t* pTrace, CDmgAccumulator* pAccumulator ) OVERRIDE;
-    virtual void            ScaleDamageByHitgroup( int iHitGroup, CTakeDamageInfo& info ) const;
+    virtual bool            ScaleDamageByHitgroup( int iHitGroup, CTakeDamageInfo& info ) const;
 
 
     virtual bool            Event_Gibbed( const CTakeDamageInfo& info ) OVERRIDE;
@@ -118,9 +118,9 @@ public:
 
 
     static float GetSwatMaxMass();
-    virtual bool Swat( CBaseEntity* pSwat, bool bBreak = false );
+    virtual bool Swat( CZMPlayer* pZM, CBaseEntity* pSwat, bool bBreak = false );
     virtual bool SwatObject( CBaseEntity* pSwat );
-    virtual void Command( const Vector& vecPos, bool bPlayerCommanded = true, float flTolerance = 0.0f );
+    virtual void Command( CZMPlayer* pZM, const Vector& vecPos, float flTolerance = 0.0f );
     virtual Activity GetSwatActivity( CBaseEntity* pEnt, bool bBreak = true ) const { return ACT_MELEE_ATTACK1; }
 
     static bool     CanSwatObject( CBaseEntity* pEnt );

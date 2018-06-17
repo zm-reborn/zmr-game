@@ -54,6 +54,8 @@ ConVar zm_cl_mwheelmovespd( "zm_cl_mwheelmovespd", "400", FCVAR_ARCHIVE );
 // Yes, unfortunately because of how FOV is used, we need to change it on the server.
 ConVar zm_cl_fov( "zm_cl_fov", "90", FCVAR_USERINFO | FCVAR_ARCHIVE, "What is our default field of view when playing.", true, ZM_MIN_FOV, true, MAX_FOV );
 
+ConVar zm_cl_zmunitcommandinterrupt( "zm_cl_zmunitcommandinterrupt", "0", FCVAR_USERINFO | FCVAR_ARCHIVE, "What commands you as the ZM can interrupt. 0 = None, 1 = Stop swat, 2 = Stop attack, 3 = Stop both", true, 0.0f, false, 0.0f );
+
 
 
 #undef CZMPlayer // We need to undefine it so we can get the server class.

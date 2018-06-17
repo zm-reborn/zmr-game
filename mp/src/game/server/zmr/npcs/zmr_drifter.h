@@ -23,7 +23,7 @@ public:
 
 
     // Drifter doesn't get any damage changes.
-    virtual void ScaleDamageByHitgroup( int iHitGroup, CTakeDamageInfo& info ) const OVERRIDE {}
+    virtual bool ScaleDamageByHitgroup( int iHitGroup, CTakeDamageInfo& info ) const OVERRIDE { return false; }
 
 
     virtual float GetClawAttackRange() const OVERRIDE { return 112.0f; }

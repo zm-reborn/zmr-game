@@ -3,6 +3,7 @@
 #include "npcr_path_cost.h"
 
 
+// NAV path cost
 float NPCR::CPathCostGroundOnly::operator()( CNavArea* area, CNavArea* fromArea, const CNavLadder* ladder, const CFuncElevator* elevator, float length ) const
 {
     // This is the first area, initial cost is 0.
@@ -13,7 +14,7 @@ float NPCR::CPathCostGroundOnly::operator()( CNavArea* area, CNavArea* fromArea,
 
     // No ladders or elevators for now.
     if ( ladder || elevator )
-        return -1.0f;
+        return PATHCOST_INVALID;
 
 
     // ZMRTODO: The updates are very slow. Have to try updating the block status here?
@@ -23,14 +24,14 @@ float NPCR::CPathCostGroundOnly::operator()( CNavArea* area, CNavArea* fromArea,
 
         //if ( area->IsBlocked( TEAM_ANY ) )
             //return -1.0f;
-        return -1.0f;
+        return PATHCOST_INVALID;
     }
             
     // The step up is too high.
     float height = fromArea->ComputeAdjacentConnectionHeightChange( area );
     if ( height > GetMaxHeightChange() )
     {
-        return -1.0f;
+        return PATHCOST_INVALID;
     }
 
     // ZMRTODO: Add something to check for height.
@@ -72,7 +73,46 @@ float NPCR::CPathCostGroundOnly::operator()( CNavArea* area, CNavArea* fromArea,
         length += m_vecEnd.DistTo( pos );
     }
 
+    // This must be a jump, increase the cost.
+    if ( height > GetStepHeight() )
+        length *= 2.0f;
+
     float cost = length + fromArea->GetCostSoFar();
 
     return cost;
+}
+
+// AI Graph path cost
+float NPCR::CPathCostGroundOnly::operator()( const Vector& vecNodePos, const Vector& vecTestPos, int fCapBitMask ) const
+{
+    // This path isn't possible for our hull / it's disabled.
+    if ( !fCapBitMask )
+        return PATHCOST_INVALID;
+
+
+    Vector dir = vecTestPos - vecNodePos;
+
+
+
+
+    float dist = (vecNodePos - vecTestPos).Length();
+
+
+    if ( fCapBitMask & bits_CAP_MOVE_JUMP )
+    {
+        float maxheight = GetMaxHeightChange();
+
+        // We can't jump.
+        if ( GetStepHeight() == maxheight )
+            return PATHCOST_INVALID;
+
+        // The step up is too high.
+        if ( dir.z > maxheight )
+            return PATHCOST_INVALID;
+
+        dist *= 2.0f;
+    }
+
+
+    return dist;
 }

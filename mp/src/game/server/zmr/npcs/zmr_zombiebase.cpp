@@ -146,6 +146,8 @@ ConVar zm_sv_defense_goal_tolerance( "zm_sv_defense_goal_tolerance", "64", FCVAR
 ConVar zm_sv_debug_zombieattack( "zm_sv_debug_zombieattack", "0" );
 
 
+extern ConVar zm_sk_default_hitmult_head;
+
 
 
 
@@ -572,6 +574,11 @@ CBaseEntity* CZMBaseZombie::ClawAttack( float flDist, float flDamage, const QAng
 
     ClawImpactSound( bHit );
 
+
+    // Tell our components we just attacked.
+    OnAttacked();
+
+
     return nullptr;
 }
 
@@ -707,22 +714,27 @@ void CZMBaseZombie::TraceAttack( const CTakeDamageInfo& inputInfo, const Vector&
     BaseClass::TraceAttack( info, vecDir, pTrace, pAccumulator );
 }
 
-void CZMBaseZombie::ScaleDamageByHitgroup( int iHitGroup, CTakeDamageInfo& info ) const
+bool CZMBaseZombie::ScaleDamageByHitgroup( int iHitGroup, CTakeDamageInfo& info ) const
 {
-    switch( iHitGroup )
+    // Don't scale explosive damage.
+    if ( info.GetDamageType() & DMG_BLAST )
+        return true;
+
+
+    switch ( iHitGroup )
     {
     case HITGROUP_HEAD :
         {
-            if( info.GetDamageType() & DMG_BUCKSHOT )
+            if ( info.GetDamageType() & DMG_BUCKSHOT )
             {
-                float flDist = FLT_MAX;
+                float flDistSqr = FLT_MAX;
 
-                if( info.GetAttacker() )
+                if ( info.GetAttacker() )
                 {
-                    flDist = ( GetAbsOrigin() - info.GetAttacker()->GetAbsOrigin() ).Length();
+                    flDistSqr = ( GetAbsOrigin() - info.GetAttacker()->GetAbsOrigin() ).LengthSqr();
                 }
 
-                if( flDist <= ZOMBIE_BUCKSHOT_TRIPLE_DAMAGE_DIST )
+                if ( flDistSqr <= (ZOMBIE_BUCKSHOT_TRIPLE_DAMAGE_DIST*ZOMBIE_BUCKSHOT_TRIPLE_DAMAGE_DIST) )
                 {
                     info.ScaleDamage( 3.0f );
                 }
@@ -734,10 +746,14 @@ void CZMBaseZombie::ScaleDamageByHitgroup( int iHitGroup, CTakeDamageInfo& info 
             }
             else
             {
-                info.ScaleDamage( 2.0f );
+                info.ScaleDamage( zm_sk_default_hitmult_head.GetFloat() );
             }
+
+            return true;
         }
     }
+
+    return false;
 }
 
 void CZMBaseZombie::Event_Killed( const CTakeDamageInfo& info )
@@ -834,7 +850,7 @@ bool CZMBaseZombie::ShouldIgnite( const CTakeDamageInfo& info )
     return false;
 }
 
-bool CZMBaseZombie::Swat( CBaseEntity* pSwat, bool bBreak )
+bool CZMBaseZombie::Swat( CZMPlayer* pZM, CBaseEntity* pSwat, bool bBreak )
 {
     if ( !pSwat ) return false;
 
@@ -847,7 +863,7 @@ bool CZMBaseZombie::Swat( CBaseEntity* pSwat, bool bBreak )
 
 
     m_CmdQueue.QueueCommand( new CZMCommandSwat( pSwat, bBreak ) );
-    OnQueuedCommand( COMMAND_SWAT );
+    OnQueuedCommand( pZM, COMMAND_SWAT );
 
     return true;
 }
@@ -911,7 +927,7 @@ bool CZMBaseZombie::SwatObject( CBaseEntity* pSwat )
     return true;
 }
 
-void CZMBaseZombie::Command( const Vector& vecPos, bool bPlayerCommanded, float flTolerance )
+void CZMBaseZombie::Command( CZMPlayer* pZM, const Vector& vecPos, float flTolerance )
 {
     /*m_vecLastPosition = vecPos;
 
@@ -963,7 +979,7 @@ void CZMBaseZombie::Command( const Vector& vecPos, bool bPlayerCommanded, float 
 
 
     m_CmdQueue.QueueCommand( new CZMCommandMove( vecPos ) );
-    OnQueuedCommand( COMMAND_MOVE );
+    OnQueuedCommand( pZM, COMMAND_MOVE );
 }
 
 bool CZMBaseZombie::CanSpawn( const Vector& vecPos ) const
