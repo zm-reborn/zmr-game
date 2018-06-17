@@ -47,5 +47,6 @@ namespace NPCR
         bool m_bDoDecelerate;
         Vector m_vecAcceleration;
         Vector m_vecVelocity;
+        Vector m_vecLastBaseVelocity;
     };
 }

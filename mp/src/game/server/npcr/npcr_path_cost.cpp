@@ -100,8 +100,14 @@ float NPCR::CPathCostGroundOnly::operator()( const Vector& vecNodePos, const Vec
 
     if ( fCapBitMask & bits_CAP_MOVE_JUMP )
     {
+        float maxheight = GetMaxHeightChange();
+
+        // We can't jump.
+        if ( GetStepHeight() == maxheight )
+            return PATHCOST_INVALID;
+
         // The step up is too high.
-        if ( dir.z > GetMaxHeightChange() )
+        if ( dir.z > maxheight )
             return PATHCOST_INVALID;
 
         dist *= 2.0f;

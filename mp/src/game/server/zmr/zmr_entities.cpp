@@ -525,7 +525,7 @@ bool CZMEntZombieSpawn::CreateZombie( ZombieClass_t zclass )
         ang.y = RAD2DEG( atan2f( dir.y, dir.x ) );
         pZombie->SetAbsAngles( ang );
 
-        pZombie->Command( m_pRallyPoint->GetAbsOrigin(), false, 256.0f ); // Some additional tolerance.
+        pZombie->Command( nullptr, m_pRallyPoint->GetAbsOrigin(), 256.0f ); // Some additional tolerance.
     }
     
 

@@ -101,7 +101,7 @@ void ZM_Cmd_Target( const CCommand &args )
     
 
 
-    g_ZombieManager.ForEachSelectedZombie( pPlayer, [ bSwat, bCanBeDamaged, bIsBreakable, bForceBreak, bTarget, pTarget, &pos ]( CZMBaseZombie* pZombie )
+    g_ZombieManager.ForEachSelectedZombie( pPlayer, [ bSwat, bCanBeDamaged, bIsBreakable, bForceBreak, bTarget, pTarget, &pos, pPlayer ]( CZMBaseZombie* pZombie )
     {
         bool bCanSwat = bSwat && pZombie->CanSwatPhysicsObjects();
         bool bCanBreak = bCanBeDamaged && ( pZombie->CanSwatPhysicsObjects() || bIsBreakable );
@@ -110,7 +110,7 @@ void ZM_Cmd_Target( const CCommand &args )
         {
             // If we can swat, we need to be forced to break.
             // If we can't swat, we'll break it!
-            pZombie->Swat( pTarget, (bCanSwat && bForceBreak && bCanBreak) || !bCanSwat );
+            pZombie->Swat( pPlayer, pTarget, (bCanSwat && bForceBreak && bCanBreak) || !bCanSwat );
         }
         else
         {
@@ -120,7 +120,7 @@ void ZM_Cmd_Target( const CCommand &args )
             }
             else
             {
-                pZombie->Command( pos );
+                pZombie->Command( pPlayer, pos );
             }
         }
     } );
@@ -967,7 +967,7 @@ void ZM_Cmd_MoveToLine( const CCommand &args )
         }
 
 
-        vZombies[i]->Command( command );
+        vZombies[i]->Command( pPlayer, command );
 
         walk += add;
     }
