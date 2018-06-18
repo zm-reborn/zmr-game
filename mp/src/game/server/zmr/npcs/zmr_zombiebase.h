@@ -21,12 +21,12 @@ class CZMBlockerScanner;
 class CZMEntAmbushTrigger;
 
 
-class CZMBaseZombie : public NPCR::CBaseNonPlayer, public CZMNPCLagCompensation
+class CZMBaseZombie : public CNPCRNonPlayer, public CZMNPCLagCompensation
 {
 public:
     typedef CZMBaseZombie ThisClass;
-    typedef NPCR::CBaseNonPlayer BaseClass;
-    //DECLARE_CLASS( CZMBaseZombie, NPCR::CBaseNonPlayer );
+    typedef CNPCRNonPlayer BaseClass;
+    //DECLARE_CLASS( CZMBaseZombie, CNPCRNonPlayer );
     DECLARE_SERVERCLASS();
     DECLARE_DATADESC();
 

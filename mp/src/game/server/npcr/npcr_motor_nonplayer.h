@@ -13,11 +13,11 @@ namespace NPCR
         typedef CNonPlayerMotor ThisClass;
         typedef CBaseMotor BaseClass;
 
-        CNonPlayerMotor( CBaseNonPlayer* pNPC );
+        CNonPlayerMotor( CNPCRNonPlayer* pNPC );
         ~CNonPlayerMotor();
 
 
-        virtual CBaseNonPlayer* GetOuter() const OVERRIDE;
+        virtual CNPCRNonPlayer* GetOuter() const OVERRIDE;
 
 
         virtual void Update() OVERRIDE;

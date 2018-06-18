@@ -8,9 +8,6 @@ class CBaseEntity;
 
 namespace NPCR
 {
-    class CBaseNonPlayer;
-
-
     class VisionEntity
     {
     public:
