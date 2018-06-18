@@ -7,7 +7,14 @@
 #include "npcr_senses.h"
 
 
-NPCR::CBaseNonPlayer::CBaseNonPlayer() : NPCR::CBaseNPC( this )
+BEGIN_DATADESC( CNPCRNonPlayer )
+    DEFINE_OUTPUT( m_OnDamaged, "OnDamaged" ),
+    DEFINE_OUTPUT( m_OnDamagedByPlayer, "OnDamagedByPlayer" ),
+    DEFINE_OUTPUT( m_OnDeath, "OnDeath" ),
+END_DATADESC()
+
+
+CNPCRNonPlayer::CNPCRNonPlayer() : NPCR::CBaseNPC( this )
 {
     m_bCurActivityLoops = false;
     m_iCurActivity = ACT_INVALID;
@@ -19,25 +26,30 @@ NPCR::CBaseNonPlayer::CBaseNonPlayer() : NPCR::CBaseNPC( this )
 
 
     m_iHealth = 0; // Set to 0 here, since keyvalues might set this to something else.
+
+
+
+
+    m_flLastDamageTime = 0.0f;
 }
 
-NPCR::CBaseNonPlayer::~CBaseNonPlayer()
+CNPCRNonPlayer::~CNPCRNonPlayer()
 {
 }
 
-void NPCR::CBaseNonPlayer::PostConstructor( const char* szClassname )
+void CNPCRNonPlayer::PostConstructor( const char* szClassname )
 {
     BaseClass::PostConstructor( szClassname );
 
     NPCR::CBaseNPC::PostConstructor();
 }
 
-NPCR::CBaseMotor* NPCR::CBaseNonPlayer::CreateMotor()
+NPCR::CBaseMotor* CNPCRNonPlayer::CreateMotor()
 {
-    return new CNonPlayerMotor( this );
+    return new NPCR::CNonPlayerMotor( this );
 }
 
-void NPCR::CBaseNonPlayer::Spawn()
+void CNPCRNonPlayer::Spawn()
 {
     BaseClass::Spawn();
 
@@ -55,7 +67,7 @@ void NPCR::CBaseNonPlayer::Spawn()
     SetActivity( ACT_IDLE );
 
 
-    SetThink( &NPCR::CBaseNonPlayer::NPCThink );
+    SetThink( &CNPCRNonPlayer::NPCThink );
     SetNextThink( gpGlobals->curtime );
 
     
@@ -109,19 +121,53 @@ void NPCR::CBaseNonPlayer::Spawn()
     }
 }
 
-int NPCR::CBaseNonPlayer::OnTakeDamage_Alive( const CTakeDamageInfo& info )
+int CNPCRNonPlayer::OnTakeDamage_Alive( const CTakeDamageInfo& info )
 {
-    int ret = BaseClass::OnTakeDamage_Alive( info );
+    if ( !BaseClass::OnTakeDamage_Alive( info ) )
+        return 0;
 
-    if ( ret )
+
+    OnDamaged( info );
+
+
+    //
+    // Fire outputs
+    //
+
+    // Don't fire this multiple times a frame.
+    if ( m_flLastDamageTime != gpGlobals->curtime )
     {
-        OnDamaged( info );
+        CBaseEntity* pAttacker = info.GetAttacker();
+
+        m_OnDamaged.FireOutput( pAttacker, this );
+
+        if ( pAttacker )
+        {
+            if ( pAttacker->IsPlayer() )
+            {
+                m_OnDamagedByPlayer.FireOutput( pAttacker, this );
+            }
+        }
+
+
+
+        m_flLastDamageTime = gpGlobals->curtime;
     }
 
-    return ret;
+
+    return 1;
 }
 
-void NPCR::CBaseNonPlayer::SetDefaultEyeOffset()
+void CNPCRNonPlayer::Event_Killed( const CTakeDamageInfo& info )
+{
+    m_OnDeath.FireOutput( info.GetAttacker(), this );
+
+
+
+    BaseClass::Event_Killed( info );
+}
+
+void CNPCRNonPlayer::SetDefaultEyeOffset()
 {
     if  ( GetModelPtr() )
     {
@@ -139,7 +185,7 @@ void NPCR::CBaseNonPlayer::SetDefaultEyeOffset()
     }
 }
 
-void NPCR::CBaseNonPlayer::HandleAnimEvent( animevent_t* pEvent )
+void CNPCRNonPlayer::HandleAnimEvent( animevent_t* pEvent )
 {
     m_bHandledAnimEvent = false;
 
@@ -149,7 +195,7 @@ void NPCR::CBaseNonPlayer::HandleAnimEvent( animevent_t* pEvent )
         BaseClass::HandleAnimEvent( pEvent );
 }
 
-void NPCR::CBaseNonPlayer::NPCThink()
+void CNPCRNonPlayer::NPCThink()
 {
     SetNextThink( gpGlobals->curtime );
 
@@ -169,7 +215,7 @@ void NPCR::CBaseNonPlayer::NPCThink()
     }
 }
 
-void NPCR::CBaseNonPlayer::VPhysicsUpdate( IPhysicsObject* pPhys )
+void CNPCRNonPlayer::VPhysicsUpdate( IPhysicsObject* pPhys )
 {
     float prevImpactScale = m_impactEnergyScale;
 
@@ -179,7 +225,7 @@ void NPCR::CBaseNonPlayer::VPhysicsUpdate( IPhysicsObject* pPhys )
     m_impactEnergyScale = prevImpactScale;
 }
 
-void NPCR::CBaseNonPlayer::PerformCustomPhysics( Vector* pNewPosition, Vector* pNewVelocity, QAngle* pNewAngles, QAngle* pNewAngVelocity )
+void CNPCRNonPlayer::PerformCustomPhysics( Vector* pNewPosition, Vector* pNewVelocity, QAngle* pNewAngles, QAngle* pNewAngVelocity )
 {
     SetGroundEntity( GetMotor()->GetGroundEntity() );
 
@@ -194,12 +240,12 @@ void NPCR::CBaseNonPlayer::PerformCustomPhysics( Vector* pNewPosition, Vector* p
     }
 }
 
-void NPCR::CBaseNonPlayer::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
+void CNPCRNonPlayer::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 {
 
 }
 
-bool NPCR::CBaseNonPlayer::SetActivity( Activity act )
+bool CNPCRNonPlayer::SetActivity( Activity act )
 {
     if ( act == m_iCurActivity && m_bCurActivityLoops )
         return true;
@@ -241,7 +287,7 @@ bool NPCR::CBaseNonPlayer::SetActivity( Activity act )
     return true;
 }
 
-bool NPCR::CBaseNonPlayer::HasActivity( Activity act )
+bool CNPCRNonPlayer::HasActivity( Activity act )
 {
     CStudioHdr* hdr = GetModelPtr();
     if ( !hdr || !hdr->SequencesAvailable() )
@@ -261,7 +307,7 @@ bool NPCR::CBaseNonPlayer::HasActivity( Activity act )
     return true;
 }
 
-float NPCR::CBaseNonPlayer::GetMoveActivityMovementSpeed()
+float CNPCRNonPlayer::GetMoveActivityMovementSpeed()
 {
     // Just assume walk by default
     int iSeq = SelectWeightedSequence( ACT_WALK );

@@ -6,7 +6,7 @@
 #include "npcr_path_follow.h"
 
 
-NPCR::CNonPlayerMotor::CNonPlayerMotor( NPCR::CBaseNonPlayer* pNPC ) : NPCR::CBaseMotor( pNPC )
+NPCR::CNonPlayerMotor::CNonPlayerMotor( CNPCRNonPlayer* pNPC ) : NPCR::CBaseMotor( pNPC )
 {
     m_vecAcceleration = vec3_origin;
     m_vecVelocity = vec3_origin;
@@ -18,9 +18,9 @@ NPCR::CNonPlayerMotor::~CNonPlayerMotor()
     
 }
 
-NPCR::CBaseNonPlayer* NPCR::CNonPlayerMotor::GetOuter() const
+CNPCRNonPlayer* NPCR::CNonPlayerMotor::GetOuter() const
 {
-    return static_cast<CBaseNonPlayer*>( BaseClass::GetOuter() );
+    return static_cast<CNPCRNonPlayer*>( BaseClass::GetOuter() );
 }
 
 
