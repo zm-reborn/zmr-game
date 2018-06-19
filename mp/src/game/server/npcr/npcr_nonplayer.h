@@ -33,6 +33,8 @@ public:
     virtual void PostConstructor( const char* szClassname ) OVERRIDE;
     virtual void Spawn() OVERRIDE;
 
+    virtual void PostUpdate() OVERRIDE;
+
 
     virtual CBaseNPC* MyNPCRPointer() OVERRIDE { return this; }
     //virtual bool IsNPC() const OVERRIDE { return true; }
@@ -75,6 +77,9 @@ public:
     CBaseEntity*    GetEnemy() const { return m_hEnemy.Get(); }
     void            SetEnemy( CBaseEntity* pEnt ) { m_hEnemy.Set( pEnt ); }
 
+    virtual void    AcquireEnemy( CBaseEntity* pEnemy );
+    virtual void    LostEnemy();
+
 
     Activity        GetActivity() const { return m_iCurActivity; }
     bool            SetActivity( Activity act );
@@ -101,8 +106,16 @@ private:
 public:
     COutputEvent m_OnDamaged;
     COutputEvent m_OnDamagedByPlayer;
+    COutputEvent m_OnHalfHealth;
     COutputEvent m_OnDeath;
+    COutputEHANDLE m_OnFoundPlayer;
+    COutputEHANDLE m_OnFoundEnemy;
+    COutputEvent m_OnLostPlayerLOS;
+    COutputEvent m_OnLostEnemyLOS;
+    COutputEvent m_OnLostEnemy; 
 
 private:
     float m_flLastDamageTime;
+    float m_flNextLOSOutputs;
+    bool m_bDidSeeEnemyLastTime;
 };
