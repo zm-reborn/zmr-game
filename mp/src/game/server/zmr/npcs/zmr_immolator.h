@@ -26,6 +26,8 @@ public:
     virtual void Event_Killed( const CTakeDamageInfo& info ) OVERRIDE;
 
 
+    virtual bool ShouldPlayIdleSound() const OVERRIDE;
+    virtual float IdleSound() OVERRIDE;
     virtual void AlertSound() OVERRIDE;
     virtual void AttackSound() OVERRIDE;
     virtual void DeathSound() OVERRIDE;
