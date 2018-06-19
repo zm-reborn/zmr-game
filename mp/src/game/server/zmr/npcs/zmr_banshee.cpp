@@ -367,6 +367,19 @@ void CZMBanshee::OnAnimActivityFinished( Activity completedActivity )
     BaseClass::OnAnimActivityFinished( completedActivity );
 }
 
+bool CZMBanshee::ShouldPlayIdleSound() const
+{
+    //return BaseClass::ShouldPlayIdleSound() && random->RandomInt( 0, 99 ) == 0;
+    return false;
+}
+
+float CZMBanshee::IdleSound()
+{
+    // Banshee idle sound doesn't seem to work.
+    //EmitSound( "NPC_FastZombie.Idle" );
+    return 1.0f;
+}
+
 #define ALERT_SOUND_NEAR_DIST       512.0f
 
 void CZMBanshee::AlertSound()

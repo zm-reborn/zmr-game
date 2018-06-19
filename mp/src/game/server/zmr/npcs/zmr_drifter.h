@@ -31,6 +31,8 @@ public:
     virtual float GetAttackLowest() const OVERRIDE { return -20.0f; }
 
 
+    virtual bool ShouldPlayIdleSound() const OVERRIDE;
+    virtual float IdleSound() OVERRIDE;
     virtual void AlertSound() OVERRIDE;
     virtual void AttackSound() OVERRIDE;
     virtual void DeathSound() OVERRIDE;

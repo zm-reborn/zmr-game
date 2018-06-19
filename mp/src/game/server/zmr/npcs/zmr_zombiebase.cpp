@@ -201,6 +201,8 @@ CZMBaseZombie::CZMBaseZombie()
     m_flBurnDamage = 0.0f;
     m_flBurnDamageTime = 0.0f;
 
+    m_flNextIdleSound = 0.0f;
+
 
     m_strModelGroup = NULL_STRING;
 
@@ -328,6 +330,19 @@ void CZMBaseZombie::ZombieThink()
     m_pAnimState->Update();
 
     BaseClass::NPCThink();
+}
+
+void CZMBaseZombie::PreUpdate()
+{
+    BaseClass::PreUpdate();
+
+
+    if ( ShouldPlayIdleSound() )
+    {
+        float delay = IdleSound();
+
+        m_flNextIdleSound = gpGlobals->curtime + delay;
+    }
 }
 
 void CZMBaseZombie::PostUpdate()
@@ -1088,6 +1103,21 @@ float CZMBaseZombie::GetMoveActivityMovementSpeed()
         return GetSequenceGroundSpeed( iSeq );
 
     return BaseClass::GetMoveActivityMovementSpeed();
+}
+
+bool CZMBaseZombie::ShouldPlayIdleSound() const
+{
+    if ( m_lifeState != LIFE_ALIVE )
+        return false;
+
+    if ( HasSpawnFlags( SF_NPC_GAG ) )
+        return false;
+
+    if ( m_flNextIdleSound > gpGlobals->curtime )
+        return false;
+
+
+    return true;
 }
 
 CON_COMMAND( zm_zombie_create, "Creates a zombie at your crosshair." )

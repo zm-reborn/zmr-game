@@ -28,6 +28,8 @@ public:
     virtual bool ScaleDamageByHitgroup( int iHitGroup, CTakeDamageInfo& info ) const OVERRIDE;
 
 
+    virtual bool ShouldPlayIdleSound() const OVERRIDE;
+    virtual float IdleSound() OVERRIDE;
     virtual void AlertSound() OVERRIDE;
     virtual void AttackSound() OVERRIDE;
     virtual void DeathSound() OVERRIDE;

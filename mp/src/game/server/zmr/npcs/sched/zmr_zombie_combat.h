@@ -88,7 +88,11 @@ public:
                 pOuter->SetEnemy( pEnemy );
 
                 if ( !pOldEnemy )
+                {
                     pOuter->AlertSound();
+
+                    pOuter->RemoveSpawnFlags( SF_NPC_GAG );
+                }
 
                 Intercept( m_pChaseSched, "We see a potential enemy!" );
                 return;
