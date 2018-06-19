@@ -10,7 +10,13 @@
 BEGIN_DATADESC( CNPCRNonPlayer )
     DEFINE_OUTPUT( m_OnDamaged, "OnDamaged" ),
     DEFINE_OUTPUT( m_OnDamagedByPlayer, "OnDamagedByPlayer" ),
+    DEFINE_OUTPUT( m_OnHalfHealth, "OnHalfHealth" ),
     DEFINE_OUTPUT( m_OnDeath, "OnDeath" ),
+    DEFINE_OUTPUT( m_OnFoundPlayer, "OnFoundPlayer" ),
+    DEFINE_OUTPUT( m_OnFoundEnemy, "OnFoundEnemy" ),
+    DEFINE_OUTPUT( m_OnLostPlayerLOS, "OnLostPlayerLOS" ),
+    DEFINE_OUTPUT( m_OnLostEnemyLOS, "OnLostEnemyLOS" ),
+    DEFINE_OUTPUT( m_OnLostEnemy, "OnLostEnemy" ),
 END_DATADESC()
 
 
@@ -31,6 +37,9 @@ CNPCRNonPlayer::CNPCRNonPlayer() : NPCR::CBaseNPC( this )
 
 
     m_flLastDamageTime = 0.0f;
+
+    m_flNextLOSOutputs = 0.0f;
+    m_bDidSeeEnemyLastTime = false;
 }
 
 CNPCRNonPlayer::~CNPCRNonPlayer()
@@ -133,12 +142,11 @@ int CNPCRNonPlayer::OnTakeDamage_Alive( const CTakeDamageInfo& info )
     //
     // Fire outputs
     //
+    CBaseEntity* pAttacker = info.GetAttacker();
 
     // Don't fire this multiple times a frame.
     if ( m_flLastDamageTime != gpGlobals->curtime )
     {
-        CBaseEntity* pAttacker = info.GetAttacker();
-
         m_OnDamaged.FireOutput( pAttacker, this );
 
         if ( pAttacker )
@@ -152,6 +160,11 @@ int CNPCRNonPlayer::OnTakeDamage_Alive( const CTakeDamageInfo& info )
 
 
         m_flLastDamageTime = gpGlobals->curtime;
+    }
+
+    if ( m_iHealth <= (m_iMaxHealth / 2) )
+    {
+        m_OnHalfHealth.FireOutput( pAttacker, this );
     }
 
 
@@ -193,6 +206,45 @@ void CNPCRNonPlayer::HandleAnimEvent( animevent_t* pEvent )
 
     if ( !m_bHandledAnimEvent )
         BaseClass::HandleAnimEvent( pEvent );
+}
+
+void CNPCRNonPlayer::PostUpdate()
+{
+    NPCR::CBaseNPC::PostUpdate();
+
+
+    CBaseEntity* pCurEnemy = GetEnemy();
+
+    if ( pCurEnemy )
+    {
+        //
+        // Fire sight outputs
+        //
+        if ( m_flNextLOSOutputs <= gpGlobals->curtime )
+        {
+            const bool bCanSee = GetSenses()->GetEntityOf( pCurEnemy ) != nullptr;
+            
+            // Player varients are kept for backwards compatibility. (damn you, zm_kink)
+            if ( !bCanSee && m_bDidSeeEnemyLastTime )
+            {
+                if ( pCurEnemy->IsPlayer() )
+                    m_OnLostPlayerLOS.FireOutput( pCurEnemy, this );
+
+                m_OnLostEnemyLOS.FireOutput( pCurEnemy, this );
+
+            }
+            else if ( bCanSee && !m_bDidSeeEnemyLastTime )
+            {
+                if ( pCurEnemy->IsPlayer() )
+                    m_OnFoundPlayer.Set( m_hEnemy, this, this );
+
+                m_OnFoundEnemy.Set( m_hEnemy, this, this );
+            }
+
+            m_flNextLOSOutputs = gpGlobals->curtime + 0.1f;
+            m_bDidSeeEnemyLastTime = bCanSee;
+        }
+    }
 }
 
 void CNPCRNonPlayer::NPCThink()
@@ -314,3 +366,24 @@ float CNPCRNonPlayer::GetMoveActivityMovementSpeed()
 
     return GetSequenceGroundSpeed( iSeq );
 }
+
+void CNPCRNonPlayer::AcquireEnemy( CBaseEntity* pEnemy )
+{
+    Assert( pEnemy != nullptr );
+
+    SetEnemy( pEnemy );
+
+
+    // Perform sight outputs.
+    m_bDidSeeEnemyLastTime = false;
+}
+
+void CNPCRNonPlayer::LostEnemy()
+{
+    CBaseEntity* pOldEnemy = GetEnemy();
+
+    SetEnemy( nullptr );
+
+    m_OnLostEnemy.FireOutput( pOldEnemy, this );
+}
+
