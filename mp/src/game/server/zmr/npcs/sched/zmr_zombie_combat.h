@@ -77,7 +77,7 @@ public:
             // Make sure our current enemy is valid.
             if ( pOldEnemy && !pOuter->IsEnemy( pOldEnemy ) )
             {
-                pOuter->SetEnemy( nullptr );
+                pOuter->LostEnemy();
                 pOldEnemy = nullptr;
             }
 
@@ -85,10 +85,14 @@ public:
 
             if ( pEnemy && pOuter->ShouldChase( pEnemy ) != NPCR::RES_NO )
             {
-                pOuter->SetEnemy( pEnemy );
+                pOuter->AcquireEnemy( pEnemy );
 
                 if ( !pOldEnemy )
+                {
                     pOuter->AlertSound();
+
+                    pOuter->RemoveSpawnFlags( SF_NPC_GAG );
+                }
 
                 Intercept( m_pChaseSched, "We see a potential enemy!" );
                 return;

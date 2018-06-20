@@ -305,7 +305,7 @@ public:
         m_bOnCeiling = false;
 
 
-        pOuter->SetEnemy( pTarget );
+        pOuter->AcquireEnemy( pTarget );
 
         // Leap towards the enemy
         pOuter->LeapAttackSound();

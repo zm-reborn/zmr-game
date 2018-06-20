@@ -11,28 +11,47 @@
 // Our NPCs.
 //
 // -----------------------
+@BaseClass base(Targetname, Angles, RenderFields, DamageFilter, Shadow) = BaseNPCRNonPlayer
+[
+	spawnflags(Flags) = 
+	[
+		2 : "Gag (No IDLE sounds until angry)" : 0
+		4 : "Fall to ground (unchecked means *teleport* to ground)" : 1
+		//16 : "Don't acquire enemies" : 0
+		512: "Fade Corpse" : 1
+		2048: "Template NPC (used by npc_maker, will not spawn)" : 0
+	]
+
+	output OnDamaged(void) : "Fired when this NPC takes damage."
+	output OnDamagedByPlayer(void) : "Fired when this NPC is hurt by a player."
+	output OnHalfHealth(void) : "Fired when this NPC reaches half of its maximum health."
+	output OnDeath(void) : "Fired when this NPC is killed."
+	output OnFoundEnemy(string) : "Fired when this NPC establishes line of sight to its enemy (outputs entity)."
+	output OnLostEnemy(void) : "Fired when this NPC loses its enemy. Usually due to the enemy being killed/removed, or because this NPC has selected a newer, more dangerous enemy."
+]
+
 @BaseClass = ZMBaseZombie
 [
 	modelgroup(string) : "Model Group" : "" : "Leave empty to use default model group (DefaultModels if not overriden). See scripts/zombiemodelgroups.txt"
 ]
 
-@NPCClass base(BaseNPC,ZMBaseZombie) studio("models/zombie/zm_classic.mdl") = npc_zombie : "Shambler"
+@NPCClass base(BaseNPCRNonPlayer,ZMBaseZombie) studio("models/zombie/zm_classic.mdl") = npc_zombie : "Shambler"
 [
 ]
 
-@NPCClass base(BaseNPC,ZMBaseZombie) studio("models/zombie/zm_fast.mdl") = npc_fastzombie : "Banshee"
+@NPCClass base(BaseNPCRNonPlayer,ZMBaseZombie) studio("models/zombie/zm_fast.mdl") = npc_fastzombie : "Banshee"
 [
 ]
 
-@NPCClass base(BaseNPC,ZMBaseZombie) studio("models/zombie/hulk.mdl") = npc_poisonzombie : "Hulk"
+@NPCClass base(BaseNPCRNonPlayer,ZMBaseZombie) studio("models/zombie/hulk.mdl") = npc_poisonzombie : "Hulk"
 [
 ]
 
-@NPCClass base(BaseNPC,ZMBaseZombie) studio("models/humans/zm_draggy.mdl") = npc_dragzombie : "Drifter"
+@NPCClass base(BaseNPCRNonPlayer,ZMBaseZombie) studio("models/humans/zm_draggy.mdl") = npc_dragzombie : "Drifter"
 [
 ]
 
-@NPCClass base(BaseNPC,ZMBaseZombie) studio("models/zombie/burnzie.mdl") = npc_burnzombie : "Immolator"
+@NPCClass base(BaseNPCRNonPlayer,ZMBaseZombie) studio("models/zombie/burnzie.mdl") = npc_burnzombie : "Immolator"
 [
 ]
 

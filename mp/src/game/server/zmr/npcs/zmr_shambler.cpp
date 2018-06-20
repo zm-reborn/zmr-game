@@ -220,6 +220,17 @@ bool CZMShambler::ScaleDamageByHitgroup( int iHitGroup, CTakeDamageInfo& info ) 
     return false;
 }
 
+bool CZMShambler::ShouldPlayIdleSound() const
+{
+    return BaseClass::ShouldPlayIdleSound() && random->RandomInt( 0, 120 ) == 0;
+}
+
+float CZMShambler::IdleSound()
+{
+    EmitSound( "Zombie.Idle" );
+    return 2.0f;
+}
+
 void CZMShambler::AlertSound()
 {
     EmitSound( "Zombie.Alert" );

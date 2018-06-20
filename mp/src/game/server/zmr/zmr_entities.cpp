@@ -835,7 +835,7 @@ void CZMEntAmbushTrigger::Trigger( CBaseEntity* pActivator )
 
             if ( !pZombie->GetEnemy() )
             {
-                pZombie->SetEnemy( pActivator );
+                pZombie->AcquireEnemy( pActivator );
             }
         }
     } );

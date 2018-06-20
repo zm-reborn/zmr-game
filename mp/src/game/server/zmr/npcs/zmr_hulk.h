@@ -47,6 +47,8 @@ public:
     virtual float GetAttackHeight() const OVERRIDE { return CollisionProp()->OBBMaxs().z + 10.0f; }
 
 
+    virtual bool ShouldPlayIdleSound() const OVERRIDE;
+    virtual float IdleSound() OVERRIDE;
     virtual void AlertSound() OVERRIDE;
     virtual void AttackSound() OVERRIDE;
     virtual void DeathSound() OVERRIDE;
