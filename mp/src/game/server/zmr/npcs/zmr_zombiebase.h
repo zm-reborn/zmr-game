@@ -21,12 +21,12 @@ class CZMBlockerScanner;
 class CZMEntAmbushTrigger;
 
 
-class CZMBaseZombie : public NPCR::CBaseNonPlayer, public CZMNPCLagCompensation
+class CZMBaseZombie : public CNPCRNonPlayer, public CZMNPCLagCompensation
 {
 public:
     typedef CZMBaseZombie ThisClass;
-    typedef NPCR::CBaseNonPlayer BaseClass;
-    //DECLARE_CLASS( CZMBaseZombie, NPCR::CBaseNonPlayer );
+    typedef CNPCRNonPlayer BaseClass;
+    //DECLARE_CLASS( CZMBaseZombie, CNPCRNonPlayer );
     DECLARE_SERVERCLASS();
     DECLARE_DATADESC();
 
@@ -39,6 +39,7 @@ public:
     virtual void Spawn() OVERRIDE;
 
     void ZombieThink();
+    virtual void PreUpdate() OVERRIDE;
     virtual void PostUpdate() OVERRIDE;
 
 
@@ -88,6 +89,8 @@ public:
 
 
     // Sounds
+    virtual bool ShouldPlayIdleSound() const;
+    virtual float IdleSound() { return 0.0f; } // Return delay for the next idle sound.
     virtual void AlertSound() {}
     virtual void AttackSound() {}
     virtual void DeathSound() {}
@@ -242,6 +245,8 @@ private:
 
     float m_flBurnDamage;
     float m_flBurnDamageTime;
+
+    float m_flNextIdleSound;
 
 
 public:

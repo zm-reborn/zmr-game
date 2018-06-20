@@ -14,12 +14,17 @@ public:
     CMoveFilter( NPCR::CBaseNPC* pNPC, int collisionGroup ) : CTraceFilterSimple( pNPC->GetCharacter(), collisionGroup )
     {
         m_pNPC = pNPC;
+        m_pRootParent = pNPC->GetCharacter()->GetRootMoveParent();
     }
 
     virtual bool ShouldHitEntity( IHandleEntity* pHandleEntity, int contentsMask ) OVERRIDE
     {
         CBaseEntity* pEnt = EntityFromEntityHandle( pHandleEntity );
         if ( !pEnt )
+            return false;
+
+        // We may have something parented to us. Ignore em.
+        if ( UTIL_EntityHasMatchingRootParent( m_pRootParent, pEnt ) )
             return false;
 
 
@@ -35,7 +40,7 @@ public:
 
 private:
     NPCR::CBaseNPC* m_pNPC;
-    int m_nCollisionGroup;
+    CBaseEntity* m_pRootParent;
 };
 
 

@@ -19,6 +19,7 @@ public:
         m_pNPC = pNPC;
 
         m_vecMyDir = m_pNPC->GetVel().Normalized();
+        m_pRootParent = pNPC->GetCharacter()->GetRootMoveParent();
     }
 
     virtual bool ShouldHitEntity( IHandleEntity* pServerEntity, int contentsMask ) OVERRIDE
@@ -27,6 +28,10 @@ public:
         {
             CBaseEntity* pEnt = EntityFromEntityHandle( pServerEntity );
             if ( !pEnt )
+                return false;
+
+            // We may have something parented to us, as per usual for silly maps to do. Ignore em.
+            if ( UTIL_EntityHasMatchingRootParent( m_pRootParent, pEnt ) )
                 return false;
 
             // Ignore the enemy, we're suppose to attack them!
@@ -70,6 +75,7 @@ public:
 private:
     NPCR::CBaseNPC* m_pNPC;
     Vector m_vecMyDir;
+    CBaseEntity* m_pRootParent;
 };
 
 void NPCR::CFollowNavPath::Invalidate()

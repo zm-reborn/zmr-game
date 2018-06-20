@@ -73,6 +73,8 @@ public:
     static float GetMaxLeapSpeed() { return 900.0f; }
 
     // Sounds
+    virtual bool ShouldPlayIdleSound() const OVERRIDE;
+    virtual float IdleSound() OVERRIDE;
     virtual void AlertSound() OVERRIDE;
     virtual void AttackSound() OVERRIDE;
     virtual void DeathSound() OVERRIDE;

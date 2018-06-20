@@ -145,6 +145,19 @@ void CZMDrifter::GetAttackHull( Vector& mins, Vector& maxs ) const
     maxs.z = GetAttackHeight();
 }
 
+bool CZMDrifter::ShouldPlayIdleSound() const
+{
+    return  BaseClass::ShouldPlayIdleSound()
+    &&      GetEnemy() == nullptr // We must be idling.
+    &&      random->RandomInt( 0, 99 ) == 0;
+}
+
+float CZMDrifter::IdleSound()
+{
+    EmitSound( "NPC_DragZombie.Idle" );
+    return 1.0f;
+}
+
 void CZMDrifter::AlertSound()
 {
     EmitSound( "NPC_DragZombie.Alert" );

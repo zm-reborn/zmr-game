@@ -145,6 +145,17 @@ void NPCR::CBaseSenses::FindNewEntities( CUtlVector<CBaseEntity*>& vListEnts )
     }
 }
 
+NPCR::VisionEntity* NPCR::CBaseSenses::GetEntityOf( CBaseEntity* pEnt ) const
+{
+    FOR_EACH_VEC( m_vVisionEnts, i )
+    {
+        if ( m_vVisionEnts[i]->GetEntity() == pEnt )
+            return m_vVisionEnts[i];
+    }
+
+    return nullptr;
+}
+
 bool NPCR::CBaseSenses::CanSee( CBaseEntity* pEnt ) const
 {
     FOR_EACH_VEC( m_vVisionEnts, i )

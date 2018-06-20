@@ -115,7 +115,7 @@ public:
 
         if ( !pOuter->IsEnemy( pEnemy ) )
         {
-            pOuter->SetEnemy( nullptr );
+            pOuter->LostEnemy();
 
             End( "Enemy is no longer enemy! wut?" );
             return;
@@ -136,7 +136,7 @@ public:
                 // We have to be reasonably closer to the potential enemy.
                 if ( flNewDist < (flCurDist*0.8f) )
                 {
-                    pOuter->SetEnemy( pEnt );
+                    pOuter->AcquireEnemy( pEnt );
                 }
             }
 

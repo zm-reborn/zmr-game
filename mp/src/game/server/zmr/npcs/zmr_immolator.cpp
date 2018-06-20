@@ -155,6 +155,23 @@ void CZMImmolator::HandleAnimEvent( animevent_t* pEvent )
     BaseClass::HandleAnimEvent( pEvent );
 }
 
+bool CZMImmolator::ShouldPlayIdleSound() const
+{
+    /*
+    return  BaseClass::ShouldPlayIdleSound()
+    &&      GetEnemy() == nullptr // We must be idling.
+    &&      random->RandomInt( 0, 120 ) == 0;
+    */
+    return false;
+}
+
+float CZMImmolator::IdleSound()
+{
+    // Immolator has a very weird idle sound.
+    //EmitSound( "NPC_BurnZombie.Idle" );
+    return 5.0f;
+}
+
 void CZMImmolator::AlertSound()
 {
 }
