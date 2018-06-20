@@ -35,7 +35,7 @@
 	modelgroup(string) : "Model Group" : "" : "Leave empty to use default model group (DefaultModels if not overriden). See scripts/zombiemodelgroups.txt"
 ]
 
-@NPCClass base(BaseNPCRNonPlayer,ZMBaseZombie) studio("models/zombie/zm_classic.mdl") = npc_zombie : "Shambler"
+@NPCClass base(BaseNPCRNonPlayer,ZMBaseZombie) studio("models/zombie/zm_classic_01.mdl") = npc_zombie : "Shambler"
 [
 ]
 
