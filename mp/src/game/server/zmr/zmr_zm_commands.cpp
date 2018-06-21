@@ -945,9 +945,12 @@ void ZM_Cmd_MoveToLine( const CCommand &args )
     } );
 
 
+    Assert( nSelected == vZombies.Count() );
+
+
     trace_t trace;
     Vector walk = start;
-    Vector add = dir * ( flLineLength / vZombies.Count() );
+    Vector add = dir * ( flLineLength / (vZombies.Count()-1) );
 
     for ( int i = 0; i < vZombies.Count(); i++ )
     {
