@@ -132,6 +132,7 @@ public:
     virtual bool    CanAct() const; // Can we reload/attack?
 
 
+    // ZMRTODO: Use config to load these.
     virtual float   GetAccuracyIncreaseRate() const { return 2.0f; }
     virtual float   GetAccuracyDecreaseRate() const { return 2.0f; }
 

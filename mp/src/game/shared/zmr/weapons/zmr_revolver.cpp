@@ -55,17 +55,14 @@ public:
             float ratio = 1.0f - pOwner->GetAccuracyRatio();
             ratio *= ratio;
             
-#ifndef VECTOR_CONE_45DEGREES
-#define VECTOR_CONE_45DEGREES       Vector( 0.38268f, 0.38268f, 0.38268f )
-#endif
             
             // 2 degrees
-#define     SECONDARY_MIN_RATIO         0.05f
+#define     SECONDARY_MIN_RATIO         0.1f
 
             const bool bIsSecondary = GetActivity() == ACT_VM_SECONDARYATTACK;
 
             // Secondary punishes moving a lot more.
-            float max = bIsSecondary ? VECTOR_CONE_45DEGREES.x : VECTOR_CONE_15DEGREES.x;
+            float max = bIsSecondary ? VECTOR_CONE_20DEGREES.x : VECTOR_CONE_10DEGREES.x;
 
             // Secondary is not perfectly accurate.
             if ( bIsSecondary )
@@ -82,7 +79,7 @@ public:
     }
 
 
-    virtual float GetAccuracyIncreaseRate() const OVERRIDE { return 1.5f; }
+    virtual float GetAccuracyIncreaseRate() const OVERRIDE { return 2.9f; }
     virtual float GetAccuracyDecreaseRate() const OVERRIDE { return 5.1f; }
 
     
