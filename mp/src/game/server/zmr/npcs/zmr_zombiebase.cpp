@@ -145,6 +145,8 @@ ConVar zm_sv_defense_goal_tolerance( "zm_sv_defense_goal_tolerance", "64", FCVAR
 
 ConVar zm_sv_debug_zombieattack( "zm_sv_debug_zombieattack", "0" );
 
+ConVar zm_sv_zombiecollisions( "zm_sv_zombiecollisions", "1", 0, "Toggle experimental zombie collisions." );
+
 
 extern ConVar zm_sk_default_hitmult_head;
 
@@ -1056,12 +1058,16 @@ NPCR::QueryResult_t CZMBaseZombie::ShouldTouch( CBaseEntity* pEnt ) const
     {
         NPCR::CBaseNPC* pOther = pEnt->MyNPCRPointer();
 
-        // Ignore others that aren't going anywhere
-        if ( GetMotor()->IsMoving() && !pOther->GetMotor()->IsMoving() )
+
+        if ( !zm_sv_zombiecollisions.GetBool() )
         {
-            CZMBaseZombie* pZombie = ToZMBaseZombie( pOther->GetCharacter() );
-            if ( !pZombie->IsAttacking() )
-                return NPCR::RES_NO;
+            // Ignore others that aren't going anywhere
+            if ( GetMotor()->IsMoving() && !pOther->GetMotor()->IsMoving() )
+            {
+                CZMBaseZombie* pZombie = ToZMBaseZombie( pOther->GetCharacter() );
+                if ( !pZombie->IsAttacking() )
+                    return NPCR::RES_NO;
+            }
         }
 
 
