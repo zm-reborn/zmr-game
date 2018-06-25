@@ -190,9 +190,9 @@ END_SEND_TABLE()
 BEGIN_DATADESC( CZMEntZombieSpawn )
     //DEFINE_KEYFIELD( m_bActive, FIELD_BOOLEAN, "Active" ),
 
-    //DEFINE_INPUTFUNC( FIELD_VOID, "Toggle", InputToggle ),
-    //DEFINE_INPUTFUNC( FIELD_VOID, "Hide", InputHide ),
-    //DEFINE_INPUTFUNC( FIELD_VOID, "Unhide", InputUnhide ),
+    DEFINE_INPUTFUNC( FIELD_VOID, "Toggle", InputToggle ),
+    DEFINE_INPUTFUNC( FIELD_VOID, "Hide", InputHide ),
+    DEFINE_INPUTFUNC( FIELD_VOID, "Unhide", InputUnhide ),
 
 
     DEFINE_KEYFIELD( m_fZombieFlags, FIELD_INTEGER, "zombieflags" ),
