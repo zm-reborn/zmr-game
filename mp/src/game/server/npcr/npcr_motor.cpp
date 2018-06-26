@@ -156,8 +156,28 @@ void NPCR::CBaseMotor::NavJump( const Vector& vecGoal, float flOverrideHeight )
     m_bDoStepDownTrace = false;
     
 
-    Vector pos = GetNPC()->GetPosition() + Vector( 0, 0, 2 );
+    // Step up off the ground so we don't snap back to ground.
+    Vector pos = GetNPC()->GetPosition();
 
+
+    float halfhull = GetHullWidth() / 2.0f;
+    Vector mins = Vector( -halfhull, -halfhull, 0.0f );
+    Vector maxs = Vector( halfhull, halfhull, 2.0f );
+
+    CMoveFilter filter( GetNPC(), COLLISION_GROUP_NPC );
+    trace_t tr;
+    UTIL_TraceHull(
+        pos - Vector( 0, 0, 32.0f ),
+        pos - Vector( 0, 0, -1.0f ),
+        mins, maxs,
+        MASK_NPCSOLID, &filter, &tr );
+
+    if ( tr.fraction < 1.0f )
+    {
+        pos = tr.endpos;
+    }
+
+    pos += Vector( 0, 0, 2.0f );
     GetNPC()->SetPosition( pos );
 
     float minheight = vecGoal.z - pos.z + GetHullHeight();
