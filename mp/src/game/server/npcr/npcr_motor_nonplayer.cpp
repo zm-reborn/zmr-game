@@ -6,6 +6,9 @@
 #include "npcr_path_follow.h"
 
 
+extern ConVar npcr_debug_navigator;
+
+
 NPCR::CNonPlayerMotor::CNonPlayerMotor( CNPCRNonPlayer* pNPC ) : NPCR::CBaseMotor( pNPC )
 {
     m_vecAcceleration = vec3_origin;
@@ -98,6 +101,13 @@ void NPCR::CNonPlayerMotor::Move()
             Vector right( m_vecMoveDir.y, -m_vecMoveDir.x, m_vecMoveDir.z );
             Vector rightVel = DotProduct( m_vecVelocity, right ) * right;
             Vector swFriction = -GetFrictionSideways() * rightVel;
+
+            if ( npcr_debug_navigator.GetBool() )
+            {
+                Vector pos = GetNPC()->GetPosition();
+                pos.z += 100.0f;
+                NDebugOverlay::Line( pos, pos + swFriction, 255, 0, 0, true, 0.1f );
+            }
 
             m_vecAcceleration.x += swFriction.x;
             m_vecAcceleration.y += swFriction.y;
@@ -209,6 +219,13 @@ bool NPCR::CNonPlayerMotor::GroundMove()
     Vector left( -m_vecMoveDir.y, m_vecMoveDir.x, 0.0f );
     m_vecMoveDir = CrossProduct( left, GetGroundNormal() );
     m_vecMoveDir.NormalizeInPlace();
+
+    if ( npcr_debug_navigator.GetBool() )
+    {
+        Vector pos = GetNPC()->GetPosition();
+        pos.z += 100.0f;
+        NDebugOverlay::Line( pos, pos + m_vecMoveDir * 16.0f, 0, 255, 0, true, 0.1f );
+    }
 
 
     float flMaxSpd = GetMovementSpeed();
