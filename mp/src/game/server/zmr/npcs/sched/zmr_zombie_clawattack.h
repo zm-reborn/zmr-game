@@ -68,7 +68,7 @@ public:
         CBaseEntity* pEnemy = pOuter->GetEnemy();
         Vector face = pEnemy ? pEnemy->WorldSpaceCenter() : m_vecLastFacing;
 
-        pOuter->GetMotor()->FaceTowards( pEnemy->WorldSpaceCenter() );
+        pOuter->GetMotor()->FaceTowards( face );
 
         m_vecLastFacing = face;
     }
