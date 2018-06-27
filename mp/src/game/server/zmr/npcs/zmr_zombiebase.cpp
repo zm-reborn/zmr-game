@@ -370,13 +370,15 @@ void CZMBaseZombie::HandleAnimEvent( animevent_t* pEvent )
 
     if ( pEvent->event == AE_ZOMBIE_STEP_LEFT )
     {
-        FootstepSound( false );
+        if ( ShouldPlayFootstepSound() )
+            FootstepSound( false );
         return;
     }
     
     if ( pEvent->event == AE_ZOMBIE_STEP_RIGHT )
     {
-        FootstepSound( true );
+        if ( ShouldPlayFootstepSound() )
+            FootstepSound( true );
         return;
     }
 
@@ -387,13 +389,15 @@ void CZMBaseZombie::HandleAnimEvent( animevent_t* pEvent )
 
     if ( pEvent->event == AE_ZOMBIE_SCUFF_LEFT )
     {
-        FootscuffSound( false );
+        if ( ShouldPlayFootstepSound() )
+            FootscuffSound( false );
         return;
     }
 
     if ( pEvent->event == AE_ZOMBIE_SCUFF_RIGHT )
     {
-        FootscuffSound( true );
+        if ( ShouldPlayFootstepSound() )
+            FootscuffSound( true );
         return;
     }
 
@@ -1109,6 +1113,11 @@ float CZMBaseZombie::GetMoveActivityMovementSpeed()
         return GetSequenceGroundSpeed( iSeq );
 
     return BaseClass::GetMoveActivityMovementSpeed();
+}
+
+bool CZMBaseZombie::ShouldPlayFootstepSound() const
+{
+    return GetMotor()->IsOnGround();
 }
 
 bool CZMBaseZombie::ShouldPlayIdleSound() const
