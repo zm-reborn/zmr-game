@@ -296,13 +296,15 @@ void CZMBanshee::HandleAnimEvent( animevent_t* pEvent )
     
     if ( pEvent->event == AE_FASTZOMBIE_GALLOP_LEFT )
     {
-        EmitSound( "NPC_FastZombie.GallopLeft" );
+        if ( ShouldPlayFootstepSound() )
+            EmitSound( "NPC_FastZombie.GallopLeft" );
         return;
     }
 
     if ( pEvent->event == AE_FASTZOMBIE_GALLOP_RIGHT )
     {
-        EmitSound( "NPC_FastZombie.GallopRight" );
+        if ( ShouldPlayFootstepSound() )
+            EmitSound( "NPC_FastZombie.GallopRight" );
         return;
     }
     

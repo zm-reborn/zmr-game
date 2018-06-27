@@ -89,6 +89,7 @@ public:
 
 
     // Sounds
+    virtual bool ShouldPlayFootstepSound() const;
     virtual bool ShouldPlayIdleSound() const;
     virtual float IdleSound() { return 0.0f; } // Return delay for the next idle sound.
     virtual void AlertSound() {}
