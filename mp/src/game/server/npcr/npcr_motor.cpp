@@ -7,6 +7,8 @@
 
 ConVar npcr_debug_navigator( "npcr_debug_navigator", "0" );
 
+ConVar npcr_motor_jump_groundoffset( "npcr_motor_jump_groundoffset", "2" );
+
 
 class CMoveFilter : public CTraceFilterSimple
 {
@@ -167,17 +169,21 @@ void NPCR::CBaseMotor::NavJump( const Vector& vecGoal, float flOverrideHeight )
     CMoveFilter filter( GetNPC(), COLLISION_GROUP_NPC );
     trace_t tr;
     UTIL_TraceHull(
-        pos - Vector( 0, 0, 32.0f ),
+        pos + Vector( 0, 0, 32.0f ),
         pos - Vector( 0, 0, -1.0f ),
         mins, maxs,
         MASK_NPCSOLID, &filter, &tr );
 
-    if ( tr.fraction < 1.0f )
+    Vector normal( 0.0f, 0.0f, 1.0f );
+    if ( !tr.startsolid && tr.fraction < 1.0f )
     {
         pos = tr.endpos;
+
+        if ( tr.plane.normal.z > 0.0f )
+            normal = tr.plane.normal;
     }
 
-    pos += Vector( 0, 0, 2.0f );
+    pos += normal * npcr_motor_jump_groundoffset.GetFloat();
     GetNPC()->SetPosition( pos );
 
     float minheight = vecGoal.z - pos.z + GetHullHeight();
