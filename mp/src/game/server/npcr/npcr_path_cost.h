@@ -28,6 +28,10 @@ namespace NPCR
 
         // AI Graph
         virtual float operator()( const Vector& vecNodePos, const Vector& vecTestPos, int fCapBitMask ) const = 0;
+
+
+        // Can we build a straight path.
+        virtual bool CanBuildSimpleRoute( const Vector& vecStart, const Vector& vecGoal ) const;
     
     private:
         float m_flStepHeight;
