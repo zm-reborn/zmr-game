@@ -137,6 +137,12 @@ C_ZMPlayer::C_ZMPlayer() : m_iv_angEyeAngles( "C_ZMPlayer::m_iv_angEyeAngles" )
     m_fxInner->SetAlpha( 0.8f );
     m_fxInner->SetMaterial( MAT_INNERFLARE );
     m_fxInner->SetSize( 22.0f );
+
+
+
+    // Have to remove them here as well because they add them in the C_BaseAnimating constructor. Fucking hell...
+    RemoveBaseAnimatingInterpolatedVars();
+	RemoveVar( &m_flCycle, false );
 }
 
 C_ZMPlayer::~C_ZMPlayer()
