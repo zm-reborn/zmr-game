@@ -639,6 +639,9 @@ private:
 	mutable CStudioHdr				*m_pStudioHdr;
 	mutable MDLHandle_t				m_hStudioHdr;
 	CThreadFastMutex				m_StudioHdrInitLock;
+#ifdef ZMR // ZMRCHANGE: Need this for the mp animstate fix.
+	friend class C_ZMPlayer;
+#endif
 };
 
 enum 

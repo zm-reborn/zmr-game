@@ -872,7 +872,13 @@ void C_BaseAnimating::UpdateRelevantInterpolatedVars()
 	// Remove any interpolated vars that need to be removed.
 	if ( !IsMarkedForDeletion() && !GetPredictable() && !IsClientCreated() && GetModelPtr() && GetModelPtr()->SequencesAvailable() )
 	{
+#ifdef ZMR // ZMRCHANGE: Disable these interpolations for players. They don't need to be interpolated anymore anyway. MP animstate crash fix.
+		// Needs to be here because AddBaseAnimatingInterpolatedVars is called in constructor. Fucking hell.
+		if ( !IsPlayer() )
+			AddBaseAnimatingInterpolatedVars();
+#else
 		AddBaseAnimatingInterpolatedVars();
+#endif
 	}			
 	else
 	{
