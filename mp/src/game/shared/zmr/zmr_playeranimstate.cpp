@@ -198,7 +198,7 @@ void CZMPlayerAnimState::Update( float eyeYaw, float eyePitch )
         ComputePoseParam_Head( pStudioHdr );
 
         // Possible workaround to pose parameter crash.
-        FixUnusedPoseParams( pStudioHdr );
+        //FixUnusedPoseParams( pStudioHdr );
 #endif
     }
 
@@ -210,37 +210,37 @@ void CZMPlayerAnimState::Update( float eyeYaw, float eyePitch )
 #endif
 }
 
-#ifdef CLIENT_DLL
-void CZMPlayerAnimState::FixUnusedPoseParams( CStudioHdr* pStudioHdr )
-{
-    if ( !zm_cl_fix_unusedposeparameters.GetBool() )
-        return;
-
-    int num = pStudioHdr->GetNumPoseParameters();
-    for ( int i = 0; i < num; i++ )
-    {
-        if ( m_PoseParameterData.m_iMoveX == i )
-            continue;
-        if ( m_PoseParameterData.m_iMoveY == i )
-            continue;
-        if ( m_PoseParameterData.m_iAimPitch == i )
-            continue;
-        if ( m_PoseParameterData.m_iAimYaw == i )
-            continue;
-        if ( m_headYawPoseParam == i )
-            continue;
-        if ( m_headPitchPoseParam == i )
-            continue;
-
-        float curval = m_pZMPlayer->GetPoseParameter( i );
-        if ( abs( curval ) > 1.0f )
-        {
-            Warning( "Poseparameter %s out of range! (%.3f) Resetting...", pStudioHdr->pPoseParameter( i ).pszName(), curval );
-            m_pZMPlayer->SetPoseParameter( i, 0.0f );
-        }
-    }
-}
-#endif
+//#ifdef CLIENT_DLL
+//void CZMPlayerAnimState::FixUnusedPoseParams( CStudioHdr* pStudioHdr )
+//{
+//    if ( !zm_cl_fix_unusedposeparameters.GetBool() )
+//        return;
+//
+//    int num = pStudioHdr->GetNumPoseParameters();
+//    for ( int i = 0; i < num; i++ )
+//    {
+//        if ( m_PoseParameterData.m_iMoveX == i )
+//            continue;
+//        if ( m_PoseParameterData.m_iMoveY == i )
+//            continue;
+//        if ( m_PoseParameterData.m_iAimPitch == i )
+//            continue;
+//        if ( m_PoseParameterData.m_iAimYaw == i )
+//            continue;
+//        if ( m_headYawPoseParam == i )
+//            continue;
+//        if ( m_headPitchPoseParam == i )
+//            continue;
+//
+//        float curval = m_pZMPlayer->GetPoseParameter( i );
+//        if ( abs( curval ) > 1.0f )
+//        {
+//            Warning( "Poseparameter %s out of range! (%.3f) Resetting...", pStudioHdr->pPoseParameter( i ).pszName(), curval );
+//            m_pZMPlayer->SetPoseParameter( i, 0.0f );
+//        }
+//    }
+//}
+//#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: 
