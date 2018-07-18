@@ -104,6 +104,7 @@ private:
 
 
 public:
+    // Outputs
     COutputEvent m_OnDamaged;
     COutputEvent m_OnDamagedByPlayer;
     COutputEvent m_OnHalfHealth;
@@ -112,7 +113,10 @@ public:
     COutputEHANDLE m_OnFoundEnemy;
     COutputEvent m_OnLostPlayerLOS;
     COutputEvent m_OnLostEnemyLOS;
-    COutputEvent m_OnLostEnemy; 
+    COutputEvent m_OnLostEnemy;
+private:
+    // Inputs
+    void InputSetHealth( inputdata_t &inputdata );
 
 private:
     float m_flLastDamageTime;

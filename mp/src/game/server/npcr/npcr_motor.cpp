@@ -303,6 +303,10 @@ Vector NPCR::CBaseMotor::HandleCollisions( const Vector& vecGoal )
             GetNPC()->OnTouch( tr.m_pEnt, &tr );
         }
 
+        // We presumably hit ground, start tracing for steps again.
+        // NOTE: Fixes not having a ground ent on moving lifts
+        if ( tr.plane.normal.z >= GetSlopeLimit() )
+            m_bDoStepDownTrace = true;
 
         m_bAdjustVel = true;
 

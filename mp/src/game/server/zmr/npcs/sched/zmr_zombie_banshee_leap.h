@@ -252,14 +252,14 @@ public:
         //
         float height = ( vecEnemyPos.z - vecMyPos.z );
 
-        float speed = sqrt( 2 * gravity * height );
+        float speed = sqrt( 2 * gravity * MAX( 1.0f, height ) );
 
         //
         // Scale the sideways velocity to get there at the right time
         //
         vecJump = vecEnemyPos - vecMyPos;
         vecJump = vecJump / (speed / gravity);
-        vecJump.z = speed;
+        vecJump.z = height >= 0.0f ? speed : -speed; // We may be going downwards.
             
         float maxspd = pOuter->GetMaxLeapSpeed();
         float distance = vecJump.Length();
