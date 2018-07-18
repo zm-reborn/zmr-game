@@ -8,6 +8,7 @@
 
 
 BEGIN_DATADESC( CNPCRNonPlayer )
+    // Outputs
     DEFINE_OUTPUT( m_OnDamaged, "OnDamaged" ),
     DEFINE_OUTPUT( m_OnDamagedByPlayer, "OnDamagedByPlayer" ),
     DEFINE_OUTPUT( m_OnHalfHealth, "OnHalfHealth" ),
@@ -17,6 +18,8 @@ BEGIN_DATADESC( CNPCRNonPlayer )
     DEFINE_OUTPUT( m_OnLostPlayerLOS, "OnLostPlayerLOS" ),
     DEFINE_OUTPUT( m_OnLostEnemyLOS, "OnLostEnemyLOS" ),
     DEFINE_OUTPUT( m_OnLostEnemy, "OnLostEnemy" ),
+    // Inputs
+    DEFINE_INPUTFUNC( FIELD_INTEGER, "SetHealth", InputSetHealth ),
 END_DATADESC()
 
 
@@ -387,3 +390,17 @@ void CNPCRNonPlayer::LostEnemy()
     m_OnLostEnemy.FireOutput( pOldEnemy, this );
 }
 
+void CNPCRNonPlayer::InputSetHealth( inputdata_t& inputdata )
+{
+    int iOldHealth = GetHealth();
+    int iNewHealth = inputdata.value.Int();
+    int iDelta = abs( iOldHealth - iNewHealth );
+    if ( iNewHealth > iOldHealth )
+    {
+        TakeHealth( iDelta, DMG_GENERIC );
+    }
+    else if ( iNewHealth < iOldHealth )
+    {
+        TakeDamage( CTakeDamageInfo( this, this, iDelta, DMG_GENERIC ) );
+    }
+}
