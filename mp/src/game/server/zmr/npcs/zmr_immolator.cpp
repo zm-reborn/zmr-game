@@ -89,9 +89,10 @@ void CZMImmolator::Ignite( float flFlameLifetime, bool bNPCOnly, float flSize, b
 
 void CZMImmolator::Event_Killed( const CTakeDamageInfo& info )
 {
-    StartFires();
-
     BaseClass::Event_Killed( info );
+
+    // We need to call this last or we will go on an endless loop
+    StartFires();
 }
 
 void CZMImmolator::StartFires()
