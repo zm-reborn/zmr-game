@@ -116,6 +116,7 @@ public:
     ZombieClass_t           GetZombieClass() const;
     int                     GetPopCost() const;
     int                     GetCost() const;
+    void                    DoAnimationEvent( int iEvent, int nData );
 protected:
     void                    SetZombieClass( ZombieClass_t zclass );
 public:

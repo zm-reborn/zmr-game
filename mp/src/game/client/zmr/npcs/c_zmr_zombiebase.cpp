@@ -7,6 +7,7 @@
 #include "zmr/zmr_player_shared.h"
 #include "zmr/zmr_global_shared.h"
 #include "zmr/c_zmr_zmvision.h"
+#include "zmr/npcs/zmr_zombieanimstate.h"
 #include "zmr/npcs/zmr_zombiebase_shared.h"
 
 
@@ -29,6 +30,22 @@ END_RECV_TABLE()
 
 BEGIN_PREDICTION_DATA( C_ZMBaseZombie )
     DEFINE_PRED_FIELD( m_iSelectorIndex, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
+
+
+    // Animation
+    DEFINE_PRED_FIELD( m_flCycle, FIELD_FLOAT, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
+    DEFINE_PRED_FIELD( m_nSequence, FIELD_INTEGER, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
+    
+    DEFINE_PRED_FIELD( m_flPlaybackRate, FIELD_FLOAT, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
+    //DEFINE_PRED_ARRAY( m_flPoseParameter, FIELD_FLOAT, MAXSTUDIOPOSEPARAM, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
+    DEFINE_PRED_ARRAY_TOL( m_flEncodedController, FIELD_FLOAT, MAXSTUDIOBONECTRLS, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE, 0.02f ),
+    DEFINE_PRED_FIELD( m_nNewSequenceParity, FIELD_INTEGER, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
+
+
+    // Misc
+    DEFINE_PRED_ARRAY( m_flexWeight, FIELD_FLOAT, MAXSTUDIOFLEXCTRL, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
+    DEFINE_PRED_FIELD( m_blinktoggle, FIELD_INTEGER, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
+    DEFINE_PRED_FIELD( m_viewtarget, FIELD_VECTOR, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
 END_PREDICTION_DATA()
 
 BEGIN_DATADESC( C_ZMBaseZombie )
@@ -50,6 +67,9 @@ CLIENTEFFECT_REGISTER_END()
 
 C_ZMBaseZombie::C_ZMBaseZombie()
 {
+    m_pAnimState = new CZMZombieAnimState( this );
+
+
     g_ZombieManager.AddZombie( this );
 
 
@@ -75,6 +95,9 @@ C_ZMBaseZombie::C_ZMBaseZombie()
 
 C_ZMBaseZombie::~C_ZMBaseZombie()
 {
+    delete m_pAnimState;
+    
+
     g_ZombieManager.RemoveZombie( this );
 
     delete m_fxHealth;
@@ -272,6 +295,13 @@ int C_ZMBaseZombie::DrawModelAndEffects( int flags )
 
 
     return ret;
+}
+
+void C_ZMBaseZombie::UpdateClientSideAnimation()
+{
+    m_pAnimState->Update();
+
+    BaseClass::UpdateClientSideAnimation();
 }
 
 /*void C_ZMBaseZombie::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr, CDmgAccumulator *pAccumulator )

@@ -56,12 +56,8 @@ public:
     virtual void Event_Killed( const CTakeDamageInfo& info ) OVERRIDE;
 
 
-    bool            HasActivity( Activity act );
-
-
     // Don't mind the odd name, it's to avoid confusion between move activity ground speed and "move speed"
     virtual float GetMoveActivityMovementSpeed();
-
 
 
     virtual bool    IsEnemy( CBaseEntity* pEnt ) const OVERRIDE { return pEnt && pEnt->IsPlayer(); }
@@ -81,8 +77,16 @@ public:
     virtual void    LostEnemy();
 
 
+    // Shared - Implemented in npcr_nonplayer_shared
+public:
+    bool            HasActivity( Activity act );
     Activity        GetActivity() const { return m_iCurActivity; }
     bool            SetActivity( Activity act );
+private:
+    Activity    m_iCurActivity;
+    Activity    m_iLastActivity;
+    bool        m_bCurActivityLoops;
+public:
 
 
 protected:
@@ -96,11 +100,7 @@ private:
 
     bool        m_bHandledAnimEvent;
 
-    Activity    m_iCurActivity;
-    Activity    m_iLastActivity;
     Activity    m_iLastLoopActivity; // For making sure we don't call OnActivityFinished multiple times.
-    bool        m_bCurActivityLoops;
-
 
 
 public:

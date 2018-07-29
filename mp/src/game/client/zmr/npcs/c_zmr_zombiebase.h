@@ -1,8 +1,7 @@
 #pragma once
 
-#include "c_basecombatcharacter.h"
 
-
+#include "npcr/c_npcr_nonplayer.h"
 
 #include "zmr/c_zmr_charcircle.h"
 #include "c_zmr_hat.h"
@@ -11,15 +10,18 @@
 #include "zmr/zmr_shareddefs.h"
 
 
+class CZMZombieAnimState;
+
+
 #define MAX_GROUP_INDEX             9
 #define INVALID_GROUP_INDEX         -1
 
 
 // ZMRTODO: Predict selector index.
-class C_ZMBaseZombie : public C_BaseCombatCharacter
+class C_ZMBaseZombie : public C_NPCRNonPlayer
 {
 public:
-	DECLARE_CLASS( C_ZMBaseZombie, C_BaseCombatCharacter )
+	DECLARE_CLASS( C_ZMBaseZombie, C_NPCRNonPlayer )
 	DECLARE_CLIENTCLASS()
 	DECLARE_PREDICTABLE();
     DECLARE_DATADESC()
@@ -33,8 +35,7 @@ public:
     int             DrawModelAndEffects( int flags );
 
 
-    virtual bool    IsNPCR() const OVERRIDE { return true; }
-
+    virtual void UpdateClientSideAnimation() OVERRIDE;
 
 
     virtual Vector          GetObserverCamOrigin() OVERRIDE { return WorldSpaceCenter(); }
@@ -59,6 +60,7 @@ public:
     ZombieClass_t           GetZombieClass() const;
     int                     GetPopCost() const;
     int                     GetCost() const;
+    void                    DoAnimationEvent( int iEvent, int nData );
 protected:
     void                    SetZombieClass( ZombieClass_t zclass );
 public:
@@ -93,6 +95,8 @@ private:
 
 
     C_ZMHolidayHat* m_pHat;
+
+    CZMZombieAnimState* m_pAnimState;
 };
 
 inline C_ZMBaseZombie* ToZMBaseZombie( C_BaseEntity* pEnt )
