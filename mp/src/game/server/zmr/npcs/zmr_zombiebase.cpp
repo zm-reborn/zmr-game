@@ -171,6 +171,17 @@ IMPLEMENT_SERVERCLASS_ST( CZMBaseZombie, DT_ZM_BaseZombie )
     SendPropInt( SENDINFO( m_iSelectorIndex ) ),
     SendPropFloat( SENDINFO( m_flHealthRatio ) ),
 
+
+    // Animation excludes
+    SendPropExclude( "DT_BaseAnimating", "m_flPoseParameter" ),
+    SendPropExclude( "DT_BaseAnimating", "m_flPlaybackRate" ),	
+    SendPropExclude( "DT_BaseAnimating", "m_nSequence" ),
+    SendPropExclude( "DT_BaseAnimatingOverlay", "overlay_vars" ),
+
+    // Animstate and clientside animation takes care of these on the client
+    SendPropExclude( "DT_ServerAnimationData" , "m_flCycle" ),	
+    SendPropExclude( "DT_AnimTimeMustBeFirst" , "m_flAnimTime" ),
+
     SendPropExclude( "DT_BaseFlex", "m_flexWeight" ),
     SendPropExclude( "DT_BaseFlex", "m_blinktoggle" ),
     SendPropExclude( "DT_BaseFlex", "m_viewtarget" ),
@@ -182,6 +193,10 @@ END_DATADESC()
 
 CZMBaseZombie::CZMBaseZombie()
 {
+    UseClientSideAnimation();
+
+
+
     m_hSwatObject.Set( nullptr );
 
     m_flLastCommanded = 0.0f;

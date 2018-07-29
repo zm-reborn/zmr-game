@@ -6,6 +6,7 @@
 #include "zmr/zmr_player_shared.h"
 #include "zmr/zmr_gamerules.h"
 #include "zmr/zmr_shareddefs.h"
+#include "zmr/npcs/zmr_zombieanimstate.h"
 
 
 
@@ -147,4 +148,28 @@ int CZMBaseZombie::GetPopCost() const
 int CZMBaseZombie::GetCost() const
 {
     return GetCost( GetZombieClass() );
+}
+
+#ifndef CLIENT_DLL
+void TE_ZombieAnimEvent( CZMBaseZombie* pZombie, ZMZombieAnimEvent_t anim, int nData );
+#endif
+
+void CZMBaseZombie::DoAnimationEvent( int iEvent, int nData )
+{
+#ifdef CLIENT_DLL
+    /*
+    if ( IsLocalPlayer() )
+    {
+        if ( ( prediction->InPrediction() && !prediction->IsFirstTimePredicted() ) )
+            return;
+    }
+    */
+    MDLCACHE_CRITICAL_SECTION();
+#endif
+
+    m_pAnimState->DoAnimationEvent( iEvent, nData );
+
+#ifndef CLIENT_DLL
+    TE_ZombieAnimEvent( this, (ZMZombieAnimEvent_t)iEvent, nData );
+#endif
 }

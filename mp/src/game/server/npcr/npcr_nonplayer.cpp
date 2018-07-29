@@ -300,68 +300,6 @@ void CNPCRNonPlayer::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent
 
 }
 
-bool CNPCRNonPlayer::SetActivity( Activity act )
-{
-    if ( act == m_iCurActivity && m_bCurActivityLoops )
-        return true;
-
-
-    CStudioHdr* hdr = GetModelPtr();
-    if ( !hdr || !hdr->SequencesAvailable() )
-    {
-        DevMsg( "NPC doesn't have any sequences!\n" );
-        return false;
-    }
-
-    VerifySequenceIndex( hdr );
-    int iNewSeq = hdr->SelectWeightedSequence( act, GetSequence() );
-
-    if ( iNewSeq <= -1 )
-    {
-        DevMsg( "Couldn't find sequence for activity %i!\n", act );
-        return false;
-    }
-
-
-    Activity last = m_iCurActivity;
-
-    if ( !IsSequenceFinished() )
-        OnAnimActivityInterrupted( act );
-
-
-    //if ( GetSequence() != iNewSeq )
-    SetCycle( 0.0f );
-
-    ResetSequence( iNewSeq );
-    m_bCurActivityLoops = SequenceLoops();
-
-    m_iCurActivity = act;
-    m_iLastActivity = last;
-    m_iLastLoopActivity = ACT_INVALID;
-
-    return true;
-}
-
-bool CNPCRNonPlayer::HasActivity( Activity act )
-{
-    CStudioHdr* hdr = GetModelPtr();
-    if ( !hdr || !hdr->SequencesAvailable() )
-    {
-        return false;
-    }
-
-    VerifySequenceIndex( hdr );
-    int iNewSeq = hdr->SelectWeightedSequence( act, GetSequence() );
-
-    if ( iNewSeq <= -1 )
-    {
-        DevMsg( "Couldn't find sequence for activity %i!\n", act );
-        return false;
-    }
-
-    return true;
-}
-
 float CNPCRNonPlayer::GetMoveActivityMovementSpeed()
 {
     // Just assume walk by default
