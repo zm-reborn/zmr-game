@@ -31,6 +31,8 @@ public:
         m_pGotoSwatSched = new GotoSwatObjSched;
         // Make sure we're not going the opposite direction when trying to swat
         m_pGotoSwatSched->SetCheckDirection( true );
+        // Scan for any enemies that are closer than the swatting object.
+        m_pGotoSwatSched->SetCheckForEnemies( true );
 
         // We want to go exactly to the goal in case the enemy is not on nav mesh.
         m_Path.UseExactGoal( true );

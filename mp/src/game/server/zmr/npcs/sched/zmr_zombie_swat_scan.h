@@ -20,6 +20,10 @@ public:
     ScanSwatObjSched()
     {
         m_pGotoSwatSched = new GotoSwatObjSched;
+        // Only go towards the enemy.
+        m_pGotoSwatSched->SetCheckDirection( true );
+        // Stop the swatting if we have enemies closer.
+        m_pGotoSwatSched->SetCheckForEnemies( true );
     }
     ~ScanSwatObjSched()
     {

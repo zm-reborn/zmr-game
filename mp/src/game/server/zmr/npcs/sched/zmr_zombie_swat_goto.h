@@ -19,12 +19,15 @@ private:
     Vector m_vecStartSwatPos;
     Vector m_vecCurSwatPos;
     bool m_bCheckDirection;
+    bool m_bCheckForEnemies; // Scan for enemies that may be closer than the swatting object
     float m_flStartExpireTimer;
+    CountdownTimer m_EnemyScanTimer;
 public:
     GotoSwatObjSched()
     {
         m_pSwatSched = new SwatObjSched();
         m_bCheckDirection = false;
+        m_bCheckForEnemies = false;
         m_flStartExpireTimer = 0.0f;
     }
     ~GotoSwatObjSched()
@@ -37,6 +40,9 @@ public:
 
     bool DoCheckDirection() const { return m_bCheckDirection; }
     void SetCheckDirection( bool state ) { m_bCheckDirection = state; }
+
+    bool DoCheckForEnemies() const { return m_bCheckForEnemies; }
+    void SetCheckForEnemies( bool state ) { m_bCheckForEnemies = state; }
 
 
     virtual const char* GetName() const OVERRIDE { return "ZombieGotoSwatObj"; }
@@ -105,6 +111,32 @@ public:
 
 
         const Vector vecCurPos = pSwat->WorldSpaceCenter();
+
+        // Scan for any enemies that are closer than the swatting object.
+        if (DoCheckForEnemies() &&
+            (!m_EnemyScanTimer.HasStarted() || m_EnemyScanTimer.IsElapsed()) )
+        {
+            CBaseEntity* pCurEnemy = pOuter->GetEnemy();
+            CBaseEntity* pEnt = pOuter->GetSenses()->GetClosestEntity();
+            if ( pEnt && pOuter->IsEnemy( pEnt ) )
+            {
+                float flCurDist = vecCurPos.DistTo( pSwat->WorldSpaceCenter() );
+                float flNewDist = vecCurPos.DistTo( pEnt->WorldSpaceCenter() );
+
+                
+                if (pOuter->HasConditionsForClawAttack( pEnt ) // We can attack the idiot, do it!
+                ||  flNewDist < (flCurDist*0.7f) ) // We have to be reasonably closer to the potential enemy.
+                {
+                    if ( !pCurEnemy || pEnt != pCurEnemy )
+                        pOuter->AcquireEnemy( pEnt );
+
+                    End( "Enemy is closer to us than the swatting object!" );
+                    return;
+                }
+            }
+
+            m_EnemyScanTimer.Start( 0.5f );
+        }
 
         // We've moved way too far from the start.
         if ( m_vecStartSwatPos.DistToSqr( vecCurPos ) > (256.0f*256.0f) )
