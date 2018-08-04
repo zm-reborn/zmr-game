@@ -839,7 +839,7 @@ void CZMFrame::FindZMObject( int x, int y, bool bSticky )
                 pUsable->entindex(),
                 bSticky ? " 1" : "" ) );
             bHit = true;*/
-            return;
+            continue;
         }
 
 
