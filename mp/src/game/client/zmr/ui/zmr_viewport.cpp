@@ -27,7 +27,7 @@
 
 // ZMRTODO: See if these works properly.
 #define MASK_ZMVIEW             ( CONTENTS_SOLID | CONTENTS_MOVEABLE ) // When testing box select.
-#define MASK_ZMSELECTUSABLE     MASK_SOLID // When left clicking (not setting rallypoint, etc.)
+#define MASK_ZMSELECTUSABLE     ( MASK_SOLID & ~(CONTENTS_WINDOW|CONTENTS_GRATE) ) // When left clicking (not setting rallypoint, etc.)
 #define MASK_ZMTARGET           MASK_SOLID // When right clicking.
 #define MASK_ZMCREATE           MASK_SOLID // When left clicking.
 
