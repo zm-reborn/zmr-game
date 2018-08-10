@@ -3,6 +3,7 @@
 
 #include "zmr/npcs/zmr_zombiebase.h"
 #include "zmr/npcs/zmr_banshee.h"
+#include "zmr/npcs/zmr_zombieanimstate.h"
 
 
 extern ConVar zm_sk_banshee_dmg_leap;
@@ -77,7 +78,7 @@ public:
 
     virtual void OnAnimEvent( animevent_t* pEvent ) OVERRIDE
     {
-        if ( pEvent->event == CZMBanshee::AE_FASTZOMBIE_LEAP )
+        if ( pEvent->event == AE_FASTZOMBIE_LEAP )
         {
             GetOuter()->HandledAnimEvent();
             
@@ -102,7 +103,7 @@ public:
 
         if ( pOuter->GetActivity() != m_iLandAct )
         {
-            m_iLandAct = CZMBanshee::ACT_FASTZOMBIE_LAND_RIGHT;
+            m_iLandAct = ACT_FASTZOMBIE_LAND_RIGHT;
 
             // See which way we're gonna land.
             CBaseEntity* pEnemy = GetOuter()->GetEnemy();
@@ -111,10 +112,10 @@ public:
                 Vector dirToEnemy = pEnemy->GetAbsOrigin() - GetOuter()->GetAbsOrigin();
                 float delta = atan2( dirToEnemy.y, dirToEnemy.x ) - GetOuter()->GetAbsAngles().y;
                 if ( delta > 0.0f )
-                    m_iLandAct = CZMBanshee::ACT_FASTZOMBIE_LAND_LEFT;
+                    m_iLandAct = ACT_FASTZOMBIE_LAND_LEFT;
             }
 
-            pOuter->SetActivity( m_iLandAct );
+            pOuter->DoAnimationEvent( ZOMBIEANIMEVENT_BANSHEEANIM, m_iLandAct );
         }
 
         m_FinishTimer.Start( 0.35f );
@@ -151,13 +152,13 @@ public:
         if ( newActivity == ACT_RANGE_ATTACK1 )
             return;
 
-        if ( newActivity == CZMBanshee::ACT_FASTZOMBIE_LEAP_STRIKE )
+        if ( newActivity == ACT_FASTZOMBIE_LEAP_STRIKE )
             return;
 
         if ( newActivity == m_iLandAct )
             return;
 
-        if ( newActivity == CZMBanshee::ACT_FASTZOMBIE_FRENZY )
+        if ( newActivity == ACT_FASTZOMBIE_FRENZY )
             return;
 
 
@@ -170,7 +171,7 @@ public:
         {
             CZMBanshee* pOuter = GetOuter();
 
-            if ( !pOuter->SetActivity( CZMBanshee::ACT_FASTZOMBIE_LEAP_STRIKE ) )
+            if ( !pOuter->DoAnimationEvent( ZOMBIEANIMEVENT_BANSHEEANIM, ACT_FASTZOMBIE_LEAP_STRIKE ) )
             {
                 End( "Couldn't start the leap strike activity!" );
             }
@@ -214,7 +215,7 @@ public:
             // We're close enough.
             if ( pOuter->GetMotor()->IsFacing( vecEnemyPos, 10.0f ) )
             {
-                if ( !pOuter->SetActivity( ACT_RANGE_ATTACK1 ) )
+                if ( !pOuter->DoAnimationEvent( ZOMBIEANIMEVENT_BANSHEEANIM, ACT_RANGE_ATTACK1 ) )
                 {
                     End( "Couldn't start leap start activity!" );
                     return;

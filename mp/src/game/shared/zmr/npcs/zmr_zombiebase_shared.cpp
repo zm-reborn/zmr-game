@@ -14,7 +14,6 @@
 CZMZombieManager g_ZombieManager;
 
 
-
 ZombieClass_t CZMBaseZombie::NameToClass( const char* name )
 {
     if ( Q_strnicmp( name, "npc_zombie", 10 ) == 0 )
@@ -154,22 +153,32 @@ int CZMBaseZombie::GetCost() const
 void TE_ZombieAnimEvent( CZMBaseZombie* pZombie, ZMZombieAnimEvent_t anim, int nData );
 #endif
 
-void CZMBaseZombie::DoAnimationEvent( int iEvent, int nData )
+bool CZMBaseZombie::DoAnimationEvent( int iEvent, int nData )
 {
 #ifdef CLIENT_DLL
-    /*
-    if ( IsLocalPlayer() )
-    {
-        if ( ( prediction->InPrediction() && !prediction->IsFirstTimePredicted() ) )
-            return;
-    }
-    */
     MDLCACHE_CRITICAL_SECTION();
 #endif
 
-    m_pAnimState->DoAnimationEvent( iEvent, nData );
+#ifdef GAME_DLL
+    // Depending on the event, send a random seed in data
+    GetAnimRandomSeed( iEvent, nData );
+#endif
+
+
+    m_iAdditionalAnimRandomSeed = nData;
+
+    bool ret = m_pAnimState->DoAnimationEvent( (ZMZombieAnimEvent_t)iEvent, nData );
 
 #ifndef CLIENT_DLL
     TE_ZombieAnimEvent( this, (ZMZombieAnimEvent_t)iEvent, nData );
 #endif
+
+    m_iAdditionalAnimRandomSeed = 0;
+
+    return ret;
+}
+
+int CZMBaseZombie::GetAnimationRandomSeed()
+{
+    return m_iAnimationRandomSeed + m_iAdditionalAnimRandomSeed;
 }

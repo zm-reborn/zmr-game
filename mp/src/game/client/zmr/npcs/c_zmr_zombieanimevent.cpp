@@ -8,5 +8,15 @@ IMPLEMENT_CLIENTCLASS_EVENT( C_ZMTEZombieAnimEvent, DT_ZM_TEZombieAnimEvent, CZM
 BEGIN_RECV_TABLE_NOBASE( C_ZMTEZombieAnimEvent, DT_ZM_TEZombieAnimEvent )
     RecvPropEHandle( RECVINFO( m_hZombie ) ),
     RecvPropInt( RECVINFO( m_iEvent ) ),
-    //RecvPropInt( RECVINFO( m_nData ) )
+    RecvPropInt( RECVINFO( m_nData ) )
 END_RECV_TABLE()
+
+void C_ZMTEZombieAnimEvent::PostDataUpdate( DataUpdateType_t updateType )
+{
+    // Create the effect.
+    C_ZMBaseZombie* pZombie = static_cast<C_ZMBaseZombie*>( m_hZombie.Get() );
+    if ( pZombie && !pZombie->IsDormant() )
+    {
+        pZombie->DoAnimationEvent( m_iEvent.Get(), m_nData.Get() );
+    }	
+}

@@ -35,7 +35,10 @@ public:
     int             DrawModelAndEffects( int flags );
 
 
+    virtual void OnDataChanged( DataUpdateType_t type ) OVERRIDE;
     virtual void UpdateClientSideAnimation() OVERRIDE;
+
+    virtual void HandleAnimEvent( animevent_t* pEvent ) OVERRIDE;
 
 
     virtual Vector          GetObserverCamOrigin() OVERRIDE { return WorldSpaceCenter(); }
@@ -43,6 +46,12 @@ public:
     virtual Vector          EyePosition() OVERRIDE;
 
     virtual const char* GetZombieLocalization() const { return ""; }
+
+    // Sounds
+    virtual bool ShouldPlayFootstepSound() const;
+    virtual void FootstepSound( bool bRightFoot = false ) {}
+    virtual void FootscuffSound( bool bRightFoot = false ) {}
+    virtual void AttackSound() {}
     
     //virtual void TraceAttack( const CTakeDamageInfo&, const Vector&, trace_t*,CDmgAccumulator* ) OVERRIDE;
     
@@ -60,9 +69,12 @@ public:
     ZombieClass_t           GetZombieClass() const;
     int                     GetPopCost() const;
     int                     GetCost() const;
-    void                    DoAnimationEvent( int iEvent, int nData );
+    bool                    DoAnimationEvent( int iEvent, int nData );
+    virtual int             GetAnimationRandomSeed() OVERRIDE;
 protected:
     void                    SetZombieClass( ZombieClass_t zclass );
+
+    int m_iAdditionalAnimRandomSeed;
 public:
 
 
@@ -87,6 +99,8 @@ protected:
 private:
     CNetworkVar( int, m_iSelectorIndex );
     CNetworkVar( float, m_flHealthRatio );
+    CNetworkVar( bool, m_bIsOnGround );
+    CNetworkVar( int, m_iAnimationRandomSeed );
 
     int m_iGroup;
     ZombieClass_t m_iZombieClass;

@@ -8,9 +8,16 @@
 
 enum ZMZombieAnimEvent_t
 {
-    ZOMBIEANIMEVENT_ATTACK = 0,
+    ZOMBIEANIMEVENT_IDLE = 0,
 
-    ZOMBIEANIMEVENT_BANSHEELEAP,
+    ZOMBIEANIMEVENT_ATTACK,
+
+    ZOMBIEANIMEVENT_SWAT,
+
+    ZOMBIEANIMEVENT_BANSHEEANIM,
+
+    ZOMBIEANIMEVENT_ON_BURN,
+    ZOMBIEANIMEVENT_ON_EXTINGUISH,
 
     ZOMBIEANIMEVENT_MAX
 };
@@ -171,10 +178,15 @@ public:
     bool        SetOuterActivity( Activity act ) const;
 
     Vector      GetOuterVelocity() const;
+    int         GetOuterRandomSequence( Activity act ) const;
 
 
+    static int                  AnimEventToActivity( ZMZombieAnimEvent_t iEvent, int nData = 0 );
+    static ZMZombieAnimEvent_t  ActivityToAnimEvent( int iActivity, int& nData );
 
-    void DoAnimationEvent( int iEvent, int nData ) {}
+    virtual bool HandleAnimEvent( ZMZombieAnimEvent_t iEvent, int nData );
+
+    bool DoAnimationEvent( ZMZombieAnimEvent_t iEvent, int nData );
 
     void UpdateLayers();
 
@@ -203,6 +215,12 @@ public:
 
 protected:
     virtual bool InitParams();
+    virtual bool ShouldUpdate() const;
+
+
+    virtual void    ShowDebugInfo();
+    void            DrawAnimStateInfo();
+
 
 
     int     AddLayeredSequence( int iSeq, int priority );

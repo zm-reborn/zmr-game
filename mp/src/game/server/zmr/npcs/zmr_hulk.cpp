@@ -147,22 +147,7 @@ void CZMHulk::AlertSound()
     EmitSound( "NPC_PoisonZombie.Alert" );
 }
 
-void CZMHulk::AttackSound()
-{
-    EmitSound( "NPC_PoisonZombie.Attack" );
-}
-
 void CZMHulk::DeathSound()
 {
     EmitSound( "NPC_PoisonZombie.Die" );
 }
-
-void CZMHulk::FootstepSound( bool bRightFoot )
-{
-    EmitSound( bRightFoot ? "NPC_PoisonZombie.FootstepRight" : "NPC_PoisonZombie.FootstepLeft" );
-}
-
-void CZMHulk::FootscuffSound( bool bRightFoot )
-{
-}
-
