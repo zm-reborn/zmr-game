@@ -56,6 +56,28 @@ inline T Lerp_Hermite( float t, const T& p0, const T& p1, const T& p2 )
 	return output;
 }
 
+#ifdef ZMR // ZMRCHANGE: Fixes pose parameters going out of whack.
+template <>
+inline float Lerp_Hermite( float t, const float& p0, const float& p1, const float& p2 )
+{
+	float d1 = p1 - p0;
+	float d2 = p2 - p1;
+	
+	if ( d1 < 0.00001f ) d1 = 0;
+	if ( d2 < 0.00001f ) d2 = 0;
+	
+	float output;
+	float tSqr = t*t;
+	float tCube = t*tSqr;
+
+	output = p1 * (2*tCube-3*tSqr+1);
+	output += p2 * (-2*tCube+3*tSqr);
+	output += d1 * (tCube-2*tSqr+t);
+	output += d2 * (tCube-tSqr);
+
+	return output;
+}
+#endif
 
 template <class T>
 inline T Derivative_Hermite( float t, const T& p0, const T& p1, const T& p2 )
