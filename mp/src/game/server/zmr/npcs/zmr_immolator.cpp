@@ -177,19 +177,7 @@ void CZMImmolator::AlertSound()
 {
 }
 
-void CZMImmolator::AttackSound()
-{
-}
-
 void CZMImmolator::DeathSound()
 {
     EmitSound( "NPC_BurnZombie.Die" );
-}
-
-void CZMImmolator::FootstepSound( bool bRightFoot )
-{
-}
-
-void CZMImmolator::FootscuffSound( bool bRightFoot )
-{
 }

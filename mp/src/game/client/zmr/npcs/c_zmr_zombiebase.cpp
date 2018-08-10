@@ -1,4 +1,5 @@
 #include "cbase.h"
+#include "eventlist.h"
 
 #include "clienteffectprecachesystem.h"
 
@@ -26,6 +27,9 @@ IMPLEMENT_CLIENTCLASS_DT( C_ZMBaseZombie, DT_ZM_BaseZombie, CZMBaseZombie )
 
 	RecvPropInt( RECVINFO( m_iSelectorIndex ) ),
 	RecvPropFloat( RECVINFO( m_flHealthRatio ) ),
+    RecvPropBool( RECVINFO( m_bIsOnGround ) ),
+    RecvPropInt( RECVINFO( m_iAnimationRandomSeed ) ),
+    RecvPropInt( RECVINFO( m_lifeState ) ),
 END_RECV_TABLE()
 
 BEGIN_PREDICTION_DATA( C_ZMBaseZombie )
@@ -79,6 +83,8 @@ C_ZMBaseZombie::C_ZMBaseZombie()
     m_iGroup = INVALID_GROUP_INDEX;
 
     m_pHat = nullptr;
+
+    m_iAdditionalAnimRandomSeed = 0;
     
 
     // Always create FX.
@@ -297,11 +303,73 @@ int C_ZMBaseZombie::DrawModelAndEffects( int flags )
     return ret;
 }
 
+void C_ZMBaseZombie::OnDataChanged( DataUpdateType_t type )
+{
+    BaseClass::OnDataChanged( type );
+
+    if ( type == DATA_UPDATE_CREATED )
+    {
+        SetNextClientThink( CLIENT_THINK_ALWAYS );
+    }
+
+    UpdateVisibility();
+}
+
 void C_ZMBaseZombie::UpdateClientSideAnimation()
 {
     m_pAnimState->Update();
 
     BaseClass::UpdateClientSideAnimation();
+}
+
+void C_ZMBaseZombie::HandleAnimEvent( animevent_t* pEvent )
+{
+    if ( pEvent->event == AE_ZOMBIE_STEP_LEFT )
+    {
+        if ( ShouldPlayFootstepSound() )
+            FootstepSound( false );
+
+        return;
+    }
+
+    if ( pEvent->event == AE_ZOMBIE_STEP_RIGHT )
+    {
+        if ( ShouldPlayFootstepSound() )
+            FootstepSound( true );
+
+        return;
+    }
+
+
+    if ( pEvent->event == AE_ZOMBIE_SCUFF_LEFT )
+    {
+        if ( ShouldPlayFootstepSound() )
+            FootscuffSound( false );
+
+        return;
+    }
+
+    if ( pEvent->event == AE_ZOMBIE_SCUFF_RIGHT )
+    {
+        if ( ShouldPlayFootstepSound() )
+            FootscuffSound( true );
+
+        return;
+    }
+
+    if ( pEvent->event == AE_ZOMBIE_STARTSWAT )
+    {
+        AttackSound();
+        return;
+    }
+
+    if ( pEvent->event == AE_ZOMBIE_ATTACK_SCREAM )
+    {
+        AttackSound();
+        return;
+    }
+
+    BaseClass::HandleAnimEvent( pEvent );
 }
 
 /*void C_ZMBaseZombie::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr, CDmgAccumulator *pAccumulator )
@@ -385,4 +453,9 @@ void C_ZMBaseZombie::ReleaseHat()
         m_pHat->Release();
         m_pHat = nullptr;
     }
+}
+
+bool C_ZMBaseZombie::ShouldPlayFootstepSound() const
+{
+    return m_bIsOnGround;
 }

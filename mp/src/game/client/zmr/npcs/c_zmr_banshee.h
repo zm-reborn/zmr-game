@@ -15,4 +15,9 @@ public:
 
 
     virtual const char* GetZombieLocalization() const OVERRIDE { return "#ZMClassBanshee"; }
+
+
+    virtual void AttackSound() OVERRIDE;
+
+    virtual void HandleAnimEvent( animevent_t* pEvent ) OVERRIDE;
 };

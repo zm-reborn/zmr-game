@@ -15,7 +15,7 @@ public:
 
     CNetworkHandle( CZMBaseZombie, m_hZombie );
     CNetworkVar( int, m_iEvent );
-    //CNetworkVar( int, m_nData );
+    CNetworkVar( int, m_nData );
 };
 
 extern void TE_ZombieAnimEvent( CZMBaseZombie* pZombie, ZMZombieAnimEvent_t anim, int nData );

@@ -4,6 +4,12 @@
 #include "npcr_nonplayer_shared.h"
 
 
+int CNPCRNonPlayer::GetAnimationRandomSeed()
+{
+    static int i = 0;
+    return ( i = (++i % 50) );
+}
+
 bool CNPCRNonPlayer::HasActivity( Activity act )
 {
     CStudioHdr* hdr = GetModelPtr();
@@ -12,7 +18,7 @@ bool CNPCRNonPlayer::HasActivity( Activity act )
         return false;
     }
 
-    VerifySequenceIndex( hdr );
+    //VerifySequenceIndex( hdr );
     int iNewSeq = hdr->SelectWeightedSequence( act, GetSequence() );
 
     if ( iNewSeq <= -1 )
@@ -38,7 +44,7 @@ bool CNPCRNonPlayer::SetActivity( Activity act )
     }
 
     
-    RandomSeed( 1 );
+    RandomSeed( GetAnimationRandomSeed() );
     VerifySequenceIndex( hdr );
     int iNewSeq = hdr->SelectWeightedSequence( act, GetSequence() );
 

@@ -641,6 +641,8 @@ private:
 	CThreadFastMutex				m_StudioHdrInitLock;
 #ifdef ZMR // ZMRCHANGE: Need this for the mp animstate fix.
 	friend class C_ZMPlayer;
+
+    friend class C_NPCRNonPlayer;
 #endif
 };
 

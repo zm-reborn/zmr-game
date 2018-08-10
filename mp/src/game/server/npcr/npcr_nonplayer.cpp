@@ -76,7 +76,6 @@ void CNPCRNonPlayer::Spawn()
 
     
     InitBoneControllers(); 
-    SetActivity( ACT_IDLE );
 
 
     SetThink( &CNPCRNonPlayer::NPCThink );

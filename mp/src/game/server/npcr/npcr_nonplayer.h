@@ -79,6 +79,8 @@ public:
 
     // Shared - Implemented in npcr_nonplayer_shared
 public:
+    virtual int     GetAnimationRandomSeed();
+
     bool            HasActivity( Activity act );
     Activity        GetActivity() const { return m_iCurActivity; }
     bool            SetActivity( Activity act );
