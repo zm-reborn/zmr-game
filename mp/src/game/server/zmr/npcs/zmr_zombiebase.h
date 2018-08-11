@@ -21,12 +21,12 @@ class CZMBlockerScanner;
 class CZMEntAmbushTrigger;
 
 
-class CZMBaseZombie : public NPCR::CBaseNonPlayer, public CZMNPCLagCompensation
+class CZMBaseZombie : public CNPCRNonPlayer, public CZMNPCLagCompensation
 {
 public:
     typedef CZMBaseZombie ThisClass;
-    typedef NPCR::CBaseNonPlayer BaseClass;
-    //DECLARE_CLASS( CZMBaseZombie, NPCR::CBaseNonPlayer );
+    typedef CNPCRNonPlayer BaseClass;
+    //DECLARE_CLASS( CZMBaseZombie, CNPCRNonPlayer );
     DECLARE_SERVERCLASS();
     DECLARE_DATADESC();
 
@@ -39,6 +39,7 @@ public:
     virtual void Spawn() OVERRIDE;
 
     void ZombieThink();
+    virtual void PreUpdate() OVERRIDE;
     virtual void PostUpdate() OVERRIDE;
 
 
@@ -76,6 +77,7 @@ public:
     virtual int             OnTakeDamage_Alive( const CTakeDamageInfo& inputInfo ) OVERRIDE;
     virtual void            TraceAttack( const CTakeDamageInfo& inputInfo, const Vector& vecDir, trace_t* pTrace, CDmgAccumulator* pAccumulator ) OVERRIDE;
     virtual bool            ScaleDamageByHitgroup( int iHitGroup, CTakeDamageInfo& info ) const;
+    void                    MultiplyBuckshotDamage( CTakeDamageInfo& info ) const;
 
 
     virtual bool            Event_Gibbed( const CTakeDamageInfo& info ) OVERRIDE;
@@ -88,11 +90,11 @@ public:
 
 
     // Sounds
+    virtual bool ShouldPlayIdleSound() const;
+    virtual float IdleSound() { return 0.0f; } // Return delay for the next idle sound.
     virtual void AlertSound() {}
-    virtual void AttackSound() {}
     virtual void DeathSound() {}
-    virtual void FootstepSound( bool bRightFoot = false ) {}
-    virtual void FootscuffSound( bool bRightFoot = false ) {}
+
     virtual void ClawImpactSound( bool bHit = true );
 
 
@@ -112,9 +114,15 @@ public:
     ZombieClass_t           GetZombieClass() const;
     int                     GetPopCost() const;
     int                     GetCost() const;
+    bool                    DoAnimationEvent( int iEvent, int nData = 0 );
+    virtual int             GetAnimationRandomSeed() OVERRIDE;
 protected:
     void                    SetZombieClass( ZombieClass_t zclass );
+
+    int m_iAdditionalAnimRandomSeed;
 public:
+
+    static void GetAnimRandomSeed( int iEvent, int& nData );
 
 
     static float GetSwatMaxMass();
@@ -226,6 +234,8 @@ private:
 
     CNetworkVar( int, m_iSelectorIndex );
     CNetworkVar( float, m_flHealthRatio ); // For humans we can use health/maxhealth
+    CNetworkVar( bool, m_bIsOnGround );
+    CNetworkVar( int, m_iAnimationRandomSeed );
 
 
 
@@ -243,18 +253,14 @@ private:
     float m_flBurnDamage;
     float m_flBurnDamageTime;
 
+    float m_flNextIdleSound;
+
 
 public:
     static int AE_ZOMBIE_ATTACK_RIGHT;
     static int AE_ZOMBIE_ATTACK_LEFT;
     static int AE_ZOMBIE_ATTACK_BOTH;
     static int AE_ZOMBIE_SWATITEM;
-    static int AE_ZOMBIE_STARTSWAT;
-    static int AE_ZOMBIE_STEP_LEFT;
-    static int AE_ZOMBIE_STEP_RIGHT;
-    static int AE_ZOMBIE_SCUFF_LEFT;
-    static int AE_ZOMBIE_SCUFF_RIGHT;
-    static int AE_ZOMBIE_ATTACK_SCREAM;
     static int AE_ZOMBIE_GET_UP;
     static int AE_ZOMBIE_POUND;
     static int AE_ZOMBIE_ALERTSOUND;

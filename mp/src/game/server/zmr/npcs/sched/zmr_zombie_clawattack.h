@@ -37,7 +37,8 @@ public:
         }
 
 
-        if ( !pOuter->SetActivity( ACT_MELEE_ATTACK1 ) )
+        
+        if ( !pOuter->DoAnimationEvent( ZOMBIEANIMEVENT_ATTACK ) )
         {
             End( "Couldn't start claw attack activity!" );
             return;
@@ -68,7 +69,7 @@ public:
         CBaseEntity* pEnemy = pOuter->GetEnemy();
         Vector face = pEnemy ? pEnemy->WorldSpaceCenter() : m_vecLastFacing;
 
-        pOuter->GetMotor()->FaceTowards( pEnemy->WorldSpaceCenter() );
+        pOuter->GetMotor()->FaceTowards( face );
 
         m_vecLastFacing = face;
     }
@@ -114,7 +115,7 @@ public:
 
         if ( GetOuter()->GetActivity() == ACT_MELEE_ATTACK1 )
         {
-            GetOuter()->SetActivity( ACT_IDLE );
+            GetOuter()->DoAnimationEvent( ZOMBIEANIMEVENT_IDLE );
         }
     }
 };

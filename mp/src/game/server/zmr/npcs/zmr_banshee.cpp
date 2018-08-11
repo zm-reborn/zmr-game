@@ -28,16 +28,7 @@ LINK_ENTITY_TO_CLASS( npc_fastzombie, CZMBanshee );
 PRECACHE_REGISTER( npc_fastzombie );
 
 
-Activity CZMBanshee::ACT_FASTZOMBIE_FRENZY = ACT_INVALID;
-Activity CZMBanshee::ACT_FASTZOMBIE_BIG_SLASH = ACT_INVALID;
 
-Activity CZMBanshee::ACT_FASTZOMBIE_LAND_RIGHT = ACT_INVALID;
-Activity CZMBanshee::ACT_FASTZOMBIE_LAND_LEFT = ACT_INVALID;
-Activity CZMBanshee::ACT_FASTZOMBIE_LEAP_STRIKE = ACT_INVALID;
-
-int CZMBanshee::AE_FASTZOMBIE_GALLOP_LEFT = AE_INVALID;
-int CZMBanshee::AE_FASTZOMBIE_GALLOP_RIGHT = AE_INVALID;
-int CZMBanshee::AE_FASTZOMBIE_LEAP = AE_INVALID;
 
 extern ConVar zm_sk_banshee_dmg_claw;
 extern ConVar zm_sk_banshee_health;
@@ -103,21 +94,6 @@ void CZMBanshee::Precache()
     PrecacheScriptSound( "NPC_FastZombie.Gurgle" );
 
     PrecacheScriptSound( "NPC_FastZombie.Moan1" );
-
-
-
-    REGISTER_PRIVATE_ACTIVITY( ACT_FASTZOMBIE_FRENZY );
-    REGISTER_PRIVATE_ACTIVITY( ACT_FASTZOMBIE_BIG_SLASH );
-
-    REGISTER_PRIVATE_ACTIVITY( ACT_FASTZOMBIE_LAND_RIGHT );
-    REGISTER_PRIVATE_ACTIVITY( ACT_FASTZOMBIE_LAND_LEFT );
-    REGISTER_PRIVATE_ACTIVITY( ACT_FASTZOMBIE_LEAP_STRIKE );
-
-
-    REGISTER_PRIVATE_ANIMEVENT( AE_FASTZOMBIE_GALLOP_LEFT );
-    REGISTER_PRIVATE_ANIMEVENT( AE_FASTZOMBIE_GALLOP_RIGHT );
-    REGISTER_PRIVATE_ANIMEVENT( AE_FASTZOMBIE_LEAP );
-    
 
 
     BaseClass::Precache();
@@ -294,18 +270,6 @@ void CZMBanshee::HandleAnimEvent( animevent_t* pEvent )
     //    return;
     //}
     
-    if ( pEvent->event == AE_FASTZOMBIE_GALLOP_LEFT )
-    {
-        EmitSound( "NPC_FastZombie.GallopLeft" );
-        return;
-    }
-
-    if ( pEvent->event == AE_FASTZOMBIE_GALLOP_RIGHT )
-    {
-        EmitSound( "NPC_FastZombie.GallopRight" );
-        return;
-    }
-    
     if (pEvent->event == AE_ZOMBIE_ATTACK_RIGHT
     ||  pEvent->event == AE_ZOMBIE_ATTACK_LEFT)
     {
@@ -340,7 +304,7 @@ void CZMBanshee::OnAnimActivityFinished( Activity completedActivity )
         bool bCanAttack = GetEnemy() && HasConditionsForClawAttack( GetEnemy() );
         if ( !bCanAttack )
         {
-            SetActivity( ACT_FASTZOMBIE_FRENZY );
+            DoAnimationEvent( ZOMBIEANIMEVENT_BANSHEEANIM, ACT_FASTZOMBIE_FRENZY );
 
             float delay = SequenceDuration();
             SetNextAttack( gpGlobals->curtime + delay );
@@ -356,7 +320,7 @@ void CZMBanshee::OnAnimActivityFinished( Activity completedActivity )
         bool bCanAttack = GetEnemy() && HasConditionsForClawAttack( GetEnemy() );
         if ( bCanAttack )
         {
-            SetActivity( ACT_FASTZOMBIE_BIG_SLASH );
+            DoAnimationEvent( ZOMBIEANIMEVENT_BANSHEEANIM, ACT_FASTZOMBIE_BIG_SLASH );
 
             float delay = SequenceDuration();
             SetNextAttack( gpGlobals->curtime + delay );
@@ -365,6 +329,19 @@ void CZMBanshee::OnAnimActivityFinished( Activity completedActivity )
     }
 
     BaseClass::OnAnimActivityFinished( completedActivity );
+}
+
+bool CZMBanshee::ShouldPlayIdleSound() const
+{
+    //return BaseClass::ShouldPlayIdleSound() && random->RandomInt( 0, 99 ) == 0;
+    return false;
+}
+
+float CZMBanshee::IdleSound()
+{
+    // Banshee idle sound doesn't seem to work.
+    //EmitSound( "NPC_FastZombie.Idle" );
+    return 1.0f;
 }
 
 #define ALERT_SOUND_NEAR_DIST       512.0f
@@ -383,22 +360,9 @@ void CZMBanshee::AlertSound()
     */
 }
 
-void CZMBanshee::AttackSound()
-{
-    EmitSound( "NPC_FastZombie.Attack" );
-}
-
 void CZMBanshee::DeathSound()
 {
     EmitSound( "NPC_FastZombie.Die" );
-}
-
-void CZMBanshee::FootstepSound( bool bRightFoot )
-{
-}
-
-void CZMBanshee::FootscuffSound( bool bRightFoot )
-{
 }
 
 void CZMBanshee::ClawImpactSound( bool bHit )

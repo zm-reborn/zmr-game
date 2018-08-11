@@ -89,9 +89,10 @@ void CZMImmolator::Ignite( float flFlameLifetime, bool bNPCOnly, float flSize, b
 
 void CZMImmolator::Event_Killed( const CTakeDamageInfo& info )
 {
-    StartFires();
-
     BaseClass::Event_Killed( info );
+
+    // We need to call this last or we will go on an endless loop
+    StartFires();
 }
 
 void CZMImmolator::StartFires()
@@ -155,23 +156,28 @@ void CZMImmolator::HandleAnimEvent( animevent_t* pEvent )
     BaseClass::HandleAnimEvent( pEvent );
 }
 
-void CZMImmolator::AlertSound()
+bool CZMImmolator::ShouldPlayIdleSound() const
 {
+    /*
+    return  BaseClass::ShouldPlayIdleSound()
+    &&      GetEnemy() == nullptr // We must be idling.
+    &&      random->RandomInt( 0, 120 ) == 0;
+    */
+    return false;
 }
 
-void CZMImmolator::AttackSound()
+float CZMImmolator::IdleSound()
+{
+    // Immolator has a very weird idle sound.
+    //EmitSound( "NPC_BurnZombie.Idle" );
+    return 5.0f;
+}
+
+void CZMImmolator::AlertSound()
 {
 }
 
 void CZMImmolator::DeathSound()
 {
     EmitSound( "NPC_BurnZombie.Die" );
-}
-
-void CZMImmolator::FootstepSound( bool bRightFoot )
-{
-}
-
-void CZMImmolator::FootscuffSound( bool bRightFoot )
-{
 }

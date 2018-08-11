@@ -5384,8 +5384,12 @@ void C_BaseAnimating::ResetSequenceInfo( void )
 	m_nNewSequenceParity = ( m_nNewSequenceParity + 1 ) & EF_PARITY_MASK;
 	m_nResetEventsParity = ( m_nResetEventsParity + 1 ) & EF_PARITY_MASK;
 
+#ifdef ZMR
+    if ( pStudioHdr && !IsNPCR() )
+#else
 	// FIXME: why is this called here?  Nothing should have changed to make this nessesary
 	if ( pStudioHdr )
+#endif
 	{
 		SetEventIndexForSequence( pStudioHdr->pSeqdesc( GetSequence() ) );
 	}

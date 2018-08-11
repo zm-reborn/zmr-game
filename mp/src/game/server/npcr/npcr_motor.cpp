@@ -7,6 +7,8 @@
 
 ConVar npcr_debug_navigator( "npcr_debug_navigator", "0" );
 
+ConVar npcr_motor_jump_groundoffset( "npcr_motor_jump_groundoffset", "2" );
+
 
 class CMoveFilter : public CTraceFilterSimple
 {
@@ -14,12 +16,17 @@ public:
     CMoveFilter( NPCR::CBaseNPC* pNPC, int collisionGroup ) : CTraceFilterSimple( pNPC->GetCharacter(), collisionGroup )
     {
         m_pNPC = pNPC;
+        m_pRootParent = pNPC->GetCharacter()->GetRootMoveParent();
     }
 
     virtual bool ShouldHitEntity( IHandleEntity* pHandleEntity, int contentsMask ) OVERRIDE
     {
         CBaseEntity* pEnt = EntityFromEntityHandle( pHandleEntity );
         if ( !pEnt )
+            return false;
+
+        // We may have something parented to us. Ignore em.
+        if ( UTIL_EntityHasMatchingRootParent( m_pRootParent, pEnt ) )
             return false;
 
 
@@ -35,7 +42,7 @@ public:
 
 private:
     NPCR::CBaseNPC* m_pNPC;
-    int m_nCollisionGroup;
+    CBaseEntity* m_pRootParent;
 };
 
 
@@ -151,8 +158,32 @@ void NPCR::CBaseMotor::NavJump( const Vector& vecGoal, float flOverrideHeight )
     m_bDoStepDownTrace = false;
     
 
-    Vector pos = GetNPC()->GetPosition() + Vector( 0, 0, 2 );
+    // Step up off the ground so we don't snap back to ground.
+    Vector pos = GetNPC()->GetPosition();
 
+
+    float halfhull = GetHullWidth() / 2.0f;
+    Vector mins = Vector( -halfhull, -halfhull, 0.0f );
+    Vector maxs = Vector( halfhull, halfhull, 2.0f );
+
+    CMoveFilter filter( GetNPC(), COLLISION_GROUP_NPC );
+    trace_t tr;
+    UTIL_TraceHull(
+        pos + Vector( 0, 0, 32.0f ),
+        pos - Vector( 0, 0, -1.0f ),
+        mins, maxs,
+        MASK_NPCSOLID, &filter, &tr );
+
+    Vector normal( 0.0f, 0.0f, 1.0f );
+    if ( !tr.startsolid && tr.fraction < 1.0f )
+    {
+        pos = tr.endpos;
+
+        if ( tr.plane.normal.z > 0.0f )
+            normal = tr.plane.normal;
+    }
+
+    pos += normal * npcr_motor_jump_groundoffset.GetFloat();
     GetNPC()->SetPosition( pos );
 
     float minheight = vecGoal.z - pos.z + GetHullHeight();
@@ -272,6 +303,10 @@ Vector NPCR::CBaseMotor::HandleCollisions( const Vector& vecGoal )
             GetNPC()->OnTouch( tr.m_pEnt, &tr );
         }
 
+        // We presumably hit ground, start tracing for steps again.
+        // NOTE: Fixes not having a ground ent on moving lifts
+        if ( tr.plane.normal.z >= GetSlopeLimit() )
+            m_bDoStepDownTrace = true;
 
         m_bAdjustVel = true;
 

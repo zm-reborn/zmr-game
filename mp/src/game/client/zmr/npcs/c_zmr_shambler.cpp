@@ -22,6 +22,21 @@ C_ZMShambler::~C_ZMShambler()
 {
 }
 
+void C_ZMShambler::FootstepSound( bool bRightFoot )
+{
+    EmitSound( bRightFoot ? "Zombie.FootstepRight" : "Zombie.FootstepLeft" );
+}
+
+void C_ZMShambler::FootscuffSound( bool bRightFoot )
+{
+    EmitSound( bRightFoot ? "Zombie.ScuffRight" : "Zombie.ScuffLeft" );
+}
+
+void C_ZMShambler::AttackSound()
+{
+    EmitSound( "Zombie.Attack" );
+}
+
 bool C_ZMShambler::CreateEventAccessories()
 {
     bool res = BaseClass::CreateEventAccessories();

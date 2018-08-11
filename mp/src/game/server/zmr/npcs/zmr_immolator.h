@@ -26,11 +26,10 @@ public:
     virtual void Event_Killed( const CTakeDamageInfo& info ) OVERRIDE;
 
 
+    virtual bool ShouldPlayIdleSound() const OVERRIDE;
+    virtual float IdleSound() OVERRIDE;
     virtual void AlertSound() OVERRIDE;
-    virtual void AttackSound() OVERRIDE;
     virtual void DeathSound() OVERRIDE;
-    virtual void FootstepSound( bool bRightFoot = false ) OVERRIDE;
-    virtual void FootscuffSound( bool bRightFoot = false ) OVERRIDE;
 
 
 private:

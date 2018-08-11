@@ -3,6 +3,28 @@
 #include "npcr_path_cost.h"
 
 
+bool NPCR::CBasePathCost::CanBuildSimpleRoute( const Vector& vecStart, const Vector& vecGoal ) const
+{
+    //float delta_z = abs( vecGoal.z - vecStart.z );
+
+    //if ( delta_z > 72.0f )
+    //    return false;
+
+
+    // Lift off the ground.
+    Vector add( 0.0f, 0.0f, 1.0f );
+
+    trace_t tr;
+    CTraceFilterWorldOnly filter;
+    UTIL_TraceLine(
+        vecStart + add,
+        vecGoal + add,
+        MASK_OPAQUE, &filter, &tr );
+
+    return tr.fraction > 0.95f;
+}
+
+
 // NAV path cost
 float NPCR::CPathCostGroundOnly::operator()( CNavArea* area, CNavArea* fromArea, const CNavLadder* ladder, const CFuncElevator* elevator, float length ) const
 {

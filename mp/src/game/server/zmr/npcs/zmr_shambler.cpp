@@ -10,13 +10,6 @@ extern ConVar zm_sk_shambler_health;
 extern ConVar zm_sk_shambler_dmg_oneslash;
 extern ConVar zm_sk_shambler_dmg_bothslash;
 
-
-
-Activity CZMShambler::ACT_ZOM_SWATLEFTMID = ACT_INVALID;
-Activity CZMShambler::ACT_ZOM_SWATLEFTLOW = ACT_INVALID;
-Activity CZMShambler::ACT_ZOM_SWATRIGHTMID = ACT_INVALID;
-Activity CZMShambler::ACT_ZOM_SWATRIGHTLOW = ACT_INVALID;
-
 extern ConVar zm_sk_shambler_hitmult_legs;
 extern ConVar zm_sk_shambler_hitmult_stomach;
 extern ConVar zm_sk_shambler_hitmult_chest;
@@ -61,11 +54,6 @@ void CZMShambler::Precache()
     PrecacheScriptSound( "NPC_BaseZombie.Moan2" );
     PrecacheScriptSound( "NPC_BaseZombie.Moan3" );
     PrecacheScriptSound( "NPC_BaseZombie.Moan4" );
-
-    REGISTER_PRIVATE_ACTIVITY( ACT_ZOM_SWATLEFTMID );
-    REGISTER_PRIVATE_ACTIVITY( ACT_ZOM_SWATLEFTLOW );
-    REGISTER_PRIVATE_ACTIVITY( ACT_ZOM_SWATRIGHTMID );
-    REGISTER_PRIVATE_ACTIVITY( ACT_ZOM_SWATRIGHTLOW );
 
 
     CZMBaseZombie::Precache();
@@ -220,27 +208,23 @@ bool CZMShambler::ScaleDamageByHitgroup( int iHitGroup, CTakeDamageInfo& info ) 
     return false;
 }
 
+bool CZMShambler::ShouldPlayIdleSound() const
+{
+    return BaseClass::ShouldPlayIdleSound() && random->RandomInt( 0, 120 ) == 0;
+}
+
+float CZMShambler::IdleSound()
+{
+    EmitSound( "Zombie.Idle" );
+    return 2.0f;
+}
+
 void CZMShambler::AlertSound()
 {
     EmitSound( "Zombie.Alert" );
 }
 
-void CZMShambler::AttackSound()
-{
-    EmitSound( "Zombie.Attack" );
-}
-
 void CZMShambler::DeathSound()
 {
     EmitSound( "Zombie.Die" );
-}
-
-void CZMShambler::FootstepSound( bool bRightFoot )
-{
-    EmitSound( bRightFoot ? "Zombie.FootstepRight" : "Zombie.FootstepLeft" );
-}
-
-void CZMShambler::FootscuffSound( bool bRightFoot )
-{
-    EmitSound( bRightFoot ? "Zombie.ScuffRight" : "Zombie.ScuffLeft" );
 }

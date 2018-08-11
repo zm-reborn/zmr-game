@@ -117,12 +117,6 @@ int CZMBaseZombie::AE_ZOMBIE_ATTACK_RIGHT = AE_INVALID;
 int CZMBaseZombie::AE_ZOMBIE_ATTACK_LEFT = AE_INVALID;
 int CZMBaseZombie::AE_ZOMBIE_ATTACK_BOTH = AE_INVALID;
 int CZMBaseZombie::AE_ZOMBIE_SWATITEM = AE_INVALID;
-int CZMBaseZombie::AE_ZOMBIE_STARTSWAT = AE_INVALID;
-int CZMBaseZombie::AE_ZOMBIE_STEP_LEFT = AE_INVALID;
-int CZMBaseZombie::AE_ZOMBIE_STEP_RIGHT = AE_INVALID;
-int CZMBaseZombie::AE_ZOMBIE_SCUFF_LEFT = AE_INVALID;
-int CZMBaseZombie::AE_ZOMBIE_SCUFF_RIGHT = AE_INVALID;
-int CZMBaseZombie::AE_ZOMBIE_ATTACK_SCREAM = AE_INVALID;
 int CZMBaseZombie::AE_ZOMBIE_GET_UP = AE_INVALID;
 int CZMBaseZombie::AE_ZOMBIE_POUND = AE_INVALID;
 int CZMBaseZombie::AE_ZOMBIE_ALERTSOUND = AE_INVALID;
@@ -144,9 +138,14 @@ ConVar zm_sv_defense_goal_tolerance( "zm_sv_defense_goal_tolerance", "64", FCVAR
 
 
 ConVar zm_sv_debug_zombieattack( "zm_sv_debug_zombieattack", "0" );
+ConVar zm_sv_debug_shotgun_dmgmult( "zm_sv_debug_shotgun_dmgmult", "0" );
+
+ConVar zm_sv_zombiecollisions( "zm_sv_zombiecollisions", "1", 0, "Toggle experimental zombie collisions." );
 
 
 extern ConVar zm_sk_default_hitmult_head;
+extern ConVar zm_sk_default_hitmult_head_buckshot;
+extern ConVar zm_sk_default_hitmult_head_buckshot_dist;
 
 
 
@@ -168,6 +167,20 @@ IMPLEMENT_SERVERCLASS_ST( CZMBaseZombie, DT_ZM_BaseZombie )
 
     SendPropInt( SENDINFO( m_iSelectorIndex ) ),
     SendPropFloat( SENDINFO( m_flHealthRatio ) ),
+    SendPropBool( SENDINFO( m_bIsOnGround ) ),
+    SendPropInt( SENDINFO( m_iAnimationRandomSeed ) ),
+    SendPropInt( SENDINFO( m_lifeState ), 3, SPROP_UNSIGNED ),
+
+
+    // Animation excludes
+    SendPropExclude( "DT_BaseAnimating", "m_flPoseParameter" ),
+    SendPropExclude( "DT_BaseAnimating", "m_flPlaybackRate" ),	
+    SendPropExclude( "DT_BaseAnimating", "m_nSequence" ),
+    SendPropExclude( "DT_BaseAnimatingOverlay", "overlay_vars" ),
+
+    // Animstate and clientside animation takes care of these on the client
+    SendPropExclude( "DT_ServerAnimationData" , "m_flCycle" ),	
+    SendPropExclude( "DT_AnimTimeMustBeFirst" , "m_flAnimTime" ),
 
     SendPropExclude( "DT_BaseFlex", "m_flexWeight" ),
     SendPropExclude( "DT_BaseFlex", "m_blinktoggle" ),
@@ -180,6 +193,10 @@ END_DATADESC()
 
 CZMBaseZombie::CZMBaseZombie()
 {
+    UseClientSideAnimation();
+
+
+
     m_hSwatObject.Set( nullptr );
 
     m_flLastCommanded = 0.0f;
@@ -189,7 +206,12 @@ CZMBaseZombie::CZMBaseZombie()
 
     m_iSelectorIndex = 0;
     m_flHealthRatio = 1.0f;
-
+    m_bIsOnGround = false;
+    static int randomseed = 0;
+    randomseed = (++randomseed) % 50;
+    m_iAnimationRandomSeed = (int)gpGlobals->curtime + randomseed;
+    
+    m_iAdditionalAnimRandomSeed = 0;
 
 
     m_hAmbushEnt.Set( nullptr );
@@ -200,6 +222,8 @@ CZMBaseZombie::CZMBaseZombie()
 
     m_flBurnDamage = 0.0f;
     m_flBurnDamageTime = 0.0f;
+
+    m_flNextIdleSound = 0.0f;
 
 
     m_strModelGroup = NULL_STRING;
@@ -279,12 +303,6 @@ void CZMBaseZombie::Precache()
     REGISTER_PRIVATE_ANIMEVENT( AE_ZOMBIE_ATTACK_LEFT );
     REGISTER_PRIVATE_ANIMEVENT( AE_ZOMBIE_ATTACK_BOTH );
     REGISTER_PRIVATE_ANIMEVENT( AE_ZOMBIE_SWATITEM );
-    REGISTER_PRIVATE_ANIMEVENT( AE_ZOMBIE_STARTSWAT );
-    REGISTER_PRIVATE_ANIMEVENT( AE_ZOMBIE_STEP_LEFT );
-    REGISTER_PRIVATE_ANIMEVENT( AE_ZOMBIE_STEP_RIGHT );
-    REGISTER_PRIVATE_ANIMEVENT( AE_ZOMBIE_SCUFF_LEFT );
-    REGISTER_PRIVATE_ANIMEVENT( AE_ZOMBIE_SCUFF_RIGHT );
-    REGISTER_PRIVATE_ANIMEVENT( AE_ZOMBIE_ATTACK_SCREAM );
     REGISTER_PRIVATE_ANIMEVENT( AE_ZOMBIE_GET_UP );
     REGISTER_PRIVATE_ANIMEVENT( AE_ZOMBIE_POUND );
     REGISTER_PRIVATE_ANIMEVENT( AE_ZOMBIE_ALERTSOUND );
@@ -296,6 +314,8 @@ void CZMBaseZombie::Spawn()
 
 
     BaseClass::Spawn();
+
+    DoAnimationEvent( ZOMBIEANIMEVENT_IDLE );
 
     SetThink( &CZMBaseZombie::ZombieThink );
     SetNextThink( gpGlobals->curtime );
@@ -330,9 +350,26 @@ void CZMBaseZombie::ZombieThink()
     BaseClass::NPCThink();
 }
 
+void CZMBaseZombie::PreUpdate()
+{
+    BaseClass::PreUpdate();
+
+
+    if ( ShouldPlayIdleSound() )
+    {
+        float delay = IdleSound();
+
+        m_flNextIdleSound = gpGlobals->curtime + delay;
+    }
+}
+
 void CZMBaseZombie::PostUpdate()
 {
     BaseClass::PostUpdate();
+
+
+    m_bIsOnGround = GetMotor()->IsOnGround();
+
 
     m_CmdQueue.UpdateExpire();
 }
@@ -353,13 +390,11 @@ void CZMBaseZombie::HandleAnimEvent( animevent_t* pEvent )
 
     if ( pEvent->event == AE_ZOMBIE_STEP_LEFT )
     {
-        FootstepSound( false );
         return;
     }
-    
+
     if ( pEvent->event == AE_ZOMBIE_STEP_RIGHT )
     {
-        FootstepSound( true );
         return;
     }
 
@@ -370,25 +405,21 @@ void CZMBaseZombie::HandleAnimEvent( animevent_t* pEvent )
 
     if ( pEvent->event == AE_ZOMBIE_SCUFF_LEFT )
     {
-        FootscuffSound( false );
         return;
     }
 
     if ( pEvent->event == AE_ZOMBIE_SCUFF_RIGHT )
     {
-        FootscuffSound( true );
         return;
     }
 
     if ( pEvent->event == AE_ZOMBIE_STARTSWAT )
     {
-        AttackSound();
         return;
     }
 
     if ( pEvent->event == AE_ZOMBIE_ATTACK_SCREAM )
     {
-        AttackSound();
         return;
     }
 
@@ -435,8 +466,7 @@ bool CZMBaseZombie::ShouldGib( const CTakeDamageInfo& info )
 
 void CZMBaseZombie::Extinguish()
 {
-    GetAnimState()->SetIdleActivity( ACT_IDLE );
-    GetAnimState()->SetMoveActivity( ACT_WALK );
+    DoAnimationEvent( ZOMBIEANIMEVENT_ON_EXTINGUISH );
 
     BaseClass::Extinguish();
 }
@@ -449,11 +479,8 @@ void CZMBaseZombie::Ignite( float flFlameLifetime, bool bNPCOnly, float flSize, 
 
     if ( !IsOnFire() && IsAlive() )
     {
-        if ( HasActivity( ACT_IDLE_ON_FIRE ) )
-            GetAnimState()->SetIdleActivity( ACT_IDLE_ON_FIRE );
-
-        if ( HasActivity( ACT_WALK_ON_FIRE ) )
-            GetAnimState()->SetMoveActivity( ACT_WALK_ON_FIRE );
+        // Tell our animstate to play burning idle & walking animations.
+        DoAnimationEvent( ZOMBIEANIMEVENT_ON_BURN );
     }
 
     BaseClass::Ignite( flFlameLifetime, bNPCOnly, flSize, bCalledByLevelDesigner );
@@ -697,16 +724,6 @@ void CZMBaseZombie::TraceAttack( const CTakeDamageInfo& inputInfo, const Vector&
 {
     CTakeDamageInfo info = inputInfo;
 
-    if( info.GetDamageType() & DMG_BUCKSHOT )
-    {
-        // Zombie gets across-the-board damage reduction for buckshot. This compensates for the recent changes which
-        // make the shotgun much more powerful, and returns the zombies to a level that has been playtested extensively.(sjb)
-        // This normalizes the buckshot damage to what it used to be on normal (5 dmg per pellet. Now it's 8 dmg per pellet). 
-        info.ScaleDamage( 0.625 );
-    }
-
-
-
     ScaleDamageByHitgroup( pTrace->hitgroup, info );
 
 
@@ -725,19 +742,10 @@ bool CZMBaseZombie::ScaleDamageByHitgroup( int iHitGroup, CTakeDamageInfo& info 
     {
     case HITGROUP_HEAD :
         {
+            // Shotgun scales damage differently.
             if ( info.GetDamageType() & DMG_BUCKSHOT )
             {
-                float flDistSqr = FLT_MAX;
-
-                if ( info.GetAttacker() )
-                {
-                    flDistSqr = ( GetAbsOrigin() - info.GetAttacker()->GetAbsOrigin() ).LengthSqr();
-                }
-
-                if ( flDistSqr <= (ZOMBIE_BUCKSHOT_TRIPLE_DAMAGE_DIST*ZOMBIE_BUCKSHOT_TRIPLE_DAMAGE_DIST) )
-                {
-                    info.ScaleDamage( 3.0f );
-                }
+                MultiplyBuckshotDamage( info );
             }
             // ZMRTODO: This random shit really has to go.
             else if ( info.GetDamageType() & DMG_CLUB )
@@ -754,6 +762,39 @@ bool CZMBaseZombie::ScaleDamageByHitgroup( int iHitGroup, CTakeDamageInfo& info 
     }
 
     return false;
+}
+
+void CZMBaseZombie::MultiplyBuckshotDamage( CTakeDamageInfo& info ) const
+{
+    CBaseEntity* pAttacker = info.GetAttacker();
+    if ( !pAttacker ) return;
+
+
+    const Vector startpos = pAttacker->EyePosition();
+    const Vector hitpos = info.GetDamagePosition();
+
+
+    float flDistSqr = startpos.DistToSqr( hitpos );
+
+    float flDmgDistSqr = zm_sk_default_hitmult_head_buckshot_dist.GetFloat();
+    flDmgDistSqr *= flDmgDistSqr;
+
+    // We need to be close enough to do more damage.
+    const bool bScaleDmg = flDistSqr < flDmgDistSqr;
+
+
+    if ( zm_sv_debug_shotgun_dmgmult.GetBool() )
+    {
+        float t = zm_sv_debug_shotgun_dmgmult.GetFloat();
+        NDebugOverlay::Axis( hitpos, vec3_angle, 2.0f, true, t );
+        NDebugOverlay::Line( startpos, hitpos, (!bScaleDmg) ? 255 : 0, bScaleDmg ? 255 : 0, 0, true, t );
+    }
+
+
+    if ( bScaleDmg )
+    {
+        info.ScaleDamage( zm_sk_default_hitmult_head_buckshot.GetFloat() );
+    }
 }
 
 void CZMBaseZombie::Event_Killed( const CTakeDamageInfo& info )
@@ -1041,12 +1082,16 @@ NPCR::QueryResult_t CZMBaseZombie::ShouldTouch( CBaseEntity* pEnt ) const
     {
         NPCR::CBaseNPC* pOther = pEnt->MyNPCRPointer();
 
-        // Ignore others that aren't going anywhere
-        if ( GetMotor()->IsMoving() && !pOther->GetMotor()->IsMoving() )
+
+        if ( !zm_sv_zombiecollisions.GetBool() )
         {
-            CZMBaseZombie* pZombie = ToZMBaseZombie( pOther->GetCharacter() );
-            if ( !pZombie->IsAttacking() )
-                return NPCR::RES_NO;
+            // Ignore others that aren't going anywhere
+            if ( GetMotor()->IsMoving() && !pOther->GetMotor()->IsMoving() )
+            {
+                CZMBaseZombie* pZombie = ToZMBaseZombie( pOther->GetCharacter() );
+                if ( !pZombie->IsAttacking() )
+                    return NPCR::RES_NO;
+            }
         }
 
 
@@ -1088,6 +1133,37 @@ float CZMBaseZombie::GetMoveActivityMovementSpeed()
         return GetSequenceGroundSpeed( iSeq );
 
     return BaseClass::GetMoveActivityMovementSpeed();
+}
+
+bool CZMBaseZombie::ShouldPlayIdleSound() const
+{
+    if ( m_lifeState != LIFE_ALIVE )
+        return false;
+
+    if ( HasSpawnFlags( SF_NPC_GAG ) )
+        return false;
+
+    if ( m_flNextIdleSound > gpGlobals->curtime )
+        return false;
+
+
+    return true;
+}
+
+void CZMBaseZombie::GetAnimRandomSeed( int iEvent, int& nData )
+{
+    // Only these events should have a random seed in the data section.
+    // The rest may have the activity number.
+    static int randomseed = 0;
+    switch ( iEvent )
+    {
+    case ZOMBIEANIMEVENT_IDLE :
+    case ZOMBIEANIMEVENT_ATTACK :
+    case ZOMBIEANIMEVENT_ON_BURN :
+    case ZOMBIEANIMEVENT_ON_EXTINGUISH :
+        nData = ( randomseed = (++randomseed) % 50 );
+    default : break;
+    }
 }
 
 CON_COMMAND( zm_zombie_create, "Creates a zombie at your crosshair." )

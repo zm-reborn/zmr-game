@@ -129,27 +129,25 @@ bool CZMHulk::ScaleDamageByHitgroup( int iHitGroup, CTakeDamageInfo& info ) cons
     return false;
 }
 
+bool CZMHulk::ShouldPlayIdleSound() const
+{
+    return  BaseClass::ShouldPlayIdleSound()
+    &&      GetEnemy() == nullptr // We must be idling.
+    &&      random->RandomInt( 0, 99 ) == 0;
+}
+
+float CZMHulk::IdleSound()
+{
+    EmitSound( "NPC_PoisonZombie.Idle" );
+    return 1.0f;
+}
+
 void CZMHulk::AlertSound()
 {
     EmitSound( "NPC_PoisonZombie.Alert" );
-}
-
-void CZMHulk::AttackSound()
-{
-    EmitSound( "NPC_PoisonZombie.Attack" );
 }
 
 void CZMHulk::DeathSound()
 {
     EmitSound( "NPC_PoisonZombie.Die" );
 }
-
-void CZMHulk::FootstepSound( bool bRightFoot )
-{
-    EmitSound( bRightFoot ? "NPC_PoisonZombie.FootstepRight" : "NPC_PoisonZombie.FootstepLeft" );
-}
-
-void CZMHulk::FootscuffSound( bool bRightFoot )
-{
-}
-

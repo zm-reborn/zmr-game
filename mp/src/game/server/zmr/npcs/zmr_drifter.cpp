@@ -74,6 +74,7 @@ void CZMDrifter::HandleAnimEvent( animevent_t* pEvent )
         GetAttachment( "Mouth", vecSpit, angSpit );
         AngleVectors( angSpit, &vecSpitDir );
 
+        // Move to client?
         UTIL_BloodSpray( vecSpit, vecSpitDir, BLOOD_COLOR_RED, random->RandomInt( 4, 16 ), FX_BLOODSPRAY_ALL );
 
 
@@ -145,25 +146,25 @@ void CZMDrifter::GetAttackHull( Vector& mins, Vector& maxs ) const
     maxs.z = GetAttackHeight();
 }
 
+bool CZMDrifter::ShouldPlayIdleSound() const
+{
+    return  BaseClass::ShouldPlayIdleSound()
+    &&      GetEnemy() == nullptr // We must be idling.
+    &&      random->RandomInt( 0, 99 ) == 0;
+}
+
+float CZMDrifter::IdleSound()
+{
+    EmitSound( "NPC_DragZombie.Idle" );
+    return 1.0f;
+}
+
 void CZMDrifter::AlertSound()
 {
     EmitSound( "NPC_DragZombie.Alert" );
-}
-
-void CZMDrifter::AttackSound()
-{
 }
 
 void CZMDrifter::DeathSound()
 {
     EmitSound( "NPC_DragZombie.Die" );
 }
-
-void CZMDrifter::FootstepSound( bool bRightFoot )
-{
-}
-
-void CZMDrifter::FootscuffSound( bool bRightFoot )
-{
-}
-

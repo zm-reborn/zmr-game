@@ -31,6 +31,8 @@ public:
         m_pGotoSwatSched = new GotoSwatObjSched;
         // Make sure we're not going the opposite direction when trying to swat
         m_pGotoSwatSched->SetCheckDirection( true );
+        // Scan for any enemies that are closer than the swatting object.
+        m_pGotoSwatSched->SetCheckForEnemies( true );
 
         // We want to go exactly to the goal in case the enemy is not on nav mesh.
         m_Path.UseExactGoal( true );
@@ -115,7 +117,7 @@ public:
 
         if ( !pOuter->IsEnemy( pEnemy ) )
         {
-            pOuter->SetEnemy( nullptr );
+            pOuter->LostEnemy();
 
             End( "Enemy is no longer enemy! wut?" );
             return;
@@ -136,7 +138,7 @@ public:
                 // We have to be reasonably closer to the potential enemy.
                 if ( flNewDist < (flCurDist*0.8f) )
                 {
-                    pOuter->SetEnemy( pEnt );
+                    pOuter->AcquireEnemy( pEnt );
                 }
             }
 

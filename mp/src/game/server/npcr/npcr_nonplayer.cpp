@@ -7,7 +7,23 @@
 #include "npcr_senses.h"
 
 
-NPCR::CBaseNonPlayer::CBaseNonPlayer() : NPCR::CBaseNPC( this )
+BEGIN_DATADESC( CNPCRNonPlayer )
+    // Outputs
+    DEFINE_OUTPUT( m_OnDamaged, "OnDamaged" ),
+    DEFINE_OUTPUT( m_OnDamagedByPlayer, "OnDamagedByPlayer" ),
+    DEFINE_OUTPUT( m_OnHalfHealth, "OnHalfHealth" ),
+    DEFINE_OUTPUT( m_OnDeath, "OnDeath" ),
+    DEFINE_OUTPUT( m_OnFoundPlayer, "OnFoundPlayer" ),
+    DEFINE_OUTPUT( m_OnFoundEnemy, "OnFoundEnemy" ),
+    DEFINE_OUTPUT( m_OnLostPlayerLOS, "OnLostPlayerLOS" ),
+    DEFINE_OUTPUT( m_OnLostEnemyLOS, "OnLostEnemyLOS" ),
+    DEFINE_OUTPUT( m_OnLostEnemy, "OnLostEnemy" ),
+    // Inputs
+    DEFINE_INPUTFUNC( FIELD_INTEGER, "SetHealth", InputSetHealth ),
+END_DATADESC()
+
+
+CNPCRNonPlayer::CNPCRNonPlayer() : NPCR::CBaseNPC( this )
 {
     m_bCurActivityLoops = false;
     m_iCurActivity = ACT_INVALID;
@@ -19,25 +35,33 @@ NPCR::CBaseNonPlayer::CBaseNonPlayer() : NPCR::CBaseNPC( this )
 
 
     m_iHealth = 0; // Set to 0 here, since keyvalues might set this to something else.
+
+
+
+
+    m_flLastDamageTime = 0.0f;
+
+    m_flNextLOSOutputs = 0.0f;
+    m_bDidSeeEnemyLastTime = false;
 }
 
-NPCR::CBaseNonPlayer::~CBaseNonPlayer()
+CNPCRNonPlayer::~CNPCRNonPlayer()
 {
 }
 
-void NPCR::CBaseNonPlayer::PostConstructor( const char* szClassname )
+void CNPCRNonPlayer::PostConstructor( const char* szClassname )
 {
     BaseClass::PostConstructor( szClassname );
 
     NPCR::CBaseNPC::PostConstructor();
 }
 
-NPCR::CBaseMotor* NPCR::CBaseNonPlayer::CreateMotor()
+NPCR::CBaseMotor* CNPCRNonPlayer::CreateMotor()
 {
-    return new CNonPlayerMotor( this );
+    return new NPCR::CNonPlayerMotor( this );
 }
 
-void NPCR::CBaseNonPlayer::Spawn()
+void CNPCRNonPlayer::Spawn()
 {
     BaseClass::Spawn();
 
@@ -52,10 +76,9 @@ void NPCR::CBaseNonPlayer::Spawn()
 
     
     InitBoneControllers(); 
-    SetActivity( ACT_IDLE );
 
 
-    SetThink( &NPCR::CBaseNonPlayer::NPCThink );
+    SetThink( &CNPCRNonPlayer::NPCThink );
     SetNextThink( gpGlobals->curtime );
 
     
@@ -109,19 +132,57 @@ void NPCR::CBaseNonPlayer::Spawn()
     }
 }
 
-int NPCR::CBaseNonPlayer::OnTakeDamage_Alive( const CTakeDamageInfo& info )
+int CNPCRNonPlayer::OnTakeDamage_Alive( const CTakeDamageInfo& info )
 {
-    int ret = BaseClass::OnTakeDamage_Alive( info );
+    if ( !BaseClass::OnTakeDamage_Alive( info ) )
+        return 0;
 
-    if ( ret )
+
+    OnDamaged( info );
+
+
+    //
+    // Fire outputs
+    //
+    CBaseEntity* pAttacker = info.GetAttacker();
+
+    // Don't fire this multiple times a frame.
+    if ( m_flLastDamageTime != gpGlobals->curtime )
     {
-        OnDamaged( info );
+        m_OnDamaged.FireOutput( pAttacker, this );
+
+        if ( pAttacker )
+        {
+            if ( pAttacker->IsPlayer() )
+            {
+                m_OnDamagedByPlayer.FireOutput( pAttacker, this );
+            }
+        }
+
+
+
+        m_flLastDamageTime = gpGlobals->curtime;
     }
 
-    return ret;
+    if ( m_iHealth <= (m_iMaxHealth / 2) )
+    {
+        m_OnHalfHealth.FireOutput( pAttacker, this );
+    }
+
+
+    return 1;
 }
 
-void NPCR::CBaseNonPlayer::SetDefaultEyeOffset()
+void CNPCRNonPlayer::Event_Killed( const CTakeDamageInfo& info )
+{
+    m_OnDeath.FireOutput( info.GetAttacker(), this );
+
+
+
+    BaseClass::Event_Killed( info );
+}
+
+void CNPCRNonPlayer::SetDefaultEyeOffset()
 {
     if  ( GetModelPtr() )
     {
@@ -139,7 +200,7 @@ void NPCR::CBaseNonPlayer::SetDefaultEyeOffset()
     }
 }
 
-void NPCR::CBaseNonPlayer::HandleAnimEvent( animevent_t* pEvent )
+void CNPCRNonPlayer::HandleAnimEvent( animevent_t* pEvent )
 {
     m_bHandledAnimEvent = false;
 
@@ -149,7 +210,46 @@ void NPCR::CBaseNonPlayer::HandleAnimEvent( animevent_t* pEvent )
         BaseClass::HandleAnimEvent( pEvent );
 }
 
-void NPCR::CBaseNonPlayer::NPCThink()
+void CNPCRNonPlayer::PostUpdate()
+{
+    NPCR::CBaseNPC::PostUpdate();
+
+
+    CBaseEntity* pCurEnemy = GetEnemy();
+
+    if ( pCurEnemy )
+    {
+        //
+        // Fire sight outputs
+        //
+        if ( m_flNextLOSOutputs <= gpGlobals->curtime )
+        {
+            const bool bCanSee = GetSenses()->GetEntityOf( pCurEnemy ) != nullptr;
+            
+            // Player varients are kept for backwards compatibility. (damn you, zm_kink)
+            if ( !bCanSee && m_bDidSeeEnemyLastTime )
+            {
+                if ( pCurEnemy->IsPlayer() )
+                    m_OnLostPlayerLOS.FireOutput( pCurEnemy, this );
+
+                m_OnLostEnemyLOS.FireOutput( pCurEnemy, this );
+
+            }
+            else if ( bCanSee && !m_bDidSeeEnemyLastTime )
+            {
+                if ( pCurEnemy->IsPlayer() )
+                    m_OnFoundPlayer.Set( m_hEnemy, this, this );
+
+                m_OnFoundEnemy.Set( m_hEnemy, this, this );
+            }
+
+            m_flNextLOSOutputs = gpGlobals->curtime + 0.1f;
+            m_bDidSeeEnemyLastTime = bCanSee;
+        }
+    }
+}
+
+void CNPCRNonPlayer::NPCThink()
 {
     SetNextThink( gpGlobals->curtime );
 
@@ -169,7 +269,7 @@ void NPCR::CBaseNonPlayer::NPCThink()
     }
 }
 
-void NPCR::CBaseNonPlayer::VPhysicsUpdate( IPhysicsObject* pPhys )
+void CNPCRNonPlayer::VPhysicsUpdate( IPhysicsObject* pPhys )
 {
     float prevImpactScale = m_impactEnergyScale;
 
@@ -179,7 +279,7 @@ void NPCR::CBaseNonPlayer::VPhysicsUpdate( IPhysicsObject* pPhys )
     m_impactEnergyScale = prevImpactScale;
 }
 
-void NPCR::CBaseNonPlayer::PerformCustomPhysics( Vector* pNewPosition, Vector* pNewVelocity, QAngle* pNewAngles, QAngle* pNewAngVelocity )
+void CNPCRNonPlayer::PerformCustomPhysics( Vector* pNewPosition, Vector* pNewVelocity, QAngle* pNewAngles, QAngle* pNewAngVelocity )
 {
     SetGroundEntity( GetMotor()->GetGroundEntity() );
 
@@ -194,77 +294,50 @@ void NPCR::CBaseNonPlayer::PerformCustomPhysics( Vector* pNewPosition, Vector* p
     }
 }
 
-void NPCR::CBaseNonPlayer::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
+void CNPCRNonPlayer::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 {
 
 }
 
-bool NPCR::CBaseNonPlayer::SetActivity( Activity act )
-{
-    if ( act == m_iCurActivity && m_bCurActivityLoops )
-        return true;
-
-
-    CStudioHdr* hdr = GetModelPtr();
-    if ( !hdr || !hdr->SequencesAvailable() )
-    {
-        DevMsg( "NPC doesn't have any sequences!\n" );
-        return false;
-    }
-
-    VerifySequenceIndex( hdr );
-    int iNewSeq = hdr->SelectWeightedSequence( act, GetSequence() );
-
-    if ( iNewSeq <= -1 )
-    {
-        DevMsg( "Couldn't find sequence for activity %i!\n", act );
-        return false;
-    }
-
-
-    Activity last = m_iCurActivity;
-
-    if ( !IsSequenceFinished() )
-        OnAnimActivityInterrupted( act );
-
-
-    //if ( GetSequence() != iNewSeq )
-    SetCycle( 0.0f );
-
-    ResetSequence( iNewSeq );
-    m_bCurActivityLoops = SequenceLoops();
-
-    m_iCurActivity = act;
-    m_iLastActivity = last;
-    m_iLastLoopActivity = ACT_INVALID;
-
-    return true;
-}
-
-bool NPCR::CBaseNonPlayer::HasActivity( Activity act )
-{
-    CStudioHdr* hdr = GetModelPtr();
-    if ( !hdr || !hdr->SequencesAvailable() )
-    {
-        return false;
-    }
-
-    VerifySequenceIndex( hdr );
-    int iNewSeq = hdr->SelectWeightedSequence( act, GetSequence() );
-
-    if ( iNewSeq <= -1 )
-    {
-        DevMsg( "Couldn't find sequence for activity %i!\n", act );
-        return false;
-    }
-
-    return true;
-}
-
-float NPCR::CBaseNonPlayer::GetMoveActivityMovementSpeed()
+float CNPCRNonPlayer::GetMoveActivityMovementSpeed()
 {
     // Just assume walk by default
     int iSeq = SelectWeightedSequence( ACT_WALK );
 
     return GetSequenceGroundSpeed( iSeq );
+}
+
+void CNPCRNonPlayer::AcquireEnemy( CBaseEntity* pEnemy )
+{
+    Assert( pEnemy != nullptr );
+
+    SetEnemy( pEnemy );
+
+
+    // Perform sight outputs.
+    m_bDidSeeEnemyLastTime = false;
+}
+
+void CNPCRNonPlayer::LostEnemy()
+{
+    CBaseEntity* pOldEnemy = GetEnemy();
+
+    SetEnemy( nullptr );
+
+    m_OnLostEnemy.FireOutput( pOldEnemy, this );
+}
+
+void CNPCRNonPlayer::InputSetHealth( inputdata_t& inputdata )
+{
+    int iOldHealth = GetHealth();
+    int iNewHealth = inputdata.value.Int();
+    int iDelta = abs( iOldHealth - iNewHealth );
+    if ( iNewHealth > iOldHealth )
+    {
+        TakeHealth( iDelta, DMG_GENERIC );
+    }
+    else if ( iNewHealth < iOldHealth )
+    {
+        TakeDamage( CTakeDamageInfo( this, this, iDelta, DMG_GENERIC ) );
+    }
 }

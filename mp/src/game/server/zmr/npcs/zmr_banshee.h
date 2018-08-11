@@ -73,11 +73,10 @@ public:
     static float GetMaxLeapSpeed() { return 900.0f; }
 
     // Sounds
+    virtual bool ShouldPlayIdleSound() const OVERRIDE;
+    virtual float IdleSound() OVERRIDE;
     virtual void AlertSound() OVERRIDE;
-    virtual void AttackSound() OVERRIDE;
     virtual void DeathSound() OVERRIDE;
-    virtual void FootstepSound( bool bRightFoot = false ) OVERRIDE;
-    virtual void FootscuffSound( bool bRightFoot = false ) OVERRIDE;
     virtual void ClawImpactSound( bool bHit = true ) OVERRIDE;
     void LeapAttackSound();
 
@@ -87,18 +86,4 @@ private:
 
     NPCR::CSchedule<CZMBaseZombie>* m_pLeapSched;
     NPCR::CSchedule<CZMBaseZombie>* m_pCeilAmbushSched;
-
-
-public:
-    static Activity ACT_FASTZOMBIE_FRENZY;
-    static Activity ACT_FASTZOMBIE_BIG_SLASH;
-
-    static Activity ACT_FASTZOMBIE_LAND_RIGHT;
-    static Activity ACT_FASTZOMBIE_LAND_LEFT;
-    static Activity ACT_FASTZOMBIE_LEAP_STRIKE;
-
-
-    static int AE_FASTZOMBIE_GALLOP_LEFT;
-    static int AE_FASTZOMBIE_GALLOP_RIGHT;
-    static int AE_FASTZOMBIE_LEAP;
 };

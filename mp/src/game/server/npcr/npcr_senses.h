@@ -8,9 +8,6 @@ class CBaseEntity;
 
 namespace NPCR
 {
-    class CBaseNonPlayer;
-
-
     class VisionEntity
     {
     public:
@@ -45,6 +42,7 @@ namespace NPCR
 
         virtual void Update() OVERRIDE;
 
+        virtual VisionEntity* GetEntityOf( CBaseEntity* pEnt ) const;
         virtual bool CanSee( CBaseEntity* pEnt ) const;
         virtual bool CanSee( VisionEntity* pVision ) const;
         virtual bool CanSee( const Vector& vecPos ) const;

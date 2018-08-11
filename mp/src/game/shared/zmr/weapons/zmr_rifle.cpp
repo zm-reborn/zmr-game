@@ -47,7 +47,7 @@ public:
             float ratio = 1.0f - pOwner->GetAccuracyRatio();
             ratio *= ratio;
 
-            float max = VECTOR_CONE_10DEGREES.x;
+            float max = VECTOR_CONE_6DEGREES.x;
             cone.x = ratio * max;
             cone.y = ratio * max;
             cone.z = ratio * max;
@@ -57,8 +57,8 @@ public:
         return cone;
     }
 
-    virtual float GetAccuracyIncreaseRate() const OVERRIDE { return 1.7f; }
-    virtual float GetAccuracyDecreaseRate() const OVERRIDE { return 4.2f; }
+    virtual float GetAccuracyIncreaseRate() const OVERRIDE { return 6.7f; }
+    virtual float GetAccuracyDecreaseRate() const OVERRIDE { return 2.1f; }
     
 
 

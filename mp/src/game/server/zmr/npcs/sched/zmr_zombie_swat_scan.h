@@ -20,6 +20,10 @@ public:
     ScanSwatObjSched()
     {
         m_pGotoSwatSched = new GotoSwatObjSched;
+        // Only go towards the enemy.
+        m_pGotoSwatSched->SetCheckDirection( true );
+        // Stop the swatting if we have enemies closer.
+        m_pGotoSwatSched->SetCheckForEnemies( true );
     }
     ~ScanSwatObjSched()
     {
@@ -86,10 +90,10 @@ public:
 
         float flDist = pEnemy ? MAX( 32.0f, vecMyPos.DistTo( vecTarget ) ) : zm_sv_swat_scan_def_maxdist.GetFloat();
 
-        return FindNearestSwatObject( vecDirToGoal, flDist );
+        return FindNearestSwatObject( vecDirToGoal, vecTarget, flDist );
     }
 
-    CBaseEntity* FindNearestSwatObject( const Vector& vecDirToGoal, float flFurthestDist )
+    CBaseEntity* FindNearestSwatObject( const Vector& vecDirToGoal, const Vector& vecTarget, float flFurthestDist )
     {
         CBaseEntity* pList[ZOMBIE_PHYSICS_SEARCH_DEPTH];
         CBaseEntity* pNearest = nullptr;
@@ -97,10 +101,16 @@ public:
         float flDist;
         IPhysicsObject* pPhysObj;
         int i;
+        trace_t tr;
+
+        const unsigned int tracemask = MASK_SOLID & ~(CONTENTS_MONSTER);
+        CTraceFilterWorldOnly filter;
 
 
         CZMBaseZombie* pOuter = GetOuter();
         const Vector vecMyPos = pOuter->GetAbsOrigin();
+
+        CBaseEntity* pEnemy = pOuter->GetEnemy();
 
 
         // Find objects within a box between us and the enemy
@@ -176,6 +186,21 @@ public:
             // don't swat things that are over my head.
             if ( center.z > pOuter->EyePosition().z )
                 continue;
+
+
+            // We must see the prop.
+            UTIL_TraceLine( center, pOuter->EyePosition(), tracemask, &filter, &tr );
+            if ( tr.fraction != 1.0f )
+                continue;
+
+            // The prop must have LOS to the target or there's no point in swatting it towards them.
+            if ( pEnemy )
+            {
+                UTIL_TraceLine( center, vecTarget, tracemask, &filter, &tr );
+                if ( tr.fraction != 1.0f )
+                    continue;
+            }
+
 
             vcollide_t *pCollide = modelinfo->GetVCollide( pList[i]->GetModelIndex() );
         

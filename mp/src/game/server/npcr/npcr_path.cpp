@@ -393,22 +393,8 @@ bool NPCR::CBaseNavPath::BuildNavPath( const Vector& vecStart, const Vector& vec
 {
     if ( !pStartArea || !pGoalArea )
     {
-        // Check if we have LOS.
-        trace_t tr;
-        CheckSimpleLOS(
-            vecStart + Vector( 0.0f, 0.0f, 1.0f ), // Lift off the ground a bit
-            vecGoal + Vector( 0.0f, 0.0f, 1.0f ),
-            tr );
-
-        float delta_z = abs( vecGoal.z - vecStart.z );
-        if ( delta_z < 72.0f && tr.fraction > 0.95f )
-        {
-            return BuildSimplePath( vecStart, vecGoal, true );
-        }
-        else
-        {
-            return false;
-        }
+        // Attempt a straight path if we have no areas.
+        return cost.CanBuildSimpleRoute( vecStart, vecGoal ) ? BuildSimplePath( vecStart, vecGoal, true ) : false;
     }
 
 
@@ -461,8 +447,10 @@ bool NPCR::CBaseNavPath::BuildGraphPath( const Vector& vecStart, const Vector& v
     AI_Waypoint_t* first = FindGraphPath( startID, endID, cost );
 
     if ( !first )
-        return false;
-
+    {
+        // Couldn't build node path, attempt straight one.
+        return cost.CanBuildSimpleRoute( vecStart, vecGoal ) ? BuildSimplePath( vecStart, vecGoal, true ) : false;
+    }
 
     // Init links
     m_nLinkCount = 0;

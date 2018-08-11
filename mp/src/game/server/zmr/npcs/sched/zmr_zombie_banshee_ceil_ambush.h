@@ -3,6 +3,7 @@
 
 #include "zmr/npcs/zmr_zombiebase.h"
 #include "zmr/npcs/zmr_banshee.h"
+#include "zmr/npcs/zmr_zombieanimstate.h"
 
 
 
@@ -75,7 +76,7 @@ public:
         pOuter->GetMotor()->SetVelocity( Vector( 0.0f, 0.0f, FASTZOMBIE_CLING_JUMPSPEED ) );
         pOuter->GetMotor()->Jump();
 
-        pOuter->SetActivity( ACT_HOP );
+        pOuter->DoAnimationEvent( ZOMBIEANIMEVENT_BANSHEEANIM, ACT_HOP );
 
 
         m_vecStartPos = vecMyPos;
@@ -93,9 +94,9 @@ public:
         }
 
         Activity act = pOuter->GetActivity();
-        if ( act == ACT_HOVER || act == ACT_HOP || act == CZMBanshee::ACT_FASTZOMBIE_LEAP_STRIKE )
+        if ( act == ACT_HOVER || act == ACT_HOP || act == ACT_FASTZOMBIE_LEAP_STRIKE )
         {
-            pOuter->SetActivity( ACT_IDLE );
+            pOuter->DoAnimationEvent( ZOMBIEANIMEVENT_IDLE );
         }
     }
 
@@ -161,7 +162,7 @@ public:
         if ( newActivity == ACT_HOVER )
             return;
 
-        if ( newActivity == CZMBanshee::ACT_FASTZOMBIE_LEAP_STRIKE )
+        if ( newActivity == ACT_FASTZOMBIE_LEAP_STRIKE )
             return;
 
 
@@ -177,7 +178,7 @@ public:
     {
         if ( m_bInLeap )
         {
-            GetOuter()->SetActivity( ACT_IDLE );
+            GetOuter()->DoAnimationEvent( ZOMBIEANIMEVENT_IDLE );
 
             TryEnd( "Finished leap successfully!" );
             return;
@@ -196,7 +197,7 @@ public:
             if ( pEnt->IsWorld() && IsCeilingFlat( tr->plane.normal ) )
             {
                 // Sets banshee upside down.
-                GetOuter()->SetActivity( ACT_HOVER );
+                GetOuter()->DoAnimationEvent( ZOMBIEANIMEVENT_BANSHEEANIM, ACT_HOVER );
 
                 m_bOnCeiling = true;
                 m_vecCeilingPos = tr->endpos;
@@ -293,7 +294,7 @@ public:
     {
         CZMBanshee* pOuter = GetOuter();
 
-        if ( !pOuter->SetActivity( CZMBanshee::ACT_FASTZOMBIE_LEAP_STRIKE ) )
+        if ( !pOuter->DoAnimationEvent( ZOMBIEANIMEVENT_BANSHEEANIM, ACT_FASTZOMBIE_LEAP_STRIKE ) )
         {
             End( "Couldn't start the leap strike activity!" );
             return;
@@ -305,7 +306,7 @@ public:
         m_bOnCeiling = false;
 
 
-        pOuter->SetEnemy( pTarget );
+        pOuter->AcquireEnemy( pTarget );
 
         // Leap towards the enemy
         pOuter->LeapAttackSound();
