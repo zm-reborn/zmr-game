@@ -12,6 +12,12 @@
 
 ConVar zm_sv_immolator_burndist( "zm_sv_immolator_burndist", "250", FCVAR_NOTIFY );
 
+ConVar zm_sv_immolator_burndmgdist( "zm_sv_immolator_burndmgdist", "132", FCVAR_NOTIFY, "The distance at which we will hurt others when burning." );
+ConVar zm_sv_immolator_burndmgtime( "zm_sv_immolator_burndmgtime", "8", FCVAR_NOTIFY, "The time those near me will burn for." );
+ConVar zm_sv_immolator_burndmg( "zm_sv_immolator_burndmg", "10", FCVAR_NOTIFY );
+
+#define BURNOTHER_INTERVAL          1.0f
+
 
 extern ConVar zm_sk_burnzombie_health;
 extern ConVar zm_sk_burnzombie_dmg;
@@ -26,6 +32,9 @@ CZMImmolator::CZMImmolator()
 {
     SetZombieClass( ZMCLASS_IMMOLATOR );
     CZMRules::IncPopCount( GetZombieClass() );
+
+
+    m_flNextBurnDamageTime = 0.0f;
 }
 
 CZMImmolator::~CZMImmolator()
@@ -73,6 +82,15 @@ void CZMImmolator::PreUpdate()
             Ignite( 1337.0f );
         }
     }
+
+
+    // We're on fire, burn people around me.
+    if ( IsOnFire() && m_flNextBurnDamageTime <= gpGlobals->curtime )
+    {
+        BurnHurtOthers();
+
+        m_flNextBurnDamageTime = gpGlobals->curtime + BURNOTHER_INTERVAL;
+    }
 }
 
 void CZMImmolator::Ignite( float flFlameLifetime, bool bNPCOnly, float flSize, bool bCalledByLevelDesigner )
@@ -93,6 +111,59 @@ void CZMImmolator::Event_Killed( const CTakeDamageInfo& info )
 
     // We need to call this last or we will go on an endless loop
     StartFires();
+}
+
+void CZMImmolator::BurnHurtOthers()
+{
+    CBaseEntity* pEnt = nullptr;
+
+    CTraceFilterSimple filter( this, COLLISION_GROUP_NONE );
+    trace_t tr;
+
+    const Vector mypos = WorldSpaceCenter();
+
+    const float flBurnTime = zm_sv_immolator_burndmgtime.GetFloat();
+    
+    while ( (pEnt = gEntList.FindEntityInSphere( pEnt, mypos, zm_sv_immolator_burndmgdist.GetFloat() )) != nullptr )
+    {
+        // They're in water
+        if ( pEnt->GetWaterLevel() >= WL_Waist )
+            continue;
+
+
+        // Can't damage if we can't see.
+        UTIL_TraceLine( mypos, pEnt->WorldSpaceCenter(), MASK_SOLID & ~(CONTENTS_MONSTER), &filter, &tr );
+
+        if ( tr.fraction != 1.0f )
+            continue;
+
+
+        if ( pEnt->IsPlayer() || pEnt->IsBaseZombie() )
+        {
+            auto* pChar = static_cast<CBaseCombatCharacter*>( pEnt );
+
+            if ( !pChar->IsOnFire() )
+            {
+                // Damage characters separately
+                CTakeDamageInfo info( this, this, zm_sv_immolator_burndmg.GetFloat(), DMG_BURN );
+                pEnt->TakeDamage( info );
+
+                if ( pEnt->GetHealth() < (pEnt->GetMaxHealth() / 5.0f) )
+                {
+                    pChar->Ignite( flBurnTime, false );
+                }
+            }
+        }
+        else
+        {
+            // Ignite props normally.
+            auto* pBreak = dynamic_cast<CBreakableProp*>( pEnt );
+            if ( pBreak )
+            {
+                pBreak->Ignite( flBurnTime, false );
+            }
+        }
+    }
 }
 
 void CZMImmolator::StartFires()
