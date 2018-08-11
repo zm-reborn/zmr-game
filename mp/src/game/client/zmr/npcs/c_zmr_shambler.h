@@ -12,6 +12,10 @@ public:
     C_ZMShambler();
     ~C_ZMShambler();
 
+    virtual void FootstepSound( bool bRightFoot = false ) OVERRIDE;
+    virtual void FootscuffSound( bool bRightFoot = false ) OVERRIDE;
+    virtual void AttackSound() OVERRIDE;
+
     virtual const char* GetZombieLocalization() const OVERRIDE { return "#ZMClassShambler"; }
 
 

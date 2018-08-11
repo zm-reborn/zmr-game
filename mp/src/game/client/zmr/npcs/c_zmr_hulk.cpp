@@ -21,6 +21,16 @@ C_ZMHulk::~C_ZMHulk()
 
 }
 
+void C_ZMHulk::FootstepSound( bool bRightFoot )
+{
+    EmitSound( bRightFoot ? "NPC_PoisonZombie.FootstepRight" : "NPC_PoisonZombie.FootstepLeft" );
+}
+
+void C_ZMHulk::AttackSound()
+{
+    EmitSound( "NPC_PoisonZombie.Attack" );
+}
+
 bool C_ZMHulk::IsAffectedByEvent( HappyZombieEvent_t iEvent ) const
 {
     return iEvent == HZEVENT_HULKAMANIA;
