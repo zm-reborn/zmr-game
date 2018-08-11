@@ -3,6 +3,8 @@
 
 
 ConVar zm_sk_default_hitmult_head( "zm_sk_default_hitmult_head", "2" );
+ConVar zm_sk_default_hitmult_head_buckshot( "zm_sk_default_hitmult_head_buckshot", "3" );
+ConVar zm_sk_default_hitmult_head_buckshot_dist( "zm_sk_default_hitmult_head_buckshot_dist", "96" );
 
 ConVar zm_sk_shambler_health( "zm_sk_shambler_health", "55" );
 ConVar zm_sk_shambler_dmg_oneslash( "zm_sk_shambler_dmg_oneslash", "25" );
