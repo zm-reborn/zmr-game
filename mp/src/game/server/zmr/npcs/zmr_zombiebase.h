@@ -77,6 +77,7 @@ public:
     virtual int             OnTakeDamage_Alive( const CTakeDamageInfo& inputInfo ) OVERRIDE;
     virtual void            TraceAttack( const CTakeDamageInfo& inputInfo, const Vector& vecDir, trace_t* pTrace, CDmgAccumulator* pAccumulator ) OVERRIDE;
     virtual bool            ScaleDamageByHitgroup( int iHitGroup, CTakeDamageInfo& info ) const;
+    void                    MultiplyBuckshotDamage( CTakeDamageInfo& info ) const;
 
 
     virtual bool            Event_Gibbed( const CTakeDamageInfo& info ) OVERRIDE;

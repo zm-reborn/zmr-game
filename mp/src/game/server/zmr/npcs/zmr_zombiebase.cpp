@@ -144,11 +144,14 @@ ConVar zm_sv_defense_goal_tolerance( "zm_sv_defense_goal_tolerance", "64", FCVAR
 
 
 ConVar zm_sv_debug_zombieattack( "zm_sv_debug_zombieattack", "0" );
+ConVar zm_sv_debug_shotgun_dmgmult( "zm_sv_debug_shotgun_dmgmult", "0" );
 
 ConVar zm_sv_zombiecollisions( "zm_sv_zombiecollisions", "1", 0, "Toggle experimental zombie collisions." );
 
 
 extern ConVar zm_sk_default_hitmult_head;
+extern ConVar zm_sk_default_hitmult_head_buckshot;
+extern ConVar zm_sk_default_hitmult_head_buckshot_dist;
 
 
 
@@ -718,16 +721,6 @@ void CZMBaseZombie::TraceAttack( const CTakeDamageInfo& inputInfo, const Vector&
 {
     CTakeDamageInfo info = inputInfo;
 
-    if( info.GetDamageType() & DMG_BUCKSHOT )
-    {
-        // Zombie gets across-the-board damage reduction for buckshot. This compensates for the recent changes which
-        // make the shotgun much more powerful, and returns the zombies to a level that has been playtested extensively.(sjb)
-        // This normalizes the buckshot damage to what it used to be on normal (5 dmg per pellet. Now it's 8 dmg per pellet). 
-        info.ScaleDamage( 0.625 );
-    }
-
-
-
     ScaleDamageByHitgroup( pTrace->hitgroup, info );
 
 
@@ -746,19 +739,10 @@ bool CZMBaseZombie::ScaleDamageByHitgroup( int iHitGroup, CTakeDamageInfo& info 
     {
     case HITGROUP_HEAD :
         {
+            // Shotgun scales damage differently.
             if ( info.GetDamageType() & DMG_BUCKSHOT )
             {
-                float flDistSqr = FLT_MAX;
-
-                if ( info.GetAttacker() )
-                {
-                    flDistSqr = ( GetAbsOrigin() - info.GetAttacker()->GetAbsOrigin() ).LengthSqr();
-                }
-
-                if ( flDistSqr <= (ZOMBIE_BUCKSHOT_TRIPLE_DAMAGE_DIST*ZOMBIE_BUCKSHOT_TRIPLE_DAMAGE_DIST) )
-                {
-                    info.ScaleDamage( 3.0f );
-                }
+                MultiplyBuckshotDamage( info );
             }
             // ZMRTODO: This random shit really has to go.
             else if ( info.GetDamageType() & DMG_CLUB )
@@ -775,6 +759,39 @@ bool CZMBaseZombie::ScaleDamageByHitgroup( int iHitGroup, CTakeDamageInfo& info 
     }
 
     return false;
+}
+
+void CZMBaseZombie::MultiplyBuckshotDamage( CTakeDamageInfo& info ) const
+{
+    CBaseEntity* pAttacker = info.GetAttacker();
+    if ( !pAttacker ) return;
+
+
+    const Vector startpos = pAttacker->EyePosition();
+    const Vector hitpos = info.GetDamagePosition();
+
+
+    float flDistSqr = startpos.DistToSqr( hitpos );
+
+    float flDmgDistSqr = zm_sk_default_hitmult_head_buckshot_dist.GetFloat();
+    flDmgDistSqr *= flDmgDistSqr;
+
+    // We need to be close enough to do more damage.
+    const bool bScaleDmg = flDistSqr < flDmgDistSqr;
+
+
+    if ( zm_sv_debug_shotgun_dmgmult.GetBool() )
+    {
+        float t = zm_sv_debug_shotgun_dmgmult.GetFloat();
+        NDebugOverlay::Axis( hitpos, vec3_angle, 2.0f, true, t );
+        NDebugOverlay::Line( startpos, hitpos, (!bScaleDmg) ? 255 : 0, bScaleDmg ? 255 : 0, 0, true, t );
+    }
+
+
+    if ( bScaleDmg )
+    {
+        info.ScaleDamage( zm_sk_default_hitmult_head_buckshot.GetFloat() );
+    }
 }
 
 void CZMBaseZombie::Event_Killed( const CTakeDamageInfo& info )
