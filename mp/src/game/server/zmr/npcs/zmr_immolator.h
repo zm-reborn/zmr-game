@@ -34,4 +34,8 @@ public:
 
 private:
     void StartFires();
+
+
+    void BurnHurtOthers();
+    float m_flNextBurnDamageTime;
 };
