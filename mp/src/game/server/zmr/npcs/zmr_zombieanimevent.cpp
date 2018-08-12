@@ -15,7 +15,8 @@ IMPLEMENT_SERVERCLASS_ST_NOBASE( CZMTEZombieAnimEvent, DT_ZM_TEZombieAnimEvent )
     // We may send the activity number or a seed for random animations.
     SendPropInt(
         SENDINFO( m_nData ),
-        Q_log2( (int)LAST_SHARED_ACTIVITY ) + 1 ), // We should only be sending max the value of an activity
+        Q_log2( (int)LAST_SHARED_ACTIVITY ) + 1, // We should only be sending max the value of an activity
+        SPROP_UNSIGNED ),
 END_SEND_TABLE()
 
 void TE_ZombieAnimEvent( CZMBaseZombie* pZombie, ZMZombieAnimEvent_t anim, int nData )
