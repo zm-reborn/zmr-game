@@ -93,12 +93,39 @@ public:
         m_iId = id;
     }
 
+    int GetLayerCycle() const
+    {
+#ifdef CLIENT_DLL
+        return m_pOuter->m_AnimOverlay[m_iLayerIndex].m_flCycle;
+#else
+        return m_pOuter->GetAnimOverlay( m_iLayerIndex )->m_flCycle;
+#endif
+    }
+
+    void SetLayerCycle( float cycle ) const
+    {
+#ifdef CLIENT_DLL
+        m_pOuter->m_AnimOverlay[m_iLayerIndex].m_flCycle = cycle;
+#else
+        m_pOuter->GetAnimOverlay( m_iLayerIndex )->m_flCycle = cycle;
+#endif
+    }
+
+    int GetLayerSequence() const
+    {
+#ifdef CLIENT_DLL
+        return m_pOuter->m_AnimOverlay[m_iLayerIndex].m_nSequence;
+#else
+        return m_pOuter->GetAnimOverlay( m_iLayerIndex )->m_nSequence;
+#endif
+    }
+
     float GetLayerWeight() const
     {
 #ifdef CLIENT_DLL
         return m_pOuter->m_AnimOverlay[m_iLayerIndex].m_flWeight;
 #else
-        return 0.0f;
+        return m_pOuter->GetAnimOverlay( m_iLayerIndex )->m_flWeight;
 #endif
     }
 
@@ -226,6 +253,8 @@ protected:
     int     AddLayeredSequence( int iSeq, int priority );
     void    RemoveLayer( int id, float rate = 0.2f, float delay = 0.0f );
     void    FastRemoveLayer( int id );
+    float   GetLayerCycle( int id );
+    void    SetLayerCycle( int id, float cycle );
     void    SetLayerLooping( int id, bool bLoop );
     void    SetLayerWeight( int id, float flWeight );
 
