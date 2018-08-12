@@ -43,9 +43,10 @@ bool CNPCRNonPlayer::SetActivity( Activity act )
         return false;
     }
 
-    
-    RandomSeed( GetAnimationRandomSeed() );
+
     VerifySequenceIndex( hdr );
+    
+    RandomSeed( GetAnimationRandomSeed() ); // Don't use random->SetSeed, SelectWeightedSequence does not use it.
     int iNewSeq = hdr->SelectWeightedSequence( act, GetSequence() );
 
     if ( iNewSeq <= -1 )
