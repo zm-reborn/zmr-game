@@ -39,10 +39,13 @@ public:
     virtual void StartReload( void );
     virtual void Pump();
 
+    virtual bool ShouldCancelReload() const;
+
     virtual bool CanPickupAmmo() const OVERRIDE { return !IsInReload(); }
     virtual bool IsInReload() const OVERRIDE;
     
 protected:
     CNetworkVar( bool, m_bNeedPump );
     CNetworkVar( int, m_iReloadState );
+    CNetworkVar( bool, m_bCancelReload );
 };

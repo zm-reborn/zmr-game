@@ -14,9 +14,11 @@ BEGIN_NETWORK_TABLE( CZMBasePumpWeapon, DT_ZM_BasePumpWeapon )
 #ifdef CLIENT_DLL
     RecvPropBool( RECVINFO( m_bNeedPump ) ),
     RecvPropInt( RECVINFO( m_iReloadState ) ),
+    RecvPropBool( RECVINFO( m_bCancelReload ) ),
 #else
     SendPropBool( SENDINFO( m_bNeedPump ) ),
     SendPropInt( SENDINFO( m_iReloadState ) ),
+    SendPropBool( SENDINFO( m_bCancelReload ) ),
 #endif
 END_NETWORK_TABLE()
 
@@ -24,6 +26,7 @@ END_NETWORK_TABLE()
 BEGIN_PREDICTION_DATA( CZMBasePumpWeapon )
     DEFINE_PRED_FIELD( m_bNeedPump, FIELD_BOOLEAN, FTYPEDESC_INSENDTABLE ),
     DEFINE_PRED_FIELD( m_iReloadState, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
+    DEFINE_PRED_FIELD( m_bCancelReload, FIELD_BOOLEAN, FTYPEDESC_INSENDTABLE ),
 END_PREDICTION_DATA()
 #endif
 
@@ -36,6 +39,7 @@ CZMBasePumpWeapon::CZMBasePumpWeapon()
 
     m_bNeedPump = false;
     m_iReloadState = RELOADSTATE_NONE;
+    m_bCancelReload = false;
 }
 
 bool CZMBasePumpWeapon::Holster( CBaseCombatWeapon* pSwitchTo )
@@ -45,6 +49,7 @@ bool CZMBasePumpWeapon::Holster( CBaseCombatWeapon* pSwitchTo )
     if ( res )
     {
         m_iReloadState = RELOADSTATE_NONE;
+        m_bCancelReload = false;
     }
 
     return res;
@@ -62,6 +67,18 @@ void CZMBasePumpWeapon::PrimaryAttack( void )
 
 void CZMBasePumpWeapon::ItemPostFrame( void )
 {
+    if ( IsInReload() )
+    {
+        // Check if player wants to cancel the reload.
+        CZMPlayer* pOwner = GetPlayerOwner();
+        if ( pOwner && pOwner->m_nButtons & (IN_ATTACK | IN_ATTACK2) )
+        {
+            m_bCancelReload = true;
+        }
+    }
+
+
+
     if ( m_bNeedPump && m_flNextPrimaryAttack <= gpGlobals->curtime )
     {
         Pump();
@@ -128,7 +145,7 @@ void CZMBasePumpWeapon::CheckReload( void )
             Reload();
 
 
-            if ( pOwner->m_nButtons & (IN_ATTACK | IN_ATTACK2) && m_iClip1 > 0 )
+            if ( ShouldCancelReload() )
             {
                 // Make sure we don't attack instantly when stopping the reload.
                 StopReload();
@@ -187,6 +204,10 @@ void CZMBasePumpWeapon::StartReload( void )
 
 void CZMBasePumpWeapon::StopReload()
 {
+    // We no longer want to cancel the reload.
+    m_bCancelReload = false;
+
+
     SendWeaponAnim( GetReloadEndAct() );
 
     float nextattack = gpGlobals->curtime + SequenceDuration();
@@ -242,4 +263,17 @@ bool CZMBasePumpWeapon::IsInReload() const
         return true;
 
     return BaseClass::IsInReload();
+}
+
+bool CZMBasePumpWeapon::ShouldCancelReload() const
+{
+    if ( m_iClip1 <= 0 )
+        return false;
+    
+    CZMPlayer* pOwner = GetPlayerOwner();
+    if  ( !pOwner )
+        return false;
+
+
+    return pOwner->m_nButtons & (IN_ATTACK | IN_ATTACK2) || m_bCancelReload;
 }
