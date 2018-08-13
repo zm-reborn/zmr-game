@@ -142,8 +142,6 @@ void CZMBasePumpWeapon::CheckReload( void )
             m_iClip1 += 1;
             pOwner->RemoveAmmo( 1, m_iPrimaryAmmoType );
 
-            Reload();
-
 
             if ( ShouldCancelReload() )
             {
@@ -156,6 +154,8 @@ void CZMBasePumpWeapon::CheckReload( void )
 
                 return;
             }
+
+            Reload();
         }
         // Clip full, stop reloading
         else
