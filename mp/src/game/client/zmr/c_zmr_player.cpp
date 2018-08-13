@@ -834,7 +834,10 @@ void C_ZMPlayer::DeathCam_Firstperson( C_ZMPlayer* pPlayer, Vector& eyeOrigin, Q
     C_ZMRagdoll* pRagdoll = pPlayer->GetRagdoll();
 
     if ( !pRagdoll || pPlayer->GetEyeAttachment() == -1 )
+    {
         DeathCam_Thirdperson( pPlayer, eyeOrigin, eyeAngles, zNear, zFar, fov );
+        return;
+    }
 
 
     pRagdoll->GetAttachment( pPlayer->GetEyeAttachment(), eyeOrigin, eyeAngles );
