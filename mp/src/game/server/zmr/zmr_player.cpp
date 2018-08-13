@@ -7,6 +7,7 @@
 #include "ilagcompensationmanager.h"
 #include "predicted_viewmodel.h"
 #include "filesystem.h"
+#include "EntityFlame.h"
 
 #include "npcs/zmr_zombiebase.h"
 #include "zmr_player_ragdoll.h"
@@ -1018,6 +1019,16 @@ void CZMPlayer::CreateRagdollEntity()
         pRagdoll->m_nForceBone = m_nForceBone;
         pRagdoll->m_vecForce = m_vecTotalBulletForce;
         pRagdoll->SetAbsOrigin( GetAbsOrigin() );
+
+        // Copy the effect over.
+        CEntityFlame* pFlame = dynamic_cast<CEntityFlame*>( GetEffectEntity() );
+        if ( pFlame )
+        {
+            pFlame->AttachToEntity( pRagdoll );
+            pRagdoll->SetEffectEntity( pFlame );
+
+            SetEffectEntity( nullptr );
+        }
     }
 
     // ragdolls will be removed on round restart automatically
@@ -1097,6 +1108,16 @@ void CZMPlayer::Event_Killed( const CTakeDamageInfo &info )
     // Note: since we're dead, it won't draw us on the client, but we don't set EF_NODRAW
     // because we still want to transmit to the clients in our PVS.
     CreateRagdollEntity();
+
+    // We can't be on fire while dead!
+    Extinguish();
+
+    CBaseEntity* pEffect = GetEffectEntity();
+    if ( pEffect != nullptr )
+    {
+        UTIL_Remove( pEffect );
+        SetEffectEntity( nullptr );
+    }
 
 
     BaseClass::Event_Killed( subinfo );
