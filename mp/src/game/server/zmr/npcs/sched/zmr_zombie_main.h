@@ -137,6 +137,12 @@ public:
         }
     }
 
+    virtual void OnCommanded( ZombieCommandType_t type )
+    {
+        // Lose enemy when we're commanded so we don't keep going for them forever.
+        GetOuter()->LostEnemy();
+    }
+
     virtual void OnChase( CBaseEntity* pEnt ) OVERRIDE
     {
         m_pPath->Invalidate();
