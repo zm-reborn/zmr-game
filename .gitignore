@@ -82,6 +82,7 @@ settings.scr
 *.ain
 *.csv
 mp/game/zombie_master_reborn/resource/zmtips_used.txt
+mp/game/zombie_master_reborn/resource/zmcrosshairs.txt
 # Tool (vbsp/vvis/vrad) compilation output
 *.dll
 *.exe
