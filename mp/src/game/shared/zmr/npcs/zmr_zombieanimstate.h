@@ -219,6 +219,7 @@ public:
 
 
     int FindLayerById( int id ) const;
+    int FindLayerBySeq( int iSeq, int startindex = 0 ) const;
 
 
     CUtlVector<CZMAnimOverlay> m_vOverlays;
@@ -252,7 +253,7 @@ protected:
 
     int     AddLayeredSequence( int iSeq, int priority );
     void    RemoveLayer( int id, float rate = 0.2f, float delay = 0.0f );
-    void    FastRemoveLayer( int id );
+    bool    FastRemoveLayer( int id );
     float   GetLayerCycle( int id );
     void    SetLayerCycle( int id, float cycle );
     void    SetLayerLooping( int id, bool bLoop );
