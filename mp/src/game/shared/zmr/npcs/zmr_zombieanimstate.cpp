@@ -248,7 +248,7 @@ void CZMZombieAnimState::DrawAnimStateInfo()
         CZMAnimOverlay* pOverlay = &m_vOverlays[i];
 
         Anim_StatePrintf( iLine++, "%i | Sequence: %s (%i) | Weight: %.2f",
-            i,
+            pOverlay->GetLayerIndex(),
             GetSequenceName( hdr, pOverlay->GetLayerSequence() ),
             pOverlay->GetLayerSequence(),
             pOverlay->GetLayerWeight() );
@@ -330,7 +330,9 @@ void CZMZombieAnimState::UpdateLayers()
             }
             else
             {
-                FastRemoveLayer( pOver->GetUniqueId() );
+                if ( FastRemoveLayer( pOver->GetUniqueId() ) )
+                    --i;
+
                 continue;
             }
         }
@@ -385,7 +387,8 @@ void CZMZombieAnimState::UpdateLayers()
 
         if ( pOver->IsDying() && pOver->GetLayerWeight() <= 0.0f )
         {
-            FastRemoveLayer( pOver->GetUniqueId() );
+            if ( FastRemoveLayer( pOver->GetUniqueId() ) )
+                --i;
         }
     }
 #endif
@@ -394,12 +397,42 @@ void CZMZombieAnimState::UpdateLayers()
 int CZMZombieAnimState::AddLayeredSequence( int iSeq, int priority )
 {
     CZMBaseZombie* pOuter = GetOuter();
+
+    // Take over an old layer that is dying if it's the same sequence.
+    float oldcycle = -1.0f;
+    float oldweight = -1.0f;
+    int i = -1;
+    while ( (i = FindLayerBySeq( iSeq, ++i )) != -1 )
+    {
+        if ( !m_vOverlays[i].IsUsed() )
+            continue;
+
+        if ( m_vOverlays[i].IsDying() )
+        {
+            oldcycle = m_vOverlays[i].GetLayerCycle();
+            oldweight = m_vOverlays[i].GetLayerWeight();
+
+            m_vOverlays[i].FastRemove();
+            m_vOverlays.Remove( i );
+            --i;
+        }
+    }
     
     int index = m_vOverlays.AddToTail();
 
     m_vOverlays[index].Create( pOuter, iSeq, priority );
 
     m_vOverlays[index].SetUniqueId( m_iNextId++ );
+
+
+    if ( oldcycle >= 0.0f )
+    {
+        m_vOverlays[index].SetLayerCycle( oldcycle );
+    }
+    if ( oldweight >= 0.0f )
+    {
+        m_vOverlays[index].SetLayerWeight( oldweight );
+    }
 
     return m_vOverlays[index].GetUniqueId();
 }
@@ -412,10 +445,10 @@ void CZMZombieAnimState::RemoveLayer( int id, float rate, float delay )
     m_vOverlays[index].Remove( rate, delay );
 }
 
-void CZMZombieAnimState::FastRemoveLayer( int id )
+bool CZMZombieAnimState::FastRemoveLayer( int id )
 {
     int index = FindLayerById( id );
-    if ( index == -1 ) return;
+    if ( index == -1 ) return false;
 
 
     int layer = m_vOverlays[index].GetLayerIndex();
@@ -435,6 +468,8 @@ void CZMZombieAnimState::FastRemoveLayer( int id )
             m_vOverlays[i].SetLayerIndex( --mylayer );
         }
     }
+
+    return true;
 }
 
 float CZMZombieAnimState::GetLayerCycle( int id )
@@ -475,6 +510,18 @@ int CZMZombieAnimState::FindLayerById( int id ) const
     for ( int i = 0; i < len; i++ )
     {
         if ( m_vOverlays[i].GetUniqueId() == id )
+            return i;
+    }
+
+    return -1;
+}
+
+int CZMZombieAnimState::FindLayerBySeq( int iSeq, int startindex ) const
+{
+    int len = m_vOverlays.Count();
+    for ( int i = MAX( startindex, 0 ); i < len; i++ )
+    {
+        if ( m_vOverlays[i].GetLayerSequence() == iSeq )
             return i;
     }
 
