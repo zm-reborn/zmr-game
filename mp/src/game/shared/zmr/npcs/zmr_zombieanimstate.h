@@ -22,143 +22,35 @@ enum ZMZombieAnimEvent_t
     ZOMBIEANIMEVENT_MAX
 };
 
+// Acts as a wrapper between the actual animation layer and the anim state.
 class CZMAnimOverlay
 {
 public:
-    /*
-    CZMAnimOverlay()
-    {
-        m_iLayerIndex = -1;
-        m_bKillMe = false;
-    }
-    */
-    void Create( CZMBaseZombie* pOuter, int iSeq, int iPriority )
-    {
-        m_pOuter = pOuter;
+    void Create( CZMBaseZombie* pOuter, int iSeq, int iPriority );
 
-#ifdef GAME_DLL
-        m_iLayerIndex = pOuter->AddLayeredSequence( iSeq, iPriority );
-#else
-        int index = pOuter->m_AnimOverlay.AddToTail();
+    void FastRemove();
 
-        C_AnimationLayer* overlay = &pOuter->m_AnimOverlay[index];
-
-        overlay->m_nOrder = 0;
-        overlay->m_nSequence = iSeq;
-        overlay->m_flWeight = 1.0f;
-        overlay->m_bClientBlend = false;
-        overlay->m_flCycle = 0.0f;
-        overlay->m_flPrevCycle = 0.0f;
-        overlay->m_flPlaybackRate = 1.0f;
-
-        m_iLayerIndex = index;
-#endif
-        m_bKillMe = false;
-    }
-
-    void FastRemove()
-    {
-        if ( !IsUsed() )
-            return;
-
-#ifdef GAME_DLL
-        m_pOuter->FastRemoveLayer( m_iLayerIndex );
-#else
-        m_pOuter->m_AnimOverlay.Remove( m_iLayerIndex );
-#endif
-        m_iLayerIndex = -1;
-    }
-
-    void Remove( float rate, float delay = 0.0f )
-    {
-        if ( !IsUsed() )
-            return;
-
-#ifdef GAME_DLL
-        m_pOuter->RemoveLayer( m_iLayerIndex, rate, delay );
-#endif
-
-        m_bKillMe = true;
-
-#ifdef CLIENT_DLL
-        m_flKillRate = m_pOuter->m_AnimOverlay[m_iLayerIndex].m_flWeight / rate;
-        m_flKillDelay = delay;
-#endif
-    }
+    void Remove( float rate, float delay = 0.0f );
 
     int GetUniqueId() const { return m_iId; }
+    void SetUniqueId( int id ) { m_iId = id; }
 
-    void SetUniqueId( int id )
-    {
-        m_iId = id;
-    }
+    int GetLayerCycle() const;
+    void SetLayerCycle( float cycle );
 
-    int GetLayerCycle() const
-    {
-#ifdef CLIENT_DLL
-        return m_pOuter->m_AnimOverlay[m_iLayerIndex].m_flCycle;
-#else
-        return m_pOuter->GetAnimOverlay( m_iLayerIndex )->m_flCycle;
-#endif
-    }
+    int GetLayerSequence() const;
 
-    void SetLayerCycle( float cycle ) const
-    {
-#ifdef CLIENT_DLL
-        m_pOuter->m_AnimOverlay[m_iLayerIndex].m_flCycle = cycle;
-#else
-        m_pOuter->GetAnimOverlay( m_iLayerIndex )->m_flCycle = cycle;
-#endif
-    }
+    float GetLayerWeight() const;
+    void SetLayerWeight( float flWeight );
 
-    int GetLayerSequence() const
-    {
-#ifdef CLIENT_DLL
-        return m_pOuter->m_AnimOverlay[m_iLayerIndex].m_nSequence;
-#else
-        return m_pOuter->GetAnimOverlay( m_iLayerIndex )->m_nSequence;
-#endif
-    }
-
-    float GetLayerWeight() const
-    {
-#ifdef CLIENT_DLL
-        return m_pOuter->m_AnimOverlay[m_iLayerIndex].m_flWeight;
-#else
-        return m_pOuter->GetAnimOverlay( m_iLayerIndex )->m_flWeight;
-#endif
-    }
-
-    void SetLayerWeight( float flWeight )
-    {
-#ifdef CLIENT_DLL
-        m_pOuter->m_AnimOverlay[m_iLayerIndex].m_flWeight = flWeight;
-#else
-        m_pOuter->SetLayerWeight( m_iLayerIndex, flWeight );
-#endif
-    }
-
-    void SetLayerLooping( bool bLoop )
-    {
-#ifdef CLIENT_DLL
-#else
-        m_pOuter->SetLayerLooping( m_iLayerIndex, bLoop );
-#endif
-    }
+    void SetLayerLooping( bool bLoop );
 
     bool IsDying() const { return m_bKillMe; }
     
-    bool IsUsed() const
-    {
-        return m_iLayerIndex != -1;
-    }
+    bool IsUsed() const { return m_iLayerIndex != -1; }
 
     int GetLayerIndex() const { return m_iLayerIndex; }
-
-    void SetLayerIndex( int index )
-    {
-        m_iLayerIndex = index;
-    }
+    void SetLayerIndex( int index ) { m_iLayerIndex = index; }
 
 #ifdef CLIENT_DLL
     float GetKillRate() const { return m_flKillRate; }
@@ -178,7 +70,9 @@ private:
     int m_iId;
 };
 
-
+// Similar to CMultiPlayerAnimState, updates animation and animation layers.
+// Animations are no longer transmitted to client from the server. Instead, server sends animation events to client.
+// Also handles movement <-> idle transitions. This is done both on client & server parallel.
 class CZMZombieAnimState
 #ifndef CLIENT_DLL
     : public NPCR::CEventListener
