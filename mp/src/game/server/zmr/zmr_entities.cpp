@@ -469,7 +469,7 @@ void CZMEntZombieSpawn::SpawnThink()
     SetNextSpawnThink();
 }
 
-bool CZMEntZombieSpawn::CreateZombie( ZombieClass_t zclass )
+CZMBaseZombie* CZMEntZombieSpawn::CreateZombie( ZombieClass_t zclass )
 {
     const char* classname = CZMBaseZombie::ClassToName( zclass );
 
@@ -482,7 +482,7 @@ bool CZMEntZombieSpawn::CreateZombie( ZombieClass_t zclass )
 
     CZMBaseZombie* pZombie = static_cast<CZMBaseZombie*>( CreateEntityByName( classname ) );
 
-    if ( !pZombie ) return false;
+    if ( !pZombie ) return nullptr;
 
 
     Vector spawnpos;
@@ -490,8 +490,8 @@ bool CZMEntZombieSpawn::CreateZombie( ZombieClass_t zclass )
 
     if ( !FindSpawnPoint( pZombie, spawnpos, ang ) )
     {
-        pZombie->SUB_Remove();
-        return false;
+        UTIL_RemoveImmediate( pZombie );
+        return nullptr;
     }
 
 
@@ -508,8 +508,8 @@ bool CZMEntZombieSpawn::CreateZombie( ZombieClass_t zclass )
     // We can be marked for deletion...
     if ( DispatchSpawn( pZombie ) != 0 )
     {
-        pZombie->SUB_Remove();
-        return false;
+        UTIL_RemoveImmediate( pZombie );
+        return nullptr;
     }
 
     pZombie->Activate();
@@ -529,7 +529,7 @@ bool CZMEntZombieSpawn::CreateZombie( ZombieClass_t zclass )
     }
     
 
-    return true;
+    return pZombie;
 }
 
 bool CZMEntZombieSpawn::FindSpawnPoint( CZMBaseZombie* pZombie, Vector& outpos, QAngle& outang )
