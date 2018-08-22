@@ -32,6 +32,8 @@ public:
     virtual int     DrawModel( int flags ) OVERRIDE;
     int             DrawModelAndEffects( int flags );
 
+    virtual void CalculateIKLocks( float currentTime ) OVERRIDE;
+
 
     virtual bool    IsNPCR() const OVERRIDE { return true; }
 
