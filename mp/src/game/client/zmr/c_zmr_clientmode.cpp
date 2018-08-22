@@ -6,6 +6,7 @@
 #include "ui/zmr_textwindow.h"
 #include "ui/zmr_scoreboard.h"
 #include "c_zmr_zmvision.h"
+#include "c_zmr_player.h"
 
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -29,6 +30,8 @@ public:
 
     virtual bool DoPostScreenSpaceEffects( const CViewSetup* pSetup ) OVERRIDE;
     virtual void PostRender() OVERRIDE;
+
+    virtual int KeyInput( int down, ButtonCode_t keynum, const char* pszCurrentBinding );
 };
 
 
@@ -62,6 +65,29 @@ void ClientModeZMNormal::PostRender()
     g_ZMVision.UpdateLight();
 
     BaseClass::PostRender();
+}
+
+int ClientModeZMNormal::KeyInput( int down, ButtonCode_t keynum, const char* pszCurrentBinding )
+{
+    int ret = BaseClass::KeyInput( down, keynum, pszCurrentBinding );
+
+    if ( !ret )
+        return 0;
+
+
+    C_ZMPlayer* pPlayer = C_ZMPlayer::GetLocalPlayer();
+
+    // Mousewheel move
+    // We have to put this here or otherwise we can't move while in free-cam.
+    if ( keynum == MOUSE_WHEEL_DOWN || keynum == MOUSE_WHEEL_UP )
+    {
+        if ( pPlayer && pPlayer->IsZM() )
+        {
+            pPlayer->SetMouseWheelMove( ( keynum == MOUSE_WHEEL_DOWN ) ? -1.0f : 1.0f );
+        }
+    }
+
+    return 1;
 }
 
 //-----------------------------------------------------------------------------
