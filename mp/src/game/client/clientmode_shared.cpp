@@ -713,17 +713,6 @@ int	ClientModeShared::KeyInput( int down, ButtonCode_t keynum, const char *pszCu
 		return pWeapon->KeyInput( down, keynum, pszCurrentBinding );
 	}
 
-#ifdef ZMR // ZMRCHANGE: We have to put this here or otherwise we can't move while in free-cam.
-    if ( keynum == MOUSE_WHEEL_DOWN || keynum == MOUSE_WHEEL_UP )
-    {
-        C_ZMPlayer* pZMPlayer = ToZMPlayer( pPlayer );
-        if ( pZMPlayer && pZMPlayer->IsZM() )
-        {
-            pZMPlayer->SetMouseWheelMove( ( keynum == MOUSE_WHEEL_DOWN ) ? -1.0f : 1.0f );
-        }
-    }
-#endif
-
 	return 1;
 }
 
