@@ -13,12 +13,28 @@
 
 #include "zmr/c_zmr_zmvision.h"
 #include "zmr/c_zmr_util.h"
+
+
+#ifdef _WIN32
+#define _WINREG_
+#undef ReadConsoleInput
+#undef INVALID_HANDLE_VALUE
+#undef GetCommandLine
+#include <Windows.h>
+#endif
+
 #else
 #include "zmr/zmr_rejoindata.h"
 #endif
 
 #include "zmr/zmr_shareddefs.h"
 #include "zmr/zmr_web.h"
+
+
+#ifdef CLIENT_DLL
+ConVar zm_cl_roundrestart_flashtaskbar( "zm_cl_roundrestart_flashtaskbar", "1", 0, "Flash the taskbar icon (Windows) whenever round restarts. 1 = Only when window is not active, 2 = Always" );
+ConVar zm_cl_roundrestart_sound( "zm_cl_roundrestart_sound", "1", 0, "Play a sound whenever round restarts. (Windows) 1 = Only when window is not active, 2 = Always" );
+#endif
 
 
 class CZMSystem : public CAutoGameSystem, public CGameEventListener
@@ -39,6 +55,8 @@ public:
     void CheckSpecialDates();
 #else
     void PrintRoundEndMessage( ZMRoundEndReason_t reason );
+
+    void RoundRestartEffect();
 #endif
 
 
@@ -165,6 +183,8 @@ void CZMSystem::FireGameEvent( IGameEvent* pEvent )
                 pRagdoll->SUB_Remove();
             }
         }
+
+        RoundRestartEffect();
     }
     else if ( Q_strcmp( pEvent->GetName(), "player_spawn" ) == 0 )
     {
@@ -197,6 +217,39 @@ void CZMSystem::PrintRoundEndMessage( ZMRoundEndReason_t reason )
     if ( pMsg )
     {
         ZMClientUtil::PrintNotify( pMsg, ZMCHATNOTIFY_NORMAL );
+    }
+}
+
+void CZMSystem::RoundRestartEffect()
+{
+    bool bActive = engine->IsActiveApp();
+
+
+
+    switch ( zm_cl_roundrestart_sound.GetInt() )
+    {
+    case 1 :
+        if ( bActive )
+            break;
+    case 2 :
+#ifdef _WIN32
+        PlaySound( (LPCTSTR)SND_ALIAS_SYSTEMEXCLAMATION, NULL, SND_ALIAS_ID | SND_ASYNC );
+#endif
+        break;
+    default :
+        break;
+    }
+
+    switch ( zm_cl_roundrestart_flashtaskbar.GetInt() )
+    {
+    case 1 : 
+        if ( bActive )
+            break;
+    case 2 :
+        engine->FlashWindow();
+        break;
+    default :
+        break;
     }
 }
 #endif
