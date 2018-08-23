@@ -13,6 +13,8 @@
 
 #include "zmr/c_zmr_zmvision.h"
 #include "zmr/c_zmr_util.h"
+#else
+#include "zmr/zmr_rejoindata.h"
 #endif
 
 #include "zmr/zmr_shareddefs.h"
@@ -28,6 +30,8 @@ public:
 
     virtual void PostInit() OVERRIDE;
 
+
+    virtual void LevelShutdownPreEntity() OVERRIDE;
     virtual void LevelInitPostEntity() OVERRIDE;
 
 
@@ -89,6 +93,13 @@ void CZMSystem::CheckSpecialDates()
     }
 }
 #endif
+
+void CZMSystem::LevelShutdownPreEntity()
+{
+#ifndef CLIENT_DLL
+    GetZMRejoinSystem()->OnLevelShutdown();
+#endif
+}
 
 void CZMSystem::LevelInitPostEntity()
 {
