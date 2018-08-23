@@ -104,6 +104,7 @@ public:
     static int      PrecachePlayerModels( KeyValues* kv );
     virtual void    Precache() OVERRIDE;
 
+    virtual void    InitialSpawn() OVERRIDE;
     virtual void    Spawn() OVERRIDE;
     virtual void    UpdateOnRemove() OVERRIDE;
     virtual void    PreThink() OVERRIDE;

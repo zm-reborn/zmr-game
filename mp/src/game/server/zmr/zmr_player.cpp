@@ -9,6 +9,7 @@
 #include "filesystem.h"
 #include "EntityFlame.h"
 
+#include "zmr_rejoindata.h"
 #include "npcs/zmr_zombiebase.h"
 #include "zmr_player_ragdoll.h"
 #include "zmr/zmr_viewmodel.h"
@@ -904,6 +905,14 @@ void CZMPlayer::UpdatePlayerFOV()
     {
         SetDefaultFOV( newFov );
     }
+}
+
+void CZMPlayer::InitialSpawn()
+{
+    BaseClass::InitialSpawn();
+
+    // During initial spawn, players should already be authenticated.
+    GetZMRejoinSystem()->OnPlayerJoin( this );
 }
 
 void CZMPlayer::Spawn()

@@ -13,6 +13,7 @@
 #include "ammodef.h"
 
 #include "zmr/zmr_voting.h"
+#include "zmr/zmr_rejoindata.h"
 
 #include "zmr/zmr_player.h"
 #else
@@ -635,6 +636,11 @@ void CZMRules::ClientDisconnected( edict_t* pClient )
 
     if ( pPlayer )
     {
+        // Tell the rejoin system we're leaving.
+        GetZMRejoinSystem()->OnPlayerLeave( pPlayer );
+
+
+
         CTeam* teamplayer = pPlayer->GetTeam();
 
         CTeam* teamhuman = GetGlobalTeam( ZMTEAM_HUMAN );
