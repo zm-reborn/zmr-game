@@ -1,11 +1,15 @@
 #include "cbase.h"
 #include "clientmode_shared.h"
 #include "ienginevgui.h"
+#include "hud.h"
+#include "in_buttons.h"
 #include "glow_outline_effect.h"
 
 #include "ui/zmr_textwindow.h"
 #include "ui/zmr_scoreboard.h"
+#include "ui/zmr_zmview_old.h"
 #include "c_zmr_zmvision.h"
+#include "c_zmr_util.h"
 #include "c_zmr_player.h"
 
 
@@ -14,6 +18,25 @@
 
 
 bool g_bRenderPostProcess = false;
+
+
+
+ConVar zm_cl_usenewzmview( "zm_cl_usenewzmview", "0", FCVAR_ARCHIVE, "Use new ZM view HUD?" );
+
+CZMViewBase* GetZMView()
+{
+    if ( zm_cl_usenewzmview.GetBool() )
+    {
+        Assert( 0 );
+        return nullptr;
+    }
+    else
+    {
+        static CZMViewOld* pOld = new CZMViewOld( "ZMView" );
+        return pOld;
+    }
+}
+
 
 
 using namespace vgui;
@@ -32,6 +55,9 @@ public:
     virtual void PostRender() OVERRIDE;
 
     virtual int KeyInput( int down, ButtonCode_t keynum, const char* pszCurrentBinding );
+
+private:
+    int ZMKeyInput( int down, ButtonCode_t keynum, const char* pszCurrentBinding );
 };
 
 
@@ -69,25 +95,52 @@ void ClientModeZMNormal::PostRender()
 
 int ClientModeZMNormal::KeyInput( int down, ButtonCode_t keynum, const char* pszCurrentBinding )
 {
-    int ret = BaseClass::KeyInput( down, keynum, pszCurrentBinding );
-
-    if ( !ret )
-        return 0;
-
-
     C_ZMPlayer* pPlayer = C_ZMPlayer::GetLocalPlayer();
 
-    // Mousewheel move
-    // We have to put this here or otherwise we can't move while in free-cam.
-    if ( keynum == MOUSE_WHEEL_DOWN || keynum == MOUSE_WHEEL_UP )
+    const bool bIsZM = pPlayer && pPlayer->IsZM();
+
+
+    if ( bIsZM )
     {
-        if ( pPlayer && pPlayer->IsZM() )
+        int ret = ZMKeyInput( down, keynum, pszCurrentBinding );
+
+        if ( ret != -1 )
+            return ret;
+    }
+
+
+    return BaseClass::KeyInput( down, keynum, pszCurrentBinding );
+}
+
+// Return -1 to call baseclass.
+int ClientModeZMNormal::ZMKeyInput( int down, ButtonCode_t keynum, const char* pszCurrentBinding )
+{
+    C_ZMPlayer* pPlayer = C_ZMPlayer::GetLocalPlayer();
+
+
+    // Group select
+    if ( down && keynum >= KEY_0 && keynum <= KEY_9 )
+    {
+        int group = keynum - KEY_0;
+        if ( pPlayer->m_nButtons & IN_DUCK )
         {
-            pPlayer->SetMouseWheelMove( ( keynum == MOUSE_WHEEL_DOWN ) ? -1.0f : 1.0f );
+            ZMClientUtil::SetSelectedGroup( group );
+        }
+        else
+        {
+            ZMClientUtil::SelectGroup( group );
         }
     }
 
-    return 1;
+
+    // Mousewheel move
+    // We have to put this here or otherwise we can't move while in free-cam.
+    if ( down && (keynum == MOUSE_WHEEL_DOWN || keynum == MOUSE_WHEEL_UP) )
+    {
+        pPlayer->SetMouseWheelMove( ( keynum == MOUSE_WHEEL_DOWN ) ? -1.0f : 1.0f );
+    }
+
+    return -1;
 }
 
 //-----------------------------------------------------------------------------
@@ -153,4 +206,16 @@ ClientModeZMNormal::~ClientModeZMNormal()
 void ClientModeZMNormal::Init()
 {
     BaseClass::Init();
+
+
+    DevMsg( "Adding ZM view to hud element list\n" );
+
+    CZMViewBase* pView = GetZMView();
+    if ( pView )
+    {
+        gHUD.RemoveHudElement( pView );
+        gHUD.AddHudElement( pView );
+
+        g_pZMView = pView;
+    }
 }

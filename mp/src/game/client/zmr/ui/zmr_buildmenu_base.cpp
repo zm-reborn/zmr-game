@@ -2,7 +2,8 @@
 
 #include "c_user_message_register.h"
 
-#include "zmr_viewport.h"
+#include "zmr_buildmenu.h"
+#include "zmr_zmview_base.h"
 #include "zmr/c_zmr_entities.h"
 #include "zmr_buildmenu_base.h"
 
@@ -74,7 +75,7 @@ void __MsgFunc_ZMBuildMenuUpdate( bf_read &msg )
 
 	//read queue from usermessage
 	int queue[BM_QUEUE_SIZE];
-	for ( int i = 0; i < BM_QUEUE_SIZE; i++ )
+	for ( int i = 0; i < ARRAYSIZE( queue ); i++ )
 	{
 		//every type was increased by 1 so that type_invalid could be 0 (byte is unsigned)
 		queue[i] = ( msg.ReadByte() - 1 );
