@@ -69,7 +69,7 @@ END_SEND_TABLE()
 IMPLEMENT_SERVERCLASS_ST( CZMPlayer, DT_ZM_Player )
     SendPropDataTable( SENDINFO_DT( m_ZMLocal ), &REFERENCE_SEND_TABLE( DT_ZM_PlyLocal ), SendProxy_SendLocalDataTable ),
 
-    SendPropInt( SENDINFO( m_iSpawnInterpCounter ), 4 ),
+    SendPropInt( SENDINFO( m_iSpawnInterpCounter ), 4, SPROP_UNSIGNED ),
     SendPropEHandle( SENDINFO( m_hRagdoll ) ),
 
     // Data that only gets sent to the local player.
