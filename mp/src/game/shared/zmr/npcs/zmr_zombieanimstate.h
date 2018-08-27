@@ -22,20 +22,28 @@ enum ZMZombieAnimEvent_t
     ZOMBIEANIMEVENT_MAX
 };
 
+
+enum ZMAnimLayerSlot_t
+{
+    ANIMOVERLAY_SLOT_IDLE = 0,
+
+    ANIMOVERLAY_SLOT_MAX
+};
+
+
 // Acts as a wrapper between the actual animation layer and the anim state.
 class CZMAnimOverlay
 {
 public:
-    void Create( CZMBaseZombie* pOuter, int iSeq, int iPriority );
+    CZMAnimOverlay();
+
+    void Create( CZMBaseZombie* pOuter, int iSeq, ZMAnimLayerSlot_t index );
 
     void FastRemove();
 
     void Remove( float rate, float delay = 0.0f );
 
-    int GetUniqueId() const { return m_iId; }
-    void SetUniqueId( int id ) { m_iId = id; }
-
-    int GetLayerCycle() const;
+    float GetLayerCycle() const;
     void SetLayerCycle( float cycle );
 
     int GetLayerSequence() const;
@@ -45,9 +53,8 @@ public:
 
     void SetLayerLooping( bool bLoop );
 
-    bool IsDying() const { return m_bKillMe; }
-    
-    bool IsUsed() const { return m_iLayerIndex != -1; }
+    bool IsDying() const;
+    bool IsUsed() const;
 
     int GetLayerIndex() const { return m_iLayerIndex; }
     void SetLayerIndex( int index ) { m_iLayerIndex = index; }
@@ -62,12 +69,10 @@ private:
 #ifdef CLIENT_DLL
     float m_flKillRate;
     float m_flKillDelay;
+    bool m_bKillMe;
 #endif
     CZMBaseZombie* m_pOuter;
     int m_iLayerIndex;
-    bool m_bKillMe;
-
-    int m_iId;
 };
 
 // Similar to CMultiPlayerAnimState, updates animation and animation layers.
@@ -112,12 +117,6 @@ public:
     void UpdateLayers();
 
 
-    int FindLayerById( int id ) const;
-    int FindLayerBySeq( int iSeq, int startindex = 0 ) const;
-
-
-    CUtlVector<CZMAnimOverlay> m_vOverlays;
-
 
     virtual void Update();
 
@@ -145,17 +144,17 @@ protected:
 
 
 
-    int     AddLayeredSequence( int iSeq, int priority );
-    void    RemoveLayer( int id, float rate = 0.2f, float delay = 0.0f );
-    bool    FastRemoveLayer( int id );
-    float   GetLayerCycle( int id );
-    void    SetLayerCycle( int id, float cycle );
-    void    SetLayerLooping( int id, bool bLoop );
-    void    SetLayerWeight( int id, float flWeight );
+    void    AddLayeredSequence( int iSeq, ZMAnimLayerSlot_t index );
+    void    RemoveLayer( ZMAnimLayerSlot_t index, float rate = 0.2f, float delay = 0.0f );
+    void    FastRemoveLayer( ZMAnimLayerSlot_t index );
+    bool    HasLayeredSequence( ZMAnimLayerSlot_t index );
+    bool    IsLayerDying( ZMAnimLayerSlot_t index );
+    float   GetLayerCycle( ZMAnimLayerSlot_t index );
+    void    SetLayerCycle( ZMAnimLayerSlot_t index, float cycle );
+    void    SetLayerLooping( ZMAnimLayerSlot_t index, bool bLoop );
+    void    SetLayerWeight( ZMAnimLayerSlot_t index, float flWeight );
 
 private:
-    int m_iMoveLayer;
-
     bool m_bWasMoving;
     float m_flMoveWeight;
     float m_flMoveActSpeed;
@@ -168,10 +167,10 @@ private:
 
     bool m_bReady;
 
-    int m_iNextId;
 
-    CZMAnimOverlay m_Overlays[8];
-    
+    CZMAnimOverlay m_AnimOverlay[ANIMOVERLAY_SLOT_MAX];
+
+
 #ifdef CLIENT_DLL
     CZMBaseZombie* m_pOuter;
 #endif
