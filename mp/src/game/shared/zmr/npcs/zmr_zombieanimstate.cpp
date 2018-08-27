@@ -25,7 +25,6 @@ CZMZombieAnimState::CZMZombieAnimState( CZMBaseZombie* pZombie )
     m_pOuter = pZombie;
 #endif
 
-    m_iMoveLayer = -1;
     m_bWasMoving = false;
     m_actIdle = ACT_INVALID;
     m_actMove = ACT_INVALID;
@@ -34,12 +33,6 @@ CZMZombieAnimState::CZMZombieAnimState( CZMBaseZombie* pZombie )
     m_flLastSpdSqr = 0.0f;
     m_bReady = false;
     m_iMoveSeq = -1;
-
-
-    m_iNextId = 0;
-
-
-    //GetOuter()->SetNumAnimOverlays( 1 );
 }
 
 CZMZombieAnimState::~CZMZombieAnimState()
@@ -133,6 +126,16 @@ bool CZMZombieAnimState::InitParams()
 {
     if ( m_bReady ) return true;
 
+
+    CZMBaseZombie* pOuter = GetOuter();
+    pOuter->SetNumAnimOverlays( ANIMOVERLAY_SLOT_MAX );
+#ifdef CLIENT_DLL
+    // Apparently the constructor doesn't set the order...
+    for ( int i = 0; i < pOuter->m_AnimOverlay.Count(); i++ )
+    {
+        pOuter->m_AnimOverlay[i].m_nOrder = 0;
+    }
+#endif
 
     m_actMove = ACT_WALK;
     m_flMoveActSpeed = 1.0f;
@@ -238,15 +241,20 @@ void CZMZombieAnimState::DrawAnimStateInfo()
         GetOuter()->GetCycle() );
 
 
-    for ( int i = 0; i < m_vOverlays.Count(); i++ )
+    for ( int i = 0; i < ARRAYSIZE( m_AnimOverlay ); i++ )
     {
-        CZMAnimOverlay* pOverlay = &m_vOverlays[i];
+        CZMAnimOverlay* pOverlay = &m_AnimOverlay[i];
 
-        Anim_StatePrintf( iLine++, "%i | Sequence: %s (%i) | Weight: %.2f",
+        if ( !pOverlay->IsUsed() )
+            continue;
+
+
+        Anim_StatePrintf( iLine++, "%i | Sequence: %s (%i) | Weight: %.2f | Cycle: %.2f",
             pOverlay->GetLayerIndex(),
             GetSequenceName( hdr, pOverlay->GetLayerSequence() ),
             pOverlay->GetLayerSequence(),
-            pOverlay->GetLayerWeight() );
+            pOverlay->GetLayerWeight(),
+            pOverlay->GetLayerCycle() );
     }
 }
 
@@ -300,14 +308,12 @@ void CZMZombieAnimState::UpdateLayers()
 
 
     // Update dying/unused overlays.
-    for ( int i = 0; i < m_vOverlays.Count(); i++ )
+    for ( int i = 0; i < ARRAYSIZE( m_AnimOverlay ); i++ )
     {
-        CZMAnimOverlay* pOver = &m_vOverlays[i];
+        CZMAnimOverlay* pOver = &m_AnimOverlay[i];
 
         if ( !pOver->IsUsed() )
         {
-            m_vOverlays.Remove( i );
-            --i;
             continue;
         }
 
@@ -327,9 +333,7 @@ void CZMZombieAnimState::UpdateLayers()
             }
             else
             {
-                if ( FastRemoveLayer( pOver->GetUniqueId() ) )
-                    --i;
-
+                FastRemoveLayer( (ZMAnimLayerSlot_t)i );
                 continue;
             }
         }
@@ -363,172 +367,78 @@ void CZMZombieAnimState::UpdateLayers()
             }
         }
     }
-#else
-    for ( int i = 0; i < m_vOverlays.Count(); i++ )
-    {
-        CZMAnimOverlay* pOver = &m_vOverlays[i];
-
-        if ( !pOver->IsUsed() )
-        {
-            m_vOverlays.Remove( i );
-            --i;
-            continue;
-        }
-
-
-        if ( pOver->IsDying() && pOver->GetLayerWeight() <= 0.0f )
-        {
-            if ( FastRemoveLayer( pOver->GetUniqueId() ) )
-                --i;
-        }
-    }
 #endif
 }
 
-int CZMZombieAnimState::AddLayeredSequence( int iSeq, int priority )
+void CZMZombieAnimState::AddLayeredSequence( int iSeq, ZMAnimLayerSlot_t index )
 {
     CZMBaseZombie* pOuter = GetOuter();
 
     // Take over an old layer that is dying if it's the same sequence.
     float oldcycle = -1.0f;
     float oldweight = -1.0f;
-    int i = -1;
-    while ( (i = FindLayerBySeq( iSeq, ++i )) != -1 )
+    if ( m_AnimOverlay[index].IsUsed() && m_AnimOverlay[index].GetLayerSequence() == iSeq )
     {
-        if ( !m_vOverlays[i].IsUsed() )
-            continue;
-
-        if ( m_vOverlays[i].IsDying() )
-        {
-            oldcycle = m_vOverlays[i].GetLayerCycle();
-            oldweight = m_vOverlays[i].GetLayerWeight();
-
-            m_vOverlays[i].FastRemove();
-            m_vOverlays.Remove( i );
-            --i;
-        }
+        oldcycle = m_AnimOverlay[index].GetLayerCycle();
+        oldweight = m_AnimOverlay[index].GetLayerWeight();
     }
-    
-    int index = m_vOverlays.AddToTail();
 
-    m_vOverlays[index].Create( pOuter, iSeq, priority );
-
-    m_vOverlays[index].SetUniqueId( m_iNextId++ );
+    m_AnimOverlay[index].Create( pOuter, iSeq, index );
 
 
     if ( oldcycle >= 0.0f )
     {
-        m_vOverlays[index].SetLayerCycle( oldcycle );
+        m_AnimOverlay[index].SetLayerCycle( oldcycle );
     }
     if ( oldweight >= 0.0f )
     {
-        m_vOverlays[index].SetLayerWeight( oldweight );
+        m_AnimOverlay[index].SetLayerWeight( oldweight );
     }
-
-    return m_vOverlays[index].GetUniqueId();
 }
 
-void CZMZombieAnimState::RemoveLayer( int id, float rate, float delay )
+void CZMZombieAnimState::RemoveLayer( ZMAnimLayerSlot_t index, float rate, float delay )
 {
-    int index = FindLayerById( id );
-    if ( index == -1 ) return;
-
-    m_vOverlays[index].Remove( rate, delay );
+    m_AnimOverlay[index].Remove( rate, delay );
 }
 
-bool CZMZombieAnimState::FastRemoveLayer( int id )
+void CZMZombieAnimState::FastRemoveLayer( ZMAnimLayerSlot_t index )
 {
-    int index = FindLayerById( id );
-    if ( index == -1 ) return false;
-
-
-    int layer = m_vOverlays[index].GetLayerIndex();
-
-    m_vOverlays[index].FastRemove();
-    m_vOverlays.Remove( index );
-
-
-
-    for ( int i = 0; i < m_vOverlays.Count(); i++ )
-    {
-        int mylayer = m_vOverlays[i].GetLayerIndex();
-        Assert( mylayer != layer );
-
-        if ( mylayer > layer )
-        {
-            m_vOverlays[i].SetLayerIndex( --mylayer );
-        }
-    }
-
-    return true;
+    m_AnimOverlay[index].FastRemove();
 }
 
-float CZMZombieAnimState::GetLayerCycle( int id )
+bool CZMZombieAnimState::HasLayeredSequence( ZMAnimLayerSlot_t index )
 {
-    int index = FindLayerById( id );
-    if ( index == -1 ) return -1.0f;
-
-    return m_vOverlays[index].GetLayerCycle();
+    return m_AnimOverlay[index].IsUsed();
 }
 
-void CZMZombieAnimState::SetLayerCycle( int id, float cycle )
+bool CZMZombieAnimState::IsLayerDying( ZMAnimLayerSlot_t index )
 {
-    int index = FindLayerById( id );
-    if ( index == -1 ) return;
-
-    m_vOverlays[index].SetLayerCycle( cycle );
+    return m_AnimOverlay[index].IsDying();
 }
 
-void CZMZombieAnimState::SetLayerLooping( int id, bool bLoop )
+float CZMZombieAnimState::GetLayerCycle( ZMAnimLayerSlot_t index )
 {
-    int index = FindLayerById( id );
-    if ( index == -1 ) return;
-
-    m_vOverlays[index].SetLayerLooping( bLoop );
+    return m_AnimOverlay[index].GetLayerCycle();
 }
 
-void CZMZombieAnimState::SetLayerWeight( int id, float flWeight )
+void CZMZombieAnimState::SetLayerCycle( ZMAnimLayerSlot_t index, float cycle )
 {
-    int index = FindLayerById( id );
-    if ( index == -1 ) return;
-
-    m_vOverlays[index].SetLayerWeight( flWeight );
+    m_AnimOverlay[index].SetLayerCycle( cycle );
 }
 
-int CZMZombieAnimState::FindLayerById( int id ) const
+void CZMZombieAnimState::SetLayerLooping( ZMAnimLayerSlot_t index, bool bLoop )
 {
-    int len = m_vOverlays.Count();
-    for ( int i = 0; i < len; i++ )
-    {
-        if ( m_vOverlays[i].GetUniqueId() == id )
-            return i;
-    }
-
-    return -1;
+    m_AnimOverlay[index].SetLayerLooping( bLoop );
 }
 
-int CZMZombieAnimState::FindLayerBySeq( int iSeq, int startindex ) const
+void CZMZombieAnimState::SetLayerWeight( ZMAnimLayerSlot_t index, float flWeight )
 {
-    int len = m_vOverlays.Count();
-    for ( int i = MAX( startindex, 0 ); i < len; i++ )
-    {
-        if ( m_vOverlays[i].GetLayerSequence() == iSeq )
-            return i;
-    }
-
-    return -1;
+    m_AnimOverlay[index].SetLayerWeight( flWeight );
 }
 
 void CZMZombieAnimState::UpdateMovement()
 {
     // Update the idle <-> move animation layer transition to have the natural appearance of acceleration and deceleration.
-
-
-    if ( m_iMoveLayer != -1 && FindLayerById( m_iMoveLayer ) == -1 )
-    {
-        m_iMoveLayer = -1;
-    }
-
 
 
 
@@ -548,10 +458,9 @@ void CZMZombieAnimState::UpdateMovement()
         else
         {
             // The activity is still going, remove our layer.
-            if ( m_iMoveLayer != -1 )
+            if ( HasLayeredSequence( ANIMOVERLAY_SLOT_IDLE ) )
             {
-                FastRemoveLayer( m_iMoveLayer );
-                m_iMoveLayer = -1;
+                FastRemoveLayer( ANIMOVERLAY_SLOT_IDLE );
             }
 
             return;
@@ -569,19 +478,12 @@ void CZMZombieAnimState::UpdateMovement()
 
     if ( bMoving && !m_bWasMoving ) // Just started moving
     {
-        if ( m_iMoveLayer != -1 )
-        {
-            FastRemoveLayer( m_iMoveLayer );
-            m_iMoveLayer = -1;
-        }
-
-
         int iSeq = GetOuterRandomSequence( m_actIdle );
         if ( iSeq >= 0 )
-            m_iMoveLayer = AddLayeredSequence( iSeq, 1 );
+            AddLayeredSequence( iSeq, ANIMOVERLAY_SLOT_IDLE );
 
 
-        SetLayerLooping( m_iMoveLayer, true );
+        SetLayerLooping( ANIMOVERLAY_SLOT_IDLE, true );
 
 
         UpdateMoveActivity();
@@ -590,10 +492,9 @@ void CZMZombieAnimState::UpdateMovement()
     {
         SetOuterActivity( m_actIdle );
 
-        if ( m_iMoveLayer != -1 )
+        if ( HasLayeredSequence( ANIMOVERLAY_SLOT_IDLE ) && !IsLayerDying( ANIMOVERLAY_SLOT_IDLE ) )
         {
-            RemoveLayer( m_iMoveLayer, MOVELAYER_FADE_RATE );
-            m_iMoveLayer = -1;
+            RemoveLayer( ANIMOVERLAY_SLOT_IDLE, MOVELAYER_FADE_RATE );
         }
     }
     else if ( bMoving )
@@ -604,7 +505,7 @@ void CZMZombieAnimState::UpdateMovement()
 
 
     // Update the layer depending how fast we're going.
-    if ( m_iMoveLayer != -1 )
+    if ( HasLayeredSequence( ANIMOVERLAY_SLOT_IDLE ) && !IsLayerDying( ANIMOVERLAY_SLOT_IDLE ) )
     {
         if ( pOuter->GetActivity() == m_actMove )
         {
@@ -620,11 +521,11 @@ void CZMZombieAnimState::UpdateMovement()
         
             m_flMoveWeight = clamp( newWeight, 0.0f, 1.0f );
 
-            SetLayerWeight( m_iMoveLayer, m_flMoveWeight );
+            SetLayerWeight( ANIMOVERLAY_SLOT_IDLE, m_flMoveWeight );
         }
         else
         {
-            SetLayerWeight( m_iMoveLayer, 0.0f );
+            SetLayerWeight( ANIMOVERLAY_SLOT_IDLE, 0.0f );
             m_flMoveWeight = 0.0f;
         }
     }
@@ -693,28 +594,61 @@ void CZMZombieAnimState::SetIdleActivity( Activity act )
     m_actIdle = act;
 }
 
-void CZMAnimOverlay::Create( CZMBaseZombie* pOuter, int iSeq, int iPriority )
+CZMAnimOverlay::CZMAnimOverlay()
 {
+    m_pOuter = nullptr;
+    m_iLayerIndex = -1;
+#ifdef CLIENT_DLL
+    m_bKillMe = false;
+#endif
+}
+
+bool CZMAnimOverlay::IsDying() const
+{
+#ifdef CLIENT_DLL
+    return m_bKillMe;
+#else
+    return m_iLayerIndex != -1 && m_pOuter->GetAnimOverlay( m_iLayerIndex )->IsKillMe();
+#endif
+}
+
+bool CZMAnimOverlay::IsUsed() const
+{
+#ifdef CLIENT_DLL
+    return m_iLayerIndex != -1 && m_pOuter->m_AnimOverlay[m_iLayerIndex].IsActive();
+#else
+    return m_iLayerIndex != -1 && m_pOuter->GetAnimOverlay( m_iLayerIndex )->m_nOrder != CBaseAnimatingOverlay::MAX_OVERLAYS;
+#endif
+}
+
+void CZMAnimOverlay::Create( CZMBaseZombie* pOuter, int iSeq, ZMAnimLayerSlot_t index )
+{
+    if ( IsUsed() )
+    {
+        FastRemove();
+    }
+
     m_pOuter = pOuter;
 
 #ifdef GAME_DLL
-    m_iLayerIndex = pOuter->AddLayeredSequence( iSeq, iPriority );
+    m_iLayerIndex = pOuter->AddLayeredSequence( iSeq, 0 );
 #else
-    int index = pOuter->m_AnimOverlay.AddToTail();
-
     C_AnimationLayer* overlay = &pOuter->m_AnimOverlay[index];
 
     overlay->m_nOrder = 0;
     overlay->m_nSequence = iSeq;
-    overlay->m_flWeight = 1.0f;
+    overlay->m_flWeight = 0.0f;
     overlay->m_bClientBlend = false;
     overlay->m_flCycle = 0.0f;
     overlay->m_flPrevCycle = 0.0f;
     overlay->m_flPlaybackRate = 1.0f;
 
     m_iLayerIndex = index;
-#endif
+
     m_bKillMe = false;
+#endif
+
+    Assert( m_iLayerIndex == index );
 }
 
 void CZMAnimOverlay::FastRemove()
@@ -725,8 +659,10 @@ void CZMAnimOverlay::FastRemove()
 #ifdef GAME_DLL
     m_pOuter->FastRemoveLayer( m_iLayerIndex );
 #else
-    m_pOuter->m_AnimOverlay.Remove( m_iLayerIndex );
+    m_pOuter->m_AnimOverlay[m_iLayerIndex].SetOrder( C_BaseAnimatingOverlay::MAX_OVERLAYS );
+    m_pOuter->m_AnimOverlay[m_iLayerIndex].m_flWeight = 0.0f;
 #endif
+
     m_iLayerIndex = -1;
 }
 
@@ -739,15 +675,14 @@ void CZMAnimOverlay::Remove( float rate, float delay )
     m_pOuter->RemoveLayer( m_iLayerIndex, rate, delay );
 #endif
 
-    m_bKillMe = true;
-
 #ifdef CLIENT_DLL
     m_flKillRate = m_pOuter->m_AnimOverlay[m_iLayerIndex].m_flWeight / rate;
     m_flKillDelay = delay;
+    m_bKillMe = true;
 #endif
 }
 
-int CZMAnimOverlay::GetLayerCycle() const
+float CZMAnimOverlay::GetLayerCycle() const
 {
 #ifdef CLIENT_DLL
     return m_pOuter->m_AnimOverlay[m_iLayerIndex].m_flCycle;
