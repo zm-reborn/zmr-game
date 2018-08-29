@@ -115,6 +115,7 @@ public:
     bool DoAnimationEvent( ZMZombieAnimEvent_t iEvent, int nData );
 
     void UpdateLayers();
+    void UpdateOuterAnims();
 
 
 
