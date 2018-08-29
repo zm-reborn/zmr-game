@@ -168,6 +168,17 @@ void CZMZombieAnimState::Update()
     // Updates our overlay list, and weight and cycle on client
     UpdateLayers();
 
+    // Finally, advance our animations
+    UpdateOuterAnims();
+
+
+    ShowDebugInfo();
+}
+
+void CZMZombieAnimState::UpdateOuterAnims()
+{
+    VPROF_BUDGET( "CZMZombieAnimState::UpdateOuterAnims", "NPCR" );
+
 #ifndef CLIENT_DLL
     // Advance weight and cycle
     GetOuter()->StudioFrameAdvance();
@@ -175,8 +186,6 @@ void CZMZombieAnimState::Update()
 #else
     GetOuter()->DispatchAnimEvents();
 #endif
-
-    ShowDebugInfo();
 }
 
 bool CZMZombieAnimState::ShouldUpdate() const
