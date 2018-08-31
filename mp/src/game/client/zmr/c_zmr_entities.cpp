@@ -25,17 +25,22 @@ bool C_ZMEntBaseSimple::ShouldDraw()
 }
 
 #ifdef _DEBUG
+ConVar zm_cl_debug_zments( "zm_cl_debug_zments", "0", FCVAR_CHEAT );
+
 void C_ZMEntBaseSimple::OnDataChanged( DataUpdateType_t type )
 {
     BaseClass::OnDataChanged( type );
 
-    if ( type == DATA_UPDATE_CREATED )
+    if ( zm_cl_debug_zments.GetBool() )
     {
-        DevMsg( "ZM ent %i created!\n", entindex() );
-    }
-    else
-    {
-        DevMsg( "ZM ent %i changed! (%i)\n", entindex(), type );
+        if ( type == DATA_UPDATE_CREATED )
+        {
+            DevMsg( "ZM ent %i created!\n", entindex() );
+        }
+        else
+        {
+            DevMsg( "ZM ent %i changed! (%i)\n", entindex(), type );
+        }
     }
 }
 #endif
