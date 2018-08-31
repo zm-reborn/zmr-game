@@ -346,6 +346,11 @@ int NPCR::CFollowNavPath::CheckAvoid( CBaseNPC* pNPC, Vector& vecGoalPos )
     fwd.z = 0.0f;
     float distToGoal = fwd.NormalizeInPlace();
 
+    // No point avoiding within this distance.
+    if ( distToGoal <= GetAvoidMinDistance() )
+        return -1;
+
+
     Vector right( fwd.y, -fwd.x, 0.0f );
 
 
@@ -441,6 +446,13 @@ int NPCR::CFollowNavPath::CheckAvoid( CBaseNPC* pNPC, Vector& vecGoalPos )
     float minSlope = pNPC->GetMotor()->GetSlopeLimit();
     if ((rightClear || rightNormal.z > minSlope)
     &&  (leftClear || leftNormal.z > minSlope))
+    {
+        return 0;
+    }
+
+    // We hit something that is further than our goal. We'll be fine.
+    if ((rightClear || distToGoal < (length*rightFrac))
+    &&  (leftClear || distToGoal < (length*leftFrac)))
     {
         return 0;
     }
