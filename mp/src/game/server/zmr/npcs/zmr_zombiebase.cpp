@@ -332,6 +332,9 @@ NPCR::CPathCostGroundOnly* CZMBaseZombie::GetPathCost() const
 
 void CZMBaseZombie::ZombieThink()
 {
+    VPROF_BUDGET( "CZMBaseZombie::ZombieThink", "NPCR" );
+
+
     m_pAnimState->Update();
 
     BaseClass::NPCThink();

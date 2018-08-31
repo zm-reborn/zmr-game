@@ -49,6 +49,8 @@ void NPCR::CNonPlayerMotor::Update()
 
 void NPCR::CNonPlayerMotor::Move()
 {
+    VPROF_BUDGET( "CNonPlayerMotor::Move", "NPCR" );
+
     m_vecAcceleration = vec3_origin;
 
     CBaseEntity* pOldGround = GetGroundEntity();

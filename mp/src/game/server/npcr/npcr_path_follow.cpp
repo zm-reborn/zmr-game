@@ -320,6 +320,9 @@ bool NPCR::CFollowNavPath::ShouldDecelerateToGoal() const
 
 int NPCR::CFollowNavPath::CheckAvoid( CBaseNPC* pNPC, Vector& vecGoalPos )
 {
+    VPROF_BUDGET( "CFollowNavPath::CheckAvoid", "NPCR" );
+
+
     Vector vecMyPos = pNPC->GetPosition();
 
     // We're currently doing the avoiding.
@@ -356,7 +359,7 @@ int NPCR::CFollowNavPath::CheckAvoid( CBaseNPC* pNPC, Vector& vecGoalPos )
     Vector scanMaxs = Vector( hullWidth, hullWidth, pNPC->GetMotor()->GetHullHeight() );
 
     float tolerance = GetGoalTolerance() + realWidth;
-    float length = 40.0f;
+    float length = 30.0f;
 
     if ( (distToGoal - tolerance) < 0.0f )
     {
