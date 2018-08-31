@@ -73,7 +73,7 @@ void NPCR::CNonPlayerMotor::Move()
 
     bool bIsOnGround = pNewGround != nullptr;
 
-    if ( !bIsOnGround )
+    if ( !bIsOnGround || m_bForceGravity )
     {
         // Apply gravity.
         m_vecAcceleration.z -= GetGravity();

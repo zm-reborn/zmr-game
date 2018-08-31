@@ -6,6 +6,7 @@
 
 
 ConVar npcr_debug_navigator( "npcr_debug_navigator", "0" );
+ConVar npcr_debug_navigator_ground( "npcr_debug_navigator_ground", "0" );
 
 ConVar npcr_motor_jump_groundoffset( "npcr_motor_jump_groundoffset", "2" );
 
@@ -52,6 +53,7 @@ NPCR::CBaseMotor::CBaseMotor( CBaseNPC* pNPC ) : NPCR::CEventListener( pNPC, pNP
     m_vecDesiredMoveDir = vec3_origin;
     m_vecGroundNormal = Vector( 0, 0, 1 );
     m_vecLastValidPos = vec3_origin;
+    m_bForceGravity = false;
 
     m_bDoMove = false;
 
@@ -67,6 +69,8 @@ NPCR::CBaseMotor::~CBaseMotor()
 
 CBaseEntity* NPCR::CBaseMotor::UpdateGround()
 {
+    m_bForceGravity = false;
+
     // Check if we're on ground and snap to it if we are.
     // This will become important later.
     // ZMRTODO: Make sure ground check delta is made smaller when jumping so we don't teleport to the ground instantly.
@@ -75,7 +79,8 @@ CBaseEntity* NPCR::CBaseMotor::UpdateGround()
 
     float halfhull = GetHullWidth() / 2.0f;
     Vector mins = Vector( -halfhull, -halfhull, 0.0f );
-    Vector maxs = Vector( halfhull, halfhull, 2.0f );
+    Vector maxs = Vector( halfhull, halfhull, GetHullHeight() - height );
+    Assert( mins.z < maxs.z );
 
 
     Vector vecStepDown;
@@ -85,17 +90,26 @@ CBaseEntity* NPCR::CBaseMotor::UpdateGround()
     }
     else
     {
-        vecStepDown = Vector( 0, 0, -0.1f );
+        vecStepDown = Vector( 0, 0, -0.01f );
     }
+
+
+    Vector offGround = Vector( 0.0f, 0.0f, height );
 
 
     CMoveFilter filter( GetNPC(), COLLISION_GROUP_NPC );
     trace_t tr;
     UTIL_TraceHull(
-        startPos + Vector( 0, 0, height + 0.001f ),
+        startPos + offGround,
         startPos + vecStepDown,
         mins, maxs,
         MASK_NPCSOLID, &filter, &tr );
+
+    if ( npcr_debug_navigator_ground.GetBool() )
+    {
+        bool bInvalid = tr.startsolid;
+        NDebugOverlay::Box( startPos + offGround, mins, maxs, bInvalid ? 255 : 0, (!bInvalid) ? 255 : 0, 0, 0, 0.1f );
+    }
 
 
     if ( tr.fraction < 1.0f && !tr.startsolid )
@@ -111,6 +125,17 @@ CBaseEntity* NPCR::CBaseMotor::UpdateGround()
 
             return tr.m_pEnt;
         }
+    }
+
+    // This is not a valid position, go back to valid one.
+    if ( tr.startsolid )
+    {
+        GetNPC()->SetPosition( m_vecLastValidPos );
+
+        // We have to force gravity here or we'll be floating in the ceiling being stuck
+        m_bForceGravity = true;
+
+        return tr.m_pEnt;
     }
 
 
@@ -274,12 +299,10 @@ Vector NPCR::CBaseMotor::HandleCollisions( const Vector& vecGoal )
     
     float halfhull = GetHullWidth() / 2.0f;
 
-    bool bTrySmallerBox = true;
-
     // If we're on ground, ignore step height.
     // This is important, because it is very easy to get stuck on slopes, etc.
     Vector mins( -halfhull, -halfhull, IsOnGround() ? GetStepHeight() : 0.0f );
-    Vector maxs( halfhull, halfhull, GetHullHeight() );
+    Vector maxs( halfhull, halfhull, GetHullHeight() - mins.z );
 
     // Should never happen.
     Assert( mins.z < maxs.z );
@@ -288,6 +311,7 @@ Vector NPCR::CBaseMotor::HandleCollisions( const Vector& vecGoal )
     int limit = 3;
     Vector startPos = validPos;
     Vector goalPos = vecGoal;
+
 
     trace_t tr;
     while ( limit-- > 0 )
@@ -348,16 +372,6 @@ Vector NPCR::CBaseMotor::HandleCollisions( const Vector& vecGoal )
                     }
                 }
             }
-            // HACK: it is incredibly easy to get stuck on ceilings.
-            else if ( bTrySmallerBox )
-            {
-                maxs.z -= 4.0f;
-                if ( maxs.z <= mins.z )
-                    maxs.z = mins.z + 1.0f;
-
-                bTrySmallerBox = false;
-                continue;
-            }
 
             Assert( validPos != m_vecLastValidPos );
             validPos = m_vecLastValidPos;
@@ -392,7 +406,7 @@ Vector NPCR::CBaseMotor::HandleCollisions( const Vector& vecGoal )
         goalPos = remainingMove;
     }
 
-    if ( !tr.startsolid && bTrySmallerBox )
+    if ( !tr.startsolid )
     {
         m_vecLastValidPos = validPos;
     }
