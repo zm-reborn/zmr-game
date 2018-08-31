@@ -1,5 +1,6 @@
 #include "cbase.h"
 #include "basecombatcharacter.h"
+#include "vprof.h"
 
 #include "npcr_schedule.h"
 #include "npcr_motor.h"
@@ -116,6 +117,8 @@ bool NPCR::CBaseNPC::ShouldUpdate() const
 
 void NPCR::CBaseNPC::Update()
 {
+    VPROF_BUDGET( "CBaseNPC::Update", "NPCR" );
+
     if ( ShouldUpdate() )
     {
         g_NPCManager.StartUpdate();

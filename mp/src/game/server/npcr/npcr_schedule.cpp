@@ -1,4 +1,5 @@
 #include "cbase.h"
+#include "vprof.h"
 
 #include "npcr_basenpc.h"
 #include "npcr_schedule.h"
@@ -22,5 +23,6 @@ NPCR::CScheduleInterface::~CScheduleInterface()
 
 void NPCR::CScheduleInterface::Update()
 {
+    VPROF_BUDGET( "CScheduleInterface::Update", "NPCR" );
     m_pInitialSched->Update();
 }

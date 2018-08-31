@@ -69,6 +69,9 @@ void CZMBlockerScanner::Update()
 
 void CZMBlockerScanner::FindBlocker()
 {
+    VPROF_BUDGET( "CZMBlockerScanner::FindBlocker", "NPCR" );
+
+
     Vector dir;
     CZMBaseZombie* pChar = GetOuter();
 

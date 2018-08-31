@@ -264,6 +264,9 @@ void NPCR::CBaseMotor::MoveTowards( const Vector& vecNewPos )
 
 Vector NPCR::CBaseMotor::HandleCollisions( const Vector& vecGoal )
 {
+    VPROF_BUDGET( "CBaseMotor::HandleCollisions", "NPCR" );
+
+
     m_bAdjustVel = false;
 
 
