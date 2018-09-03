@@ -83,6 +83,10 @@ namespace NPCR
         int                 CheckAvoid( CBaseNPC* pNPC, Vector& vecGoalPos );
         int                 CheckStuck( CBaseNPC* pNPC, Vector& vecGoalPos );
 
+        void                StartCheckingStuck( CBaseNPC* pNPC );
+        void                StopCheckingStuck();
+
+
         virtual bool        ShouldFailNavJump( CBaseNPC* pNPC ) const;
 
         void ClearAvoidState()
@@ -110,5 +114,6 @@ namespace NPCR
         CountdownTimer m_StuckTimer;
         Vector m_vecStuckDelta;
         float m_flStuckAngle;
+        CountdownTimer m_StuckCheckTimer;
     };
 }
