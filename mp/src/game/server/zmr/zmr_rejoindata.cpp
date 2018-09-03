@@ -119,7 +119,13 @@ CZMRejoinDataSystem::CZMRejoinDataSystem()
 
 CZMRejoinDataSystem::~CZMRejoinDataSystem()
 {
-    m_vListeners.PurgeAndDeleteElements();
+    FOR_EACH_VEC( m_vListeners, i )
+    {
+        if ( m_vListeners[i]->FreeMe() )
+            delete m_vListeners[i];
+    }
+    m_vListeners.RemoveAll();
+
     m_vPlayerData.PurgeAndDeleteElements();
 }
 

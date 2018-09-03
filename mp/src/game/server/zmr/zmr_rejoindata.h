@@ -76,6 +76,8 @@ public:
     virtual ~CZMRejoinListener();
 
     virtual CZMRejoinData* OnPlayerLeave( CZMPlayer* pPlayer ) { return nullptr; }
+
+    virtual bool FreeMe() const { return false; }
 };
 //
 
