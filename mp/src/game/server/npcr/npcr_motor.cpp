@@ -54,6 +54,7 @@ NPCR::CBaseMotor::CBaseMotor( CBaseNPC* pNPC ) : NPCR::CEventListener( pNPC, pNP
     m_vecGroundNormal = Vector( 0, 0, 1 );
     m_vecLastValidPos = vec3_origin;
     m_bForceGravity = false;
+    m_flGroundZOffset = 0.0f;
 
     m_bDoMove = false;
 
@@ -105,15 +106,30 @@ CBaseEntity* NPCR::CBaseMotor::UpdateGround()
         mins, maxs,
         MASK_NPCSOLID, &filter, &tr );
 
-    if ( npcr_debug_navigator_ground.GetBool() )
+    if ( npcr_debug_navigator_ground.GetInt() > 0 )
     {
         bool bInvalid = tr.startsolid;
-        NDebugOverlay::Box( startPos + offGround, mins, maxs, bInvalid ? 255 : 0, (!bInvalid) ? 255 : 0, 0, 0, 0.1f );
+        switch ( npcr_debug_navigator_ground.GetInt() )
+        {
+        case 1 :
+            NDebugOverlay::Box( startPos + offGround, mins, maxs, bInvalid ? 255 : 0, (!bInvalid) ? 255 : 0, 0, 0, 0.1f );
+            break;
+        case 2 :
+            NDebugOverlay::Box( tr.endpos, mins, maxs, bInvalid ? 255 : 0, (!bInvalid) ? 255 : 0, 0, 0, 0.1f );
+            break;
+        default :
+            break;
+        }
     }
-
 
     if ( tr.fraction < 1.0f && !tr.startsolid )
     {
+        if ( tr.endpos.z > startPos.z )
+        {
+            m_flGroundZOffset = tr.endpos.z - startPos.z;
+        }
+        else m_flGroundZOffset = 0.0f;
+
         GetNPC()->SetPosition( tr.endpos );
 
         if ( tr.plane.normal.z > GetSlopeLimit() )
@@ -302,7 +318,7 @@ Vector NPCR::CBaseMotor::HandleCollisions( const Vector& vecGoal )
     // If we're on ground, ignore step height.
     // This is important, because it is very easy to get stuck on slopes, etc.
     Vector mins( -halfhull, -halfhull, IsOnGround() ? GetStepHeight() : 0.0f );
-    Vector maxs( halfhull, halfhull, GetHullHeight() - mins.z );
+    Vector maxs( halfhull, halfhull, GetHullHeight() - m_flGroundZOffset );
 
     // Should never happen.
     Assert( mins.z < maxs.z );
@@ -311,6 +327,11 @@ Vector NPCR::CBaseMotor::HandleCollisions( const Vector& vecGoal )
     int limit = 3;
     Vector startPos = validPos;
     Vector goalPos = vecGoal;
+
+    if ( npcr_debug_navigator.GetBool() )
+    {
+        NDebugOverlay::Box( startPos, mins, maxs, 0, 255, 0, 0, 0.1f );
+    }
 
 
     trace_t tr;

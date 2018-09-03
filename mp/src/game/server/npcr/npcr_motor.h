@@ -72,6 +72,7 @@ namespace NPCR
         Vector m_vecMoveDir;
         Vector m_vecDesiredMoveDir;
         bool m_bForceGravity;
+        float m_flGroundZOffset;
         
     private:
         Vector m_vecGroundNormal;
