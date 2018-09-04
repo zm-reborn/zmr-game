@@ -34,6 +34,9 @@ float AngleNormalizeRadians( float angle )
     return angle;
 }
 
+#define RADIALINDEX_TEAM        0
+#define RADIALINDEX_USELESS     1
+
 struct ZMVoiceMenuData_t
 {
     ZMVoiceMenuData_t( const char* localization, int index )
@@ -46,6 +49,17 @@ struct ZMVoiceMenuData_t
     char m_szLocalization[64];
     wchar_t m_wszCachedTxt[64];
     int m_iIndex;
+};
+
+struct ZMVoiceMenu_t
+{
+    ~ZMVoiceMenu_t()
+    {
+        m_vItems.PurgeAndDeleteElements();
+    }
+
+    CUtlVector<ZMVoiceMenuData_t*> m_vItems;
+    bool m_bOffset;
 };
 
 
@@ -72,18 +86,21 @@ public:
     virtual void SetVisible( bool state ) OVERRIDE;
 
 
-    void LoadCommands();
+    void LoadMenus();
 
     
-    void BeginFadeIn();
+    void BeginFadeIn( int menuIndex );
     void BeginFadeOut();
     void PerformVoice();
 
     float GetRadialSize();
-    float GetStartingAngle() const;
+    float GetStartingAngle( int nElements, bool offset = false ) const;
 
 protected:
     void UpdateSelection();
+
+
+    bool LoadMenuTo( ZMVoiceMenu_t& vMenu, const char* path );
 
 
     void PaintString( const vgui::HFont font, const Color& clr, int x, int y, const wchar_t* txt );
@@ -96,12 +113,13 @@ private:
     CPanelAnimationVar( float, m_flTextPosScale, "TextPosScale", "0.7" );
     CPanelAnimationVar( float, m_flFadeInTime, "FadeInTime", "0.2" );
     CPanelAnimationVar( float, m_flFadeOutTime, "FadeOutTime", "0.2" );
-    CPanelAnimationVar( bool, m_bOffsetStart, "OffsetStart", "1" );
 
     CPanelAnimationVar( Color, m_BgColor, "BgColor", "ZMHudBgColor" );
 
 
-    CUtlVector<ZMVoiceMenuData_t*> m_vCommands;
+    ZMVoiceMenu_t m_MenuTeam;
+    ZMVoiceMenu_t m_MenuUseless;
+    ZMVoiceMenu_t* m_pCurrentMenu;
 
 
     int m_nTexBgId;
@@ -126,7 +144,7 @@ static void IN_ZM_VoiceMenu1( const CCommand& args )
         bool newstate = ( args.Arg( 0 )[0] == '+' ) ? true : false;
 
         if ( newstate )
-            g_pVoiceMenu->BeginFadeIn();
+            g_pVoiceMenu->BeginFadeIn( atoi( args.Arg( 1 ) ) );
         else
             g_pVoiceMenu->BeginFadeOut();
 
@@ -159,25 +177,35 @@ CZMHudVoiceMenu::CZMHudVoiceMenu( const char* pElementName ) : CHudElement( pEle
 
     m_iCurSelection = -1;
 
-    LoadCommands();
+    m_pCurrentMenu = nullptr;
+    LoadMenus();
 }
 
 CZMHudVoiceMenu::~CZMHudVoiceMenu()
 {
-    m_vCommands.PurgeAndDeleteElements();
 }
 
-void CZMHudVoiceMenu::LoadCommands()
+void CZMHudVoiceMenu::LoadMenus()
 {
-    m_vCommands.PurgeAndDeleteElements();
+    m_MenuTeam.m_vItems.PurgeAndDeleteElements();
+    m_MenuUseless.m_vItems.PurgeAndDeleteElements();
 
 
+    LoadMenuTo( m_MenuTeam, "resource/zmvoicemenu.txt" );
+    LoadMenuTo( m_MenuUseless, "resource/zmvoicemenu2.txt" );
+}
+
+bool CZMHudVoiceMenu::LoadMenuTo( ZMVoiceMenu_t& vMenu, const char* path )
+{
     KeyValues* kv = new KeyValues( "VoiceMenu" );
-    if ( !kv->LoadFromFile( filesystem, "resource/zmvoicemenu.txt" ) )
+    if ( !kv->LoadFromFile( filesystem, path ) )
     {
         kv->deleteThis();
-        return;
+        return false;
     }
+
+
+    vMenu.m_bOffset = kv->GetInt( "offset" );
 
 
     KeyValues* data = kv->GetFirstSubKey();
@@ -192,14 +220,15 @@ void CZMHudVoiceMenu::LoadCommands()
             continue;
 
         
-        m_vCommands.AddToTail( new ZMVoiceMenuData_t( pLocal, index ) );
+        vMenu.m_vItems.AddToTail( new ZMVoiceMenuData_t( pLocal, index ) );
     }
     while ( (data = data->GetNextKey()) != nullptr );
 
 
 
-
     kv->deleteThis();
+
+    return true;
 }
 
 void CZMHudVoiceMenu::Init()
@@ -265,9 +294,12 @@ void CZMHudVoiceMenu::UpdateSelection()
     }
 
 
-    int count = m_vCommands.Count();
+    if ( !m_pCurrentMenu )
+        return;
+
+    int count = m_pCurrentMenu->m_vItems.Count();
     
-    float dir = GetStartingAngle();
+    float dir = GetStartingAngle( count, m_pCurrentMenu->m_bOffset );
     float jump = (M_PI_F*2) / count;
 
     for ( int i = 0; i < count; i++ )
@@ -291,16 +323,28 @@ float CZMHudVoiceMenu::GetRadialSize()
     return MIN( m_flSize, (float)(GetWide() > GetTall() ? GetTall() : GetWide()) );
 }
 
-float CZMHudVoiceMenu::GetStartingAngle() const
+float CZMHudVoiceMenu::GetStartingAngle( int nElements, bool offset ) const
 {
     float up = -(M_PI_F/2.0f);
 
-    return m_bOffsetStart ? ( up - (M_PI_F*2) / m_vCommands.Count() / 2 ) : up;
+    return offset ? ( up - (M_PI_F*2) / nElements / 2 ) : up;
 }
 
-void CZMHudVoiceMenu::BeginFadeIn()
+void CZMHudVoiceMenu::BeginFadeIn( int radialIndex )
 {
     m_iCurSelection = -1;
+
+
+    switch ( radialIndex )
+    {
+    case RADIALINDEX_USELESS :
+        m_pCurrentMenu = &m_MenuUseless;
+        break;
+    case RADIALINDEX_TEAM :
+    default :
+        m_pCurrentMenu = &m_MenuTeam;
+        break;
+    }
 
 
     m_flFadeOut = 0.0f;
@@ -320,11 +364,14 @@ void CZMHudVoiceMenu::BeginFadeOut()
 
 void CZMHudVoiceMenu::PerformVoice()
 {
-    if ( !m_vCommands.IsValidIndex( m_iCurSelection ) )
+    if ( !m_pCurrentMenu )
+        return;
+
+    if ( !m_pCurrentMenu->m_vItems.IsValidIndex( m_iCurSelection ) )
         return;
 
 
-    ZMGetVoiceLines()->SendVoiceLine( m_vCommands[m_iCurSelection]->m_iIndex );
+    ZMGetVoiceLines()->SendVoiceLine( m_pCurrentMenu->m_vItems[m_iCurSelection]->m_iIndex );
 }
 
 void CZMHudVoiceMenu::Paint()
@@ -373,8 +420,11 @@ void CZMHudVoiceMenu::Paint()
     size = halfsize * m_flTextPosScale;
 
 
-    int count = m_vCommands.Count();
-    float dir = GetStartingAngle();
+    if ( !m_pCurrentMenu )
+        return;
+
+    int count = m_pCurrentMenu->m_vItems.Count();
+    float dir = GetStartingAngle( count, m_pCurrentMenu->m_bOffset );
     float jump = (M_PI_F*2) / count;
 
 
@@ -387,7 +437,7 @@ void CZMHudVoiceMenu::Paint()
 
     for ( int i = 0; i < count; i++ )
     {
-        ZMVoiceMenuData_t* pData = m_vCommands[i];
+        ZMVoiceMenuData_t* pData = m_pCurrentMenu->m_vItems[i];
 
         float vx, vy;
 
@@ -463,6 +513,6 @@ CON_COMMAND( zm_hud_reloadvoicemenu, "" )
 {
     if ( g_pVoiceMenu )
     {
-        g_pVoiceMenu->LoadCommands();
+        g_pVoiceMenu->LoadMenus();
     }
 }
