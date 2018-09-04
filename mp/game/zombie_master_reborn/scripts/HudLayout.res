@@ -109,6 +109,15 @@
 		"SmallOffsetY"	"0"
 	}
 	
+	ZMHudVoiceMenu
+	{
+		"fieldName"		"ZMHudVoiceMenu"
+		"wide"	"300"
+		"tall"  "300"
+		"xpos"	"0"
+		"ypos"	"0"
+	}
+	
 	ZMHudTooltip
 	{
 		"fieldName"		"ZMHudToolTip"

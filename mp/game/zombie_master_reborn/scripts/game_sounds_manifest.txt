@@ -79,4 +79,5 @@ game_sounds_manifest
 	"precache_file"		"scripts/npc_sounds_burnzombie.txt" // ZMR
 	
 	"precache_file"		"scripts/game_sounds_zmmisc.txt" // ZMR
+	"precache_file"		"scripts/game_sounds_zmvoice.txt" // ZMR
 }
