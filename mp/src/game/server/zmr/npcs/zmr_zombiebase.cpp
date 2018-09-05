@@ -113,6 +113,9 @@ private:
 
 
 
+#define CYCLELATCH_UPDATE_INTERVAL      0.2f
+
+
 int CZMBaseZombie::AE_ZOMBIE_ATTACK_RIGHT = AE_INVALID;
 int CZMBaseZombie::AE_ZOMBIE_ATTACK_LEFT = AE_INVALID;
 int CZMBaseZombie::AE_ZOMBIE_ATTACK_BOTH = AE_INVALID;
@@ -167,6 +170,8 @@ IMPLEMENT_SERVERCLASS_ST( CZMBaseZombie, DT_ZM_BaseZombie )
     SendPropBool( SENDINFO( m_bIsOnGround ) ),
     SendPropInt( SENDINFO( m_iAnimationRandomSeed ) ),
     SendPropInt( SENDINFO( m_lifeState ), 3, SPROP_UNSIGNED ),
+    // If you increase the number of bits networked, make sure to also modify the code below and in the client class.
+    SendPropInt( SENDINFO( m_cycleLatch ), 4, SPROP_UNSIGNED ),
 
 
     // Animation excludes
@@ -209,6 +214,9 @@ CZMBaseZombie::CZMBaseZombie()
     m_iAnimationRandomSeed = (int)gpGlobals->curtime + randomseed;
     
     m_iAdditionalAnimRandomSeed = 0;
+
+    m_cycleLatch = 0;
+    m_cycleLatchTimer.Invalidate();
 
 
     m_hAmbushEnt.Set( nullptr );
@@ -318,6 +326,8 @@ void CZMBaseZombie::Spawn()
     SetNextThink( gpGlobals->curtime );
 
 
+    m_cycleLatchTimer.Start( CYCLELATCH_UPDATE_INTERVAL );
+
     AddSolidFlags( FSOLID_NOT_STANDABLE );
 }
 
@@ -345,6 +355,15 @@ void CZMBaseZombie::ZombieThink()
     m_pAnimState->Update();
 
     BaseClass::NPCThink();
+
+
+
+    if ( IsAlive() && m_cycleLatchTimer.IsElapsed() )
+    {
+        m_cycleLatchTimer.Start( CYCLELATCH_UPDATE_INTERVAL );
+        // Compress the cycle into 4 bits. Can represent 0.0625 in steps which is enough.
+        m_cycleLatch.GetForModify() = 16 * GetCycle();
+    }
 }
 
 void CZMBaseZombie::PreUpdate()
