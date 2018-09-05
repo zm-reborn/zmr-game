@@ -28,6 +28,9 @@
 #include "tier0/memdbgon.h"
 
 
+ConVar zm_sv_maxbunnyhopspeed( "zm_sv_maxbunnyhopspeed", "300", FCVAR_REPLICATED | FCVAR_NOTIFY );
+
+
 extern bool g_bMovementOptimizations;
 
 
@@ -599,6 +602,7 @@ bool CZMGameMovement::CheckJumpButton( void )
     player->PlayStepSound( (Vector &)mv->GetAbsOrigin(), player->m_pSurfaceData, 1.0, true );
     
     //MoveHelper()->PlayerSetAnimation( PLAYER_JUMP );
+    // ZMRCHANGE
     GetZMPlayer()->DoAnimationEvent( PLAYERANIMEVENT_JUMP );
 
     float flGroundFactor = 1.0f;
@@ -650,6 +654,28 @@ bool CZMGameMovement::CheckJumpButton( void )
     mv->m_outStepHeight += 0.15f;
 
     OnJump(mv->m_outJumpVel.z);
+
+
+
+    // Restrict bunnyhopping speed
+
+    float maxspd = zm_sv_maxbunnyhopspeed.GetFloat();
+    if ( maxspd >= 0.0f )
+    {
+        float length = mv->m_vecVelocity.Length2D();
+
+        // We have to take into account the base velocity (push triggers, etc.)
+        // Otherwise the player could throttle the speed given by the push and fuck things up.
+        maxspd = MAX( player->GetBaseVelocity().Length2D(), maxspd );
+
+        if ( length > 0.1f && length > maxspd )
+        {
+            float mult = maxspd / length;
+            mv->m_vecVelocity[0] *= mult;
+            mv->m_vecVelocity[1] *= mult;
+        }
+    }
+
 
     // Flag that we jumped.
     mv->m_nOldButtons |= IN_JUMP;	// don't jump again until released
