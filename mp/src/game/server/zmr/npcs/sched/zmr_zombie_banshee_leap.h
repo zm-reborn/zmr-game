@@ -179,6 +179,13 @@ public:
         }
     }
 
+    virtual void OnEnd() OVERRIDE
+    {
+        // This activity loops, so we'll have to manually stop it.
+        if ( GetOuter()->GetActivity() == CZMBanshee::ACT_FASTZOMBIE_LEAP_STRIKE )
+            GetOuter()->SetActivity( ACT_IDLE );
+    }
+
     virtual void OnCommanded( ZombieCommandType_t com ) OVERRIDE
     {
         TryEnd( "We were commanded to do something else!" );
