@@ -981,6 +981,10 @@ void CZMPlayer::Spawn()
     m_impactEnergyScale = 4.0f;
 
 
+    // Reset our base velocity so we don't go flying. RIP Muob
+    SetBaseVelocity( vec3_origin );
+
+
     // Reset activity. Makes sure we don't get insta-punished when spawning after spectating somebody, etc.
     m_flLastActivity = gpGlobals->curtime;
 
