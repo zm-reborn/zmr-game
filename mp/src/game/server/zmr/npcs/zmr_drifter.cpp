@@ -74,6 +74,7 @@ void CZMDrifter::HandleAnimEvent( animevent_t* pEvent )
         GetAttachment( "Mouth", vecSpit, angSpit );
         AngleVectors( angSpit, &vecSpitDir );
 
+        // Move to client?
         UTIL_BloodSpray( vecSpit, vecSpitDir, BLOOD_COLOR_RED, random->RandomInt( 4, 16 ), FX_BLOODSPRAY_ALL );
 
 
@@ -163,20 +164,7 @@ void CZMDrifter::AlertSound()
     EmitSound( "NPC_DragZombie.Alert" );
 }
 
-void CZMDrifter::AttackSound()
-{
-}
-
 void CZMDrifter::DeathSound()
 {
     EmitSound( "NPC_DragZombie.Die" );
 }
-
-void CZMDrifter::FootstepSound( bool bRightFoot )
-{
-}
-
-void CZMDrifter::FootscuffSound( bool bRightFoot )
-{
-}
-

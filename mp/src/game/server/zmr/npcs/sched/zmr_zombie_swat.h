@@ -54,7 +54,7 @@ public:
         m_hSwatObject.Set( pSwat );
 
         m_SwatAct = pOuter->GetSwatActivity( pSwat, DoBreakObject() );
-        if ( !pOuter->SetActivity( m_SwatAct ) )
+        if ( !pOuter->DoAnimationEvent( ZOMBIEANIMEVENT_SWAT, m_SwatAct ) )
         {
             End( "Couldn't set swatting activity!" );
             return;
@@ -123,7 +123,7 @@ public:
 
         if ( GetOuter()->GetActivity() == m_SwatAct )
         {
-            GetOuter()->SetActivity( ACT_IDLE );
+            GetOuter()->DoAnimationEvent( ZOMBIEANIMEVENT_IDLE );
         }
     }
 
