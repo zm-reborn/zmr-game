@@ -1,6 +1,7 @@
 #include "cbase.h"
 #include "bone_setup.h"
 #include "eventlist.h"
+#include "vprof.h"
 #include <engine/ivdebugoverlay.h>
 
 #include "clienteffectprecachesystem.h"
@@ -670,5 +671,38 @@ void C_ZMBaseZombie::ReleaseHat()
 
 bool C_ZMBaseZombie::ShouldPlayFootstepSound() const
 {
-    return m_bIsOnGround;
+    if ( !m_bIsOnGround )
+        return false;
+
+    // If our idle animation is more prominent, don't play any footsteps.
+    return m_AnimOverlay.Count() <= ANIMOVERLAY_SLOT_IDLE || m_AnimOverlay[ANIMOVERLAY_SLOT_IDLE].m_flWeight < 0.8f;
+}
+
+void C_ZMBaseZombie::PlayFootstepSound( const char* soundname )
+{
+    VPROF_BUDGET( "C_ZMBaseZombie::PlayFootstepSound", _T( "CBaseEntity::EmitSound" ) );
+
+
+    // Depending on how "active" our walking animation is, change the footstep volume.
+    // I can't seem to notice a difference, but whatever. Perhaps the soundscript affects this in some way?
+    float volume = VOL_NORM;
+
+    if ( m_AnimOverlay.Count() > ANIMOVERLAY_SLOT_IDLE )
+    {
+        float value = 1.0f - m_AnimOverlay[ANIMOVERLAY_SLOT_IDLE].m_flWeight;
+        value *= value;
+
+        volume = clamp( value, 0.05f, 1.0f );
+    }
+
+
+    CLocalPlayerFilter filter;
+
+    EmitSound_t params;
+    params.m_pSoundName = soundname;
+    params.m_pflSoundDuration = nullptr;
+    params.m_bWarnOnDirectWaveReference = true;
+    params.m_flVolume = volume;
+
+    EmitSound( filter, entindex(), params );
 }

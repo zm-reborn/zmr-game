@@ -23,7 +23,7 @@ C_ZMHulk::~C_ZMHulk()
 
 void C_ZMHulk::FootstepSound( bool bRightFoot )
 {
-    EmitSound( bRightFoot ? "NPC_PoisonZombie.FootstepRight" : "NPC_PoisonZombie.FootstepLeft" );
+    PlayFootstepSound( bRightFoot ? "NPC_PoisonZombie.FootstepRight" : "NPC_PoisonZombie.FootstepLeft" );
 }
 
 void C_ZMHulk::AttackSound()
