@@ -269,6 +269,16 @@ void CZMBanshee::HandleAnimEvent( animevent_t* pEvent )
 
     //    return;
     //}
+
+    if ( pEvent->event == AE_FASTZOMBIE_GALLOP_LEFT )
+    {
+        return;
+    }
+
+    if ( pEvent->event == AE_FASTZOMBIE_GALLOP_RIGHT )
+    {
+        return;
+    }
     
     if (pEvent->event == AE_ZOMBIE_ATTACK_RIGHT
     ||  pEvent->event == AE_ZOMBIE_ATTACK_LEFT)
