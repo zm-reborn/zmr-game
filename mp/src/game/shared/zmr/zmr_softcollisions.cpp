@@ -13,7 +13,7 @@
 extern ConVar zm_sv_zombiesoftcollisions;
 
 ConVar zm_sv_softcollisions_zombie_size( "zm_sv_softcollisions_zombie_size", "24", FCVAR_NOTIFY | FCVAR_ARCHIVE );
-ConVar zm_sv_softcollisions_zombie_multiplier( "zm_sv_softcollisions_zombie_multiplier", "370", FCVAR_NOTIFY | FCVAR_ARCHIVE );
+ConVar zm_sv_softcollisions_zombie_force( "zm_sv_softcollisions_zombie_force", "700", FCVAR_NOTIFY | FCVAR_ARCHIVE );
 ConVar zm_sv_softcollisions_zombie_debug( "zm_sv_softcollisions_zombie_debug", "0" );
 #endif
 
@@ -21,7 +21,7 @@ ConVar zm_sv_softcollisions_zombie_debug( "zm_sv_softcollisions_zombie_debug", "
 extern ConVar zm_sv_playercollision;
 
 ConVar zm_sv_softcollisions_player_size( "zm_sv_softcollisions_player_size", "24", FCVAR_NOTIFY | FCVAR_ARCHIVE | FCVAR_REPLICATED );
-ConVar zm_sv_softcollisions_player_multiplier( "zm_sv_softcollisions_player_multiplier", "950", FCVAR_NOTIFY | FCVAR_ARCHIVE | FCVAR_REPLICATED );
+ConVar zm_sv_softcollisions_player_force( "zm_sv_softcollisions_player_force", "950", FCVAR_NOTIFY | FCVAR_ARCHIVE | FCVAR_REPLICATED );
 ConVar zm_sv_softcollisions_player_air_multiplier( "zm_sv_softcollisions_player_air_multiplier", "0.4", FCVAR_NOTIFY | FCVAR_ARCHIVE | FCVAR_REPLICATED );
 ConVar zm_sv_softcollisions_player_debug( "zm_sv_softcollisions_player_debug", "0", FCVAR_REPLICATED );
 
@@ -93,7 +93,7 @@ void CZMSoftCollisions::PerformZombieSoftCollisions()
             continue;
 
         float force = RemapValClamped( dist, 0.0f, flMaxDist, 1.0f, 5.0f );
-        force *= zm_sv_softcollisions_zombie_multiplier.GetFloat() * groundspeedmult;
+        force *= zm_sv_softcollisions_zombie_force.GetFloat() * groundspeedmult;
 
 
         
@@ -155,7 +155,7 @@ void CZMSoftCollisions::PerformPlayerSoftCollisions()
             continue;
 
         float force = RemapValClamped( dist, 0.0f, flMaxDist, 1.0f, 5.0f );
-        force *= zm_sv_softcollisions_player_multiplier.GetFloat();
+        force *= zm_sv_softcollisions_player_force.GetFloat();
         
 
         if ( !(pOrigin->GetFlags() & FL_ONGROUND) )
