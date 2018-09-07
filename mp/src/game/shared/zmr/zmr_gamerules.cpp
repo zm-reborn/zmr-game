@@ -329,14 +329,14 @@ void CZMRules::Precache( void )
     BaseClass::Precache();
 }
 
-static ConVar zm_sv_playercollision( "zm_sv_playercollision", "1", FCVAR_NOTIFY | FCVAR_ARCHIVE | FCVAR_REPLICATED, "Is player collision enabled?" );
+ConVar zm_sv_playercollision( "zm_sv_playercollision", "1", FCVAR_NOTIFY | FCVAR_ARCHIVE | FCVAR_REPLICATED, "Is player collision enabled?" );
 
 bool CZMRules::ShouldCollide( int collisionGroup0, int collisionGroup1 )
 {
     // Disable player collision.
     if ((collisionGroup0 == COLLISION_GROUP_PLAYER || collisionGroup0 == COLLISION_GROUP_PLAYER_MOVEMENT)
     &&  (collisionGroup1 == COLLISION_GROUP_PLAYER || collisionGroup1 == COLLISION_GROUP_PLAYER_MOVEMENT)
-    &&  !zm_sv_playercollision.GetBool())
+    &&  zm_sv_playercollision.GetInt() <= 1)
     {
         return false;
     }
