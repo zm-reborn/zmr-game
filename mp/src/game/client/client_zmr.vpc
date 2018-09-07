@@ -182,6 +182,15 @@ $Project "Client (ZMR)"
 				$File	"$SRCDIR\game\shared\Multiplayer\multiplayer_animstate.cpp"
 				$File	"$SRCDIR\game\shared\Multiplayer\multiplayer_animstate.h"
 			}
+			$Folder "NPCR"
+			{
+				$File	"npcr\c_npcr_nonplayer.cpp"
+				$File	"npcr\c_npcr_nonplayer.h"
+				
+				// Shared
+				$File	"$SRCDIR\game\shared\npcr\npcr_nonplayer_shared.cpp"
+				$File	"$SRCDIR\game\shared\npcr\npcr_nonplayer_shared.h"
+			}
 			$Folder "Npcs"
 			{
 				$File	"zmr\npcs\c_zmr_banshee.cpp"
@@ -196,10 +205,14 @@ $Project "Client (ZMR)"
 				$File	"zmr\npcs\c_zmr_immolator.h"
 				$File	"zmr\npcs\c_zmr_shambler.cpp"
 				$File	"zmr\npcs\c_zmr_shambler.h"
+				$File	"zmr\npcs\c_zmr_zombieanimevent.cpp"
+				$File	"zmr\npcs\c_zmr_zombieanimevent.h"
 				$File	"zmr\npcs\c_zmr_zombiebase.cpp"
 				$File	"zmr\npcs\c_zmr_zombiebase.h"
 				
 				// Shared
+				$File	"$SRCDIR\game\shared\zmr\npcs\zmr_zombieanimstate.cpp"
+				$File	"$SRCDIR\game\shared\zmr\npcs\zmr_zombieanimstate.h"
 				$File	"$SRCDIR\game\shared\zmr\npcs\zmr_zombiebase_shared.cpp"
 				$File	"$SRCDIR\game\shared\zmr\npcs\zmr_zombiebase_shared.h"
 			}

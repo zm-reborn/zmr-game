@@ -26,12 +26,14 @@ extern int AE_ZOMBIE_ATTACK_RIGHT;
 extern int AE_ZOMBIE_ATTACK_LEFT;
 extern int AE_ZOMBIE_ATTACK_BOTH;
 extern int AE_ZOMBIE_SWATITEM;
+#ifndef ZMR
 extern int AE_ZOMBIE_STARTSWAT;
 extern int AE_ZOMBIE_STEP_LEFT;
 extern int AE_ZOMBIE_STEP_RIGHT;
 extern int AE_ZOMBIE_SCUFF_LEFT;
 extern int AE_ZOMBIE_SCUFF_RIGHT;
 extern int AE_ZOMBIE_ATTACK_SCREAM;
+#endif
 extern int AE_ZOMBIE_GET_UP;
 extern int AE_ZOMBIE_POUND;
 

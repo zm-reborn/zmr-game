@@ -639,6 +639,10 @@ private:
 	mutable CStudioHdr				*m_pStudioHdr;
 	mutable MDLHandle_t				m_hStudioHdr;
 	CThreadFastMutex				m_StudioHdrInitLock;
+
+#ifdef ZMR // ZMRCHANGE: Need this for animations
+	friend class C_NPCRNonPlayer;
+#endif
 };
 
 enum 

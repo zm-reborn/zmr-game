@@ -6,6 +6,7 @@
 #include "zmr/zmr_player_shared.h"
 #include "zmr/zmr_gamerules.h"
 #include "zmr/zmr_shareddefs.h"
+#include "zmr/npcs/zmr_zombieanimstate.h"
 
 
 
@@ -149,4 +150,38 @@ int CZMBaseZombie::GetPopCost() const
 int CZMBaseZombie::GetCost() const
 {
     return GetCost( GetZombieClass() );
+}
+
+#ifndef CLIENT_DLL
+void TE_ZombieAnimEvent( CZMBaseZombie* pZombie, ZMZombieAnimEvent_t anim, int nData );
+#endif
+
+bool CZMBaseZombie::DoAnimationEvent( int iEvent, int nData )
+{
+#ifdef CLIENT_DLL
+    MDLCACHE_CRITICAL_SECTION();
+#endif
+
+#ifdef GAME_DLL
+    // Depending on the event, send a random seed in data
+    GetAnimRandomSeed( iEvent, nData );
+#endif
+
+
+    m_iAdditionalAnimRandomSeed = nData;
+
+    bool ret = m_pAnimState->DoAnimationEvent( (ZMZombieAnimEvent_t)iEvent, nData );
+
+#ifndef CLIENT_DLL
+    TE_ZombieAnimEvent( this, (ZMZombieAnimEvent_t)iEvent, nData );
+#endif
+
+    m_iAdditionalAnimRandomSeed = 0;
+
+    return ret;
+}
+
+int CZMBaseZombie::GetAnimationRandomSeed()
+{
+    return m_iAnimationRandomSeed + m_iAdditionalAnimRandomSeed;
 }

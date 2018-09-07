@@ -343,6 +343,10 @@ $Project "Server (ZMR)"
 				$File	"npcr\npcr_schedule.h"
 				$File	"npcr\npcr_senses.cpp"
 				$File	"npcr\npcr_senses.h"
+				
+				// Shared
+				$File	"$SRCDIR\game\shared\npcr\npcr_nonplayer_shared.cpp"
+				$File	"$SRCDIR\game\shared\npcr\npcr_nonplayer_shared.h"
 			}
 			$Folder "Npcs"
 			{
@@ -371,6 +375,8 @@ $Project "Server (ZMR)"
 					$File	"zmr\npcs\zmr_blockerfinder.h"
 					$File	"zmr\npcs\zmr_cmd_queue.h"
 					$File	"zmr\npcs\zmr_npclagcomp.h"
+					$File	"zmr\npcs\zmr_zombieanimevent.cpp"
+					$File	"zmr\npcs\zmr_zombieanimevent.h"
 					$File	"zmr\npcs\zmr_zombiemodelgroups.cpp"
 					$File	"zmr\npcs\zmr_zombiemodelgroups.h"
 				}

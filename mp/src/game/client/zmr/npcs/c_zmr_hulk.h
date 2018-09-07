@@ -13,6 +13,8 @@ public:
     C_ZMHulk();
     ~C_ZMHulk();
 
+    virtual void FootstepSound( bool bRightFoot = false ) OVERRIDE;
+    virtual void AttackSound() OVERRIDE;
 
     virtual const char* GetZombieLocalization() const OVERRIDE { return "#ZMClassHulk"; }
 
