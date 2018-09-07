@@ -14,6 +14,7 @@
 #include "zmr/npcs/zmr_zombieanimstate.h"
 #include "zmr_global_shared.h"
 #include "zmr_zombiebase.h"
+#include "zmr/zmr_softcollisions.h"
 #include "zmr/npcs/zmr_zombiebase_shared.h"
 #include "sched/zmr_zombie_main.h"
 
@@ -143,7 +144,7 @@ ConVar zm_sv_defense_goal_tolerance( "zm_sv_defense_goal_tolerance", "64", FCVAR
 ConVar zm_sv_debug_zombieattack( "zm_sv_debug_zombieattack", "0" );
 ConVar zm_sv_debug_shotgun_dmgmult( "zm_sv_debug_shotgun_dmgmult", "0" );
 
-ConVar zm_sv_zombiecollisions( "zm_sv_zombiecollisions", "1", 0, "Toggle experimental zombie collisions." );
+ConVar zm_sv_zombiesoftcollisions( "zm_sv_zombiesoftcollisions", "1", FCVAR_NOTIFY, "Toggle experimental zombie collisions." );
 
 
 extern ConVar zm_sk_default_hitmult_head;
@@ -1105,15 +1106,13 @@ NPCR::QueryResult_t CZMBaseZombie::ShouldTouch( CBaseEntity* pEnt ) const
         NPCR::CBaseNPC* pOther = pEnt->MyNPCRPointer();
 
 
-        if ( !zm_sv_zombiecollisions.GetBool() )
+        if ( zm_sv_zombiesoftcollisions.GetBool() )
         {
-            // Ignore others that aren't going anywhere
-            if ( GetMotor()->IsMoving() && !pOther->GetMotor()->IsMoving() )
-            {
-                CZMBaseZombie* pZombie = ToZMBaseZombie( pOther->GetCharacter() );
-                if ( !pZombie->IsAttacking() )
-                    return NPCR::RES_NO;
-            }
+            GetZMSoftCollisions()->OnZombieCollide(
+                const_cast<CZMBaseZombie*>( this ),
+                static_cast<CZMBaseZombie*>( pEnt ) );
+
+            return NPCR::RES_NO;
         }
 
 

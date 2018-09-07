@@ -20,6 +20,7 @@
 #include "zmr/c_zmr_player.h"
 #endif
 
+#include "zmr/zmr_softcollisions.h"
 #include "zmr_gamemovement.h"
 
 
@@ -33,6 +34,113 @@ ConVar zm_sv_maxbunnyhopspeed( "zm_sv_maxbunnyhopspeed", "300", FCVAR_REPLICATED
 
 extern bool g_bMovementOptimizations;
 
+
+
+extern ConVar zm_sv_playercollision;
+
+
+// Custom move filter to implement soft collisions.
+class CPlayerMoveFilter : public CTraceFilterSimple
+{
+public:
+    CPlayerMoveFilter( CBasePlayer* pMe, int collisionGroup, bool bAddToSoftList = true ) : CTraceFilterSimple( pMe, collisionGroup )
+    {
+        m_pMe = pMe;
+        m_bAddToSoftList = bAddToSoftList;
+    }
+
+    virtual bool ShouldHitEntity( IHandleEntity* pHandleEntity, int contentsMask ) OVERRIDE
+    {
+        if ( pHandleEntity == GetPassEntity() )
+            return false;
+
+
+        // Pass our hit player to soft collisions.
+        CBaseEntity* pEnt = EntityFromEntityHandle( pHandleEntity );
+        if ( pEnt && pEnt->IsPlayer() )
+        {
+#ifdef CLIENT_DLL
+            C_ZMPlayer* pLocal = C_ZMPlayer::GetLocalPlayer();
+#endif
+            if (zm_sv_playercollision.GetInt() == 1 && m_bAddToSoftList
+#ifdef CLIENT_DLL
+                // Only for local player. Prediction is nice.
+            &&  (m_pMe == pLocal || pEnt == pLocal || (pLocal && pLocal->GetObserverTarget() == m_pMe))
+#endif
+                )
+            {
+                GetZMSoftCollisions()->OnPlayerCollide( m_pMe, pEnt );
+            }
+
+
+            return false;
+        }
+
+
+
+        return CTraceFilterSimple::ShouldHitEntity( pHandleEntity, contentsMask );
+    }
+private:
+    CBasePlayer* m_pMe;
+
+    bool m_bAddToSoftList;
+};
+
+void CZMGameMovement::TracePlayerBBox( const Vector& start, const Vector& end, unsigned int fMask, int collisionGroup, trace_t& pm )
+{
+    // We don't need to do our own bbox trace if we have collisions on.
+    if ( zm_sv_playercollision.GetInt() >= 2 )
+    {
+        BaseClass::TracePlayerBBox( start, end, fMask, collisionGroup, pm );
+        return;
+    }
+
+
+
+    // Do our own bbox trace to account for soft collisions
+
+
+    VPROF( "CGameMovement::TracePlayerBBox" );
+
+
+    CBasePlayer* pMe = static_cast<CBasePlayer*>( EntityFromEntityHandle( mv->m_nPlayerHandle.Get() ) );
+    CPlayerMoveFilter filter( pMe, collisionGroup );
+    Ray_t ray;
+    ray.Init( start, end, GetPlayerMins(), GetPlayerMaxs() );
+
+
+    enginetrace->TraceRay( ray, fMask, &filter, &pm );
+}
+
+CBaseHandle CZMGameMovement::TestPlayerPosition( const Vector& pos, int collisionGroup, trace_t& pm )
+{
+    // We don't need to do our own bbox trace if we have collisions on.
+    if ( zm_sv_playercollision.GetInt() >= 2 )
+    {
+        return BaseClass::TestPlayerPosition( pos, collisionGroup, pm );
+    }
+
+
+
+    // Do our own bbox trace to account for soft collisions
+
+    CBasePlayer* pMe = static_cast<CBasePlayer*>( EntityFromEntityHandle( mv->m_nPlayerHandle.Get() ) );
+    CPlayerMoveFilter filter( pMe, collisionGroup );
+    Ray_t ray;
+    ray.Init( pos, pos, GetPlayerMins(), GetPlayerMaxs() );
+
+
+    enginetrace->TraceRay( ray, PlayerSolidMask(), &filter, &pm );
+
+	if ( (pm.contents & PlayerSolidMask()) && pm.m_pEnt )
+	{
+		return pm.m_pEnt->GetRefEHandle();
+	}
+	else
+	{	
+		return INVALID_EHANDLE_INDEX;
+	}
+}
 
 void CZMGameMovement::PlayerMove( void )
 {
