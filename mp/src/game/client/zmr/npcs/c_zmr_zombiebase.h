@@ -54,6 +54,7 @@ public:
     virtual void FootstepSound( bool bRightFoot = false ) {}
     virtual void FootscuffSound( bool bRightFoot = false ) {}
     virtual void AttackSound() {}
+    void PlayFootstepSound( const char* soundname );
     
     //virtual void TraceAttack( const CTakeDamageInfo&, const Vector&, trace_t*,CDmgAccumulator* ) OVERRIDE;
     
