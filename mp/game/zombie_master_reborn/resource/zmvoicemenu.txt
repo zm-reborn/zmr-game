@@ -26,20 +26,20 @@
 		"name"		"#ZMVoiceMenuLaugh"
 		"index"		"5"
 	}
-	"VoiceHelp"
+	"VoiceGo"
 	{
-		"name"		"#ZMVoiceMenuHelp"
-		"index"		"2"
+		"name"		"#ZMVoiceMenuGo"
+		"index"		"6"
 	}
 	"VoiceFollow"
 	{
 		"name"		"#ZMVoiceMenuFollow"
 		"index"		"3"
 	}
-	"VoiceGo"
+	"VoiceHelp"
 	{
-		"name"		"#ZMVoiceMenuGo"
-		"index"		"6"
+		"name"		"#ZMVoiceMenuHelp"
+		"index"		"2"
 	}
 	"VoiceAlert"
 	{
