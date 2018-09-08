@@ -13,6 +13,7 @@
 "blank"			"=========================="
 "dropweapon"			"Drop Weapon"
 "dropammo"				"Drop Ammo"
+"+zm_voicemenu"			"Voice Menu"
 "zm_showmaptext"		"Show Map Info/Objectives"
 "zm_observezombie"		"Observe Zombie/Random Spectator Target"
 "blank"			"=========================="
