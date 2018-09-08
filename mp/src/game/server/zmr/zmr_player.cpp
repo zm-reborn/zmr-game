@@ -119,6 +119,7 @@ CZMPlayer::CZMPlayer()
     m_iLastWeaponFireUsercmd = 0;
     m_bEnterObserver = false;
     m_flNextModelChangeTime = 0.0f;
+    m_flNextVoiceLineTime = 0.0f;
 
     BaseClass::ChangeTeam( 0 );
 

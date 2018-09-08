@@ -9,6 +9,7 @@
 #include "zmr_player.h"
 #include "zmr/zmr_global_shared.h"
 #include "zmr/zmr_gamerules.h"
+#include "zmr_voicelines.h"
 
 
 /*
@@ -211,3 +212,27 @@ void ZM_ObserveZombie( const CCommand &args )
 }
 
 static ConCommand zm_observezombie( "zm_observezombie", ZM_ObserveZombie, "Allows observer to spectate a given zombie (ent index)." );
+
+
+/*
+
+*/
+void ZM_VoiceMenu( const CCommand &args )
+{
+    if ( args.ArgC() <= 1 ) return;
+
+
+    CZMPlayer* pPlayer = ToZMPlayer( UTIL_GetCommandClient() );
+    if ( !pPlayer )  return;
+
+    if ( !pPlayer->IsHuman() || !pPlayer->IsAlive() ) return;
+
+
+
+    ZMGetVoiceLines()->OnVoiceLine( pPlayer, atoi( args.Arg( 1 ) ) );
+}
+
+static ConCommand zm_cmd_voicemenu( "zm_cmd_voicemenu", ZM_VoiceMenu );
+
+
+
