@@ -1,0 +1,163 @@
+"ZMVoiceline.Yes.Male"
+{
+	"soundlevel"  "SNDLVL_TALKING"
+
+	"rndwave"
+	{
+		"wave"	"vo/npc/male01/yeah02.wav"
+		"wave"	"vo/npc/male01/yougotit02.wav"
+	}
+}
+"ZMVoiceline.Yes.Female"
+{
+	"soundlevel"  "SNDLVL_TALKING"
+
+	"rndwave"
+	{
+		"wave"	"vo/npc/female01/yougotit02.wav"
+		"wave"	"vo/npc/female01/squad_affirm03.wav"
+	}
+}
+"ZMVoiceline.No.Male"
+{
+	"soundlevel"  "SNDLVL_TALKING"
+
+	"rndwave"
+	{
+		"wave"	"vo/npc/male01/ohno.wav"
+	}
+}
+"ZMVoiceline.No.Female"
+{
+	"soundlevel"  "SNDLVL_TALKING"
+
+	"rndwave"
+	{
+		"wave"	"vo/npc/female01/no01.wav"
+		"wave"	"vo/npc/female01/no02.wav"
+	}
+}
+"ZMVoiceline.Help.Male"
+{
+	"soundlevel"  "SNDLVL_TALKING"
+
+	"rndwave"
+	{
+		"wave"	"vo/npc/male01/help01.wav"
+	}
+}
+
+"ZMVoiceline.Help.Female"
+{
+	"soundlevel"  "SNDLVL_TALKING"
+
+	"rndwave"
+	{
+		"wave"	"vo/npc/female01/help01.wav"
+	}
+}
+"ZMVoiceline.Go.Male"
+{
+	"soundlevel"  "SNDLVL_TALKING"
+
+	"rndwave"
+	{
+		"wave"	"vo/npc/male01/letsgo01.wav"
+		"wave"	"vo/npc/male01/letsgo02.wav"
+	}
+}
+"ZMVoiceline.Go.Female"
+{
+	"soundlevel"  "SNDLVL_TALKING"
+
+	"rndwave"
+	{
+		"wave"	"vo/npc/female01/letsgo01.wav"
+		"wave"	"vo/npc/female01/letsgo02.wav"
+		"wave"	"vo/npc/female01/squad_follow03.wav"
+	}
+}
+"ZMVoiceline.Follow.Male"
+{
+	"soundlevel"  "SNDLVL_TALKING"
+
+	"rndwave"
+	{
+		"wave"	"vo/coast/cardock/le_followme.wav"
+		"wave"	"vo/coast/odessa/male01/stairman_follow01.wav"
+	}
+}
+"ZMVoiceline.Follow.Female"
+{
+	"soundlevel"  "SNDLVL_TALKING"
+
+	"rndwave"
+	{
+		"wave"	"vo/coast/odessa/female01/stairman_follow01.wav"
+	}
+}
+"ZMVoiceline.Taunt.Male"
+{
+	"soundlevel"  "SNDLVL_TALKING"
+
+	"rndwave"
+	{
+		"wave"	"vo/npc/male01/likethat.wav"
+		"wave"	"vo/npc/male01/evenodds.wav"
+	}
+}
+"ZMVoiceline.Taunt.Female"
+{
+	"soundlevel"  "SNDLVL_TALKING"
+
+	"rndwave"
+	{
+		"wave"	"vo/npc/female01/likethat.wav"
+		"wave"	"vo/npc/female01/waitingsomebody.wav"
+	}
+}
+"ZMVoiceline.Laugh.Male"
+{
+	"soundlevel"  "SNDLVL_TALKING"
+
+	"rndwave"
+	{
+		"wave"	"vo/npc/male01/fantastic01.wav"
+		"wave"	"vo/coast/odessa/male01/nlo_cheer01.wav"
+		"wave"	"vo/coast/odessa/male01/nlo_cheer02.wav"
+		"wave"	"vo/coast/odessa/male01/nlo_cheer03.wav"
+		"wave"	"vo/coast/odessa/male01/nlo_cheer04.wav"
+	}
+}
+"ZMVoiceline.Laugh.Female"
+{
+	"soundlevel"  "SNDLVL_TALKING"
+
+	"rndwave"
+	{
+		"wave"	"vo/npc/female01/fantastic01.wav"
+		"wave"	"vo/coast/odessa/female01/nlo_cheer01.wav"
+		"wave"	"vo/coast/odessa/female01/nlo_cheer02.wav"
+		"wave"	"vo/coast/odessa/female01/nlo_cheer03.wav"
+	}
+}
+"ZMVoiceline.Alert.Male"
+{
+	"soundlevel"  "SNDLVL_TALKING"
+
+	"rndwave"
+	{
+		"wave"	"vo/npc/male01/headsup01.wav"
+		"wave"	"vo/npc/male01/headsup02.wav"
+	}
+}
+"ZMVoiceline.Alert.Female"
+{
+	"soundlevel"  "SNDLVL_TALKING"
+
+	"rndwave"
+	{
+		"wave"	"vo/npc/female01/headsup01.wav"
+		"wave"	"vo/npc/female01/headsup02.wav"
+	}
+}

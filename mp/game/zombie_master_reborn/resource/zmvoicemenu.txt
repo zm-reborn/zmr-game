@@ -1,0 +1,49 @@
+//
+// name		- The voice line name in the menu
+// index	- The index that the client sends to server. (see zm_voicelines.txt)
+// offset	- Normally, the radial items start at the top. Offset offsets this, get it?
+//
+"VoiceMenu"
+{
+	"offset"		"1"
+	"VoiceYes"
+	{
+		"name"		"#ZMVoiceMenuYes"
+		"index"		"0"
+	}
+	"VoiceNo"
+	{
+		"name"		"#ZMVoiceMenuNo"
+		"index"		"1"
+	}
+	"VoiceTaunt"
+	{
+		"name"		"#ZMVoiceMenuTaunt"
+		"index"		"4"
+	}
+	"VoiceLaugh"
+	{
+		"name"		"#ZMVoiceMenuLaugh"
+		"index"		"5"
+	}
+	"VoiceGo"
+	{
+		"name"		"#ZMVoiceMenuGo"
+		"index"		"6"
+	}
+	"VoiceFollow"
+	{
+		"name"		"#ZMVoiceMenuFollow"
+		"index"		"3"
+	}
+	"VoiceHelp"
+	{
+		"name"		"#ZMVoiceMenuHelp"
+		"index"		"2"
+	}
+	"VoiceAlert"
+	{
+		"name"		"#ZMVoiceMenuAlert"
+		"index"		"7"
+	}
+}

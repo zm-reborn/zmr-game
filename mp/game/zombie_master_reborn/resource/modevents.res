@@ -47,6 +47,16 @@
 	{
 	}
 	
+	"voicemenu_use"
+	{
+		"userid"	"short" // User ID of the player saying shit
+		"voiceline"	"short" // The index of voice line
+		
+		// The position of the player. This is used if the player does not exist on the client.
+		"pos_x"	"float"
+		"pos_y"	"float"
+		"pos_z"	"float"
+	}
 	
 	
 
