@@ -15,9 +15,6 @@
 #include "hudelement.h"
 
 
-using namespace vgui;
-
-
 #include "zmr_framepanel.h"
 
 #include "zmr/c_zmr_player.h"
@@ -100,7 +97,7 @@ public:
 
     virtual bool ShouldDraw() OVERRIDE { return IsVisible() && CHudElement::ShouldDraw(); }
 
-    virtual void OnMousePressed( MouseCode code ) OVERRIDE;
+    virtual void OnMousePressed( vgui::MouseCode code ) OVERRIDE;
     virtual void OnThink() OVERRIDE;
     virtual void Paint() OVERRIDE;
 
