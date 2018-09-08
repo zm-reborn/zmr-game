@@ -11,7 +11,8 @@
 #include "flashlighteffect.h"
 
 
-#include "zmr/ui/zmr_viewport.h"
+#include "zmr/c_zmr_util.h"
+#include "zmr/ui/zmr_zmview_base.h"
 
 #include "npcs/c_zmr_zombiebase.h"
 #include "zmr/zmr_global_shared.h"

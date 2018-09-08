@@ -1,131 +1,42 @@
 #include "cbase.h"
-
-#include "iclientmode.h"
-#include "input.h"
-#include "view.h"
+#include "view.h" // MainViewForward
+#include "iclientmode.h" // g_pClientMode
+#include "hud.h" // CHudElement
 #include "in_buttons.h"
-#include "hud_basechat.h"
-#include "clientmode_shared.h"
-#include "clientsideeffects.h"
+#include "input.h"
+#include "clienteffectprecachesystem.h"
 #include "fx_quad.h"
-#include <vgui/IInput.h>
 
-#include "zmr_linetool.h"
-#include "zmr/zmr_player_shared.h"
-#include "zmr/zmr_gamerules.h"
-#include "zmr/zmr_global_shared.h"
-#include "zmr/c_zmr_entities.h"
-#include "zmr/npcs/c_zmr_zombiebase.h"
+#include "zmr/npcs/zmr_zombiebase_shared.h"
 #include "zmr/c_zmr_util.h"
+#include "zmr_zmview_base.h"
 
 
 
 
-#include "zmr_viewport.h"
+CZMViewBase* g_pZMView = nullptr;
 
 
+ConVar zm_cl_zmview_doubleclick( "zm_cl_zmview_doubleclick", "0.4", FCVAR_ARCHIVE );
 
-// ZMRTODO: See if these works properly.
-#define MASK_ZMVIEW             ( CONTENTS_SOLID | CONTENTS_MOVEABLE ) // When testing box select.
-#define MASK_ZMSELECTUSABLE     ( MASK_SOLID & ~(CONTENTS_WINDOW|CONTENTS_GRATE) ) // When left clicking (not setting rallypoint, etc.)
-#define MASK_ZMTARGET           MASK_SOLID // When right clicking.
-#define MASK_ZMCREATE           MASK_SOLID // When left clicking.
 
 ConVar zm_cl_poweruser_boxselect( "zm_cl_poweruser_boxselect", "0", FCVAR_ARCHIVE, "Select zombies through walls with box select." );
 ConVar zm_cl_poweruser( "zm_cl_poweruser", "0", FCVAR_ARCHIVE, "Select spawns/traps/zombies through walls." );
 ConVar zm_cl_hidemouseinscore( "zm_cl_hidemouseinscore", "1", FCVAR_ARCHIVE, "Is mouse input disabled while having scoreboard open?" );
 
 
-ConVar zm_cl_usenewmenus( "zm_cl_usenewmenus", "1", FCVAR_ARCHIVE, "Use new ZM menus?" );
 
 
-// ZMRTODO: Remove this abomination.
-static int GetGroupByKey()
-{
-    if ( vgui::input()->IsKeyDown( KEY_1 ) ) return 1;
-    if ( vgui::input()->IsKeyDown( KEY_2 ) ) return 2;
-    if ( vgui::input()->IsKeyDown( KEY_3 ) ) return 3;
-    if ( vgui::input()->IsKeyDown( KEY_4 ) ) return 4;
-    if ( vgui::input()->IsKeyDown( KEY_5 ) ) return 5;
-    if ( vgui::input()->IsKeyDown( KEY_6 ) ) return 6;
-    if ( vgui::input()->IsKeyDown( KEY_7 ) ) return 7;
-    if ( vgui::input()->IsKeyDown( KEY_8 ) ) return 8;
-    if ( vgui::input()->IsKeyDown( KEY_9 ) ) return 9;
-    if ( vgui::input()->IsKeyDown( KEY_0 ) ) return 0;
 
-    return INVALID_GROUP_INDEX;
-}
+#define MAT_RING            "effects/zm_ring"
+#define MAT_TARGETBREAK     "zmr_effects/target_break"
 
-static void UTIL_TraceZMView( trace_t* trace, Vector endpos, int mask, CTraceFilterSimple* filter = nullptr, C_BaseEntity* pEnt = nullptr, int collisionGroup = COLLISION_GROUP_NONE )
-{
-    Vector pos = MainViewOrigin();
-
-    const bool startinside = (UTIL_PointContents( pos ) & CONTENTS_SOLID) == 0;
-
-    // If we started inside the world, only trace through nodraw surfaces.
-    // It is possible to be able to see some things behind the sky while inside the world but let's stay safe.
-    const unsigned short invalidsurfaces = startinside ? SURF_NODRAW : (SURF_SKY | SURF_NODRAW);
-
-    Vector dir = (endpos - pos).Normalized();
-
-    // Keep tracing until we hit something that the player can't see through.
-    while ( true )
-    {
-        // NOTE: You cannot rely on trace startsolid! This is why we check for point contents here.
-        // It only works if you start inside a brush leaf (yes, the outside world also has leafs), simply being outside is apparently not solid.
-        bool bOutsideWorld = (UTIL_PointContents( pos ) & CONTENTS_SOLID) != 0;
-
-        if ( filter )
-        {
-            UTIL_TraceLine( pos, endpos, mask, filter, trace );
-        }
-        else
-        {
-            UTIL_TraceLine( pos, endpos, mask, pEnt, collisionGroup, trace );
-        }
-
-        // Didn't hit anything.
-        if ( trace->fraction == 1.0f )
-            break;
-
-        // Didn't start outside world, should be a valid trace.
-        if ( !bOutsideWorld )
-        {
-            if ( !trace->DidHitWorld() || (trace->surface.flags & invalidsurfaces) == 0 )
-            {
-                break;
-            }
-        }
-
-        // Go to the next spot to start at.
-        // A bit hacky way of doing this. Trace endpos doesn't seem to be the pos where we left solid.
-        float dist = pos.DistTo( endpos );
-        float frac = trace->startsolid ? trace->fractionleftsolid : trace->fraction;
-
-        pos += dir * (frac * dist) + dir * 2.0f; // Add a bit of extra so we definitely don't hit the same wall again.
-    }
-}
+CLIENTEFFECT_REGISTER_BEGIN( PrecacheZMViewEffects )
+CLIENTEFFECT_MATERIAL( MAT_RING )
+CLIENTEFFECT_MATERIAL( MAT_TARGETBREAK )
+CLIENTEFFECT_REGISTER_END()
 
 
-DECLARE_HUDELEMENT( CZMFrame );
-
-
-extern IViewPort* gViewPortInterface;
-
-CZMFrame* g_pZMView = nullptr;
-
-CON_COMMAND( zm_observermode, "" )
-{
-    if ( g_pZMView )
-    {
-        bool state = !g_pZMView->IsVisible();
-
-        if ( args.ArgC() > 1 ) state = atoi( args.Arg( 1 ) ) ? true : false;
-
-
-        g_pZMView->SetVisible( state );
-    }
-}
 
 
 class CTraceFilterNoNPCs : public CTraceFilterSimple
@@ -151,86 +62,70 @@ public:
     }
 };
 
-using namespace vgui;
 
 
-
-
-CZMFrame::CZMFrame( const char* pElementName ) : CHudElement( pElementName ), BaseClass( g_pClientMode->GetViewport(), "ZMFrame" )
+CON_COMMAND( zm_observermode, "" )
 {
-    g_pZMView = this;
+    if ( g_pZMView )
+    {
+        bool state = !g_pZMView->IsVisible();
+
+        if ( args.ArgC() > 1 ) state = atoi( args.Arg( 1 ) ) ? true : false;
 
 
+        g_pZMView->SetVisible( state );
+    }
+}
+
+CZMViewBase::CZMViewBase( const char* pElementName ) : CHudElement( pElementName ), CZMFramePanel( g_pClientMode->GetViewport(), pElementName )
+{
+    // Proportional doesn't stretch with widescreen anyway
     SetProportional( false );
     SetBounds( 0, 0, ScreenWidth(), ScreenHeight() );
 
 
-    m_BoxSelect = new CZMBoxSelect( this );
-    m_LineTool = new CZMLineTool( this );
-
-	m_pZMControl = new CZMHudControlPanel( this );
-
-	m_pManiMenu = new CZMManiMenu( this ); 
-	m_pManiMenuNew = new CZMManiMenuNew( this ); 
-	m_pBuildMenu = new CZMBuildMenu( this ); 
-	m_pBuildMenuNew = new CZMBuildMenuNew( this ); 
-
-
-    SetKeyBoardInputEnabled( false );
-    SetMouseInputEnabled( true );
-    
-
-    
-
     SetVisible( false );
     SetBorder( nullptr );
     SetPaintBackgroundEnabled( false );
-    
 
     SetHiddenBits( HIDEHUD_WEAPONSELECTION );
 
-    
-    m_MouseDragStatus = BUTTON_CODE_INVALID;
-    SetClickMode( ZMCLICKMODE_NORMAL );
+
+    // We cannot enable input. Especially not keyboard input.
+    // Otherwise the input would be swallowed by us, so players binding shit to let's say mouse4 wouldn't work.
+    // Instead, our clientmode will call the necessary functions.
+    SetKeyBoardInputEnabled( false );
+    SetMouseInputEnabled( true );
+
+
+
+    m_BoxSelect = new CZMBoxSelect( this );
+    m_LineTool = new CZMLineTool( this );
 }
 
-CZMFrame::~CZMFrame()
+CZMViewBase::~CZMViewBase()
 {
     delete m_BoxSelect;
     delete m_LineTool;
-
-    delete m_pZMControl;
-
-    delete m_pManiMenu;
-    delete m_pManiMenuNew;
-    delete m_pBuildMenu;
-    delete m_pBuildMenuNew;
 }
 
-void CZMFrame::LevelInit()
+void CZMViewBase::LevelInit()
 {
+    m_bDraggingLeft = m_bDraggingRight = false;
     m_flLastLeftClick = m_flLastRightClick = 0.0f;
+    SetClickMode( ZMCLICKMODE_NORMAL );
 
-    // So we don't draw a menu from last map...
     CloseChildMenus();
 }
 
-void CZMFrame::SetVisible( bool state )
+bool CZMViewBase::ShouldDraw()
 {
-    BaseClass::SetVisible( state );
-
-    engine->ClientCmd( "-left" );
-    engine->ClientCmd( "-right" );
-    engine->ClientCmd( "-lookup" );
-    engine->ClientCmd( "-lookdown" );
-
-
-    HideMouseTools();
+    return IsVisible();
 }
 
-void CZMFrame::SetClickMode( ZMClickMode_t mode, bool print )
+void CZMViewBase::SetClickMode( ZMClickMode_t mode, bool print )
 {
-    if ( mode == m_iClickMode ) return;
+    if ( mode == GetClickMode() ) return;
 
 
     if ( print )
@@ -259,73 +154,115 @@ void CZMFrame::SetClickMode( ZMClickMode_t mode, bool print )
     m_iClickMode = mode;
 }
 
-void CZMFrame::HideMouseTools()
+float CZMViewBase::GetDoubleClickDelta() const
+{
+    return zm_cl_zmview_doubleclick.GetFloat();
+}
+
+bool CZMViewBase::IsDoubleClickLeft() const
+{
+    return (gpGlobals->curtime - m_flLastLeftClick) <= GetDoubleClickDelta();
+}
+
+bool CZMViewBase::IsDoubleClickRight() const
+{
+    return (gpGlobals->curtime - m_flLastRightClick) <= GetDoubleClickDelta();
+}
+
+bool CZMViewBase::IsDraggingLeft() const
+{
+    return m_bDraggingLeft;
+}
+
+bool CZMViewBase::IsDraggingRight() const
+{
+    return m_bDraggingRight;
+}
+
+void CZMViewBase::CloseChildMenus()
+{
+
+}
+
+void CZMViewBase::HideMouseTools()
 {
     if ( m_BoxSelect )
         m_BoxSelect->SetVisible( false );
-
     if ( m_LineTool )
         m_LineTool->SetVisible( false );
 }
 
-CZMBuildMenuBase* CZMFrame::GetBuildMenu()
+
+
+void CZMViewBase::SetVisible( bool state )
 {
-    // Tertiary tries to make me cast... pshh, I'll just use good ol' if's. 
-    if ( zm_cl_usenewmenus.GetBool() )
-    {
-        return m_pBuildMenuNew;
-    }
-    else
-    {
-        return m_pBuildMenu;
-    }
+    BaseClass::SetVisible( state );
+
+    engine->ClientCmd( "-left" );
+    engine->ClientCmd( "-right" );
+    engine->ClientCmd( "-lookup" );
+    engine->ClientCmd( "-lookdown" );
+
+
+    HideMouseTools();
 }
 
-CZMManiMenuBase* CZMFrame::GetManiMenu()
+bool CZMViewBase::IsVisible()
 {
-    // Tertiary tries to make me cast... pshh, I'll just use good ol' if's. 
-    if ( zm_cl_usenewmenus.GetBool() )
-    {
-        return m_pManiMenuNew;
-    }
-    else
-    {
-        return m_pManiMenu;
-    }
+    return BaseClass::IsVisible();
 }
 
-void CZMFrame::OnCursorMoved( int x, int y )
+void CZMViewBase::OnCursorMoved( int x, int y )
 {
-    switch ( m_MouseDragStatus )
+    if ( IsDraggingLeft() )
     {
-    case MOUSE_LEFT :
         m_BoxSelect->SetEnd( x, y );
-        break;
-    case MOUSE_RIGHT :
+    }
+
+    if ( IsDraggingRight() )
+    {
         m_LineTool->SetEnd( x, y );
-        break;
     }
 }
 
-void CZMFrame::OnMouseReleased( MouseCode code )
+void CZMViewBase::OnMouseReleased( MouseCode code )
 {
     switch ( code )
     {
     case MOUSE_RIGHT :
         OnRightRelease();
         m_flLastRightClick = gpGlobals->curtime;
+        m_bDraggingRight = false;
         break;
     case MOUSE_LEFT :
         OnLeftRelease();
         m_flLastLeftClick = gpGlobals->curtime;
+        m_bDraggingLeft = false;
         break;
     default : break;
     }
-    
-    m_MouseDragStatus = BUTTON_CODE_INVALID;
 }
 
-void CZMFrame::OnMouseWheeled( int delta )
+void CZMViewBase::OnMousePressed( MouseCode code )
+{
+    CloseChildMenus();
+
+
+    switch ( code )
+    {
+    case MOUSE_RIGHT :
+        OnRightClick();
+        m_bDraggingRight = true;
+        break;
+    case MOUSE_LEFT :
+        OnLeftClick();
+        m_bDraggingLeft = true;
+        break;
+    default : break;
+    }
+}
+
+void CZMViewBase::OnMouseWheeled( int delta )
 {
     BaseClass::OnMouseWheeled( delta );
 
@@ -336,45 +273,7 @@ void CZMFrame::OnMouseWheeled( int delta )
         pPlayer->SetMouseWheelMove( (float)delta );
 }
 
-void CZMFrame::OnMousePressed( MouseCode code )
-{
-    CloseChildMenus();
-
-
-    switch ( code )
-    {
-    case MOUSE_RIGHT :
-        OnRightClick();
-        break;
-    case MOUSE_LEFT :
-        OnLeftClick();
-        break;
-    default : break;
-    }
-
-
-    m_MouseDragStatus = code;
-}
-
-// Too OP.
-/*void CZMFrame::OnMouseDoublePressed( MouseCode code )
-{
-    if ( code != MOUSE_LEFT ) return;
-
-
-    int mx, my;
-    ::input->GetFullscreenMousePos( &mx, &my );
-
-    trace_t trace;
-    CTraceFilterNoNPCsOrPlayer filter( nullptr, COLLISION_GROUP_NONE );
-    TraceScreenToWorld( mx, my, &trace, &filter );
-
-    Vector end = trace.endpos;
-
-    engine->ClientCmd( VarArgs( "zm_cmd_createhidden %.1f %.1f %.1f", end[0], end[1], end[2] ) );
-}*/
-
-void CZMFrame::OnThink()
+void CZMViewBase::OnThink()
 {
     C_ZMPlayer* pPlayer = C_ZMPlayer::GetLocalPlayer();
 
@@ -447,57 +346,11 @@ void CZMFrame::OnThink()
             engine->ClientCmd( "-lookdown" );
         }
     }
-
-
-    // ZMRTODO: Put this somewhere else. This is a terrible place to do this.
-    // OnKeyCodePressed, etc. can't be used here since we have to have keyboard input disabled in order to let the game accept inputs.
-    int group = GetGroupByKey();
-    if ( group != INVALID_GROUP_INDEX )
-    {
-        if ( pPlayer->m_nButtons & IN_DUCK )
-        {
-            ZMClientUtil::SetSelectedGroup( group );
-        }
-        else
-        {
-            ZMClientUtil::SelectGroup( group );
-        }
-    }
 }
 
-void CZMFrame::TraceScreenToWorld( int mx, int my, trace_t* res, CTraceFilterSimple* filter, int mask )
-{
-    CBasePlayer* pPlayer = C_BasePlayer::GetLocalPlayer();
-
-    if ( !pPlayer ) return;
-
-    float fov = pPlayer->GetFOV();
-
-    float dx, dy;
-    float c_x, c_y;
-
-    float dist;
-
-    float aspect = ScreenWidth() / (float)ScreenHeight();
-
-    aspect = ( 4.0f / 3.0f ) / aspect;
 
 
-    c_x = ScreenWidth() / 2.0f;
-    c_y = ScreenHeight() / 2.0f;
-
-    dx = ((float)mx - c_x) / aspect;
-    dy = (c_y - (float)my) / aspect;
-
-    dist = c_x / tanf( M_PI_F * fov / 360.0f );
-
-    Vector ray = (MainViewForward() * dist) + (MainViewRight() * dx) + (MainViewUp() * dy);
-    VectorNormalize( ray );
-
-    UTIL_TraceZMView( res, MainViewOrigin() + ray * MAX_COORD_FLOAT, mask, filter, pPlayer );
-}
-
-void CZMFrame::OnLeftClick()
+void CZMViewBase::OnLeftClick()
 {
     int mx, my;
     ::input->GetFullscreenMousePos( &mx, &my );
@@ -574,7 +427,7 @@ void CZMFrame::OnLeftClick()
     SetClickMode( ZMCLICKMODE_NORMAL );
 }
 
-void CZMFrame::OnLeftRelease()
+void CZMViewBase::OnLeftRelease()
 {
     m_BoxSelect->SetVisible( false );
 
@@ -602,7 +455,7 @@ void CZMFrame::OnLeftRelease()
     }
 }
 
-void CZMFrame::OnRightClick()
+void CZMViewBase::OnRightClick()
 {
     m_BoxSelect->SetVisible( false );
 
@@ -614,7 +467,7 @@ void CZMFrame::OnRightClick()
     m_LineTool->SetEnd( mx, my );
 }
 
-void CZMFrame::OnRightRelease()
+void CZMViewBase::OnRightRelease()
 {
     m_LineTool->SetVisible( false );
 
@@ -625,7 +478,7 @@ void CZMFrame::OnRightRelease()
     m_LineTool->SetEnd( mx, my );
 
     // We were dragging, move units into a line.
-    if ( m_MouseDragStatus == MOUSE_RIGHT && m_LineTool->IsValidLine( 10 ) )
+    if ( IsDraggingRight() && m_LineTool->IsValidLine( 10 ) )
     {
         DoMoveLine();
         return;
@@ -680,7 +533,7 @@ void CZMFrame::OnRightRelease()
                         0,
                         Vector( 1.0f, 1.0f, 1.0f ), 
                         0.2f, 
-                        "zmr_effects/target_break",
+                        MAT_TARGETBREAK,
                         (FXQUAD_BIAS_ALPHA) );
 
             return;
@@ -705,12 +558,12 @@ void CZMFrame::OnRightRelease()
                 0,
                 Vector( 1.0f, 1.0f, 1.0f ), 
                 0.4f, 
-                "effects/zm_ring",
+                MAT_RING,
                 (FXQUAD_BIAS_ALPHA) );
 
 }
 
-void CZMFrame::DoMoveLine()
+void CZMViewBase::DoMoveLine()
 {
     int x1, y1, x2, y2;
     Vector start, end;
@@ -731,7 +584,7 @@ void CZMFrame::DoMoveLine()
         //clamp( (ZMClientUtil::GetSelectedZombieCount() - 1) * 2.5f, 0.0f, 92.0f ) ) );
 }
 
-void CZMFrame::FindZombiesInBox( int start_x, int start_y, int end_x, int end_y, bool bSticky )
+void CZMViewBase::FindZombiesInBox( int start_x, int start_y, int end_x, int end_y, bool bSticky )
 {
     Vector screen;
     int i;
@@ -779,7 +632,7 @@ void CZMFrame::FindZombiesInBox( int start_x, int start_y, int end_x, int end_y,
     ZMClientUtil::SelectZombies( vZombies, bSticky );
 }
 
-void CZMFrame::FindZMObject( int x, int y, bool bSticky )
+void CZMViewBase::FindZMObject( int x, int y, bool bSticky )
 {
     C_BaseEntity* list[32];
     Ray_t ray;
@@ -859,25 +712,89 @@ void CZMFrame::FindZMObject( int x, int y, bool bSticky )
         ZMClientUtil::DeselectAllZombies();
 }
 
-void CZMFrame::CloseChildMenus()
+
+
+
+
+void CZMViewBase::TraceScreenToWorld( int mx, int my, trace_t* res, CTraceFilterSimple* filter, int mask )
 {
-    if ( m_pBuildMenu && m_pBuildMenu->IsVisible() )
-    {
-        m_pBuildMenu->Close();
-    }
+    C_ZMPlayer* pPlayer = C_ZMPlayer::GetLocalPlayer();
 
-    if ( m_pBuildMenuNew && m_pBuildMenuNew->IsVisible() )
-    {
-        m_pBuildMenuNew->Close();
-    }
+    if ( !pPlayer ) return;
 
-    if ( m_pManiMenu && m_pManiMenu->IsVisible() )
-    {
-        m_pManiMenu->Close();
-    }
 
-    if ( m_pManiMenuNew && m_pManiMenuNew->IsVisible() )
+    float fov = pPlayer->GetFOV();
+
+    float dx, dy;
+    float c_x, c_y;
+
+    float dist;
+
+    float aspect = ScreenWidth() / (float)ScreenHeight();
+
+    aspect = ( 4.0f / 3.0f ) / aspect;
+
+
+    c_x = ScreenWidth() / 2.0f;
+    c_y = ScreenHeight() / 2.0f;
+
+    dx = ((float)mx - c_x) / aspect;
+    dy = (c_y - (float)my) / aspect;
+
+    dist = c_x / tanf( M_PI_F * fov / 360.0f );
+
+    Vector ray = (MainViewForward() * dist) + (MainViewRight() * dx) + (MainViewUp() * dy);
+    VectorNormalize( ray );
+
+    UTIL_TraceZMView( res, MainViewOrigin() + ray * MAX_COORD_FLOAT, mask, filter, pPlayer );
+}
+
+void UTIL_TraceZMView( trace_t* trace, Vector endpos, int mask, CTraceFilterSimple* filter, C_BaseEntity* pEnt, int collisionGroup )
+{
+    Vector pos = MainViewOrigin();
+
+    const bool startinside = (UTIL_PointContents( pos ) & CONTENTS_SOLID) == 0;
+
+    // If we started inside the world, only trace through nodraw surfaces.
+    // It is possible to be able to see some things behind the sky while inside the world but let's stay safe.
+    const unsigned short invalidsurfaces = startinside ? SURF_NODRAW : (SURF_SKY | SURF_NODRAW);
+
+    Vector dir = (endpos - pos).Normalized();
+
+    // Keep tracing until we hit something that the player can't see through.
+    while ( true )
     {
-        m_pManiMenuNew->Close();
+        // NOTE: You cannot rely on trace startsolid! This is why we check for point contents here.
+        // It only works if you start inside a brush leaf (yes, the outside world also has leafs), simply being outside is apparently not solid.
+        bool bOutsideWorld = (UTIL_PointContents( pos ) & CONTENTS_SOLID) != 0;
+
+        if ( filter )
+        {
+            UTIL_TraceLine( pos, endpos, mask, filter, trace );
+        }
+        else
+        {
+            UTIL_TraceLine( pos, endpos, mask, pEnt, collisionGroup, trace );
+        }
+
+        // Didn't hit anything.
+        if ( trace->fraction == 1.0f )
+            break;
+
+        // Didn't start outside world, should be a valid trace.
+        if ( !bOutsideWorld )
+        {
+            if ( !trace->DidHitWorld() || (trace->surface.flags & invalidsurfaces) == 0 )
+            {
+                break;
+            }
+        }
+
+        // Go to the next spot to start at.
+        // A bit hacky way of doing this. Trace endpos doesn't seem to be the pos where we left solid.
+        float dist = pos.DistTo( endpos );
+        float frac = trace->startsolid ? trace->fractionleftsolid : trace->fraction;
+
+        pos += dir * (frac * dist) + dir * 2.0f; // Add a bit of extra so we definitely don't hit the same wall again.
     }
 }
