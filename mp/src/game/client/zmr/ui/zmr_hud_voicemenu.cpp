@@ -24,18 +24,39 @@ using namespace vgui;
 #include "zmr_voicelines.h"
 
 
+// Similar to AngleNormalize
 float AngleNormalizeRadians( float angle )
 {
     angle = fmodf( angle, M_PI_F*2 );
     if ( angle > M_PI_F )
         angle -= M_PI_F*2;
     if ( angle < -M_PI_F )
-        angle -= M_PI_F*2;
+        angle += M_PI_F*2;
     return angle;
 }
 
-#define RADIALINDEX_TEAM        0
-#define RADIALINDEX_USELESS     1
+
+// The index player may pass in +zm_voicemenu 1
+enum
+{
+    RADIALINDEX_INVALID = -1,
+
+
+    RADIALINDEX_TEAM,
+    // Current not used.
+    RADIALINDEX_USELESS,
+
+    RADIALINDEX_SURVIVOR_MAX,
+
+
+
+    // In case we ever add a ZM one.
+    RADIALINDEX_ZM = RADIALINDEX_SURVIVOR_MAX,
+
+
+    RADIALINDEX_ZM_MAX
+};
+
 
 struct ZMVoiceMenuData_t
 {
@@ -79,6 +100,7 @@ public:
 
     virtual bool ShouldDraw() OVERRIDE { return IsVisible() && CHudElement::ShouldDraw(); }
 
+    virtual void OnMousePressed( MouseCode code ) OVERRIDE;
     virtual void OnThink() OVERRIDE;
     virtual void Paint() OVERRIDE;
 
@@ -86,10 +108,13 @@ public:
     virtual void SetVisible( bool state ) OVERRIDE;
 
 
+
+    virtual ZMVoiceMenu_t* GetPreferredVoiceMenu( int radialIndex );
+
     void LoadMenus();
 
     
-    void BeginFadeIn( int menuIndex );
+    void BeginFadeIn( ZMVoiceMenu_t* pMenu );
     void BeginFadeOut();
     void PerformVoice();
 
@@ -137,18 +162,35 @@ private:
 
 CZMHudVoiceMenu* g_pVoiceMenu = nullptr;
 
+
+
+
+
+
 static void IN_ZM_VoiceMenu1( const CCommand& args )
 {
+    bool newstate = ( args.Arg( 0 )[0] == '+' ) ? true : false;
+
+    int index = atoi( args.Arg( 1 ) );
+
+
     if ( g_pVoiceMenu )
     {
-        bool newstate = ( args.Arg( 0 )[0] == '+' ) ? true : false;
+        ZMVoiceMenu_t* pMenu = g_pVoiceMenu->GetPreferredVoiceMenu( index );
 
-        if ( newstate )
-            g_pVoiceMenu->BeginFadeIn( atoi( args.Arg( 1 ) ) );
-        else
-            g_pVoiceMenu->BeginFadeOut();
+        if ( pMenu )
+        {
+            if ( newstate )
+            {
+                g_pVoiceMenu->BeginFadeIn( pMenu );
+            }
+            else
+            {
+                g_pVoiceMenu->BeginFadeOut();
 
-        g_pVoiceMenu->PerformVoice();
+                g_pVoiceMenu->PerformVoice();
+            }
+        }
     }
 }
 ConCommand zm_voicemenu1_up( "+zm_voicemenu", IN_ZM_VoiceMenu1 );
@@ -261,6 +303,15 @@ void CZMHudVoiceMenu::SetVisible( bool state )
     BaseClass::SetVisible( state );
 }
 
+void CZMHudVoiceMenu::OnMousePressed( MouseCode code )
+{
+    if ( code == MOUSE_LEFT )
+    {
+        PerformVoice();
+        BeginFadeOut();
+    }
+}
+
 void CZMHudVoiceMenu::OnThink()
 {
     UpdateSelection();
@@ -330,22 +381,12 @@ float CZMHudVoiceMenu::GetStartingAngle( int nElements, bool offset ) const
     return offset ? ( up - (M_PI_F*2) / nElements / 2 ) : up;
 }
 
-void CZMHudVoiceMenu::BeginFadeIn( int radialIndex )
+void CZMHudVoiceMenu::BeginFadeIn( ZMVoiceMenu_t* pMenu )
 {
     m_iCurSelection = -1;
 
 
-    switch ( radialIndex )
-    {
-    case RADIALINDEX_USELESS :
-        m_pCurrentMenu = &m_MenuUseless;
-        break;
-    case RADIALINDEX_TEAM :
-    default :
-        m_pCurrentMenu = &m_MenuTeam;
-        break;
-    }
-
+    m_pCurrentMenu = pMenu;
 
     m_flFadeOut = 0.0f;
     m_flFadeIn = gpGlobals->curtime;
@@ -356,6 +397,15 @@ void CZMHudVoiceMenu::BeginFadeIn( int radialIndex )
 
 void CZMHudVoiceMenu::BeginFadeOut()
 {
+    // We've already faded out!
+    if ( !IsVisible() )
+        return;
+
+    // We're in the process of fading out.
+    if ( m_flFadeOut > gpGlobals->curtime )
+        return;
+
+
     m_flFadeOut = gpGlobals->curtime + m_flFadeOutTime;
     m_flFadeIn = 0.0f;
 
@@ -372,6 +422,27 @@ void CZMHudVoiceMenu::PerformVoice()
 
 
     ZMGetVoiceLines()->SendVoiceLine( m_pCurrentMenu->m_vItems[m_iCurSelection]->m_iIndex );
+}
+
+ZMVoiceMenu_t* CZMHudVoiceMenu::GetPreferredVoiceMenu( int radialIndex )
+{
+    C_ZMPlayer* pLocal = C_ZMPlayer::GetLocalPlayer();
+    if ( !pLocal )
+        return nullptr;
+
+
+    if ( pLocal->IsHuman() )
+    {
+        switch ( radialIndex )
+        {
+        case RADIALINDEX_USELESS : return &m_MenuUseless;
+        case RADIALINDEX_TEAM :
+        default :
+            return &m_MenuTeam;
+        }
+    }
+
+    return nullptr;
 }
 
 void CZMHudVoiceMenu::Paint()
