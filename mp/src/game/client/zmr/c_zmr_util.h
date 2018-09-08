@@ -9,7 +9,7 @@ namespace ZMClientUtil
     void PrintNotify( const char* msg, ZMChatNotifyType_t type = ZMCHATNOTIFY_NORMAL );
     void GetNotifyTypeColor( ZMChatNotifyType_t type, char* buffer, size_t len );
 
-    void ChatPrint( const char* format, ... );
+    void ChatPrint( int iPlayerIndex, bool bPlaySound, const char* format, ... );
 
 
     void QueueTooltip( const char*, float delay );

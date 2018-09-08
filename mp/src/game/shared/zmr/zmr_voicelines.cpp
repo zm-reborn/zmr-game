@@ -2,6 +2,7 @@
 #include "filesystem.h"
 
 #ifdef CLIENT_DLL
+#include "voice_status.h"
 #include "c_playerresource.h"
 
 #include <engine/IEngineSound.h>
@@ -133,13 +134,17 @@ void CZMVoiceLines::FireGameEvent( IGameEvent* pEvent )
             return;
 
 
+        // If the player is muted, don't do anything.
+        bool bIsMuted = GetLocalPlayerIndex() != index && GetClientVoiceMgr()->IsPlayerBlocked( index );
+
+
 
         C_ZMPlayer* pPlayer = ToZMPlayer( UTIL_PlayerByIndex( index ) );
             
 
 
         // Play the sound
-        if ( pLine->m_szSoundBase[0] != NULL && !zm_cl_voiceline_disablesound.GetBool() )
+        if ( pLine->m_szSoundBase[0] != NULL && !zm_cl_voiceline_disablesound.GetBool() && !bIsMuted )
         {
             const char* gender = IsFemale( pPlayer ) ? "Female" : "Male";
 
@@ -153,7 +158,9 @@ void CZMVoiceLines::FireGameEvent( IGameEvent* pEvent )
             else
             {
                 Vector pos;
-                scanf( pEvent->GetString( "pos" ), pos.x, pos.y, pos.z );
+                pos.x = pEvent->GetFloat( "pos_x" );
+                pos.y = pEvent->GetFloat( "pos_y" );
+                pos.z = pEvent->GetFloat( "pos_z" );
 
                 CSingleUserRecipientFilter filter( pLocal );
                 pLocal->EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, line, &pos, 0.0f, nullptr );
@@ -161,10 +168,29 @@ void CZMVoiceLines::FireGameEvent( IGameEvent* pEvent )
         }
 
         
-        
+        // Print chat message
         if ( pLine->m_szChatMsg[0] != NULL && !zm_cl_voiceline_disablechat.GetBool() )
         {
-            ZMClientUtil::ChatPrint( "\x07%s[VOICE] %s: %s", "ff0000", g_PR->GetPlayerName( index ), g_pVGuiLocalize->FindAsUTF8( pLine->m_szChatMsg ) );
+            // We'll have to convert ansi -> unicode -> ansi to get localization to work :(
+            wchar_t buf[512];
+            wchar_t playerName[128];
+
+
+            g_pVGuiLocalize->ConvertANSIToUnicode( g_PR->GetPlayerName( index ), playerName, sizeof( playerName ) );
+            
+
+
+            g_pVGuiLocalize->ConstructString( buf, sizeof( buf ), g_pVGuiLocalize->Find( "ZM_Chat_Voice" ),
+                2,
+                playerName,
+                g_pVGuiLocalize->Find( pLine->m_szChatMsg ) );
+
+
+            char ansi[512];
+            g_pVGuiLocalize->ConvertUnicodeToANSI( buf, ansi, sizeof( ansi ) );
+
+
+            ZMClientUtil::ChatPrint( index, false, ansi );
         }
     }
 }
@@ -223,7 +249,9 @@ void CZMVoiceLines::OnVoiceLine( CZMPlayer* pPlayer, int index )
     {
         pEvent->SetInt( "userid", pPlayer->GetUserID() );
         pEvent->SetInt( "voiceline", index );
-        pEvent->SetString( "pos", UTIL_VarArgs( "%.0f %.0f %.0f", origin.x, origin.y, origin.z ) );
+        pEvent->SetFloat( "pos_x", origin.x );
+        pEvent->SetFloat( "pos_y", origin.y );
+        pEvent->SetFloat( "pos_z", origin.z );
         gameeventmanager->FireEvent( pEvent, false );
     }
 }
