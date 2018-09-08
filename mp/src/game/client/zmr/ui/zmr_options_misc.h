@@ -1,6 +1,7 @@
 #pragma once
 
 
+#include <vgui_controls/ComboBox.h>
 #include <vgui_controls/CheckButton.h>
 #include <vgui_controls/Slider.h>
 #include <vgui_controls/TextEntry.h>
@@ -28,4 +29,5 @@ private:
     vgui::CheckButton*  m_pCheck_ShowHelp;
     vgui::Slider*       m_pSlider_Fov;
     vgui::TextEntry*    m_pTextEntry_Fov;
+    vgui::ComboBox*     m_pCombo_FlashRR;
 };
