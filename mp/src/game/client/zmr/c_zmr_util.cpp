@@ -23,11 +23,11 @@ void ZMClientUtil::PrintNotify( const char* msg, ZMChatNotifyType_t type )
 
     if ( msg[0] == '#' )
     {
-        ZMClientUtil::ChatPrint( "\x07%s%s", buf, g_pVGuiLocalize->FindAsUTF8( msg ) );
+        ZMClientUtil::ChatPrint( GetLocalPlayerIndex(), true, "\x07%s%s", buf, g_pVGuiLocalize->FindAsUTF8( msg ) );
     }
     else
     {
-        ZMClientUtil::ChatPrint( "\x07%s%s", buf, msg );
+        ZMClientUtil::ChatPrint( GetLocalPlayerIndex(), true, "\x07%s%s", buf, msg );
     }
     
 }
@@ -46,7 +46,7 @@ void ZMClientUtil::GetNotifyTypeColor( ZMChatNotifyType_t type, char* buffer, si
         Q_strncpy( buffer, pColor, len );
 }
 
-void ZMClientUtil::ChatPrint( const char* format, ... )
+void ZMClientUtil::ChatPrint( int iPlayerIndex, bool bPlaySound, const char* format, ... )
 {
     CHudChat* pChat = GET_HUDELEMENT( CHudChat );
 
@@ -56,7 +56,7 @@ void ZMClientUtil::ChatPrint( const char* format, ... )
 
     if ( format[0] == '#' )
     {
-        pChat->ChatPrintf( GetLocalPlayerIndex(), CHAT_FILTER_NONE, "%s",
+        pChat->ChatPrintf( iPlayerIndex, CHAT_FILTER_NONE, "%s",
             g_pVGuiLocalize->FindAsUTF8( format ) );
     }
     else
@@ -68,11 +68,14 @@ void ZMClientUtil::ChatPrint( const char* format, ... )
         Q_vsnprintf( msg, sizeof( msg ), format, marker );
         va_end( marker );
 
-        pChat->ChatPrintf( GetLocalPlayerIndex(), CHAT_FILTER_NONE, msg );
+        pChat->ChatPrintf( iPlayerIndex, CHAT_FILTER_NONE, msg );
     }
 
-    CLocalPlayerFilter filter;
-    C_BaseEntity::EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, "HudChat.Message" );
+    if ( bPlaySound )
+    {
+        CLocalPlayerFilter filter;
+        C_BaseEntity::EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, "HudChat.Message" );
+    }
 }
 
 void ZMClientUtil::QueueTooltip( const char* name, float delay )
