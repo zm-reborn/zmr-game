@@ -24,6 +24,7 @@ ConVar zm_sv_voiceline_madness( "zm_sv_voiceline_madness", "0", 0, "Don't do it.
 #else
 ConVar zm_cl_voiceline_disablesound( "zm_cl_voiceline_disablesound", "0", FCVAR_ARCHIVE );
 ConVar zm_cl_voiceline_disablechat( "zm_cl_voiceline_disablechat", "0", FCVAR_ARCHIVE );
+ConVar zm_cl_voiceline_disableforzm( "zm_cl_voiceline_disableforzm", "1", FCVAR_ARCHIVE );
 #endif
 
 ConVar zm_sv_voiceline_disable( "zm_sv_voiceline_disable", "0", FCVAR_NOTIFY | FCVAR_ARCHIVE | FCVAR_REPLICATED );
@@ -137,6 +138,9 @@ void CZMVoiceLines::FireGameEvent( IGameEvent* pEvent )
         // If the player is muted, don't do anything.
         bool bIsMuted = GetLocalPlayerIndex() != index && GetClientVoiceMgr()->IsPlayerBlocked( index );
 
+        // Disable chat if we're the ZM as well.
+        bool bDisableChat = zm_cl_voiceline_disablechat.GetBool()
+                        ||  (pLocal->IsZM() && zm_cl_voiceline_disableforzm.GetBool());
 
 
         C_ZMPlayer* pPlayer = ToZMPlayer( UTIL_PlayerByIndex( index ) );
@@ -169,7 +173,7 @@ void CZMVoiceLines::FireGameEvent( IGameEvent* pEvent )
 
         
         // Print chat message
-        if ( pLine->m_szChatMsg[0] != NULL && !zm_cl_voiceline_disablechat.GetBool() )
+        if ( pLine->m_szChatMsg[0] != NULL && !bDisableChat )
         {
             // We'll have to convert ansi -> unicode -> ansi to get localization to work :(
             wchar_t buf[512];
