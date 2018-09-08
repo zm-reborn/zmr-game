@@ -2,7 +2,7 @@
 
 #include "c_user_message_register.h"
 
-#include "zmr_viewport.h"
+#include "zmr_zmview_base.h"
 #include "zmr/c_zmr_entities.h"
 #include "zmr_manimenu_base.h"
 

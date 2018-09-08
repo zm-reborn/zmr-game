@@ -1,3 +1,5 @@
+#pragma once
+
 #include "baseviewport.h"
 #include "hudelement.h"
 

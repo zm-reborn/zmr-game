@@ -7,7 +7,7 @@
 
 
 #include "zmr_global_shared.h"
-#include "zmr_viewport.h"
+#include "zmr_zmview_base.h"
 #include "zmr_cntrlpanel.h"
 #include "zmr/c_zmr_zmvision.h"
 
