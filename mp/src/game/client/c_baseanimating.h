@@ -639,14 +639,9 @@ private:
 	mutable CStudioHdr				*m_pStudioHdr;
 	mutable MDLHandle_t				m_hStudioHdr;
 	CThreadFastMutex				m_StudioHdrInitLock;
-<<<<<<< HEAD
-#ifdef ZMR // ZMRCHANGE: Need this for shared zombie anims.
-    friend class C_NPCRNonPlayer;
-=======
 
 #ifdef ZMR // ZMRCHANGE: Need this for animations
 	friend class C_NPCRNonPlayer;
->>>>>>> dev
 #endif
 };
 
