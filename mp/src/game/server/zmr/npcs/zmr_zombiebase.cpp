@@ -5,6 +5,7 @@
 #include "eventlist.h"
 #include "gib.h"
 #include "collisionutils.h"
+#include "in_buttons.h"
 
 #include "npcr_manager.h"
 
@@ -187,6 +188,7 @@ IMPLEMENT_SERVERCLASS_ST( CZMBaseZombie, DT_ZM_BaseZombie )
     // Animstate and clientside animation takes care of these on the client
     SendPropExclude( "DT_ServerAnimationData" , "m_flCycle" ),	
     SendPropExclude( "DT_AnimTimeMustBeFirst" , "m_flAnimTime" ),
+    SendPropInt( SENDINFO( m_iPlayerControllerIndex ) ),
 
     SendPropExclude( "DT_BaseFlex", "m_flexWeight" ),
     SendPropExclude( "DT_BaseFlex", "m_blinktoggle" ),
@@ -218,10 +220,12 @@ CZMBaseZombie::CZMBaseZombie()
     m_iAnimationRandomSeed = (int)gpGlobals->curtime + randomseed;
     
     m_iAdditionalAnimRandomSeed = 0;
+    m_iPlayerControllerIndex = 0;
 
     m_cycleLatch = 0;
     m_cycleLatchTimer.Invalidate();
 
+    m_pPlayerController = nullptr;
 
     m_hAmbushEnt.Set( nullptr );
 
@@ -234,6 +238,7 @@ CZMBaseZombie::CZMBaseZombie()
 
     m_flNextIdleSound = 0.0f;
 
+    m_bFreePopulation = true;
 
     m_strModelGroup = NULL_STRING;
 
@@ -255,7 +260,7 @@ CZMBaseZombie::~CZMBaseZombie()
 
     // It's safe to remove pop count here.
     CZMRules* pRules = ZMRules();
-    if ( pRules )
+    if ( m_bFreePopulation && pRules )
     {
         pRules->SetZombiePop( pRules->GetZombiePop() - GetPopCost() );
     }
@@ -278,9 +283,28 @@ bool CZMBaseZombie::CreateComponents()
     return true;
 }
 
+class CZMZombieSchedInterface : public NPCR::CScheduleInterface
+{
+public:
+    CZMZombieSchedInterface( CZMBaseZombie* pZombie ) : NPCR::CScheduleInterface( pZombie, new MoveSchedule )
+    {
+    }
+
+    virtual CZMBaseZombie* GetOuter() const OVERRIDE { return static_cast<CZMBaseZombie*>( NPCR::CScheduleInterface::GetOuter() ); }
+
+protected:
+    virtual void Update() OVERRIDE
+    {
+        if ( !GetOuter()->IsPlayerControlled() )
+        {
+            NPCR::CScheduleInterface::Update();
+        }
+    }
+};
+
 NPCR::CScheduleInterface* CZMBaseZombie::CreateScheduleInterface()
 {
-    return new NPCR::CScheduleInterface( this, new MoveSchedule );
+    return new CZMZombieSchedInterface( this );
 }
 
 CZMZombieAnimState* CZMBaseZombie::CreateAnimState()
@@ -384,6 +408,77 @@ void CZMBaseZombie::PreUpdate()
 
         m_flNextIdleSound = gpGlobals->curtime + delay;
     }
+
+    if ( IsPlayerControlled() )
+    {
+        HandlePlayerCommands();
+    }
+}
+
+void CZMBaseZombie::HandlePlayerCommands()
+{
+    if ( !m_pPlayerController )
+        return;
+
+
+    HandlePlayerAttack();
+    HandlePlayerMovement();
+    
+}
+
+void CZMBaseZombie::HandlePlayerMovement()
+{
+    if ( GetNextMove() > gpGlobals->curtime )
+        return;
+
+    QAngle ang = m_pPlayerController->EyeAngles();
+    ang.x = ang.z = 0.0f;
+
+    Vector out;
+    out.z = 0.0f;
+    Vector fwd, right;
+    AngleVectors( ang, &fwd, &right, nullptr );
+
+    int btns = m_pPlayerController->m_nButtons;
+
+    const float move = 200.0f;
+    float fwdmove = 0.0f;
+    float sidemove = 0.0f;
+    if ( btns & IN_FORWARD )
+        fwdmove = move;
+    else if ( btns & IN_BACK )
+        fwdmove = -move;
+
+    if ( btns & IN_MOVERIGHT )
+        sidemove = move;
+    else if ( btns & IN_MOVELEFT )
+        sidemove = -move;
+
+    if ( fwdmove != 0.0f || sidemove != 0.0f )
+    {
+        for ( int i = 0; i < 2; i++ )
+        {
+            out[i] = fwd[i] * fwdmove + right[i] * sidemove;
+        }
+
+        GetMotor()->Approach( GetLocalOrigin() + out );
+    }
+}
+
+void CZMBaseZombie::HandlePlayerAttack()
+{
+    int btns = m_pPlayerController->m_nButtons;
+    if ( !(btns & IN_ATTACK) )
+        return;
+
+    if ( GetNextAttack() > gpGlobals->curtime )
+        return;
+
+    SetActivity( ACT_MELEE_ATTACK1 );
+    float delay = SequenceDuration();
+
+    SetNextAttack( gpGlobals->curtime + delay );
+    SetNextMove( gpGlobals->curtime + delay );
 }
 
 void CZMBaseZombie::PostUpdate()
@@ -682,6 +777,16 @@ bool CZMBaseZombie::MeleeAttackTrace(
 void CZMBaseZombie::ClawImpactSound( bool bHit )
 {
     EmitSound( bHit ? "Zombie.AttackHit" : "Zombie.AttackMiss" );
+}
+
+void CZMBaseZombie::SetPlayerControlled( CBasePlayer* pPlayer )
+{
+    m_pPlayerController = pPlayer;
+
+    m_iPlayerControllerIndex = pPlayer ? pPlayer->entindex() : 0;
+
+    if ( pPlayer )
+        m_bFreePopulation = false;
 }
 
 float CZMBaseZombie::GetSwatMaxMass()

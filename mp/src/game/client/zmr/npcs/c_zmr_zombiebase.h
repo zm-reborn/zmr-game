@@ -74,6 +74,8 @@ public:
     int                     GetCost() const;
     bool                    DoAnimationEvent( int iEvent, int nData );
     virtual int             GetAnimationRandomSeed() OVERRIDE;
+    bool                    IsPlayerControlled() const;
+    int                     GetControllerIndex() const;
 protected:
     void                    SetZombieClass( ZombieClass_t zclass );
 
@@ -111,6 +113,7 @@ private:
     CNetworkVar( int, m_iAnimationRandomSeed );
     int m_cycleLatch; // The animation cycle goes out of sync very easily. Mostly from the player entering/exiting PVS. Server will frequently update us with a new one.
     float m_flServerCycle;
+    CNetworkVar( int, m_iPlayerControllerIndex );
 
     int m_iGroup;
     ZombieClass_t m_iZombieClass;

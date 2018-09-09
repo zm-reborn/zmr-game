@@ -255,3 +255,9 @@ void CZMPlayer::UpdateAccuracyRatio()
 
     m_ZMLocal.m_flAccuracyRatio = clamp( cur + add, min, max );
 }
+
+bool CZMPlayer::IsControllingZombie() const
+{
+    CZMBaseZombie* pZombie = ToZMBaseZombie( m_hObserverTarget.Get() );
+    return pZombie != nullptr && pZombie->GetControllerIndex() == entindex();
+}

@@ -99,6 +99,10 @@ int ClientModeZMNormal::KeyInput( int down, ButtonCode_t keynum, const char* psz
 
     const bool bIsZM = pPlayer && pPlayer->IsZM();
 
+    if ( pPlayer && pPlayer->IsControllingZombie() )
+    {
+        return 1;
+    }
 
     if ( bIsZM )
     {

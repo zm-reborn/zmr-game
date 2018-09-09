@@ -185,3 +185,13 @@ int CZMBaseZombie::GetAnimationRandomSeed()
 {
     return m_iAnimationRandomSeed + m_iAdditionalAnimRandomSeed;
 }
+
+bool CZMBaseZombie::IsPlayerControlled() const
+{
+    return m_iPlayerControllerIndex != 0;
+}
+
+int CZMBaseZombie::GetControllerIndex() const
+{
+    return m_iPlayerControllerIndex;
+}

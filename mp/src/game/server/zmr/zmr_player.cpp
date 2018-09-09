@@ -134,6 +134,7 @@ CZMPlayer::CZMPlayer()
 
     m_flNextResourceInc = 0.0f;
 
+    m_flNextScufflerTime = 0.0f;
     
     SetWeaponSlotFlags( 0 );
 }

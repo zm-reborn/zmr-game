@@ -36,6 +36,7 @@ IMPLEMENT_CLIENTCLASS_DT( C_ZMBaseZombie, DT_ZM_BaseZombie, CZMBaseZombie )
     RecvPropInt( RECVINFO( m_iAnimationRandomSeed ) ),
     RecvPropInt( RECVINFO( m_lifeState ) ),
     RecvPropInt( RECVINFO( m_cycleLatch ), 0, &C_ZMBaseZombie::RecvProxy_CycleLatch ),
+	RecvPropInt( RECVINFO( m_iPlayerControllerIndex ) ),
 END_RECV_TABLE()
 
 BEGIN_PREDICTION_DATA( C_ZMBaseZombie )
@@ -176,7 +177,7 @@ int C_ZMBaseZombie::DrawModel( int flags )
     }
         
 
-    if ( !g_bRenderPostProcess )
+    if ( !g_bRenderPostProcess && m_iPlayerControllerIndex == 0 )
     {
         float ratio = m_flHealthRatio > 1.0f ? 1.0f : m_flHealthRatio;
         if ( ratio < 0.0f ) ratio = 0.0f;

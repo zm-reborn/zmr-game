@@ -105,6 +105,7 @@ public:
     void                    DoAnimationEvent( PlayerAnimEvent_t playerAnim, int nData = 0 );
     float                   GetAccuracyRatio() const;
     void                    UpdateAccuracyRatio();
+    bool                    IsControllingZombie() const;
 
     void SetMouseWheelMove( float dir );
 

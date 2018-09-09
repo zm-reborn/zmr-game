@@ -88,6 +88,7 @@ public:
 
     virtual void HandleAnimEvent( animevent_t* pEvent ) OVERRIDE;
 
+    void        SetPlayerControlled( CBasePlayer* pPlayer );
 
     // Sounds
     virtual bool ShouldPlayIdleSound() const;
@@ -116,6 +117,8 @@ public:
     int                     GetCost() const;
     bool                    DoAnimationEvent( int iEvent, int nData = 0 );
     virtual int             GetAnimationRandomSeed() OVERRIDE;
+    bool                    IsPlayerControlled() const;
+    int                     GetControllerIndex() const;
 protected:
     void                    SetZombieClass( ZombieClass_t zclass );
 
@@ -215,11 +218,16 @@ public:
 protected:
     CZMZombieAnimState* GetAnimState() const { return m_pAnimState; }
 
+    virtual void HandlePlayerCommands();
+    virtual void HandlePlayerMovement();
+    virtual void HandlePlayerAttack();
 
 private:
     float m_flNextAttack;
 
     float m_flLastCommanded;
+
+    bool m_bFreePopulation;
 
 
     CZMBlockerScanner* m_pBlockerScanner;
@@ -238,6 +246,7 @@ private:
     CNetworkVar( int, m_iAnimationRandomSeed );
     CNetworkVar( int, m_cycleLatch ); // Network the cycle to clients periodically
     CountdownTimer m_cycleLatchTimer;
+    CNetworkVar( int, m_iPlayerControllerIndex );
 
 
 
@@ -248,6 +257,7 @@ private:
     CZMCommandQueue m_CmdQueue;
 
 
+    CBasePlayer* m_pPlayerController;
 
     float m_flNextMove;
 
