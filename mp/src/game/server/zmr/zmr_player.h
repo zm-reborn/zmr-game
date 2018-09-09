@@ -104,6 +104,7 @@ public:
     static int      PrecachePlayerModels( KeyValues* kv );
     virtual void    Precache() OVERRIDE;
 
+    virtual void    InitialSpawn() OVERRIDE;
     virtual void    Spawn() OVERRIDE;
     virtual void    UpdateOnRemove() OVERRIDE;
     virtual void    PreThink() OVERRIDE;
@@ -249,6 +250,8 @@ public:
     inline bool     IsAFK() { return zm_sv_antiafk.GetInt() > 0 && (gpGlobals->curtime - GetLastActivity()) > zm_sv_antiafk.GetFloat(); };
 
     inline float    GetNextModelChangeTime() { return m_flNextModelChangeTime; };
+    inline float    GetNextVoiceLineTime() const { return m_flNextVoiceLineTime; }
+    inline void     SetNextVoiceLineTime( float t ) { m_flNextVoiceLineTime = t; }
 
     int             GetZMCommandInterruptFlags() const;
 
@@ -266,6 +269,7 @@ private:
 	CZMPlayerStateInfo* m_pCurStateInfo;
     bool                m_bEnterObserver;
     float               m_flNextModelChangeTime;
+    float               m_flNextVoiceLineTime;
 
     CZMPlayerAnimState* m_pPlayerAnimState;
 

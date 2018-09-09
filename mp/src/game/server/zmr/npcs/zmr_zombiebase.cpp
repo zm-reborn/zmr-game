@@ -14,6 +14,7 @@
 #include "zmr/npcs/zmr_zombieanimstate.h"
 #include "zmr_global_shared.h"
 #include "zmr_zombiebase.h"
+#include "zmr/zmr_softcollisions.h"
 #include "zmr/npcs/zmr_zombiebase_shared.h"
 #include "sched/zmr_zombie_main.h"
 
@@ -113,6 +114,9 @@ private:
 
 
 
+#define CYCLELATCH_UPDATE_INTERVAL      0.2f
+
+
 int CZMBaseZombie::AE_ZOMBIE_ATTACK_RIGHT = AE_INVALID;
 int CZMBaseZombie::AE_ZOMBIE_ATTACK_LEFT = AE_INVALID;
 int CZMBaseZombie::AE_ZOMBIE_ATTACK_BOTH = AE_INVALID;
@@ -126,7 +130,7 @@ int CZMBaseZombie::AE_ZOMBIE_ALERTSOUND = AE_INVALID;
 ConVar zm_sv_swatmaxmass( "zm_sv_swatmaxmass", "200", FCVAR_NOTIFY );
 ConVar zm_sv_swatlift( "zm_sv_swatlift", "20000", FCVAR_NOTIFY );
 ConVar zm_sv_swatforcemin( "zm_sv_swatforcemin", "20000", FCVAR_NOTIFY );
-ConVar zm_sv_swatforcemax( "zm_sv_swatforcemax", "70000", FCVAR_NOTIFY );
+ConVar zm_sv_swatforcemax( "zm_sv_swatforcemax", "50000", FCVAR_NOTIFY ); // Originally 70000
 ConVar zm_sv_swatangvel( "zm_sv_swatangvel", "1000", FCVAR_NOTIFY, "Amount of angular velocity swatting applies to prop." );
 
 
@@ -140,7 +144,7 @@ ConVar zm_sv_defense_goal_tolerance( "zm_sv_defense_goal_tolerance", "64", FCVAR
 ConVar zm_sv_debug_zombieattack( "zm_sv_debug_zombieattack", "0" );
 ConVar zm_sv_debug_shotgun_dmgmult( "zm_sv_debug_shotgun_dmgmult", "0" );
 
-ConVar zm_sv_zombiecollisions( "zm_sv_zombiecollisions", "1", 0, "Toggle experimental zombie collisions." );
+ConVar zm_sv_zombiesoftcollisions( "zm_sv_zombiesoftcollisions", "1", FCVAR_NOTIFY, "Toggle experimental zombie collisions." );
 
 
 extern ConVar zm_sk_default_hitmult_head;
@@ -170,6 +174,8 @@ IMPLEMENT_SERVERCLASS_ST( CZMBaseZombie, DT_ZM_BaseZombie )
     SendPropBool( SENDINFO( m_bIsOnGround ) ),
     SendPropInt( SENDINFO( m_iAnimationRandomSeed ) ),
     SendPropInt( SENDINFO( m_lifeState ), 3, SPROP_UNSIGNED ),
+    // If you increase the number of bits networked, make sure to also modify the code below and in the client class.
+    SendPropInt( SENDINFO( m_cycleLatch ), 4, SPROP_UNSIGNED ),
 
 
     // Animation excludes
@@ -212,6 +218,9 @@ CZMBaseZombie::CZMBaseZombie()
     m_iAnimationRandomSeed = (int)gpGlobals->curtime + randomseed;
     
     m_iAdditionalAnimRandomSeed = 0;
+
+    m_cycleLatch = 0;
+    m_cycleLatchTimer.Invalidate();
 
 
     m_hAmbushEnt.Set( nullptr );
@@ -321,6 +330,8 @@ void CZMBaseZombie::Spawn()
     SetNextThink( gpGlobals->curtime );
 
 
+    m_cycleLatchTimer.Start( CYCLELATCH_UPDATE_INTERVAL );
+
     AddSolidFlags( FSOLID_NOT_STANDABLE );
 }
 
@@ -345,9 +356,21 @@ NPCR::CPathCostGroundOnly* CZMBaseZombie::GetPathCost() const
 
 void CZMBaseZombie::ZombieThink()
 {
+    VPROF_BUDGET( "CZMBaseZombie::ZombieThink", "NPCR" );
+
+
     m_pAnimState->Update();
 
     BaseClass::NPCThink();
+
+
+
+    if ( IsAlive() && m_cycleLatchTimer.IsElapsed() )
+    {
+        m_cycleLatchTimer.Start( CYCLELATCH_UPDATE_INTERVAL );
+        // Compress the cycle into 4 bits. Can represent 0.0625 in steps which is enough.
+        m_cycleLatch.GetForModify() = 16 * GetCycle();
+    }
 }
 
 void CZMBaseZombie::PreUpdate()
@@ -1083,15 +1106,13 @@ NPCR::QueryResult_t CZMBaseZombie::ShouldTouch( CBaseEntity* pEnt ) const
         NPCR::CBaseNPC* pOther = pEnt->MyNPCRPointer();
 
 
-        if ( !zm_sv_zombiecollisions.GetBool() )
+        if ( zm_sv_zombiesoftcollisions.GetBool() )
         {
-            // Ignore others that aren't going anywhere
-            if ( GetMotor()->IsMoving() && !pOther->GetMotor()->IsMoving() )
-            {
-                CZMBaseZombie* pZombie = ToZMBaseZombie( pOther->GetCharacter() );
-                if ( !pZombie->IsAttacking() )
-                    return NPCR::RES_NO;
-            }
+            GetZMSoftCollisions()->OnZombieCollide(
+                const_cast<CZMBaseZombie*>( this ),
+                static_cast<CZMBaseZombie*>( pEnt ) );
+
+            return NPCR::RES_NO;
         }
 
 

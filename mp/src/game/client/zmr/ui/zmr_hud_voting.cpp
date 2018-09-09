@@ -29,6 +29,7 @@ public:
 
 
     virtual void Init( void ) OVERRIDE;
+    virtual void LevelInit() OVERRIDE;
     virtual void VidInit( void ) OVERRIDE;
     virtual void Reset() OVERRIDE;
     virtual void OnThink() OVERRIDE;
@@ -112,6 +113,13 @@ void CZMHudVote::Init( void )
     InitVoting();
 }
 
+void CZMHudVote::LevelInit()
+{
+    m_bDrawVote = false;
+
+    InitVoting();
+}
+
 void CZMHudVote::VidInit( void )
 {
     InitVoting();
@@ -126,6 +134,8 @@ void CZMHudVote::InitVoting()
 {
     // Have to set this here since we can't use proportional.
     SetWide( ScreenWidth() );
+
+    SetPos( 0, ScreenHeight() - GetTall() - ScreenHeight() * 0.06f );
 
 
     wchar_t szYes[16];
@@ -231,7 +241,7 @@ void CZMHudVote::Paint()
     if ( m_szHowto[0] != NULL )
     {
         surface()->GetTextSize( m_hTextFont, m_szHowto, w, h );
-        PaintString( m_hTextFont, m_VoteColor, GetWide() / 2.0f - w / 2.0f, 70, m_szHowto );
+        PaintString( m_hTextFont, m_VoteColor, GetWide() / 2.0f - w / 2.0f, 60, m_szHowto );
     }
 
 
@@ -239,7 +249,7 @@ void CZMHudVote::Paint()
     {
         surface()->GetTextSize( m_hTextFont, m_szVote, w, h );
 
-        PaintString( m_hTextFont, m_VoteColor, GetWide() / 2.0f - w / 2.0f, 100, m_szVote );
+        PaintString( m_hTextFont, m_VoteColor, GetWide() / 2.0f - w / 2.0f, 80, m_szVote );
     }
 
     if ( m_pszMyVote && *m_pszMyVote )

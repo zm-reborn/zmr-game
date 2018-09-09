@@ -49,6 +49,8 @@ void NPCR::CNonPlayerMotor::Update()
 
 void NPCR::CNonPlayerMotor::Move()
 {
+    VPROF_BUDGET( "CNonPlayerMotor::Move", "NPCR" );
+
     m_vecAcceleration = vec3_origin;
 
     CBaseEntity* pOldGround = GetGroundEntity();
@@ -71,7 +73,7 @@ void NPCR::CNonPlayerMotor::Move()
 
     bool bIsOnGround = pNewGround != nullptr;
 
-    if ( !bIsOnGround )
+    if ( !bIsOnGround || m_bForceGravity )
     {
         // Apply gravity.
         m_vecAcceleration.z -= GetGravity();

@@ -7,7 +7,9 @@
 #include "ilagcompensationmanager.h"
 #include "predicted_viewmodel.h"
 #include "filesystem.h"
+#include "EntityFlame.h"
 
+#include "zmr_rejoindata.h"
 #include "npcs/zmr_zombiebase.h"
 #include "zmr_player_ragdoll.h"
 #include "zmr/zmr_viewmodel.h"
@@ -67,7 +69,7 @@ END_SEND_TABLE()
 IMPLEMENT_SERVERCLASS_ST( CZMPlayer, DT_ZM_Player )
     SendPropDataTable( SENDINFO_DT( m_ZMLocal ), &REFERENCE_SEND_TABLE( DT_ZM_PlyLocal ), SendProxy_SendLocalDataTable ),
 
-    SendPropInt( SENDINFO( m_iSpawnInterpCounter ), 4 ),
+    SendPropInt( SENDINFO( m_iSpawnInterpCounter ), 4, SPROP_UNSIGNED ),
     SendPropEHandle( SENDINFO( m_hRagdoll ) ),
 
     // Data that only gets sent to the local player.
@@ -117,6 +119,7 @@ CZMPlayer::CZMPlayer()
     m_iLastWeaponFireUsercmd = 0;
     m_bEnterObserver = false;
     m_flNextModelChangeTime = 0.0f;
+    m_flNextVoiceLineTime = 0.0f;
 
     BaseClass::ChangeTeam( 0 );
 
@@ -260,8 +263,8 @@ void CZMPlayer::NoteWeaponFired()
 
 extern ConVar zm_sv_antiafk_punish;
 
-ConVar zm_sv_flashlightdrainrate( "zm_sv_flashlightdrainrate", "0.4", 0, "How fast the flashlight battery drains per second. (out of 100)" );
-ConVar zm_sv_flashlightrechargerate( "zm_sv_flashlightrechargerate", "0.1", 0, "How fast the flashlight battery recharges per second. (out of 100)" );
+ConVar zm_sv_flashlightdrainrate( "zm_sv_flashlightdrainrate", "0.6", FCVAR_NOTIFY, "How fast the flashlight battery drains per second. (out of 100)" ); // Originally 0.4
+ConVar zm_sv_flashlightrechargerate( "zm_sv_flashlightrechargerate", "0.6", FCVAR_NOTIFY, "How fast the flashlight battery recharges per second. (out of 100)" ); // Originally 0.1
 
 void CZMPlayer::PreThink( void )
 {
@@ -905,6 +908,14 @@ void CZMPlayer::UpdatePlayerFOV()
     }
 }
 
+void CZMPlayer::InitialSpawn()
+{
+    BaseClass::InitialSpawn();
+
+    // During initial spawn, players should already be authenticated.
+    GetZMRejoinSystem()->OnPlayerJoin( this );
+}
+
 void CZMPlayer::Spawn()
 {
     m_iSpawnInterpCounter = (m_iSpawnInterpCounter + 1) % 8;
@@ -971,6 +982,10 @@ void CZMPlayer::Spawn()
     m_impactEnergyScale = 4.0f;
 
 
+    // Reset our base velocity so we don't go flying. RIP Muob
+    SetBaseVelocity( vec3_origin );
+
+
     // Reset activity. Makes sure we don't get insta-punished when spawning after spectating somebody, etc.
     m_flLastActivity = gpGlobals->curtime;
 
@@ -1018,6 +1033,16 @@ void CZMPlayer::CreateRagdollEntity()
         pRagdoll->m_nForceBone = m_nForceBone;
         pRagdoll->m_vecForce = m_vecTotalBulletForce;
         pRagdoll->SetAbsOrigin( GetAbsOrigin() );
+
+        // Copy the effect over.
+        CEntityFlame* pFlame = dynamic_cast<CEntityFlame*>( GetEffectEntity() );
+        if ( pFlame )
+        {
+            pFlame->AttachToEntity( pRagdoll );
+            pRagdoll->SetEffectEntity( pFlame );
+
+            SetEffectEntity( nullptr );
+        }
     }
 
     // ragdolls will be removed on round restart automatically
@@ -1097,6 +1122,16 @@ void CZMPlayer::Event_Killed( const CTakeDamageInfo &info )
     // Note: since we're dead, it won't draw us on the client, but we don't set EF_NODRAW
     // because we still want to transmit to the clients in our PVS.
     CreateRagdollEntity();
+
+    // We can't be on fire while dead!
+    Extinguish();
+
+    CBaseEntity* pEffect = GetEffectEntity();
+    if ( pEffect != nullptr )
+    {
+        UTIL_Remove( pEffect );
+        SetEffectEntity( nullptr );
+    }
 
 
     BaseClass::Event_Killed( subinfo );

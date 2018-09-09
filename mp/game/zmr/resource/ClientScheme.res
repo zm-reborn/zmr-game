@@ -649,7 +649,7 @@ Scheme
 			"1"
 			{
 				"name"		"Trebuchet MS"
-				"tall"		"38"
+				"tall"		"28"
 				"weight"	"2000"
 				"antialias" "1"
 				"custom"	"1"
@@ -660,7 +660,7 @@ Scheme
 			"1"
 			{
 				"name"		"Trebuchet MS"
-				"tall"		"32"
+				"tall"		"24"
 				"weight"	"2000"
 				"antialias" "1"
 				"custom"	"1"
@@ -671,7 +671,7 @@ Scheme
 			"1"
 			{
 				"name"		"Trebuchet MS"
-				"tall"		"24"
+				"tall"		"18"
 				"weight"	"900"
 				"antialias" "1"
 			}
@@ -873,6 +873,30 @@ Scheme
 				"weight"	"0"
 				"antialias" "1"
 				"additive"	"0"
+				"custom"	"1"
+			}
+		}
+		ZMHudVoiceMenuNormal
+		{
+			"1"
+			{
+				"name"		"Built Titling Rg"
+				"tall"		"18"
+				"weight"	"0"
+				"antialias" "1"
+				"additive"	"1"
+				"custom"	"1"
+			}
+		}
+		ZMHudVoiceMenuSelected
+		{
+			"1"
+			{
+				"name"		"Built Titling Rg"
+				"tall"		"24"
+				"weight"	"0"
+				"antialias" "1"
+				"additive"	"1"
 				"custom"	"1"
 			}
 		}

@@ -50,6 +50,8 @@ namespace NPCR
         virtual const NavLink_t* GetGoalLink() const { return m_pGoal; }
         virtual const NavLink_t* GetCurLink() const { return m_pCurLink; }
 
+        // The minimum distance to goal that we stop trying to avoid.
+        virtual float GetAvoidMinDistance() const { return 24.0f; }
 
 
         float   GetGoalTolerance() const { return m_flGoalTolerance; }
@@ -81,6 +83,10 @@ namespace NPCR
         int                 CheckAvoid( CBaseNPC* pNPC, Vector& vecGoalPos );
         int                 CheckStuck( CBaseNPC* pNPC, Vector& vecGoalPos );
 
+        void                StartCheckingStuck( CBaseNPC* pNPC );
+        void                StopCheckingStuck();
+
+
         virtual bool        ShouldFailNavJump( CBaseNPC* pNPC ) const;
 
         void ClearAvoidState()
@@ -108,5 +114,6 @@ namespace NPCR
         CountdownTimer m_StuckTimer;
         Vector m_vecStuckDelta;
         float m_flStuckAngle;
+        CountdownTimer m_StuckCheckTimer;
     };
 }

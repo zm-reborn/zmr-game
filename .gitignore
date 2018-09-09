@@ -81,7 +81,8 @@ mp/game/zmr/download/*
 mp/game/zmr/downloadlists/
 *.ain
 *.csv
-zmtips_used.txt
+mp/game/zmr/resource/zmtips_used.txt
+mp/game/zmr/resource/zmcrosshairs.txt
 # Tool (vbsp/vvis/vrad) compilation output
 *.dll
 *.exe

@@ -14,6 +14,9 @@
 CZMZombieManager g_ZombieManager;
 
 
+ConVar zm_sv_debug_zombieik( "zm_sv_debug_zombieik", "0", FCVAR_REPLICATED );
+
+
 ZombieClass_t CZMBaseZombie::NameToClass( const char* name )
 {
     if ( Q_strnicmp( name, "npc_zombie", 10 ) == 0 )

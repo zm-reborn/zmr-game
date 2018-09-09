@@ -1,0 +1,63 @@
+// The voice lines
+// index		- The index the client sends in the command. (see zmvoicemenu.txt)
+// chatmsg		- The chat message that gets printed.
+// snd			- The soundscript name.
+// delay		- The delay before the same player can play a voice line again.
+//
+"VoiceLines"
+{
+	"VoiceYes"
+	{
+		"index"		"0"
+		"chatmsg"		"#ZMVoiceMenuMsgYes"
+		"snd"		"ZMVoiceline.Yes"
+		"delay"		"2"
+	}
+	"VoiceNo"
+	{
+		"index"		"1"
+		"chatmsg"		"#ZMVoiceMenuMsgNo"
+		"snd"		"ZMVoiceline.No"
+		"delay"		"2"
+	}
+	"VoiceHelp"
+	{
+		"index"		"2"
+		"chatmsg"		"#ZMVoiceMenuMsgHelp"
+		"snd"		"ZMVoiceline.Help"
+		"delay"		"4"
+	}
+	"VoiceFollow"
+	{
+		"index"		"3"
+		"chatmsg"		"#ZMVoiceMenuMsgFollow"
+		"snd"		"ZMVoiceline.Follow"
+		"delay"		"4"
+	}
+	"VoiceTaunt"
+	{
+		"index"		"4"
+		"snd"		"ZMVoiceline.Taunt"
+		"delay"		"6"
+	}
+	"VoiceLaugh"
+	{
+		"index"		"5"
+		"snd"		"ZMVoiceline.Laugh"
+		"delay"		"6"
+	}
+	"VoiceGo"
+	{
+		"index"		"6"
+		"chatmsg"		"#ZMVoiceMenuMsgGo"
+		"snd"		"ZMVoiceline.Go"
+		"delay"		"6"
+	}
+	"VoiceAlert"
+	{
+		"index"		"7"
+		"chatmsg"		"#ZMVoiceMenuMsgAlert"
+		"snd"		"ZMVoiceline.Alert"
+		"delay"		"6"
+	}
+}

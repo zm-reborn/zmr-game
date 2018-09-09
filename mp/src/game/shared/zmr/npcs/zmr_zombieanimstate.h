@@ -22,143 +22,42 @@ enum ZMZombieAnimEvent_t
     ZOMBIEANIMEVENT_MAX
 };
 
+
+enum ZMAnimLayerSlot_t
+{
+    ANIMOVERLAY_SLOT_IDLE = 0,
+
+    ANIMOVERLAY_SLOT_MAX
+};
+
+
+// Acts as a wrapper between the actual animation layer and the anim state.
 class CZMAnimOverlay
 {
 public:
-    /*
-    CZMAnimOverlay()
-    {
-        m_iLayerIndex = -1;
-        m_bKillMe = false;
-    }
-    */
-    void Create( CZMBaseZombie* pOuter, int iSeq, int iPriority )
-    {
-        m_pOuter = pOuter;
+    CZMAnimOverlay();
 
-#ifdef GAME_DLL
-        m_iLayerIndex = pOuter->AddLayeredSequence( iSeq, iPriority );
-#else
-        int index = pOuter->m_AnimOverlay.AddToTail();
+    void Create( CZMBaseZombie* pOuter, int iSeq, ZMAnimLayerSlot_t index );
 
-        C_AnimationLayer* overlay = &pOuter->m_AnimOverlay[index];
+    void FastRemove();
 
-        overlay->m_nOrder = 0;
-        overlay->m_nSequence = iSeq;
-        overlay->m_flWeight = 1.0f;
-        overlay->m_bClientBlend = false;
-        overlay->m_flCycle = 0.0f;
-        overlay->m_flPrevCycle = 0.0f;
-        overlay->m_flPlaybackRate = 1.0f;
+    void Remove( float rate, float delay = 0.0f );
 
-        m_iLayerIndex = index;
-#endif
-        m_bKillMe = false;
-    }
+    float GetLayerCycle() const;
+    void SetLayerCycle( float cycle );
 
-    void FastRemove()
-    {
-        if ( !IsUsed() )
-            return;
+    int GetLayerSequence() const;
 
-#ifdef GAME_DLL
-        m_pOuter->FastRemoveLayer( m_iLayerIndex );
-#else
-        m_pOuter->m_AnimOverlay.Remove( m_iLayerIndex );
-#endif
-        m_iLayerIndex = -1;
-    }
+    float GetLayerWeight() const;
+    void SetLayerWeight( float flWeight );
 
-    void Remove( float rate, float delay = 0.0f )
-    {
-        if ( !IsUsed() )
-            return;
+    void SetLayerLooping( bool bLoop );
 
-#ifdef GAME_DLL
-        m_pOuter->RemoveLayer( m_iLayerIndex, rate, delay );
-#endif
-
-        m_bKillMe = true;
-
-#ifdef CLIENT_DLL
-        m_flKillRate = m_pOuter->m_AnimOverlay[m_iLayerIndex].m_flWeight / rate;
-        m_flKillDelay = delay;
-#endif
-    }
-
-    int GetUniqueId() const { return m_iId; }
-
-    void SetUniqueId( int id )
-    {
-        m_iId = id;
-    }
-
-    int GetLayerCycle() const
-    {
-#ifdef CLIENT_DLL
-        return m_pOuter->m_AnimOverlay[m_iLayerIndex].m_flCycle;
-#else
-        return m_pOuter->GetAnimOverlay( m_iLayerIndex )->m_flCycle;
-#endif
-    }
-
-    void SetLayerCycle( float cycle ) const
-    {
-#ifdef CLIENT_DLL
-        m_pOuter->m_AnimOverlay[m_iLayerIndex].m_flCycle = cycle;
-#else
-        m_pOuter->GetAnimOverlay( m_iLayerIndex )->m_flCycle = cycle;
-#endif
-    }
-
-    int GetLayerSequence() const
-    {
-#ifdef CLIENT_DLL
-        return m_pOuter->m_AnimOverlay[m_iLayerIndex].m_nSequence;
-#else
-        return m_pOuter->GetAnimOverlay( m_iLayerIndex )->m_nSequence;
-#endif
-    }
-
-    float GetLayerWeight() const
-    {
-#ifdef CLIENT_DLL
-        return m_pOuter->m_AnimOverlay[m_iLayerIndex].m_flWeight;
-#else
-        return m_pOuter->GetAnimOverlay( m_iLayerIndex )->m_flWeight;
-#endif
-    }
-
-    void SetLayerWeight( float flWeight )
-    {
-#ifdef CLIENT_DLL
-        m_pOuter->m_AnimOverlay[m_iLayerIndex].m_flWeight = flWeight;
-#else
-        m_pOuter->SetLayerWeight( m_iLayerIndex, flWeight );
-#endif
-    }
-
-    void SetLayerLooping( bool bLoop )
-    {
-#ifdef CLIENT_DLL
-#else
-        m_pOuter->SetLayerLooping( m_iLayerIndex, bLoop );
-#endif
-    }
-
-    bool IsDying() const { return m_bKillMe; }
-    
-    bool IsUsed() const
-    {
-        return m_iLayerIndex != -1;
-    }
+    bool IsDying() const;
+    bool IsUsed() const;
 
     int GetLayerIndex() const { return m_iLayerIndex; }
-
-    void SetLayerIndex( int index )
-    {
-        m_iLayerIndex = index;
-    }
+    void SetLayerIndex( int index ) { m_iLayerIndex = index; }
 
 #ifdef CLIENT_DLL
     float GetKillRate() const { return m_flKillRate; }
@@ -170,15 +69,15 @@ private:
 #ifdef CLIENT_DLL
     float m_flKillRate;
     float m_flKillDelay;
+    bool m_bKillMe;
 #endif
     CZMBaseZombie* m_pOuter;
     int m_iLayerIndex;
-    bool m_bKillMe;
-
-    int m_iId;
 };
 
-
+// Similar to CMultiPlayerAnimState, updates animation and animation layers.
+// Animations are no longer transmitted to client from the server. Instead, server sends animation events to client.
+// Also handles movement <-> idle transitions. This is done both on client & server parallel.
 class CZMZombieAnimState
 #ifndef CLIENT_DLL
     : public NPCR::CEventListener
@@ -216,12 +115,8 @@ public:
     bool DoAnimationEvent( ZMZombieAnimEvent_t iEvent, int nData );
 
     void UpdateLayers();
+    void UpdateOuterAnims();
 
-
-    int FindLayerById( int id ) const;
-
-
-    CUtlVector<CZMAnimOverlay> m_vOverlays;
 
 
     virtual void Update();
@@ -250,17 +145,17 @@ protected:
 
 
 
-    int     AddLayeredSequence( int iSeq, int priority );
-    void    RemoveLayer( int id, float rate = 0.2f, float delay = 0.0f );
-    void    FastRemoveLayer( int id );
-    float   GetLayerCycle( int id );
-    void    SetLayerCycle( int id, float cycle );
-    void    SetLayerLooping( int id, bool bLoop );
-    void    SetLayerWeight( int id, float flWeight );
+    void    AddLayeredSequence( int iSeq, ZMAnimLayerSlot_t index );
+    void    RemoveLayer( ZMAnimLayerSlot_t index, float rate = 0.2f, float delay = 0.0f );
+    void    FastRemoveLayer( ZMAnimLayerSlot_t index );
+    bool    HasLayeredSequence( ZMAnimLayerSlot_t index );
+    bool    IsLayerDying( ZMAnimLayerSlot_t index );
+    float   GetLayerCycle( ZMAnimLayerSlot_t index );
+    void    SetLayerCycle( ZMAnimLayerSlot_t index, float cycle );
+    void    SetLayerLooping( ZMAnimLayerSlot_t index, bool bLoop );
+    void    SetLayerWeight( ZMAnimLayerSlot_t index, float flWeight );
 
 private:
-    int m_iMoveLayer;
-
     bool m_bWasMoving;
     float m_flMoveWeight;
     float m_flMoveActSpeed;
@@ -273,10 +168,10 @@ private:
 
     bool m_bReady;
 
-    int m_iNextId;
 
-    CZMAnimOverlay m_Overlays[8];
-    
+    CZMAnimOverlay m_AnimOverlay[ANIMOVERLAY_SLOT_MAX];
+
+
 #ifdef CLIENT_DLL
     CZMBaseZombie* m_pOuter;
 #endif

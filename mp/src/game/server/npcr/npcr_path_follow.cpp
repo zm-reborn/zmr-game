@@ -6,6 +6,7 @@
 
 
 ConVar npcr_debug_path_avoid( "npcr_debug_path_avoid", "0" );
+ConVar npcr_debug_path_stuck( "npcr_debug_path_stuck", "0" );
 
 
 // 80 degrees
@@ -90,6 +91,7 @@ void NPCR::CFollowNavPath::Invalidate()
     m_nStuckTimes = 0;
     m_StuckTimer.Invalidate();
     m_flStuckAngle = STUCK_ANGLE_START;
+    m_StuckCheckTimer.Invalidate();
 
 
     m_JumpStatus = JUMP_BEGIN;
@@ -246,24 +248,34 @@ void NPCR::CFollowNavPath::GroundMove( CBaseNPC* pNPC )
     Vector vecGoal = m_pGoal->pos;
 
 
-    bool bIsDoingStuckMove = CheckStuck( pNPC, vecGoal ) != 0;
+    int iStuck = CheckStuck( pNPC, vecGoal );
+    bool bIsDoingStuckMove = iStuck != 0;
 
 
     int res = CheckAvoid( pNPC, vecGoal );
 
     if ( !bIsDoingStuckMove )
     {
-        if ( res == 1 )
+        // Periodically check if we're stuck even if we're not currently trying to avoid anything.
+        // It's possible that our avoid traces don't hit anything, but we're still stuck.
+        if ( !m_StuckCheckTimer.HasStarted() || m_StuckCheckTimer.IsElapsed() )
+        {
+            StartCheckingStuck( pNPC );
+
+            m_StuckCheckTimer.Start( 2.0f );
+        }
+        else if ( res == 1 )
         {
             // We started avoiding an obstacle, start checking our position whether we're going anywhere or not.
-            m_bStuckPosCheck = true;
-            m_vecStuckPos = pNPC->GetPosition();
+            StartCheckingStuck( pNPC );
         }
-        else if ( res == 0 )
+        else
         {
             // Nothing in our way.
-            m_bStuckPosCheck = false;
-            m_nStuckTimes = 0;
+            if ( m_bStuckPosCheck && m_nStuckTimes <= 0 )
+            {
+                StopCheckingStuck();
+            }
         }
     }
 
@@ -320,6 +332,9 @@ bool NPCR::CFollowNavPath::ShouldDecelerateToGoal() const
 
 int NPCR::CFollowNavPath::CheckAvoid( CBaseNPC* pNPC, Vector& vecGoalPos )
 {
+    VPROF_BUDGET( "CFollowNavPath::CheckAvoid", "NPCR" );
+
+
     Vector vecMyPos = pNPC->GetPosition();
 
     // We're currently doing the avoiding.
@@ -343,6 +358,11 @@ int NPCR::CFollowNavPath::CheckAvoid( CBaseNPC* pNPC, Vector& vecGoalPos )
     fwd.z = 0.0f;
     float distToGoal = fwd.NormalizeInPlace();
 
+    // No point avoiding within this distance.
+    if ( distToGoal <= GetAvoidMinDistance() )
+        return -1;
+
+
     Vector right( fwd.y, -fwd.x, 0.0f );
 
 
@@ -356,7 +376,7 @@ int NPCR::CFollowNavPath::CheckAvoid( CBaseNPC* pNPC, Vector& vecGoalPos )
     Vector scanMaxs = Vector( hullWidth, hullWidth, pNPC->GetMotor()->GetHullHeight() );
 
     float tolerance = GetGoalTolerance() + realWidth;
-    float length = 40.0f;
+    float length = 30.0f;
 
     if ( (distToGoal - tolerance) < 0.0f )
     {
@@ -438,6 +458,13 @@ int NPCR::CFollowNavPath::CheckAvoid( CBaseNPC* pNPC, Vector& vecGoalPos )
     float minSlope = pNPC->GetMotor()->GetSlopeLimit();
     if ((rightClear || rightNormal.z > minSlope)
     &&  (leftClear || leftNormal.z > minSlope))
+    {
+        return 0;
+    }
+
+    // We hit something that is further than our goal. We'll be fine.
+    if ((rightClear || distToGoal < (length*rightFrac))
+    &&  (leftClear || distToGoal < (length*leftFrac)))
     {
         return 0;
     }
@@ -564,6 +591,12 @@ int NPCR::CFollowNavPath::CheckStuck( CBaseNPC* pNPC, Vector& vecGoalPos )
         {
             // We've been stuck for a while.
 
+
+            if ( npcr_debug_path_stuck.GetBool() )
+            {
+                DevMsg( "We're stuck! Starting to do stuck move.\n" );
+            }
+
             // Go back a bit
             const Vector vecMyPos = pNPC->GetPosition();
             Vector vecBack = vecMyPos - vecGoalPos;
@@ -594,3 +627,26 @@ int NPCR::CFollowNavPath::CheckStuck( CBaseNPC* pNPC, Vector& vecGoalPos )
 
     return 0;
 }
+
+void NPCR::CFollowNavPath::StartCheckingStuck( NPCR::CBaseNPC* pNPC )
+{
+    if ( !m_bStuckPosCheck && npcr_debug_path_stuck.GetBool() )
+    {
+        DevMsg( "Started checking for stuck\n" );
+    }
+
+    m_bStuckPosCheck = true;
+    m_vecStuckPos = pNPC->GetPosition();
+}
+
+void NPCR::CFollowNavPath::StopCheckingStuck()
+{
+    if ( m_bStuckPosCheck && npcr_debug_path_stuck.GetBool() )
+    {
+        DevMsg( "Stopped checking for stuck\n" );
+    }
+
+    m_bStuckPosCheck = false;
+    m_nStuckTimes = 0;
+}
+

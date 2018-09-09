@@ -76,7 +76,7 @@ public:
     void InputUnhide( inputdata_t &inputdata );
 
 
-    bool IsActive() { return m_bActive; };
+    bool IsActive() const { return m_bActive; }
 
 private:
     bool m_bActive;
@@ -112,24 +112,26 @@ public:
 
     void SpawnThink();
 
-    bool QueueUnit( CZMPlayer*, ZombieClass_t, int );
-    void QueueClear( int = -1, int = -1 );
-    bool CanSpawn( ZombieClass_t );
+
+    CZMBaseZombie* CreateZombie( ZombieClass_t zclass );
+
+    bool QueueUnit( CZMPlayer* pPlayer, ZombieClass_t zclass, int amount );
+    void QueueClear( int inamount = -1, int inpos = -1 );
+    bool CanSpawn( ZombieClass_t zclass );
 
     void SendMenuUpdate();
 
-    void SetRallyPoint( const Vector& );
+    void SetRallyPoint( const Vector& pos );
 
 
-    inline int GetZombieFlags() { return m_fZombieFlags; };
+    inline int GetZombieFlags() const { return m_fZombieFlags; }
     const char* GetZombieModelGroup() const { return STRING( m_sZombieModelGroup ); }
 
 private:
     void StartSpawning();
     void StopSpawning();
 
-    bool CreateZombie( ZombieClass_t );
-    bool FindSpawnPoint( CZMBaseZombie*, Vector&, QAngle& );
+    bool FindSpawnPoint( CZMBaseZombie* pZombie, Vector& output, QAngle& outang );
 
     void SetNextSpawnThink();
 
@@ -260,15 +262,15 @@ public:
 
     void CreateTrigger( const Vector& pos );
     void RemoveTriggers();
-    void RemoveTrigger( CZMEntManipulateTrigger* );
-    inline int GetTriggerCount() { return m_vTriggers.Count(); };
+    void RemoveTrigger( CZMEntManipulateTrigger* pTrigger );
+    inline int GetTriggerCount() const { return m_vTriggers.Count(); }
 
     COutputEvent m_OnPressed;
 
 
-    inline const char* GetDescription() { return m_sDescription.Get().ToCStr(); };
-    inline int GetTrapCost() { return m_nTrapCost; };
-    inline int GetCost() { return m_nCost; };
+    inline const char* GetDescription() const { return m_sDescription.Get().ToCStr(); }
+    inline int GetTrapCost() const { return m_nTrapCost; }
+    inline int GetCost() const { return m_nCost; }
 
 private:
     CNetworkVar( string_t, m_sDescription );
@@ -341,7 +343,7 @@ public:
     inline LoadOutMethod_t GetMethod();
 
 private:
-    void GiveWeapon( CZMPlayer*, int );
+    void GiveWeapon( CZMPlayer* pPlayer, int loadout_wep );
 
 
     LoadOutMethod_t m_iMethod;
@@ -368,7 +370,7 @@ public:
     void Spawn() OVERRIDE;
 
 
-    inline bool IsActive() { return m_bActive; };
+    inline bool IsActive() const { return m_bActive; }
 
 
     void InputToggle( inputdata_t &inputdata );
@@ -395,7 +397,7 @@ public:
     void Spawn() OVERRIDE;
 
 
-    inline bool IsActive() { return m_bActive; };
+    inline bool IsActive() const { return m_bActive; }
 
 
     void InputToggle( inputdata_t &inputdata );
@@ -422,11 +424,11 @@ public:
     void Spawn() OVERRIDE;
     void Precache() OVERRIDE;
     
-    void DelayedExplode( float );
+    void DelayedExplode( float delay );
 
 private:
     void DelayThink();
-    void CreateEffects( float );
+    void CreateEffects( float delay );
 
     EHANDLE m_hSpark;
 };
@@ -448,8 +450,8 @@ public:
     void InputDisable( inputdata_t& inputData );
     void InputToggle( inputdata_t& inputData );
 
-    inline bool IsEnabled() { return m_bIsEnabled; };
-    inline void SetEnabled( bool b ) { m_bIsEnabled = b; };
+    inline bool IsEnabled() const { return m_bIsEnabled; }
+    inline void SetEnabled( bool b ) { m_bIsEnabled = b; }
 
 private:
     bool m_bIsEnabled;

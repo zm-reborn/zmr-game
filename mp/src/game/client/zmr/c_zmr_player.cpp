@@ -11,12 +11,14 @@
 #include "flashlighteffect.h"
 
 
-#include "zmr/ui/zmr_viewport.h"
+#include "zmr/c_zmr_util.h"
+#include "zmr/ui/zmr_zmview_base.h"
 
 #include "npcs/c_zmr_zombiebase.h"
 #include "zmr/zmr_global_shared.h"
 #include "zmr/zmr_viewmodel.h"
 #include "c_zmr_entities.h"
+#include "zmr/zmr_softcollisions.h"
 #include "c_zmr_player_ragdoll.h"
 
 #include "c_zmr_player.h"
@@ -215,6 +217,17 @@ void C_ZMPlayer::PreThink()
     //        StopSprinting();
     //    }
     //}
+}
+
+void C_ZMPlayer::PostThink()
+{
+    if ( IsLocalPlayer() )
+    {
+        // Perform soft collisions here, so we can get at least some prediction going on.
+        GetZMSoftCollisions()->Update( 0.0f );
+    }
+
+    BaseClass::PostThink();
 }
 
 void C_ZMPlayer::UpdateClientSideAnimation()
@@ -834,7 +847,10 @@ void C_ZMPlayer::DeathCam_Firstperson( C_ZMPlayer* pPlayer, Vector& eyeOrigin, Q
     C_ZMRagdoll* pRagdoll = pPlayer->GetRagdoll();
 
     if ( !pRagdoll || pPlayer->GetEyeAttachment() == -1 )
+    {
         DeathCam_Thirdperson( pPlayer, eyeOrigin, eyeAngles, zNear, zFar, fov );
+        return;
+    }
 
 
     pRagdoll->GetAttachment( pPlayer->GetEyeAttachment(), eyeOrigin, eyeAngles );

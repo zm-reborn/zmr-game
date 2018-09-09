@@ -34,6 +34,8 @@ public:
     virtual int     DrawModel( int flags ) OVERRIDE;
     int             DrawModelAndEffects( int flags );
 
+    virtual void CalculateIKLocks( float currentTime ) OVERRIDE;
+
 
     virtual void OnDataChanged( DataUpdateType_t type ) OVERRIDE;
     virtual void UpdateClientSideAnimation() OVERRIDE;
@@ -52,6 +54,7 @@ public:
     virtual void FootstepSound( bool bRightFoot = false ) {}
     virtual void FootscuffSound( bool bRightFoot = false ) {}
     virtual void AttackSound() {}
+    void PlayFootstepSound( const char* soundname );
     
     //virtual void TraceAttack( const CTakeDamageInfo&, const Vector&, trace_t*,CDmgAccumulator* ) OVERRIDE;
     
@@ -77,6 +80,11 @@ protected:
     int m_iAdditionalAnimRandomSeed;
 public:
 
+	static void RecvProxy_CycleLatch( const CRecvProxyData *pData, void *pStruct, void *pOut );
+
+	virtual float   GetServerIntendedCycle() OVERRIDE;
+	virtual void    SetServerIntendedCycle( float cycle ) OVERRIDE;
+
 
     inline int  GetGroup() const { return m_iGroup; };
     inline void SetGroup( int group ) { m_iGroup = group; };
@@ -101,6 +109,8 @@ private:
     CNetworkVar( float, m_flHealthRatio );
     CNetworkVar( bool, m_bIsOnGround );
     CNetworkVar( int, m_iAnimationRandomSeed );
+    int m_cycleLatch; // The animation cycle goes out of sync very easily. Mostly from the player entering/exiting PVS. Server will frequently update us with a new one.
+    float m_flServerCycle;
 
     int m_iGroup;
     ZombieClass_t m_iZombieClass;

@@ -13,7 +13,11 @@ class BansheeLeapSched : public NPCR::CSchedule<CZMBaseZombie>
 {
 private:
     bool m_bInLeap;
-    Activity m_iLandAct;
+    //
+    // Don't do a wonky landing animation anymore.
+    //
+    //Activity m_iLandAct;
+    bool m_bLanded;
     CountdownTimer m_FinishTimer;
     CountdownTimer m_ExpireTimer;
     bool m_bDidLeapAttack;
@@ -27,7 +31,8 @@ public:
         CZMBanshee* pOuter = GetOuter();
 
         m_bInLeap = false;
-        m_iLandAct = ACT_INVALID;
+        //m_iLandAct = ACT_INVALID;
+        m_bLanded = false;
         m_FinishTimer.Invalidate();
         m_ExpireTimer.Start( 5.0f );
         m_bDidLeapAttack = false;
@@ -66,7 +71,8 @@ public:
         else
         {
             // When landing, keep facing the enemy.
-            if ( m_iLandAct != ACT_INVALID )
+            //if ( m_iLandAct != ACT_INVALID )
+            if ( !m_bLanded )
             {
                 CBaseEntity* pEnemy = GetOuter()->GetEnemy();
 
@@ -101,8 +107,10 @@ public:
     {
         CZMBanshee* pOuter = GetOuter();
 
-        if ( pOuter->GetActivity() != m_iLandAct )
+        //if ( pOuter->GetActivity() != m_iLandAct )
+        if ( !m_bLanded )
         {
+            /*
             m_iLandAct = ACT_FASTZOMBIE_LAND_RIGHT;
 
             // See which way we're gonna land.
@@ -116,6 +124,10 @@ public:
             }
 
             pOuter->DoAnimationEvent( ZOMBIEANIMEVENT_BANSHEEANIM, m_iLandAct );
+            */
+            pOuter->DoAnimationEvent( ZOMBIEANIMEVENT_IDLE );
+
+            m_bLanded = true;
         }
 
         m_FinishTimer.Start( 0.35f );
@@ -155,8 +167,8 @@ public:
         if ( newActivity == ACT_FASTZOMBIE_LEAP_STRIKE )
             return;
 
-        if ( newActivity == m_iLandAct )
-            return;
+        //if ( newActivity == m_iLandAct )
+        //    return;
 
         if ( newActivity == ACT_FASTZOMBIE_FRENZY )
             return;
@@ -178,6 +190,13 @@ public:
 
             return;
         }
+    }
+
+    virtual void OnEnd() OVERRIDE
+    {
+        // This activity loops, so we'll have to manually stop it.
+        if ( GetOuter()->GetActivity() == ACT_FASTZOMBIE_LEAP_STRIKE )
+            GetOuter()->DoAnimationEvent( ZOMBIEANIMEVENT_IDLE );
     }
 
     virtual void OnCommanded( ZombieCommandType_t com ) OVERRIDE
