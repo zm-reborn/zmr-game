@@ -61,6 +61,8 @@ public:
     ZombieClass_t           GetZombieClass() const;
     int                     GetPopCost() const;
     int                     GetCost() const;
+    bool                    IsPlayerControlled() const;
+    int                     GetControllerIndex() const;
 protected:
     void                    SetZombieClass( ZombieClass_t zclass );
 public:
@@ -87,6 +89,7 @@ protected:
 private:
     CNetworkVar( int, m_iSelectorIndex );
     CNetworkVar( float, m_flHealthRatio );
+    CNetworkVar( int, m_iPlayerControllerIndex );
 
     int m_iGroup;
     ZombieClass_t m_iZombieClass;

@@ -150,3 +150,13 @@ int CZMBaseZombie::GetCost() const
 {
     return GetCost( GetZombieClass() );
 }
+
+bool CZMBaseZombie::IsPlayerControlled() const
+{
+    return m_iPlayerControllerIndex != 0;
+}
+
+int CZMBaseZombie::GetControllerIndex() const
+{
+    return m_iPlayerControllerIndex;
+}

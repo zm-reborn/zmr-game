@@ -186,6 +186,7 @@ public:
 
     float m_flNextResourceInc;
 
+    float m_flNextScufflerTime;
 
     void SetBuildSpawn( CZMEntZombieSpawn* pSpawn )
     {
@@ -230,6 +231,7 @@ public:
     void                DoAnimationEvent( PlayerAnimEvent_t playerAnim, int nData = 0 );
     float               GetAccuracyRatio() const;
     void                UpdateAccuracyRatio();
+    bool                IsControllingZombie() const;
 
     KeyValues*          LoadPlayerModels();
 

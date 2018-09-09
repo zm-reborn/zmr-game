@@ -69,13 +69,20 @@ void ClientModeZMNormal::PostRender()
 
 int ClientModeZMNormal::KeyInput( int down, ButtonCode_t keynum, const char* pszCurrentBinding )
 {
+    C_ZMPlayer* pPlayer = C_ZMPlayer::GetLocalPlayer();
+
+    if ( pPlayer && pPlayer->IsControllingZombie() )
+    {
+        return 1;
+    }
+
     int ret = BaseClass::KeyInput( down, keynum, pszCurrentBinding );
 
     if ( !ret )
         return 0;
 
 
-    C_ZMPlayer* pPlayer = C_ZMPlayer::GetLocalPlayer();
+    
 
     // Mousewheel move
     // We have to put this here or otherwise we can't move while in free-cam.

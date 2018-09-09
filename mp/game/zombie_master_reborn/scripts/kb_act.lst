@@ -15,6 +15,7 @@
 "dropammo"				"Drop Ammo"
 "zm_showmaptext"		"Show Map Info/Objectives"
 "zm_observezombie"		"Observe Zombie/Random Spectator Target"
+"zm_zombie_scuffler"		"Spawn As Shambler From Closest Spawn"
 "blank"			"=========================="
 "blank"			"Zombie Master"
 "blank"			"=========================="

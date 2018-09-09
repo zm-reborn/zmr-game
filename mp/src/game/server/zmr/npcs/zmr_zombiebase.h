@@ -88,6 +88,7 @@ public:
 
     virtual void HandleAnimEvent( animevent_t* pEvent ) OVERRIDE;
 
+    void        SetPlayerControlled( CBasePlayer* pPlayer );
 
     // Sounds
     virtual bool ShouldPlayFootstepSound() const;
@@ -117,6 +118,8 @@ public:
     ZombieClass_t           GetZombieClass() const;
     int                     GetPopCost() const;
     int                     GetCost() const;
+    bool                    IsPlayerControlled() const;
+    int                     GetControllerIndex() const;
 protected:
     void                    SetZombieClass( ZombieClass_t zclass );
 public:
@@ -212,11 +215,16 @@ public:
 protected:
     CZMZombieAnimState* GetAnimState() const { return m_pAnimState; }
 
+    virtual void HandlePlayerCommands();
+    virtual void HandlePlayerMovement();
+    virtual void HandlePlayerAttack();
 
 private:
     float m_flNextAttack;
 
     float m_flLastCommanded;
+
+    bool m_bFreePopulation;
 
 
     CZMBlockerScanner* m_pBlockerScanner;
@@ -231,6 +239,7 @@ private:
 
     CNetworkVar( int, m_iSelectorIndex );
     CNetworkVar( float, m_flHealthRatio ); // For humans we can use health/maxhealth
+    CNetworkVar( int, m_iPlayerControllerIndex );
 
 
 
@@ -241,6 +250,7 @@ private:
     CZMCommandQueue m_CmdQueue;
 
 
+    CBasePlayer* m_pPlayerController;
 
     float m_flNextMove;
 
