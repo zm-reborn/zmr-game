@@ -255,6 +255,9 @@ public:
 
     int             GetZMCommandInterruptFlags() const;
 
+    float           GetInterpNPCTime() const { return m_flInterpNPCTime; }
+    void            UpdatePlayerInterpNPC();
+
 private:
     // Since I didn't get this at first either, this is only sent to THIS player.
     CNetworkVarEmbedded( CZMPlayerLocalData, m_ZMLocal );
@@ -284,6 +287,9 @@ private:
 
     // Store all the ammo indices denied for this frame.
     CUtlVector<int> m_vAmmoDenied;
+
+    // The cl_interp_npcs value
+    float m_flInterpNPCTime;
 };
 
 inline CZMPlayer* ToZMPlayer( CBaseEntity* pEntity )
