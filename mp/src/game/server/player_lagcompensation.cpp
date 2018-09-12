@@ -497,6 +497,9 @@ void CLagCompensationManager::StartLagCompensation( CBasePlayer *player, CUserCm
 	Q_memset( m_ChangeData, 0, sizeof( m_ChangeData ) );
 
 	m_isCurrentlyDoingCompensation = true;
+#ifdef ZMR
+    CZMPlayer* pZMPlayer = ToZMPlayer( player );
+#endif
 
 	// Get true latency
 
@@ -512,7 +515,12 @@ void CLagCompensationManager::StartLagCompensation( CBasePlayer *player, CUserCm
 	}
 
 	// calc number of view interpolation ticks - 1
+#ifdef ZMR // ZMRCHANGE: We don't compensate players anymore, so use the npc interp if possible
+    float NPCInterpTime = pZMPlayer->GetInterpNPCTime();
+    int lerpTicks = TIME_TO_TICKS( NPCInterpTime > player->m_fLerpTime ? NPCInterpTime : player->m_fLerpTime );
+#else
 	int lerpTicks = TIME_TO_TICKS( player->m_fLerpTime );
+#endif
 
 	// add view interpolation latency see C_BaseEntity::GetInterpolationAmount()
 	correct += TICKS_TO_TIME( lerpTicks );
@@ -535,7 +543,8 @@ void CLagCompensationManager::StartLagCompensation( CBasePlayer *player, CUserCm
 	
 	// Iterate all active players
 	const CBitVec<MAX_EDICTS> *pEntityTransmitBits = engine->GetEntityTransmitBitsForClient( player->entindex() - 1 );
-	for ( int i = 1; i <= gpGlobals->maxClients; i++ )
+#ifndef ZMR
+    for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 	{
 		CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
 
@@ -557,10 +566,9 @@ void CLagCompensationManager::StartLagCompensation( CBasePlayer *player, CUserCm
 		// Move other player back in time
 		BacktrackPlayer( pPlayer, TICKS_TO_TIME( targettick ) );
 	}
+#endif
 
 #ifdef ZMR
-    CZMPlayer* pZMPlayer = ToZMPlayer( player );
-
     // also iterate all monsters
     for ( int i = 0; i < nZombies; i++ )
     {
@@ -1254,6 +1262,7 @@ void CLagCompensationManager::FinishLagCompensation( CBasePlayer *player )
 	}
 
 	// Iterate all active players
+#ifndef ZMR
 	for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 	{
 		int pl_index = i - 1;
@@ -1345,6 +1354,7 @@ void CLagCompensationManager::FinishLagCompensation( CBasePlayer *player )
 			pPlayer->SetSimulationTime( restore->m_flSimulationTime );
 		}
 	}
+#endif
 
 
 #ifdef ZMR

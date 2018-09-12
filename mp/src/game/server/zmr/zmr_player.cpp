@@ -120,6 +120,7 @@ CZMPlayer::CZMPlayer()
     m_bEnterObserver = false;
     m_flNextModelChangeTime = 0.0f;
     m_flNextVoiceLineTime = 0.0f;
+    m_flInterpNPCTime = 0.0f;
 
     BaseClass::ChangeTeam( 0 );
 
@@ -906,6 +907,14 @@ void CZMPlayer::UpdatePlayerFOV()
     {
         SetDefaultFOV( newFov );
     }
+}
+
+void CZMPlayer::UpdatePlayerInterpNPC()
+{
+    const char* szValue = engine->GetClientConVarValue( entindex(), "cl_interp_npcs" );
+    float value = szValue ? atof( szValue ) : 0.0f;
+
+    m_flInterpNPCTime = clamp( value, 0.0f, 0.5f );
 }
 
 void CZMPlayer::InitialSpawn()
