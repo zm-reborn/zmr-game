@@ -6,10 +6,10 @@
 
 NPCR::NPCManager NPCR::g_NPCManager;
 
-
 ConVar npcr_updaterate( "npcr_updaterate", "15", FCVAR_NOTIFY | FCVAR_ARCHIVE, "How many times a second we should update our NPCs", true, 1.0f, false, 0.0f );
 ConVar npcr_framelimit( "npcr_framelimit", "15", FCVAR_NOTIFY | FCVAR_ARCHIVE, "", true, 1.0f, false, 0.0f );
 ConVar npcr_debug_noupdates( "npcr_debug_noupdates", "0" );
+ConVar npcr_alwaysupdate( "npcr_alwaysupdate", "0" );
 ConVar npcr_debug_manager( "npcr_debug_manager", "0" );
 
 
@@ -52,7 +52,7 @@ void NPCR::NPCManager::OnGameFrame()
     FOR_EACH_VEC( m_vNPCs, i )
     {
         if ( (iCurTick - m_vNPCs[i]->m_iLastUpdateTick) < iDeltaTick )
-            break;
+            continue;
 
         m_vNPCs[i]->m_bFlaggedForUpdate = true;
     }
@@ -70,6 +70,9 @@ void NPCR::NPCManager::FinishUpdate()
 
 bool NPCR::NPCManager::ShouldUpdate( const NPCR::CBaseNPC* pNPC ) const
 {
+    if ( npcr_alwaysupdate.GetBool() )
+        return true;
+
     if ( !pNPC->m_bFlaggedForUpdate )
         return false;
 
