@@ -21,8 +21,6 @@ extern bool g_bRenderPostProcess;
 static ConVar zm_cl_zombiefadein( "zm_cl_zombiefadein", "0.55", FCVAR_ARCHIVE, "How fast zombie fades.", true, 0.0f, true, 2.0f );
 
 
-#define CYCLELATCH_TOLERANCE            0.15f
-
 #undef CZMBaseZombie
 IMPLEMENT_CLIENTCLASS_DT( C_ZMBaseZombie, DT_ZM_BaseZombie, CZMBaseZombie )
     // See server -> zmr_zombiebase.cpp
@@ -35,7 +33,6 @@ IMPLEMENT_CLIENTCLASS_DT( C_ZMBaseZombie, DT_ZM_BaseZombie, CZMBaseZombie )
     RecvPropBool( RECVINFO( m_bIsOnGround ) ),
     RecvPropInt( RECVINFO( m_iAnimationRandomSeed ) ),
     RecvPropInt( RECVINFO( m_lifeState ) ),
-    RecvPropInt( RECVINFO( m_cycleLatch ), 0, &C_ZMBaseZombie::RecvProxy_CycleLatch ),
 END_RECV_TABLE()
 
 BEGIN_PREDICTION_DATA( C_ZMBaseZombie )
@@ -91,8 +88,6 @@ C_ZMBaseZombie::C_ZMBaseZombie()
     m_pHat = nullptr;
 
     m_iAdditionalAnimRandomSeed = 0;
-
-    m_flServerCycle = -1.0f;
     
 
     // Always create FX.
@@ -567,29 +562,6 @@ void C_ZMBaseZombie::HandleAnimEvent( animevent_t* pEvent )
 {
     BaseClass::TraceAttack( info, vecDir, ptr, pAccumulator );
 }*/
-
-
-void C_ZMBaseZombie::RecvProxy_CycleLatch( const CRecvProxyData *pData, void *pStruct, void *pOut )
-{
-	C_ZMBaseZombie* pZombie = static_cast<C_ZMBaseZombie*>( pStruct );
-	float flServerCycle = (float)pData->m_Value.m_Int / 16.0f;
-	float flCurCycle = pZombie->GetCycle();
-	// The cycle is way out of sync.
-	if ( fabs( flCurCycle - flServerCycle ) > CYCLELATCH_TOLERANCE )
-	{
-		pZombie->SetServerIntendedCycle( flServerCycle );
-	}
-}
-
-float C_ZMBaseZombie::GetServerIntendedCycle()
-{
-    return m_flServerCycle;
-}
-
-void C_ZMBaseZombie::SetServerIntendedCycle( float cycle )
-{
-    m_flServerCycle = cycle;
-}
 
 extern ConVar zm_sv_happyzombies;
 ConVar zm_cl_happyzombies_disable( "zm_cl_happyzombies_disable", "0", 0, "No fun :(" );
