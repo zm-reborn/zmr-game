@@ -1,0 +1,6 @@
+whitelist
+{
+	// Don't edit this portion, clientside hit detection rely on these models being the same on the server and client.
+	models\zombie\...				allow_from_disk+check_crc
+	models\humans\zm_draggy.*		allow_from_disk+check_crc
+}

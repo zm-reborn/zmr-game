@@ -2,6 +2,7 @@
 #include "bone_setup.h"
 #include "eventlist.h"
 #include "vprof.h"
+#include "takedamageinfo.h"
 #include <engine/ivdebugoverlay.h>
 
 #include "clienteffectprecachesystem.h"
@@ -13,6 +14,7 @@
 #include "zmr/c_zmr_zmvision.h"
 #include "zmr/npcs/zmr_zombieanimstate.h"
 #include "zmr/npcs/zmr_zombiebase_shared.h"
+#include "zmr/zmr_usercmd.h"
 
 
 extern bool g_bRenderPostProcess;
@@ -558,10 +560,20 @@ void C_ZMBaseZombie::HandleAnimEvent( animevent_t* pEvent )
     BaseClass::HandleAnimEvent( pEvent );
 }
 
-/*void C_ZMBaseZombie::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr, CDmgAccumulator *pAccumulator )
+void C_ZMBaseZombie::TraceAttack( const CTakeDamageInfo& info, const Vector& vecDir, trace_t* ptr, CDmgAccumulator* pAccumulator )
 {
     BaseClass::TraceAttack( info, vecDir, ptr, pAccumulator );
-}*/
+
+    if ( m_takedamage == DAMAGE_YES )
+    {
+        ZMUserCmdHitData_t hit;
+        hit.entindex = entindex();
+        hit.nHits = 1;
+        hit.hitgroups[0] = ptr->hitgroup;
+
+        g_ZMUserCmdSystem.AddDamage( hit );
+    }
+}
 
 extern ConVar zm_sv_happyzombies;
 ConVar zm_cl_happyzombies_disable( "zm_cl_happyzombies_disable", "0", 0, "No fun :(" );

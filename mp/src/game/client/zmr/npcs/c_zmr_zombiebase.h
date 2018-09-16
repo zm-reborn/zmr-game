@@ -56,7 +56,8 @@ public:
     virtual void AttackSound() {}
     void PlayFootstepSound( const char* soundname );
     
-    //virtual void TraceAttack( const CTakeDamageInfo&, const Vector&, trace_t*,CDmgAccumulator* ) OVERRIDE;
+    virtual void TraceAttack( const CTakeDamageInfo& info, const Vector& vecDir, trace_t* ptr, CDmgAccumulator* pAccumulator ) OVERRIDE;
+    
     
     // Implemented in zmr_zombiebase_shared
     static bool             IsValidClass( ZombieClass_t zclass );

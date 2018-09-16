@@ -141,6 +141,9 @@ void CZMBaseWeapon::FireBullets( const FireBulletsInfo_t &info )
 	modinfo.m_iPlayerDamage = (int)modinfo.m_flDamage;
     
     
+#ifndef CLIENT_DLL
+    GetPlayerOwner()->CopyWeaponDamage( this, modinfo );
+#endif
 
     GetOwner()->FireBullets( modinfo );
 }
@@ -1008,6 +1011,24 @@ void CZMBaseWeapon::TransferReserveAmmo( CBaseCombatCharacter* pOwner )
         pOwner->SetAmmoCount( pOwner->GetAmmoCount( type ) + GetReserveAmmo(), type );
         SetReserveAmmo( 0 );
     }
+}
+
+bool CZMBaseWeapon::IsUserCmdHitsValid( ZMUserCmdValidData_t& data )
+{
+    if ( !data.pVictim->IsBaseZombie() )
+        return OnUserCmdError( "Hit entity is not a zombie!!" );
+
+    return CZMUserCmdHitWepValidator::IsUserCmdHitsValid( data );
+}
+
+float CZMBaseWeapon::GetMaxDamageDist( ZMUserCmdValidData_t& data ) const
+{
+    return m_fMaxRange1;
+}
+
+int CZMBaseWeapon::GetMaxUserCmdBullets( ZMUserCmdValidData_t& data ) const
+{
+    return GetBulletsPerShot();
 }
 #endif
 
