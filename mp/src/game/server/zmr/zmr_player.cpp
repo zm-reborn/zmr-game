@@ -121,6 +121,8 @@ CZMPlayer::CZMPlayer()
     m_flNextModelChangeTime = 0.0f;
     m_flNextVoiceLineTime = 0.0f;
     m_flInterpNPCTime = 0.0f;
+    m_serverWepData.Reset();
+
 
     BaseClass::ChangeTeam( 0 );
 
@@ -349,6 +351,9 @@ void CZMPlayer::PreThink( void )
 
 void CZMPlayer::PostThink()
 {
+    HandleDamagesFromUserCmd();
+
+
     BaseClass::PostThink();
     
     if ( GetFlags() & FL_DUCKING )
@@ -363,6 +368,33 @@ void CZMPlayer::PostThink()
 
     m_angEyeAngles = EyeAngles();
     m_pPlayerAnimState->Update( m_angEyeAngles[YAW], m_angEyeAngles[PITCH] );
+}
+
+void CZMPlayer::CopyWeaponDamage( CZMBaseWeapon* pWeapon, const FireBulletsInfo_t& info )
+{
+    const CUserCmd* pCmd = GetCurrentCommand();
+    Assert( pCmd != nullptr );
+    if ( !pCmd )
+        return;
+
+    m_serverWepData.iAmmoType = info.m_iAmmoType;
+    m_serverWepData.flDamage = info.m_iPlayerDamage;
+    m_serverWepData.iLastFireCommandNumber = pCmd->command_number;
+    m_serverWepData.hWeapon.Set( pWeapon );
+}
+
+void CZMPlayer::HandleDamagesFromUserCmd()
+{
+    const CUserCmd* pCmd = GetCurrentUserCommand();
+
+    if ( !pCmd || !pCmd->zmHitData.Count() )
+        return;
+
+
+    g_ZMUserCmdSystem.ApplyDamage( this, m_serverWepData, pCmd->zmHitData );
+
+
+    m_serverWepData.Reset();
 }
 
 void CZMPlayer::PlayerDeathThink()
@@ -1065,11 +1097,11 @@ void CZMPlayer::FireBullets( const FireBulletsInfo_t& info )
     if ( !m_bIsFireBulletsRecursive )
     {
         // Move ents back to history positions based on local player's lag
-        lagcompensation->StartLagCompensation( this, this->GetCurrentCommand() );
+        //lagcompensation->StartLagCompensation( this, this->GetCurrentCommand() );
 
 
         NoteWeaponFired();
-
+        
 
         m_bIsFireBulletsRecursive = true;
         CBaseEntity::FireBullets( info );
@@ -1077,7 +1109,7 @@ void CZMPlayer::FireBullets( const FireBulletsInfo_t& info )
 
 
         // Move ents back to their original positions.
-        lagcompensation->FinishLagCompensation( this );
+        //lagcompensation->FinishLagCompensation( this );
     }
     else
     {

@@ -9,6 +9,7 @@
 #include "zmr/c_zmr_crosshair.h"
 #endif
 #include "zmr/zmr_weapon_parse.h"
+#include "zmr_usercmdvalid.h"
 
 #include "zmr/zmr_player_shared.h"
 
@@ -27,7 +28,7 @@
 // 1 is constrained.
 #define SF_ZMWEAPON_TEMPLATE        ( 1 << 1 )
 
-class CZMBaseWeapon : public CBaseCombatWeapon
+class CZMBaseWeapon : public CBaseCombatWeapon, public CZMUserCmdHitWepValidator
 {
 public:
 	DECLARE_CLASS( CZMBaseWeapon, CBaseCombatWeapon );
@@ -157,6 +158,15 @@ protected:
     void TransferReserveAmmo( CBaseCombatCharacter* );
     // No support for secondary ammo since we'll never use it anyway, RIGHT?
     int m_nReserveAmmo;
+
+
+
+    // Client side hit reg stuff
+public:
+    virtual bool IsUserCmdHitsValid( ZMUserCmdValidData_t& data ) OVERRIDE;
+protected:
+    virtual float GetMaxDamageDist( ZMUserCmdValidData_t& data ) const OVERRIDE;
+    virtual int GetMaxUserCmdBullets( ZMUserCmdValidData_t& data ) const OVERRIDE;
 
 
     inline int GetOverrideDamage() const { return m_nOverrideDamage; }

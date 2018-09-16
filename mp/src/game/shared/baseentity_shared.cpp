@@ -1708,11 +1708,18 @@ void CBaseEntity::FireBullets( const FireBulletsInfo_t &info )
                 if ( pEntity->GetOwnerEntity() == m_pShooter )
                     return false;
 
-                if (m_pShooter->IsPlayer()
-                &&  pEntity->IsPlayer()
-                &&  pEntity->GetTeamNumber() == m_pShooter->GetTeamNumber()
-                &&  zm_sv_bulletspassplayers.GetBool())
-                    return false;
+                if ( m_pShooter->IsPlayer() )
+                {
+#ifdef GAME_DLL
+                    // Clientside hit reg will do this for us.
+                    if ( pEntity->IsBaseZombie() )
+                        return false;
+#endif
+                    if (pEntity->IsPlayer()
+                    &&  pEntity->GetTeamNumber() == m_pShooter->GetTeamNumber()
+                    &&  zm_sv_bulletspassplayers.GetBool())
+                        return false;
+                }
             }
 
             return true;

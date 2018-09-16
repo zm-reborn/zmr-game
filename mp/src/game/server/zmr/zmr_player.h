@@ -78,6 +78,22 @@ private:
     bool m_bIsCustom;
 };
 
+struct ZMServerWepData_t
+{
+    void Reset()
+    {
+        iAmmoType = -1;
+        iLastFireCommandNumber = 0;
+        flDamage = 0.0f;
+        hWeapon.Set( nullptr );
+    }
+
+    int iLastFireCommandNumber;
+    int iAmmoType;
+    float flDamage;
+    CHandle<CZMBaseWeapon> hWeapon;
+};
+
 class CZMPlayer : public CHL2_Player
 {
 public:
@@ -258,7 +274,13 @@ public:
     float           GetInterpNPCTime() const { return m_flInterpNPCTime; }
     void            UpdatePlayerInterpNPC();
 
+
+    void CopyWeaponDamage( CZMBaseWeapon* pWeapon, const FireBulletsInfo_t& info );
 private:
+    void HandleDamagesFromUserCmd();
+    ZMServerWepData_t m_serverWepData;
+
+
     // Since I didn't get this at first either, this is only sent to THIS player.
     CNetworkVarEmbedded( CZMPlayerLocalData, m_ZMLocal );
 
