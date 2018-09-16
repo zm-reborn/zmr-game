@@ -107,6 +107,7 @@ namespace NPCR
         int m_iLastUpdateTick;
         float m_flLastUpdate;
         float m_flUpdateTime;
+        int m_iUpdateSlot;
 
         bool m_bFlaggedForUpdate;
 
