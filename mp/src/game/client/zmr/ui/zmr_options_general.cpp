@@ -3,6 +3,7 @@
 
 
 #include "zmr_options_general.h"
+#include "zmr/zmr_playermodels.h"
 #include "zmr/c_zmr_player.h"
 
 
@@ -64,27 +65,13 @@ CZMOptionsSubGeneral::CZMOptionsSubGeneral( Panel* parent ) : BaseClass( parent 
     m_pModelPanel->SetPanelDirty();
     m_pModelCombo->ActivateItemByRow( 0 );
 
-    kv = new KeyValues( "Models" );
-
-    if ( kv->LoadFromFile( filesystem, "resource/zmoptions_playermodels.txt", "MOD" ) )
+    ZMGetPlayerModels()->LoadModelsFromFile();
+    ZMPlayerModelList_t* pModels = ZMGetPlayerModels()->GetPlayerModels();
+    for ( int i = 0; i < pModels->Count(); i++ )
     {
-        KeyValues* pKey = kv->GetFirstSubKey();
-
-        while ( pKey )
-        {
-            m_pModelCombo->AddItem( pKey->GetName(), pKey );
-
-            pKey = pKey->GetNextKey();
-        }
+        CZMPlayerModelData* pData = pModels->Element( i );
+        m_pModelCombo->AddItem( pData->GetModelData()->GetName(), pData->GetModelData() );
     }
-    else
-    {
-        Warning( "Couldn't load player models from file!\n" );
-    }
-
-    
-
-    kv->deleteThis();
 }
 
 CZMOptionsSubGeneral::~CZMOptionsSubGeneral()
