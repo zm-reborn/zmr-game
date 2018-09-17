@@ -390,6 +390,13 @@ void CZMHudVoiceMenu::BeginFadeIn( ZMVoiceMenu_t* pMenu )
 
     SetVisible( true );
     SetMouseInputEnabled( true );
+
+    // Center mouse
+    int mx, my;
+    mx = GetXPos() + GetWide() / 2;
+    my = GetYPos() + GetTall() / 2;
+
+    ::input->SetFullscreenMousePos( mx, my );
 }
 
 void CZMHudVoiceMenu::BeginFadeOut()
