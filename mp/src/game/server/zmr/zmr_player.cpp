@@ -1238,6 +1238,14 @@ void CZMPlayer::DeathSound( const CTakeDamageInfo &info )
     EmitSound( filter, entindex(), ep );
 }
 
+void CZMPlayer::Ignite( float flFlameLifetime, bool bNPCOnly, float flSize, bool bCalledByLevelDesigner )
+{
+    if ( !IsHuman() || !IsAlive() )
+        return;
+
+    BaseClass::Ignite( flFlameLifetime, bNPCOnly, flSize, bCalledByLevelDesigner );
+}
+
 extern ConVar physcannon_maxmass;
 
 void CZMPlayer::PickupObject( CBaseEntity *pObject, bool bLimitMassAndSize )

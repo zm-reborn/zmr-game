@@ -151,6 +151,7 @@ public:
     virtual int     OnTakeDamage( const CTakeDamageInfo& info ) OVERRIDE;
 	virtual void    CommitSuicide( bool bExplode = false, bool bForce = false ) OVERRIDE;
 	virtual void    CommitSuicide( const Vector &vecForce, bool bExplode = false, bool bForce = false ) OVERRIDE;
+    virtual void    Ignite( float flFlameLifetime, bool bNPCOnly, float flSize, bool bCalledByLevelDesigner ) OVERRIDE;
 
     virtual CBaseEntity* EntSelectSpawnPoint( void ) OVERRIDE;
 
