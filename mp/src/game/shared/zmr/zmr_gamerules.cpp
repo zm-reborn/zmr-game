@@ -447,21 +447,23 @@ void CZMRules::ClientSettingsChanged( CBasePlayer* pPlayer )
     const char *pCurrentModel = modelinfo->GetModelName( pPlayer->GetModel() );
     const char *szModelName = engine->GetClientConVarValue( engine->IndexOfEdict( pPlayer->edict() ), "cl_playermodel" );
 
-    //If we're different.
-    if ( stricmp( szModelName, pCurrentModel ) )
+    // If we're different.
+    if ( Q_stricmp( szModelName, pCurrentModel ) != 0 )
     {
-        //Too soon, set the cvar back to what it was.
-        //Note: this will make this function be called again
-        //but since our models will match it'll just skip this whole dealio.
+        // Too soon, set the cvar back to what it was.
+        // Note: this will make this function be called again
+        // but since our models will match it'll just skip this whole dealio.
         if ( pZMPlayer->GetNextModelChangeTime() >= gpGlobals->curtime )
         {
-            char szReturnString[512];
+            engine->ClientCommand( pZMPlayer->edict(), UTIL_VarArgs( "cl_playermodel %s", pCurrentModel ) );
 
-            Q_snprintf( szReturnString, sizeof (szReturnString ), "cl_playermodel %s\n", pCurrentModel );
-            engine->ClientCommand ( pZMPlayer->edict(), szReturnString );
-
-            Q_snprintf( szReturnString, sizeof( szReturnString ), "Please wait %.1f more seconds before trying to switch player models.\n", (pZMPlayer->GetNextModelChangeTime() - gpGlobals->curtime) );
-            ClientPrint( pZMPlayer, HUD_PRINTTALK, szReturnString );
+            ClientPrint(
+                pZMPlayer,
+                HUD_PRINTTALK,
+                UTIL_VarArgs(
+                    "Please wait %.1f more seconds before trying to switch player models.\n",
+                    (pZMPlayer->GetNextModelChangeTime() - gpGlobals->curtime)
+                ) );
             return;
         }
 
@@ -472,10 +474,7 @@ void CZMRules::ClientSettingsChanged( CBasePlayer* pPlayer )
 
         if ( pCurrentModel != pszNewModel )
         {
-            char szReturnString[192];
-            Q_snprintf( szReturnString, sizeof( szReturnString ), "Your player model is: %s\n", pszNewModel );
-
-            ClientPrint( pZMPlayer, HUD_PRINTTALK, szReturnString );
+            ClientPrint( pZMPlayer, HUD_PRINTTALK, UTIL_VarArgs( "Your player model is: %s\n", pszNewModel ) );
         }
     }
 

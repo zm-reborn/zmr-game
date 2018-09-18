@@ -723,21 +723,10 @@ void CZMPlayer::SetAnimation( PLAYER_ANIM playerAnim )
 
 bool CZMPlayer::SetPlayerModel()
 {
-    ZMPlayerModelList_t* pModels = ZMGetPlayerModels()->GetPlayerModels();
-    if ( !pModels->Count() )
-    {
-        Assert( 0 );
-        Warning( "No player models to select from! RIP\n" );
-        return false;
-    }
-
-
     bool changed = false;
 
 
-    int nModels = pModels->Count();
-
-    const char* pszFallback = pModels->Element( random->RandomInt( 0, nModels - 1 ) )->GetModelName();
+    const char* pszFallback = ZMGetPlayerModels()->GetRandomPlayerModel()->GetModelName();
 
     const char* szModelName = nullptr;
     const char* pszCurrentModelName = modelinfo->GetModelName( GetModel() );
@@ -750,19 +739,19 @@ bool CZMPlayer::SetPlayerModel()
     int modelIndex = modelinfo->GetModelIndex( szModelName );
 
 
-    if ( modelIndex == -1 || ZMGetPlayerModels()->FindPlayerModel( szModelName ) == -1 )
+    // The model player wanted is invalid?
+    if ( modelIndex == -1 || ZMGetPlayerModels()->GetPlayerModelData( szModelName ) == nullptr )
     {
+        // The current model is also fucked, fallback.
         if (modelIndexCurrent == -1
-        ||  ZMGetPlayerModels()->FindPlayerModel( pszCurrentModelName ) == -1)
+        ||  ZMGetPlayerModels()->GetPlayerModelData( pszCurrentModelName ) == nullptr)
         {
             pszCurrentModelName = pszFallback;
             modelIndexCurrent = -1;
         }
 
-
-        char szReturnString[512];
-        Q_snprintf( szReturnString, sizeof (szReturnString ), "cl_playermodel %s\n", pszCurrentModelName );
-        engine->ClientCommand( edict(), szReturnString );
+        // Update the cvar on the client's side to make sure they have it right also.
+        engine->ClientCommand( edict(), UTIL_VarArgs( "cl_playermodel %s", pszCurrentModelName ) );
 
         modelIndex = -1;
     }
