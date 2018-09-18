@@ -280,6 +280,10 @@ INetworkStringTable *g_pStringTableServerPopFiles = NULL;
 INetworkStringTable *g_pStringTableServerMapCycleMvM = NULL;
 #endif
 
+#ifdef ZMR
+extern INetworkStringTable* g_pZMCustomPlyModels;
+#endif
+
 static CGlobalVarsBase dummyvars( true );
 // So stuff that might reference gpGlobals during DLL initialization won't have a NULL pointer.
 // Once the engine calls Init on this DLL, this pointer gets assigned to the shared data in the engine
@@ -1668,6 +1672,9 @@ void CHLClient::ResetStringTablePointers()
 	g_pStringTableServerPopFiles = NULL;
 	g_pStringTableServerMapCycleMvM = NULL;
 #endif
+#ifdef ZMR
+	g_pZMCustomPlyModels = nullptr;
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -1902,6 +1909,12 @@ void CHLClient::InstallStringTableCallback( const char *tableName )
 	else if ( !Q_strcasecmp( tableName, "ServerMapCycleMvM" ) )
 	{
 		g_pStringTableServerMapCycleMvM = networkstringtable->FindTable( tableName );
+	}
+#endif
+#ifdef ZMR
+	else if ( !Q_strcasecmp( tableName, "ZMCustomModels" ) )
+	{
+		g_pZMCustomPlyModels = networkstringtable->FindTable( tableName );
 	}
 #endif
 
