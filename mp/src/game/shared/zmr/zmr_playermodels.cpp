@@ -73,7 +73,7 @@ int CZMPlayerModelSystem::LoadModelsFromFile()
 #ifdef GAME_DLL
     if ( !m_vPlayerModels.Count() )
     {
-        AddDefaultPlayerModels();
+        AddFallbackModel();
     }
 #endif
 
@@ -137,7 +137,7 @@ int CZMPlayerModelSystem::LoadModelData( KeyValues* kv )
     return m_vPlayerModels.Count();
 }
 
-void CZMPlayerModelSystem::AddDefaultPlayerModels()
+void CZMPlayerModelSystem::AddFallbackModel()
 {
     KeyValues* pNewKey = new KeyValues( "" );
 
@@ -149,8 +149,20 @@ void CZMPlayerModelSystem::AddDefaultPlayerModels()
     pNewKey->deleteThis();
 }
 
+CZMPlayerModelData* CZMPlayerModelSystem::GetRandomPlayerModel() const
+{
+    int count = m_vPlayerModels.Count();
+    if ( !count )
+    {
+        return nullptr;
+    }
 
-CZMPlayerModelData* CZMPlayerModelSystem::GetPlayerModelData( const char* model )
+
+    int index = random->RandomInt( 0, count - 1 );
+    return m_vPlayerModels[index];
+}
+
+CZMPlayerModelData* CZMPlayerModelSystem::GetPlayerModelData( const char* model ) const
 {
     int len = m_vPlayerModels.Count();
     for ( int i = 0; i < len; ++i )
@@ -164,7 +176,7 @@ CZMPlayerModelData* CZMPlayerModelSystem::GetPlayerModelData( const char* model 
     return nullptr;
 }
 
-int CZMPlayerModelSystem::FindPlayerModel( const char* model )
+int CZMPlayerModelSystem::FindPlayerModel( const char* model ) const
 {
     int len = m_vPlayerModels.Count();
     for ( int i = 0; i < len; ++i )

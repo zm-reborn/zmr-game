@@ -42,12 +42,16 @@ public:
     int PrecachePlayerModels();
 
 
-    CZMPlayerModelData*     GetPlayerModelData( const char* model );
-    int                     FindPlayerModel( const char* model );
+
+
+    CZMPlayerModelData*     GetRandomPlayerModel() const;
+    CZMPlayerModelData*     GetPlayerModelData( const char* model ) const;
 
 private:
+    int FindPlayerModel( const char* model ) const;
+
     int LoadModelData( KeyValues* kv );
-    void AddDefaultPlayerModels();
+    void AddFallbackModel();
 
 
     ZMPlayerModelList_t m_vPlayerModels;
