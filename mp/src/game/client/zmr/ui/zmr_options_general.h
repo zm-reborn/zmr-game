@@ -33,4 +33,5 @@ private:
     vgui::Slider*       m_pSlider_Yaw;
 
     const char* GetCurrentPlayerModel();
+    void AppendCustomModels();
 };

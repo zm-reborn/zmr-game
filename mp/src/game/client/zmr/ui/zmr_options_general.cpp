@@ -118,6 +118,9 @@ void CZMOptionsSubGeneral::OnResetData()
     m_pSlider_Pitch->SetValue( (int)cl_pitchspeed.GetFloat() );
 
 
+
+    AppendCustomModels();
+
     bool bValidModel = false;
 
     ConVar* cl_playermodel = cvar->FindVar( "cl_playermodel" );
@@ -142,6 +145,40 @@ void CZMOptionsSubGeneral::OnResetData()
     }
 }
 
+void CZMOptionsSubGeneral::AppendCustomModels()
+{
+    int i;
+    ZMPlayerModelList_t list;
+
+    ZMGetPlayerModels()->ParseCustomModels( list );
+
+    // First remove all the old ones.
+    // We might've changed servers.
+    for ( i = 0; i < m_pModelCombo->GetItemCount(); i++ )
+    {
+        KeyValues* kv = m_pModelCombo->GetItemUserData( i );
+        if ( kv && kv->GetBool( "custom" ) )
+        {
+            m_pModelCombo->DeleteItem( i );
+            --i;
+        }
+    }
+
+    // Add the new ones.
+    for ( i = 0; i < list.Count(); i++ )
+    {
+        CZMPlayerModelData* pData = list[i];
+
+        KeyValues* kv = pData->GetModelData();
+        kv->SetBool( "custom", true );
+
+        m_pModelCombo->AddItem( pData->GetModelData()->GetName(), kv );
+    }
+
+    DevMsg( "Added %i custom player models to model list.\n", list.Count() );
+
+    list.PurgeAndDeleteElements();
+}
 
 const char* CZMOptionsSubGeneral::GetCurrentPlayerModel()
 {

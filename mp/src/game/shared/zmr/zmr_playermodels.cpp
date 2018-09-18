@@ -1,19 +1,25 @@
 #include "cbase.h"
 #include "filesystem.h"
 
+#include <networkstringtabledefs.h>
+
 
 #include "zmr_playermodels.h"
 
 
 
 #define PLAYERMODEL_FILE            "resource/zmplayermodels.txt"
+#define PLAYERMODEL_FILE_CUSTOM     "resource/zmplayermodels_custom.txt"
 
 #define DEF_PLAYER_MODEL            "models/male_pi.mdl"
 
 
 
+INetworkStringTable* g_pZMCustomPlyModels = nullptr;
+
+
 //
-CZMPlayerModelData::CZMPlayerModelData( KeyValues* kv, bool bIsCustom )
+CZMPlayerModelData::CZMPlayerModelData( const KeyValues* kv, bool bIsCustom )
 {
     Assert( kv );
     m_pKvData = kv->MakeCopy();
@@ -28,13 +34,23 @@ CZMPlayerModelData::~CZMPlayerModelData()
         m_pKvData->deleteThis();
     m_pKvData = nullptr;
 }
+
+KeyValues* CZMPlayerModelData::CreateEmptyModelData( const char* model, const char* name )
+{
+    KeyValues* kv = new KeyValues( name );
+    kv->SetString( "model", model );
+
+    return kv;
+}
 //
 
 
 //
 CZMPlayerModelSystem::CZMPlayerModelSystem()
 {
-
+#ifdef GAME_DLL
+    m_bLoadedFromFile = false;
+#endif
 }
 
 CZMPlayerModelSystem::~CZMPlayerModelSystem()
@@ -42,42 +58,152 @@ CZMPlayerModelSystem::~CZMPlayerModelSystem()
     m_vPlayerModels.PurgeAndDeleteElements();
 }
 
+#ifdef GAME_DLL
+void CZMPlayerModelSystem::LevelInitPreEntity()
+{
+    m_vPlayerModels.PurgeAndDeleteElements();
+    m_bLoadedFromFile = false;
+}
+#endif
+
 const char* CZMPlayerModelSystem::GetDefaultPlayerModel()
 {
     return DEF_PLAYER_MODEL;
 }
 
+void CZMPlayerModelSystem::ParseCustomModels( ZMPlayerModelList_t& list )
+{
+    if ( !g_pZMCustomPlyModels )
+        return;
+
+
+    char buffer[512];
+
+    int nMdls = g_pZMCustomPlyModels->GetNumStrings();
+    for ( int i = 0; i < nMdls; i++ )
+    {
+        Q_strncpy( buffer, g_pZMCustomPlyModels->GetString( i ), sizeof( buffer ) );
+
+        char* sep = Q_strrchr( buffer, ';' );
+        if ( !sep )
+            continue;
+
+
+        *sep = 0;
+
+        KeyValues* kv = CZMPlayerModelData::CreateEmptyModelData( sep + 1, buffer );
+
+        list.AddToTail( new CZMPlayerModelData( kv, true ) );
+
+        kv->deleteThis();
+    }
+}
+
+void CZMPlayerModelSystem::SaveCustomModelsToStringTable()
+{
+    // There's no way to reset a string table?
+    if ( g_pZMCustomPlyModels->GetNumStrings() != 0 )
+    {
+        return;
+    }
+
+
+    int num = 0;
+
+    char buffer[512];
+
+    int len = m_vPlayerModels.Count();
+    for ( int i = 0; i < len; i++ )
+    {
+        if ( m_vPlayerModels[i]->IsCustom() )
+        {
+            KeyValues* kv = m_vPlayerModels[i]->GetModelData();
+
+            Q_snprintf( buffer, sizeof( buffer ), "%s;%s", kv->GetName(), kv->GetString( "model" ) );
+
+            g_pZMCustomPlyModels->AddString( true, buffer );
+
+            ++num;
+        }
+    }
+
+    DevMsg( "Wrote %i custom player models to string table.\n", num );
+}
+
 int CZMPlayerModelSystem::LoadModelsFromFile()
 {
+#ifdef GAME_DLL
+    // Only load once per map
+    if ( m_bLoadedFromFile )
+        return m_vPlayerModels.Count();
+#endif
+
+
 #ifdef CLIENT_DLL
+    // Only load once from file for client.
     if ( m_vPlayerModels.Count() )
         return m_vPlayerModels.Count();
 #endif
 
-    KeyValues* kv = new KeyValues( "PlayerModels" );
-    if ( !kv->LoadFromFile( filesystem, PLAYERMODEL_FILE ) )
-    {
-        kv->deleteThis();
-        return m_vPlayerModels.Count();
-    }
 
-
-
-    m_vPlayerModels.PurgeAndDeleteElements();
-
-
-    LoadModelData( kv );
-    kv->deleteThis();
-
-    // We need to add something for the server.
+    LoadStockModels();
 #ifdef GAME_DLL
+    LoadCustomModels();
+    SaveCustomModelsToStringTable();
+#endif
+
+#ifdef GAME_DLL
+    // We need to add something for the server.
     if ( !m_vPlayerModels.Count() )
     {
         AddFallbackModel();
     }
+
+
+    DevMsg( "Total player models: %i\n", m_vPlayerModels.Count() );
+
+
+    m_bLoadedFromFile = true;
 #endif
 
     return m_vPlayerModels.Count();
+}
+
+int CZMPlayerModelSystem::LoadStockModels()
+{
+    KeyValues* kv = new KeyValues( "PlayerModels" );
+    if ( !kv->LoadFromFile( filesystem, PLAYERMODEL_FILE ) )
+    {
+        kv->deleteThis();
+        return 0;
+    }
+
+
+    int ret = LoadModelData( kv, m_vPlayerModels, false );
+
+    kv->deleteThis();
+
+    return ret;
+}
+
+int CZMPlayerModelSystem::LoadCustomModels()
+{
+    KeyValues* kv = new KeyValues( "PlayerModels" );
+    if ( !kv->LoadFromFile( filesystem, PLAYERMODEL_FILE_CUSTOM ) )
+    {
+        kv->deleteThis();
+        return 0;
+    }
+
+
+    int ret = LoadModelData( kv, m_vPlayerModels, true );
+
+    kv->deleteThis();
+
+
+    DevMsg( "Loaded %i custom player models from file!\n", ret );
+
+    return ret;
 }
 
 int CZMPlayerModelSystem::PrecachePlayerModels()
@@ -110,10 +236,12 @@ int CZMPlayerModelSystem::PrecachePlayerModels()
     return m_vPlayerModels.Count();
 }
 
-int CZMPlayerModelSystem::LoadModelData( KeyValues* kv )
+int CZMPlayerModelSystem::LoadModelData( KeyValues* kv, ZMPlayerModelList_t& list, bool bIsCustom )
 {
     if ( !kv ) return 0;
 
+
+    int num = 0;
 
     KeyValues* pKey = kv->GetFirstSubKey();
 
@@ -124,7 +252,8 @@ int CZMPlayerModelSystem::LoadModelData( KeyValues* kv )
 
         if ( *model )
         {
-            m_vPlayerModels.AddToTail( new CZMPlayerModelData( pKey ) );
+            list.AddToTail( new CZMPlayerModelData( pKey, bIsCustom ) );
+            ++num;
         }
         else
         {
@@ -134,19 +263,16 @@ int CZMPlayerModelSystem::LoadModelData( KeyValues* kv )
         pKey = pKey->GetNextKey();
     }
 
-    return m_vPlayerModels.Count();
+    return num;
 }
 
 void CZMPlayerModelSystem::AddFallbackModel()
 {
-    KeyValues* pNewKey = new KeyValues( "" );
+    KeyValues* kv = CZMPlayerModelData::CreateEmptyModelData( GetDefaultPlayerModel(), "_DefaultModel" );
 
-    KeyValues* pSub = pNewKey->FindKey( "_DefaultModel", true );
-    pSub->SetString( "model", GetDefaultPlayerModel() );
+    m_vPlayerModels.AddToTail( new CZMPlayerModelData( kv, false ) );
 
-    m_vPlayerModels.AddToTail( new CZMPlayerModelData( pSub, false ) );
-
-    pNewKey->deleteThis();
+    kv->deleteThis();
 }
 
 CZMPlayerModelData* CZMPlayerModelSystem::GetRandomPlayerModel() const
