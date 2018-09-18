@@ -1160,15 +1160,21 @@ void CZMPlayer::SetHandsData( CZMPlayerModelData* pData )
     if ( !pVM ) return;
 
 
-    const char* szHands = pData->GetArmModel();
-    if ( *szHands )
+
+    // Set the model
+    const char* pszArms = pData->GetArmModel();
+    if ( !pszArms || !(*pszArms) )
     {
-        int iHands = modelinfo->GetModelIndex( szHands );
-        if ( iHands != -1 && pVM->GetModelIndex() != iHands )
-        {
-            pVM->SetModelIndex( iHands );
-        }
+        pszArms = VMHANDS_FALLBACKMODEL;
     }
+
+    int modelIndex = modelinfo->GetModelIndex( pszArms );
+    if ( modelIndex != -1 && pVM->GetModelIndex() != modelIndex )
+    {
+        pVM->SetModel( pszArms );
+    }
+
+
 
     int skin = pData->GetArmSkin();
     if ( skin >= 0 && skin < MAXSTUDIOSKINS )

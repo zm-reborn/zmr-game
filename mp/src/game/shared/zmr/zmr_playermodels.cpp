@@ -217,12 +217,18 @@ int CZMPlayerModelSystem::PrecachePlayerModels()
 
         if ( CBaseEntity::PrecacheModel( model ) != -1 ) // Valid model?
         {
-            const char* arms = pData->GetModelData()->GetString( "handsmodel" );
-            if ( *arms && CBaseEntity::PrecacheModel( model ) == -1 )
+            const char* arms = pData->GetArmModel();
+            if ( *arms )
             {
-                pData->GetModelData()->SetString( "handsmodel", "" );
-
-                Warning( "Invalid arm model path '%s' ('%s')!\n", arms, name );
+                if ( CBaseEntity::PrecacheModel( arms ) != -1 )
+                {
+                    DevMsg( "Precached player model arm model (%s) explicitly.\n", arms );
+                }
+                else
+                {
+                    pData->GetModelData()->SetString( "armsmodel", "" );
+                    Warning( "Invalid arm model path '%s' ('%s')!\n", arms, name );
+                }
             }
         }
         else
