@@ -136,7 +136,9 @@ void CZMOptionsSubGeneral::OnResetData()
 
     if ( !bValidModel )
     {
-        m_pModelCombo->ActivateItemByRow( 0 );
+        // Not the model we're looking for, pick a random one then.
+        int count = m_pModelCombo->GetItemCount();
+        m_pModelCombo->ActivateItemByRow( count ? random->RandomInt( 0, count - 1 ) : 0 );
     }
 }
 
