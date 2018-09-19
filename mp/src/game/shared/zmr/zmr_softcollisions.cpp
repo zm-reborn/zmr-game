@@ -1,5 +1,6 @@
 #include "cbase.h"
 #include "vprof.h"
+#include "in_buttons.h"
 
 #include "zmr_player_shared.h"
 #ifdef GAME_DLL
@@ -22,10 +23,179 @@ extern ConVar zm_sv_playercollision;
 
 ConVar zm_sv_softcollisions_player_size( "zm_sv_softcollisions_player_size", "24", FCVAR_NOTIFY | FCVAR_ARCHIVE | FCVAR_REPLICATED );
 ConVar zm_sv_softcollisions_player_force( "zm_sv_softcollisions_player_force", "950", FCVAR_NOTIFY | FCVAR_ARCHIVE | FCVAR_REPLICATED );
-ConVar zm_sv_softcollisions_player_air_multiplier( "zm_sv_softcollisions_player_air_multiplier", "0.4", FCVAR_NOTIFY | FCVAR_ARCHIVE | FCVAR_REPLICATED );
+ConVar zm_sv_softcollisions_player_air_multiplier( "zm_sv_softcollisions_player_air_multiplier", "0.1", FCVAR_NOTIFY | FCVAR_ARCHIVE | FCVAR_REPLICATED );
 ConVar zm_sv_softcollisions_player_debug( "zm_sv_softcollisions_player_debug", "0", FCVAR_REPLICATED );
 
 
+//
+#ifdef GAME_DLL
+// Perform zombie collisions
+CZMBaseSoftCol::SoftColRes_t CZMZombieSoftCol::PerformCollision()
+{
+    const float flMaxDist = zm_sv_softcollisions_zombie_size.GetFloat();
+
+
+
+    CZMBaseZombie* pOrigin = static_cast<CZMBaseZombie*>( hOrigin.Get() );
+    CZMBaseZombie* pOther = static_cast<CZMBaseZombie*>( hOther.Get() );
+    if ( !pOrigin || !pOther || !pOrigin->IsAlive() || !pOther->IsAlive() )
+    {
+        return CZMBaseSoftCol::COLRES_INVALID;
+    }
+
+
+    Vector dir = pOrigin->GetLocalOrigin() - pOther->GetLocalOrigin();
+    if ( dir.x == 0.0f && dir.y == 0.0f ) // Always push somewhere.
+    {
+        dir.x = vecLastDir.x;
+        dir.y = vecLastDir.y;
+    }
+    dir.z = 0.0f;
+
+    // Invert it so we push more the closer we are.
+    float dist = dir.NormalizeInPlace();
+    dist = MAX( 0.0f, flMaxDist - dist );
+    if ( dist == 0.0f ) // We're no longer in pushing distance, clear us from the list.
+    {
+        return CZMBaseSoftCol::COLRES_INVALID;
+    }
+
+
+    // Assume the zombie who's not moving is there for a reason.
+    if ( !pOrigin->IsMoving() && pOther->IsMoving() )
+    {
+        return CZMBaseSoftCol::COLRES_NONE;
+    }
+
+
+    Vector vel = pOrigin->GetMotor()->GetVelocity();
+
+
+    const float flGroundSpd = pOrigin->m_flGroundSpeed;
+
+    const float groundspeedmult = RemapValClamped( flGroundSpd, 100.0f, 200.0f, 1.0f, 2.0f );
+
+    const float flMinPush = 20.0f;
+
+
+    float force = RemapValClamped( dist, 0.0f, flMaxDist, 1.0f, 5.0f );
+    force *= zm_sv_softcollisions_zombie_force.GetFloat() * groundspeedmult;
+
+
+        
+
+    if ( vel.Dot( dir ) < 0.0f || vel.Length2D() < flMinPush )
+    {
+        vel += dir * force * gpGlobals->frametime;
+        pOrigin->GetMotor()->SetVelocity( vel );
+
+        vecLastDir = dir.AsVector2D();
+
+        return CZMBaseSoftCol::COLRES_APPLIED;
+    }
+
+
+
+    return CZMBaseSoftCol::COLRES_NONE;
+}
+#endif
+
+// Perform player collisions
+CZMBaseSoftCol::SoftColRes_t CZMPlayerSoftCol::PerformCollision()
+{
+    const float flMaxDist = zm_sv_softcollisions_player_size.GetFloat();
+
+
+
+    CZMPlayer* pOrigin = static_cast<CZMPlayer*>( hOrigin.Get() );
+    CZMPlayer* pOther = static_cast<CZMPlayer*>( hOther.Get() );
+    if (
+        !pOrigin || !pOther || !pOrigin->IsAlive() || !pOther->IsAlive()
+#ifdef CLIENT_DLL
+        || pOther->IsDormant()
+#endif
+    )
+    {
+        return CZMBaseSoftCol::COLRES_INVALID;
+    }
+
+
+    Vector vel = pOrigin->GetLocalVelocity();
+    Vector vel2 = pOther->GetLocalVelocity();
+
+
+    Vector dir = pOrigin->GetLocalOrigin() - pOther->GetLocalOrigin();
+    if ( dir.x == 0.0f && dir.y == 0.0f ) // Always push somewhere. Players may be hugging a corner.
+    {
+        dir.x = vecLastDir.x;
+        dir.y = vecLastDir.y;
+    }
+    dir.z = 0.0f;
+
+
+    // Invert it so we push more the closer we are.
+    float dist = dir.NormalizeInPlace();
+    dist = MAX( 0.0f, flMaxDist - dist );
+    if ( dist == 0.0f ) // We're no longer in pushing distance, clear us from the list.
+    {
+        return CZMBaseSoftCol::COLRES_INVALID;
+    }
+
+
+    // Don't apply soft collisions if we (the origin) are not moving.
+    // Assume the other will perform the pushing to us.
+#ifdef GAME_DLL
+    // This button check is here to mitigate griefing.
+    // Player A is standing still in a corner (not pressing anything)
+    // Player B jumps inside A, trying to move him.
+    // Both players are now "not moving", hence A may get moved by B.
+    // The keys will make the difference.
+    const bool bMovingOrigin =
+        vel == vec3_origin
+    ||  (pOrigin->m_nButtons & (IN_MOVELEFT|IN_MOVERIGHT|IN_FORWARD|IN_BACK)) != 0;
+        
+    const bool bMovingOther =
+        vel2 != vec3_origin
+    ||  (pOther->m_nButtons & (IN_MOVELEFT|IN_MOVERIGHT|IN_FORWARD|IN_BACK)) != 0;
+#else
+    const bool bMovingOrigin = vel == vec3_origin;
+    const bool bMovingOther = vel2 != vec3_origin;
+#endif
+    if ( !bMovingOrigin && bMovingOther )
+    {
+        return CZMBaseSoftCol::COLRES_NONE;
+    }
+
+
+    float force = RemapValClamped( dist, 0.0f, flMaxDist, 1.0f, 5.0f );
+    force *= zm_sv_softcollisions_player_force.GetFloat();
+        
+
+    if ( !(pOrigin->GetFlags() & FL_ONGROUND) )
+    {
+        force *= zm_sv_softcollisions_player_air_multiplier.GetFloat();
+    }
+
+
+    const float flMinPush = 100.0f;
+
+    if ( vel.Dot( dir ) < 0.0f || vel.Length2D() < flMinPush )
+    {
+        vel += dir * force * gpGlobals->frametime;
+        pOrigin->SetLocalVelocity( vel );
+
+        vecLastDir = dir.AsVector2D();
+
+        return CZMBaseSoftCol::COLRES_APPLIED;
+    }
+
+
+    return CZMBaseSoftCol::COLRES_NONE;
+}
+//
+
+
+//
 #ifdef GAME_DLL
 void CZMSoftCollisions::FrameUpdatePostEntityThink()
 #else
@@ -36,8 +206,10 @@ void CZMSoftCollisions::Update( float frametime )
     {
         PerformPlayerSoftCollisions();
     }
-
-    ClearPlayerCollisions();
+    else
+    {
+        ClearPlayerCollisions();
+    }
 
 
 #ifdef GAME_DLL
@@ -45,8 +217,10 @@ void CZMSoftCollisions::Update( float frametime )
     {
         PerformZombieSoftCollisions();
     }
-
-    ClearZombieCollisions();
+    else
+    {
+        ClearZombieCollisions();
+    }
 #endif
 }
 
@@ -59,51 +233,17 @@ void CZMSoftCollisions::PerformZombieSoftCollisions()
 
     int counter = 0;
 
-
-    const float frametime = gpGlobals->frametime;
-    const float flMaxDist = zm_sv_softcollisions_zombie_size.GetFloat();
-
     FOR_EACH_VEC( m_vZombieCollisions, i )
     {
-        CZMBaseZombie* pOrigin = static_cast<CZMBaseZombie*>( m_vZombieCollisions[i].pOrigin );
-        CZMBaseZombie* pOther = static_cast<CZMBaseZombie*>( m_vZombieCollisions[i].pOther );
+        CZMBaseSoftCol::SoftColRes_t ret = m_vZombieCollisions[i].PerformCollision();
 
-        if ( !pOrigin->IsMoving() && pOther->IsMoving() )
-            continue;
-
-
-        Vector dir = pOrigin->GetLocalOrigin() - pOther->GetLocalOrigin();
-        dir.z = 0.0f;
-
-
-        Vector vel = pOrigin->GetMotor()->GetVelocity();
-
-
-        const float flGroundSpd = pOrigin->m_flGroundSpeed;
-
-        const float groundspeedmult = RemapValClamped( flGroundSpd, 100.0f, 200.0f, 1.0f, 2.0f );
-
-        const float flMinPush = 20.0f;
-
-
-        // Invert it so we push more the closer we are.
-        float dist = dir.NormalizeInPlace();
-        dist = MAX( 0.0f, flMaxDist - dist );
-        if ( dist == 0.0f )
-            continue;
-
-        float force = RemapValClamped( dist, 0.0f, flMaxDist, 1.0f, 5.0f );
-        force *= zm_sv_softcollisions_zombie_force.GetFloat() * groundspeedmult;
-
-
-        
-
-        if ( vel.Dot( dir ) < 0.0f || vel.Length2D() < flMinPush )
+        switch ( ret )
         {
-            vel += dir * force * frametime;
-            pOrigin->GetMotor()->SetVelocity( vel );
-
+        case CZMBaseSoftCol::COLRES_APPLIED :
             ++counter;
+        case CZMBaseSoftCol::COLRES_INVALID :
+            m_vZombieCollisions.Remove( i );
+            --i;
         }
     }
 
@@ -124,54 +264,17 @@ void CZMSoftCollisions::PerformPlayerSoftCollisions()
     int counter = 0;
 
 
-    const float frametime = gpGlobals->frametime;
-    const float flMaxDist = zm_sv_softcollisions_player_size.GetFloat();
-
     FOR_EACH_VEC( m_vPlayerCollisions, i )
     {
-        CZMPlayer* pOrigin = static_cast<CZMPlayer*>( m_vPlayerCollisions[i].pOrigin );
-        CZMPlayer* pOther = static_cast<CZMPlayer*>( m_vPlayerCollisions[i].pOther );
+        CZMBaseSoftCol::SoftColRes_t ret = m_vPlayerCollisions[i].PerformCollision();
 
-
-        Vector vel = pOrigin->GetLocalVelocity();
-        //Vector vel2 = pOther->GetLocalVelocity();
-
-        // Don't apply soft collisions if we (the origin) are not moving.
-        // Assume the other will perform the pushing to us.
-        //if ( vel == vec3_origin && vel2 != vec3_origin )
-        //    continue;
-
-
-        Vector dir = pOrigin->GetLocalOrigin() - pOther->GetLocalOrigin();
-        dir.z = 0.0f;
-
-
-
-
-        // Invert it so we push more the closer we are.
-        float dist = dir.NormalizeInPlace();
-        dist = MAX( 0.0f, flMaxDist - dist );
-        if ( dist == 0.0f )
-            continue;
-
-        float force = RemapValClamped( dist, 0.0f, flMaxDist, 1.0f, 5.0f );
-        force *= zm_sv_softcollisions_player_force.GetFloat();
-        
-
-        if ( !(pOrigin->GetFlags() & FL_ONGROUND) )
+        switch ( ret )
         {
-            force *= zm_sv_softcollisions_player_air_multiplier.GetFloat();
-        }
-
-
-        const float flMinPush = 100.0f;
-
-        if ( vel.Dot( dir ) < 0.0f || vel.Length2D() < flMinPush )
-        {
-            vel += dir * force * frametime;
-            pOrigin->SetLocalVelocity( vel );
-
+        case CZMBaseSoftCol::COLRES_APPLIED :
             ++counter;
+        case CZMBaseSoftCol::COLRES_INVALID :
+            m_vPlayerCollisions.Remove( i );
+            --i;
         }
     }
 
@@ -194,12 +297,14 @@ void CZMSoftCollisions::OnZombieCollide( CBaseEntity* pOrigin, CBaseEntity* pOth
     // Do we already have this collision?
     FOR_EACH_VEC( m_vZombieCollisions, i )
     {
-        if ( m_vZombieCollisions[i].pOrigin == pOrigin && m_vZombieCollisions[i].pOther == pOther )
+        if ( m_vZombieCollisions[i].Equals( pOrigin, pOther ) )
             return;
     }
 
 
-    m_vZombieCollisions.AddToTail( { pOrigin, pOther } );
+    CZMZombieSoftCol col( pOrigin, pOther );
+
+    m_vZombieCollisions.AddToTail( col );
 }
 #endif
 
@@ -208,12 +313,14 @@ void CZMSoftCollisions::OnPlayerCollide( CBaseEntity* pOrigin, CBaseEntity* pOth
     // Do we already have this collision?
     FOR_EACH_VEC( m_vPlayerCollisions, i )
     {
-        if ( m_vPlayerCollisions[i].pOrigin == pOrigin && m_vPlayerCollisions[i].pOther == pOther )
+        if ( m_vPlayerCollisions[i].Equals( pOrigin, pOther ) )
             return;
     }
 
 
-    m_vPlayerCollisions.AddToTail( { pOrigin, pOther } );
+    CZMPlayerSoftCol col( pOrigin, pOther );
+
+    m_vPlayerCollisions.AddToTail( col );
 }
 
 
@@ -228,6 +335,8 @@ void CZMSoftCollisions::ClearZombieCollisions()
     m_vZombieCollisions.RemoveAll();
 }
 #endif
+//
+
 
 
 static CZMSoftCollisions g_ZMSoftCollisions;

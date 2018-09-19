@@ -1,13 +1,64 @@
 #pragma once
 
 
-
-struct ZMSoftCol_t
+//
+abstract_class CZMBaseSoftCol
 {
-    CBaseEntity* pOrigin;
-    CBaseEntity* pOther;
+public:
+    CZMBaseSoftCol( CBaseEntity* pOrigin, CBaseEntity* pOther )
+    {
+        hOrigin.Set( pOrigin );
+        hOther.Set( pOther );
+        vecLastDir = Vector2D( 1.0f, 1.0f );
+    }
+    virtual ~CZMBaseSoftCol() {}
+
+    bool Equals( const CBaseEntity* pOrigin, const CBaseEntity* pOther )
+    {
+        return hOrigin.Get() == pOrigin && hOther.Get() == pOther;
+    }
+
+
+    enum SoftColRes_t
+    {
+        COLRES_NONE = 0,
+        COLRES_APPLIED,
+
+        COLRES_INVALID
+    };
+
+
+
+    SoftColRes_t PerformCollision() { return COLRES_NONE; }
+
+
+protected:
+    EHANDLE hOrigin;
+    EHANDLE hOther;
+    Vector2D vecLastDir;
 };
 
+#ifdef GAME_DLL
+class CZMZombieSoftCol : public CZMBaseSoftCol
+{
+public:
+    CZMZombieSoftCol( CBaseEntity* pOrigin, CBaseEntity* pOther ) : CZMBaseSoftCol( pOrigin, pOther ) {}
+
+    SoftColRes_t PerformCollision();
+};
+#endif
+
+class CZMPlayerSoftCol : public CZMBaseSoftCol
+{
+public:
+    CZMPlayerSoftCol( CBaseEntity* pOrigin, CBaseEntity* pOther ) : CZMBaseSoftCol( pOrigin, pOther ) {}
+
+    SoftColRes_t PerformCollision();
+};
+//
+
+
+//
 class CZMSoftCollisions : 
 #ifdef GAME_DLL
     public CAutoGameSystemPerFrame
@@ -37,10 +88,12 @@ protected:
     void ClearZombieCollisions();
 #endif
 
-    CUtlVector<ZMSoftCol_t> m_vPlayerCollisions;
+    CUtlVector<CZMPlayerSoftCol> m_vPlayerCollisions;
 #ifdef GAME_DLL
-    CUtlVector<ZMSoftCol_t> m_vZombieCollisions;
+    CUtlVector<CZMZombieSoftCol> m_vZombieCollisions;
 #endif
 };
+//
+
 
 extern CZMSoftCollisions* GetZMSoftCollisions();
