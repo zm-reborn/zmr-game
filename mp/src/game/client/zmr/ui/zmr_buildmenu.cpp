@@ -43,19 +43,19 @@ extern IGameUIFuncs *gameuifuncs; // for key binding details
 
 // ZMRTODO: Remove this old stuff...
 const char *TypeToImage[ZMCLASS_MAX] = {
-		"zombies/info_shambler",
-		"zombies/info_banshee",
-		"zombies/info_hulk",
-		"zombies/info_drifter",
-		"zombies/info_immolator"
+        "zombies/info_shambler",
+        "zombies/info_banshee",
+        "zombies/info_hulk",
+        "zombies/info_drifter",
+        "zombies/info_immolator"
 };
 
 const char *TypeToQueueImage[ZMCLASS_MAX] = {
-		"zombies/queue_shambler",
-		"zombies/queue_banshee",
-		"zombies/queue_hulk",
-		"zombies/queue_drifter",
-		"zombies/queue_immolator",
+        "zombies/queue_shambler",
+        "zombies/queue_banshee",
+        "zombies/queue_hulk",
+        "zombies/queue_drifter",
+        "zombies/queue_immolator",
 };
 
 #define BURNZOMBIE_FLAG 16
@@ -64,99 +64,96 @@ const char *TypeToQueueImage[ZMCLASS_MAX] = {
 #define FASTIE_FLAG 2
 #define SHAMBLIE_FLAG 1
 
-CZMBuildMenu::CZMBuildMenu( Panel* pParent ) : CZMBuildMenuBase( "ZMBuildMenu" )
+CZMBuildMenu::CZMBuildMenu( Panel* pParent ) : CZMBuildMenuBase( pParent, "ZMBuildMenu" )
 {
-    SetParent( pParent->GetVPanel() );
-
-
     SetSizeable( false );
-	SetProportional( false );
-	SetMoveable( true );
+    SetProportional( false );
+    SetMoveable( true );
     SetKeyBoardInputEnabled( false );
     SetMouseInputEnabled( true );
 
 
-	SetScheme( vgui::scheme()->LoadSchemeFromFile( "resource/ZombieMaster.res", "ZombieMaster" ) );
-	LoadControlSettings( "resource/ui/zmbuildmenu.res" );
+    SetScheme( vgui::scheme()->LoadSchemeFromFile( "resource/ZombieMaster.res", "ZombieMaster" ) );
+    LoadControlSettings( "resource/ui/zmbuildmenu.res" );
 
 
-	vgui::ivgui()->AddTickSignal( GetVPanel(), 150 );
+    vgui::ivgui()->AddTickSignal( GetVPanel(), 150 );
 
 
 
-	
+    
 
-	//we fetch a bunch of pointers to various elements here so we can alter them quickly and easily
-	info_image = dynamic_cast<vgui::ImagePanel*>(FindChildByName("ZombieImage"));
+    //we fetch a bunch of pointers to various elements here so we can alter them quickly and easily
+    info_image = dynamic_cast<vgui::ImagePanel*>(FindChildByName("ZombieImage"));
 
-	info_rescost = dynamic_cast<vgui::Label*>(FindChildByName("CostRes"));
-	info_popcost = dynamic_cast<vgui::Label*>(FindChildByName("CostPop"));
-	info_description = dynamic_cast<vgui::Label*>(FindChildByName("LabelDescription"));
+    info_rescost = dynamic_cast<vgui::Label*>(FindChildByName("CostRes"));
+    info_popcost = dynamic_cast<vgui::Label*>(FindChildByName("CostPop"));
+    info_description = dynamic_cast<vgui::Label*>(FindChildByName("LabelDescription"));
 
-	removelast =  dynamic_cast<vgui::Button*>(FindChildByName("RemoveLast"));
-	clearqueue =  dynamic_cast<vgui::Button*>(FindChildByName("ClearQueue"));
+    removelast =  dynamic_cast<vgui::Button*>(FindChildByName("RemoveLast"));
+    clearqueue =  dynamic_cast<vgui::Button*>(FindChildByName("ClearQueue"));
 
-	//prepare a list of our spawn buttons etc so we can easily iterate over them
-	for (int i=0; i < ZMCLASS_MAX; i++)
-	{
-		char buffer[25];
-		Q_snprintf(buffer, sizeof(buffer), "z_spawn1_%02d", i);
-		spawnbuttons[i] = FindChildByName(buffer);
+    //prepare a list of our spawn buttons etc so we can easily iterate over them
+    for (int i=0; i < ZMCLASS_MAX; i++)
+    {
+        char buffer[25];
+        Q_snprintf(buffer, sizeof(buffer), "z_spawn1_%02d", i);
+        spawnbuttons[i] = FindChildByName(buffer);
 
-		Q_snprintf(buffer, sizeof(buffer), "z_spawn5_%02d", i);
-		spawnfives[i] = FindChildByName(buffer);
+        Q_snprintf(buffer, sizeof(buffer), "z_spawn5_%02d", i);
+        spawnfives[i] = FindChildByName(buffer);
 
-		zombieimages[i] = vgui::scheme()->GetImage(TypeToImage[i], true);
-		zombiequeue[i] = vgui::scheme()->GetImage(TypeToQueueImage[i], false);
-	
-	}
-	
+        zombieimages[i] = vgui::scheme()->GetImage(TypeToImage[i], true);
+        zombiequeue[i] = vgui::scheme()->GetImage(TypeToQueueImage[i], false);
+    
+    }
+    
 
-	KeyValues *kv = new KeyValues("zombiedesc.res");
-	if  ( kv->LoadFromFile( (IBaseFileSystem*)filesystem, "resource/zombiedesc.res", "MOD" ) )
-	{
-		//braaaaaaah, char juggling is pain
+    KeyValues *kv = new KeyValues("zombiedesc.res");
+    if  ( kv->LoadFromFile( (IBaseFileSystem*)filesystem, "resource/zombiedesc.res", "MOD" ) )
+    {
+        //braaaaaaah, char juggling is pain
 
-		const char *temp = kv->GetString("shambler", "Shambler");
-		int length = 128;
-		char *saved = new char[length];
-		Q_strncpy(saved, temp, strlen(temp) + 1);
-		zombiedescriptions[ZMCLASS_SHAMBLER] = saved;
+        const char *temp = kv->GetString("shambler", "Shambler");
+        int length = 128;
+        char *saved = new char[length];
+        Q_strncpy(saved, temp, strlen(temp) + 1);
+        zombiedescriptions[ZMCLASS_SHAMBLER] = saved;
 
-		temp = kv->GetString("banshee", "Banshee");
-		saved = new char[length];
-		Q_strncpy(saved, temp, strlen(temp) + 1);
-		zombiedescriptions[ZMCLASS_BANSHEE] = saved;
+        temp = kv->GetString("banshee", "Banshee");
+        saved = new char[length];
+        Q_strncpy(saved, temp, strlen(temp) + 1);
+        zombiedescriptions[ZMCLASS_BANSHEE] = saved;
 
-		temp = kv->GetString("hulk", "Hulk");
-		saved = new char[length];
-		Q_strncpy(saved, temp, strlen(temp) + 1);
-		zombiedescriptions[ZMCLASS_HULK] = saved;
+        temp = kv->GetString("hulk", "Hulk");
+        saved = new char[length];
+        Q_strncpy(saved, temp, strlen(temp) + 1);
+        zombiedescriptions[ZMCLASS_HULK] = saved;
 
-		temp = kv->GetString("drifter", "Drifter");
-		saved = new char[length];
-		Q_strncpy(saved, temp, strlen(temp) + 1);
-		zombiedescriptions[ZMCLASS_DRIFTER] = saved;
+        temp = kv->GetString("drifter", "Drifter");
+        saved = new char[length];
+        Q_strncpy(saved, temp, strlen(temp) + 1);
+        zombiedescriptions[ZMCLASS_DRIFTER] = saved;
 
-		temp = kv->GetString("immolator", "Immolator");
-		saved = new char[length];
-		Q_strncpy(saved, temp, strlen(temp) + 1);
-		zombiedescriptions[ZMCLASS_IMMOLATOR] = saved;
-	}
+        temp = kv->GetString("immolator", "Immolator");
+        saved = new char[length];
+        Q_strncpy(saved, temp, strlen(temp) + 1);
+        zombiedescriptions[ZMCLASS_IMMOLATOR] = saved;
+    }
     else
     {
         Warning( "No zombiedesc.res exist!\n" );
     }
 
-	//will delete its child keys as well
-	kv->deleteThis();
+    //will delete its child keys as well
+    kv->deleteThis();
 
-	for (int i=0; i < BM_QUEUE_SIZE; i++)
-	{
-		char buffer[10];
-		Q_snprintf(buffer, sizeof(buffer), "queue%02d", i);
-		queueimages[i] = dynamic_cast<vgui::ImagePanel*>(FindChildByName(buffer));
-	}
+    for (int i=0; i < BM_QUEUE_SIZE; i++)
+    {
+        char buffer[10];
+        Q_snprintf(buffer, sizeof(buffer), "queue%02d", i);
+        queueimages[i] = dynamic_cast<vgui::ImagePanel*>(FindChildByName(buffer));
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -164,11 +161,11 @@ CZMBuildMenu::CZMBuildMenu( Panel* pParent ) : CZMBuildMenuBase( "ZMBuildMenu" )
 //-----------------------------------------------------------------------------
 CZMBuildMenu::~CZMBuildMenu()
 {
-	for (int i=0; i < TYPE_TOTAL; i++)
-	{
-		if (zombiedescriptions[i])
-			delete zombiedescriptions[i];
-	}
+    for (int i=0; i < TYPE_TOTAL; i++)
+    {
+        if (zombiedescriptions[i])
+            delete zombiedescriptions[i];
+    }
 
 }
 
@@ -189,23 +186,23 @@ void CZMBuildMenu::ShowPanel( bool state )
 
 void CZMBuildMenu::OnThink()
 {
-	if ( !IsVisible() ) return;
+    if ( !IsVisible() ) return;
 
 
     // Make sure we have focus.
     MoveToFront();
 
 
-	CalculateButtonState();
+    CalculateButtonState();
 
-	for (int i = 0; i < ZMCLASS_MAX; i++)
-	{
-		if ((spawnbuttons[i] && spawnbuttons[i]->IsCursorOver()) ||
-			(spawnfives[i] && spawnfives[i]->IsCursorOver()))
-		{
-			ShowZombieInfo(i);
-		}
-	}
+    for (int i = 0; i < ZMCLASS_MAX; i++)
+    {
+        if ((spawnbuttons[i] && spawnbuttons[i]->IsCursorOver()) ||
+            (spawnfives[i] && spawnfives[i]->IsCursorOver()))
+        {
+            ShowZombieInfo(i);
+        }
+    }
 }
 
 
@@ -215,58 +212,58 @@ void CZMBuildMenu::CalculateButtonState()
     int flags = GetZombieFlags();
 
 
-	bool button_states[TYPE_TOTAL]; //five buttons
+    bool button_states[TYPE_TOTAL]; //five buttons
 
-	//TGB: if the flags are 0/unset, all zombies should be available
-	//so changed from != 0 to == 0
-	if  (flags == 0)
-	{
-		for (int type=0; type < TYPE_TOTAL; type++)
-			button_states[type] = true;
-	}
-	else
-	{
-		//Someone's defined ZombieFlags here, so start disabling things
-		for (int type=0; type < TYPE_TOTAL; type++)
-			button_states[type] = false;
+    //TGB: if the flags are 0/unset, all zombies should be available
+    //so changed from != 0 to == 0
+    if  (flags == 0)
+    {
+        for (int type=0; type < TYPE_TOTAL; type++)
+            button_states[type] = true;
+    }
+    else
+    {
+        //Someone's defined ZombieFlags here, so start disabling things
+        for (int type=0; type < TYPE_TOTAL; type++)
+            button_states[type] = false;
 
-		//Burnzombies
-		if (flags & BURNZOMBIE_FLAG)
-		{
-			button_states[ZMCLASS_IMMOLATOR] = true;
-		}
-		//Dragzombies
-		if (flags & DRAGZOMBIE_FLAG)
-		{
-			button_states[ZMCLASS_DRIFTER] = true;
-		}
-		//Hulks
-		if (flags & HULK_FLAG)
-		{
-			button_states[ZMCLASS_HULK] = true;
-		}
-		//Fasties
-		if (flags & FASTIE_FLAG)
-		{
-			button_states[ZMCLASS_BANSHEE] = true;
-		}
-		//Shamblies
-		if (flags & SHAMBLIE_FLAG)
-		{
-			button_states[ZMCLASS_SHAMBLER] = true;
-		}
-	}
-		
+        //Burnzombies
+        if (flags & BURNZOMBIE_FLAG)
+        {
+            button_states[ZMCLASS_IMMOLATOR] = true;
+        }
+        //Dragzombies
+        if (flags & DRAGZOMBIE_FLAG)
+        {
+            button_states[ZMCLASS_DRIFTER] = true;
+        }
+        //Hulks
+        if (flags & HULK_FLAG)
+        {
+            button_states[ZMCLASS_HULK] = true;
+        }
+        //Fasties
+        if (flags & FASTIE_FLAG)
+        {
+            button_states[ZMCLASS_BANSHEE] = true;
+        }
+        //Shamblies
+        if (flags & SHAMBLIE_FLAG)
+        {
+            button_states[ZMCLASS_SHAMBLER] = true;
+        }
+    }
+        
 
-	for (int type=0; type < TYPE_TOTAL; type++)
-	{
-		if (spawnbuttons[type])
-			spawnbuttons[type]->SetEnabled(button_states[type]);
+    for (int type=0; type < TYPE_TOTAL; type++)
+    {
+        if (spawnbuttons[type])
+            spawnbuttons[type]->SetEnabled(button_states[type]);
 
-		if (spawnfives[type])
-			spawnfives[type]->SetEnabled(button_states[type]);
-			
-	}
+        if (spawnfives[type])
+            spawnfives[type]->SetEnabled(button_states[type]);
+            
+    }
 }
 
 //--------------------------------------------------------------
@@ -274,22 +271,22 @@ void CZMBuildMenu::CalculateButtonState()
 //--------------------------------------------------------------
 void CZMBuildMenu::ShowZombieInfo( int type )
 {
-	if (!info_image || !info_rescost || !info_popcost || !info_description)
-		return;
+    if (!info_image || !info_rescost || !info_popcost || !info_description)
+        return;
 
-	info_image->SetImage(zombieimages[type]);
+    info_image->SetImage(zombieimages[type]);
 
 
     ZombieClass_t zclass = static_cast<ZombieClass_t>( type );
 
-	char buffer[50];
-	Q_snprintf(buffer, sizeof(buffer), "%d", C_ZMBaseZombie::GetCost(zclass) );
-	info_rescost->SetText(buffer);
+    char buffer[50];
+    Q_snprintf(buffer, sizeof(buffer), "%d", C_ZMBaseZombie::GetCost(zclass) );
+    info_rescost->SetText(buffer);
 
-	Q_snprintf(buffer, sizeof(buffer), "%d", C_ZMBaseZombie::GetPopCost(zclass));
-	info_popcost->SetText(buffer);
+    Q_snprintf(buffer, sizeof(buffer), "%d", C_ZMBaseZombie::GetPopCost(zclass));
+    info_popcost->SetText(buffer);
 
-	info_description->SetText(zombiedescriptions[type]);
+    info_description->SetText(zombiedescriptions[type]);
 }
 
 //--------------------------------------------------------------
@@ -297,39 +294,39 @@ void CZMBuildMenu::ShowZombieInfo( int type )
 //--------------------------------------------------------------
 void CZMBuildMenu::UpdateQueue( const int q[], int size )
 {
-	bool zombies_present = false;
-	for ( int i = 0; i < size; i++ )
-	{
-		const int type = q[i];
+    bool zombies_present = false;
+    for ( int i = 0; i < size; i++ )
+    {
+        const int type = q[i];
 
-		if (!queueimages[i])
-			return;
+        if (!queueimages[i])
+            return;
 
-		// Is there a zombie queued at this spot?
-		if ( C_ZMBaseZombie::IsValidClass( (ZombieClass_t)type ) )
-		{
-			vgui::IImage *given_img = zombiequeue[type];
+        // Is there a zombie queued at this spot?
+        if ( C_ZMBaseZombie::IsValidClass( (ZombieClass_t)type ) )
+        {
+            vgui::IImage *given_img = zombiequeue[type];
 
-			if (given_img != queueimages[i]->GetImage())
-			{
-				//queueimages[i]->SetShouldScaleImage(true);
-				queueimages[i]->SetImage(given_img);
-			}
-			queueimages[i]->SetVisible(true);
+            if (given_img != queueimages[i]->GetImage())
+            {
+                //queueimages[i]->SetShouldScaleImage(true);
+                queueimages[i]->SetImage(given_img);
+            }
+            queueimages[i]->SetVisible(true);
 
-			zombies_present = true;
-		}
-		else
-		{
-			// no valid type, so don't draw an image
-			queueimages[i]->SetVisible(false);
-		}
-		
-	}
+            zombies_present = true;
+        }
+        else
+        {
+            // no valid type, so don't draw an image
+            queueimages[i]->SetVisible(false);
+        }
+        
+    }
 
-	if (removelast)
-		removelast->SetEnabled(zombies_present);
-	if (clearqueue)
-		clearqueue->SetEnabled(zombies_present);
-	
+    if (removelast)
+        removelast->SetEnabled(zombies_present);
+    if (clearqueue)
+        clearqueue->SetEnabled(zombies_present);
+    
 }

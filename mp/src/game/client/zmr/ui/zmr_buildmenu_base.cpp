@@ -8,6 +8,14 @@
 #include "zmr_buildmenu_base.h"
 
 
+CZMBuildMenuBase::CZMBuildMenuBase( vgui::Panel* pParent, const char* name ) : BaseClass( pParent, name )
+{
+}
+
+CZMBuildMenuBase::~CZMBuildMenuBase()
+{
+}
+
 void CZMBuildMenuBase::OnCommand( const char *command )
 {
 	if ( Q_strnicmp( command, "zm_cmd_queue", 12 ) == 0 )
