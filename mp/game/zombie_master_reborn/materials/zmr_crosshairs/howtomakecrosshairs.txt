@@ -1,0 +1,14 @@
+// Make your crosshair texture, 1024x1024, diffuse should be completely white, alpha channel has the actual crosshair.
+// Export as tga in <gamefolder>/materialsrc/zmr_crosshairs (this is required, unfortunately)
+// Make a .txt with the same name as the tga and paste the parameters below into it.
+// Drag the tga onto bin/vtex.exe
+// There is now a new vtf in materials/zmr_crosshairs with the same name.
+// You'll have to copy one of the .vmts and tune edgesoftnessstart/edgesoftnessend
+// Pro-tip: use 'mat_reloadmaterial zmr_crosshairs/name' for quick editing
+
+alphatodistance 1
+reduce 8
+distancespread 4
+nomip 1
+nolod 1
+nocompress 1

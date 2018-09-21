@@ -1,0 +1,15 @@
+UnlitGeneric
+{
+	$basetexture zmr_crosshairs\hollow_4
+	$ignorez 1
+	$vertexalpha 1
+	$vertexcolor 1
+	
+	
+	$distancealpha 1
+	
+	$softedges 1
+	$edgesoftnessstart .6
+	$edgesoftnessend .5
+	$scaleedgesoftnessbasedonscreenres 0
+}
