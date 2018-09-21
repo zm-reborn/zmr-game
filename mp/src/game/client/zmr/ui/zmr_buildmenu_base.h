@@ -17,12 +17,8 @@ public:
     DECLARE_CLASS_SIMPLE( CZMBuildMenuBase, vgui::Frame );
 
 
-    CZMBuildMenuBase( const char* name ) : Frame( g_pClientMode->GetViewport(), name )
-    {
-    }
-    ~CZMBuildMenuBase()
-    {
-    }
+    CZMBuildMenuBase( vgui::Panel* pParent, const char* name );
+    ~CZMBuildMenuBase();
 
 
     virtual vgui::VPANEL GetVPanel( void ) OVERRIDE { return BaseClass::GetVPanel(); };
