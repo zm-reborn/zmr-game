@@ -472,6 +472,25 @@ CBaseEntity* CZMPlayer::FindNextObserverTarget( bool bReverse )
     return BaseClass::FindNextObserverTarget( bReverse );
 }
 
+void CZMPlayer::CheckObserverSettings()
+{
+    // HACK: Fix zombie spectating not transmitting things properly because view offsets are at origin
+    if ( GetObserverMode() == OBS_MODE_CHASE )
+    {
+        CBaseEntity* pTarget = GetObserverTarget();
+
+        if ( pTarget && pTarget->IsBaseZombie() )
+        {
+            if ( pTarget->GetViewOffset() != GetViewOffset() )
+            {
+                SetViewOffset( pTarget->GetViewOffset() );
+            }
+        }
+    }
+
+    BaseClass::CheckObserverSettings();
+}
+
 void CZMPlayer::SetTeamSpecificProps()
 {
     // To shut up the asserts...

@@ -84,6 +84,7 @@ public:
 
     virtual bool            IsValidObserverTarget( CBaseEntity* pEnt ) OVERRIDE;
     virtual CBaseEntity*    FindNextObserverTarget( bool bReverse ) OVERRIDE;
+    virtual void            CheckObserverSettings() OVERRIDE;
 
     virtual int     ShouldTransmit( const CCheckTransmitInfo* ) OVERRIDE;
 
