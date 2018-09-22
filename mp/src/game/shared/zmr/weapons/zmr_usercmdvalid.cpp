@@ -15,6 +15,10 @@ bool CZMUserCmdHitWepValidator::IsUserCmdHitsValid( ZMUserCmdValidData_t& data )
     Assert( data.pAttacker != nullptr && data.pVictim != nullptr );
 
 
+    if ( !g_ZMUserCmdSystem.UsesClientsideDetection( data.pVictim ) )
+        return OnUserCmdError( "Victim does not use clientside detection!" );
+
+
     int maxBullets = GetMaxUserCmdBullets( data );
     if ( maxBullets > 0 && data.nHits > maxBullets )
     {
@@ -32,7 +36,7 @@ bool CZMUserCmdHitWepValidator::IsUserCmdHitsValid( ZMUserCmdValidData_t& data )
     }
 
 
-    Vector dir = data.pVictim->WorldSpaceCenter() - data.pAttacker->Weapon_ShootPosition();
+    Vector dir = data.pVictim->WorldSpaceCenter() - data.vecSrc;
     float dist = dir.NormalizeInPlace();
 
     float maxdist = GetMaxDamageDist( data );

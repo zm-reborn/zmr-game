@@ -11,7 +11,7 @@
 class CZMBaseWeapon;
 struct ZMUserCmdValidData_t
 {
-    ZMUserCmdValidData_t( CZMPlayer* pAttacker, CZMBaseWeapon* pWeapon )
+    ZMUserCmdValidData_t( CZMPlayer* pAttacker, CZMBaseWeapon* pWeapon, Vector vecSrc )
     {
         this->pAttacker = pAttacker;
         this->pVictim = nullptr;
@@ -19,6 +19,7 @@ struct ZMUserCmdValidData_t
         this->nHits = 0;
         this->nAlreadyHit = 0;
         this->nEntitiesAlreadyHit = 0;
+        this->vecSrc = vecSrc;
     }
 
 
@@ -28,6 +29,7 @@ struct ZMUserCmdValidData_t
     int     nHits;
     int     nAlreadyHit;
     int     nEntitiesAlreadyHit;
+    Vector  vecSrc;
 };
 #endif
 

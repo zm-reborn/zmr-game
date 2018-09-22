@@ -121,7 +121,7 @@ CZMPlayer::CZMPlayer()
     m_flNextModelChangeTime = 0.0f;
     m_flNextVoiceLineTime = 0.0f;
     m_flInterpNPCTime = 0.0f;
-    m_serverWepData.Reset();
+    m_ServerWepData.Reset();
 
 
     BaseClass::ChangeTeam( 0 );
@@ -377,10 +377,11 @@ void CZMPlayer::CopyWeaponDamage( CZMBaseWeapon* pWeapon, const FireBulletsInfo_
     if ( !pCmd )
         return;
 
-    m_serverWepData.iAmmoType = info.m_iAmmoType;
-    m_serverWepData.flDamage = info.m_iPlayerDamage;
-    m_serverWepData.iLastFireCommandNumber = pCmd->command_number;
-    m_serverWepData.hWeapon.Set( pWeapon );
+    m_ServerWepData.iAmmoType = info.m_iAmmoType;
+    m_ServerWepData.flDamage = info.m_iPlayerDamage;
+    m_ServerWepData.iLastFireCommandNumber = pCmd->command_number;
+    m_ServerWepData.hWeapon.Set( pWeapon );
+    m_ServerWepData.vecShootPos = info.m_vecSrc;
 }
 
 void CZMPlayer::HandleDamagesFromUserCmd()
@@ -391,10 +392,10 @@ void CZMPlayer::HandleDamagesFromUserCmd()
         return;
 
 
-    g_ZMUserCmdSystem.ApplyDamage( this, m_serverWepData, pCmd->zmHitData );
+    g_ZMUserCmdSystem.ApplyDamage( this, m_ServerWepData, pCmd->zmHitData );
 
 
-    m_serverWepData.Reset();
+    m_ServerWepData.Reset();
 }
 
 void CZMPlayer::PlayerDeathThink()

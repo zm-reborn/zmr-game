@@ -1013,14 +1013,6 @@ void CZMBaseWeapon::TransferReserveAmmo( CBaseCombatCharacter* pOwner )
     }
 }
 
-bool CZMBaseWeapon::IsUserCmdHitsValid( ZMUserCmdValidData_t& data )
-{
-    if ( !data.pVictim->IsBaseZombie() )
-        return OnUserCmdError( "Hit entity is not a zombie!!" );
-
-    return CZMUserCmdHitWepValidator::IsUserCmdHitsValid( data );
-}
-
 float CZMBaseWeapon::GetMaxDamageDist( ZMUserCmdValidData_t& data ) const
 {
     return m_fMaxRange1;
