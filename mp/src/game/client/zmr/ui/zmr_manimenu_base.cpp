@@ -7,6 +7,18 @@
 #include "zmr_manimenu_base.h"
 
 
+
+void CZMManiMenuBase::Paint()
+{
+    // HACK:
+    // See scoreboard Paint() for rant
+    CMatRenderContextPtr pRenderContext( materials );
+    pRenderContext->SetStencilReferenceValue( 0 );
+
+
+    BaseClass::Paint();
+}
+
 void CZMManiMenuBase::OnCommand( const char *command )
 {
 	if ( Q_stricmp( command, "manipulate" ) == 0 )
