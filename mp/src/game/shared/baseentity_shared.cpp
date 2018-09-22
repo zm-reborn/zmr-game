@@ -56,6 +56,8 @@ ConVar hl2_episodic( "hl2_episodic", "0", FCVAR_REPLICATED );
 
 #if defined( ZMR ) && !defined( CLIENT_DLL )
 static ConVar sv_removeunreasonablevphysics( "sv_removeunreasonablevphysics", "1" );
+
+#include "zmr_usercmd.h"
 #endif
 
 #include "rumble_shared.h"
@@ -1712,7 +1714,7 @@ void CBaseEntity::FireBullets( const FireBulletsInfo_t &info )
                 {
 #ifdef GAME_DLL
                     // Clientside hit reg will do this for us.
-                    if ( pEntity->IsBaseZombie() )
+                    if ( g_ZMUserCmdSystem.UsesClientsideDetection( pEntity ) )
                         return false;
 #endif
                     if (pEntity->IsPlayer()

@@ -44,7 +44,6 @@ public:
 
 
 
-
 #ifdef CLIENT_DLL
     void ClearDamage();
 
@@ -57,6 +56,8 @@ public:
         const ZMServerWepData_t& dmgdata,
         const ZMUserCmdHitList_t& list );
 #endif
+
+    bool UsesClientsideDetection( CBaseEntity* pEnt ) const;
 
 protected:
 #ifdef CLIENT_DLL

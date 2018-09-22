@@ -86,12 +86,14 @@ struct ZMServerWepData_t
         iLastFireCommandNumber = 0;
         flDamage = 0.0f;
         hWeapon.Set( nullptr );
+        vecShootPos = vec3_origin;
     }
 
     int iLastFireCommandNumber;
     int iAmmoType;
     float flDamage;
     CHandle<CZMBaseWeapon> hWeapon;
+    Vector vecShootPos;
 };
 
 class CZMPlayer : public CHL2_Player
@@ -278,7 +280,7 @@ public:
     void CopyWeaponDamage( CZMBaseWeapon* pWeapon, const FireBulletsInfo_t& info );
 private:
     void HandleDamagesFromUserCmd();
-    ZMServerWepData_t m_serverWepData;
+    ZMServerWepData_t m_ServerWepData;
 
 
     // Since I didn't get this at first either, this is only sent to THIS player.

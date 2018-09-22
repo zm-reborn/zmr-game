@@ -156,11 +156,12 @@ int CZMUserCmdSystem::ApplyDamage( CZMPlayer* pPlayer, const ZMServerWepData_t& 
 
     int iAmmoType = wepdata.iAmmoType;
     int fDmgBits = GetAmmoDef()->DamageType( wepdata.iAmmoType );
+    Vector vecSrc = wepdata.vecShootPos;
     int nHitsAccumulated = 0;
     int nEntitiesHitAccumulated = 0;
 
     CUtlVector<int> dealt;
-    ZMUserCmdValidData_t data( pPlayer, pWep );
+    ZMUserCmdValidData_t data( pPlayer, pWep, vecSrc );
 
     // Loop through the entities and damage them.
 
@@ -212,19 +213,21 @@ int CZMUserCmdSystem::ApplyDamage( CZMPlayer* pPlayer, const ZMServerWepData_t& 
 
 
         // Construct a pseudo FireBullets to let the entity handle all the damage scaling, etc.
+        
 
-        Vector hitpos = pEntity->WorldSpaceCenter();
-        Vector dir = hitpos - pPlayer->Weapon_ShootPosition();
-        dir.NormalizeInPlace();
-        
-        
         trace_t tr;
-        tr.endpos = hitpos;
+        tr.startpos = vecSrc;
+        tr.endpos = pEntity->WorldSpaceCenter();
+
+
+        Vector dir = tr.endpos - tr.startpos;
+        dir.NormalizeInPlace();
+
 
         CTakeDamageInfo dmg( pPlayer, pPlayer, pWep, vec3_origin, vec3_origin, flDamage, fDmgBits );
         dmg.SetAmmoType( iAmmoType );
         pPlayer->ModifyFireBulletsDamage( &dmg );
-        CalculateBulletDamageForce( &dmg, dmg.GetAmmoType(), dir, hitpos );
+        CalculateBulletDamageForce( &dmg, dmg.GetAmmoType(), dir, tr.endpos );
 
 
         for ( int i = 0; i < cmddata.nHits; i++ )
@@ -254,5 +257,18 @@ int CZMUserCmdSystem::ApplyDamage( CZMPlayer* pPlayer, const ZMServerWepData_t& 
     return dealt.Count();
 }
 #endif
+
+bool CZMUserCmdSystem::UsesClientsideDetection( CBaseEntity* pEnt ) const
+{
+    //
+    // NOTE: Client will still have to manually insert hit data from TraceAttack.
+    //
+#ifdef CLIENT_DLL
+    return pEnt && pEnt->IsNPCR();
+#else
+    return pEnt && pEnt->IsBaseZombie();
+#endif
+}
+
 
 CZMUserCmdSystem g_ZMUserCmdSystem;

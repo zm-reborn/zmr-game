@@ -162,9 +162,6 @@ protected:
 
 
     // Client side hit reg stuff
-public:
-    virtual bool IsUserCmdHitsValid( ZMUserCmdValidData_t& data ) OVERRIDE;
-protected:
     virtual float GetMaxDamageDist( ZMUserCmdValidData_t& data ) const OVERRIDE;
     virtual int GetMaxUserCmdBullets( ZMUserCmdValidData_t& data ) const OVERRIDE;
 
