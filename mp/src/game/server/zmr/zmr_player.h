@@ -87,6 +87,7 @@ struct ZMServerWepData_t
         flDamage = 0.0f;
         hWeapon.Set( nullptr );
         vecShootPos = vec3_origin;
+        bIsMelee = false;
     }
 
     int iLastFireCommandNumber;
@@ -94,6 +95,7 @@ struct ZMServerWepData_t
     float flDamage;
     CHandle<CZMBaseWeapon> hWeapon;
     Vector vecShootPos;
+    bool bIsMelee;
 };
 
 class CZMPlayer : public CHL2_Player
@@ -278,6 +280,7 @@ public:
 
 
     void CopyWeaponDamage( CZMBaseWeapon* pWeapon, const FireBulletsInfo_t& info );
+    void CopyMeleeDamage( CZMBaseWeapon* pWeapon, const Vector& vecSrc, float flDamage );
 private:
     void HandleDamagesFromUserCmd();
     ZMServerWepData_t m_ServerWepData;

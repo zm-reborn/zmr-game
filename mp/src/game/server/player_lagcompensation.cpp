@@ -36,7 +36,7 @@ static ConVar sv_lagcompensation_teleport_dist( "sv_lagcompensation_teleport_dis
 #define LAG_COMPENSATION_ERROR_EPS_SQR ( 4.0f * 4.0f )
 
 #ifdef ZMR
-ConVar sv_unlag( "sv_unlag", "0", FCVAR_DEVELOPMENTONLY, "Enables player lag compensation" );
+ConVar sv_unlag( "sv_unlag", "0", 0, "Enables player lag compensation" );
 #else
 ConVar sv_unlag( "sv_unlag", "1", FCVAR_DEVELOPMENTONLY, "Enables player lag compensation" );
 #endif

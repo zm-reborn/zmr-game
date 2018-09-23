@@ -13,6 +13,8 @@
 #endif
 
 
+static ConVar zm_sv_clientsidehitdetection( "zm_sv_clientsidehitdetection", "1", FCVAR_NOTIFY | FCVAR_ARCHIVE | FCVAR_REPLICATED );
+
 
 void ZMUserCmdHitData_t::Merge( const ZMUserCmdHitData_t& hit )
 {
@@ -226,8 +228,16 @@ int CZMUserCmdSystem::ApplyDamage( CZMPlayer* pPlayer, const ZMServerWepData_t& 
 
         CTakeDamageInfo dmg( pPlayer, pPlayer, pWep, vec3_origin, vec3_origin, flDamage, fDmgBits );
         dmg.SetAmmoType( iAmmoType );
-        pPlayer->ModifyFireBulletsDamage( &dmg );
-        CalculateBulletDamageForce( &dmg, dmg.GetAmmoType(), dir, tr.endpos );
+
+        if ( !wepdata.bIsMelee )
+        {
+            pPlayer->ModifyFireBulletsDamage( &dmg );
+            CalculateBulletDamageForce( &dmg, dmg.GetAmmoType(), dir, tr.endpos );
+        }
+        else
+        {
+            CalculateMeleeDamageForce( &dmg, dir, tr.endpos );
+        }
 
 
         for ( int i = 0; i < cmddata.nHits; i++ )
@@ -258,11 +268,19 @@ int CZMUserCmdSystem::ApplyDamage( CZMPlayer* pPlayer, const ZMServerWepData_t& 
 }
 #endif
 
+bool CZMUserCmdSystem::UsesClientsideDetection()
+{
+    return zm_sv_clientsidehitdetection.GetBool();
+}
+
 bool CZMUserCmdSystem::UsesClientsideDetection( CBaseEntity* pEnt ) const
 {
     //
     // NOTE: Client will still have to manually insert hit data from TraceAttack.
     //
+    if ( !UsesClientsideDetection() )
+        return false;
+
 #ifdef CLIENT_DLL
     return pEnt && pEnt->IsNPCR();
 #else

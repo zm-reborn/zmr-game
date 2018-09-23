@@ -564,7 +564,7 @@ void C_ZMBaseZombie::TraceAttack( const CTakeDamageInfo& info, const Vector& vec
 {
     BaseClass::TraceAttack( info, vecDir, ptr, pAccumulator );
 
-    if ( m_takedamage == DAMAGE_YES )
+    if ( m_takedamage == DAMAGE_YES && g_ZMUserCmdSystem.UsesClientsideDetection( this ) )
     {
         ZMUserCmdHitData_t hit;
         hit.entindex = entindex();
