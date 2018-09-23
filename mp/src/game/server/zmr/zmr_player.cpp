@@ -382,6 +382,22 @@ void CZMPlayer::CopyWeaponDamage( CZMBaseWeapon* pWeapon, const FireBulletsInfo_
     m_ServerWepData.iLastFireCommandNumber = pCmd->command_number;
     m_ServerWepData.hWeapon.Set( pWeapon );
     m_ServerWepData.vecShootPos = info.m_vecSrc;
+    m_ServerWepData.bIsMelee = false;
+}
+
+void CZMPlayer::CopyMeleeDamage( CZMBaseWeapon* pWeapon, const Vector& vecSrc, float flDamage )
+{
+    const CUserCmd* pCmd = GetCurrentCommand();
+    Assert( pCmd != nullptr );
+    if ( !pCmd )
+        return;
+
+    m_ServerWepData.iAmmoType = -1;
+    m_ServerWepData.flDamage = flDamage;
+    m_ServerWepData.iLastFireCommandNumber = pCmd->command_number;
+    m_ServerWepData.hWeapon.Set( pWeapon );
+    m_ServerWepData.vecShootPos = vecSrc;
+    m_ServerWepData.bIsMelee = true;
 }
 
 void CZMPlayer::HandleDamagesFromUserCmd()
@@ -1098,7 +1114,7 @@ void CZMPlayer::FireBullets( const FireBulletsInfo_t& info )
     if ( !m_bIsFireBulletsRecursive )
     {
         // Move ents back to history positions based on local player's lag
-        //lagcompensation->StartLagCompensation( this, this->GetCurrentCommand() );
+        lagcompensation->StartLagCompensation( this, this->GetCurrentCommand() );
 
 
         NoteWeaponFired();
@@ -1110,7 +1126,7 @@ void CZMPlayer::FireBullets( const FireBulletsInfo_t& info )
 
 
         // Move ents back to their original positions.
-        //lagcompensation->FinishLagCompensation( this );
+        lagcompensation->FinishLagCompensation( this );
     }
     else
     {

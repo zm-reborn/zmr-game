@@ -57,6 +57,7 @@ public:
         const ZMUserCmdHitList_t& list );
 #endif
 
+    static bool UsesClientsideDetection();
     bool UsesClientsideDetection( CBaseEntity* pEnt ) const;
 
 protected:

@@ -54,11 +54,12 @@ ConVar hl2_episodic( "hl2_episodic", "0", FCVAR_REPLICATED );
 #endif // TF_DLL
 
 
-#if defined( ZMR ) && !defined( CLIENT_DLL )
+#ifdef ZMR
+#ifdef GAME_DLL
 static ConVar sv_removeunreasonablevphysics( "sv_removeunreasonablevphysics", "1" );
-
-#include "zmr_usercmd.h"
 #endif
+#include "zmr_player_shared.h"
+#endif // ZMR
 
 #include "rumble_shared.h"
 
@@ -1616,8 +1617,6 @@ typedef CTraceFilterSimpleList CBulletsTraceFilter;
 #endif
 
 #ifdef ZMR
-static ConVar zm_sv_bulletspassplayers( "zm_sv_bulletspassplayers", "1", FCVAR_NOTIFY | FCVAR_ARCHIVE | FCVAR_REPLICATED, "Do bullets players shoot pass through other players?" );
-
 #ifdef _DEBUG
 static ConVar zm_sv_debugbullets( "zm_sv_debugbullets", "0", FCVAR_NOTIFY | FCVAR_REPLICATED, "" );
 static ConVar zm_sv_debugbullets_time( "zm_sv_debugbullets_time", "1", FCVAR_NOTIFY | FCVAR_REPLICATED, "" );
@@ -1684,58 +1683,10 @@ void CBaseEntity::FireBullets( const FireBulletsInfo_t &info )
 
 	Vector vecDir;
 	Vector vecEnd;
-
-#ifdef ZMR // ZMRCHANGE: Use our own bullet trace filter.
-    class CZMBulletsTraceFilter : public CTraceFilter
-    {
-    public:
-        CZMBulletsTraceFilter( CBaseEntity* pEnt, CBaseEntity* pAdd, int collisionGroup ) : CTraceFilter()
-        {
-            m_pShooter = pEnt;
-            m_pAdditional = pAdd;
-        }
-
-        bool ShouldHitEntity( IHandleEntity* pHandleEntity, int contentsMask )
-        {
-            CBaseEntity* pEntity = EntityFromEntityHandle( pHandleEntity );
-
-            if ( !pEntity ) return false;
-            if ( pEntity == m_pShooter ) return false;
-            if ( pEntity == m_pAdditional ) return false;
-
-
-            if ( m_pShooter )
-            {
-                // It's a bone follower of the entity to ignore (toml 8/3/2007)
-                if ( pEntity->GetOwnerEntity() == m_pShooter )
-                    return false;
-
-                if ( m_pShooter->IsPlayer() )
-                {
-#ifdef GAME_DLL
-                    // Clientside hit reg will do this for us.
-                    if ( g_ZMUserCmdSystem.UsesClientsideDetection( pEntity ) )
-                        return false;
-#endif
-                    if (pEntity->IsPlayer()
-                    &&  pEntity->GetTeamNumber() == m_pShooter->GetTeamNumber()
-                    &&  zm_sv_bulletspassplayers.GetBool())
-                        return false;
-                }
-            }
-
-            return true;
-        }
-
-    private:
-        CBaseEntity* m_pShooter;
-        CBaseEntity* m_pAdditional;
-    };
-#endif
 	
 	// Skip multiple entities when tracing
 #ifdef ZMR
-    CZMBulletsTraceFilter traceFilter( this, info.m_pAdditionalIgnoreEnt, COLLISION_GROUP_NONE );
+    CZMPlayerAttackTraceFilter traceFilter( this, info.m_pAdditionalIgnoreEnt, COLLISION_GROUP_NONE );
 #else
 	CBulletsTraceFilter traceFilter( COLLISION_GROUP_NONE );
 
