@@ -207,6 +207,7 @@ CZMHudVoiceMenu::CZMHudVoiceMenu( const char* pElementName ) : CHudElement( pEle
 
     SetPaintBackgroundEnabled( false );
     SetVisible( false );
+    SetKeyBoardInputEnabled( false );
 
 
 
