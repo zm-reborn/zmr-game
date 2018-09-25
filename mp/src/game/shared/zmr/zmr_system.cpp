@@ -1,6 +1,9 @@
 #include "cbase.h"
 #include "GameEventListener.h"
 #include <ctime>
+#ifdef GAME_DLL
+#include "networkstringtable_gamedll.h"
+#endif
 
 #ifdef CLIENT_DLL
 #include "physpropclientside.h"
@@ -251,6 +254,15 @@ void CZMSystem::RoundRestartEffect()
     default :
         break;
     }
+}
+#endif
+
+
+#ifdef GAME_DLL
+void ZMCreateStringTables()
+{
+    extern INetworkStringTable* g_pZMCustomPlyModels;
+    g_pZMCustomPlyModels = networkstringtable->CreateStringTable( "ZMCustomModels", 32 );
 }
 #endif
 

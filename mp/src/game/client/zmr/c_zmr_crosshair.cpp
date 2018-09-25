@@ -41,9 +41,9 @@ CZMBaseCrosshair* CZMCrosshairSystem::CreateCrosshairFromData( KeyValues* kv )
 
     const char* type = kv->GetString( "type" );
 
-    if ( Q_stricmp( type, "font" ) == 0 )
+    if ( Q_stricmp( type, "material" ) == 0 )
     {
-        return new CZMFontCrosshair;
+        return new CZMMaterialCrosshair;
     }
     else if ( Q_stricmp( type, "dynamiccrosshair" ) == 0 )
     {
@@ -264,7 +264,7 @@ void CZMBaseCrosshair::GetDrawPosition( float& flPosX, float& flPosY ) const
     flPosY = vh / 2;
 }
 
-void CZMBaseCrosshair::DrawDot() const
+void CZMBaseCrosshair::DrawDot()
 {
     float dot = GetDotSize();
     if ( dot <= 0.0f )
@@ -282,6 +282,7 @@ void CZMBaseCrosshair::DrawDot() const
 
     float outw = GetOutlineWidth();
 
+    /*
     surface()->DrawSetColor( outlineclr );
     surface()->DrawFilledRect(
         cx - dot - outw,
@@ -291,6 +292,26 @@ void CZMBaseCrosshair::DrawDot() const
 
     surface()->DrawSetColor( clr );
     surface()->DrawFilledRect(
+        cx - dot,
+        cy - dot,
+        cx + dot,
+        cy + dot );
+    */
+
+    if ( outw > 0.0f )
+    {
+        surface()->DrawSetColor( outlineclr );
+        DrawMaterial(
+            "zmr_crosshairs/dot",
+            cx - dot - outw,
+            cy - dot - outw,
+            cx + dot + outw,
+            cy + dot + outw );
+    }
+
+    surface()->DrawSetColor( clr );
+    DrawMaterial(
+        "zmr_crosshairs/dot",
         cx - dot,
         cy - dot,
         cx + dot,
@@ -435,48 +456,74 @@ void CZMPistolCrosshair::Draw()
 
 
 //
-CZMFontCrosshair::CZMFontCrosshair()
+CZMMaterialCrosshair::CZMMaterialCrosshair()
 {
-    m_hFont = NULL;
+    m_nTexMat0Id = 0;
+    *m_szTexture = NULL;
 }
 
-void CZMFontCrosshair::LoadValues( KeyValues* kv )
+void CZMMaterialCrosshair::LoadValues( KeyValues* kv )
 {
     CZMBaseCrosshair::LoadValues( kv );
 
 
-    m_FontColor = kv->GetColor( "fontcolor" );
-    m_wChar = (wchar_t)kv->GetString( "fontchar" )[0];
+    m_Mat0Clr = kv->GetColor( "mat0color" );
+    const char* mat = kv->GetString( "material0" );
+
+    Q_strncpy( m_szTexture, mat, sizeof( m_szTexture ) );
 }
 
-void CZMFontCrosshair::WriteValues( KeyValues* kv ) const
+void CZMMaterialCrosshair::WriteValues( KeyValues* kv ) const
 {
     CZMBaseCrosshair::WriteValues( kv );
 
-    char c[2];
-    c[0] = (char)m_wChar;
-    c[1] = 0;
 
-
-    kv->SetString( "type", "font" );
-    kv->SetString( "fontchar", c );
+    kv->SetString( "type", "material" );
+    kv->SetString( "material0", m_szTexture );
 
 
     char temp[64];
     Color clr;
-    clr = m_FontColor;
+    clr = m_Mat0Clr;
     Q_snprintf( temp, sizeof( temp ), "%i %i %i %i", (int)clr[0], (int)clr[1], (int)clr[2], (int)clr[3] );
-    kv->SetString( "fontcolor", temp );
+    kv->SetString( "mat0color", temp );
 }
 
-void CZMFontCrosshair::Draw()
+void CZMMaterialCrosshair::Draw()
 {
-    const Color circleclr = GetFontColor();
+    const Color circleclr = GetMaterial0Color();
 
     float cx, cy;
     GetDrawPosition( cx, cy );
 
+    float offset = GetOffsetFromCenter();
 
+    bool bHasTexture = *m_szTexture != NULL;
+
+    if ( bHasTexture )
+    {
+        if ( m_nTexMat0Id == 0 )
+        {
+            m_nTexMat0Id = surface()->CreateNewTextureID();
+            surface()->DrawSetTextureFile( m_nTexMat0Id, m_szTexture, true, false );
+        }
+
+        if ( offset > 0 )
+        {
+            surface()->DrawSetColor( circleclr );
+            surface()->DrawSetTexture( m_nTexMat0Id );
+            surface()->DrawTexturedRect(
+                cx - offset,
+                cy - offset,
+                cx + offset,
+                cy + offset );
+        }
+    }
+
+
+
+
+    /*
     if ( m_hFont == NULL )
     {
         m_hFont = scheme()->GetIScheme( scheme()->GetScheme( "ClientScheme" ) )->GetFont( "ZMCrosshairSmall", false );
@@ -495,6 +542,8 @@ void CZMFontCrosshair::Draw()
     surface()->DrawSetTextPos( cx - h / 2, cy - h / 2 );
     surface()->DrawSetTextFont( m_hFont );
     surface()->DrawUnicodeChar( m_wChar );
+    */
+
 
     /*
     float offset = GetOffsetFromCenter();
@@ -638,4 +687,21 @@ void CZMAccuracyCrosshair::Draw()
 
 
     DrawDot();
+}
+
+CZMCrosshairPartMat::CZMCrosshairPartMat()
+{
+    m_nTexId = 0;
+}
+
+void CZMCrosshairPartMat::DrawMaterial( const char* pszMat, int x0, int y0, int x1, int y1 )
+{
+    if ( m_nTexId == 0 )
+    {
+        m_nTexId = surface()->CreateNewTextureID();
+        surface()->DrawSetTextureFile( m_nTexId, pszMat, true, false );
+    }
+
+    surface()->DrawSetTexture( m_nTexId );
+    surface()->DrawTexturedRect( x0, y0, x1, y1 );
 }

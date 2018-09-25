@@ -1,0 +1,106 @@
+// The default player models.
+//
+// model		- You're gonna need this one
+// armsmodel	- If not set, uses models/weapons/c_arms_citizen.mdl
+// armscolor	- The color of the sleeve
+// armsskin		- The skin, defaults to 0. 0 = white, 1 = black
+// gender		- Gender, 0 = male, 1 = female. Male by default.
+//
+"PlayerModels"
+{
+	"Female #1"
+	{
+		"model"		"models/humans/group02/female_01.mdl"
+		"armscolor"		"100 163 168"
+		"gender"		"1"
+	}
+	"Female #2"
+	{
+		"model"		"models/humans/group02/female_02.mdl"
+		"armscolor"		"87 95 73"
+		"gender"		"1"
+	}
+	"Female #3"
+	{
+		"model"		"models/humans/group02/female_03.mdl"
+		"armscolor"		"131 167 115"
+		"armsskin"		"1"
+		"gender"		"1"
+	}
+	"Female #4"
+	{
+		"model"		"models/humans/group02/female_04.mdl"
+		"armscolor"		"93 85 75"
+		"gender"		"1"
+	}
+	"Female #5"
+	{
+		"model"		"models/humans/group02/female_06.mdl"
+		"armscolor"		"152 57 63"
+		"gender"		"1"
+	}
+	"Female #6"
+	{
+		"model"		"models/humans/group02/female_07.mdl"
+		"armscolor"		"106 70 96"
+		"armsskin"		"1"
+		"gender"		"1"
+	}
+	"Male #1"
+	{
+		"model"		"models/humans/group02/male_01.mdl"
+		"armscolor"		"155 161 163"
+		"armsskin"		"1"
+	}
+	"Male #2"
+	{
+		"model"		"models/humans/group02/male_02.mdl"
+		"armscolor"		"74 75 74"
+	}
+	"Male #3"
+	{
+		"model"		"models/humans/group02/male_03.mdl"
+		"armscolor"		"164 76 19"
+		"armsskin"		"1"
+	}
+	"Male #4"
+	{
+		"model"		"models/humans/group02/male_04.mdl"
+		"armscolor"		"110 41 30"
+	}
+	"Male #5"
+	{
+		"model"		"models/humans/group02/male_05.mdl"
+		"armscolor"		"119 120 119"
+	}
+	"Male #6"
+	{
+		"model"		"models/humans/group02/male_06.mdl"
+		"armscolor"		"47 54 37"
+	}
+	"Male #7"
+	{
+		"model"		"models/humans/group02/male_07.mdl"
+		"armscolor"		"45 33 20"
+	}
+	"Male #8"
+	{
+		"model"		"models/humans/group02/male_08.mdl"
+		"armscolor"		"61 77 90"
+	}
+	"Male #9"
+	{
+		"model"		"models/humans/group02/male_09.mdl"
+		"armscolor"		"50 54 74"
+	}
+	"Pi"
+	{
+		"model"		"models/male_pi.mdl"
+		"armscolor"		"40 39 31"
+	}
+	"Lawyer"
+	{
+		"model"		"models/male_lawyer.mdl"
+		"armscolor"		"93 92 93"
+	}
+}

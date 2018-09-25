@@ -17,12 +17,8 @@ public:
     DECLARE_CLASS_SIMPLE( CZMBuildMenuBase, vgui::Frame );
 
 
-    CZMBuildMenuBase( const char* name ) : Frame( g_pClientMode->GetViewport(), name )
-    {
-    }
-    ~CZMBuildMenuBase()
-    {
-    }
+    CZMBuildMenuBase( vgui::Panel* pParent, const char* name );
+    ~CZMBuildMenuBase();
 
 
     virtual vgui::VPANEL GetVPanel( void ) OVERRIDE { return BaseClass::GetVPanel(); };
@@ -37,6 +33,9 @@ public:
 
     virtual void OnCommand( const char* command ) OVERRIDE;
     virtual void OnClose() OVERRIDE;
+
+
+    virtual void Paint() OVERRIDE;
 
 
     virtual void ShowMenu( C_ZMEntZombieSpawn* pSpawn );

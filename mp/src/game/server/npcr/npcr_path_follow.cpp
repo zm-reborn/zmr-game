@@ -112,7 +112,6 @@ NPCR::PathRes_t NPCR::CFollowNavPath::CheckGoal( CBaseNPC* pNPC ) const
     }
 
 
-
     const NavLink_t* next = NextLink( m_pGoal );
 
     const float flGoalToGoalTolerance = 48.0f;
@@ -133,24 +132,29 @@ NPCR::PathRes_t NPCR::CFollowNavPath::CheckGoal( CBaseNPC* pNPC ) const
 
 
     Vector dirToMe = vecMyPos - m_pGoal->pos;
-    float distToGoalSqr = dirToMe.Length2DSqr();
+
+    // Use proper length for drop downs
+    if ( m_pCurLink && m_pCurLink->navTravel != TRAVEL_DROPDOWN )
+    {
+        dirToMe.z = 0.0f;
+    }
+
+    float distToGoal = dirToMe.NormalizeInPlace();
+
 
     // We close enough to goal?
-    if ( distToGoalSqr < (tolerance*tolerance) )
+    if ( distToGoal < tolerance )
     {
         return PATH_SUCCESS;
     }
 
 
     // Check the next link in case current goal is redundant.
-    if ( m_pGoal->navTravel == TRAVEL_ONGROUND && next && distToGoalSqr < (128.0f*128.0f) )
+    if ( m_pGoal->navTravel != TRAVEL_NAVJUMP && next && distToGoal < 128.0f )
     {
         // It's pretty much just a straight line to the next one, we can ignore this one then.
         if ( m_pGoal->fwd_dot > 0.9f )
             return PATH_SUCCESS;
-
-
-        dirToMe.NormalizeInPlace();
 
         // We're literally on the path to the next goal.
         if ( m_pGoal->fwd.Dot( dirToMe ) > 0.8f )
@@ -163,7 +167,7 @@ NPCR::PathRes_t NPCR::CFollowNavPath::CheckGoal( CBaseNPC* pNPC ) const
             float distToNextSqr = next->pos.DistToSqr( vecMyPos );
             float goalToNextSqr = m_pGoal->length;
             goalToNextSqr *= goalToNextSqr;
-            if ( distToNextSqr < distToGoalSqr || distToNextSqr < goalToNextSqr )
+            if ( distToNextSqr < (distToGoal*distToGoal) || distToNextSqr < goalToNextSqr )
             {
                 return PATH_SUCCESS;
             }

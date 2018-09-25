@@ -290,6 +290,25 @@ void CZMClientScoreBoardDialog::PerformLayout()
 
 void CZMClientScoreBoardDialog::PaintBackground()
 {
+    // Alright, time for another story
+    // For the longest time, we've had problems with translucent UI materials having sorting issues.
+    // I had never seen it this bad and seemingly for no reason.
+    // I've tried every fucking combination of material parameters ($alphatest,$distancetoalpha...)
+    // and trying to debug the panel class for hours.
+    // Only recently I noticed that this problem is only encountered with frame panels...
+    // Well, after taking a look in the LEAKED engine vgui code, I was able to fix it with this shit.
+    // Tbh, I should've been able to fix this earlier...
+    //
+    // Popup panels are drawn separately with their own stencil reference value
+    // to make them render on top of other panels.
+    // WE don't want this, but we need the popup ability to toggle mouse whenever we want.
+    // Hence, just set the value to 0
+    //
+    // Thanks Valve! (this is my 7th "thanks valve", and I'm sure there's more to come)
+    CMatRenderContextPtr pRenderContext( materials );
+    pRenderContext->SetStencilReferenceValue( 0 );
+
+
     // Paint fancy border.
 
     int x, y;

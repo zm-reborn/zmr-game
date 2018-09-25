@@ -22,6 +22,7 @@
 #ifdef GAME_DLL
 ConVar zm_sv_voiceline_madness( "zm_sv_voiceline_madness", "0", 0, "Don't do it." );
 #else
+ConVar zm_cl_voiceline_volume( "zm_cl_voiceline_volume", "0.3", FCVAR_ARCHIVE );
 ConVar zm_cl_voiceline_disablesound( "zm_cl_voiceline_disablesound", "0", FCVAR_ARCHIVE );
 ConVar zm_cl_voiceline_disablechat( "zm_cl_voiceline_disablechat", "0", FCVAR_ARCHIVE );
 ConVar zm_cl_voiceline_disableforzm( "zm_cl_voiceline_disableforzm", "1", FCVAR_ARCHIVE );
@@ -155,20 +156,22 @@ void CZMVoiceLines::FireGameEvent( IGameEvent* pEvent )
             char line[256];
             Q_snprintf( line, sizeof( line ), "%s.%s", pLine->m_szSoundBase, gender );
 
+            C_ZMPlayer* pOrigin = nullptr;
+            Vector pos;
+
             if ( pPlayer && !pPlayer->IsDormant() )
             {
-                pPlayer->EmitSound( line );
+                pOrigin = pPlayer;
             }
             else
             {
-                Vector pos;
                 pos.x = pEvent->GetFloat( "pos_x" );
                 pos.y = pEvent->GetFloat( "pos_y" );
                 pos.z = pEvent->GetFloat( "pos_z" );
-
-                CSingleUserRecipientFilter filter( pLocal );
-                pLocal->EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, line, &pos, 0.0f, nullptr );
             }
+
+
+            PlayVoiceLine( pOrigin, &pos, line );
         }
 
         
@@ -197,6 +200,24 @@ void CZMVoiceLines::FireGameEvent( IGameEvent* pEvent )
             ZMClientUtil::ChatPrint( index, false, ansi );
         }
     }
+}
+
+void CZMVoiceLines::PlayVoiceLine( C_BasePlayer* pOrigin, const Vector* vecPos, const char* szLine )
+{
+    CLocalPlayerFilter filter;
+    EmitSound_t params;
+    params.m_pSoundName = szLine;
+    params.m_bWarnOnDirectWaveReference = true;
+    params.m_flVolume = zm_cl_voiceline_volume.GetFloat();
+    params.m_nFlags = SND_CHANGE_VOL; // Tell soundhandle that we want to use our m_flVolume.
+
+
+    if ( !pOrigin )
+    {
+        params.m_pOrigin = vecPos;
+    }
+
+    C_BaseEntity::EmitSound( filter, pOrigin ? pOrigin->entindex() : 0, params );
 }
 
 bool CZMVoiceLines::IsFemale( C_ZMPlayer* pPlayer ) const

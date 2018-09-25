@@ -1445,6 +1445,11 @@ void CServerGameDLL::CreateNetworkStringTables( void )
 	g_pStringTableServerMapCycleMvM = networkstringtable->CreateStringTable( "ServerMapCycleMvM", 128 );
 #endif
 
+#ifdef ZMR
+	extern void ZMCreateStringTables();
+	ZMCreateStringTables();
+#endif
+
 	bool bPopFilesValid = true;
 	(void)bPopFilesValid; // Avoid unreferenced variable warning
 

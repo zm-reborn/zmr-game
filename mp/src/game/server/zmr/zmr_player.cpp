@@ -16,6 +16,7 @@
 #include "zmr_entities.h"
 #include "zmr/zmr_gamerules.h"
 #include "zmr/zmr_global_shared.h"
+#include "zmr/zmr_playermodels.h"
 #include "weapons/zmr_carry.h"
 #include "zmr_player.h"
 
@@ -23,11 +24,10 @@
 
 
 #define VMHANDS_FALLBACKMODEL   "models/weapons/c_arms_citizen.mdl"
-#define DEF_PLAYER_MODEL        "models/male_pi.mdl"
 
 
 
-static ConVar zm_sv_randomplayermodel( "zm_sv_randomplayermodel", "1", FCVAR_NOTIFY | FCVAR_ARCHIVE, "If player has an invalid model, use a random one. Temporary 'fix' for model choosing not working." );
+
 static ConVar zm_sv_modelchangedelay( "zm_sv_modelchangedelay", "6", FCVAR_NOTIFY | FCVAR_ARCHIVE, "", true, 0.0f, false, 0.0f );
 
 ConVar zm_sv_antiafk( "zm_sv_antiafk", "90", FCVAR_NOTIFY | FCVAR_ARCHIVE, "If the player is AFK for this many seconds, put them into spectator mode. 0 = disable" );
@@ -38,8 +38,6 @@ static ConVar zm_sv_npcheadpushoff( "zm_sv_npcheadpushoff", "200", FCVAR_NOTIFY 
 // This is for maps that use the OnBreak trick to name the ZM. This does not work in ZMR anymore.
 static ConVar zm_sv_comp_zmtargetname( "zm_sv_comp_zmtargetname", "", 0, "Gives the ZM a targetname on spawn. This is for compatibility with old maps!!!" );
 
-
-CUtlVector<CZMPlayerModelData*> CZMPlayer::m_PlayerModels;
 
 
 
@@ -144,73 +142,6 @@ CZMPlayer::~CZMPlayer( void )
     m_pPlayerAnimState->Release();
 }
 
-void CZMPlayer::AddDefaultPlayerModels( KeyValues* kv )
-{
-    KeyValues* pNewKey = new KeyValues( "" );
-
-    KeyValues* pSub = pNewKey->FindKey( "_DefaultModel", true );
-    pSub->SetString( "model", DEF_PLAYER_MODEL );
-
-    kv->AddSubKey( pNewKey );
-}
-
-int CZMPlayer::PrecachePlayerModels( KeyValues* kv )
-{
-    if ( !kv ) return 0;
-
-
-    int num = 0;
-
-    KeyValues* pKey = kv->GetFirstSubKey();
-
-    while ( pKey )
-    {
-        const char* name = pKey->GetName();
-        const char* model = pKey->GetString( "model" );
-
-        if ( *model )
-        {
-            if ( PrecacheModel( model ) != -1 ) // Valid model?
-            {
-                ++num;
-
-
-                const char* hands = pKey->GetString( "handsmodel" );
-                if ( *hands && PrecacheModel( model ) == -1 )
-                {
-                    pKey->SetString( "handsmodel", "" );
-
-                    Warning( "Invalid hand model path '%s' ('%s')!\n", hands, name );
-                }
-
-
-                m_PlayerModels.AddToTail( new CZMPlayerModelData( pKey ) );
-            }
-            else
-            {
-                Warning( "Invalid model path '%s' ('%s')!\n", model, name );
-
-                KeyValues* oldKey = pKey;
-
-                pKey = pKey->GetNextKey();
-
-                kv->RemoveSubKey( oldKey );
-                oldKey->deleteThis();
-
-                continue;
-            }
-        }
-        else
-        {
-            Warning( "No model path for '%s'!\n", name );
-        }
-
-        pKey = pKey->GetNextKey();
-    }
-
-    return num;
-}
-
 void CZMPlayer::Precache()
 {
     // Precache register makes sure we are already precached.
@@ -225,21 +156,12 @@ void CZMPlayer::Precache()
     PrecacheModel( VMHANDS_FALLBACKMODEL );
 
 
-    m_PlayerModels.PurgeAndDeleteElements();
+    ZMGetPlayerModels()->LoadModelsFromFile();
 
-    KeyValues* kv = LoadPlayerModels();
-
-    // Make sure at least one model gets precached.
-    if ( !kv )
-        AddDefaultPlayerModels( (kv = new KeyValues( "" )) );
-
-    if ( !PrecachePlayerModels( kv ) )
+    if ( !ZMGetPlayerModels()->PrecachePlayerModels() )
     {
         Warning( "WARNING: No player models precached! Crash inbound!\n" );
     }
-
-    if ( kv )
-        kv->deleteThis();
 }
 
 void CZMPlayer::UpdateOnRemove()
@@ -551,6 +473,25 @@ CBaseEntity* CZMPlayer::FindNextObserverTarget( bool bReverse )
     return BaseClass::FindNextObserverTarget( bReverse );
 }
 
+void CZMPlayer::CheckObserverSettings()
+{
+    // HACK: Fix zombie spectating not transmitting things properly because view offsets are at origin
+    if ( GetObserverMode() == OBS_MODE_CHASE )
+    {
+        CBaseEntity* pTarget = GetObserverTarget();
+
+        if ( pTarget && pTarget->IsBaseZombie() )
+        {
+            if ( pTarget->GetViewOffset() != GetViewOffset() )
+            {
+                SetViewOffset( pTarget->GetViewOffset() );
+            }
+        }
+    }
+
+    BaseClass::CheckObserverSettings();
+}
+
 void CZMPlayer::SetTeamSpecificProps()
 {
     // To shut up the asserts...
@@ -800,33 +741,12 @@ void CZMPlayer::SetAnimation( PLAYER_ANIM playerAnim )
     // CBasePlayer may still call this.
 }
 
-KeyValues* CZMPlayer::LoadPlayerModels()
-{
-    KeyValues* kv = new KeyValues( "PlayerModels" );
-    if ( !kv->LoadFromFile( filesystem, "resource/zmoptions_playermodels.txt", "MOD" ) )
-    {
-        kv->deleteThis();
-        return nullptr;
-    }
-
-    return kv;
-}
-
 bool CZMPlayer::SetPlayerModel()
 {
-    if ( !m_PlayerModels.Count() )
-    {
-        Assert( 0 );
-        Warning( "No player models to select from! RIP\n" );
-        return false;
-    }
-
-
     bool changed = false;
 
-    const char* pszFallback = zm_sv_randomplayermodel.GetBool() ?
-        m_PlayerModels[random->RandomInt( 0, m_PlayerModels.Count() - 1 )]->GetModelName() :
-        DEF_PLAYER_MODEL;
+
+    const char* pszFallback = ZMGetPlayerModels()->GetRandomPlayerModel()->GetModelName();
 
     const char* szModelName = nullptr;
     const char* pszCurrentModelName = modelinfo->GetModelName( GetModel() );
@@ -839,20 +759,19 @@ bool CZMPlayer::SetPlayerModel()
     int modelIndex = modelinfo->GetModelIndex( szModelName );
 
 
-    if ( modelIndex == -1 || FindPlayerModel( szModelName ) == -1 )
+    // The model player wanted is invalid?
+    if ( modelIndex == -1 || ZMGetPlayerModels()->GetPlayerModelData( szModelName ) == nullptr )
     {
+        // The current model is also fucked, fallback.
         if (modelIndexCurrent == -1
-        ||  FindPlayerModel( pszCurrentModelName ) == -1
-        ||  zm_sv_randomplayermodel.GetBool() )
+        ||  ZMGetPlayerModels()->GetPlayerModelData( pszCurrentModelName ) == nullptr)
         {
             pszCurrentModelName = pszFallback;
             modelIndexCurrent = -1;
         }
 
-
-        char szReturnString[512];
-        Q_snprintf( szReturnString, sizeof (szReturnString ), "cl_playermodel %s\n", pszCurrentModelName );
-        engine->ClientCommand( edict(), szReturnString );
+        // Update the cvar on the client's side to make sure they have it right also.
+        engine->ClientCommand( edict(), UTIL_VarArgs( "cl_playermodel %s", pszCurrentModelName ) );
 
         modelIndex = -1;
     }
@@ -871,26 +790,12 @@ bool CZMPlayer::SetPlayerModel()
 
     if ( changed )
     {
-        SetHandsData( GetPlayerModelData( szModelName ) );
+        SetHandsData( ZMGetPlayerModels()->GetPlayerModelData( szModelName ) );
     }
 
     m_flNextModelChangeTime = gpGlobals->curtime + zm_sv_modelchangedelay.GetFloat();
 
     return changed;
-}
-
-int CZMPlayer::FindPlayerModel( const char* model )
-{
-    int len = m_PlayerModels.Count();
-    for ( int i = 0; i < len; ++i )
-    {
-        if ( Q_stricmp( m_PlayerModels[i]->GetModelName(), model ) == 0 )
-        {
-            return i;
-        }
-    }
-
-    return -1;
 }
 
 void CZMPlayer::UpdatePlayerFOV()
@@ -1239,6 +1144,14 @@ void CZMPlayer::DeathSound( const CTakeDamageInfo &info )
     EmitSound( filter, entindex(), ep );
 }
 
+void CZMPlayer::Ignite( float flFlameLifetime, bool bNPCOnly, float flSize, bool bCalledByLevelDesigner )
+{
+    if ( !IsHuman() || !IsAlive() )
+        return;
+
+    BaseClass::Ignite( flFlameLifetime, bNPCOnly, flSize, bCalledByLevelDesigner );
+}
+
 extern ConVar physcannon_maxmass;
 
 void CZMPlayer::PickupObject( CBaseEntity *pObject, bool bLimitMassAndSize )
@@ -1247,20 +1160,6 @@ void CZMPlayer::PickupObject( CBaseEntity *pObject, bool bLimitMassAndSize )
 
 
     PlayerAttemptPickup( this, pObject );
-}
-
-KeyValues* CZMPlayer::GetPlayerModelData( const char* model )
-{
-    int len = m_PlayerModels.Count();
-    for ( int i = 0; i < len; ++i )
-    {
-        if ( Q_strcmp( model, m_PlayerModels[i]->GetModelName() ) == 0 )
-        {
-            return m_PlayerModels[i]->GetModelData();
-        }
-    }
-
-    return nullptr;
 }
 
 void CZMPlayer::SetHandsModel( const char* model )
@@ -1273,31 +1172,37 @@ void CZMPlayer::SetHandsModel( const char* model )
     pVM->SetModel( model );
 }
 
-void CZMPlayer::SetHandsData( KeyValues* kv )
+void CZMPlayer::SetHandsData( CZMPlayerModelData* pData )
 {
-    if ( !kv ) return;
+    if ( !pData ) return;
 
     CZMViewModel* pVM = static_cast<CZMViewModel*>( GetViewModel( VMINDEX_HANDS ) );
     if ( !pVM ) return;
 
 
-    const char* szHands = kv->GetString( "handsmodel" );
-    if ( *szHands )
+
+    // Set the model
+    const char* pszArms = pData->GetArmModel();
+    if ( !pszArms || !(*pszArms) )
     {
-        int iHands = modelinfo->GetModelIndex( szHands );
-        if ( iHands != -1 && pVM->GetModelIndex() != iHands )
-        {
-            pVM->SetModelIndex( iHands );
-        }
+        pszArms = VMHANDS_FALLBACKMODEL;
     }
 
-    int skin = kv->GetInt( "handsskin", 0 );
+    int modelIndex = modelinfo->GetModelIndex( pszArms );
+    if ( modelIndex != -1 && pVM->GetModelIndex() != modelIndex )
+    {
+        pVM->SetModel( pszArms );
+    }
+
+
+
+    int skin = pData->GetArmSkin();
     if ( skin >= 0 && skin < MAXSTUDIOSKINS )
     {
         pVM->m_nSkin = skin;
     }
 
-    Color clr = kv->GetColor( "handscolor" );
+    Color clr = pData->GetArmColor();
     if ( clr[0] != 0 || clr[1] != 0 || clr[2] != 0 )
     {
         pVM->SetModelColor2( clr[0] / 255.0f, clr[1] / 255.0f, clr[2] / 255.0f );
@@ -1347,7 +1252,7 @@ void CZMPlayer::CreateViewModel( int index )
     }
 
     SetHandsModel( VMHANDS_FALLBACKMODEL );
-    SetHandsData( GetPlayerModelData( STRING( GetModelName() ) ) );
+    SetHandsData( ZMGetPlayerModels()->GetPlayerModelData( STRING( GetModelName() ) ) );
 }
 
 bool CZMPlayer::BumpWeapon( CBaseCombatWeapon *pWeapon )

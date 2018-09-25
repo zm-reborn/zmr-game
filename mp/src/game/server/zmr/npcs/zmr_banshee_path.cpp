@@ -200,5 +200,28 @@ float CZMBansheeFollowPath::FindJumpHeight( const Vector& vecStart, const Vector
             end.z += flIncrementZ;
     }
 
+
+    if ( ret_height == -1.0f )
+        return -1.0f;
+
+
+    // Finally, make sure we can actually get to the end by tracing to it.
+    start = end;
+    start.z = vecStart.z + ret_height;
+    end.z = vecGoal.z + 1.0f;
+
+    UTIL_TraceLine( start, end, MASK_NPCSOLID & ~(CONTENTS_MONSTER), &filter, &tr );
+    bool bHit = tr.fraction != 1.0f;
+
+    if ( bDebugging )
+    {
+        NDebugOverlay::Line( start, end, bHit ? 255 : 0, (!bHit) ? 255 : 0, 0, true, 1.0f );
+    }
+
+    if ( bHit )
+    {
+        return -1.0f;
+    }
+
     return ret_height;
 }

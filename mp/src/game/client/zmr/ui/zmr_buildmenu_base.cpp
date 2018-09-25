@@ -8,6 +8,25 @@
 #include "zmr_buildmenu_base.h"
 
 
+CZMBuildMenuBase::CZMBuildMenuBase( vgui::Panel* pParent, const char* name ) : BaseClass( pParent, name )
+{
+}
+
+CZMBuildMenuBase::~CZMBuildMenuBase()
+{
+}
+
+void CZMBuildMenuBase::Paint()
+{
+    // HACK:
+    // See scoreboard Paint() for rant
+    CMatRenderContextPtr pRenderContext( materials );
+    pRenderContext->SetStencilReferenceValue( 0 );
+
+
+    BaseClass::Paint();
+}
+
 void CZMBuildMenuBase::OnCommand( const char *command )
 {
 	if ( Q_strnicmp( command, "zm_cmd_queue", 12 ) == 0 )

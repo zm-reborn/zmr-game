@@ -1,0 +1,15 @@
+// This is an example! Create a copy named zmplayermodels_custom.txt!
+//
+// This is for the server. You can have a maximum of 32 player models.
+// See zmplayermodels.txt for all the values you can use.
+// These models are precached and shown on the player's options menu.
+// NOTE: These models are NOT added to downloads table automatically. You'll have to use thirdparty plugins
+// if you plan to use completely custom ones.
+// 
+"PlayerModels"
+{
+	"Barney"
+	{
+		"model"		"models/barney.mdl"
+	}
+}

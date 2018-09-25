@@ -21,7 +21,10 @@ namespace NPCR
     enum NavTravel_t
     {
         TRAVEL_ONGROUND = 0,
-        TRAVEL_NAVJUMP
+        // There's a drop, use special goal detection so we properly follow the path.
+        // This is for cases where the NPC turns around after dropping down.
+        TRAVEL_DROPDOWN,
+        TRAVEL_NAVJUMP, // We need to jump
     };
     
     struct NavLink_t

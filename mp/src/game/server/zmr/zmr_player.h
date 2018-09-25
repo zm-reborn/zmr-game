@@ -27,6 +27,7 @@ extern ConVar zm_sv_antiafk;
 class CZMBaseZombie;
 class CZMBaseWeapon;
 class CZMRagdoll;
+class CZMPlayerModelData;
 
 enum ZMPlayerState_t
 {
@@ -49,35 +50,6 @@ public:
     void (CZMPlayer::*pfnPreThink)(); // Do a PreThink() in this state.
 };
 
-class CZMPlayerModelData
-{
-public:
-    CZMPlayerModelData( KeyValues* kv, bool bIsCustom = false )
-    {
-        Assert( kv );
-        m_kvData = kv->MakeCopy();
-        m_szModelName = m_kvData->GetString( "model" );
-
-        m_bIsCustom = bIsCustom;
-    }
-
-    ~CZMPlayerModelData()
-    {
-        if ( m_kvData )
-            m_kvData->deleteThis();
-        m_kvData = nullptr;
-    }
-
-    const char* GetModelName() { return m_szModelName; };
-    KeyValues*  GetModelData() { return m_kvData; };
-    bool        IsCustom() { return m_bIsCustom; };
-
-private:
-    const char* m_szModelName;
-    KeyValues* m_kvData;
-    bool m_bIsCustom;
-};
-
 class CZMPlayer : public CHL2_Player
 {
 public:
@@ -96,12 +68,7 @@ public:
         return static_cast<CZMPlayer*>( CreateEntityByName( className ) );
     }
 
-    // All valid and precached player models.
-    static CUtlVector<CZMPlayerModelData*> m_PlayerModels;
 
-
-    static void     AddDefaultPlayerModels( KeyValues* kv );
-    static int      PrecachePlayerModels( KeyValues* kv );
     virtual void    Precache() OVERRIDE;
 
     virtual void    InitialSpawn() OVERRIDE;
@@ -117,16 +84,15 @@ public:
 
     virtual bool            IsValidObserverTarget( CBaseEntity* pEnt ) OVERRIDE;
     virtual CBaseEntity*    FindNextObserverTarget( bool bReverse ) OVERRIDE;
+    virtual void            CheckObserverSettings() OVERRIDE;
 
     virtual int     ShouldTransmit( const CCheckTransmitInfo* ) OVERRIDE;
 
     virtual void    SetAnimation( PLAYER_ANIM playerAnim ) OVERRIDE;
     bool            SetPlayerModel();
-    static int      FindPlayerModel( const char* model );
     void            UpdatePlayerFOV();
-    KeyValues*      GetPlayerModelData( const char* model );
     void            SetHandsModel( const char* model );
-    void            SetHandsData( KeyValues* kv );
+    void            SetHandsData( CZMPlayerModelData* pData );
     virtual void    CreateViewModel( int index = 0 ) OVERRIDE;
 
 
@@ -151,6 +117,7 @@ public:
     virtual int     OnTakeDamage( const CTakeDamageInfo& info ) OVERRIDE;
 	virtual void    CommitSuicide( bool bExplode = false, bool bForce = false ) OVERRIDE;
 	virtual void    CommitSuicide( const Vector &vecForce, bool bExplode = false, bool bForce = false ) OVERRIDE;
+    virtual void    Ignite( float flFlameLifetime, bool bNPCOnly, float flSize, bool bCalledByLevelDesigner ) OVERRIDE;
 
     virtual CBaseEntity* EntSelectSpawnPoint( void ) OVERRIDE;
 
@@ -233,8 +200,6 @@ public:
     float               GetAccuracyRatio() const;
     void                UpdateAccuracyRatio();
     bool                IsControllingZombie() const;
-
-    KeyValues*          LoadPlayerModels();
 
 
     CZMBaseWeapon*  GetWeaponOfHighestSlot();

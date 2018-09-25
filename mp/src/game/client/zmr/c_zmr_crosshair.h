@@ -2,8 +2,24 @@
 
 
 
+
 //
-abstract_class CZMBaseCrosshair
+abstract_class CZMCrosshairPartMat
+{
+public:
+    CZMCrosshairPartMat();
+
+protected:
+    void DrawMaterial( const char* pszMat, int x0, int y0, int x1, int y1 );
+
+private:
+    int m_nTexId;
+
+};
+//
+
+//
+abstract_class CZMBaseCrosshair : public CZMCrosshairPartMat
 {
 public:
     CZMBaseCrosshair();
@@ -38,7 +54,7 @@ public:
     const char* GetMenuName() const { return m_szMenuName; }
 
 protected:
-    virtual void DrawDot() const;
+    virtual void DrawDot();
 
 
 
@@ -104,10 +120,10 @@ public:
 
 
 //
-class CZMFontCrosshair : public CZMBaseCrosshair
+class CZMMaterialCrosshair : public CZMBaseCrosshair
 {
 public:
-    CZMFontCrosshair();
+    CZMMaterialCrosshair();
 
 
     virtual void LoadValues( KeyValues* kv ) OVERRIDE;
@@ -116,12 +132,12 @@ public:
     virtual void Draw() OVERRIDE;
 
 
-    const Color& GetFontColor() const { return m_FontColor; }
+    const Color& GetMaterial0Color() const { return m_Mat0Clr; }
 
 protected:
-    Color m_FontColor;
-    wchar_t m_wChar;
-    vgui::HFont m_hFont;
+    Color m_Mat0Clr;
+    int m_nTexMat0Id;
+    char m_szTexture[192];
 };
 //
 

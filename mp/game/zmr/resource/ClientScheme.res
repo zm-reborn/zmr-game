@@ -864,18 +864,6 @@ Scheme
 				"outline"	"1"
 			}
 		}
-		ZMCrosshairSmall
-		{
-			"1"
-			{
-				"name"		"zmcrosshairs"
-				"tall"		"60"
-				"weight"	"0"
-				"antialias" "1"
-				"additive"	"0"
-				"custom"	"1"
-			}
-		}
 		ZMHudVoiceMenuNormal
 		{
 			"1"
@@ -1958,7 +1946,6 @@ Scheme
 		"1"		"resource/ZM.ttf" // ZMR
 		"1"		"resource/MONOFONT.ttf" // ZMR
 		"1"		"resource/built titling bd.ttf" // ZMR
-		"2"		"resource/zmcrosshairs.ttf" // ZMR
 	}
 
 }

@@ -39,14 +39,12 @@ static void SortZMQueueImages( Panel* pPanel, CUtlVector<CZMPlaceImage*>* pImage
 }
 
 
-CZMBuildMenuNew::CZMBuildMenuNew( Panel* pParent ) : CZMBuildMenuBase( "ZMBuildMenuNew" )
+CZMBuildMenuNew::CZMBuildMenuNew( Panel* pParent ) : CZMBuildMenuBase( pParent, "ZMBuildMenuNew" )
 {
-    SetParent( pParent->GetVPanel() );
-
     SetPaintBackgroundEnabled( false );
     SetSizeable( false );
-	SetProportional( true );
-	SetMoveable( false );
+    SetProportional( true );
+    SetMoveable( false );
     SetKeyBoardInputEnabled( false );
     SetMouseInputEnabled( true );
     DisableMouseInputForThisPanel( true ); // Only THIS panel can't be clicked. Children work fine.
@@ -54,7 +52,7 @@ CZMBuildMenuNew::CZMBuildMenuNew( Panel* pParent ) : CZMBuildMenuBase( "ZMBuildM
 
     m_iCurTooltip = -1;
 
-	LoadControlSettings( "resource/ui/zmbuildmenunew.res" );
+    LoadControlSettings( "resource/ui/zmbuildmenunew.res" );
 
 
     m_pRadial = dynamic_cast<CZMRadialPanel*>( FindChildByName( "ZMRadialPanel1" ) );
@@ -106,7 +104,7 @@ void CZMBuildMenuNew::ShowPanel( bool state )
 
 void CZMBuildMenuNew::OnThink()
 {
-	if ( !IsVisible() ) return;
+    if ( !IsVisible() ) return;
 
 
     MoveToFront();
@@ -246,15 +244,15 @@ void CZMBuildMenuNew::UpdateQueue( const int queue[], int size )
 
     for ( int i = 0; i < size; i++ )
     {
-		const ZombieClass_t type = (ZombieClass_t)queue[i];
+        const ZombieClass_t type = (ZombieClass_t)queue[i];
 
-		if ( C_ZMBaseZombie::IsValidClass( type ) )
-		{
-			IImage* pImg = m_pQueueImages[(int)type];
+        if ( C_ZMBaseZombie::IsValidClass( type ) )
+        {
+            IImage* pImg = m_pQueueImages[(int)type];
             int w = m_pImageList->GetImagesSize();
             pImg->SetSize( w, w );
             m_pImageList->AddImage( pImg );
-		}
+        }
     }
 
     m_pImageList->PerformLayout();

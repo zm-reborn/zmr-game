@@ -4,8 +4,10 @@
 
 	"rndwave"
 	{
+		"wave"	"vo/npc/male01/ok01.wav"
 		"wave"	"vo/npc/male01/yeah02.wav"
 		"wave"	"vo/npc/male01/yougotit02.wav"
+		"wave"	"vo/npc/male01/squad_affirm03.wav"
 	}
 }
 "ZMVoiceline.Yes.Female"
@@ -14,6 +16,8 @@
 
 	"rndwave"
 	{
+		"wave"	"vo/npc/female01/ok01.wav"
+		"wave"	"vo/npc/female01/ok02.wav"
 		"wave"	"vo/npc/female01/yougotit02.wav"
 		"wave"	"vo/npc/female01/squad_affirm03.wav"
 	}
@@ -24,7 +28,9 @@
 
 	"rndwave"
 	{
+		//"wave"	"vo/npc/male01/vanswer01.wav"
 		"wave"	"vo/npc/male01/ohno.wav"
+		"wave"	"vo/trainyard/male01/cit_hit05.wav"
 	}
 }
 "ZMVoiceline.No.Female"
@@ -35,6 +41,7 @@
 	{
 		"wave"	"vo/npc/female01/no01.wav"
 		"wave"	"vo/npc/female01/no02.wav"
+		"wave"	"vo/trainyard/female01/cit_hit05.wav"
 	}
 }
 "ZMVoiceline.Help.Male"
@@ -44,9 +51,11 @@
 	"rndwave"
 	{
 		"wave"	"vo/npc/male01/help01.wav"
+		"wave"	"vo/streetwar/sniper/male01/c17_09_help01.wav"
+		"wave"	"vo/streetwar/sniper/male01/c17_09_help02.wav"
+		"wave"	"vo/streetwar/sniper/male01/c17_09_help03.wav"
 	}
 }
-
 "ZMVoiceline.Help.Female"
 {
 	"soundlevel"  "SNDLVL_TALKING"
@@ -54,6 +63,7 @@
 	"rndwave"
 	{
 		"wave"	"vo/npc/female01/help01.wav"
+		"wave"	"vo/canals/arrest_helpme.wav"
 	}
 }
 "ZMVoiceline.Go.Male"
@@ -64,6 +74,7 @@
 	{
 		"wave"	"vo/npc/male01/letsgo01.wav"
 		"wave"	"vo/npc/male01/letsgo02.wav"
+		"wave"	"vo/npc/male01/squad_follow03.wav"
 	}
 }
 "ZMVoiceline.Go.Female"
@@ -74,6 +85,7 @@
 	{
 		"wave"	"vo/npc/female01/letsgo01.wav"
 		"wave"	"vo/npc/female01/letsgo02.wav"
+		"wave"	"vo/npc/female01/squad_follow02.wav"
 		"wave"	"vo/npc/female01/squad_follow03.wav"
 	}
 }
@@ -85,6 +97,8 @@
 	{
 		"wave"	"vo/coast/cardock/le_followme.wav"
 		"wave"	"vo/coast/odessa/male01/stairman_follow01.wav"
+		"wave"	"vo/npc/male01/squad_away02.wav"
+		"wave"	"vo/npc/male01/squad_away03.wav"
 	}
 }
 "ZMVoiceline.Follow.Female"
@@ -94,6 +108,9 @@
 	"rndwave"
 	{
 		"wave"	"vo/coast/odessa/female01/stairman_follow01.wav"
+		"wave"	"vo/npc/female01/squad_away01.wav"
+		"wave"	"vo/npc/female01/squad_away02.wav"
+		"wave"	"vo/npc/female01/squad_away03.wav"
 	}
 }
 "ZMVoiceline.Taunt.Male"

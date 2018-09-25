@@ -3,6 +3,7 @@
 
 
 #include "zmr_options_general.h"
+#include "zmr/zmr_playermodels.h"
 #include "zmr/c_zmr_player.h"
 
 
@@ -64,27 +65,13 @@ CZMOptionsSubGeneral::CZMOptionsSubGeneral( Panel* parent ) : BaseClass( parent 
     m_pModelPanel->SetPanelDirty();
     m_pModelCombo->ActivateItemByRow( 0 );
 
-    kv = new KeyValues( "Models" );
-
-    if ( kv->LoadFromFile( filesystem, "resource/zmoptions_playermodels.txt", "MOD" ) )
+    ZMGetPlayerModels()->LoadModelsFromFile();
+    ZMPlayerModelList_t* pModels = ZMGetPlayerModels()->GetPlayerModels();
+    for ( int i = 0; i < pModels->Count(); i++ )
     {
-        KeyValues* pKey = kv->GetFirstSubKey();
-
-        while ( pKey )
-        {
-            m_pModelCombo->AddItem( pKey->GetName(), pKey );
-
-            pKey = pKey->GetNextKey();
-        }
+        CZMPlayerModelData* pData = pModels->Element( i );
+        m_pModelCombo->AddItem( pData->GetModelData()->GetName(), pData->GetModelData() );
     }
-    else
-    {
-        Warning( "Couldn't load player models from file!\n" );
-    }
-
-    
-
-    kv->deleteThis();
 }
 
 CZMOptionsSubGeneral::~CZMOptionsSubGeneral()
@@ -131,6 +118,9 @@ void CZMOptionsSubGeneral::OnResetData()
     m_pSlider_Pitch->SetValue( (int)cl_pitchspeed.GetFloat() );
 
 
+
+    AppendCustomModels();
+
     bool bValidModel = false;
 
     ConVar* cl_playermodel = cvar->FindVar( "cl_playermodel" );
@@ -149,10 +139,46 @@ void CZMOptionsSubGeneral::OnResetData()
 
     if ( !bValidModel )
     {
-        m_pModelCombo->ActivateItemByRow( 0 );
+        // Not the model we're looking for, pick a random one then.
+        int count = m_pModelCombo->GetItemCount();
+        m_pModelCombo->ActivateItemByRow( count ? random->RandomInt( 0, count - 1 ) : 0 );
     }
 }
 
+void CZMOptionsSubGeneral::AppendCustomModels()
+{
+    int i;
+    ZMPlayerModelList_t list;
+
+    ZMGetPlayerModels()->ParseCustomModels( list );
+
+    // First remove all the old ones.
+    // We might've changed servers.
+    for ( i = 0; i < m_pModelCombo->GetItemCount(); i++ )
+    {
+        KeyValues* kv = m_pModelCombo->GetItemUserData( i );
+        if ( kv && kv->GetBool( "custom" ) )
+        {
+            m_pModelCombo->DeleteItem( i );
+            --i;
+        }
+    }
+
+    // Add the new ones.
+    for ( i = 0; i < list.Count(); i++ )
+    {
+        CZMPlayerModelData* pData = list[i];
+
+        KeyValues* kv = pData->GetModelData();
+        kv->SetBool( "custom", true );
+
+        m_pModelCombo->AddItem( pData->GetModelData()->GetName(), kv );
+    }
+
+    DevMsg( "Added %i custom player models to model list.\n", list.Count() );
+
+    list.PurgeAndDeleteElements();
+}
 
 const char* CZMOptionsSubGeneral::GetCurrentPlayerModel()
 {
