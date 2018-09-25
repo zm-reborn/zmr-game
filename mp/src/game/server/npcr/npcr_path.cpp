@@ -345,7 +345,13 @@ bool NPCR::CBaseNavPath::ComputeNavPathDetails( int count, const Vector& vecStar
 
         // Compute the height difference.
         float height = from->area->ComputeAdjacentConnectionHeightChange( to->area );
-        if ( height != FLT_MAX && height > cost.GetStepHeight() )
+        if ( height == FLT_MAX )
+            continue;
+
+
+        const float flStepHeight = cost.GetStepHeight();
+
+        if ( height > flStepHeight )
         {
             NavLink_t* jumpstart = from;
             
@@ -379,6 +385,25 @@ bool NPCR::CBaseNavPath::ComputeNavPathDetails( int count, const Vector& vecStar
             // Make sure we are within our area after backing up
             // Also updates Z
             jumpstart->area->GetClosestPointOnArea( jumpstart->pos, &jumpstart->pos );
+        }
+        else if ( height < (-flStepHeight) && (i + 1) < m_nLinkCount )
+        {
+            // We're going down, check if there's a drastic drop
+            const Vector down = Vector( 0.0f, 0.0f, -1.0f );
+
+
+            NavLink_t* droplink = &m_Links[i+1];
+
+            // We don't change directions much, it's all good.
+            if ( droplink->fwd_dot > 0.4f )
+                continue;
+
+            Vector dir = droplink->pos - to->pos;
+            dir.NormalizeInPlace();
+
+            // Yep, we're going down fast, make this a drop down link
+            if ( dir.Dot( down ) > 0.6f )
+                to->navTravel = TRAVEL_DROPDOWN;
         }
     }
 
@@ -557,6 +582,7 @@ void NPCR::CBaseNavPath::DrawSegment( const NPCR::NavLink_t* from, const NPCR::N
     switch ( from->navTravel )
     {
     case TRAVEL_NAVJUMP :   r = g = 0; b = 255; break;
+    case TRAVEL_DROPDOWN :  r = g = 255; b = 0; break;
     case TRAVEL_ONGROUND :
     default :               r = g = b = 255; break;
     }
