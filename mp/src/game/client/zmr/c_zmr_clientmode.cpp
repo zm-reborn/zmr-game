@@ -97,14 +97,45 @@ int ClientModeZMNormal::KeyInput( int down, ButtonCode_t keynum, const char* psz
 {
     C_ZMPlayer* pPlayer = C_ZMPlayer::GetLocalPlayer();
 
-    const bool bIsZM = pPlayer && pPlayer->IsZM();
+
+    // Should we start typing a message?
+    if ( pszCurrentBinding &&
+        (   Q_strcmp( pszCurrentBinding, "messagemode" ) == 0 ||
+            Q_strcmp( pszCurrentBinding, "say" ) == 0 ) )
+    {
+        if ( down )
+        {
+            StartMessageMode( MM_SAY );
+        }
+        return 0;
+    }
+    else if ( pszCurrentBinding &&
+                (   Q_strcmp( pszCurrentBinding, "messagemode2" ) == 0 ||
+                    Q_strcmp( pszCurrentBinding, "say_team" ) == 0 ) )
+    {
+        if ( down )
+        {
+            StartMessageMode( MM_SAY_TEAM );
+        }
+        return 0;
+    }
+
+
+    // Let game-specific hud elements get a crack at the key input
+    if ( !HudElementKeyInput( down, keynum, pszCurrentBinding ) )
+    {
+        return 0;
+    }
+
+
 
     if ( pPlayer && pPlayer->IsControllingZombie() )
     {
         return 1;
     }
 
-    if ( bIsZM )
+
+    if ( pPlayer && pPlayer->IsZM() )
     {
         int ret = ZMKeyInput( down, keynum, pszCurrentBinding );
 
@@ -113,7 +144,22 @@ int ClientModeZMNormal::KeyInput( int down, ButtonCode_t keynum, const char* psz
     }
 
 
-    return BaseClass::KeyInput( down, keynum, pszCurrentBinding );
+    // If ingame spectator mode, let spectator input intercept key event here
+    if( pPlayer &&
+        ( pPlayer->GetObserverMode() > OBS_MODE_DEATHCAM ) &&
+        !HandleSpectatorKeyInput( down, keynum, pszCurrentBinding ) )
+    {
+        return 0;
+    }
+
+    C_BaseCombatWeapon *pWeapon = GetActiveWeapon();
+    if ( pWeapon && !pWeapon->KeyInput( down, keynum, pszCurrentBinding ) )
+    {
+        return 0;
+    }
+
+
+    return 1;
 }
 
 // Return -1 to call baseclass.
