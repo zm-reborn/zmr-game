@@ -456,7 +456,7 @@ void CZMBaseZombie::HandlePlayerAttack()
     if ( GetNextAttack() > gpGlobals->curtime )
         return;
 
-    SetActivity( ACT_MELEE_ATTACK1 );
+    DoAnimationEvent( ZOMBIEANIMEVENT_ATTACK );
     float delay = SequenceDuration();
 
     SetNextAttack( gpGlobals->curtime + delay );

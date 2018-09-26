@@ -35,6 +35,7 @@ IMPLEMENT_CLIENTCLASS_DT( C_ZMBaseZombie, DT_ZM_BaseZombie, CZMBaseZombie )
     RecvPropBool( RECVINFO( m_bIsOnGround ) ),
     RecvPropInt( RECVINFO( m_iAnimationRandomSeed ) ),
     RecvPropInt( RECVINFO( m_lifeState ) ),
+    RecvPropInt( RECVINFO( m_iPlayerControllerIndex ) ),
 END_RECV_TABLE()
 
 BEGIN_PREDICTION_DATA( C_ZMBaseZombie )
