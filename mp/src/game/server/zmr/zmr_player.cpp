@@ -118,6 +118,9 @@ CZMPlayer::CZMPlayer()
     m_bEnterObserver = false;
     m_flNextModelChangeTime = 0.0f;
     m_flNextVoiceLineTime = 0.0f;
+    m_flInterpNPCTime = 0.0f;
+    m_ServerWepData.Reset();
+
 
     BaseClass::ChangeTeam( 0 );
 
@@ -271,6 +274,9 @@ void CZMPlayer::PreThink( void )
 
 void CZMPlayer::PostThink()
 {
+    HandleDamagesFromUserCmd();
+
+
     BaseClass::PostThink();
     
     if ( GetFlags() & FL_DUCKING )
@@ -285,6 +291,50 @@ void CZMPlayer::PostThink()
 
     m_angEyeAngles = EyeAngles();
     m_pPlayerAnimState->Update( m_angEyeAngles[YAW], m_angEyeAngles[PITCH] );
+}
+
+void CZMPlayer::CopyWeaponDamage( CZMBaseWeapon* pWeapon, const FireBulletsInfo_t& info )
+{
+    const CUserCmd* pCmd = GetCurrentCommand();
+    Assert( pCmd != nullptr );
+    if ( !pCmd )
+        return;
+
+    m_ServerWepData.iAmmoType = info.m_iAmmoType;
+    m_ServerWepData.flDamage = info.m_iPlayerDamage;
+    m_ServerWepData.iLastFireCommandNumber = pCmd->command_number;
+    m_ServerWepData.hWeapon.Set( pWeapon );
+    m_ServerWepData.vecShootPos = info.m_vecSrc;
+    m_ServerWepData.bIsMelee = false;
+}
+
+void CZMPlayer::CopyMeleeDamage( CZMBaseWeapon* pWeapon, const Vector& vecSrc, float flDamage )
+{
+    const CUserCmd* pCmd = GetCurrentCommand();
+    Assert( pCmd != nullptr );
+    if ( !pCmd )
+        return;
+
+    m_ServerWepData.iAmmoType = -1;
+    m_ServerWepData.flDamage = flDamage;
+    m_ServerWepData.iLastFireCommandNumber = pCmd->command_number;
+    m_ServerWepData.hWeapon.Set( pWeapon );
+    m_ServerWepData.vecShootPos = vecSrc;
+    m_ServerWepData.bIsMelee = true;
+}
+
+void CZMPlayer::HandleDamagesFromUserCmd()
+{
+    const CUserCmd* pCmd = GetCurrentUserCommand();
+
+    if ( !pCmd || !pCmd->zmHitData.Count() )
+        return;
+
+
+    g_ZMUserCmdSystem.ApplyDamage( this, m_ServerWepData, pCmd->zmHitData );
+
+
+    m_ServerWepData.Reset();
 }
 
 void CZMPlayer::PlayerDeathThink()
@@ -814,6 +864,14 @@ void CZMPlayer::UpdatePlayerFOV()
     }
 }
 
+void CZMPlayer::UpdatePlayerInterpNPC()
+{
+    const char* szValue = engine->GetClientConVarValue( entindex(), "cl_interp_npcs" );
+    float value = szValue ? atof( szValue ) : 0.0f;
+
+    m_flInterpNPCTime = clamp( value, 0.0f, 0.5f );
+}
+
 void CZMPlayer::InitialSpawn()
 {
     BaseClass::InitialSpawn();
@@ -966,7 +1024,7 @@ void CZMPlayer::FireBullets( const FireBulletsInfo_t& info )
 
 
         NoteWeaponFired();
-
+        
 
         m_bIsFireBulletsRecursive = true;
         CBaseEntity::FireBullets( info );

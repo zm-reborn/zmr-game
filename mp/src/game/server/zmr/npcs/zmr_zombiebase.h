@@ -244,8 +244,6 @@ private:
     CNetworkVar( float, m_flHealthRatio ); // For humans we can use health/maxhealth
     CNetworkVar( bool, m_bIsOnGround );
     CNetworkVar( int, m_iAnimationRandomSeed );
-    CNetworkVar( int, m_cycleLatch ); // Network the cycle to clients periodically
-    CountdownTimer m_cycleLatchTimer;
     CNetworkVar( int, m_iPlayerControllerIndex );
 
 

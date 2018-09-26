@@ -5873,7 +5873,11 @@ static float AdjustInterpolationAmount( C_BaseEntity *pEntity, float baseInterpo
 		{
 			while ( pEntity )
 			{
+#ifdef ZMR
+				if ( pEntity->IsNPC() || pEntity->IsNPCR() )
+#else
 				if ( pEntity->IsNPC() )
+#endif
 					return minNPCInterpolation;
 
 				pEntity = pEntity->GetMoveParent();

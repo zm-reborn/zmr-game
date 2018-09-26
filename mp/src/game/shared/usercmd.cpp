@@ -169,6 +169,7 @@ void WriteUsercmd( bf_write *buf, const CUserCmd *to, const CUserCmd *from )
 		buf->WriteOneBit( 0 );
 	}
 
+#ifndef ZMR
 #if defined( HL2_CLIENT_DLL )
 	if ( to->entitygroundcontact.Count() != 0 )
 	{
@@ -180,6 +181,23 @@ void WriteUsercmd( bf_write *buf, const CUserCmd *to, const CUserCmd *from )
 			buf->WriteUBitLong( to->entitygroundcontact[i].entindex, MAX_EDICT_BITS );
 			buf->WriteBitCoord( to->entitygroundcontact[i].minheight );
 			buf->WriteBitCoord( to->entitygroundcontact[i].maxheight );
+		}
+	}
+	else
+	{
+		buf->WriteOneBit( 0 );
+	}
+#endif
+#endif // ZMR
+#if defined( ZMR ) && defined( CLIENT_DLL ) // ZMRCHANGE: Write our clientside hit data
+	if ( to->zmHitData.Count() != 0 )
+	{
+		buf->WriteOneBit( 1 );
+		buf->WriteUBitLong( to->zmHitData.Count(), ZM_USERCMD_MAX_HITS_BITS );
+
+		for ( int i = 0; i < to->zmHitData.Count(); i++ )
+		{
+            to->zmHitData[i].WriteTo( buf );
 		}
 	}
 	else
@@ -289,6 +307,7 @@ void ReadUsercmd( bf_read *buf, CUserCmd *move, CUserCmd *from )
 		move->mousedy = buf->ReadShort();
 	}
 
+#ifndef ZMR
 #if defined( HL2_DLL )
 	if ( buf->ReadOneBit() )
 	{
@@ -300,6 +319,20 @@ void ReadUsercmd( bf_read *buf, CUserCmd *move, CUserCmd *from )
 			move->entitygroundcontact[i].entindex = buf->ReadUBitLong( MAX_EDICT_BITS );
 			move->entitygroundcontact[i].minheight = buf->ReadBitCoord( );
 			move->entitygroundcontact[i].maxheight = buf->ReadBitCoord( );
+		}
+	}
+#endif
+#endif // ZMR
+#if defined( ZMR ) && defined( GAME_DLL ) // ZMRCHANGE: Read our clientside hit data
+	if ( buf->ReadOneBit() )
+	{
+        int n, i;
+        n = buf->ReadUBitLong( ZM_USERCMD_MAX_HITS_BITS );
+		move->zmHitData.SetCount( MIN( n, ZM_USERCMD_MAX_HITS ) );
+
+		for ( i = 0; i < move->zmHitData.Count(); i++ )
+		{
+            move->zmHitData[i].ReadFrom( buf );
 		}
 	}
 #endif

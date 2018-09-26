@@ -21,6 +21,7 @@ NPCR::CBaseNPC::CBaseNPC( CBaseCombatCharacter* pChar ) : NPCR::CNPCInterface( p
     m_flUpdateTime = 0.1f;
     m_bFlaggedForUpdate = false;
     m_iLastUpdateTick = 0;
+    m_iUpdateSlot = 0;
 
 
     g_NPCManager.RegisterNPC( this );

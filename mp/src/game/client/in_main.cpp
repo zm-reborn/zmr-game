@@ -47,6 +47,7 @@ extern ConVar cam_idealyaw;
 
 #ifdef ZMR
 #include "zmr/zmr_shareddefs.h"
+#include "zmr/zmr_usercmd.h"
 #include "zmr/ui/zmr_zmview_base.h"
 #endif
 
@@ -1294,6 +1295,11 @@ void CInput::CreateMove ( int sequence_number, float input_sample_frametime, boo
 		cmd->entitygroundcontact.AddToTail( m_EntityGroundContact[i] );
 	}
 	m_EntityGroundContact.RemoveAll();
+#endif
+
+#ifdef ZMR
+    g_ZMUserCmdSystem.WriteToCmd( *cmd );
+	g_ZMUserCmdSystem.ClearDamage();
 #endif
 
 	pVerified->m_cmd = *cmd;

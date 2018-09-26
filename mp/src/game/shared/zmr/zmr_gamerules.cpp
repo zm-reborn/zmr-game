@@ -479,6 +479,7 @@ void CZMRules::ClientSettingsChanged( CBasePlayer* pPlayer )
     }
 
     pZMPlayer->UpdatePlayerFOV();
+    pZMPlayer->UpdatePlayerInterpNPC();
 
     // Don't use HL2DM rules, it'll change player's team.
     CTeamplayRules::ClientSettingsChanged( pPlayer );

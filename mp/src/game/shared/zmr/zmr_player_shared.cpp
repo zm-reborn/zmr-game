@@ -25,6 +25,48 @@ extern ConVar zm_cl_participation;
 extern ConVar zm_sv_resource_max;
 
 
+ConVar zm_sv_bulletspassplayers( "zm_sv_bulletspassplayers", "1", FCVAR_NOTIFY | FCVAR_ARCHIVE | FCVAR_REPLICATED, "Do bullets players shoot pass through other players?" );
+
+
+//
+CZMPlayerAttackTraceFilter::CZMPlayerAttackTraceFilter( CBaseEntity* pAttacker, CBaseEntity* pIgnore, int collisionGroup ) : CTraceFilter()
+{
+    Assert( pAttacker != nullptr && pAttacker->IsPlayer() );
+    m_pAttacker = pAttacker;
+    m_pIgnore = pIgnore;
+}
+
+bool CZMPlayerAttackTraceFilter::ShouldHitEntity( IHandleEntity* pHandleEntity, int contentsMask )
+{
+    CBaseEntity* pEntity = EntityFromEntityHandle( pHandleEntity );
+
+    if ( !pEntity ) return false;
+    if ( pEntity == m_pAttacker ) return false;
+    if ( pEntity == m_pIgnore ) return false;
+
+
+    // It's a bone follower of the entity to ignore (toml 8/3/2007)
+    if ( pEntity->GetOwnerEntity() == m_pAttacker )
+        return false;
+
+    if ( m_pAttacker->IsPlayer() )
+    {
+#ifdef GAME_DLL
+        // Clientside hit reg will do this for us.
+        if ( g_ZMUserCmdSystem.UsesClientsideDetection( pEntity ) )
+            return false;
+#endif
+        if (pEntity->IsPlayer()
+        &&  pEntity->GetTeamNumber() == m_pAttacker->GetTeamNumber()
+        &&  zm_sv_bulletspassplayers.GetBool())
+            return false;
+    }
+
+    return true;
+}
+//
+
+
 bool CZMPlayer::HasEnoughResToSpawn( ZombieClass_t zclass )
 {
     return GetResources() >= CZMBaseZombie::GetCost( zclass );

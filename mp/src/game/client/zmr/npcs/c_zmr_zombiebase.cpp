@@ -2,6 +2,7 @@
 #include "bone_setup.h"
 #include "eventlist.h"
 #include "vprof.h"
+#include "takedamageinfo.h"
 #include <engine/ivdebugoverlay.h>
 
 #include "clienteffectprecachesystem.h"
@@ -13,6 +14,7 @@
 #include "zmr/c_zmr_zmvision.h"
 #include "zmr/npcs/zmr_zombieanimstate.h"
 #include "zmr/npcs/zmr_zombiebase_shared.h"
+#include "zmr/zmr_usercmd.h"
 
 
 extern bool g_bRenderPostProcess;
@@ -20,8 +22,6 @@ extern bool g_bRenderPostProcess;
 
 static ConVar zm_cl_zombiefadein( "zm_cl_zombiefadein", "0.55", FCVAR_ARCHIVE, "How fast zombie fades.", true, 0.0f, true, 2.0f );
 
-
-#define CYCLELATCH_TOLERANCE            0.15f
 
 #undef CZMBaseZombie
 IMPLEMENT_CLIENTCLASS_DT( C_ZMBaseZombie, DT_ZM_BaseZombie, CZMBaseZombie )
@@ -35,8 +35,6 @@ IMPLEMENT_CLIENTCLASS_DT( C_ZMBaseZombie, DT_ZM_BaseZombie, CZMBaseZombie )
     RecvPropBool( RECVINFO( m_bIsOnGround ) ),
     RecvPropInt( RECVINFO( m_iAnimationRandomSeed ) ),
     RecvPropInt( RECVINFO( m_lifeState ) ),
-    RecvPropInt( RECVINFO( m_cycleLatch ), 0, &C_ZMBaseZombie::RecvProxy_CycleLatch ),
-	RecvPropInt( RECVINFO( m_iPlayerControllerIndex ) ),
 END_RECV_TABLE()
 
 BEGIN_PREDICTION_DATA( C_ZMBaseZombie )
@@ -92,8 +90,6 @@ C_ZMBaseZombie::C_ZMBaseZombie()
     m_pHat = nullptr;
 
     m_iAdditionalAnimRandomSeed = 0;
-
-    m_flServerCycle = -1.0f;
     
 
     // Always create FX.
@@ -564,32 +560,19 @@ void C_ZMBaseZombie::HandleAnimEvent( animevent_t* pEvent )
     BaseClass::HandleAnimEvent( pEvent );
 }
 
-/*void C_ZMBaseZombie::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr, CDmgAccumulator *pAccumulator )
+void C_ZMBaseZombie::TraceAttack( const CTakeDamageInfo& info, const Vector& vecDir, trace_t* ptr, CDmgAccumulator* pAccumulator )
 {
     BaseClass::TraceAttack( info, vecDir, ptr, pAccumulator );
-}*/
 
+    if ( m_takedamage == DAMAGE_YES && g_ZMUserCmdSystem.UsesClientsideDetection( this ) )
+    {
+        ZMUserCmdHitData_t hit;
+        hit.entindex = entindex();
+        hit.nHits = 1;
+        hit.hitgroups[0] = ptr->hitgroup;
 
-void C_ZMBaseZombie::RecvProxy_CycleLatch( const CRecvProxyData *pData, void *pStruct, void *pOut )
-{
-	C_ZMBaseZombie* pZombie = static_cast<C_ZMBaseZombie*>( pStruct );
-	float flServerCycle = (float)pData->m_Value.m_Int / 16.0f;
-	float flCurCycle = pZombie->GetCycle();
-	// The cycle is way out of sync.
-	if ( fabs( flCurCycle - flServerCycle ) > CYCLELATCH_TOLERANCE )
-	{
-		pZombie->SetServerIntendedCycle( flServerCycle );
-	}
-}
-
-float C_ZMBaseZombie::GetServerIntendedCycle()
-{
-    return m_flServerCycle;
-}
-
-void C_ZMBaseZombie::SetServerIntendedCycle( float cycle )
-{
-    m_flServerCycle = cycle;
+        g_ZMUserCmdSystem.AddDamage( hit );
+    }
 }
 
 extern ConVar zm_sv_happyzombies;
