@@ -40,8 +40,10 @@ private:
     int m_nTexPanelBgTopId;
 
     C_BaseEntity*   m_pOldTarget;
+    int             m_iOldEntIndex;
     int             m_nOldTargetHealth;
     int             m_nOldObserverMode;
+    int             m_iOldTeam;
 
     CPanelAnimationVar( Color, m_BarColor, "BarColor", "0 0 0 220" );
     CPanelAnimationVar( vgui::HFont, m_hTextFont, "TextFont", "ZMHudVoteText" );
