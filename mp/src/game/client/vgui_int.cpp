@@ -234,9 +234,9 @@ void VGui_CreateGlobalPanels( void )
     g_pZMOptionsMenu->Create( parent );
     g_pZMNewVerMenuInt->Create( parent );
     g_pZMMainMenu->Create( NULL );
-    g_pZMLoadingUI->Create( NULL );
+    //g_pZMLoadingUI->Create( NULL );
     ZMOverrideGameUI();
-    ZMOverrideLoadingUI();
+    //ZMOverrideLoadingUI();
 #endif
 }
 
@@ -246,7 +246,7 @@ void VGui_Shutdown()
     g_pZMOptionsMenu->Destroy();
     g_pZMNewVerMenuInt->Destroy();
     g_pZMMainMenu->Destroy();
-    g_pZMLoadingUI->Destroy();
+    //g_pZMLoadingUI->Destroy();
 #endif
 
 	VGUI_DestroyClientDLLRootPanel();
