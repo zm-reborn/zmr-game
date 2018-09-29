@@ -1,39 +1,22 @@
 #include "cbase.h"
 #include "filesystem.h"
+#include "IGameUIFuncs.h"
 
-#include <vgui_controls/Panel.h>
 #include <vgui/ISurface.h>
-#include <GameUI/IGameUI.h>
 
-
+#include "zmr_mainmenu_contactbuttons.h"
+#include "zmr_mainmenu_btn.h"
 #include "zmr_mainmenu.h"
 
 
 
 static CDllDemandLoader g_GameUI( "GameUI" );
 
+
+extern IGameUIFuncs* gameuifuncs;
+
+
 using namespace vgui;
-
-class CZMMainMenu : public Panel
-{
-public:
-    DECLARE_CLASS_SIMPLE( CZMMainMenu, Panel );
-
-    CZMMainMenu( VPANEL parent );
-    ~CZMMainMenu();
-
-    virtual void ApplySchemeSettings( IScheme* pScheme ) OVERRIDE;
-
-
-    IGameUI* GetGameUI();
-
-private:
-    bool LoadGameUI();
-    void ReleaseGameUI();
-
-
-    IGameUI* m_pGameUI;
-};
 
 class CZMMainMenuInterface : public IZMUi
 {
@@ -64,6 +47,10 @@ IZMUi* g_pZMMainMenu = static_cast<IZMUi*>( &g_ZMMainMenuInt );
 
 CZMMainMenu::CZMMainMenu( VPANEL parent ) : BaseClass( nullptr, "ZMMainMenu" )
 {
+    // Has to be set to load fonts correctly.
+    SetScheme( vgui::scheme()->LoadSchemeFromFile( "resource/ClientScheme.res", "ClientScheme" ) );
+
+
     SetParent( parent );
 
     m_pGameUI = nullptr;
@@ -73,6 +60,13 @@ CZMMainMenu::CZMMainMenu( VPANEL parent ) : BaseClass( nullptr, "ZMMainMenu" )
     }
 
 
+    SetProportional( true );
+
+    SetVisible( true );
+    SetMouseInputEnabled( true );
+    SetKeyBoardInputEnabled( true );
+    
+
     /*KeyValues* kv = new KeyValues( "GameMenu" );
     kv->UsesEscapeSequences( true );
 
@@ -80,6 +74,12 @@ CZMMainMenu::CZMMainMenu( VPANEL parent ) : BaseClass( nullptr, "ZMMainMenu" )
     {
         
     }*/
+
+    //MakePopup( false );
+    //GetFocusNavGroup().SetFocusTopLevel( true );
+
+    m_nTexBgId = surface()->CreateNewTextureID();
+    surface()->DrawSetTextureFile( m_nTexBgId, "zmr_mainmenu/bg_mainmenu", true, false );
 }
 
 CZMMainMenu::~CZMMainMenu()
@@ -113,16 +113,158 @@ bool CZMMainMenu::LoadGameUI()
 void CZMMainMenu::ReleaseGameUI()
 {
     g_GameUI.Unload();
+    if ( m_pGameUI )
+        m_pGameUI->SetMainMenuOverride( NULL );
     m_pGameUI = nullptr;
+}
+
+void CZMMainMenu::PaintBackground()
+{
+    // Draw the "line"
+    const int nTexHeight = 512;
+    const int nTexWidth = 1024;
+
+
+    Panel* pPanel = GetChild( 0 );
+
+
+
+    surface()->DrawSetColor( m_BgColor );
+
+    const int w = GetWide();
+    int h = pPanel ? (pPanel->GetTall()+10) : 100;
+
+    int offset_y = pPanel ? ((pPanel->GetYPos()+pPanel->GetTall()/2)-h/2) : 0;
+
+    if ( (offset_y + h) > GetTall() )
+    {
+        h = GetTall() - offset_y;
+    }
+
+
+    float repeats = w / (nTexWidth * (h / (float)nTexHeight));
+
+
+    surface()->DrawSetTexture( m_nTexBgId );
+    surface()->DrawTexturedSubRect( 0, offset_y, w, offset_y + h, 0.0f, 0.0f, repeats, 1.0f );
+}
+
+void CZMMainMenu::PerformLayout()
+{
+    const bool bInGame = engine->IsInGame();
+
+    int len = GetChildCount();
+    for ( int i = 0; i < len; i++ )
+    {
+        Panel* pChild = GetChild( i );
+
+        auto* pButton = dynamic_cast<CZMMainMenuButton*>( pChild );
+        if ( pButton )
+        {
+            if ( pButton->DrawOnlyInGame() )
+                pButton->SetVisible( bInGame );
+
+            continue;
+        }
+
+        auto* pList = dynamic_cast<CZMMainMenuContactButtonList*>( pChild );
+        if ( pList )
+        {
+            pChild->SetPos( GetXPos(), GetTall() - GetChild( i )->GetTall() );
+
+            continue;
+        }
+    }
+
+    BaseClass::PerformLayout();
 }
 
 void CZMMainMenu::ApplySchemeSettings( IScheme* pScheme )
 {
-    BaseClass::ApplySchemeSettings( pScheme );
+    m_BgColor = GetSchemeColor( "ZMMainMenuBg", COLOR_BLACK, pScheme );
+
+
+    LoadControlSettings( "resource/ui/zmmainmenu.res" );
 
     int w, h;
     surface()->GetScreenSize( w, h );
-    SetSize( w, h );
+    SetBounds( 0, 0, w, h );
+
+
+    BaseClass::ApplySchemeSettings( pScheme );
+}
+
+void CZMMainMenu::OnCommand( const char* command )
+{
+    m_pGameUI->SendMainMenuCommand( command );
+    //BaseClass::OnCommand( command );
+}
+
+void CZMMainMenu::OnKeyCodePressed( KeyCode code )
+{
+    // HACK: Allow F key bindings to operate even here
+    if ( IsPC() && code >= KEY_F1 && code <= KEY_F12 )
+    {
+        // See if there is a binding for the FKey
+        const char* binding = gameuifuncs->GetBindingForButtonCode( code );
+        if ( binding && *binding )
+        {
+            // submit the entry as a console commmand
+            char szCommand[256];
+            Q_strncpy( szCommand, binding, sizeof( szCommand ) );
+            engine->ClientCmd_Unrestricted( szCommand );
+        }
+    }
+
+    BaseClass::OnKeyCodePressed( code );
+}
+
+void CZMMainMenu::OnMousePressed( KeyCode code )
+{
+    HideSubButtons();
+    
+
+    BaseClass::OnMousePressed( code );
+}
+
+void CZMMainMenu::PrintDebug()
+{
+    int w, h;
+    int x, y;
+
+
+    Msg( "------\n" );
+
+    surface()->GetScreenSize( w, h );
+    Msg( "Screen width: %i, height: %i\n", w, h );
+
+
+    Panel* pResume = FindChildByName( "ResumeButton", false );
+    if ( pResume )
+    {
+        pResume->GetPos( x, y );
+        Msg( "ResumeButton X: %i, Y: %i\n", x, y );
+    }
+
+
+    GetBounds( x, y, w, h );
+    Msg( "Me X: %i, Y: %i | Width: %i, Height: %i\n", x, y, w, h );
+
+
+    Msg( "------\n" );
+}
+
+void CZMMainMenu::HideSubButtons( Panel* pIgnore )
+{
+    int len = GetChildCount();
+    for ( int i = 0; i < len; i++ )
+    {
+        CZMMainMenuButton* pButton = dynamic_cast<CZMMainMenuButton*>( GetChild( i ) );
+        if ( pButton && pButton != pIgnore )
+        {
+            pButton->HideSubButtons();
+        }
+    }
 }
 
 

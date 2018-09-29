@@ -218,6 +218,19 @@ $Project "Client (ZMR)"
 			}
 			$Folder "UI"
 			{
+				$Folder "Main Menu"
+				{
+					//$File	"zmr\ui\menu\zmr_loadingbg.cpp"
+					//$File	"zmr\ui\menu\zmr_loadingbg.h"
+					$File	"zmr\ui\menu\zmr_mainmenu.cpp"
+					//$File	"zmr\ui\menu\zmr_mainmenu.h"
+					$File	"zmr\ui\menu\zmr_mainmenu_btn.cpp"
+					$File	"zmr\ui\menu\zmr_mainmenu_btn.h"
+					$File	"zmr\ui\menu\zmr_mainmenu_contactbuttons.cpp"
+					$File	"zmr\ui\menu\zmr_mainmenu_contactbuttons.h"
+					$File	"zmr\ui\menu\zmr_mainmenu_subbtn.cpp"
+					$File	"zmr\ui\menu\zmr_mainmenu_subbtn.h"
+				}
 				$Folder "Options"
 				{
 					$File	"zmr\ui\zmr_options.cpp"
