@@ -22,7 +22,7 @@
 #ifdef GAME_DLL
 ConVar zm_sv_voiceline_madness( "zm_sv_voiceline_madness", "0", 0, "Don't do it." );
 #else
-ConVar zm_cl_voiceline_volume( "zm_cl_voiceline_volume", "0.3", FCVAR_ARCHIVE );
+ConVar zm_cl_voiceline_volume( "zm_cl_voiceline_volume", "1", FCVAR_ARCHIVE );
 ConVar zm_cl_voiceline_disablesound( "zm_cl_voiceline_disablesound", "0", FCVAR_ARCHIVE );
 ConVar zm_cl_voiceline_disablechat( "zm_cl_voiceline_disablechat", "0", FCVAR_ARCHIVE );
 ConVar zm_cl_voiceline_disableforzm( "zm_cl_voiceline_disableforzm", "1", FCVAR_ARCHIVE );
