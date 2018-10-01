@@ -93,10 +93,10 @@ void NPCR::CBaseSenses::UpdateVision()
     for ( int i = m_vVisionEnts.Count() - 1; i >= 0; i-- )
     {
         VisionEntity* pVision = m_vVisionEnts[i];
-        if ( !CanSee( pVision ) )
-        {
-            CBaseEntity* pLost = pVision->GetEntity();
+        CBaseEntity* pLost = pVision->GetEntity();
 
+        if ( !IsValidVisionEntity( pLost ) || !CanSee( pVision ) )
+        {
             if ( pLost )
                 GetNPC()->OnSightLost( pLost );
 
@@ -249,4 +249,9 @@ CBaseEntity* NPCR::CBaseSenses::GetClosestEntity() const
     }
 
     return pClosest;
+}
+
+bool NPCR::CBaseSenses::IsValidVisionEntity( CBaseEntity* pEnt ) const
+{
+    return pEnt && GetNPC()->IsEnemy( pEnt );
 }
