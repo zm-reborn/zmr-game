@@ -178,7 +178,10 @@ void CZMBaseMeleeWeapon::TraceMeleeAttack( trace_t& traceHit )
     pOwner->EyeVectors( &forward, nullptr, nullptr );
 
     Vector swingEnd = swingStart + forward * GetRange();
-    UTIL_TraceLine( swingStart, swingEnd, MASK_MELEE, pOwner, COLLISION_GROUP_NONE, &traceHit );
+
+    CZMPlayerAttackTraceFilter filter( pOwner, nullptr, COLLISION_GROUP_NONE );
+    UTIL_TraceLine( swingStart, swingEnd, MASK_MELEE, &filter, &traceHit );
+
 
     if ( traceHit.fraction == 1.0f )
     {
@@ -246,8 +249,12 @@ void CZMBaseMeleeWeapon::Hit( trace_t& traceHit, Activity nHitActivity )
 
         CalculateMeleeDamageForce( &info, hitDirection, traceHit.endpos );
 
-        pHitEntity->DispatchTraceAttack( info, hitDirection, &traceHit ); 
+        pHitEntity->DispatchTraceAttack( info, hitDirection, &traceHit );
         ApplyMultiDamage();
+
+#ifdef GAME_DLL
+        pPlayer->CopyMeleeDamage( this, pPlayer->Weapon_ShootPosition(), dmg );
+#endif
 
 #ifndef CLIENT_DLL
         // Now hit all triggers along the ray that... 

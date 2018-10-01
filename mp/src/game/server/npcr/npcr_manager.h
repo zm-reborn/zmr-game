@@ -32,12 +32,19 @@ namespace NPCR
             }
         }
 
+
+        bool UsesUpdateSlots() const;
+        void UpdateSlots();
+
     private:
         float m_flUpdateStartTime;
         float m_flLastUpdateTime;
 
         float m_flUpdateSum;
         int m_iLastFrame;
+
+        int m_iCurUpdateSlot;
+        int m_nUpdateSlots;
 
         CUtlVector<CBaseNPC*> m_vNPCs;
     };

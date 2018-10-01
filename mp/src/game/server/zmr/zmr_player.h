@@ -50,6 +50,26 @@ public:
     void (CZMPlayer::*pfnPreThink)(); // Do a PreThink() in this state.
 };
 
+struct ZMServerWepData_t
+{
+    void Reset()
+    {
+        iAmmoType = -1;
+        iLastFireCommandNumber = 0;
+        flDamage = 0.0f;
+        hWeapon.Set( nullptr );
+        vecShootPos = vec3_origin;
+        bIsMelee = false;
+    }
+
+    int iLastFireCommandNumber;
+    int iAmmoType;
+    float flDamage;
+    CHandle<CZMBaseWeapon> hWeapon;
+    Vector vecShootPos;
+    bool bIsMelee;
+};
+
 class CZMPlayer : public CHL2_Player
 {
 public:
@@ -220,7 +240,17 @@ public:
 
     int             GetZMCommandInterruptFlags() const;
 
+    float           GetInterpNPCTime() const { return m_flInterpNPCTime; }
+    void            UpdatePlayerInterpNPC();
+
+
+    void CopyWeaponDamage( CZMBaseWeapon* pWeapon, const FireBulletsInfo_t& info );
+    void CopyMeleeDamage( CZMBaseWeapon* pWeapon, const Vector& vecSrc, float flDamage );
 private:
+    void HandleDamagesFromUserCmd();
+    ZMServerWepData_t m_ServerWepData;
+
+
     // Since I didn't get this at first either, this is only sent to THIS player.
     CNetworkVarEmbedded( CZMPlayerLocalData, m_ZMLocal );
 
@@ -249,6 +279,9 @@ private:
 
     // Store all the ammo indices denied for this frame.
     CUtlVector<int> m_vAmmoDenied;
+
+    // The cl_interp_npcs value
+    float m_flInterpNPCTime;
 };
 
 inline CZMPlayer* ToZMPlayer( CBaseEntity* pEntity )
