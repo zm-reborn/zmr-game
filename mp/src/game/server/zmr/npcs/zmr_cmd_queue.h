@@ -167,6 +167,8 @@ public:
             {
                 m_vCommands.Remove( i );
                 --i;
+
+                delete slot;
             }
         }
     }
@@ -179,8 +181,12 @@ public:
             int index = FindCommandIndex( com );
             if ( index != -1 )
             {
+                auto* slot = m_vCommands[index];
+
                 m_vCommands.Remove( index );
                 bRemoved = true;
+
+                delete slot;
             }
             else break;
         }

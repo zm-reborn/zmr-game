@@ -14,6 +14,7 @@ NPCR::CBaseSenses::CBaseSenses( NPCR::CBaseNPC* pNPC ) : NPCR::CEventListener( p
 
 NPCR::CBaseSenses::~CBaseSenses()
 {
+    m_vVisionEnts.PurgeAndDeleteElements();
 }
 
 void NPCR::CBaseSenses::Update()
@@ -91,14 +92,16 @@ void NPCR::CBaseSenses::UpdateVision()
 
     for ( int i = m_vVisionEnts.Count() - 1; i >= 0; i-- )
     {
-        if ( !CanSee( m_vVisionEnts[i] ) )
+        VisionEntity* pVision = m_vVisionEnts[i];
+        if ( !CanSee( pVision ) )
         {
-            CBaseEntity* pLost = m_vVisionEnts[i]->GetEntity();
+            CBaseEntity* pLost = pVision->GetEntity();
 
             if ( pLost )
-                GetNPC()->OnSightLost( m_vVisionEnts[i]->GetEntity() );
+                GetNPC()->OnSightLost( pLost );
 
             m_vVisionEnts.Remove( i );
+            delete pVision;
         }
     }
     
