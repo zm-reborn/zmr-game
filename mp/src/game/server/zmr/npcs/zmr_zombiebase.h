@@ -54,7 +54,7 @@ public:
     virtual CZMZombieAnimState*         CreateAnimState();
 
     virtual NPCR::CScheduleInterface*   CreateScheduleInterface() OVERRIDE;
-    virtual NPCR::CBaseSenses*          CreateSenses() OVERRIDE { return new NPCR::CBaseSenses( this ); }
+    virtual NPCR::CBaseSenses*          CreateSenses() OVERRIDE;
 
     CZMBlockerScanner*                  GetBlockerFinder() const { return m_pBlockerScanner; }
 

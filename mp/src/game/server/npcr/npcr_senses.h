@@ -14,15 +14,21 @@ namespace NPCR
         VisionEntity( CBaseEntity* pEnt )
         {
             m_pEnt = pEnt;
-            UpdateLastSeen();
+            m_flLastSeen = gpGlobals->curtime;
         }
         ~VisionEntity() {}
 
 
         CBaseEntity*    GetEntity() { return m_pEnt.Get(); };
 
-        float           LastSeen() { return m_flLastSeen; };
-        void            UpdateLastSeen() { m_flLastSeen = gpGlobals->curtime; };
+        float   LastSeen() const { return m_flLastSeen; }
+        void    UpdateLastSeen()
+        {
+            float newtime = gpGlobals->curtime;
+            if ( newtime > m_flLastSeen )
+                m_flLastSeen = newtime;
+        }
+        void    SetLastSeen( float lastseen ) { m_flLastSeen = lastseen; }
 
     private:
         CHandle<CBaseEntity> m_pEnt;
