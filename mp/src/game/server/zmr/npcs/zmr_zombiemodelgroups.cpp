@@ -174,11 +174,15 @@ bool CZMZombieDataPerType::PrecacheMe()
 {
     FOR_EACH_VEC( m_vModels, i )
     {
-        if ( !m_vModels[i]->PrecacheMe() )
+        auto* pModelData = m_vModels[i];
+        if ( !pModelData->PrecacheMe() )
         {
-            Warning( "Failed to precache zombie model group! Model: %s!\n", m_vModels[i]->GetModelPath() );
+            Warning( "Failed to precache zombie model group! Model: %s!\n", pModelData->GetModelPath() );
+            
             m_vModels.Remove( i );
             --i;
+
+            delete pModelData;
         }
     }
 
