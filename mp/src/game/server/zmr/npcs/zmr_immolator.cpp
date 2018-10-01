@@ -14,7 +14,7 @@ ConVar zm_sv_immolator_burndist( "zm_sv_immolator_burndist", "250", FCVAR_NOTIFY
 
 ConVar zm_sv_immolator_burndmgdist( "zm_sv_immolator_burndmgdist", "132", FCVAR_NOTIFY, "The distance at which we will hurt others when burning." );
 ConVar zm_sv_immolator_burndmgtime( "zm_sv_immolator_burndmgtime", "8", FCVAR_NOTIFY, "The time those near me will burn for." );
-ConVar zm_sv_immolator_burndmg( "zm_sv_immolator_burndmg", "10", FCVAR_NOTIFY );
+ConVar zm_sv_immolator_burndmg( "zm_sv_immolator_burndmg", "1", FCVAR_NOTIFY );
 
 #define BURNOTHER_INTERVAL          1.0f
 
