@@ -175,7 +175,7 @@ bool NPCR::CBaseSenses::CanSee( VisionEntity* pVision ) const
     CBaseEntity* pEnt = pVision->GetEntity();
     if ( !pEnt )
         return false;
-    if ( (gpGlobals->curtime - pVision->LastSeen()) > VISION_LASTSEEN_GRACE )
+    if ( (gpGlobals->curtime - pVision->LastSeen()) < VISION_LASTSEEN_GRACE )
         return true;
 
 
