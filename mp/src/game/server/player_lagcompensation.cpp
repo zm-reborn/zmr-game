@@ -35,7 +35,11 @@ static ConVar sv_lagcompensation_teleport_dist( "sv_lagcompensation_teleport_dis
 // Allow 4 units of error ( about 1 / 8 bbox width )
 #define LAG_COMPENSATION_ERROR_EPS_SQR ( 4.0f * 4.0f )
 
+#ifdef ZMR
+ConVar sv_unlag( "sv_unlag", "0", 0, "Enables player lag compensation" );
+#else
 ConVar sv_unlag( "sv_unlag", "1", FCVAR_DEVELOPMENTONLY, "Enables player lag compensation" );
+#endif
 ConVar sv_maxunlag( "sv_maxunlag", "1.0", FCVAR_DEVELOPMENTONLY, "Maximum lag compensation in seconds", true, 0.0f, true, 1.0f );
 ConVar sv_lagflushbonecache( "sv_lagflushbonecache", "1", FCVAR_DEVELOPMENTONLY, "Flushes entity bone cache on lag compensation" );
 ConVar sv_showlagcompensation( "sv_showlagcompensation", "0", FCVAR_CHEAT, "Show lag compensated hitboxes whenever a player is lag compensated." );
@@ -497,6 +501,9 @@ void CLagCompensationManager::StartLagCompensation( CBasePlayer *player, CUserCm
 	Q_memset( m_ChangeData, 0, sizeof( m_ChangeData ) );
 
 	m_isCurrentlyDoingCompensation = true;
+#ifdef ZMR
+    CZMPlayer* pZMPlayer = ToZMPlayer( player );
+#endif
 
 	// Get true latency
 
@@ -512,7 +519,12 @@ void CLagCompensationManager::StartLagCompensation( CBasePlayer *player, CUserCm
 	}
 
 	// calc number of view interpolation ticks - 1
+#ifdef ZMR // ZMRCHANGE: We don't compensate players anymore, so use the npc interp if possible
+    float NPCInterpTime = pZMPlayer->GetInterpNPCTime();
+    int lerpTicks = TIME_TO_TICKS( NPCInterpTime > player->m_fLerpTime ? NPCInterpTime : player->m_fLerpTime );
+#else
 	int lerpTicks = TIME_TO_TICKS( player->m_fLerpTime );
+#endif
 
 	// add view interpolation latency see C_BaseEntity::GetInterpolationAmount()
 	correct += TICKS_TO_TIME( lerpTicks );
@@ -535,7 +547,8 @@ void CLagCompensationManager::StartLagCompensation( CBasePlayer *player, CUserCm
 	
 	// Iterate all active players
 	const CBitVec<MAX_EDICTS> *pEntityTransmitBits = engine->GetEntityTransmitBitsForClient( player->entindex() - 1 );
-	for ( int i = 1; i <= gpGlobals->maxClients; i++ )
+#ifndef ZMR
+    for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 	{
 		CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
 
@@ -557,10 +570,9 @@ void CLagCompensationManager::StartLagCompensation( CBasePlayer *player, CUserCm
 		// Move other player back in time
 		BacktrackPlayer( pPlayer, TICKS_TO_TIME( targettick ) );
 	}
+#endif
 
 #ifdef ZMR
-    CZMPlayer* pZMPlayer = ToZMPlayer( player );
-
     // also iterate all monsters
     for ( int i = 0; i < nZombies; i++ )
     {
@@ -1254,6 +1266,7 @@ void CLagCompensationManager::FinishLagCompensation( CBasePlayer *player )
 	}
 
 	// Iterate all active players
+#ifndef ZMR
 	for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 	{
 		int pl_index = i - 1;
@@ -1345,6 +1358,7 @@ void CLagCompensationManager::FinishLagCompensation( CBasePlayer *player )
 			pPlayer->SetSimulationTime( restore->m_flSimulationTime );
 		}
 	}
+#endif
 
 
 #ifdef ZMR

@@ -16,6 +16,10 @@
 #include "imovehelper.h"
 #include "checksum_crc.h"
 
+#ifdef ZMR
+#include "zmr/zmr_usercmd.h"
+#endif
+
 
 class bf_read;
 class bf_write;
@@ -61,6 +65,9 @@ public:
 #if defined( HL2_DLL ) || defined( HL2_CLIENT_DLL )
 		entitygroundcontact.RemoveAll();
 #endif
+#ifdef ZMR
+		zmHitData.RemoveAll();
+#endif
 	}
 
 	CUserCmd& operator =( const CUserCmd& src )
@@ -89,6 +96,9 @@ public:
 
 #if defined( HL2_DLL ) || defined( HL2_CLIENT_DLL )
 		entitygroundcontact			= src.entitygroundcontact;
+#endif
+#ifdef ZMR
+		zmHitData = src.zmHitData;
 #endif
 
 		return *this;
@@ -172,6 +182,9 @@ public:
 	CUtlVector< CEntityGroundContact > entitygroundcontact;
 #endif
 
+#ifdef ZMR
+	ZMUserCmdHitList_t zmHitData;
+#endif
 };
 
 void ReadUsercmd( bf_read *buf, CUserCmd *move, CUserCmd *from );

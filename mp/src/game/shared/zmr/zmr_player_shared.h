@@ -13,3 +13,16 @@
 #else
 #define C_ZMPlayer CZMPlayer
 #endif
+
+
+class CZMPlayerAttackTraceFilter : public CTraceFilter
+{
+public:
+    CZMPlayerAttackTraceFilter( CBaseEntity* pAttacker, CBaseEntity* pIgnore, int collisionGroup );
+
+    virtual bool ShouldHitEntity( IHandleEntity* pHandleEntity, int contentsMask ) OVERRIDE;
+
+private:
+    CBaseEntity* m_pAttacker;
+    CBaseEntity* m_pIgnore;
+};
