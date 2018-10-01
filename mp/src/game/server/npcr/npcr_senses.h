@@ -56,6 +56,8 @@ namespace NPCR
 
         virtual CBaseEntity* GetClosestEntity() const;
 
+        virtual bool IsValidVisionEntity( CBaseEntity* pEnt ) const;
+
     protected:
         virtual bool ShouldUpdateVision();
         virtual bool ShouldUpdateHearing();
