@@ -63,7 +63,13 @@ bool CZMImageRow::RemoveImageByIndex( int index )
     if ( !m_Images.IsValidIndex( index ) )
         return false;
 
+
+    auto* pImage = m_Images[index];
+
     m_Images.Remove( index );
+
+    delete pImage;
+
     return true;
 }
 
