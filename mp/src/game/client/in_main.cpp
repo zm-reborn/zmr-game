@@ -48,7 +48,6 @@ extern ConVar cam_idealyaw;
 #ifdef ZMR
 #include "zmr/zmr_shareddefs.h"
 #include "zmr/zmr_usercmd.h"
-#include "zmr/ui/zmr_zmview_base.h"
 #endif
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -1513,16 +1512,6 @@ int CInput::GetButtonBits( int bResetState )
 		bits |= IN_WEAPON2;
 	}
 
-#ifdef ZMR
-    if ( g_pZMView && !g_pZMView->IsVisible() )
-    {
-        bits |= IN_ZM_OBSERVERMODE;
-    }
-    else if ( bResetState )
-    {
-        bits &= ~IN_ZM_OBSERVERMODE;
-    }
-#endif
 
 	// Clear out any residual
 	bits &= ~s_ClearInputState;

@@ -105,6 +105,7 @@ public:
     void                    DoAnimationEvent( PlayerAnimEvent_t playerAnim, int nData = 0 );
     float                   GetAccuracyRatio() const;
     void                    UpdateAccuracyRatio();
+    void                    GetZMMovementVars( float& maxspd, float& accel, float& decel ) const;
 
     void SetMouseWheelMove( float dir );
 

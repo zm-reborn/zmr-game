@@ -297,3 +297,28 @@ void CZMPlayer::UpdateAccuracyRatio()
 
     m_ZMLocal.m_flAccuracyRatio = clamp( cur + add, min, max );
 }
+
+#ifdef CLIENT_DLL
+extern ConVar zm_cl_zmmovespeed;
+extern ConVar zm_cl_zmmoveaccelerate;
+extern ConVar zm_cl_zmmovedecelerate;
+#endif
+
+void CZMPlayer::GetZMMovementVars( float& maxspd, float& accel, float& decel ) const
+{
+#ifdef CLIENT_DLL
+    //if ( !IsLocalPlayer() )
+    //{
+    //    return;
+    //}
+
+
+    maxspd = zm_cl_zmmovespeed.GetFloat();
+    accel = zm_cl_zmmoveaccelerate.GetFloat();
+    decel = zm_cl_zmmovedecelerate.GetFloat();
+#else
+    maxspd = m_flZMMoveSpeed;
+    accel = m_flZMMoveAccel;
+    decel = m_flZMMoveDecel;
+#endif
+}

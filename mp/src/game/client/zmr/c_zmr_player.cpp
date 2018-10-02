@@ -9,6 +9,7 @@
 #include "view.h"
 #include "bone_setup.h"
 #include "flashlighteffect.h"
+#include "in_buttons.h"
 
 
 #include "zmr/c_zmr_util.h"
@@ -47,10 +48,17 @@ ConVar zm_cl_flashlight_thirdperson( "zm_cl_flashlight_thirdperson", "1", FCVAR_
 
 ConVar zm_cl_participation( "zm_cl_participation", "0", FCVAR_USERINFO | FCVAR_ARCHIVE, "Your participation setting. 0 = Want to be ZM, 1 = Only human, 2 = Only spectator" );
 
-
-ConVar zm_cl_mwheelmove( "zm_cl_mwheelmove", "1", FCVAR_ARCHIVE, "As the ZM, can you move up/down with mousewheel?" );
-ConVar zm_cl_mwheelmovereverse( "zm_cl_mwheelmovereverse", "1", FCVAR_ARCHIVE, "Is mousewheel scrolling reversed?" );
-ConVar zm_cl_mwheelmovespd( "zm_cl_mwheelmovespd", "400", FCVAR_ARCHIVE );
+// General ZM moving
+ConVar zm_cl_zmmovespeed( "zm_cl_zmmovespeed", "1600", FCVAR_USERINFO | FCVAR_ARCHIVE, "How fast you'll move." );
+ConVar zm_cl_zmmoveaccelerate( "zm_cl_zmmoveaccelerate", "5", FCVAR_USERINFO | FCVAR_ARCHIVE, "How fast you'll accelerate." );
+ConVar zm_cl_zmmovedecelerate( "zm_cl_zmmovedecelerate", "4", FCVAR_USERINFO | FCVAR_ARCHIVE, "How fast you'll decelerate." );
+// Mouse wheel
+ConVar zm_cl_zmmovemwheelmove( "zm_cl_zmmovemwheelmove", "1", FCVAR_ARCHIVE, "As the ZM, can you move up/down with mousewheel?" );
+ConVar zm_cl_zmmovemwheelmovereverse( "zm_cl_zmmovemwheelmovereverse", "1", FCVAR_ARCHIVE, "Is mousewheel scrolling reversed?" );
+ConVar zm_cl_zmmovemwheelmovespd( "zm_cl_zmmovemwheelmovespd", "1600", FCVAR_ARCHIVE, "", true, 400.0f, true, 2000.0f );
+// Button ones
+ConVar zm_cl_zmmovejumpspd( "zm_cl_zmmovejumpspd", "1600", FCVAR_ARCHIVE );
+ConVar zm_cl_zmmovespdspd( "zm_cl_zmmovespdspd", "1600", FCVAR_ARCHIVE );
 
 
 // Yes, unfortunately because of how FOV is used, we need to change it on the server.
@@ -1024,21 +1032,58 @@ bool C_ZMPlayer::CreateMove( float delta, CUserCmd* cmd )
         cmd->upmove += m_flUpMove;
     }
 
+
+    if ( IsZM() )
+    {
+        // Encode the real wanted movement speed to 1/100
+
+
+        if ( cmd->forwardmove != 0.0f )
+        {
+            float value = zm_cl_zmmovespeed.GetFloat() * 0.01f;
+            cmd->forwardmove = cmd->forwardmove > 0.0f ? value : -value;
+        }
+
+        if ( cmd->sidemove != 0.0f )
+        {
+            float value = zm_cl_zmmovespeed.GetFloat() * 0.01f;
+            cmd->sidemove = cmd->sidemove > 0.0f ? value : -value;
+        }
+
+
+        // Let players go up/down with jump and sprint key.
+        if ( cmd->buttons & IN_JUMP )
+        {
+            cmd->upmove += zm_cl_zmmovejumpspd.GetFloat() * 0.01f;
+        }
+
+        if ( cmd->buttons & IN_SPEED )
+        {
+            cmd->upmove -= zm_cl_zmmovespdspd.GetFloat() * 0.01f;
+        }
+
+
+        if ( g_pZMView && !g_pZMView->IsVisible() )
+        {
+            cmd->buttons |= IN_ZM_OBSERVERMODE;
+        }
+    }
+
     return bResult;
 }
 
 void C_ZMPlayer::SetMouseWheelMove( float dir )
 {
-    if ( !zm_cl_mwheelmove.GetBool() ) return;
+    if ( !zm_cl_zmmovemwheelmove.GetBool() ) return;
 
     if ( dir == 0.0f ) return;
 
     if ( m_flNextUpMove > gpGlobals->curtime )
         return;
 
-    if ( zm_cl_mwheelmovereverse.GetBool() )
+    if ( zm_cl_zmmovemwheelmovereverse.GetBool() )
         dir *= -1.0f;
 
     m_flNextUpMove = gpGlobals->curtime + 0.1f;
-    m_flUpMove = zm_cl_mwheelmovespd.GetFloat() * dir;
+    m_flUpMove = zm_cl_zmmovemwheelmovespd.GetFloat() * dir;
 }

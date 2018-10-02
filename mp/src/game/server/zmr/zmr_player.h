@@ -218,6 +218,7 @@ public:
     void                DoAnimationEvent( PlayerAnimEvent_t playerAnim, int nData = 0 );
     float               GetAccuracyRatio() const;
     void                UpdateAccuracyRatio();
+    void                GetZMMovementVars( float& maxspd, float& accel, float& decel ) const;
 
 
     CZMBaseWeapon*  GetWeaponOfHighestSlot();
@@ -242,6 +243,8 @@ public:
 
     float           GetInterpNPCTime() const { return m_flInterpNPCTime; }
     void            UpdatePlayerInterpNPC();
+
+    void            UpdatePlayerZMVars();
 
 
     void CopyWeaponDamage( CZMBaseWeapon* pWeapon, const FireBulletsInfo_t& info );
@@ -282,6 +285,12 @@ private:
 
     // The cl_interp_npcs value
     float m_flInterpNPCTime;
+
+    // Cache of client's ZM movement values
+    void SafelyClampZMValue( float& value, float min, float max );
+    float m_flZMMoveSpeed;
+    float m_flZMMoveAccel;
+    float m_flZMMoveDecel;
 };
 
 inline CZMPlayer* ToZMPlayer( CBaseEntity* pEntity )

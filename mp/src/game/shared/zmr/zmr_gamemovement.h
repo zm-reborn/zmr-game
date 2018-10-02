@@ -44,7 +44,7 @@ public:
 
     virtual void CategorizePosition() OVERRIDE;
 
-    void FullZMMove( float factor, float maxacceleration );
+    void FullZMMove();
     virtual void Duck() OVERRIDE;
 
     virtual bool CheckJumpButton() OVERRIDE;
