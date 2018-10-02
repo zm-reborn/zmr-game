@@ -120,6 +120,17 @@
 		"visible"	"0"
 	}
 	
+	ZMHudTargetID
+	{
+		"fieldName" "ZMHudTargetID"
+		"visible" "1"
+		"enabled" "1"
+		"wide"	 "640"
+		"tall"	 "480"
+		
+		"TargetIDFont"		"TargetID"
+	}
+	
 	ZMHudTooltip
 	{
 		"fieldName"		"ZMHudToolTip"
@@ -148,15 +159,6 @@
 		"text_ypos" "20"
 		"digit_xpos" "50"
 		"digit_ypos" "2"
-	}
-
-	TargetID
-	{
-		"fieldName" "TargetID"
-		"visible" "1"
-		"enabled" "1"
-		"wide"	 "640"
-		"tall"	 "480"
 	}
 
 	TeamDisplay
