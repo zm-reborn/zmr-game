@@ -137,6 +137,11 @@ CZMPlayer::CZMPlayer()
 
     
     SetWeaponSlotFlags( 0 );
+
+
+    m_flZMMoveSpeed = 1600.0f;
+    m_flZMMoveAccel = 5.0f;
+    m_flZMMoveDecel = 4.0f;
 }
 
 CZMPlayer::~CZMPlayer( void )
@@ -869,6 +874,42 @@ void CZMPlayer::UpdatePlayerInterpNPC()
     float value = szValue ? atof( szValue ) : 0.0f;
 
     m_flInterpNPCTime = clamp( value, 0.0f, 0.5f );
+}
+
+void CZMPlayer::SafelyClampZMValue( float& value, float min, float max )
+{
+    // We'll have to make sure the client isn't trying to pass infinity/nan
+    // That's no good.
+    bool valid = value <= max && value >= min;
+    if ( valid )
+        return;
+
+
+    if ( value > max )
+    {
+        value = max;
+    }
+    else
+    {
+        value = min;
+    }
+}
+
+void CZMPlayer::UpdatePlayerZMVars()
+{
+    const char* szValue;
+
+    szValue = engine->GetClientConVarValue( entindex(), "zm_cl_zmmovespeed" );
+    m_flZMMoveSpeed = szValue ? atof( szValue ) : 0.0f;
+    SafelyClampZMValue( m_flZMMoveSpeed, 100.0f, 10000.0f );
+
+    szValue = engine->GetClientConVarValue( entindex(), "zm_cl_zmmoveaccelerate" );
+    m_flZMMoveAccel = szValue ? atof( szValue ) : 0.0f;
+    SafelyClampZMValue( m_flZMMoveAccel, 1.0f, 50.0f );
+
+    szValue = engine->GetClientConVarValue( entindex(), "zm_cl_zmmovedecelerate" );
+    m_flZMMoveDecel = szValue ? atof( szValue ) : 0.0f;
+    SafelyClampZMValue( m_flZMMoveDecel, 1.0f, 50.0f );
 }
 
 void CZMPlayer::InitialSpawn()
