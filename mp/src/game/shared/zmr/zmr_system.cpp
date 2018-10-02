@@ -105,6 +105,11 @@ void CZMSystem::CheckSpecialDates()
     {
         iEvent = HZEVENT_HULKAMANIA;
     }
+    // Halloween
+    else if ( t->tm_mon == 10 && t->tm_mday > 23 )
+    {
+        iEvent = HZEVENT_HALLOWEEN;
+    }
 
 
     if ( iEvent != HZEVENT_INVALID )
