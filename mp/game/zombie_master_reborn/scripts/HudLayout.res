@@ -143,6 +143,16 @@
 		"TooltipBgColor"	"70 0 0 150"
 	}
 	
+	ZMHudSpectatorUI
+	{
+		"fieldName"		"ZMHudSpectatorUI"
+	}
+	
+	ZMHudCrosshair
+	{
+		"fieldName"		"ZMHudCrosshair"
+	}
+	
 	HudHealth
 	{
 		"fieldName"		"HudHealth"
