@@ -1,0 +1,5 @@
+VertexlitGeneric
+{
+	$basetexture models\props\misc\hallo_badge
+	$model 1
+}
