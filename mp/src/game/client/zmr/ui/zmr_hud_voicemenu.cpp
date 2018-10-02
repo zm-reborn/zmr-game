@@ -149,7 +149,7 @@ private:
 
     int m_iCurSelection;
 
-    const float m_flInnerScale = 0.12f;
+    float m_flInnerScale;
 
 
     float m_flFadeIn;
@@ -216,6 +216,8 @@ CZMHudVoiceMenu::CZMHudVoiceMenu( const char* pElementName ) : CHudElement( pEle
 
 
     m_iCurSelection = -1;
+    
+    m_flInnerScale = 0.12f;
 
     m_pCurrentMenu = nullptr;
     LoadMenus();
