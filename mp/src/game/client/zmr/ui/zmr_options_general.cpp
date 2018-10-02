@@ -175,7 +175,10 @@ void CZMOptionsSubGeneral::AppendCustomModels()
         m_pModelCombo->AddItem( pData->GetModelData()->GetName(), kv );
     }
 
-    DevMsg( "Added %i custom player models to model list.\n", list.Count() );
+    if ( list.Count() )
+    {
+        DevMsg( "Added %i custom player models to model list.\n", list.Count() );
+    }
 
     list.PurgeAndDeleteElements();
 }
