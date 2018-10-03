@@ -29,7 +29,9 @@ CZMHudSpectatorUI::CZMHudSpectatorUI( const char *pElementName ) : CHudElement( 
     surface()->DrawSetTextureFile( m_nTexPanelBgTopId, "zmr_effects/hud_bg_spec_top", true, false );
 
     m_pOldTarget = nullptr;
+    m_iOldEntIndex = 0;
     m_nOldObserverMode = OBS_MODE_NONE;
+    m_iOldTeam = 0;
 
 
     SetProportional( true );
@@ -117,11 +119,12 @@ void CZMHudSpectatorUI::OnThink()
 
     if ( !IsVisible() ) return;
 
-
+    
     if (m_pOldTarget
     &&  pLocal->GetObserverTarget() == m_pOldTarget
     &&  pLocal->GetObserverMode() == m_nOldObserverMode
-    &&  m_pOldTarget->GetHealth() == m_nOldTargetHealth )
+    &&  m_pOldTarget->GetHealth() == m_nOldTargetHealth
+    &&  g_PR->GetTeam( m_iOldEntIndex ) == m_iOldTeam)
         return;
 
     Update();
@@ -210,7 +213,9 @@ bool CZMHudSpectatorUI::UpdateTargetText()
 
 
     m_pOldTarget = pEnt;
+    m_iOldEntIndex = pEnt ? pEnt->entindex() : 0;
     m_nOldTargetHealth = pEnt ? pEnt->GetHealth() : 0;
+    m_iOldTeam = pEnt ? g_PR->GetTeam( pEnt->entindex() ) : 0;
     m_nOldObserverMode = pLocal->GetObserverMode();
 
 

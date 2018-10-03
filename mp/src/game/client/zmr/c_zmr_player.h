@@ -106,6 +106,7 @@ public:
     float                   GetAccuracyRatio() const;
     void                    UpdateAccuracyRatio();
     bool                    IsControllingZombie() const;
+    void                    GetZMMovementVars( float& maxspd, float& accel, float& decel ) const;
 
     void SetMouseWheelMove( float dir );
 

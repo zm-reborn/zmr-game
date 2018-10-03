@@ -4423,6 +4423,9 @@ void CBasePlayer::UpdatePlayerSound ( void )
 
 	if ( pSound )
 	{
+#ifdef ZMR // ZMRCHANGE: Why did they NOT do this?? Thanks Valve.
+        pSound->m_hOwner.Set( this );
+#endif
 		pSound->SetSoundOrigin( GetAbsOrigin() );
 		pSound->m_iType = SOUND_PLAYER;
 		pSound->m_iVolume = iVolume;

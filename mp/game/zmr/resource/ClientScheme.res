@@ -1235,7 +1235,7 @@ Scheme
 			"1"
 			{
 				"name"		"Verdana"
-				"tall"		"16"
+				"tall"		"12"
 				"weight"	"2000"
 				"range"		"0x0000 0x007F"	//	Basic Latin
 				"antialias" "1"

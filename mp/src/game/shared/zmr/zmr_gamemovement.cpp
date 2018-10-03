@@ -238,7 +238,7 @@ void CZMGameMovement::PlayerMove( void )
             // ZMRTODO: Use our own move values.
             if ( ToZMPlayer( player )->IsZM() )
             {
-                FullZMMove( sv_noclipspeed.GetFloat(), sv_noclipaccelerate.GetFloat() );
+                FullZMMove();
             }
             else
             {
@@ -507,24 +507,32 @@ void CZMGameMovement::Accelerate( Vector& wishdir, float wishspeed, float accel 
     }
 }
 
-void CZMGameMovement::FullZMMove( float factor, float maxacceleration )
+void CZMGameMovement::FullZMMove()
 {
+    // Client sends its wanted max speed, acceleration, etc. through forward/side move and userinfo convars.
+    // See C_ZMPlayer::CreateMove
+    // Also see CZMPlayer::UpdatePlayerZMVars
+
 	Vector wishvel;
 	Vector forward, right, up;
 	Vector wishdir;
 	float wishspeed;
-	float maxspeed = sv_maxspeed.GetFloat() * factor;
+    float maxspeed;
+    float accel;
+    float decel;
 
-	AngleVectors (mv->m_vecViewAngles, &forward, &right, &up);  // Determine movement angles
+
+    GetZMPlayer()->GetZMMovementVars( maxspeed, accel, decel );
+
+	AngleVectors( mv->m_vecViewAngles, &forward, &right, &up );  // Determine movement angles
     
-	/*if ( mv->m_nButtons & IN_SPEED )
-	{
-		factor /= 2.0f;
-	}*/
+
 	
 	// Copy movement amounts
-	float fmove = mv->m_flForwardMove * factor;
-	float smove = mv->m_flSideMove * factor;
+    // The real wanted movement speed is scaled down, so here we scale it back up.
+	float fmove = mv->m_flForwardMove * 100.0f;
+	float smove = mv->m_flSideMove * 100.0f;
+    float umove = mv->m_flUpMove * 100.0f;
     
 	if ( !(mv->m_nButtons & IN_ZM_OBSERVERMODE) )
 	{
@@ -532,77 +540,64 @@ void CZMGameMovement::FullZMMove( float factor, float maxacceleration )
 		right[2] = 0;
 	}
 
-	VectorNormalize (forward);  // Normalize remainder of vectors
-	VectorNormalize (right);    // 
+	VectorNormalize( forward );
+	VectorNormalize( right );
+
 
 	for ( int i = 0; i < 3; i++ )
 		wishvel[i] = forward[i]*fmove + right[i]*smove;
-	wishvel[2] += mv->m_flUpMove * factor;
+	wishvel[2] += umove;
 
 
-    // Let players go up/down with jump and duck.
-    if ( mv->m_nButtons & IN_JUMP )
-    {
-        wishvel[2] += 300.0f * factor;
-    }
+	VectorCopy( wishvel, wishdir );   // Determine maginitude of speed of move
+	wishspeed = VectorNormalize( wishdir );
 
-    if ( mv->m_nButtons & IN_SPEED )
-    {
-        wishvel[2] -= 300.0f * factor;
-    }
-
-
-	VectorCopy (wishvel, wishdir);   // Determine maginitude of speed of move
-	wishspeed = VectorNormalize(wishdir);
-
-	//
-	// Clamp to server defined max speed
-	//
-	if (wishspeed > maxspeed )
+	if ( wishspeed > maxspeed )
 	{
-		VectorScale (wishvel, maxspeed/wishspeed, wishvel);
+		VectorScale( wishvel, maxspeed/wishspeed, wishvel );
 		wishspeed = maxspeed;
 	}
+    
 
-	if ( maxacceleration > 0.0 )
+
+	Accelerate( wishdir, wishspeed, accel );
+
+	float spd = VectorLength( mv->m_vecVelocity );
+	if ( spd < 1.0f )
 	{
-		// Set pmove velocity
-		Accelerate ( wishdir, wishspeed, maxacceleration );
-
-		float spd = VectorLength( mv->m_vecVelocity );
-		if (spd < 1.0f)
-		{
-			mv->m_vecVelocity.Init();
-			return;
-		}
-		
-		// Bleed off some speed, but if we have less than the bleed
-		//  threshhold, bleed the theshold amount.
-		float control = (spd < maxspeed/4.0) ? maxspeed/4.0 : spd;
-		
-		float friction = sv_friction.GetFloat();// * player->m_surfaceFriction;
-				
-		// Add the amount to the drop amount.
-		float drop = control * friction * gpGlobals->frametime;
-
-		// scale the velocity
-		float newspeed = spd - drop;
-		if (newspeed < 0)
-			newspeed = 0;
-
-		// Determine proportion of old speed we are using.
-		newspeed /= spd;
-		VectorScale( mv->m_vecVelocity, newspeed, mv->m_vecVelocity );
-	}
-	else
-	{
-		VectorCopy( wishvel, mv->m_vecVelocity );
+		mv->m_vecVelocity.Init();
+		return;
 	}
 
-	// Just move ( don't clip or anything )
+
+		
+	// Bleed off some speed, but if we have less than the bleed
+	//  threshhold, bleed the theshold amount.
+	float control = (spd < maxspeed/4.0) ? maxspeed/4.0 : spd;
+	
+	float friction = decel;
+
+	// Add the amount to the drop amount.
+	float drop = control * friction * gpGlobals->frametime;
+
+	// scale the velocity
+	float newspeed = spd - drop;
+	if ( newspeed < 0 )
+		newspeed = 0;
+
+	// Determine proportion of old speed we are using.
+	newspeed /= spd;
+	VectorScale( mv->m_vecVelocity, newspeed, mv->m_vecVelocity );
+
+
+
+	// Do the actual moving
+
+
 	Vector out;
 	VectorMA( mv->GetAbsOrigin(), gpGlobals->frametime, mv->m_vecVelocity, out );
 
+    // Yes, we do need to trace for the ZM. This is for ZM clips.
     trace_t pm;
     TracePlayerBBox( mv->GetAbsOrigin(), out, PlayerSolidMask(), COLLISION_GROUP_NONE, pm );
 
@@ -614,13 +609,6 @@ void CZMGameMovement::FullZMMove( float factor, float maxacceleration )
     {
         TryPlayerMove( &out, &pm );
     }
-
-
-	// Zero out velocity if in noaccel mode
-	if ( maxacceleration < 0.0f )
-	{
-		mv->m_vecVelocity.Init();
-	}
 }
 
 void CZMGameMovement::PlayerRoughLandingEffects( float fvol )

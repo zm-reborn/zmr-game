@@ -71,27 +71,21 @@ void CZMCrosshairSystem::LoadFiles()
 
     // Try to load player's customized crosshairs first.
     kv = new KeyValues( "Crosshairs" );
-    bool bLoaded = kv->LoadFromFile( filesystem, CROSSHAIRFILE );
+    kv->LoadFromFile( filesystem, CROSSHAIRFILE );
 
-    if ( bLoaded )
-    {
-        ReadCrosshairs( kv );
-    }
+    ReadCrosshairs( kv );
 
     kv->deleteThis();
 
 
-    if ( m_vCrosshairs.Count() < 1 )
-    {
-        // Didn't work, load defaults.
-        kv = new KeyValues( "Crosshairs" );
-        kv->LoadFromFile( filesystem, CROSSHAIRFILE_DEFAULT );
 
+    // Load defaults afterwards.
+    kv = new KeyValues( "Crosshairs" );
+    kv->LoadFromFile( filesystem, CROSSHAIRFILE_DEFAULT );
 
-        ReadCrosshairs( kv );
+    ReadCrosshairs( kv );
 
-        kv->deleteThis();
-    }
+    kv->deleteThis();
 }
 
 void CZMCrosshairSystem::WriteCrosshairsToFile() const
@@ -138,6 +132,11 @@ void CZMCrosshairSystem::ReadCrosshairs( KeyValues* kv )
 
 int CZMCrosshairSystem::AddCrosshair( KeyValues* kv )
 {
+    int index = FindCrosshairByName( kv->GetName() );
+    if ( index != -1 )
+        return index;
+
+
     CZMBaseCrosshair* pCross = CreateCrosshairFromData( kv );
 
     if ( pCross )

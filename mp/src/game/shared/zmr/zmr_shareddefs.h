@@ -178,6 +178,7 @@ enum HappyZombieEvent_t
 
     HZEVENT_CHRISTMAS,
     HZEVENT_HULKAMANIA,
+    HZEVENT_HALLOWEEN,
 
     HZEVENT_MAX
 };

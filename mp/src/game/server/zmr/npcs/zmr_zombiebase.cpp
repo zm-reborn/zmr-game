@@ -13,6 +13,7 @@
 #include "zmr_gamerules.h"
 #include "zmr_blockerfinder.h"
 #include "zmr/npcs/zmr_zombieanimstate.h"
+#include "zmr/npcs/zmr_zombie_senses.h"
 #include "zmr_global_shared.h"
 #include "zmr_zombiebase.h"
 #include "zmr/zmr_softcollisions.h"
@@ -298,6 +299,11 @@ protected:
 NPCR::CScheduleInterface* CZMBaseZombie::CreateScheduleInterface()
 {
     return new CZMZombieSchedInterface( this );
+}
+
+NPCR::CBaseSenses* CZMBaseZombie::CreateSenses()
+{
+    return new CZMZombieSenses( this );
 }
 
 CZMZombieAnimState* CZMBaseZombie::CreateAnimState()

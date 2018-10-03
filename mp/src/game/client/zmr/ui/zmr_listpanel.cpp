@@ -36,10 +36,6 @@ CZMListRow::CZMListRow( CZMListSection* parent, int itemId, KeyValues* kv ) : vg
 
 CZMListRow::~CZMListRow()
 {
-#ifdef _DEBUG
-    DevMsg( "~CZMListRow()\n" );
-#endif
-
     if ( m_pKvData )
     {
         m_pKvData->deleteThis();

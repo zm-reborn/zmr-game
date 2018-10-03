@@ -22,7 +22,7 @@
 #ifdef GAME_DLL
 ConVar zm_sv_voiceline_madness( "zm_sv_voiceline_madness", "0", 0, "Don't do it." );
 #else
-ConVar zm_cl_voiceline_volume( "zm_cl_voiceline_volume", "0.3", FCVAR_ARCHIVE );
+ConVar zm_cl_voiceline_volume( "zm_cl_voiceline_volume", "1", FCVAR_ARCHIVE );
 ConVar zm_cl_voiceline_disablesound( "zm_cl_voiceline_disablesound", "0", FCVAR_ARCHIVE );
 ConVar zm_cl_voiceline_disablechat( "zm_cl_voiceline_disablechat", "0", FCVAR_ARCHIVE );
 ConVar zm_cl_voiceline_disableforzm( "zm_cl_voiceline_disableforzm", "1", FCVAR_ARCHIVE );
@@ -52,27 +52,30 @@ void CZMVoiceLines::PostInit()
 #ifdef CLIENT_DLL
 void CZMVoiceLines::LevelInitPreEntity()
 {
-    bool prev = C_BaseEntity::IsPrecacheAllowed();
-    C_BaseEntity::SetAllowPrecache( true );
-
-    int len = m_vLines.Count();
-    for ( int i = 0; i < len; i++ )
-    {
-        if ( m_vLines[i]->m_szSoundBase[0] != NULL )
-        {
-            char line[256];
+    // Soundscripts should automatically be precached.
 
 
+    //bool prev = C_BaseEntity::IsPrecacheAllowed();
+    //C_BaseEntity::SetAllowPrecache( true );
 
-            Q_snprintf( line, sizeof( line ), "%s.%s", m_vLines[i]->m_szSoundBase, "Male" );
-            C_BaseEntity::PrecacheSound( line );
+    //int len = m_vLines.Count();
+    //for ( int i = 0; i < len; i++ )
+    //{
+    //    if ( m_vLines[i]->m_szSoundBase[0] != NULL )
+    //    {
+    //        char line[256];
 
-            Q_snprintf( line, sizeof( line ), "%s.%s", m_vLines[i]->m_szSoundBase, "Female" );
-            C_BaseEntity::PrecacheSound( line );
-        }
-    }
 
-    C_BaseEntity::SetAllowPrecache( prev );
+
+    //        Q_snprintf( line, sizeof( line ), "%s.%s", m_vLines[i]->m_szSoundBase, "Male" );
+    //        C_BaseEntity::PrecacheSound( line );
+
+    //        Q_snprintf( line, sizeof( line ), "%s.%s", m_vLines[i]->m_szSoundBase, "Female" );
+    //        C_BaseEntity::PrecacheSound( line );
+    //    }
+    //}
+
+    //C_BaseEntity::SetAllowPrecache( prev );
 }
 #endif
 

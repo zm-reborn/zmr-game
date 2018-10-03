@@ -181,7 +181,7 @@ public:
 #if defined( HL2_DLL ) || defined( HL2_CLIENT_DLL )
 	CUtlVector< CEntityGroundContact > entitygroundcontact;
 #endif
-	
+
 #ifdef ZMR
 	ZMUserCmdHitList_t zmHitData;
 #endif

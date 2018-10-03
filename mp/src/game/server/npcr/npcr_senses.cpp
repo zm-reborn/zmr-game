@@ -14,6 +14,7 @@ NPCR::CBaseSenses::CBaseSenses( NPCR::CBaseNPC* pNPC ) : NPCR::CEventListener( p
 
 NPCR::CBaseSenses::~CBaseSenses()
 {
+    m_vVisionEnts.PurgeAndDeleteElements();
 }
 
 void NPCR::CBaseSenses::Update()
@@ -91,14 +92,16 @@ void NPCR::CBaseSenses::UpdateVision()
 
     for ( int i = m_vVisionEnts.Count() - 1; i >= 0; i-- )
     {
-        if ( !CanSee( m_vVisionEnts[i] ) )
-        {
-            CBaseEntity* pLost = m_vVisionEnts[i]->GetEntity();
+        VisionEntity* pVision = m_vVisionEnts[i];
+        CBaseEntity* pLost = pVision->GetEntity();
 
+        if ( !IsValidVisionEntity( pLost ) || !CanSee( pVision ) )
+        {
             if ( pLost )
-                GetNPC()->OnSightLost( m_vVisionEnts[i]->GetEntity() );
+                GetNPC()->OnSightLost( pLost );
 
             m_vVisionEnts.Remove( i );
+            delete pVision;
         }
     }
     
@@ -172,7 +175,7 @@ bool NPCR::CBaseSenses::CanSee( VisionEntity* pVision ) const
     CBaseEntity* pEnt = pVision->GetEntity();
     if ( !pEnt )
         return false;
-    if ( (gpGlobals->curtime - pVision->LastSeen()) > VISION_LASTSEEN_GRACE )
+    if ( (gpGlobals->curtime - pVision->LastSeen()) < VISION_LASTSEEN_GRACE )
         return true;
 
 
@@ -246,4 +249,9 @@ CBaseEntity* NPCR::CBaseSenses::GetClosestEntity() const
     }
 
     return pClosest;
+}
+
+bool NPCR::CBaseSenses::IsValidVisionEntity( CBaseEntity* pEnt ) const
+{
+    return pEnt && GetNPC()->IsEnemy( pEnt );
 }
