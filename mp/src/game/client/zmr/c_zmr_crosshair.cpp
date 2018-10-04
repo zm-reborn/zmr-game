@@ -466,7 +466,6 @@ void CZMMaterialCrosshair::LoadValues( KeyValues* kv )
     CZMBaseCrosshair::LoadValues( kv );
 
 
-    m_Mat0Clr = kv->GetColor( "mat0color" );
     const char* mat = kv->GetString( "material0" );
 
     Q_strncpy( m_szTexture, mat, sizeof( m_szTexture ) );
@@ -479,18 +478,11 @@ void CZMMaterialCrosshair::WriteValues( KeyValues* kv ) const
 
     kv->SetString( "type", "material" );
     kv->SetString( "material0", m_szTexture );
-
-
-    char temp[64];
-    Color clr;
-    clr = m_Mat0Clr;
-    Q_snprintf( temp, sizeof( temp ), "%i %i %i %i", (int)clr[0], (int)clr[1], (int)clr[2], (int)clr[3] );
-    kv->SetString( "mat0color", temp );
 }
 
 void CZMMaterialCrosshair::Draw()
 {
-    const Color circleclr = GetMaterial0Color();
+    const Color clr = GetMainColor();
 
     float cx, cy;
     GetDrawPosition( cx, cy );
@@ -509,7 +501,7 @@ void CZMMaterialCrosshair::Draw()
 
         if ( offset > 0 )
         {
-            surface()->DrawSetColor( circleclr );
+            surface()->DrawSetColor( clr );
             surface()->DrawSetTexture( m_nTexMat0Id );
             surface()->DrawTexturedRect(
                 cx - offset,
