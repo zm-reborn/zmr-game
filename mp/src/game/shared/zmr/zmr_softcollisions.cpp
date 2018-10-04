@@ -21,7 +21,7 @@ ConVar zm_sv_softcollisions_zombie_debug( "zm_sv_softcollisions_zombie_debug", "
 
 extern ConVar zm_sv_playercollision;
 
-ConVar zm_sv_softcollisions_player_size( "zm_sv_softcollisions_player_size", "24", FCVAR_NOTIFY | FCVAR_ARCHIVE | FCVAR_REPLICATED );
+ConVar zm_sv_softcollisions_player_size( "zm_sv_softcollisions_player_size", "32", FCVAR_NOTIFY | FCVAR_ARCHIVE | FCVAR_REPLICATED );
 ConVar zm_sv_softcollisions_player_force( "zm_sv_softcollisions_player_force", "950", FCVAR_NOTIFY | FCVAR_ARCHIVE | FCVAR_REPLICATED );
 ConVar zm_sv_softcollisions_player_air_multiplier( "zm_sv_softcollisions_player_air_multiplier", "0.1", FCVAR_NOTIFY | FCVAR_ARCHIVE | FCVAR_REPLICATED );
 ConVar zm_sv_softcollisions_player_debug( "zm_sv_softcollisions_player_debug", "0", FCVAR_REPLICATED );
