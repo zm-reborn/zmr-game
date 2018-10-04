@@ -132,10 +132,7 @@ public:
     virtual void Draw() OVERRIDE;
 
 
-    const Color& GetMaterial0Color() const { return m_Mat0Clr; }
-
 protected:
-    Color m_Mat0Clr;
     int m_nTexMat0Id;
     char m_szTexture[192];
 };
