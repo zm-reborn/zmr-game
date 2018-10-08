@@ -55,6 +55,9 @@ public:
         CZMPlayer* pPlayer,
         const ZMServerWepData_t& dmgdata,
         const ZMUserCmdHitList_t& list );
+
+    static bool HasHitboxes( CBaseEntity* pVictim );
+    static bool ComputeTraceEnd( CBaseEntity* pVictim, trace_t& tr );
 #endif
 
     static bool UsesClientsideDetection();
