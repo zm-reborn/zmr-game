@@ -52,8 +52,10 @@ bool CZMPlayerAttackTraceFilter::ShouldHitEntity( IHandleEntity* pHandleEntity, 
     if ( m_pAttacker->IsPlayer() )
     {
 #ifdef GAME_DLL
+        CBasePlayer* pPlayer = static_cast<CBasePlayer*>( m_pAttacker );
+
         // Clientside hit reg will do this for us.
-        if ( g_ZMUserCmdSystem.UsesClientsideDetection( pEntity ) )
+        if ( !pPlayer->IsBot() && g_ZMUserCmdSystem.UsesClientsideDetection( pEntity ) )
             return false;
 #endif
         if (pEntity->IsPlayer()
