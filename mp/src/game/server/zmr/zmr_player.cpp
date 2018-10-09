@@ -283,10 +283,18 @@ void CZMPlayer::PostThink()
 
     BaseClass::PostThink();
     
-    if ( GetFlags() & FL_DUCKING )
-    {
-        SetCollisionBounds( VEC_CROUCH_TRACE_MIN, VEC_CROUCH_TRACE_MAX );
-    }
+
+    // I have yet to see what the point of this is. (originates from HL2MP)
+    //
+    // This makes players die sooner from doors closing from top to bottom. (ie. compound, crocodile)
+    // Most likely also the culprit for getting players stuck on each other's head when the bottom one is crouching.
+    //
+    // But it was causing prediction errors so fuck it. It's bullshit.
+
+    //if ( GetFlags() & FL_DUCKING )
+    //{
+    //    SetCollisionBounds( VEC_CROUCH_TRACE_MIN, VEC_CROUCH_TRACE_MAX );
+    //}
 
 
     QAngle angles = GetLocalAngles();
