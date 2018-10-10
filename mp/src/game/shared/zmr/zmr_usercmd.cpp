@@ -385,24 +385,19 @@ bool CZMUserCmdSystem::ComputeTraceEnd( CBaseEntity* pVictim, trace_t& tr )
         MatrixPosition( *pMatrix, tr.endpos );
 
         // Center it
-        //QAngle ang;
-        //Vector fwd;
-        //MatrixAngles( *pMatrix, ang );
+        Vector boxextents;
+        for ( int j = 0; j < 3; j++ )
+            boxextents[j] = (pBox->bbmin[j] + pBox->bbmax[j]) * 0.5f;
 
-        //AngleVectors( ang, &fwd );
-
-        //Vector delta = (pBox->bbmax - pBox->bbmin) / 2.0f;
-
-
-        //tr.endpos += fwd * delta;
+        VectorTransform( boxextents, *pMatrix, tr.endpos );
 
 
         // Do the actual magic
-	    trace_t tempTrace;
-	    if ( IntersectRayWithBox( tr.startpos, tr.endpos - tr.startpos, pBox->bbmin, pBox->bbmax, 0.0f, &tempTrace ) )
-        {
-            tr.endpos = tempTrace.endpos;
-        }
+        //trace_t tempTrace;
+        //if ( IntersectRayWithBox( start, delta2, pBox->bbmin, pBox->bbmax, 0.0f, &tempTrace ) )
+        //{
+        //    tr.endpos = tempTrace.endpos;
+        //}
 
         return true;
     }
