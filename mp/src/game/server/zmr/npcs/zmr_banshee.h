@@ -5,7 +5,7 @@
 #include "zmr_zombiebase.h"
 
 
-class CZMBansheeMotor : public NPCR::CNonPlayerMotor
+class CZMBansheeMotor : public CZMBaseZombieMotor
 {
 public:
     CZMBansheeMotor( CZMBaseZombie* pOuter );

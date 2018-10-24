@@ -4,10 +4,10 @@
 
 #include "zmr_zombiebase.h"
 
-class CZMHulkMotor : public NPCR::CNonPlayerMotor
+class CZMHulkMotor : public CZMBaseZombieMotor
 {
 public:
-    CZMHulkMotor( CZMBaseZombie* pOuter ) : NPCR::CNonPlayerMotor( pOuter )
+    CZMHulkMotor( CZMBaseZombie* pOuter ) : CZMBaseZombieMotor( pOuter )
     {
     }
 

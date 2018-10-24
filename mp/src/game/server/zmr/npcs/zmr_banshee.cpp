@@ -35,7 +35,7 @@ extern ConVar zm_sk_banshee_health;
 
 
 
-CZMBansheeMotor::CZMBansheeMotor( CZMBaseZombie* pOuter ) : NPCR::CNonPlayerMotor( pOuter )
+CZMBansheeMotor::CZMBansheeMotor( CZMBaseZombie* pOuter ) : CZMBaseZombieMotor( pOuter )
 {
 }
 
