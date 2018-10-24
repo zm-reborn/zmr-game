@@ -21,6 +21,15 @@ class CZMBlockerScanner;
 class CZMEntAmbushTrigger;
 
 
+class CZMBaseZombieMotor : public NPCR::CNonPlayerMotor
+{
+public:
+    CZMBaseZombieMotor( CZMBaseZombie* pOuter );
+
+    virtual float GetStepHeight() const OVERRIDE;
+};
+
+
 class CZMBaseZombie : public CNPCRNonPlayer, public CZMNPCLagCompensation
 {
 public:
@@ -55,6 +64,7 @@ public:
 
     virtual NPCR::CScheduleInterface*   CreateScheduleInterface() OVERRIDE;
     virtual NPCR::CBaseSenses*          CreateSenses() OVERRIDE;
+    virtual NPCR::CNonPlayerMotor*      CreateMotor() OVERRIDE;
 
     CZMBlockerScanner*                  GetBlockerFinder() const { return m_pBlockerScanner; }
 

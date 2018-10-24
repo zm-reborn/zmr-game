@@ -144,6 +144,8 @@ ConVar zm_sv_debug_shotgun_dmgmult( "zm_sv_debug_shotgun_dmgmult", "0" );
 
 ConVar zm_sv_zombiesoftcollisions( "zm_sv_zombiesoftcollisions", "1", FCVAR_NOTIFY, "Toggle experimental zombie collisions." );
 
+ConVar zm_sv_zombie_stepheight( "zm_sv_zombie_stepheight", "17", FCVAR_NOTIFY, "The default zombie step height." );
+
 
 extern ConVar zm_sk_default_hitmult_head;
 extern ConVar zm_sk_default_hitmult_head_buckshot;
@@ -192,6 +194,17 @@ END_SEND_TABLE()
 BEGIN_DATADESC( CZMBaseZombie )
     DEFINE_KEYFIELD( m_strModelGroup, FIELD_STRING, "modelgroup" ),
 END_DATADESC()
+
+
+CZMBaseZombieMotor::CZMBaseZombieMotor( CZMBaseZombie* pOuter ) : NPCR::CNonPlayerMotor( pOuter )
+{
+    
+}
+
+float CZMBaseZombieMotor::GetStepHeight() const
+{
+    return zm_sv_zombie_stepheight.GetFloat();
+}
 
 CZMBaseZombie::CZMBaseZombie()
 {
@@ -279,6 +292,11 @@ NPCR::CScheduleInterface* CZMBaseZombie::CreateScheduleInterface()
 NPCR::CBaseSenses* CZMBaseZombie::CreateSenses()
 {
     return new CZMZombieSenses( this );
+}
+
+NPCR::CNonPlayerMotor* CZMBaseZombie::CreateMotor()
+{
+    return new CZMBaseZombieMotor( this );
 }
 
 CZMZombieAnimState* CZMBaseZombie::CreateAnimState()
