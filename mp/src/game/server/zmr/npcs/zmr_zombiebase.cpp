@@ -1088,7 +1088,21 @@ NPCR::CFollowNavPath* CZMBaseZombie::GetFollowPath() const
 
 NPCR::QueryResult_t CZMBaseZombie::ShouldTouch( CBaseEntity* pEnt ) const
 {
-    if ( pEnt->IsBaseZombie() )
+    // Fixes a few PARTICULAR maps that use this old terrible method of letting zombies pass through brushes.
+    // Here you go, Psycho.
+    if ( pEnt->IsBSPModel() )
+    {
+        auto pFuncBrush = dynamic_cast<CFuncBrush*>( pEnt );
+        if ( pFuncBrush )
+        {
+            auto* pMe = const_cast<CZMBaseZombie*>( this );
+            bool bMatches = pMe->ClassMatches( pFuncBrush->m_iszExcludedClass )
+                        ||  pMe->NameMatches( pFuncBrush->m_iszExcludedClass );
+
+            return bMatches ? NPCR::RES_NO : NPCR::RES_YES;
+        }
+    }
+    else if ( pEnt->IsBaseZombie() )
     {
         NPCR::CBaseNPC* pOther = pEnt->MyNPCRPointer();
 
