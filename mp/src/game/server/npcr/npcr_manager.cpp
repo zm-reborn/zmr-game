@@ -132,14 +132,24 @@ void NPCR::NPCManager::OnGameFrame()
     }
 }
 
+double NPCR::NPCManager::GetProfilingTime()
+{
+    // Floating point is not enough for us.
+    // The precision starts to suffer after a day or two of upkeeping the server.
+
+
+    return Plat_FloatTime();
+    //return engine->Time();
+}
+
 void NPCR::NPCManager::StartUpdate()
 {
-    m_flUpdateStartTime = engine->Time();
+    m_flUpdateStartTime = GetProfilingTime();
 }
 
 void NPCR::NPCManager::FinishUpdate()
 {
-    m_flUpdateSum += engine->Time() - m_flUpdateStartTime;
+    m_flUpdateSum += GetProfilingTime() - m_flUpdateStartTime;
 }
 
 bool NPCR::NPCManager::ShouldUpdate( const NPCR::CBaseNPC* pNPC ) const
@@ -155,7 +165,7 @@ bool NPCR::NPCManager::ShouldUpdate( const NPCR::CBaseNPC* pNPC ) const
 
 
     float limit = npcr_framelimit.GetFloat();
-    float sum = m_flUpdateSum * 1000.0f;
+    float sum = (float)(m_flUpdateSum * 1000.0);
 
     if ( sum < limit )
     {
