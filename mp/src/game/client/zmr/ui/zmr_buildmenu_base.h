@@ -35,8 +35,6 @@ public:
     virtual void OnClose() OVERRIDE;
 
 
-    virtual void Paint() OVERRIDE;
-
 
     virtual void ShowMenu( C_ZMEntZombieSpawn* pSpawn );
     virtual void UpdateQueue( const int q[], int size ) {};

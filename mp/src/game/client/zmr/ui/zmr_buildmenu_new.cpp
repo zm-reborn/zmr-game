@@ -87,6 +87,17 @@ CZMBuildMenuNew::~CZMBuildMenuNew()
 {
 }
 
+void CZMBuildMenuNew::Paint()
+{
+    // HACK:
+    // See scoreboard Paint() for rant
+    CMatRenderContextPtr pRenderContext( materials );
+    pRenderContext->SetStencilReferenceValue( 0 );
+
+
+    BaseClass::Paint();
+}
+
 void CZMBuildMenuNew::ShowPanel( bool state )
 {
     if ( IsVisible() == state ) return;
