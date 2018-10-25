@@ -83,6 +83,7 @@ public:
 
     virtual bool Holster( CBaseCombatWeapon* pSwitchTo = nullptr ) OVERRIDE;
     virtual void Drop( const Vector& ) OVERRIDE;
+    virtual void ItemBusyFrame() OVERRIDE;
     virtual void ItemPostFrame( void ) OVERRIDE;
 
 
@@ -163,6 +164,13 @@ CZMWeaponRifle::~CZMWeaponRifle()
     CheckUnZoom();
 }
 
+void CZMWeaponRifle::ItemBusyFrame()
+{
+    CheckToggleZoom();
+
+    BaseClass::ItemBusyFrame();
+}
+
 void CZMWeaponRifle::ItemPostFrame( void )
 {
     CheckToggleZoom();
@@ -205,15 +213,16 @@ void CZMWeaponRifle::UnZoom( CZMPlayer* pPlayer )
 
 void CZMWeaponRifle::CheckUnZoom()
 {
-    CZMPlayer* pPlayer = GetPlayerOwner();
-    if ( !pPlayer ) return;
-
-
-    if ( IsZoomed() )
-    {
-        pPlayer->SetFOV( this, 0, 0.2f );
-
+    // We always need to unzoom here even when we don't have a player holding us.
+    bool bWasZoomed = IsZoomed();
+    if ( bWasZoomed )
         m_bInZoom = false;
+
+
+    CZMPlayer* pPlayer = GetPlayerOwner();
+    if ( pPlayer && bWasZoomed )
+    {
+        UnZoom( pPlayer );
     }
 }
 
