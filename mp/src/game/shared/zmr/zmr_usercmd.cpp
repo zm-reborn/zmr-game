@@ -223,6 +223,10 @@ int CZMUserCmdSystem::ApplyDamage( CZMPlayer* pPlayer, const ZMServerWepData_t& 
 
         // Construct a pseudo FireBullets to let the entity handle all the damage scaling, etc.
         
+        // Copy the data back in case the validator updated anything.
+        nHits = data.nHits;
+        nHitsAccumulated = data.nAlreadyHit;
+        nEntitiesHitAccumulated = data.nEntitiesAlreadyHit;
 
         Vector vecDefEnd = pEntity->WorldSpaceCenter();
 
@@ -259,7 +263,7 @@ int CZMUserCmdSystem::ApplyDamage( CZMPlayer* pPlayer, const ZMServerWepData_t& 
 #endif
 
         int iLastHitGroup = -1;
-        for ( int i = 0; i < cmddata.nHits; i++ )
+        for ( int i = 0; i < nHits; i++ )
         {
             // Entity needs hitgroups
             tr.hitgroup = cmddata.hitgroups[i];
