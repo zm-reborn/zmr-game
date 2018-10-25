@@ -18,6 +18,8 @@ public:
 
     virtual const char* GetName() OVERRIDE { return "ZMManiMenu"; };
 
+    virtual void Paint() OVERRIDE;
+
     virtual void ShowPanel( bool state ) OVERRIDE;
 	virtual void OnThink( void ) OVERRIDE;
 

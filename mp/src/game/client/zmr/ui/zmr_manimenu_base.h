@@ -36,8 +36,6 @@ public:
     virtual bool HasInputElements( void ) OVERRIDE { return true; }
 
 
-    virtual void Paint() OVERRIDE;
-
 
     virtual void OnCommand( const char *command ) OVERRIDE;
 
