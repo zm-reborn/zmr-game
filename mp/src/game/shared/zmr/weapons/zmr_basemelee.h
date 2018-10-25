@@ -52,6 +52,10 @@ public:
     virtual bool ShouldDrawCrosshair() OVERRIDE { return false; }
 #endif
 
+#ifdef GAME_DLL
+    virtual float GetMaxDamageDist( ZMUserCmdValidData_t& data ) const OVERRIDE;
+#endif
+
 protected:
     virtual void Swing( bool bSecondary );
     virtual void StartHit( trace_t* traceRes = nullptr, Activity iActivityDamage = ACT_VM_HITCENTER );
