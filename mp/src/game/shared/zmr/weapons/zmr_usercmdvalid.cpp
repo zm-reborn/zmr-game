@@ -22,7 +22,13 @@ bool CZMUserCmdHitWepValidator::IsUserCmdHitsValid( ZMUserCmdValidData_t& data )
     int maxBullets = GetMaxUserCmdBullets( data );
     if ( maxBullets > 0 && data.nHits > maxBullets )
     {
-        return OnUserCmdError( "Entity had more hits than bullets fired!" );
+        // HACK
+        // For now simply cap the hits to max if they exceed.
+        // This is commonly reached due to melee weapons being screwy on the client.
+        // Once that's fixed, remove this hack.
+        DevMsg( "Maximum hits was exceeded! (%i) Capping to %i!\n", data.nHits, maxBullets );
+        data.nHits = maxBullets;
+        //return OnUserCmdError( "Entity had more hits than bullets fired!" );
     }
 
 
