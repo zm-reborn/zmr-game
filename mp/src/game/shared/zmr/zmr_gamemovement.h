@@ -33,7 +33,7 @@ public:
 
     virtual void TracePlayerBBox( const Vector& start, const Vector& end, unsigned int fMask, int collisionGroup, trace_t& pm ) OVERRIDE;
     virtual CBaseHandle TestPlayerPosition( const Vector& pos, int collisionGroup, trace_t& pm ) OVERRIDE;
-
+    virtual void TryTouchGround( const Vector& start, const Vector& end, const Vector& mins, const Vector& maxs, unsigned int fMask, int collisionGroup, trace_t& pm ) OVERRIDE;
 
     virtual Vector GetPlayerMins() const OVERRIDE;
     virtual Vector GetPlayerMins( bool ducked ) const OVERRIDE;

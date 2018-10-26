@@ -2,6 +2,7 @@
 #include "movevars_shared.h"
 #include "in_buttons.h"
 #include "convar.h"
+#include "collisionutils.h"
 
 #ifndef CLIENT_DLL
 #include "player.h"
@@ -43,10 +44,12 @@ extern ConVar zm_sv_playercollision;
 class CPlayerMoveFilter : public CTraceFilterSimple
 {
 public:
-    CPlayerMoveFilter( CBasePlayer* pMe, int collisionGroup, bool bAddToSoftList = true ) : CTraceFilterSimple( pMe, collisionGroup )
+    CPlayerMoveFilter( CBasePlayer* pMe, int collisionGroup ) : CTraceFilterSimple( pMe, collisionGroup )
     {
         m_pMe = pMe;
-        m_bAddToSoftList = bAddToSoftList;
+        m_pMe->CollisionProp()->WorldSpaceAABB( &m_vecMins, &m_vecMaxs );
+        m_vecMins += 1.0f;
+        m_vecMaxs -= 1.0f;
     }
 
     virtual bool ShouldHitEntity( IHandleEntity* pHandleEntity, int contentsMask ) OVERRIDE
@@ -55,21 +58,29 @@ public:
             return false;
 
 
-        // Pass our hit player to soft collisions.
+        
         CBaseEntity* pEnt = EntityFromEntityHandle( pHandleEntity );
         if ( pEnt && pEnt->IsPlayer() )
         {
 #ifdef CLIENT_DLL
             C_ZMPlayer* pLocal = C_ZMPlayer::GetLocalPlayer();
 #endif
-            if (zm_sv_playercollision.GetInt() == 1 && m_bAddToSoftList
+            if (zm_sv_playercollision.GetInt() == 1
 #ifdef CLIENT_DLL
                 // Only for local player. Prediction is nice.
             &&  (m_pMe == pLocal || pEnt == pLocal || (pLocal && pLocal->GetObserverTarget() == m_pMe))
 #endif
                 )
             {
+                // Pass our hit player to soft collisions.
                 GetZMSoftCollisions()->OnPlayerCollide( m_pMe, pEnt );
+            }
+            // If we have collisions on and they're inside one another, ignore collision.
+            else if ( zm_sv_playercollision.GetInt() >= 2 )
+            {
+                Vector otmins, otmaxs;
+                pEnt->CollisionProp()->WorldSpaceAABB( &otmins, &otmaxs );
+                return !IsBoxIntersectingBox( m_vecMins, m_vecMaxs, otmins, otmaxs );
             }
 
 
@@ -82,22 +93,13 @@ public:
     }
 private:
     CBasePlayer* m_pMe;
-
-    bool m_bAddToSoftList;
+    Vector m_vecMins;
+    Vector m_vecMaxs;
 };
 
 void CZMGameMovement::TracePlayerBBox( const Vector& start, const Vector& end, unsigned int fMask, int collisionGroup, trace_t& pm )
 {
-    // We don't need to do our own bbox trace if we have collisions on.
-    if ( zm_sv_playercollision.GetInt() >= 2 )
-    {
-        BaseClass::TracePlayerBBox( start, end, fMask, collisionGroup, pm );
-        return;
-    }
-
-
-
-    // Do our own bbox trace to account for soft collisions
+    // Do our own bbox trace to account for soft collisions and stuckness
 
 
     VPROF( "CGameMovement::TracePlayerBBox" );
@@ -114,15 +116,7 @@ void CZMGameMovement::TracePlayerBBox( const Vector& start, const Vector& end, u
 
 CBaseHandle CZMGameMovement::TestPlayerPosition( const Vector& pos, int collisionGroup, trace_t& pm )
 {
-    // We don't need to do our own bbox trace if we have collisions on.
-    if ( zm_sv_playercollision.GetInt() >= 2 )
-    {
-        return BaseClass::TestPlayerPosition( pos, collisionGroup, pm );
-    }
-
-
-
-    // Do our own bbox trace to account for soft collisions
+    // Do our own bbox trace to account for soft collisions and stuckness
 
     CBasePlayer* pMe = static_cast<CBasePlayer*>( EntityFromEntityHandle( mv->m_nPlayerHandle.Get() ) );
     CPlayerMoveFilter filter( pMe, collisionGroup );
@@ -140,6 +134,23 @@ CBaseHandle CZMGameMovement::TestPlayerPosition( const Vector& pos, int collisio
 	{	
 		return INVALID_EHANDLE_INDEX;
 	}
+}
+
+void CZMGameMovement::TryTouchGround( const Vector& start, const Vector& end, const Vector& mins, const Vector& maxs, unsigned int fMask, int collisionGroup, trace_t& pm )
+{
+    // Do our own bbox trace to account for soft collisions and stuckness
+
+
+	VPROF( "CGameMovement::TryTouchGround" );
+
+
+    CBasePlayer* pMe = static_cast<CBasePlayer*>( EntityFromEntityHandle( mv->m_nPlayerHandle.Get() ) );
+    CPlayerMoveFilter filter( pMe, collisionGroup );
+	Ray_t ray;
+	ray.Init( start, end, mins, maxs );
+
+
+    enginetrace->TraceRay( ray, fMask, &filter, &pm );
 }
 
 void CZMGameMovement::PlayerMove( void )
