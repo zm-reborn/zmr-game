@@ -1063,6 +1063,13 @@ int CBreakableProp::OnTakeDamage( const CTakeDamageInfo &inputInfo )
         {
             return 0;
         }
+	
+	//TGB: if we're explodable and burning, increase damage. Helps vs. barrel griefing as you 
+	//can't screw around as much with a barrel lit by immo fire
+	if (IsOnFire())
+	{
+		info.ScaleDamage(2.0f); //ouch
+	}
     }
 #endif
 
