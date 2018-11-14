@@ -1051,9 +1051,10 @@ int CBreakableProp::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 		return 1;
 	}
 
-#ifdef ZMR // ZMRCHANGE: Don't let other players damage our barrel! D:
+#ifdef ZMR
     if ( m_explodeDamage > 0 || m_explodeRadius > 0 )
     {
+	// ZMRCHANGE: Don't let other players damage our barrel! D:
         IPhysicsObject* pPhys = VPhysicsGetObject();
         CBaseEntity* pAttacker = info.GetAttacker();
 
@@ -1063,6 +1064,13 @@ int CBreakableProp::OnTakeDamage( const CTakeDamageInfo &inputInfo )
         {
             return 0;
         }
+	
+	//TGB: if we're explodable and burning, increase damage. Helps vs. barrel griefing as you 
+	//can't screw around as much with a barrel lit by immo fire
+	if (IsOnFire())
+	{
+		info.ScaleDamage(2.0f);
+	}
     }
 #endif
 
