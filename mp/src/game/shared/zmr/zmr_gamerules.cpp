@@ -897,6 +897,8 @@ void CZMRules::InitDefaultAIRelationships()
     CBaseCombatCharacter::SetDefaultRelationship( CLASS_ZOMBIE, CLASS_NONE,         D_NU, 0 );
     CBaseCombatCharacter::SetDefaultRelationship( CLASS_ZOMBIE, CLASS_PLAYER,       D_HT, 0 );
     CBaseCombatCharacter::SetDefaultRelationship( CLASS_ZOMBIE, CLASS_ZOMBIE,       D_NU, 0 );
+
+    CBaseCombatCharacter::SetDefaultRelationship( CLASS_PLAYER, CLASS_ZOMBIE,       D_HT, 0 );
 }
 
 bool CZMRules::FAllowNPCs()
