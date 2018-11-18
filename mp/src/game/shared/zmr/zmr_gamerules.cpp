@@ -899,6 +899,11 @@ void CZMRules::InitDefaultAIRelationships()
     CBaseCombatCharacter::SetDefaultRelationship( CLASS_ZOMBIE, CLASS_ZOMBIE,       D_NU, 0 );
 
     CBaseCombatCharacter::SetDefaultRelationship( CLASS_PLAYER, CLASS_ZOMBIE,       D_HT, 0 );
+
+    // Let's assume anything that doesn't have a class also hates survivors.
+    // This is a quick workaround for zm_frozenfinale final boss not spotting survivors.
+    // And for fucksake, in the future, use the ai_relationship-entity.
+    CBaseCombatCharacter::SetDefaultRelationship( CLASS_NONE, CLASS_PLAYER,         D_HT, 0 );
 }
 
 bool CZMRules::FAllowNPCs()
