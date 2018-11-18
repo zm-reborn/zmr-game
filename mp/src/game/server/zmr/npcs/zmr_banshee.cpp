@@ -35,7 +35,7 @@ extern ConVar zm_sk_banshee_health;
 
 
 
-// Banshe motor
+// Banshee motor
 CZMBansheeMotor::CZMBansheeMotor( CZMBaseZombie* pOuter ) : CZMBaseZombieMotor( pOuter )
 {
     m_bIsInNavJump = false;
@@ -61,6 +61,8 @@ void CZMBansheeMotor::NavJump( const Vector& vecGoal, float flOverrideHeight )
 
 bool CZMBansheeMotor::ShouldAdjustVelocity() const
 {
+    // We don't want to adjust velocity while nav jumping.
+    // This allows banshees to hit a wall while in air and still reach their goal.
     return !m_bIsInNavJump && BaseClass::ShouldAdjustVelocity();
 }
 
