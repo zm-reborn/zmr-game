@@ -8,11 +8,23 @@
 class CZMBansheeMotor : public CZMBaseZombieMotor
 {
 public:
+    typedef CZMBansheeMotor ThisClass;
+    typedef CZMBaseZombieMotor BaseClass;
+
     CZMBansheeMotor( CZMBaseZombie* pOuter );
 
     virtual float GetHullHeight() const OVERRIDE;
 
     //virtual float GetFrictionForward() const OVERRIDE { return IsAttemptingToMove() ? 0.0f : 0.2f; }
+
+    virtual void OnLandedGround( CBaseEntity* pGround ) OVERRIDE;
+    virtual void NavJump( const Vector& vecGoal, float flOverrideHeight = 0.0f ) OVERRIDE;
+
+protected:
+    virtual bool ShouldAdjustVelocity() const OVERRIDE;
+
+private:
+    bool m_bIsInNavJump;
 };
 
 class CZMBanshee : public CZMBaseZombie

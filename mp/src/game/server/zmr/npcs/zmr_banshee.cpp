@@ -35,14 +35,36 @@ extern ConVar zm_sk_banshee_health;
 
 
 
+// Banshe motor
 CZMBansheeMotor::CZMBansheeMotor( CZMBaseZombie* pOuter ) : CZMBaseZombieMotor( pOuter )
 {
+    m_bIsInNavJump = false;
 }
 
 float CZMBansheeMotor::GetHullHeight() const
 {
     return CZMBanshee::GetBansheeHullHeight();
 }
+
+void CZMBansheeMotor::OnLandedGround( CBaseEntity* pGround )
+{
+    m_bIsInNavJump = false;
+
+    BaseClass::OnLandedGround( pGround );
+}
+
+void CZMBansheeMotor::NavJump( const Vector& vecGoal, float flOverrideHeight )
+{
+    m_bIsInNavJump = true;
+    BaseClass::NavJump( vecGoal, flOverrideHeight );
+}
+
+bool CZMBansheeMotor::ShouldAdjustVelocity() const
+{
+    return !m_bIsInNavJump && BaseClass::ShouldAdjustVelocity();
+}
+
+
 
 
 IMPLEMENT_SERVERCLASS_ST( CZMBanshee, DT_ZM_Banshee )
