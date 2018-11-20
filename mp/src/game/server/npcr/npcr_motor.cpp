@@ -124,11 +124,13 @@ CBaseEntity* NPCR::CBaseMotor::UpdateGround()
 
     if ( tr.fraction < 1.0f && !tr.startsolid )
     {
+        // This ground z offset is used to fix npcs getting stuck to a ceiling.
         if ( tr.endpos.z > startPos.z )
         {
             m_flGroundZOffset = tr.endpos.z - startPos.z;
         }
         else m_flGroundZOffset = 0.0f;
+
 
         GetNPC()->SetPosition( tr.endpos );
 
@@ -404,6 +406,9 @@ Vector NPCR::CBaseMotor::HandleCollisions( const Vector& vecGoal )
         Vector fullMove = goalPos - startPos;
         Vector leftToMove = fullMove * ( 1.0f - tr.fraction );
 
+
+        // Don't bother going down when we're on ground and there's a slanted wall.
+        // This stops npcs getting stuck in the ground.
         if (tr.plane.normal.z < GetSlopeLimit()
         &&  IsOnGround() )
         //&&  fullMove.z > 0.0f )
