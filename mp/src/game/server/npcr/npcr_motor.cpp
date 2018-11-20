@@ -405,8 +405,8 @@ Vector NPCR::CBaseMotor::HandleCollisions( const Vector& vecGoal )
         Vector leftToMove = fullMove * ( 1.0f - tr.fraction );
 
         if (tr.plane.normal.z < GetSlopeLimit()
-        &&  IsOnGround()
-        &&  fullMove.z > 0.0f )
+        &&  IsOnGround() )
+        //&&  fullMove.z > 0.0f )
         {
             fullMove.z = 0.0f;
             tr.plane.normal.z = 0.0f;
