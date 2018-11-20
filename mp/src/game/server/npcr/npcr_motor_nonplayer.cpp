@@ -78,6 +78,24 @@ void NPCR::CNonPlayerMotor::Move()
         // Apply gravity.
         m_vecAcceleration.z -= GetGravity();
     }
+    else
+    {
+        // Constraint our velocity to ground normal.
+        // This stops the little bobbing that may occur if our velocity is not right.
+        Vector veldir = m_vecVelocity;
+        float dist = veldir.NormalizeInPlace();
+
+        const float epsilon = 0.1f;
+
+        if ( dist > epsilon )
+        {
+            // Woah, vector projection.
+            Vector left( -veldir.y, veldir.x, 0.0f );
+            Vector movedir = CrossProduct( left, GetGroundNormal() );
+
+            m_vecVelocity = movedir * m_vecVelocity.Dot( movedir );
+        }
+    }
 
     Vector vecOrigPos = GetNPC()->GetPosition();
 
