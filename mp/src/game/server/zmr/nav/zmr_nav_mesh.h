@@ -3,6 +3,10 @@
 
 #include "nav_mesh.h"
 
+
+#define NAV_MESH_ZMR_NOFLOOR    0x00040000
+
+
 class CZMRNavMesh : public CNavMesh
 {
 public:
@@ -13,6 +17,8 @@ public:
     CZMRNavMesh();
     ~CZMRNavMesh();
 
+    virtual void Update() OVERRIDE;
+
     virtual CNavArea* CreateArea() const OVERRIDE;
 
 
@@ -20,4 +26,16 @@ public:
 
 
     virtual void FireGameEvent( IGameEvent* pEvent ) OVERRIDE;
+
+
+    static float GetTransientCheckStartHeight() { return 17.0f; }
+
+    void UpdateTransientAreas();
+    void UpdateFloorCheckAreas();
+
+    void GetAreaBounds( CNavArea* pArea, Vector& mins, Vector& maxs );
+
+private:
+    CountdownTimer m_UpdateTransientTimer;
+    CountdownTimer m_UpdateCheckFloorTimer;
 };
