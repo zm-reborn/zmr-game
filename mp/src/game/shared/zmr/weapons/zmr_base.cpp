@@ -2,6 +2,8 @@
 #ifdef CLIENT_DLL
 #include "prediction.h"
 #endif
+#include "datacache/imdlcache.h"
+#include "eventlist.h"
 
 #include <vphysics/constraints.h>
 
@@ -30,9 +32,11 @@ static ConVar zm_sv_weaponreserveammo( "zm_sv_weaponreserveammo", "1", FCVAR_NOT
 
 BEGIN_NETWORK_TABLE( CZMBaseWeapon, DT_ZM_BaseWeapon )
 #ifdef CLIENT_DLL
-    RecvPropInt( RECVINFO( m_nOverrideClip1 ) )
+    RecvPropInt( RECVINFO( m_nOverrideClip1 ) ),
+    RecvPropFloat( RECVINFO( m_flNextClipFillTime ) ),
 #else
-    SendPropInt( SENDINFO( m_nOverrideClip1 ) )
+    SendPropInt( SENDINFO( m_nOverrideClip1 ) ),
+    SendPropFloat( SENDINFO( m_flNextClipFillTime ) ),
 #endif
 END_NETWORK_TABLE()
 
@@ -67,6 +71,8 @@ CZMBaseWeapon::CZMBaseWeapon()
     m_nOverrideDamage = -1;
     m_nOverrideClip1 = -1;
 #endif
+
+    m_flNextClipFillTime = 0.0f;
 }
 
 CZMBaseWeapon::~CZMBaseWeapon()
@@ -94,6 +100,146 @@ void CZMBaseWeapon::FreeWeaponSlot()
     pPlayer->RemoveWeaponSlotFlag( GetSlotFlag() );
 }
 #endif
+
+bool CZMBaseWeapon::DefaultReload( int iClipSize1, int iClipSize2, int iActivity )
+{
+    auto* pOwner = GetPlayerOwner();
+    if ( !pOwner )
+        return false;
+
+    // If I don't have any spare ammo, I can't reload
+    if ( pOwner->GetAmmoCount(m_iPrimaryAmmoType) <= 0 )
+        return false;
+
+    bool bReload = false;
+
+    // If you don't have clips, then don't try to reload them.
+    if ( UsesClipsForAmmo1() )
+    {
+        // need to reload primary clip?
+        int primary	= MIN(iClipSize1 - m_iClip1, pOwner->GetAmmoCount(m_iPrimaryAmmoType));
+        if ( primary != 0 )
+        {
+            bReload = true;
+        }
+    }
+
+    if ( UsesClipsForAmmo2() )
+    {
+        // need to reload secondary clip?
+        int secondary = MIN(iClipSize2 - m_iClip2, pOwner->GetAmmoCount(m_iSecondaryAmmoType));
+        if ( secondary != 0 )
+        {
+            bReload = true;
+        }
+    }
+
+    if ( !bReload )
+        return false;
+
+#ifdef CLIENT_DLL
+    // Play reload
+    WeaponSound( RELOAD );
+#endif
+    SendWeaponAnim( iActivity );
+
+
+    MDLCACHE_CRITICAL_SECTION();
+
+    float flSeqTime = SequenceDuration();
+    //pOwner->SetNextAttack( flSequenceEndTime );
+
+    float flReloadTime = GetFirstInstanceOfAnimEventTime( GetSequence(), (int)AE_WPN_INCREMENTAMMO );
+    if ( flReloadTime == -1.0f )
+        flReloadTime = flSeqTime;
+
+    m_flNextPrimaryAttack = m_flNextSecondaryAttack = gpGlobals->curtime + flSeqTime;
+
+
+    m_flNextClipFillTime = gpGlobals->curtime + flReloadTime;
+
+    m_bInReload = true;
+
+    return true;
+}
+
+void CZMBaseWeapon::CheckReload()
+{
+    if ( m_bInReload )
+    {
+        //auto* pOwner = GetPlayerOwner();
+        if ( ShouldIncrementClip() )
+        {
+            IncrementClip();
+        }
+
+        if ( ShouldCancelReload() )
+        {
+            CancelReload();
+
+            return;
+        }
+
+        if ( m_flNextPrimaryAttack <= gpGlobals->curtime )
+        {
+            if ( m_bReloadsSingly && m_iClip1 < GetMaxClip1() )
+            {
+                if ( !Reload() )
+                    m_bInReload = false;
+            }
+            else
+            {
+                m_bInReload = false;
+            }
+        }
+    }
+}
+
+void CZMBaseWeapon::CancelReload()
+{
+    m_bInReload = false;
+
+    // Make sure we don't attack instantly when stopping the reload.
+    // Add a bit more time.
+    m_flNextPrimaryAttack += 0.1f;
+    m_flNextSecondaryAttack += 0.1f;
+}
+
+bool CZMBaseWeapon::ShouldIncrementClip() const
+{
+    return ( m_flNextClipFillTime != 0.0f && m_flNextClipFillTime <= gpGlobals->curtime );
+}
+
+void CZMBaseWeapon::IncrementClip()
+{
+    // We don't want to increment the clip more than once per reload.
+    m_flNextClipFillTime = 0.0f;
+
+
+    auto* pOwner = GetPlayerOwner();
+    if ( !pOwner )
+        return;
+    
+
+    int nPrimAmmo = pOwner->GetAmmoCount( m_iPrimaryAmmoType );
+    int nSecAmmo = pOwner->GetAmmoCount( m_iSecondaryAmmoType );
+
+    // If I use primary clips, reload primary
+    if ( UsesClipsForAmmo1() && nPrimAmmo > 0 && GetMaxClip1() > m_iClip1 )
+    {
+        int primary	= m_bReloadsSingly ? 1 : MIN( GetMaxClip1() - m_iClip1, nPrimAmmo );	
+        m_iClip1 += primary;
+        pOwner->RemoveAmmo( primary, m_iPrimaryAmmoType);
+    }
+
+    // If I use secondary clips, reload secondary
+    if ( UsesClipsForAmmo2() && nSecAmmo > 0 && GetMaxClip2() > m_iClip2 )
+    {
+        int secondary = m_bReloadsSingly ? 1 : MIN( GetMaxClip2() - m_iClip2, nSecAmmo );
+        m_iClip2 += secondary;
+        pOwner->RemoveAmmo( secondary, m_iSecondaryAmmoType );
+    }
+}
 
 bool CZMBaseWeapon::Reload()
 {
