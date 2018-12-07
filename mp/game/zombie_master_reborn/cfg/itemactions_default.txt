@@ -1,0 +1,20 @@
+
+"ItemActions"
+{
+	"Replace"
+	{
+		"Stock_SpawnOtherShotgunTypes"
+		{
+			"filter_class"		"weapon_zm_shotgun"
+			
+			"replace"		"Shotgun"
+		}
+		
+		//"Stock_SpawnOtherPistolTypes"
+		//{
+		//	"filter_class"		"weapon_zm_pistol"
+		//	
+		//	"replace"		"Pistol"
+		//}
+	}
+}
