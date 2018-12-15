@@ -1,14 +1,19 @@
 #include "cbase.h"
 
+#include <vgui/ISurface.h>
+
 #include "zmr_mainmenu.h"
 #include "zmr_mainmenu_btn.h"
 #include "zmr_mainmenu_subbtn.h"
 
-
+// memdbgon must be the last include file in a .cpp file!!!
+#include <tier0/memdbgon.h>
 
 
 DECLARE_BUILD_FACTORY( CZMMainMenuButton );
 
+
+extern CUtlSymbolTable g_ButtonSoundNames;
 
 using namespace vgui;
 
@@ -23,41 +28,65 @@ CZMMainMenuButton::~CZMMainMenuButton()
     m_vSubBtns.RemoveAll();
 }
 
-void CZMMainMenuButton::OnCursorEntered()
+void CZMMainMenuButton::DoClick()
 {
-    AttemptToShowButtons();
-
-    BaseClass::OnCursorEntered();
+    if ( !IsArmed() || !m_vSubBtns.Count() )
+    {
+        BaseClass::DoClick();
+    }
 }
 
 void CZMMainMenuButton::OnCursorExited()
 {
-    //HideSubButtons();
-
-    BaseClass::OnCursorExited();
+    if ( !m_vSubBtns.Count() )
+    {
+        BaseClass::OnCursorExited();
+    }
 }
 
-void CZMMainMenuButton::OnMousePressed( MouseCode code )
+void CZMMainMenuButton::SetSelected( bool state )
 {
-    if ( m_vSubBtns.Count() )
+    if ( _buttonFlags.IsFlagSet( SELECTED ) != state )
     {
-        GetMainMenu()->HideSubButtons( this );
-
-        if ( !IsSubButtonsVisible() )
-            ShowSubButtons();
-        else
-            HideSubButtons();
-
-        return;
+        _buttonFlags.SetFlag( SELECTED, state );
+        RecalculateDepressedState();
+        InvalidateLayout( false );
     }
 
-    BaseClass::OnMousePressed( code );
+    SetArmed( state );
+}
+
+void CZMMainMenuButton::SetArmed( bool state )
+{
+    if ( _buttonFlags.IsFlagSet( ARMED ) != state )
+    {
+        _buttonFlags.SetFlag( ARMED, state );
+
+        // Play any sounds specified
+        if ( state && m_sArmedSoundName != UTL_INVAL_SYMBOL )
+        {
+            surface()->PlaySound( g_ButtonSoundNames.String( m_sArmedSoundName ) );
+        }
+
+
+        // Hide all other sub buttons
+        if ( state )
+        {
+            GetMainMenu()->HideSubButtons( this );
+        }
+
+
+        if ( state ) ShowSubButtons(); else HideSubButtons();
+
+
+        RecalculateDepressedState();
+        InvalidateLayout( false );
+    }
 }
 
 void CZMMainMenuButton::ApplySchemeSettings( IScheme* pScheme )
 {
     BaseClass::ApplySchemeSettings( pScheme );
-
 
     //PositionSubButtons();
 }
@@ -70,13 +99,9 @@ void CZMMainMenuButton::ApplySettings( KeyValues* kv )
     KeyValues* subkv = kv->FindKey( "subbuttons" );
     if ( subkv )
     {
-        subkv = subkv->GetFirstSubKey();
-
-        while ( subkv )
+        for ( subkv = subkv->GetFirstTrueSubKey(); subkv; subkv = subkv->GetNextTrueSubKey() )
         {
-            AddSubButton( subkv->GetName(), subkv->GetString() );
-
-            subkv = subkv->GetNextKey();
+            AddSubButton( subkv );
         }
     }
 
@@ -153,6 +178,17 @@ void CZMMainMenuButton::AddSubButton( const char* label, const char* command )
     pBtn->SetText( label );
     pBtn->SetVisible( false );
     pBtn->SetCommand( command );
+
+    m_vSubBtns.AddToTail( pBtn );
+}
+
+void CZMMainMenuButton::AddSubButton( KeyValues* kv )
+{
+    auto* pBtn = new CZMMainMenuSubButton( this, "" );
+
+    pBtn->ApplySettings( kv );
+
+    pBtn->SetVisible( false );
 
     m_vSubBtns.AddToTail( pBtn );
 }

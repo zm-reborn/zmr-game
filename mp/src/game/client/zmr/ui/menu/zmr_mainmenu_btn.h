@@ -18,12 +18,15 @@ public:
     ~CZMMainMenuButton();
 
 
-    virtual void OnCursorEntered() OVERRIDE;
     virtual void OnCursorExited() OVERRIDE;
-    virtual void OnMousePressed( vgui::MouseCode code ) OVERRIDE;
 
     virtual void ApplySchemeSettings( vgui::IScheme* pScheme ) OVERRIDE;
     virtual void ApplySettings( KeyValues* kv ) OVERRIDE;
+
+
+    virtual void DoClick() OVERRIDE;
+    virtual void SetSelected( bool state ) OVERRIDE;
+    virtual void SetArmed( bool state ) OVERRIDE;
 
 
     void AttemptToShowButtons();
@@ -38,8 +41,10 @@ public:
 
     void SetDrawOnlyInGame( bool state ) { m_bOnlyInGame = state; }
 
+
 protected:
     void AddSubButton( const char* label, const char* command );
+    void AddSubButton( KeyValues* kv );
 
 private:
     CUtlVector<CZMMainMenuSubButton*> m_vSubBtns;

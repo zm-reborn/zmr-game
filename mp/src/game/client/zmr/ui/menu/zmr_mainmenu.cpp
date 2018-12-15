@@ -8,6 +8,8 @@
 #include "zmr_mainmenu_btn.h"
 #include "zmr_mainmenu.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include <tier0/memdbgon.h>
 
 
 static CDllDemandLoader g_GameUI( "GameUI" );
@@ -45,8 +47,14 @@ static CZMMainMenuInterface g_ZMMainMenuInt;
 IZMUi* g_pZMMainMenu = static_cast<IZMUi*>( &g_ZMMainMenuInt );
 
 
+bool CZMMainMenu::s_bWasInGame = false;
+
+
 CZMMainMenu::CZMMainMenu( VPANEL parent ) : BaseClass( nullptr, "ZMMainMenu" )
 {
+    m_iBottomStripChildIndex = -1;
+
+
     // Has to be set to load fonts correctly.
     SetScheme( vgui::scheme()->LoadSchemeFromFile( "resource/ClientScheme.res", "ClientScheme" ) );
 
@@ -60,6 +68,7 @@ CZMMainMenu::CZMMainMenu( VPANEL parent ) : BaseClass( nullptr, "ZMMainMenu" )
     }
 
 
+
     SetProportional( true );
 
     SetVisible( true );
@@ -67,19 +76,17 @@ CZMMainMenu::CZMMainMenu( VPANEL parent ) : BaseClass( nullptr, "ZMMainMenu" )
     SetKeyBoardInputEnabled( true );
     
 
-    /*KeyValues* kv = new KeyValues( "GameMenu" );
-    kv->UsesEscapeSequences( true );
-
-    if ( kv->LoadFromFile( filesystem, "resource/GameMenu.res" ) )
-    {
-        
-    }*/
 
     //MakePopup( false );
-    //GetFocusNavGroup().SetFocusTopLevel( true );
+    GetFocusNavGroup().SetFocusTopLevel( true );
+
+
 
     m_nTexBgId = surface()->CreateNewTextureID();
     surface()->DrawSetTextureFile( m_nTexBgId, "zmr_mainmenu/bg_mainmenu", true, false );
+
+
+    RequestFocus();
 }
 
 CZMMainMenu::~CZMMainMenu()
@@ -118,54 +125,72 @@ void CZMMainMenu::ReleaseGameUI()
     m_pGameUI = nullptr;
 }
 
+void CZMMainMenu::OnThink()
+{
+    bool bInGame = engine->IsInGame();
+    if ( bInGame && engine->IsLevelMainMenuBackground() )
+        bInGame = false;
+
+    if ( s_bWasInGame != bInGame )
+    {
+        CheckInGameButtons( bInGame );
+        s_bWasInGame = bInGame;
+    }
+}
+
 void CZMMainMenu::PaintBackground()
 {
-    // Draw the "line"
+    // Draw the "line" strip
     const int nTexHeight = 512;
     const int nTexWidth = 1024;
-
-
-    Panel* pPanel = GetChild( 0 );
-
-
-
-    surface()->DrawSetColor( m_BgColor );
-
     const int w = GetWide();
-    int h = pPanel ? (pPanel->GetTall()+10) : 100;
 
-    int offset_y = pPanel ? ((pPanel->GetYPos()+pPanel->GetTall()/2)-h/2) : 0;
-
-    if ( (offset_y + h) > GetTall() )
+    if ( m_iBottomStripChildIndex >= 0 && m_iBottomStripChildIndex < GetChildCount() )
     {
-        h = GetTall() - offset_y;
+        auto* pPanel = GetChild( m_iBottomStripChildIndex );
+
+
+        surface()->DrawSetColor( m_BgColor );
+
+        
+        int h = pPanel ? (pPanel->GetTall()+10) : 100;
+
+        int offset_y = pPanel ? ((pPanel->GetYPos()+pPanel->GetTall()/2)-h/2) : 0;
+
+        if ( (offset_y + h) > GetTall() )
+        {
+            h = GetTall() - offset_y;
+        }
+
+
+        float repeats = w / (nTexWidth * (h / (float)nTexHeight));
+
+
+        surface()->DrawSetTexture( m_nTexBgId );
+        surface()->DrawTexturedSubRect( 0, offset_y, w, offset_y + h, 0.0f, 0.0f, repeats, 1.0f );
     }
+}
 
-
-    float repeats = w / (nTexWidth * (h / (float)nTexHeight));
-
-
-    surface()->DrawSetTexture( m_nTexBgId );
-    surface()->DrawTexturedSubRect( 0, offset_y, w, offset_y + h, 0.0f, 0.0f, repeats, 1.0f );
+void CZMMainMenu::CheckInGameButtons( bool bInGame )
+{
+    int len = GetChildCount();
+    for ( int i = 0; i < len; i++ )
+    {
+        auto* pButton = dynamic_cast<CZMMainMenuButton*>( GetChild( i ) );
+        if ( pButton && pButton->DrawOnlyInGame() )
+        {
+            pButton->SetVisible( bInGame );
+        }
+    }
 }
 
 void CZMMainMenu::PerformLayout()
 {
-    const bool bInGame = engine->IsInGame();
-
+    // Layout the child buttons accordingly
     int len = GetChildCount();
     for ( int i = 0; i < len; i++ )
     {
         Panel* pChild = GetChild( i );
-
-        auto* pButton = dynamic_cast<CZMMainMenuButton*>( pChild );
-        if ( pButton )
-        {
-            if ( pButton->DrawOnlyInGame() )
-                pButton->SetVisible( bInGame );
-
-            continue;
-        }
 
         auto* pList = dynamic_cast<CZMMainMenuContactButtonList*>( pChild );
         if ( pList )
@@ -177,6 +202,13 @@ void CZMMainMenu::PerformLayout()
     }
 
     BaseClass::PerformLayout();
+}
+
+void CZMMainMenu::ApplySettings( KeyValues* kv )
+{
+    m_iBottomStripChildIndex = kv->GetInt( "bottom_strip_index", -1 );
+
+    BaseClass::ApplySettings( kv );
 }
 
 void CZMMainMenu::ApplySchemeSettings( IScheme* pScheme )
@@ -202,19 +234,21 @@ void CZMMainMenu::OnCommand( const char* command )
 
 void CZMMainMenu::OnKeyCodePressed( KeyCode code )
 {
+    // ZMRTODO: We never seem to actually receive any codes... :(
+
     // HACK: Allow F key bindings to operate even here
-    if ( IsPC() && code >= KEY_F1 && code <= KEY_F12 )
-    {
-        // See if there is a binding for the FKey
-        const char* binding = gameuifuncs->GetBindingForButtonCode( code );
-        if ( binding && *binding )
-        {
-            // submit the entry as a console commmand
-            char szCommand[256];
-            Q_strncpy( szCommand, binding, sizeof( szCommand ) );
-            engine->ClientCmd_Unrestricted( szCommand );
-        }
-    }
+    //if ( IsPC() && code >= KEY_F1 && code <= KEY_F12 )
+    //{
+    //    // See if there is a binding for the FKey
+    //    const char* binding = gameuifuncs->GetBindingForButtonCode( code );
+    //    if ( binding && *binding )
+    //    {
+    //        // submit the entry as a console commmand
+    //        char szCommand[256];
+    //        Q_strncpy( szCommand, binding, sizeof( szCommand ) );
+    //        engine->ClientCmd_Unrestricted( szCommand );
+    //    }
+    //}
 
     BaseClass::OnKeyCodePressed( code );
 }
@@ -227,42 +261,15 @@ void CZMMainMenu::OnMousePressed( KeyCode code )
     BaseClass::OnMousePressed( code );
 }
 
-void CZMMainMenu::PrintDebug()
-{
-    int w, h;
-    int x, y;
-
-
-    Msg( "------\n" );
-
-    surface()->GetScreenSize( w, h );
-    Msg( "Screen width: %i, height: %i\n", w, h );
-
-
-    Panel* pResume = FindChildByName( "ResumeButton", false );
-    if ( pResume )
-    {
-        pResume->GetPos( x, y );
-        Msg( "ResumeButton X: %i, Y: %i\n", x, y );
-    }
-
-
-    GetBounds( x, y, w, h );
-    Msg( "Me X: %i, Y: %i | Width: %i, Height: %i\n", x, y, w, h );
-
-
-    Msg( "------\n" );
-}
-
-void CZMMainMenu::HideSubButtons( Panel* pIgnore )
+void CZMMainMenu::HideSubButtons( CZMMainMenuButton* pIgnore )
 {
     int len = GetChildCount();
     for ( int i = 0; i < len; i++ )
     {
-        CZMMainMenuButton* pButton = dynamic_cast<CZMMainMenuButton*>( GetChild( i ) );
+        auto* pButton = dynamic_cast<CZMMainMenuButton*>( GetChild( i ) );
         if ( pButton && pButton != pIgnore )
         {
-            pButton->HideSubButtons();
+            pButton->SetSelected( false );
         }
     }
 }
