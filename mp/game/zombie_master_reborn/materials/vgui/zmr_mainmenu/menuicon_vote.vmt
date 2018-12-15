@@ -1,0 +1,7 @@
+UnlitGeneric
+{
+	$basetexture vgui\zmr_mainmenu\menuicon_vote
+	$ignorez 1
+	$vertexalpha 1
+	$vertexcolor 1
+}
