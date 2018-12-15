@@ -7,6 +7,8 @@
 #include "zmr/ui/zmr_int.h"
 
 
+class CZMMainMenuButton;
+
 
 class CZMMainMenu : public vgui::EditablePanel
 {
@@ -16,7 +18,9 @@ public:
     CZMMainMenu( vgui::VPANEL parent );
     ~CZMMainMenu();
 
+    virtual void OnThink() OVERRIDE;
     virtual void PerformLayout() OVERRIDE;
+    virtual void ApplySettings( KeyValues* kv ) OVERRIDE;
     virtual void ApplySchemeSettings( vgui::IScheme* pScheme ) OVERRIDE;
     virtual void OnCommand( const char* command ) OVERRIDE;
     virtual void OnKeyCodePressed( vgui::KeyCode code ) OVERRIDE;
@@ -25,22 +29,26 @@ public:
     virtual void PaintBackground() OVERRIDE;
 
 
-
-    void HideSubButtons( vgui::Panel* pIgnore = nullptr );
+    void HideSubButtons( CZMMainMenuButton* pIgnore = nullptr );
 
     IGameUI* GetGameUI();
 
 private:
-    void PrintDebug();
-
     bool LoadGameUI();
     void ReleaseGameUI();
+
+
+    void CheckInGameButtons( bool bInGame );
+    static bool s_bWasInGame;
 
 
     IGameUI* m_pGameUI;
 
     int m_nTexBgId;
     Color m_BgColor;
+
+
+    int m_iBottomStripChildIndex;
 };
 
 
