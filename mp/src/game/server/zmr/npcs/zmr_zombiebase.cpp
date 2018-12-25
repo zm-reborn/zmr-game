@@ -1111,12 +1111,30 @@ NPCR::QueryResult_t CZMBaseZombie::ShouldTouch( CBaseEntity* pEnt ) const
     if ( pEnt->IsBSPModel() )
     {
         auto* pFuncBrush = dynamic_cast<CFuncBrush*>( pEnt );
-        if ( pFuncBrush )
+
+
+        // Should we bother doing classname and name matching at all?
+        bool bShouldCheck = pFuncBrush ? (pFuncBrush->m_iszExcludedClass != NULL_STRING || pFuncBrush->m_bInvertExclusion) : false;
+
+
+        if ( pFuncBrush && bShouldCheck )
         {
             auto* pMe = const_cast<CZMBaseZombie*>( this );
-            bool bMatches = pMe->ClassMatches( pFuncBrush->m_iszExcludedClass )
-                        // Have a name? Try comparing that also.
-                        ||  (STRING( pMe->GetEntityName() )[0] != NULL && pMe->NameMatches( pFuncBrush->m_iszExcludedClass ));
+            
+
+            bool bMatches;
+
+            bool bClassMatch = pMe->ClassMatches( pFuncBrush->m_iszExcludedClass );
+            // Have a name? Try comparing that also.
+            bool bNameMatch = STRING( pMe->GetEntityName() )[0] != NULL && pMe->NameMatches( pFuncBrush->m_iszExcludedClass );
+            
+
+            bMatches = bClassMatch || bNameMatch;
+
+            if ( pFuncBrush->m_bInvertExclusion )
+            {
+                bMatches = !bMatches;
+            }
 
             return bMatches ? NPCR::RES_NO : NPCR::RES_YES;
         }
