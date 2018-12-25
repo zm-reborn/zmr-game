@@ -1110,12 +1110,13 @@ NPCR::QueryResult_t CZMBaseZombie::ShouldTouch( CBaseEntity* pEnt ) const
     // Here you go, Psycho.
     if ( pEnt->IsBSPModel() )
     {
-        auto pFuncBrush = dynamic_cast<CFuncBrush*>( pEnt );
+        auto* pFuncBrush = dynamic_cast<CFuncBrush*>( pEnt );
         if ( pFuncBrush )
         {
             auto* pMe = const_cast<CZMBaseZombie*>( this );
             bool bMatches = pMe->ClassMatches( pFuncBrush->m_iszExcludedClass )
-                        ||  pMe->NameMatches( pFuncBrush->m_iszExcludedClass );
+                        // Have a name? Try comparing that also.
+                        ||  (STRING( pMe->GetEntityName() )[0] != NULL && pMe->NameMatches( pFuncBrush->m_iszExcludedClass ));
 
             return bMatches ? NPCR::RES_NO : NPCR::RES_YES;
         }
