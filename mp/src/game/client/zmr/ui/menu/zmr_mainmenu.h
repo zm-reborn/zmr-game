@@ -28,6 +28,12 @@ public:
 
     virtual void PaintBackground() OVERRIDE;
 
+    virtual bool IsVisible() OVERRIDE;
+
+
+    MESSAGE_FUNC( OnLoadingScreenStart, "loadingstart" );
+    MESSAGE_FUNC( OnLoadingScreenEnd, "loadingend" );
+
 
     void HideSubButtons( CZMMainMenuButton* pIgnore = nullptr );
 
@@ -36,6 +42,8 @@ public:
 private:
     bool LoadGameUI();
     void ReleaseGameUI();
+
+    void SetLoadingScreenState( bool state );
 
 
     void CheckInGameButtons( bool bInGame );
@@ -47,6 +55,8 @@ private:
     int m_nTexBgId;
     Color m_BgColor;
 
+
+    bool m_bInLoadingScreen;
 
     int m_iBottomStripChildIndex;
 };

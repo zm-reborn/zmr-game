@@ -1,0 +1,27 @@
+"Tips"
+{
+	"intro"
+	{
+		"shown"		"0"
+	}
+	"f1menu"
+	{
+		"shown"		"0"
+	}
+	"sharing"
+	{
+		"shown"		"0"
+	}
+	"wut1"
+	{
+		"shown"		"0"
+	}
+	"wut2"
+	{
+		"shown"		"0"
+	}
+	"wut3"
+	{
+		"shown"		"0"
+	}
+}

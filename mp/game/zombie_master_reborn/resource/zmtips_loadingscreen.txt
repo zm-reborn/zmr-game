@@ -1,0 +1,46 @@
+"Tips"
+{
+	"intro"
+	{
+		"msg"			"What is Lorem Ipsum? Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+		"time"			"15"
+		"limit"			"2"
+	}
+	"f1menu"
+	{
+		"msg"			"Lost? Objectives may be listed through %s menu."
+		"time"			"10"
+		"limit"			"5"
+		
+		"param1"		"key@zm_showmaptext"
+	}
+	"sharing"
+	{
+		"msg"			"Sharing is caring. Pressing %s will drop your current weapon with its ammo."
+		"time"			"15"
+		"limit"			"5"
+		
+		"param1"		"key@dropweapon"
+	}
+	"wut1"
+	{
+		"msg"			"Try not to be a dick."
+		"time"			"15"
+		"limit"			"1"
+		"random"		"1"
+	}
+	"wut2"
+	{
+		"msg"			"We're running out of tips to show you..."
+		"time"			"15"
+		"limit"			"1"
+		"random"		"1"
+	}
+	"wut3"
+	{
+		"msg"			"Did you know that ZPS is bad game?"
+		"time"			"15"
+		"limit"			"1"
+		"random"		"1"
+	}
+}
