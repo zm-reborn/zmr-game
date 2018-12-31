@@ -3,6 +3,7 @@
 #include "IGameUIFuncs.h"
 
 #include <vgui/ISurface.h>
+#include <vgui/Iinput.h>
 
 #include "zmr_mainmenu_contactbuttons.h"
 #include "zmr_mainmenu_btn.h"
@@ -53,6 +54,7 @@ bool CZMMainMenu::s_bWasInGame = false;
 CZMMainMenu::CZMMainMenu( VPANEL parent ) : BaseClass( nullptr, "ZMMainMenu" )
 {
     m_iBottomStripChildIndex = -1;
+    m_bInLoadingScreen = false;
 
 
     // Has to be set to load fonts correctly.
@@ -138,6 +140,17 @@ void CZMMainMenu::OnThink()
     }
 }
 
+bool CZMMainMenu::IsVisible()
+{
+    // We have to have this exception here
+    // because just using SetVisible( false ) is not working.
+    if ( m_bInLoadingScreen )
+        return false;
+
+
+    return BaseClass::IsVisible();
+}
+
 void CZMMainMenu::PaintBackground()
 {
     // Draw the "line" strip
@@ -217,6 +230,7 @@ void CZMMainMenu::ApplySchemeSettings( IScheme* pScheme )
 
 
     LoadControlSettings( "resource/ui/zmmainmenu.res" );
+    
 
     int w, h;
     surface()->GetScreenSize( w, h );
@@ -272,6 +286,25 @@ void CZMMainMenu::HideSubButtons( CZMMainMenuButton* pIgnore )
             pButton->SetSelected( false );
         }
     }
+}
+
+void CZMMainMenu::OnLoadingScreenStart()
+{
+    SetLoadingScreenState( true );
+}
+
+void CZMMainMenu::OnLoadingScreenEnd()
+{
+    SetLoadingScreenState( false );
+}
+
+void CZMMainMenu::SetLoadingScreenState( bool state )
+{
+    // Yea, we have to manually hide the main menu when we start loading.
+    bool draw = !state;
+
+    m_bInLoadingScreen = state;
+    SetVisible( draw );
 }
 
 
