@@ -49,7 +49,7 @@ public:
     virtual bool Reload() OVERRIDE;
     // NOTE: Always use this to get the damage from .txt file.
     virtual void FireBullets( const FireBulletsInfo_t &info ) OVERRIDE;
-    virtual void FireBullets( int numShots, int iAmmoType );
+    virtual void FireBullets( int numShots, int iAmmoType, float flMaxDist );
     virtual void PrimaryAttack() OVERRIDE;
     virtual void Shoot();
     virtual void PrimaryAttackEffects();

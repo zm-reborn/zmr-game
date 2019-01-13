@@ -24,6 +24,9 @@
 extern ConVar zm_sv_antiafk;
 
 
+struct ZMFireBulletsInfo_t;
+class CZMPlayerAttackTraceFilter;
+
 class CZMBaseZombie;
 class CZMBaseWeapon;
 class CZMRagdoll;
@@ -128,7 +131,6 @@ public:
     virtual bool BumpWeapon( CBaseCombatWeapon *pWeapon ) OVERRIDE;
 
     // Lag compensation stuff...
-    void FireBullets( const FireBulletsInfo_t& ) OVERRIDE;
     bool WantsLagCompensationOnNPC( const CZMBaseZombie* pZombie, const CUserCmd* pCmd, const CBitVec<MAX_EDICTS>* pEntityTransmitBits ) const;
     void NoteWeaponFired();
 
@@ -219,6 +221,10 @@ public:
     float               GetAccuracyRatio() const;
     void                UpdateAccuracyRatio();
     void                GetZMMovementVars( float& maxspd, float& accel, float& decel ) const;
+    virtual void        FireBullets( const FireBulletsInfo_t& info ) OVERRIDE;
+    void                SimulateBullet( ZMFireBulletsInfo_t& bulletsinfo );
+    bool                HandleBulletPenetration( trace_t& tr, CZMPlayerAttackTraceFilter* pFilter, Vector& vecNextSrc, float& flDistance );
+    bool                HandleShotImpactingWater( const FireBulletsInfo_t& info, const Vector& vecEnd, CTraceFilter* pFilter );
 
 
     CZMBaseWeapon*  GetWeaponOfHighestSlot();

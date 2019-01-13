@@ -148,7 +148,7 @@ void CZMBaseWeapon::FireBullets( const FireBulletsInfo_t &info )
     GetOwner()->FireBullets( modinfo );
 }
 
-void CZMBaseWeapon::FireBullets( int numShots, int iAmmoType )
+void CZMBaseWeapon::FireBullets( int numShots, int iAmmoType, float flMaxDist )
 {
     CZMPlayer* pPlayer = GetPlayerOwner();
     if ( !pPlayer )
@@ -176,7 +176,7 @@ void CZMBaseWeapon::FireBullets( int numShots, int iAmmoType )
     }*/
 
 
-    info.m_flDistance = MAX_TRACE_LENGTH;
+    info.m_flDistance = flMaxDist;
     info.m_iAmmoType = iAmmoType;
     info.m_iTracerFreq = 2;
 
@@ -284,7 +284,7 @@ void CZMBaseWeapon::Shoot()
         int numBullets = GetBulletsPerShot();
         Assert( numBullets > 0 );
 
-        FireBullets( numBullets, m_iPrimaryAmmoType );
+        FireBullets( numBullets, m_iPrimaryAmmoType, m_fMaxRange1 );
     }
 
     if ( !m_iClip1 && pPlayer->GetAmmoCount( m_iPrimaryAmmoType ) <= 0 )

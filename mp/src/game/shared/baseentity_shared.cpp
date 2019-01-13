@@ -1616,12 +1616,6 @@ public:
 typedef CTraceFilterSimpleList CBulletsTraceFilter;
 #endif
 
-#ifdef ZMR
-#ifdef _DEBUG
-static ConVar zm_sv_debugbullets( "zm_sv_debugbullets", "0", FCVAR_NOTIFY | FCVAR_REPLICATED, "" );
-static ConVar zm_sv_debugbullets_time( "zm_sv_debugbullets_time", "1", FCVAR_NOTIFY | FCVAR_REPLICATED, "" );
-#endif // _DEBUG
-#endif
 
 void CBaseEntity::FireBullets( const FireBulletsInfo_t &info )
 {
@@ -1685,14 +1679,10 @@ void CBaseEntity::FireBullets( const FireBulletsInfo_t &info )
 	Vector vecEnd;
 	
 	// Skip multiple entities when tracing
-#ifdef ZMR
-    CZMPlayerAttackTraceFilter traceFilter( this, info.m_pAdditionalIgnoreEnt, COLLISION_GROUP_NONE );
-#else
 	CBulletsTraceFilter traceFilter( COLLISION_GROUP_NONE );
 
 	traceFilter.SetPassEntity( this ); // Standard pass entity for THIS so that it can be easily removed from the list after passing through a portal
 	traceFilter.AddEntityToIgnore( info.m_pAdditionalIgnoreEnt );
-#endif
 
 #if defined( HL2_EPISODIC ) && defined( GAME_DLL )
 	// FIXME: We need to emulate this same behavior on the client as well -- jdw
@@ -1919,12 +1909,6 @@ void CBaseEntity::FireBullets( const FireBulletsInfo_t &info )
 			{
 				flActualDamage = g_pGameRules->GetAmmoDamage( pAttacker, tr.m_pEnt, info.m_iAmmoType );
 			}
-#ifndef ZMR // ZMRCHANGE: Never gib us from bullets...
-			else
-			{
-				nActualDamageType = nDamageType | ((flActualDamage > 16) ? DMG_ALWAYSGIB : DMG_NEVERGIB );
-			}
-#endif
 
 			if ( !bHitWater || ((info.m_nFlags & FIRE_BULLETS_DONT_HIT_UNDERWATER) == 0) )
 			{
@@ -2038,18 +2022,6 @@ void CBaseEntity::FireBullets( const FireBulletsInfo_t &info )
 			}
 		}
 
-#if defined( ZMR ) && defined( _DEBUG ) // ZMRCHANGE: Allows bullet debugging.
-        if ( zm_sv_debugbullets.GetBool() )
-        {
-#ifdef CLIENT_DLL
-            const int dbgclr[3] = { 255, 0, 0 };
-#else
-            const int dbgclr[3] = { 0, 0, 255 };
-#endif // CLIENT_DLL
-
-            DebugDrawLine( tr.startpos, tr.endpos, dbgclr[0], dbgclr[1], dbgclr[2], false, abs( zm_sv_debugbullets_time.GetFloat() ) );
-        }
-#endif // ZMR
 		//NOTENOTE: We could expand this to a more general solution for various material penetration types (wood, thin metal, etc)
 
 		// See if we should pass through glass
@@ -2073,14 +2045,12 @@ void CBaseEntity::FireBullets( const FireBulletsInfo_t &info )
 #ifdef GAME_DLL
 	ApplyMultiDamage();
 
-#ifndef ZMR // ZMRCHANGE: This was causing crashes. Commenting it out since we're not using stats.
 	if ( IsPlayer() && flCumulativeDamage > 0.0f )
 	{
 		CBasePlayer *pPlayer = static_cast< CBasePlayer * >( this );
 		CTakeDamageInfo dmgInfo( this, pAttacker, flCumulativeDamage, nDamageType );
 		gamestats->Event_WeaponHit( pPlayer, info.m_bPrimaryAttack, pPlayer->GetActiveWeapon()->GetClassname(), dmgInfo );
 	}
-#endif // ZMR
 #endif
 }
 
