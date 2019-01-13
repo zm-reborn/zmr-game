@@ -16,15 +16,16 @@ int ITEM_GiveAmmo( CBasePlayer* pPlayer, float flCount, const char* pszAmmoName,
 #define REGISTER_ZMAMMO(classname,classname2,model,ammoname,ammocount)  class classname2 : public CZMAmmo \
                                                                         { \
                                                                         public: \
-                                                                            virtual const char* GetItemModel() OVERRIDE { return model; }; \
-                                                                            virtual const char* GetAmmoName() OVERRIDE { return ammoname; }; \
-                                                                            virtual int GetAmmoCount() OVERRIDE { return ammocount; }; \
+                                                                            classname2() { m_nMaxAmmo = ammocount; m_nAmmo = m_nMaxAmmo; } \
+                                                                            virtual const char* GetItemModel() const OVERRIDE { return model; } \
+                                                                            virtual const char* GetAmmoName() const OVERRIDE { return ammoname; } \
                                                                         }; \
                                                                         LINK_ENTITY_TO_CLASS( classname, classname2 );
 
 CZMAmmo::CZMAmmo()
 {
     m_iAmmoType = -1;
+    m_nAmmo = 0;
 }
 
 void CZMAmmo::Spawn()
@@ -63,12 +64,12 @@ void CZMAmmo::Precache()
 
 bool CZMAmmo::MyTouch( CBasePlayer* pPlayer )
 {
-    if ( ITEM_GiveAmmo( pPlayer, GetAmmoCount(), GetAmmoName() ) )
+    int given = ITEM_GiveAmmo( pPlayer, m_nAmmo, GetAmmoName() );
+    if ( given )
     {
-        if ( g_pGameRules->ItemShouldRespawn( this ) == GR_ITEM_RESPAWN_NO )
-            UTIL_Remove( this );
+        m_nAmmo -= given;
 
-        return true;
+        return ( m_nAmmo <= 0 );
     }
 
     return false;
@@ -76,6 +77,8 @@ bool CZMAmmo::MyTouch( CBasePlayer* pPlayer )
 
 IMPLEMENT_SERVERCLASS_ST( CZMAmmo, DT_ZM_Ammo )
     SendPropInt( SENDINFO( m_iAmmoType ), 8 ),
+    SendPropInt( SENDINFO( m_nAmmo ), 8, SPROP_UNSIGNED ),
+    SendPropInt( SENDINFO( m_nMaxAmmo ), 8, SPROP_UNSIGNED ),
 END_SEND_TABLE()
 
 BEGIN_DATADESC( CZMAmmo )

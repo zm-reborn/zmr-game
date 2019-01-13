@@ -597,7 +597,7 @@ bool CZMRules::CanHaveAmmo( CBaseCombatCharacter* pPlayer, int iAmmoIndex )
 
     // Do we have enough room?
     int room = GetAmmoDef()->MaxCarry( iAmmoIndex ) - pPlayer->GetAmmoCount( iAmmoIndex );
-    if ( room > 0 && room > (pWep->GetDropAmmoAmount() * 0.5f) )
+    if ( room > 0 )
     {
         return true;
     }
