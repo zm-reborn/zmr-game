@@ -4,7 +4,6 @@
 
 #include "player_pickup.h"
 
-#include "ilagcompensationmanager.h"
 #include "predicted_viewmodel.h"
 #include "filesystem.h"
 #include "EntityFlame.h"
@@ -1059,35 +1058,6 @@ void CZMPlayer::CreateRagdollEntity()
 
     // ragdolls will be removed on round restart automatically
     m_hRagdoll.Set( pRagdoll );
-}
-
-void CZMPlayer::FireBullets( const FireBulletsInfo_t& info )
-{
-    // Make sure we don't lag compensate twice.
-    // This is called recursively from HandleShotImpactingGlass.
-    if ( !m_bIsFireBulletsRecursive )
-    {
-        // Move ents back to history positions based on local player's lag
-        lagcompensation->StartLagCompensation( this, this->GetCurrentCommand() );
-
-
-        NoteWeaponFired();
-        
-
-        m_bIsFireBulletsRecursive = true;
-        CBaseEntity::FireBullets( info );
-        m_bIsFireBulletsRecursive = false;
-
-
-        // Move ents back to their original positions.
-        lagcompensation->FinishLagCompensation( this );
-    }
-    else
-    {
-        DevMsg( "Called FireBullets recursively!\n" );
-
-        CBaseEntity::FireBullets( info );
-    }
 }
 
 extern ConVar sv_maxunlag;
