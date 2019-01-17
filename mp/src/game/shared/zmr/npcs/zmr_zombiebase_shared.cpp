@@ -185,3 +185,8 @@ int CZMBaseZombie::GetAnimationRandomSeed()
 {
     return m_iAnimationRandomSeed + m_iAdditionalAnimRandomSeed;
 }
+
+bool CZMBaseZombie::CanBePenetrated() const
+{
+    return true;
+}

@@ -40,3 +40,8 @@ const char* C_ZMHulk::GetEventHatModel( HappyZombieEvent_t iEvent ) const
 {
     return HULKAMANIA_MODEL;
 }
+
+bool C_ZMHulk::CanBePenetrated() const
+{
+    return false;
+}

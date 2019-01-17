@@ -126,6 +126,7 @@ public:
     int                     GetCost() const;
     bool                    DoAnimationEvent( int iEvent, int nData = 0 );
     virtual int             GetAnimationRandomSeed() OVERRIDE;
+    virtual bool            CanBePenetrated() const;
 protected:
     void                    SetZombieClass( ZombieClass_t zclass );
 

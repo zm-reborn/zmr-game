@@ -129,6 +129,11 @@ bool CZMHulk::ScaleDamageByHitgroup( int iHitGroup, CTakeDamageInfo& info ) cons
     return false;
 }
 
+bool CZMHulk::CanBePenetrated() const
+{
+    return false;
+}
+
 bool CZMHulk::ShouldPlayIdleSound() const
 {
     return  BaseClass::ShouldPlayIdleSound()

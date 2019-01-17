@@ -43,6 +43,8 @@ extern ConVar zm_sv_resource_max;
 
 ConVar zm_sv_bulletspassplayers( "zm_sv_bulletspassplayers", "1", FCVAR_NOTIFY | FCVAR_ARCHIVE | FCVAR_REPLICATED, "Do bullets players shoot pass through other players?" );
 
+ConVar zm_sv_debug_penetration( "zm_sv_debug_penetration", "0", FCVAR_REPLICATED | FCVAR_CHEAT );
+
 
 //
 CZMPlayerAttackTraceFilter::CZMPlayerAttackTraceFilter( CBaseEntity* pAttacker, CBaseEntity* pIgnore, int collisionGroup ) : CTraceFilter()
@@ -54,6 +56,8 @@ CZMPlayerAttackTraceFilter::CZMPlayerAttackTraceFilter( CBaseEntity* pAttacker, 
     {
         AddToIgnoreList( pIgnore );
     }
+
+    m_nPenetrations = 0;
 }
 
 bool CZMPlayerAttackTraceFilter::ShouldHitEntity( IHandleEntity* pHandleEntity, int contentsMask )
@@ -83,7 +87,10 @@ bool CZMPlayerAttackTraceFilter::ShouldHitEntity( IHandleEntity* pHandleEntity, 
 
         // Clientside hit reg will do this for us.
         if ( !pPlayer->IsBot() && g_ZMUserCmdSystem.UsesClientsideDetection( pEntity ) )
+        {
+            ++m_nPenetrations;
             return false;
+        }
 #endif
         if (pEntity->IsPlayer()
         &&  pEntity->GetTeamNumber() == m_pAttacker->GetTeamNumber()
@@ -104,6 +111,46 @@ bool CZMPlayerAttackTraceFilter::RemoveFromIgnoreList( CBaseEntity* pIgnore )
 {
     return m_vIgnore.FindAndRemove( pIgnore );
 }
+
+void CZMPlayerAttackTraceFilter::ClearIgnoreList()
+{
+    m_vIgnore.RemoveAll();
+}
+//
+
+
+//
+struct ZMFireBulletsInfo_t
+{
+    ZMFireBulletsInfo_t( const FireBulletsInfo_t& bulletinfo, Vector vecDir, CZMPlayerAttackTraceFilter* filter ) : info( bulletinfo ), Manipulator( vecDir ), pFilter( filter )
+    {
+        bStartedInWater = false;
+        bDoImpacts = false;
+        bDoTracers = false;
+        flCumulativeDamage = 0.0f;
+        this->vecDir = vecDir;
+    }
+
+    void ClearPerBulletData()
+    {
+        pFilter->ClearIgnoreList();
+        pFilter->ClearPenetrations();
+    }
+
+
+    int iPlayerDamage;
+    CZMBaseWeapon* pWeapon;
+
+    bool bStartedInWater;
+    bool bDoImpacts;
+    bool bDoTracers;
+    float flCumulativeDamage;
+
+    const FireBulletsInfo_t& info;
+    CShotManipulator Manipulator;
+    CZMPlayerAttackTraceFilter* pFilter;
+    Vector vecDir;
+};
 //
 
 
@@ -391,6 +438,8 @@ void CZMPlayer::FireBullets( const FireBulletsInfo_t& info )
     int         nDamageType = pAmmoDef->DamageType( info.m_iAmmoType );
     int         nAmmoFlags  = pAmmoDef->Flags( info.m_iAmmoType );
     
+    auto*       pWeapon = static_cast<CZMBaseWeapon*>( GetActiveWeapon() );
+
 
 #if defined( GAME_DLL )
     if ( IsPlayer() )
@@ -401,16 +450,6 @@ void CZMPlayer::FireBullets( const FireBulletsInfo_t& info )
 
         if ( rumbleEffect != RUMBLE_INVALID )
         {
-            // ZMR
-            //if ( rumbleEffect == RUMBLE_SHOTGUN_SINGLE )
-            //{
-            //    if ( info.m_iShots == 12 )
-            //    {
-            //        // Upgrade to double barrel rumble effect
-            //        rumbleEffect = RUMBLE_SHOTGUN_DOUBLE;
-            //    }
-            //}
-
             pPlayer->RumbleEffect( rumbleEffect, 0, RUMBLE_FLAG_RESTART );
         }
     }
@@ -443,7 +482,7 @@ void CZMPlayer::FireBullets( const FireBulletsInfo_t& info )
 
     ZMFireBulletsInfo_t bulletinfo( info, info.m_vecDirShooting, &traceFilter );
     bulletinfo.iPlayerDamage = iPlayerDamage;
-
+    bulletinfo.pWeapon = pWeapon;
 
 
     bulletinfo.bStartedInWater = ( enginetrace->GetPointContents( info.m_vecSrc ) & (CONTENTS_WATER|CONTENTS_SLIME) ) != 0;
@@ -469,9 +508,6 @@ void CZMPlayer::FireBullets( const FireBulletsInfo_t& info )
         RandomSeed( iSeed ); // Init random system with this seed
 
 
-        bulletinfo.iShot = iShot;
-
-
         // If we're firing multiple shots, and the first shot has to be bang on target, ignore spread
         if ( !iShot && info.m_iShots > 1 && (info.m_nFlags & FIRE_BULLETS_FIRST_SHOT_ACCURATE) )
         {
@@ -489,11 +525,10 @@ void CZMPlayer::FireBullets( const FireBulletsInfo_t& info )
             bulletinfo.bDoTracers = true;
         }
 
-
         // Do the actual shooting
         SimulateBullet( bulletinfo );
 
-
+        bulletinfo.ClearPerBulletData();
 
         iSeed++;
     }
@@ -552,6 +587,8 @@ void CZMPlayer::SimulateBullet( ZMFireBulletsInfo_t& bulletinfo )
     bool bHitWater = bStartedInWater;
     //bool bHitGlass = false;
 
+    bool bFirstValidShot = true;
+
 
     int iSanityCheck = 0;
 
@@ -577,25 +614,10 @@ void CZMPlayer::SimulateBullet( ZMFireBulletsInfo_t& bulletinfo )
         UTIL_TraceLine( vecSrc, vecEnd, MASK_SHOT, pFilter, &tr );
 
 
-
-        flDistanceLeft *= (1.0f - tr.fraction);
-
-
-        //
-        // We can't really do anything if we're inside something.
-        // Attempt penetration, otherwise quit.
-        //
-        if ( tr.startsolid )
+        if ( !tr.startsolid )
         {
-            if ( HandleBulletPenetration( tr, pFilter, vecSrc, flDistanceLeft ) )
-            {
-                // Penetration succeeded, try again.
-                continue;
-            }
-
-            break;
+            flDistanceLeft *= (1.0f - tr.fraction);
         }
-        
 
 
         //
@@ -661,10 +683,12 @@ void CZMPlayer::SimulateBullet( ZMFireBulletsInfo_t& bulletinfo )
         //
 
 
-        if ( !nPenetrations )
+        if ( bFirstValidShot && !tr.startsolid )
         {
             vecFirstStart = tr.startpos;
             vecFirstEnd = tr.endpos;
+
+            bFirstValidShot = false;
         }
 
 
@@ -725,7 +749,8 @@ void CZMPlayer::SimulateBullet( ZMFireBulletsInfo_t& bulletinfo )
         //
         // We hit something, attempt penetration.
         //
-        if ( HandleBulletPenetration( tr, pFilter, vecSrc, flDistanceLeft ) )
+        if (nPenetrations < bulletinfo.pWeapon->GetMaxPenetrations()
+        &&  HandleBulletPenetration( tr, bulletinfo, vecSrc, flDistanceLeft ) )
         {
             ++nPenetrations;
         }
@@ -771,10 +796,10 @@ void CZMPlayer::SimulateBullet( ZMFireBulletsInfo_t& bulletinfo )
 #endif
 }
 
-bool CZMPlayer::HandleBulletPenetration( trace_t& tr, CZMPlayerAttackTraceFilter* pFilter, Vector& vecNextSrc, float& flDistance )
+bool CZMPlayer::HandleBulletPenetration( trace_t& tr, const ZMFireBulletsInfo_t& bulletinfo, Vector& vecNextSrc, float& flDistance )
 {
     // Make sure we are inside/outside the volume by nudging the trace forward/back.
-    const float epsilon = 0.05f;
+    const float epsilon = 0.1f;
 
 
     if ( tr.fraction == 1.0f )
@@ -784,7 +809,6 @@ bool CZMPlayer::HandleBulletPenetration( trace_t& tr, CZMPlayerAttackTraceFilter
         return false;
 
 
-    float distToTrace = 16.0f;
     float flSurfaceMult = 1.0f;
 
     bool bPenetrate = tr.startsolid;
@@ -797,7 +821,7 @@ bool CZMPlayer::HandleBulletPenetration( trace_t& tr, CZMPlayerAttackTraceFilter
     {
         //
         // Only penetrate through the world
-        // There may be maps that rely on 
+        // There may be maps that rely on things NOT being penetrable
         //
         if ( tr.m_pEnt->IsWorld() )
         {
@@ -833,6 +857,11 @@ bool CZMPlayer::HandleBulletPenetration( trace_t& tr, CZMPlayerAttackTraceFilter
 
 
 
+    const float flMaxPenetration =
+        bulletinfo.pWeapon->GetMaxPenetrationDist() * flSurfaceMult;
+
+
+
     if ( !bPenetrate )
     {
         return false;
@@ -846,13 +875,20 @@ bool CZMPlayer::HandleBulletPenetration( trace_t& tr, CZMPlayerAttackTraceFilter
     //
     if ( bIsCharacter )
     {
-        auto dir = tr.endpos - tr.startpos;
-        dir.NormalizeInPlace();
+        auto* pZombie = ToZMBaseZombie( tr.m_pEnt );
 
-        vecNextSrc = tr.endpos + dir * epsilon;
+        if ( pZombie && pZombie->CanBePenetrated() )
+        {
+            auto dir = tr.endpos - tr.startpos;
+            dir.NormalizeInPlace();
 
-        pFilter->AddToIgnoreList( tr.m_pEnt );
-        return true;
+            vecNextSrc = tr.endpos + dir * epsilon;
+
+            bulletinfo.pFilter->AddToIgnoreList( tr.m_pEnt );
+            return true;
+        }
+
+        return false;
     }
 
 
@@ -864,11 +900,9 @@ bool CZMPlayer::HandleBulletPenetration( trace_t& tr, CZMPlayerAttackTraceFilter
     dir.NormalizeInPlace();
 
 
-    float distToTrace = MIN( flDistance, 32.0f );
-
+    float distToTrace = MIN( flDistance, flMaxPenetration );
     
     auto start = tr.endpos + dir * epsilon;
-    auto end = start + dir * distToTrace;
 
 
     if ( tr.startsolid )
@@ -877,7 +911,9 @@ bool CZMPlayer::HandleBulletPenetration( trace_t& tr, CZMPlayerAttackTraceFilter
     }
     else
     {
-        UTIL_TraceLine( start, end, MASK_SHOT, pFilter, &peneTrace );
+        auto end = start + dir * distToTrace;
+
+        UTIL_TraceLine( start, end, MASK_SHOT, bulletinfo.pFilter, &peneTrace );
     }
 
 
@@ -888,17 +924,12 @@ bool CZMPlayer::HandleBulletPenetration( trace_t& tr, CZMPlayerAttackTraceFilter
     }
 
 
-    if ( peneTrace.fraction == 1.0f )
-    {
-        return false;
-    }
-
 
     float frac = peneTrace.fractionleftsolid;
 
     if ( frac == 0.0f )
     {
-        Assert( 0 );
+        Assert( peneTrace.allsolid );
         return false;
     }
 
@@ -912,7 +943,24 @@ bool CZMPlayer::HandleBulletPenetration( trace_t& tr, CZMPlayerAttackTraceFilter
 
     float distInSolid = distToTrace * frac;
 
+    bool bPasses = distInSolid < flMaxPenetration;
 
+    if ( zm_sv_debug_penetration.GetFloat() > 0.0f )
+    {
+        DebugDrawLine(
+            peneTrace.startpos,
+            peneTrace.startpos + dir * distInSolid,
+            bPasses ? 0 : 255,
+            (!bPasses) ? 0 : 255,
+            0,
+            true,
+            zm_sv_debug_penetration.GetFloat() );
+    }
+
+    if ( !bPasses )
+    {
+        return false;
+    }
 
 
     vecNextSrc = start + (dir * distInSolid) + (dir * epsilon);
