@@ -47,6 +47,13 @@ public:
     virtual void Precache() OVERRIDE;
 #endif
 
+    virtual void ItemPostFrame() OVERRIDE;
+
+    virtual Activity GetPrimaryAttackActivity() OVERRIDE;
+    //virtual Activity GetSecondaryAttackActivity() OVERRIDE;
+    virtual Activity GetDrawActivity() OVERRIDE;
+    virtual void WeaponIdle() OVERRIDE;
+
     bool DefaultReload( int iClipSize1, int iClipSize2, int iActivity );
     virtual	void CheckReload( void ) OVERRIDE;
     virtual bool Reload() OVERRIDE;
@@ -139,6 +146,9 @@ public:
     virtual bool ShouldIncrementClip() const;
     virtual void CancelReload();
     virtual bool ShouldCancelReload() const { return false; }
+
+    // We have animations for when the gun is empty?
+    virtual bool UsesDryActivity( Activity act );
 
 
     // ZMRTODO: Use config to load these.

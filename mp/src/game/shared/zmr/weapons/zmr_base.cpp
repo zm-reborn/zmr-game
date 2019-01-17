@@ -4,6 +4,7 @@
 #endif
 #include "datacache/imdlcache.h"
 #include "eventlist.h"
+#include "animation.h"
 
 #include <vphysics/constraints.h>
 
@@ -33,10 +34,10 @@ static ConVar zm_sv_weaponreserveammo( "zm_sv_weaponreserveammo", "1", FCVAR_NOT
 BEGIN_NETWORK_TABLE( CZMBaseWeapon, DT_ZM_BaseWeapon )
 #ifdef CLIENT_DLL
     RecvPropInt( RECVINFO( m_nOverrideClip1 ) ),
-    RecvPropFloat( RECVINFO( m_flNextClipFillTime ) ),
+    RecvPropTime( RECVINFO( m_flNextClipFillTime ) ),
 #else
     SendPropInt( SENDINFO( m_nOverrideClip1 ) ),
-    SendPropFloat( SENDINFO( m_flNextClipFillTime ) ),
+    SendPropTime( SENDINFO( m_flNextClipFillTime ) ),
 #endif
 END_NETWORK_TABLE()
 
@@ -100,6 +101,92 @@ void CZMBaseWeapon::FreeWeaponSlot()
     pPlayer->RemoveWeaponSlotFlag( GetSlotFlag() );
 }
 #endif
+
+void CZMBaseWeapon::ItemPostFrame()
+{
+    BaseClass::ItemPostFrame();
+
+
+//#ifdef GAME_DLL
+//    auto* pOwner = GetPlayerOwner();
+//    if ( !pOwner )
+//        return;
+//
+//
+//    // ZMRTODO: Put this somewhere else.
+//    auto* pVM = pOwner->GetViewModel( m_nViewModelIndex );
+//
+//    int iPoseParamIndex = pVM->LookupPoseParameter( "move_x" );
+//    if ( iPoseParamIndex != -1 )
+//    {
+//        float spd = pOwner->GetLocalVelocity().Length2D();
+//        float target = spd > 0.1f ? MIN( 1.0f, spd / 190.0f ) : 0.0f;
+//
+//        float cur = pVM->GetPoseParameter( iPoseParamIndex );
+//        float add = gpGlobals->frametime * 2.0f;
+//        if ( target < cur )
+//        {
+//            add *= -1.0f;
+//        }
+//        else if ( cur == target )
+//            return;
+//
+//        float newratio = cur + add;
+//
+//        pVM->SetPoseParameter( iPoseParamIndex, clamp( newratio, 0.0f, 1.0f ) );
+//    }
+//#endif
+}
+
+Activity CZMBaseWeapon::GetPrimaryAttackActivity()
+{
+    auto* pOwner = GetPlayerOwner();
+    if ( !pOwner )
+        return ACT_VM_PRIMARYATTACK;
+
+    auto* pVM = pOwner->GetViewModel( m_nViewModelIndex );
+
+    // If we have last bullet, play fitting animation if we have it.
+    bool bUseLastAct =  !IsMeleeWeapon()
+                    &&  m_iClip1 == 1
+                    &&  ::SelectHeaviestSequence( pVM->GetModelPtr(), ACT_ZM_VM_PRIMARYATTACK_LAST ) != ACTIVITY_NOT_AVAILABLE;
+
+    return bUseLastAct ? ACT_ZM_VM_PRIMARYATTACK_LAST : ACT_VM_PRIMARYATTACK;
+}
+
+//Activity CZMBaseWeapon::GetSecondaryAttackActivity()
+//{
+//
+//}
+
+Activity CZMBaseWeapon::GetDrawActivity()
+{
+    return UsesDryActivity( ACT_ZM_VM_DRAW_DRY ) ? ACT_ZM_VM_DRAW_DRY : ACT_VM_DRAW;
+}
+
+bool CZMBaseWeapon::UsesDryActivity( Activity act )
+{
+    auto* pOwner = GetPlayerOwner();
+    if ( !pOwner )
+        return false;
+
+    auto* pVM = pOwner->GetViewModel( m_nViewModelIndex );
+
+
+    return  !IsMeleeWeapon()
+        &&  m_iClip1 == 0
+        &&  ::SelectHeaviestSequence( pVM->GetModelPtr(), act ) != ACTIVITY_NOT_AVAILABLE; // Do we have that activity?
+}
+
+void CZMBaseWeapon::WeaponIdle()
+{
+    if ( HasWeaponIdleTimeElapsed() )
+    {
+        Activity act = UsesDryActivity( ACT_ZM_VM_IDLE_DRY ) ? ACT_ZM_VM_IDLE_DRY : ACT_VM_IDLE;
+
+        SendWeaponAnim( act );
+    }
+}
 
 bool CZMBaseWeapon::DefaultReload( int iClipSize1, int iClipSize2, int iActivity )
 {
@@ -246,7 +333,10 @@ bool CZMBaseWeapon::Reload()
     if ( !CanAct() ) return false;
 
 
-    bool ret = DefaultReload( GetMaxClip1(), GetMaxClip2(), ACT_VM_RELOAD );
+    bool ret = DefaultReload(
+                    GetMaxClip1(),
+                    GetMaxClip2(),
+                    UsesDryActivity( ACT_ZM_VM_RELOAD_DRY ) ? ACT_ZM_VM_RELOAD_DRY : ACT_VM_RELOAD );
 
     if ( ret )
     {
@@ -952,6 +1042,7 @@ ConVar cl_bobcycle( "cl_bobcycle", "0.45", 0 , "How fast the bob cycles", true, 
 ConVar cl_bobup( "cl_bobup", "0.5", 0 , "Don't change...", true, 0.01f, true, 0.99f );
 ConVar cl_bobvertscale( "cl_bobvertscale", "0.6", 0, "Vertical scale" ); // Def. is 0.1
 ConVar cl_boblatscale( "cl_boblatscale", "0.8", 0, "Lateral scale" );
+ConVar cl_bobenable( "cl_bobenable", "1" );
 
 extern float g_lateralBob;
 extern float g_verticalBob;
@@ -1029,6 +1120,10 @@ float CZMBaseWeapon::CalcViewmodelBob( void )
 
 void CZMBaseWeapon::AddViewmodelBob( CBaseViewModel *viewmodel, Vector& origin, QAngle& angles )
 {
+    if ( !cl_bobenable.GetBool() )
+        return;
+
+
     Vector	forward, right;
     AngleVectors( angles, &forward, &right, NULL );
 
