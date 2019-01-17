@@ -137,6 +137,10 @@ public:
     virtual float   GetAccuracyIncreaseRate() const { return 2.0f; }
     virtual float   GetAccuracyDecreaseRate() const { return 2.0f; }
 
+    virtual float   GetPenetrationDmgMult() const { return 1.0f; }
+    virtual int     GetMaxPenetrations() const { return 0; }
+    virtual float   GetMaxPenetrationDist() const { return 16.0f; }
+
     float           GetFirstInstanceOfAnimEventTime( int iSeq, int iAnimEvent ) const;
 
 
@@ -164,6 +168,7 @@ protected:
     // Client side hit reg stuff
     virtual float GetMaxDamageDist( ZMUserCmdValidData_t& data ) const OVERRIDE;
     virtual int GetMaxUserCmdBullets( ZMUserCmdValidData_t& data ) const OVERRIDE;
+    virtual int GetMaxNumPenetrate( ZMUserCmdValidData_t& data ) const OVERRIDE;
 
 
     inline int GetOverrideDamage() const { return m_nOverrideDamage; }

@@ -60,6 +60,7 @@ public:
     virtual float GetAccuracyIncreaseRate() const OVERRIDE { return 6.7f; }
     virtual float GetAccuracyDecreaseRate() const OVERRIDE { return 2.1f; }
     
+    virtual int GetMaxPenetrations() const OVERRIDE { return 4; }
 
 
     virtual void AddViewKick( void ) OVERRIDE

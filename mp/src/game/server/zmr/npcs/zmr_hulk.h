@@ -51,4 +51,8 @@ public:
     virtual float IdleSound() OVERRIDE;
     virtual void AlertSound() OVERRIDE;
     virtual void DeathSound() OVERRIDE;
+
+
+    // Shared
+    virtual bool    CanBePenetrated() const OVERRIDE;
 };

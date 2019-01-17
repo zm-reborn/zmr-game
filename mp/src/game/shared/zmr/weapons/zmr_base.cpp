@@ -1022,6 +1022,11 @@ int CZMBaseWeapon::GetMaxUserCmdBullets( ZMUserCmdValidData_t& data ) const
 {
     return GetBulletsPerShot();
 }
+
+int CZMBaseWeapon::GetMaxNumPenetrate( ZMUserCmdValidData_t& data ) const
+{
+    return GetMaxPenetrations();
+}
 #endif
 
 bool CZMBaseWeapon::CanAct() const

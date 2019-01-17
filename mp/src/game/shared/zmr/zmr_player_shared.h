@@ -18,6 +18,8 @@
 #include "shot_manipulator.h"
 
 
+struct ZMFireBulletsInfo_t;
+
 class CZMPlayerAttackTraceFilter : public CTraceFilter
 {
 public:
@@ -28,34 +30,15 @@ public:
 
     int     AddToIgnoreList( CBaseEntity* pIgnore );
     bool    RemoveFromIgnoreList( CBaseEntity* pIgnore );
+    void    ClearIgnoreList();
+
+    int     GetPenetrations() const { return m_nPenetrations; }
+    void    ClearPenetrations() { m_nPenetrations = 0; }
 
 private:
     CBaseEntity* m_pAttacker;
 
     CUtlVector<CBaseEntity*> m_vIgnore;
-};
 
-struct ZMFireBulletsInfo_t
-{
-    ZMFireBulletsInfo_t( const FireBulletsInfo_t& bulletinfo, Vector vecDir, CZMPlayerAttackTraceFilter* filter ) : info( bulletinfo ), Manipulator( vecDir ), pFilter( filter )
-    {
-        bStartedInWater = false;
-        bDoImpacts = false;
-        bDoTracers = false;
-        flCumulativeDamage = 0.0f;
-        this->vecDir = vecDir;
-    }
-
-    int iShot;
-    int iPlayerDamage;
-
-    bool bStartedInWater;
-    bool bDoImpacts;
-    bool bDoTracers;
-    float flCumulativeDamage;
-
-    const FireBulletsInfo_t& info;
-    CShotManipulator Manipulator;
-    CZMPlayerAttackTraceFilter* pFilter;
-    Vector vecDir;
+    int m_nPenetrations;
 };
