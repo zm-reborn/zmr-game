@@ -1302,7 +1302,7 @@ void CZMPlayer::CreateViewModel( int index )
     }
 
 
-    CBaseViewModel* vm = static_cast<CBaseViewModel*>( CreateEntityByName( "predicted_viewmodel" ) );
+    CZMViewModel* vm = static_cast<CZMViewModel*>( CreateEntityByName( "zm_viewmodel" ) );
     
     if ( vm )
     {
