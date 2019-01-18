@@ -88,9 +88,9 @@ public:
     virtual void ItemPostFrame( void ) OVERRIDE;
 
 
-    virtual Activity GetReloadStartAct() OVERRIDE { return ACT_RIFLE_RELOAD_START; }
-    virtual Activity GetReloadEndAct() OVERRIDE { return ACT_RIFLE_RELOAD_FINISH; }
-    virtual Activity GetPumpAct() OVERRIDE { return ACT_RIFLE_LEVER; }
+    virtual Activity GetReloadStartAct() OVERRIDE { return ACT_VM_RELOAD_START; }
+    virtual Activity GetReloadEndAct() OVERRIDE { return ACT_VM_RELOAD_FINISH; }
+    virtual Activity GetPumpAct() OVERRIDE { return ACT_SHOTGUN_PUMP; }
 
     inline bool IsZoomed() { return m_bInZoom; }
     void CheckToggleZoom();

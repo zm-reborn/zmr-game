@@ -46,6 +46,16 @@ public:
 #else
     virtual void Precache() OVERRIDE;
 #endif
+
+    virtual void ItemPostFrame() OVERRIDE;
+
+    virtual Activity GetPrimaryAttackActivity() OVERRIDE;
+    //virtual Activity GetSecondaryAttackActivity() OVERRIDE;
+    virtual Activity GetDrawActivity() OVERRIDE;
+    virtual void WeaponIdle() OVERRIDE;
+
+    bool DefaultReload( int iClipSize1, int iClipSize2, int iActivity );
+    virtual	void CheckReload( void ) OVERRIDE;
     virtual bool Reload() OVERRIDE;
     // NOTE: Always use this to get the damage from .txt file.
     virtual void FireBullets( const FireBulletsInfo_t &info ) OVERRIDE;
@@ -132,6 +142,14 @@ public:
     virtual bool    IsInReload() const { return const_cast<CZMBaseWeapon*>( this )->CanReload() && m_bInReload; }
     virtual bool    CanAct() const; // Can we reload/attack?
 
+    virtual void IncrementClip();
+    virtual bool ShouldIncrementClip() const;
+    virtual void CancelReload();
+    virtual bool ShouldCancelReload() const { return false; }
+
+    // We have animations for when the gun is empty?
+    virtual bool UsesDryActivity( Activity act );
+
 
     // ZMRTODO: Use config to load these.
     virtual float   GetAccuracyIncreaseRate() const { return 2.0f; }
@@ -185,6 +203,9 @@ private:
     int             m_nOverrideDamage;
 #endif
     CNetworkVar( int, m_nOverrideClip1 );
+
+
+    CNetworkVar( float, m_flNextClipFillTime );
 };
 
 inline CZMBaseWeapon* ToZMBaseWeapon( CBaseEntity* pEnt )
