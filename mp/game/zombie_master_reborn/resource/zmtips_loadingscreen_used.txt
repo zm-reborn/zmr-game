@@ -12,15 +12,23 @@
 	{
 		"shown"		"0"
 	}
-	"wut1"
+	"flashlight"
 	{
 		"shown"		"0"
 	}
-	"wut2"
+	"zombietypes"
 	{
 		"shown"		"0"
 	}
-	"wut3"
+	"meme1"
+	{
+		"shown"		"0"
+	}
+	"meme2"
+	{
+		"shown"		"0"
+	}
+	"meme3"
 	{
 		"shown"		"0"
 	}

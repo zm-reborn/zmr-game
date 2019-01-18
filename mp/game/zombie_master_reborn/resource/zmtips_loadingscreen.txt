@@ -2,13 +2,13 @@
 {
 	"intro"
 	{
-		"msg"			"What is Lorem Ipsum? Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+		"msg"			""
 		"time"			"15"
 		"limit"			"2"
 	}
 	"f1menu"
 	{
-		"msg"			"Lost? Objectives may be listed through %s menu."
+		"msg"			"#ZMTipObjectives1"
 		"time"			"10"
 		"limit"			"5"
 		
@@ -16,29 +16,41 @@
 	}
 	"sharing"
 	{
-		"msg"			"Sharing is caring. Pressing %s will drop your current weapon with its ammo."
+		"msg"			"#ZMTipAmmo1"
 		"time"			"15"
 		"limit"			"5"
 		
 		"param1"		"key@dropweapon"
 	}
-	"wut1"
+	"flashlight"
 	{
-		"msg"			"Try not to be a dick."
+		"msg"			"#ZMTipFlashlight"
+		"time"			"15"
+		"limit"			"3"
+	}
+	"zombietypes"
+	{
+		"msg"			"#ZMTipZombieTypes"
+		"time"			"15"
+		"limit"			"3"
+	}
+	"meme1"
+	{
+		"msg"			"#ZMTipMeme1"
 		"time"			"15"
 		"limit"			"1"
 		"random"		"1"
 	}
-	"wut2"
+	"meme2"
 	{
-		"msg"			"We're running out of tips to show you..."
+		"msg"			"#ZMTipMeme2"
 		"time"			"15"
 		"limit"			"1"
 		"random"		"1"
 	}
-	"wut3"
+	"meme3"
 	{
-		"msg"			"Did you know that ZPS is bad game?"
+		"msg"			"#ZMTipMeme3"
 		"time"			"15"
 		"limit"			"1"
 		"random"		"1"

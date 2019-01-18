@@ -327,19 +327,19 @@ void CZMLoadingPanel::PaintBackground()
 
     {
         // Tip background
-        int padding_x = 20;
-        int padding_y = 20;
+        //int padding_x = 20;
+        //int padding_y = 20;
 
-        int x = m_pTipLabel->GetXPos();
-        int y = m_pTipLabel->GetYPos();
+        //int x = m_pTipLabel->GetXPos();
+        //int y = m_pTipLabel->GetYPos();
 
-        int w, h;
-        m_pTipLabel->GetContentSize( w, h );
-        //w += m_pTipLabel->GetXPos();
+        //int w, h;
+        //m_pTipLabel->GetContentSize( w, h );
+        ////w += m_pTipLabel->GetXPos();
 
 
-        surface()->DrawSetTexture( m_nTexTipBgId );
-        surface()->DrawTexturedRect( x - padding_x, y - padding_y, x + w + padding_x, y + h + padding_y );
+        //surface()->DrawSetTexture( m_nTexTipBgId );
+        //surface()->DrawTexturedRect( x - padding_x, y - padding_y, x + w + padding_x, y + h + padding_y );
     }
 }
 
