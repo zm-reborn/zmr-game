@@ -708,6 +708,32 @@ void CZMBaseWeapon::GetGlowEffectColor( float& r, float& g, float& b )
     if ( split.Count() > 2 ) b = atof( split[2] );
 }
 
+ShadowType_t CZMBaseWeapon::ShadowCastType()
+{
+    if ( IsEffectActive( EF_NODRAW | EF_NOSHADOW ) )
+        return SHADOWS_NONE;
+
+
+    auto* pOwner = GetPlayerOwner();
+    if ( !pOwner ) // Not carried
+        return SHADOWS_RENDER_TO_TEXTURE;
+
+
+    // Player's shadow isn't drawn either.
+    if ( pOwner->ShadowCastType() == SHADOWS_NONE )
+        return SHADOWS_NONE;
+
+
+    // In firstperson?
+    if ( pOwner->IsLocalPlayer() && !C_BasePlayer::ShouldDrawLocalPlayer() )
+        return SHADOWS_NONE;
+
+
+    // In thirdperson
+    // Draw if active
+    return pOwner->GetActiveWeapon() == this ? SHADOWS_RENDER_TO_TEXTURE : SHADOWS_NONE;
+}
+
 void CZMBaseWeapon::OnDataChanged( DataUpdateType_t type )
 {
     BaseClass::OnDataChanged( type );
