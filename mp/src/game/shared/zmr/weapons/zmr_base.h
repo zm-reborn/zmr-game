@@ -81,6 +81,8 @@ public:
     virtual bool    GlowUnoccluded() OVERRIDE { return true; };
 
 
+    virtual ShadowType_t ShadowCastType() OVERRIDE;
+
     virtual void OnDataChanged( DataUpdateType_t ) OVERRIDE;
     virtual bool ShouldPredict() OVERRIDE;
 #endif
