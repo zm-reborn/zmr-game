@@ -11,6 +11,7 @@
 #include "c_zmr_zmvision.h"
 #include "c_zmr_util.h"
 #include "c_zmr_player.h"
+#include "c_zmr_zmkeys.h"
 
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -38,7 +39,6 @@ CZMViewBase* GetZMView()
 }
 
 
-
 using namespace vgui;
 
 class ClientModeZMNormal : public ClientModeShared
@@ -56,8 +56,14 @@ public:
 
     virtual int KeyInput( int down, ButtonCode_t keynum, const char* pszCurrentBinding );
 
+
+    bool IsZMHoldingCtrl() const { return m_bZMHoldingCtrl; }
+    void SetZMHoldingCtrl( bool state ) { m_bZMHoldingCtrl = state; }
+
 private:
     int ZMKeyInput( int down, ButtonCode_t keynum, const char* pszCurrentBinding );
+
+    bool m_bZMHoldingCtrl;
 };
 
 
@@ -67,6 +73,21 @@ IClientMode *GetClientModeNormal()
     static ClientModeZMNormal g_ClientModeNormal;
     return &g_ClientModeNormal;
 }
+
+ClientModeZMNormal* GetZMClientMode()
+{
+    return static_cast<ClientModeZMNormal*>( GetClientModeNormal() );
+}
+
+
+static void IN_ZM_Cmd_Control( const CCommand& args )
+{
+    bool state = ( args.Arg( 0 )[0] == '+' ) ? true : false;
+
+    GetZMClientMode()->SetZMHoldingCtrl( state );
+}
+ConCommand zm_cmd_ctrl_up( "+zm_cmd_ctrl", IN_ZM_Cmd_Control );
+ConCommand zm_cmd_ctrl_down( "-zm_cmd_ctrl", IN_ZM_Cmd_Control );
 
 
 bool ClientModeZMNormal::DoPostScreenSpaceEffects( const CViewSetup* pSetup )
@@ -118,11 +139,12 @@ int ClientModeZMNormal::ZMKeyInput( int down, ButtonCode_t keynum, const char* p
     C_ZMPlayer* pPlayer = C_ZMPlayer::GetLocalPlayer();
 
 
+
     // Group select
     if ( down && keynum >= KEY_0 && keynum <= KEY_9 )
     {
         int group = keynum - KEY_0;
-        if ( pPlayer->m_nButtons & IN_DUCK )
+        if ( IsZMHoldingCtrl() )
         {
             ZMClientUtil::SetSelectedGroup( group );
         }

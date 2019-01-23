@@ -83,6 +83,8 @@ settings.scr
 *.csv
 mp/game/zombie_master_reborn/resource/zmtips_used.txt
 mp/game/zombie_master_reborn/resource/zmcrosshairs.txt
+keys_survivor.cfg
+keys_zm.cfg
 # Tool (vbsp/vvis/vrad) compilation output
 *.dll
 *.exe

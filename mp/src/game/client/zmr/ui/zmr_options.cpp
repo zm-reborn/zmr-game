@@ -11,6 +11,7 @@
 #include "zmr_options_graphics.h"
 #include "zmr_options_misc.h"
 #include "zmr_options_crosshair.h"
+#include "zmr_options_keys.h"
 
 
 
@@ -88,6 +89,7 @@ CZMOptionsMenu::CZMOptionsMenu( VPANEL parent ) : BaseClass( nullptr, "ZMOptions
     AddPage( new CZMOptionsSubGraphics( this ), "Video" );
     AddPage( new CZMOptionsSubCrosshair( this ), "Crosshair" );
     AddPage( new CZMOptionsSubMisc( this ), "Misc" );
+    AddPage( new CZMOptionsSubKeys( this ), "Keys" );
 
 
     vgui::ivgui()->AddTickSignal( GetVPanel(), 100 );
