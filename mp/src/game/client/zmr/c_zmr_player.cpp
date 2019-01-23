@@ -21,6 +21,7 @@
 #include "c_zmr_entities.h"
 #include "zmr/zmr_softcollisions.h"
 #include "c_zmr_player_ragdoll.h"
+#include "c_zmr_zmkeys.h"
 
 #include "c_zmr_player.h"
 #include "c_zmr_zmvision.h"
@@ -379,7 +380,12 @@ void C_ZMPlayer::TeamChange( int iNewTeam )
         g_pZMView->SetVisible( iNewTeam == ZMTEAM_ZM );
 
 
+
+
     // Execute team config.
+    CZMTeamKeysConfig::ExecuteTeamConfig( iNewTeam );
+
+
     if ( iNewTeam == ZMTEAM_ZM )
     {
         ZMClientUtil::QueueTooltip( "zmintro", 1.0f );
