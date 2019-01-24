@@ -15,6 +15,7 @@
 
 #include "zmr_player.h"
 #include "zmr_entities.h"
+#include "zmr_hiddenspawn.h"
 
 
 /*
@@ -140,135 +141,18 @@ void ZM_Cmd_CreateHidden( const CCommand &args )
     if ( !UTIL_IsCommandIssuedByServerAdmin() && !pPlayer->IsZM() ) return;
 
     if ( args.ArgC() < 4 ) return;
-    
-
-    if ( !CZMBaseZombie::HasEnoughPopToSpawn( ZMCLASS_SHAMBLER ) )
-    {
-        ZMUtil::PrintNotify( pPlayer, ZMCHATNOTIFY_ZM, "#ZMNotEnoughPop" );
-        return;
-    }
-        
-
-    if ( !pPlayer->HasEnoughRes( zm_sv_cost_hiddenshambler.GetInt() ) )
-    {
-        ZMUtil::PrintNotify( pPlayer, ZMCHATNOTIFY_ZM, "#ZMNotEnoughRes" );
-        return;
-    }
 
 
     Vector pos;
-    trace_t trace;
-
     pos.x = atof( args.Arg( 1 ) );
     pos.y = atof( args.Arg( 2 ) );
     pos.z = atof( args.Arg( 3 ) ) + 1.0f;
 
 
-    CZMEntTriggerBlockHidden* pBlock;
-    for ( int i = 0; i < g_pBlockHidden->Count(); i++ )
-    {
-        pBlock = g_pBlockHidden->Element( i );
-
-        if (pBlock && pBlock->IsActive()
-        &&  pBlock->CollisionProp()
-        &&  pBlock->CollisionProp()->IsPointInBounds( pos ) )
-        {
-            ZMUtil::PrintNotify( pPlayer, ZMCHATNOTIFY_ZM, "#ZMHiddenCreateBlocked" );
-            return;
-        }
-    }
-
-    bool bVisible = false;
-
-
-    for ( int i = 1; i <= gpGlobals->maxClients; i++ )
-    {
-        CZMPlayer* pPlayer = ToZMPlayer( UTIL_PlayerByIndex( i ) );
-
-        if ( !pPlayer ) continue;
-
-        if ( !pPlayer->IsHuman() ) continue;
-
-        if ( !pPlayer->IsAlive() ) continue;
-
-
-        // ZMRTODO: Throw this somewhere else.
-        UTIL_TraceLine( pPlayer->EyePosition(), pos, MASK_VISIBLE, pPlayer, COLLISION_GROUP_NONE, &trace );
-
-        if ( trace.fraction == 1.0f )
-        {
-            bVisible = true;
-            break;
-        }
-
-        
-        UTIL_TraceLine( pPlayer->EyePosition(), pos + Vector( 0.0f, 0.0f, 64.0f ), MASK_VISIBLE, pPlayer, COLLISION_GROUP_NONE, &trace );
-
-        if ( trace.fraction == 1.0f )
-        {
-            bVisible = true;
-            break;
-        }
-    }
-
-    if ( bVisible )
-    {
-        ZMUtil::PrintNotify( pPlayer, ZMCHATNOTIFY_ZM, "#ZMHiddenCreateHumanSee" );
-        return;
-    }
-
-
-
-
-    CZMBaseZombie* pZombie = static_cast<CZMBaseZombie*>( CreateEntityByName( CZMBaseZombie::ClassToName( ZMCLASS_SHAMBLER ) ) );
-
-    if ( !pZombie ) return;
-
-
-    DispatchSpawn( pZombie );
-    
-    const Vector findground( 0.0f, 0.0f, 2.0f );
-
-    Vector mins, maxs;
-    maxs.x = pZombie->GetMotor()->GetHullWidth() / 2.0f;
-    maxs.y = maxs.x;
-    maxs.z = pZombie->GetMotor()->GetHullHeight();
-
-    mins.x = mins.y = -maxs.x;
-    mins.z = 0.0f;
-
-
-    // Trace down to get ground position.
-    UTIL_TraceHull(
-        pos + Vector( 0.0f, 0.0f, 8.0f ),
-        pos - findground,
-        mins, maxs,
-        MASK_NPCSOLID, pZombie, COLLISION_GROUP_NONE, &trace );
-    
-    const Vector up = Vector( 0.0f, 0.0f, 1.0f );
-    const float dot = DotProduct( up, trace.plane.normal );
-
-    if (trace.startsolid || trace.fraction == 1.0f
-    ||  (trace.fraction != 1.0f && dot < 0.6f)) // Is our spawn location ground?
-    {
-        ZMUtil::PrintNotify( pPlayer, ZMCHATNOTIFY_ZM, "#ZMInvalidSpot" );
-
-        pZombie->SUB_Remove();
-
-        return;
-    }
+    ZombieClass_t zclass = ZMCLASS_SHAMBLER;
 
     
-    pZombie->Teleport( &trace.endpos, nullptr, nullptr );
-
-    // Face away from ZM.
-    QAngle ang = pPlayer->GetAbsAngles();
-    ang.x = ang.z = 0.0f;
-    pZombie->SetAbsAngles( ang );
-
-    pZombie->Activate();
-
-    pPlayer->IncResources( -zm_sv_cost_hiddenshambler.GetInt() );
+    g_ZMHiddenSpawn.Spawn( zclass, pPlayer, pos );
 }
 
 static ConCommand zm_cmd_createhidden( "zm_cmd_createhidden", ZM_Cmd_CreateHidden, "Create da zombies!", FCVAR_HIDDEN );

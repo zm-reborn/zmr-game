@@ -20,7 +20,7 @@ static const char* g_szZMCommands[] = {
     "zm_vision",
     "zm_cmd_selectall",
     "zm_cmd_delete",
-    "zm_cmd_hiddenspawn",
+    "zm_hiddenspawn",
     "roundrestart",
 };
 

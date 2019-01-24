@@ -77,6 +77,15 @@ CON_COMMAND( zm_observermode, "" )
     }
 }
 
+CON_COMMAND( zm_hiddenspawn, "" )
+{
+    if ( g_pZMView )
+    {
+        g_pZMView->SetClickMode( ZMCLICKMODE_HIDDEN );
+    }
+}
+
+
 CZMViewBase::CZMViewBase( const char* pElementName ) : CHudElement( pElementName ), CZMFramePanel( g_pClientMode->GetViewport(), pElementName )
 {
     // Proportional doesn't stretch with widescreen anyway
