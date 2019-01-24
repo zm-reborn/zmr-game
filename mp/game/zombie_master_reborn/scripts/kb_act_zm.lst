@@ -7,7 +7,7 @@
 "zm_vision"				"Toggle Vision"
 "zm_cmd_selectall"		"Select All Zombies"
 "zm_cmd_delete"			"Delete Selected Zombies"
-"zm_cmd_hiddenspawn"	"Hidden Spawn"
+"zm_hiddenspawn"		"Hidden Spawn"
 "+zm_cmd_ctrl"			"Control"
 "blank"				"=========================="
 "blank"				"Survivor/Spectator"
