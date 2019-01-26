@@ -3,7 +3,7 @@
 #include "IGameUIFuncs.h"
 
 #include <vgui/ISurface.h>
-#include <vgui/Iinput.h>
+#include <vgui/IInput.h>
 
 #include "zmr_mainmenu_contactbuttons.h"
 #include "zmr_mainmenu_btn.h"
