@@ -25,7 +25,7 @@ CZMMainMenuButton::CZMMainMenuButton( Panel* pParent, const char* name ) : BaseC
 
 CZMMainMenuButton::~CZMMainMenuButton()
 {
-    m_vSubBtns.RemoveAll();
+    m_vSubBtns.PurgeAndDeleteElements();
 }
 
 void CZMMainMenuButton::DoClick()
