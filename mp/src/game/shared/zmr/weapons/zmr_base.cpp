@@ -477,34 +477,52 @@ void CZMBaseWeapon::PrimaryAttack( void )
     Shoot();
 }
 
-void CZMBaseWeapon::Shoot()
+void CZMBaseWeapon::Shoot( int iAmmoType, int nBullets, int nAmmo, float flMaxRange, bool bUseClip1, bool bSecondaryEffects )
 {
     CZMPlayer* pPlayer = GetPlayerOwner();
     if ( !pPlayer ) return;
 
 
+    if ( iAmmoType == -1 )
+        iAmmoType = m_iPrimaryAmmoType;
+    if ( nAmmo <= -1 )
+        nAmmo = 1;
+    if ( nBullets <= -1 )
+        nBullets = GetBulletsPerShot() * MAX( 1, nAmmo );
+    if ( flMaxRange < 0.0f )
+        flMaxRange = m_fMaxRange1;
+
+    int& iClip = (int&)m_iClip1;
+    if ( !bUseClip1 )
+        iClip = (int&)m_iClip2;
+
+
+    Assert( nBullets > 0 );
+
 
     // Effects need to be called AFTER setting next primary attack(?)
-    PrimaryAttackEffects();
+    if ( !bSecondaryEffects )
+        PrimaryAttackEffects();
+    else
+        SecondaryAttackEffects();
 
 
     // ZMRTODO: Add burst firing here.
-    int shots = 1;
 
 
     // Make sure we don't fire more than the amount in the clip
     if ( UsesClipsForAmmo1() )
     {
-        shots = MIN( shots, m_iClip1 );
-        m_iClip1 -= shots;
+        nAmmo = MIN( nAmmo, iClip );
+        iClip -= nAmmo;
     }
     else
     {
-        shots = MIN( shots, pPlayer->GetAmmoCount( m_iPrimaryAmmoType ) );
-        pPlayer->RemoveAmmo( shots, m_iPrimaryAmmoType );
+        nAmmo = MIN( nAmmo, pPlayer->GetAmmoCount( iAmmoType ) );
+        pPlayer->RemoveAmmo( nAmmo, iAmmoType );
     }
 
-    Assert( shots > 0 );
+    Assert( nAmmo > 0 );
 
     
     // I still barely understand how you're suppose to handle prediction.
@@ -517,13 +535,10 @@ void CZMBaseWeapon::Shoot()
     if ( prediction->IsFirstTimePredicted() )
 #endif
     {
-        int numBullets = GetBulletsPerShot();
-        Assert( numBullets > 0 );
-
-        FireBullets( numBullets, m_iPrimaryAmmoType, m_fMaxRange1 );
+        FireBullets( nBullets, iAmmoType, flMaxRange );
     }
 
-    if ( !m_iClip1 && pPlayer->GetAmmoCount( m_iPrimaryAmmoType ) <= 0 )
+    if ( !iClip && pPlayer->GetAmmoCount( iAmmoType ) <= 0 )
     {
         // HEV suit - indicate out of ammo condition
         pPlayer->SetSuitUpdate( "!HEV_AMO0", FALSE, 0 ); 
@@ -556,6 +571,28 @@ void CZMBaseWeapon::PrimaryAttackEffects()
         pPlayer->DoAnimationEvent( PLAYERANIMEVENT_ATTACK_PRIMARY );
 
         WeaponSound( SINGLE, m_flNextPrimaryAttack );
+    }
+}
+
+void CZMBaseWeapon::SecondaryAttackEffects()
+{
+    CZMPlayer* pPlayer = GetPlayerOwner();
+    if ( !pPlayer )
+        return;
+
+
+    // IMPORTANT: Always needs to be called
+    SendWeaponAnim( GetSecondaryAttackActivity() );
+
+#ifdef CLIENT_DLL
+    if ( prediction->IsFirstTimePredicted() )
+#endif
+    {
+        pPlayer->DoMuzzleFlash();
+
+        pPlayer->DoAnimationEvent( PLAYERANIMEVENT_ATTACK_SECONDARY );
+
+        WeaponSound( SINGLE, m_flNextSecondaryAttack );
     }
 }
 
