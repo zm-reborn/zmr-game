@@ -11,8 +11,8 @@
 		"visible"		"1"
 		"enabled"		"1"
 		
-		// The child index from which the bottom strip is painted
-		"bottom_strip_index"		"2"
+		// The child from which the bottom strip is painted
+		"bottom_strip_start"		"ServerButton"
 	}
 	"ResumeButton"
 	{
@@ -89,6 +89,7 @@
 		{
 			"playonline"
 			{
+				"fieldName"		"PlayOnline"
 				"allcaps"		"1"
 				"labelText"		"#GameUI_GameMenu_FindServers"
 				"command"		"OpenServerBrowser"
@@ -97,6 +98,7 @@
 			}
 			"createserver"
 			{
+				"fieldName"		"CreateServer"
 				"allcaps"		"1"
 				"labelText"		"#GameUI_CreateServer"
 				"command"		"OpenCreateMultiplayerGameDialog"
@@ -105,6 +107,7 @@
 			}
 			"playtutorial"
 			{
+				"fieldName"		"PlayTutorial"
 				"allcaps"		"1"
 				"labelText"		"PLAY TUTORIAL"
 				"command"		""
@@ -139,6 +142,7 @@
 		{
 			"defoptions"
 			{
+				"fieldName"		"DefaultOptions"
 				"allcaps"		"1"
 				"labelText"		"Input/Video"
 				"command"		"OpenOptionsDialog"
@@ -147,6 +151,7 @@
 			}
 			"modoptions"
 			{
+				"fieldName"		"ModOptions"
 				"allcaps"		"1"
 				"labelText"		"Mod Options"
 				"command"		"engine ToggleZMOptions"
@@ -181,6 +186,7 @@
 		{
 			"restartround"
 			{
+				"fieldName"		"RestartRound"
 				"allcaps"		"1"
 				"labelText"		"Restart Round"
 				"command"		"engine callvote ZMVoteRoundRestart"

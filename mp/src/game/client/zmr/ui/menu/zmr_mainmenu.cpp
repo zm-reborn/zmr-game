@@ -21,6 +21,22 @@ extern IGameUIFuncs* gameuifuncs;
 
 using namespace vgui;
 
+
+
+CON_COMMAND( zm_cl_debug_mainmenu, "" )
+{
+    auto* pMainMenu = static_cast<CZMMainMenu*>( g_pZMMainMenu->GetPanel() );
+    if ( pMainMenu )
+    {
+        for ( int i = 0 ; i < pMainMenu->GetChildCount(); i++ )
+        {
+            auto* pChild = pMainMenu->GetChild( i );
+            Msg( "Child %i: %s\n", i, pChild->GetName() );
+        }
+        
+    }
+}
+
 class CZMMainMenuInterface : public IZMUi
 {
 public:
@@ -54,6 +70,7 @@ bool CZMMainMenu::s_bWasInGame = false;
 CZMMainMenu::CZMMainMenu( VPANEL parent ) : BaseClass( nullptr, "ZMMainMenu" )
 {
     m_iBottomStripChildIndex = -1;
+    m_szBottomStrip[0] = NULL;
     m_bInLoadingScreen = false;
 
 
@@ -158,6 +175,7 @@ void CZMMainMenu::PaintBackground()
     const int nTexWidth = 1024;
     const int w = GetWide();
 
+
     if ( m_iBottomStripChildIndex >= 0 && m_iBottomStripChildIndex < GetChildCount() )
     {
         auto* pPanel = GetChild( m_iBottomStripChildIndex );
@@ -219,7 +237,8 @@ void CZMMainMenu::PerformLayout()
 
 void CZMMainMenu::ApplySettings( KeyValues* kv )
 {
-    m_iBottomStripChildIndex = kv->GetInt( "bottom_strip_index", -1 );
+    Q_strncpy( m_szBottomStrip, kv->GetString( "bottom_strip_start" ), sizeof( m_szBottomStrip ) );
+
 
     BaseClass::ApplySettings( kv );
 }
@@ -231,6 +250,12 @@ void CZMMainMenu::ApplySchemeSettings( IScheme* pScheme )
 
     LoadControlSettings( "resource/ui/zmmainmenu.res" );
     
+
+    if ( m_szBottomStrip[0] != NULL )
+    {
+        m_iBottomStripChildIndex = FindChildIndexByName( m_szBottomStrip );
+    }
+
 
     int w, h;
     surface()->GetScreenSize( w, h );
