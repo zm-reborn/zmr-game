@@ -2,6 +2,7 @@
 #include "vgui_controls/PropertyDialog.h"
 
 #include <vgui/IVGui.h>
+#include <vgui/ISurface.h>
 #include <vgui_controls/AnimationController.h>
 #include <vgui_controls/PropertySheet.h>
 
@@ -14,35 +15,31 @@
 #include "zmr_options_keys.h"
 
 
-
-
-
-using namespace vgui;
-
-class CZMOptionsMenu : public PropertyDialog
+class CZMOptionsMenu : public vgui::PropertyDialog
 {
 public:
-    DECLARE_CLASS_SIMPLE( CZMOptionsMenu, PropertyDialog );
+    DECLARE_CLASS_SIMPLE( CZMOptionsMenu, vgui::PropertyDialog );
 
-    CZMOptionsMenu( VPANEL parent );
+    CZMOptionsMenu( vgui::VPANEL parent );
     ~CZMOptionsMenu();
     
     
     virtual void OnTick() OVERRIDE;
     virtual void OnThink() OVERRIDE;
     
-    virtual void OnCommand( const char* ) OVERRIDE;
+    virtual void OnCommand( const char* command ) OVERRIDE;
 
 private:
     void UpdateMenu();
+    void CenterMe();
 };
 
 class CZMOptionsMenuInterface : public IZMUi
 {
 public:
-    CZMOptionsMenuInterface() { m_Panel = nullptr; };
+    CZMOptionsMenuInterface() { m_Panel = nullptr; }
 
-    void Create( VPANEL parent ) OVERRIDE
+    void Create( vgui::VPANEL parent ) OVERRIDE
     {
         m_Panel = new CZMOptionsMenu( parent );
     }
@@ -71,6 +68,9 @@ CON_COMMAND( ToggleZMOptions, "" )
 {
     g_bZMOptionsShow = !g_bZMOptionsShow;
 }
+
+
+using namespace vgui;
 
 CZMOptionsMenu::CZMOptionsMenu( VPANEL parent ) : BaseClass( nullptr, "ZMOptionsMenu" )
 {
@@ -111,6 +111,7 @@ void CZMOptionsMenu::OnTick()
         if ( IsVisible() )
         {
             UpdateMenu();
+            CenterMe();
 
             Activate();
         }
@@ -156,4 +157,14 @@ void CZMOptionsMenu::UpdateMenu()
             pPage->OnResetData();
         }
     }
+}
+
+void CZMOptionsMenu::CenterMe()
+{
+    int x, y, w, h;
+    surface()->GetWorkspaceBounds( x, y, w, h );
+    
+    int mw = GetWide();
+    int mh = GetTall();
+    SetPos( x + w / 2 - mw / 2, y + h / 2 - mh / 2 );
 }
