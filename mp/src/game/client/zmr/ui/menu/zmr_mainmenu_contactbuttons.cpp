@@ -165,16 +165,11 @@ void CZMMainMenuContactButtonList::ApplySettings( KeyValues* kv )
     KeyValues* subkv = kv->FindKey( "links" );
     if ( subkv )
     {
-        subkv = subkv->GetFirstSubKey();
-
-        while ( subkv )
+        for ( subkv = subkv->GetFirstSubKey(); subkv; subkv = subkv->GetNextKey() )
         {
             AddButton( subkv );
-
-            subkv = subkv->GetNextKey();
         }
     }
-
 
     BaseClass::ApplySettings( kv );
 }
@@ -183,7 +178,7 @@ void CZMMainMenuContactButtonList::AddButton( KeyValues* kv )
 {
     new CZMMainMenuContactButton(
         this,
-        "",
+        kv->GetName(),
         kv->GetString( "icon" ),
         kv->GetString( "url" ) );
 }

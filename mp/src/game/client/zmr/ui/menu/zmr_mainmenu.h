@@ -59,6 +59,7 @@ private:
     bool m_bInLoadingScreen;
 
     int m_iBottomStripChildIndex;
+    char m_szBottomStrip[64];
 };
 
 
