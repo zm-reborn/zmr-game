@@ -82,6 +82,7 @@ settings.scr
 *.ain
 *.csv
 mp/game/zombie_master_reborn/resource/zmtips_hudtips_used.txt
+mp/game/zombie_master_reborn/resource/zmtips_loadingscreen_used.txt
 mp/game/zombie_master_reborn/resource/zmcrosshairs.txt
 keys_survivor.cfg
 keys_zm.cfg
