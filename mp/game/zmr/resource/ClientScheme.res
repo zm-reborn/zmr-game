@@ -46,6 +46,8 @@ Scheme
 		"ZMDullWhite"		"142 142 142 255"
 		
 		"ZMScoreboardBg"	"50 0 0 150"
+		"ZMMainMenuBg"		"40 0 0 255"
+		"ZMLoadingBg"		"28 0 0 255"
 		
 		//"FgColor"			"255 220 0 100"
 		"FgColor"			"255 255 255 100"
@@ -886,6 +888,51 @@ Scheme
 				"antialias" "1"
 				"additive"	"1"
 				"custom"	"1"
+			}
+		}
+		ZMMainMenuButton
+		{
+			"1"
+			{
+				"name"		"Built Titling Rg"
+				"tall"		"28"
+				"weight"	"100"
+				"antialias" "1"
+				"additive"	"0"
+				"custom"	"1"
+			}
+		}
+		ZMMainMenuSubButton
+		{
+			"1"
+			{
+				"name"		"Built Titling Rg"
+				"tall"		"18"
+				"weight"	"100"
+				"antialias" "1"
+				"additive"	"0"
+				"custom"	"1"
+			}
+		}
+		ZMLoadingScreenMain
+		{
+			"1"
+			{
+				"name"		"Built Titling Rg"
+				"tall"		"48"
+				"weight"	"100"
+				"antialias" "1"
+				"additive"	"0"
+				"custom"	"1"
+			}
+		}
+		"ZMLoadingScreenNormal"
+		{
+			"1"
+			{
+				"name"		"Verdana Bold"
+				"tall"		"16"
+				"antialias" "1"
 			}
 		}
 		HudNumbersSmall

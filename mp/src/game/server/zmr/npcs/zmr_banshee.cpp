@@ -35,14 +35,38 @@ extern ConVar zm_sk_banshee_health;
 
 
 
-CZMBansheeMotor::CZMBansheeMotor( CZMBaseZombie* pOuter ) : NPCR::CNonPlayerMotor( pOuter )
+// Banshee motor
+CZMBansheeMotor::CZMBansheeMotor( CZMBaseZombie* pOuter ) : CZMBaseZombieMotor( pOuter )
 {
+    m_bIsInNavJump = false;
 }
 
 float CZMBansheeMotor::GetHullHeight() const
 {
     return CZMBanshee::GetBansheeHullHeight();
 }
+
+void CZMBansheeMotor::OnLandedGround( CBaseEntity* pGround )
+{
+    m_bIsInNavJump = false;
+
+    BaseClass::OnLandedGround( pGround );
+}
+
+void CZMBansheeMotor::NavJump( const Vector& vecGoal, float flOverrideHeight )
+{
+    m_bIsInNavJump = true;
+    BaseClass::NavJump( vecGoal, flOverrideHeight );
+}
+
+bool CZMBansheeMotor::ShouldAdjustVelocity() const
+{
+    // We don't want to adjust velocity while nav jumping.
+    // This allows banshees to hit a wall while in air and still reach their goal.
+    return !m_bIsInNavJump && BaseClass::ShouldAdjustVelocity();
+}
+
+
 
 
 IMPLEMENT_SERVERCLASS_ST( CZMBanshee, DT_ZM_Banshee )

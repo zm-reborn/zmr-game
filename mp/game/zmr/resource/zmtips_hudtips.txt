@@ -53,6 +53,8 @@
 		"msg"			"#ZMMenuZMNV"
 		"time"			"10"
 		"team"			"3"
+		
+		"param1"		"key@zm_vision"
 	}
 	"zmmenu_attack"
 	{
@@ -86,7 +88,7 @@
 		"time"			"10"
 		"team"			"3"
 		
-		"param1"		"key@+duck"
+		"param1"		"key@+zm_cmd_ctrl"
 	}
 	"zmmenu_selectgroup"
 	{
@@ -99,6 +101,8 @@
 		"msg"			"#ZMMenuZMSummon"
 		"time"			"10"
 		"team"			"3"
+		
+		"param1"		"key@zm_hiddenspawn"
 	}
 	"zmmenu_delete"
 	{

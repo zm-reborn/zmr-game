@@ -195,3 +195,8 @@ int CZMBaseZombie::GetControllerIndex() const
 {
     return m_iPlayerControllerIndex;
 }
+
+bool CZMBaseZombie::CanBePenetrated() const
+{
+    return true;
+}

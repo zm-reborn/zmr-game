@@ -13,6 +13,7 @@
 #include "ammodef.h"
 
 #include "zmr/zmr_voting.h"
+#include "zmr/zmr_mapitemaction.h"
 #include "zmr/zmr_rejoindata.h"
 
 #include "zmr/zmr_player.h"
@@ -597,7 +598,7 @@ bool CZMRules::CanHaveAmmo( CBaseCombatCharacter* pPlayer, int iAmmoIndex )
 
     // Do we have enough room?
     int room = GetAmmoDef()->MaxCarry( iAmmoIndex ) - pPlayer->GetAmmoCount( iAmmoIndex );
-    if ( room > 0 && room > (pWep->GetDropAmmoAmount() * 0.5f) )
+    if ( room > 0 )
     {
         return true;
     }
@@ -897,6 +898,13 @@ void CZMRules::InitDefaultAIRelationships()
     CBaseCombatCharacter::SetDefaultRelationship( CLASS_ZOMBIE, CLASS_NONE,         D_NU, 0 );
     CBaseCombatCharacter::SetDefaultRelationship( CLASS_ZOMBIE, CLASS_PLAYER,       D_HT, 0 );
     CBaseCombatCharacter::SetDefaultRelationship( CLASS_ZOMBIE, CLASS_ZOMBIE,       D_NU, 0 );
+
+    CBaseCombatCharacter::SetDefaultRelationship( CLASS_PLAYER, CLASS_ZOMBIE,       D_HT, 0 );
+
+    // Let's assume anything that doesn't have a class also hates survivors.
+    // This is a quick workaround for zm_frozenfinale final boss not spotting survivors.
+    // And for fucksake, in the future, use the ai_relationship-entity.
+    CBaseCombatCharacter::SetDefaultRelationship( CLASS_NONE, CLASS_PLAYER,         D_HT, 0 );
 }
 
 bool CZMRules::FAllowNPCs()
@@ -1265,6 +1273,10 @@ void CZMRules::RestoreMap()
 
         virtual CBaseEntity* CreateNextEntity( const char *pClassname )
         {
+            if ( ZMItemAction::g_ZMMapItemSystem.AffectsItem( pClassname ) )
+                return nullptr;
+
+
             if ( m_iIterator == g_MapEntityRefs.InvalidIndex() )
             {
                 // This shouldn't be possible. When we loaded the map, it should have used 
@@ -1303,6 +1315,9 @@ void CZMRules::RestoreMap()
     // DO NOT CALL SPAWN ON info_node ENTITIES!
 
     MapEntity_ParseAllEntities( engine->GetMapEntitiesString(), &filter, true );
+
+
+    ZMItemAction::g_ZMMapItemSystem.SpawnItems();
 }
 
 static ConVar zm_sv_resource_rate( "zm_sv_resource_rate", "5", FCVAR_NOTIFY );

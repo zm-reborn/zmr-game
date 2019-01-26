@@ -11,7 +11,8 @@ namespace NPCR
         NPCManager();
         ~NPCManager();
 
-        float GetLastUpdateTime() { return m_flLastUpdateTime; };
+
+        static double GetProfilingTime();
         
         void RegisterNPC( CBaseNPC* pNPC );
         void UnRegisterNPC( CBaseNPC* pNPC );
@@ -37,10 +38,9 @@ namespace NPCR
         void UpdateSlots();
 
     private:
-        float m_flUpdateStartTime;
-        float m_flLastUpdateTime;
+        double m_flUpdateStartTime;
+        double m_flUpdateSum;
 
-        float m_flUpdateSum;
         int m_iLastFrame;
 
         int m_iCurUpdateSlot;

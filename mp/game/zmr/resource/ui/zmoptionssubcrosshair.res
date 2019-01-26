@@ -163,7 +163,7 @@
 		"visible"		"1"
 		"enabled"		"1"
 		"tabPosition"		"0"
-		"labelText"		"Offset:"
+		"labelText"		"Offset/Size:"
 		"textAlignment"		"east"
 		"dulltext"		"0"
 		"brighttext"		"0"
@@ -332,7 +332,7 @@
 		"tabPosition"		"0"
 		"numTicks"		"0"
 		"rangeMin"		"0"
-		"rangeMax"		"50"
+		"rangeMax"		"60"
 	}
 	"BuildModeDialog"
 	{

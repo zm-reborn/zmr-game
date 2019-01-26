@@ -13,6 +13,9 @@
 #include "zmr/zmr_playerlocaldata.h"
 
 
+struct ZMFireBulletsInfo_t;
+class CZMPlayerAttackTraceFilter;
+
 class C_ZMRagdoll;
 class C_ZMBaseWeapon;
 
@@ -107,6 +110,10 @@ public:
     void                    UpdateAccuracyRatio();
     bool                    IsControllingZombie() const;
     void                    GetZMMovementVars( float& maxspd, float& accel, float& decel ) const;
+    virtual void            FireBullets( const FireBulletsInfo_t& info ) OVERRIDE;
+    void                    SimulateBullet( ZMFireBulletsInfo_t& bulletinfo );
+    bool                    HandleBulletPenetration( trace_t& tr, const ZMFireBulletsInfo_t& bulletinfo, Vector& vecNextSrc, float& flDistance );
+    bool                    HandleShotImpactingWater( const FireBulletsInfo_t& info, const Vector& vecEnd, CTraceFilter* pFilter );
 
     void SetMouseWheelMove( float dir );
 

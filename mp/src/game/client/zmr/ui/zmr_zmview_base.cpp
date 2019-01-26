@@ -9,8 +9,8 @@
 
 #include "zmr/npcs/zmr_zombiebase_shared.h"
 #include "zmr/c_zmr_util.h"
+#include "zmr/c_zmr_clientmode.h"
 #include "zmr_zmview_base.h"
-
 
 
 
@@ -76,6 +76,15 @@ CON_COMMAND( zm_observermode, "" )
         g_pZMView->SetVisible( state );
     }
 }
+
+CON_COMMAND( zm_hiddenspawn, "" )
+{
+    if ( g_pZMView )
+    {
+        g_pZMView->SetClickMode( ZMCLICKMODE_HIDDEN );
+    }
+}
+
 
 CZMViewBase::CZMViewBase( const char* pElementName ) : CHudElement( pElementName ), CZMFramePanel( g_pClientMode->GetViewport(), pElementName )
 {
@@ -436,9 +445,7 @@ void CZMViewBase::OnLeftRelease()
     ::input->GetFullscreenMousePos( &mx, &my );
 
     m_BoxSelect->SetEnd( mx, my );
-    
 
-    C_BasePlayer* pPlayer = C_BasePlayer::GetLocalPlayer();
 
     // If our box is too small then don't use it.
     if ( m_BoxSelect->ShouldSelect() )
@@ -447,11 +454,12 @@ void CZMViewBase::OnLeftRelease()
         m_BoxSelect->GetBox( &i, &j, &k, &l );
 
         
-        FindZombiesInBox( i, j, k, l, (pPlayer && pPlayer->m_nButtons & IN_DUCK) ? true : false );
+        
+        FindZombiesInBox( i, j, k, l, GetZMClientMode()->IsZMHoldingCtrl() );
     }
     else
     {
-        FindZMObject( mx, my, (pPlayer && pPlayer->m_nButtons & IN_DUCK) ? true : false );
+        FindZMObject( mx, my, GetZMClientMode()->IsZMHoldingCtrl() );
     }
 }
 

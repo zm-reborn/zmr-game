@@ -34,16 +34,22 @@ public:
 
 protected:
     CNetworkVar( int, m_iAmmoType );
+    CNetworkVar( int, m_nAmmo );
+    CNetworkVar( int, m_nMaxAmmo );
 };
 
 IMPLEMENT_CLIENTCLASS_DT( C_ZMAmmo, DT_ZM_Ammo, CZMAmmo )
     RecvPropInt( RECVINFO( m_iAmmoType ) ),
+    RecvPropInt( RECVINFO( m_nAmmo ), SPROP_UNSIGNED ),
+    RecvPropInt( RECVINFO( m_nMaxAmmo ), SPROP_UNSIGNED ),
 END_RECV_TABLE()
 
 
 C_ZMAmmo::C_ZMAmmo()
 {
     m_iAmmoType = -1;
+    m_nAmmo = 0;
+    m_nMaxAmmo = 0;
 }
 
 void C_ZMAmmo::Spawn()
@@ -77,7 +83,7 @@ void C_ZMAmmo::UpdateGlow()
     &&  pPlayer->IsHuman()
     &&  pPlayer->GetAbsOrigin().DistToSqr( GetAbsOrigin() ) < ITEM_GLOW_DIST_SQR
     &&  pPlayer->GetWeaponForAmmo( m_iAmmoType ) != nullptr
-    &&  pPlayer->GetAmmoCount( m_iAmmoType ) < (GetAmmoDef()->MaxCarry( m_iAmmoType ) * 0.8f) )
+    &&  pPlayer->GetAmmoCount( m_iAmmoType ) < GetAmmoDef()->MaxCarry( m_iAmmoType ) )
     {
         if ( !IsClientSideGlowEnabled() )
             SetClientSideGlowEnabled( true );

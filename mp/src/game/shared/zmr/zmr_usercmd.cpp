@@ -1,6 +1,9 @@
 #include "cbase.h"
 #ifdef GAME_DLL
 #include "ammodef.h"
+#include "bone_setup.h"
+
+#include <collisionutils.h>
 #endif
 
 
@@ -14,6 +17,10 @@
 
 
 static ConVar zm_sv_clientsidehitdetection( "zm_sv_clientsidehitdetection", "1", FCVAR_NOTIFY | FCVAR_ARCHIVE | FCVAR_REPLICATED );
+
+#ifdef GAME_DLL
+ConVar zm_sv_debug_clientsidehitdetec( "zm_sv_debug_clientsidehitdetec", "0" );
+#endif
 
 
 void ZMUserCmdHitData_t::Merge( const ZMUserCmdHitData_t& hit )
@@ -216,10 +223,17 @@ int CZMUserCmdSystem::ApplyDamage( CZMPlayer* pPlayer, const ZMServerWepData_t& 
 
         // Construct a pseudo FireBullets to let the entity handle all the damage scaling, etc.
         
+        // Copy the data back in case the validator updated anything.
+        nHits = data.nHits;
+        nHitsAccumulated = data.nAlreadyHit;
+        nEntitiesHitAccumulated = data.nEntitiesAlreadyHit;
+
+        Vector vecDefEnd = pEntity->WorldSpaceCenter();
 
         trace_t tr;
         tr.startpos = vecSrc;
-        tr.endpos = pEntity->WorldSpaceCenter();
+        tr.endpos = vecDefEnd;
+        tr.fraction = 1.0f; // We'll have to fraction it properly.
 
 
         Vector dir = tr.endpos - tr.startpos;
@@ -239,14 +253,42 @@ int CZMUserCmdSystem::ApplyDamage( CZMPlayer* pPlayer, const ZMServerWepData_t& 
             CalculateMeleeDamageForce( &dmg, dir, tr.endpos );
         }
 
+        bool bHasHitboxes = HasHitboxes( pEntity );
 
-        for ( int i = 0; i < cmddata.nHits; i++ )
+#ifdef _DEBUG
+        if ( !bHasHitboxes && zm_sv_debug_clientsidehitdetec.GetBool() )
+        {
+            DevMsg( "Usercmd victim has no hitboxes!\n" );
+        }
+#endif
+
+        int iLastHitGroup = -1;
+        for ( int i = 0; i < nHits; i++ )
         {
             // Entity needs hitgroups
             tr.hitgroup = cmddata.hitgroups[i];
 
 
+            // Compute the trace end if the hitgroup changes.
+            if ( bHasHitboxes && tr.hitgroup != iLastHitGroup )
+            {
+                tr.endpos = vecDefEnd;
+                ComputeTraceEnd( pEntity, tr );
+            }
+
+#ifdef _DEBUG
+            if ( zm_sv_debug_clientsidehitdetec.GetFloat() > 0.0f )
+            {
+                QAngle ang;
+                VectorAngles( tr.plane.normal, ang );
+                NDebugOverlay::Axis( tr.endpos, ang, 8.0f, true, zm_sv_debug_clientsidehitdetec.GetFloat() );
+            }
+#endif
+
+
             pEntity->DispatchTraceAttack( dmg, dir, &tr, nullptr );
+
+            iLastHitGroup = tr.hitgroup;
         }
 
         if ( g_MultiDamage.GetDamage() != 0.0f )
@@ -265,6 +307,106 @@ int CZMUserCmdSystem::ApplyDamage( CZMPlayer* pPlayer, const ZMServerWepData_t& 
     }
 
     return dealt.Count();
+}
+
+bool CZMUserCmdSystem::HasHitboxes( CBaseEntity* pVictim )
+{
+    // Does it have proper hitboxes with multiple hitgroups?
+
+    CBaseAnimating* pAnim = pVictim->GetBaseAnimating();
+    if ( !pAnim )
+        return false;
+
+    CStudioHdr* pHdr = pAnim->GetModelPtr();
+    if ( !pHdr )
+        return false;
+
+    mstudiohitboxset_t* set = pHdr->pHitboxSet( pAnim->GetHitboxSet() );
+    if ( !set || !set->numhitboxes )
+        return false;
+
+
+    int iHitGroup = -1;
+
+    for ( int i = 0; i < set->numhitboxes; i++ )
+    {
+        mstudiobbox_t* pBox = set->pHitbox( i );
+        if ( iHitGroup != -1 && pBox->group != iHitGroup )
+        {
+            return true;
+        }
+
+        iHitGroup = pBox->group;
+    }
+
+    return false;
+}
+
+bool CZMUserCmdSystem::ComputeTraceEnd( CBaseEntity* pVictim, trace_t& tr )
+{
+    // Compute where the trace could've ended based on the hitgroup.
+    // The victim may need that to figure out how much damage they receive.
+
+    CBaseAnimating* pAnim = pVictim->GetBaseAnimating();
+    if ( !pAnim )
+        return false;
+
+    CStudioHdr* pHdr = pAnim->GetModelPtr();
+    if ( !pHdr )
+        return false;
+
+    mstudiohitboxset_t* set = pHdr->pHitboxSet( pAnim->GetHitboxSet() );
+    if ( !set || !set->numhitboxes )
+        return false;
+
+
+    // The model will have multiple hitboxes with the same hitgroup but it's not a big deal, really.
+    int iHitGroup = tr.hitgroup;
+
+    for ( int i = 0; i < set->numhitboxes; i++ )
+    {
+        mstudiobbox_t* pBox = set->pHitbox( i );
+        if ( pBox->group != iHitGroup )
+            continue;
+        
+
+        // We found the bone with the same hitgroup, now compute the actual intersection.
+
+        int iBone = pBox->bone;
+        mstudiobone_t* pBone = pHdr->pBone( iBone );
+
+
+        tr.surface.flags = SURF_HITBOX;
+        tr.surface.surfaceProps = physprops->GetSurfaceIndex( pBone->pszSurfaceProp() );
+
+
+
+        matrix3x4_t* pMatrix = pAnim->GetBoneCache()->GetCachedBone( iBone );
+        if ( !pMatrix )
+            return false;
+
+
+        MatrixPosition( *pMatrix, tr.endpos );
+
+        // Center it
+        Vector boxextents;
+        for ( int j = 0; j < 3; j++ )
+            boxextents[j] = (pBox->bbmin[j] + pBox->bbmax[j]) * 0.5f;
+
+        VectorTransform( boxextents, *pMatrix, tr.endpos );
+
+
+        // Do the actual magic
+        //trace_t tempTrace;
+        //if ( IntersectRayWithBox( start, delta2, pBox->bbmin, pBox->bbmax, 0.0f, &tempTrace ) )
+        //{
+        //    tr.endpos = tempTrace.endpos;
+        //}
+
+        return true;
+    }
+    
+    return false;
 }
 #endif
 

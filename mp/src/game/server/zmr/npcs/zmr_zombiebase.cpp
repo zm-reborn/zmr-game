@@ -145,6 +145,8 @@ ConVar zm_sv_debug_shotgun_dmgmult( "zm_sv_debug_shotgun_dmgmult", "0" );
 
 ConVar zm_sv_zombiesoftcollisions( "zm_sv_zombiesoftcollisions", "1", FCVAR_NOTIFY, "Toggle experimental zombie collisions." );
 
+ConVar zm_sv_zombie_stepheight( "zm_sv_zombie_stepheight", "17", FCVAR_NOTIFY, "The default zombie step height." );
+
 
 extern ConVar zm_sk_default_hitmult_head;
 extern ConVar zm_sk_default_hitmult_head_buckshot;
@@ -194,6 +196,17 @@ END_SEND_TABLE()
 BEGIN_DATADESC( CZMBaseZombie )
     DEFINE_KEYFIELD( m_strModelGroup, FIELD_STRING, "modelgroup" ),
 END_DATADESC()
+
+
+CZMBaseZombieMotor::CZMBaseZombieMotor( CZMBaseZombie* pOuter ) : NPCR::CNonPlayerMotor( pOuter )
+{
+    
+}
+
+float CZMBaseZombieMotor::GetStepHeight() const
+{
+    return zm_sv_zombie_stepheight.GetFloat();
+}
 
 CZMBaseZombie::CZMBaseZombie()
 {
@@ -304,6 +317,11 @@ NPCR::CScheduleInterface* CZMBaseZombie::CreateScheduleInterface()
 NPCR::CBaseSenses* CZMBaseZombie::CreateSenses()
 {
     return new CZMZombieSenses( this );
+}
+
+NPCR::CNonPlayerMotor* CZMBaseZombie::CreateMotor()
+{
+    return new CZMBaseZombieMotor( this );
 }
 
 CZMZombieAnimState* CZMBaseZombie::CreateAnimState()
@@ -1194,7 +1212,40 @@ NPCR::CFollowNavPath* CZMBaseZombie::GetFollowPath() const
 
 NPCR::QueryResult_t CZMBaseZombie::ShouldTouch( CBaseEntity* pEnt ) const
 {
-    if ( pEnt->IsBaseZombie() )
+    // Fixes a few PARTICULAR maps that use this old terrible method of letting zombies pass through brushes.
+    // Here you go, Psycho.
+    if ( pEnt->IsBSPModel() )
+    {
+        auto* pFuncBrush = dynamic_cast<CFuncBrush*>( pEnt );
+
+
+        // Should we bother doing classname and name matching at all?
+        bool bShouldCheck = pFuncBrush ? (pFuncBrush->m_iszExcludedClass != NULL_STRING || pFuncBrush->m_bInvertExclusion) : false;
+
+
+        if ( pFuncBrush && bShouldCheck )
+        {
+            auto* pMe = const_cast<CZMBaseZombie*>( this );
+            
+
+            bool bMatches;
+
+            bool bClassMatch = pMe->ClassMatches( pFuncBrush->m_iszExcludedClass );
+            // Have a name? Try comparing that also.
+            bool bNameMatch = STRING( pMe->GetEntityName() )[0] != NULL && pMe->NameMatches( pFuncBrush->m_iszExcludedClass );
+            
+
+            bMatches = bClassMatch || bNameMatch;
+
+            if ( pFuncBrush->m_bInvertExclusion )
+            {
+                bMatches = !bMatches;
+            }
+
+            return bMatches ? NPCR::RES_NO : NPCR::RES_YES;
+        }
+    }
+    else if ( pEnt->IsBaseZombie() )
     {
         NPCR::CBaseNPC* pOther = pEnt->MyNPCRPointer();
 

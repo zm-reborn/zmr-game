@@ -59,7 +59,8 @@ namespace NPCR
         static Vector CalcJumpLaunchVelocity( const Vector& startPos, const Vector& endPos, float flGravity, float* pminHeight, float maxHorzVelocity, Vector* pvecApex );
         
     protected:
-        bool ShouldAdjustVelocity() const { return m_bAdjustVel; }
+        virtual bool ShouldAdjustVelocity() const { return m_bAdjustVel; }
+
         void UpdateMoving() { m_MoveTimer.Start( 0.2f ); }
         const Vector& GetGroundNormal() const { return m_vecGroundNormal; }
 

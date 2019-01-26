@@ -4,7 +4,6 @@
 
 #include "player_pickup.h"
 
-#include "ilagcompensationmanager.h"
 #include "predicted_viewmodel.h"
 #include "filesystem.h"
 #include "EntityFlame.h"
@@ -284,10 +283,18 @@ void CZMPlayer::PostThink()
 
     BaseClass::PostThink();
     
-    if ( GetFlags() & FL_DUCKING )
-    {
-        SetCollisionBounds( VEC_CROUCH_TRACE_MIN, VEC_CROUCH_TRACE_MAX );
-    }
+
+    // I have yet to see what the point of this is. (originates from HL2MP)
+    //
+    // This makes players die sooner from doors closing from top to bottom. (ie. compound, crocodile)
+    // Most likely also the culprit for getting players stuck on each other's head when the bottom one is crouching.
+    //
+    // But it was causing prediction errors so fuck it. It's bullshit.
+
+    //if ( GetFlags() & FL_DUCKING )
+    //{
+    //    SetCollisionBounds( VEC_CROUCH_TRACE_MIN, VEC_CROUCH_TRACE_MAX );
+    //}
 
 
     QAngle angles = GetLocalAngles();
@@ -1054,35 +1061,6 @@ void CZMPlayer::CreateRagdollEntity()
     m_hRagdoll.Set( pRagdoll );
 }
 
-void CZMPlayer::FireBullets( const FireBulletsInfo_t& info )
-{
-    // Make sure we don't lag compensate twice.
-    // This is called recursively from HandleShotImpactingGlass.
-    if ( !m_bIsFireBulletsRecursive )
-    {
-        // Move ents back to history positions based on local player's lag
-        lagcompensation->StartLagCompensation( this, this->GetCurrentCommand() );
-
-
-        NoteWeaponFired();
-        
-
-        m_bIsFireBulletsRecursive = true;
-        CBaseEntity::FireBullets( info );
-        m_bIsFireBulletsRecursive = false;
-
-
-        // Move ents back to their original positions.
-        lagcompensation->FinishLagCompensation( this );
-    }
-    else
-    {
-        DevMsg( "Called FireBullets recursively!\n" );
-
-        CBaseEntity::FireBullets( info );
-    }
-}
-
 extern ConVar sv_maxunlag;
 
 bool CZMPlayer::WantsLagCompensationOnNPC( const CZMBaseZombie* pZombie, const CUserCmd* pCmd, const CBitVec<MAX_EDICTS>* pEntityTransmitBits ) const
@@ -1325,7 +1303,7 @@ void CZMPlayer::CreateViewModel( int index )
     }
 
 
-    CBaseViewModel* vm = static_cast<CBaseViewModel*>( CreateEntityByName( "predicted_viewmodel" ) );
+    CZMViewModel* vm = static_cast<CZMViewModel*>( CreateEntityByName( "zm_viewmodel" ) );
     
     if ( vm )
     {

@@ -81,8 +81,11 @@ mp/game/zmr/download/*
 mp/game/zmr/downloadlists/
 *.ain
 *.csv
-mp/game/zmr/resource/zmtips_used.txt
+mp/game/zmr/resource/zmtips_hudtips_used.txt
+mp/game/zmr/resource/zmtips_loadingscreen_used.txt
 mp/game/zmr/resource/zmcrosshairs.txt
+keys_survivor.cfg
+keys_zm.cfg
 # Tool (vbsp/vvis/vrad) compilation output
 *.dll
 *.exe

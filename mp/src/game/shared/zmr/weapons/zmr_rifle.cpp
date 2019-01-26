@@ -60,6 +60,7 @@ public:
     virtual float GetAccuracyIncreaseRate() const OVERRIDE { return 6.7f; }
     virtual float GetAccuracyDecreaseRate() const OVERRIDE { return 2.1f; }
     
+    virtual int GetMaxPenetrations() const OVERRIDE { return 4; }
 
 
     virtual void AddViewKick( void ) OVERRIDE
@@ -83,12 +84,13 @@ public:
 
     virtual bool Holster( CBaseCombatWeapon* pSwitchTo = nullptr ) OVERRIDE;
     virtual void Drop( const Vector& ) OVERRIDE;
+    virtual void ItemBusyFrame() OVERRIDE;
     virtual void ItemPostFrame( void ) OVERRIDE;
 
 
-    virtual Activity GetReloadStartAct() OVERRIDE { return ACT_RIFLE_RELOAD_START; }
-    virtual Activity GetReloadEndAct() OVERRIDE { return ACT_RIFLE_RELOAD_FINISH; }
-    virtual Activity GetPumpAct() OVERRIDE { return ACT_RIFLE_LEVER; }
+    virtual Activity GetReloadStartAct() OVERRIDE { return ACT_VM_RELOAD_START; }
+    virtual Activity GetReloadEndAct() OVERRIDE { return ACT_VM_RELOAD_FINISH; }
+    virtual Activity GetPumpAct() OVERRIDE { return ACT_SHOTGUN_PUMP; }
 
     inline bool IsZoomed() { return m_bInZoom; }
     void CheckToggleZoom();
@@ -163,6 +165,13 @@ CZMWeaponRifle::~CZMWeaponRifle()
     CheckUnZoom();
 }
 
+void CZMWeaponRifle::ItemBusyFrame()
+{
+    CheckToggleZoom();
+
+    BaseClass::ItemBusyFrame();
+}
+
 void CZMWeaponRifle::ItemPostFrame( void )
 {
     CheckToggleZoom();
@@ -205,15 +214,16 @@ void CZMWeaponRifle::UnZoom( CZMPlayer* pPlayer )
 
 void CZMWeaponRifle::CheckUnZoom()
 {
-    CZMPlayer* pPlayer = GetPlayerOwner();
-    if ( !pPlayer ) return;
-
-
-    if ( IsZoomed() )
-    {
-        pPlayer->SetFOV( this, 0, 0.2f );
-
+    // We always need to unzoom here even when we don't have a player holding us.
+    bool bWasZoomed = IsZoomed();
+    if ( bWasZoomed )
         m_bInZoom = false;
+
+
+    CZMPlayer* pPlayer = GetPlayerOwner();
+    if ( pPlayer && bWasZoomed )
+    {
+        UnZoom( pPlayer );
     }
 }
 

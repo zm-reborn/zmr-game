@@ -575,7 +575,9 @@ const char *MapEntity_ParseEntity(CBaseEntity *&pEntity, const char *pEntData, I
 		}
 		else
 		{
+#ifndef ZMR // ZMRCHANGE: Shut up.
 			Warning("Can't init %s\n", className);
+#endif
 		}
 	}
 	else

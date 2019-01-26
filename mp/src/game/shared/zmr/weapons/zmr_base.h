@@ -46,10 +46,20 @@ public:
 #else
     virtual void Precache() OVERRIDE;
 #endif
+
+    virtual void ItemPostFrame() OVERRIDE;
+
+    virtual Activity GetPrimaryAttackActivity() OVERRIDE;
+    //virtual Activity GetSecondaryAttackActivity() OVERRIDE;
+    virtual Activity GetDrawActivity() OVERRIDE;
+    virtual void WeaponIdle() OVERRIDE;
+
+    bool DefaultReload( int iClipSize1, int iClipSize2, int iActivity );
+    virtual	void CheckReload( void ) OVERRIDE;
     virtual bool Reload() OVERRIDE;
     // NOTE: Always use this to get the damage from .txt file.
     virtual void FireBullets( const FireBulletsInfo_t &info ) OVERRIDE;
-    virtual void FireBullets( int numShots, int iAmmoType );
+    virtual void FireBullets( int numShots, int iAmmoType, float flMaxDist );
     virtual void PrimaryAttack() OVERRIDE;
     virtual void Shoot();
     virtual void PrimaryAttackEffects();
@@ -70,6 +80,8 @@ public:
     virtual bool    GlowOccluded() OVERRIDE { return false; };
     virtual bool    GlowUnoccluded() OVERRIDE { return true; };
 
+
+    virtual ShadowType_t ShadowCastType() OVERRIDE;
 
     virtual void OnDataChanged( DataUpdateType_t ) OVERRIDE;
     virtual bool ShouldPredict() OVERRIDE;
@@ -132,10 +144,22 @@ public:
     virtual bool    IsInReload() const { return const_cast<CZMBaseWeapon*>( this )->CanReload() && m_bInReload; }
     virtual bool    CanAct() const; // Can we reload/attack?
 
+    virtual void IncrementClip();
+    virtual bool ShouldIncrementClip() const;
+    virtual void CancelReload();
+    virtual bool ShouldCancelReload() const { return false; }
+
+    // We have animations for when the gun is empty?
+    virtual bool UsesDryActivity( Activity act );
+
 
     // ZMRTODO: Use config to load these.
     virtual float   GetAccuracyIncreaseRate() const { return 2.0f; }
     virtual float   GetAccuracyDecreaseRate() const { return 2.0f; }
+
+    virtual float   GetPenetrationDmgMult() const { return 1.0f; }
+    virtual int     GetMaxPenetrations() const { return 0; }
+    virtual float   GetMaxPenetrationDist() const { return 16.0f; }
 
     float           GetFirstInstanceOfAnimEventTime( int iSeq, int iAnimEvent ) const;
 
@@ -164,6 +188,7 @@ protected:
     // Client side hit reg stuff
     virtual float GetMaxDamageDist( ZMUserCmdValidData_t& data ) const OVERRIDE;
     virtual int GetMaxUserCmdBullets( ZMUserCmdValidData_t& data ) const OVERRIDE;
+    virtual int GetMaxNumPenetrate( ZMUserCmdValidData_t& data ) const OVERRIDE;
 
 
     inline int GetOverrideDamage() const { return m_nOverrideDamage; }
@@ -180,6 +205,9 @@ private:
     int             m_nOverrideDamage;
 #endif
     CNetworkVar( int, m_nOverrideClip1 );
+
+
+    CNetworkVar( float, m_flNextClipFillTime );
 };
 
 inline CZMBaseWeapon* ToZMBaseWeapon( CBaseEntity* pEnt )

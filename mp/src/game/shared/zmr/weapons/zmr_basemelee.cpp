@@ -417,6 +417,14 @@ void CZMBaseMeleeWeapon::ImpactEffect( trace_t& traceHit )
         UTIL_ImpactTrace( &traceHit, DMG_CLUB );
 }
 
+#ifdef GAME_DLL
+float CZMBaseMeleeWeapon::GetMaxDamageDist( ZMUserCmdValidData_t& data ) const
+{
+    // Give them some leeway in case they're laggy.
+    return GetRange() * 2.0f;
+}
+#endif
+
 #ifndef CLIENT_DLL
 void CZMBaseMeleeWeapon::Operator_HandleAnimEvent( animevent_t* pEvent, CBaseCombatCharacter* pOperator )
 {

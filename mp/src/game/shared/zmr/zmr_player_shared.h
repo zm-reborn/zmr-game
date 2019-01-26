@@ -15,6 +15,11 @@
 #endif
 
 
+#include "shot_manipulator.h"
+
+
+struct ZMFireBulletsInfo_t;
+
 class CZMPlayerAttackTraceFilter : public CTraceFilter
 {
 public:
@@ -22,7 +27,18 @@ public:
 
     virtual bool ShouldHitEntity( IHandleEntity* pHandleEntity, int contentsMask ) OVERRIDE;
 
+
+    int     AddToIgnoreList( CBaseEntity* pIgnore );
+    bool    RemoveFromIgnoreList( CBaseEntity* pIgnore );
+    void    ClearIgnoreList();
+
+    int     GetPenetrations() const { return m_nPenetrations; }
+    void    ClearPenetrations() { m_nPenetrations = 0; }
+
 private:
     CBaseEntity* m_pAttacker;
-    CBaseEntity* m_pIgnore;
+
+    CUtlVector<CBaseEntity*> m_vIgnore;
+
+    int m_nPenetrations;
 };

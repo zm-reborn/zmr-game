@@ -1,5 +1,5 @@
 #include "cbase.h"
-#include "clientmode_shared.h"
+
 #include "ienginevgui.h"
 #include "hud.h"
 #include "in_buttons.h"
@@ -11,6 +11,8 @@
 #include "c_zmr_zmvision.h"
 #include "c_zmr_util.h"
 #include "c_zmr_player.h"
+#include "c_zmr_zmkeys.h"
+#include "c_zmr_clientmode.h"
 
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -38,29 +40,6 @@ CZMViewBase* GetZMView()
 }
 
 
-
-using namespace vgui;
-
-class ClientModeZMNormal : public ClientModeShared
-{
-public:
-    DECLARE_CLASS( ClientModeZMNormal, ClientModeShared );
-
-    ClientModeZMNormal();
-    ~ClientModeZMNormal();
-
-    virtual void Init() OVERRIDE;
-
-    virtual bool DoPostScreenSpaceEffects( const CViewSetup* pSetup ) OVERRIDE;
-    virtual void PostRender() OVERRIDE;
-
-    virtual int KeyInput( int down, ButtonCode_t keynum, const char* pszCurrentBinding );
-
-private:
-    int ZMKeyInput( int down, ButtonCode_t keynum, const char* pszCurrentBinding );
-};
-
-
 // Instance the singleton and expose the interface to it.
 IClientMode *GetClientModeNormal()
 {
@@ -68,7 +47,25 @@ IClientMode *GetClientModeNormal()
     return &g_ClientModeNormal;
 }
 
+ClientModeZMNormal* GetZMClientMode()
+{
+    return static_cast<ClientModeZMNormal*>( GetClientModeNormal() );
+}
 
+
+static void IN_ZM_Cmd_Control( const CCommand& args )
+{
+    bool state = ( args.Arg( 0 )[0] == '+' ) ? true : false;
+
+    GetZMClientMode()->SetZMHoldingCtrl( state );
+}
+ConCommand zm_cmd_ctrl_up( "+zm_cmd_ctrl", IN_ZM_Cmd_Control );
+ConCommand zm_cmd_ctrl_down( "-zm_cmd_ctrl", IN_ZM_Cmd_Control );
+
+
+
+
+//
 bool ClientModeZMNormal::DoPostScreenSpaceEffects( const CViewSetup* pSetup )
 {
     // Makes sure we don't redraw character circles here.
@@ -168,11 +165,12 @@ int ClientModeZMNormal::ZMKeyInput( int down, ButtonCode_t keynum, const char* p
     C_ZMPlayer* pPlayer = C_ZMPlayer::GetLocalPlayer();
 
 
+
     // Group select
     if ( down && keynum >= KEY_0 && keynum <= KEY_9 )
     {
         int group = keynum - KEY_0;
-        if ( pPlayer->m_nButtons & IN_DUCK )
+        if ( IsZMHoldingCtrl() )
         {
             ZMClientUtil::SetSelectedGroup( group );
         }
@@ -192,10 +190,11 @@ int ClientModeZMNormal::ZMKeyInput( int down, ButtonCode_t keynum, const char* p
 
     return -1;
 }
+//
 
-//-----------------------------------------------------------------------------
-// Purpose: this is the viewport that contains all the hud elements
-//-----------------------------------------------------------------------------
+
+
+
 class CZMViewport : public CBaseViewport
 {
 public:
@@ -211,9 +210,12 @@ public:
         SetPaintBackgroundEnabled( false );
     }
 
-    virtual IViewPortPanel* CreatePanelByName( const char *szPanelName ) OVERRIDE;
+    virtual IViewPortPanel* CreatePanelByName( const char* szPanelName ) OVERRIDE;
 };
 
+using namespace vgui;
+
+//
 IViewPortPanel* CZMViewport::CreatePanelByName( const char* szPanelName )
 {
     IViewPortPanel* newpanel = nullptr;
@@ -269,3 +271,4 @@ void ClientModeZMNormal::Init()
         g_pZMView = pView;
     }
 }
+//

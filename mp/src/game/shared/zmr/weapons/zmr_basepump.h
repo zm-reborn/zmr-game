@@ -33,13 +33,14 @@ public:
     virtual void StopReload();
     virtual void FinishReload( void ) OVERRIDE;
 
-    virtual Activity GetReloadStartAct() { return ACT_VM_RELOAD_START;}
+    virtual Activity GetReloadStartAct() { return ACT_VM_RELOAD_START; }
     virtual Activity GetReloadEndAct() { return ACT_VM_RELOAD_FINISH; }
     virtual Activity GetPumpAct() { return ACT_SHOTGUN_PUMP; }
     virtual void StartReload( void );
     virtual void Pump();
 
-    virtual bool ShouldCancelReload() const;
+    virtual void CancelReload() OVERRIDE;
+    virtual bool ShouldCancelReload() const OVERRIDE;
 
     virtual bool CanPickupAmmo() const OVERRIDE { return !IsInReload(); }
     virtual bool IsInReload() const OVERRIDE;

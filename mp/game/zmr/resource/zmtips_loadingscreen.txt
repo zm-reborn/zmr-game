@@ -1,0 +1,58 @@
+"Tips"
+{
+	"intro"
+	{
+		"msg"			""
+		"time"			"15"
+		"limit"			"2"
+	}
+	"f1menu"
+	{
+		"msg"			"#ZMTipObjectives1"
+		"time"			"10"
+		"limit"			"5"
+		
+		"param1"		"key@zm_showmaptext"
+	}
+	"sharing"
+	{
+		"msg"			"#ZMTipAmmo1"
+		"time"			"15"
+		"limit"			"5"
+		
+		"param1"		"key@dropweapon"
+	}
+	"flashlight"
+	{
+		"msg"			"#ZMTipFlashlight"
+		"time"			"15"
+		"limit"			"3"
+	}
+	"zombietypes"
+	{
+		"msg"			"#ZMTipZombieTypes"
+		"time"			"15"
+		"limit"			"3"
+	}
+	"meme1"
+	{
+		"msg"			"#ZMTipMeme1"
+		"time"			"15"
+		"limit"			"1"
+		"random"		"1"
+	}
+	"meme2"
+	{
+		"msg"			"#ZMTipMeme2"
+		"time"			"15"
+		"limit"			"1"
+		"random"		"1"
+	}
+	"meme3"
+	{
+		"msg"			"#ZMTipMeme3"
+		"time"			"15"
+		"limit"			"1"
+		"random"		"1"
+	}
+}

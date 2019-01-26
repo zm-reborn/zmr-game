@@ -13,23 +13,28 @@
 // NOTE: We have to use string tables because of how the info panel parses the file.
 // If you don't use this method, it will assume it's just a file and not parse it as HTML if necessary.
 
-#define OBJ_MAX_FILE_SIZE           ( 4 * 1024 )
-
-#define OBJ_STRINGTABLE_ENTRY       "mapinfo"
 
 
 extern INetworkStringTable* g_pStringTableInfoPanel;
 
+const char* ZMLegacyObjPanel::GetString()
+{
+    if ( !g_pStringTableInfoPanel )
+        return nullptr;
+
+
+    int index = g_pStringTableInfoPanel->FindStringIndex( ZM_OBJ_STRINGTABLE_ENTRY );
+
+    if ( index == INVALID_STRING_INDEX )
+        return nullptr;
+
+
+    return g_pStringTableInfoPanel->GetString( index );
+}
+
 bool ZMLegacyObjPanel::ObjectivesExist()
 {
-    if ( !g_pStringTableInfoPanel ) return false;
-
-
-    int index = g_pStringTableInfoPanel->FindStringIndex( OBJ_STRINGTABLE_ENTRY );
-
-    if ( index == INVALID_STRING_INDEX ) return false;
-
-    const char* sz = g_pStringTableInfoPanel->GetString( index );
+    const char* sz = GetString();
     if ( !sz || !*sz ) return false;
 
 
@@ -41,7 +46,7 @@ void ZMLegacyObjPanel::ResetObjectives()
     if ( !g_pStringTableInfoPanel ) return;
 
 
-    int index = g_pStringTableInfoPanel->FindStringIndex( OBJ_STRINGTABLE_ENTRY );
+    int index = g_pStringTableInfoPanel->FindStringIndex( ZM_OBJ_STRINGTABLE_ENTRY );
 
     if ( index == INVALID_STRING_INDEX ) return;
 
@@ -49,59 +54,87 @@ void ZMLegacyObjPanel::ResetObjectives()
     g_pStringTableInfoPanel->SetStringUserData( index, 0, nullptr );
 }
 
-bool ZMLegacyObjPanel::LoadObjectivesFromFile()
+bool ZMLegacyObjPanel::SaveToStringTable( const char* mapname )
 {
     if ( !g_pStringTableInfoPanel ) return false;
 
 
-    // Will return path to map.
-    char szPath[256];
-    Q_strncpy( szPath, engine->GetLevelName(), sizeof( szPath ) );
+    char* buffer = new char[ZM_OBJ_MAX_SIZE];
+    if ( !LoadObjectivesFromFile( mapname, buffer, ZM_OBJ_MAX_SIZE ) )
+    {
+        delete[] buffer;
+        return false;
+    }
+
+
+
+    int size = Q_strlen( buffer ) + 1;
+
+    g_pStringTableInfoPanel->AddString( false, ZM_OBJ_STRINGTABLE_ENTRY, size, buffer );
+    delete[] buffer;
+
+    return true;
+}
+
+bool ZMLegacyObjPanel::LoadObjectivesFromFile( const char* mapname, char* buffer, int len )
+{
+    char* c, *c2, *k;
+    char fixedname[128];
+    char path[256];
+
+    // Find the last forward or back slash and copy starting from there
+    c = nullptr;
+    k = (char*)mapname;
+    while ( (k = strchr( k, '/' )) != nullptr ) { c = k; ++k; }
+    c2 = nullptr;
+    k = (char*)mapname;
+    while ( (k = strchr( k, '\\' )) != nullptr ) { c2 = k; ++k; }
+
+    if ( c ) mapname = c + 1;
+    if ( c2 && c2 >= mapname ) mapname = c2 + 1;
+
+
+    Q_strncpy( fixedname, mapname, sizeof( fixedname ) );
 
     // Find the last dot & remove the .bsp
-    char* c = nullptr;
-    char* k = szPath;
+    c = nullptr;
+    k = fixedname;
     while ( (k = strchr( k, '.' )) != nullptr ) { c = k; ++k; }
 
-    if ( c ) *c = 0;
+    if ( c ) *c = NULL;
 
 
-    Q_snprintf( szPath, sizeof( szPath ), "%s.txt", szPath );
+    Q_snprintf( path, sizeof( path ), "maps/%s.txt", fixedname );
 
-    int len = filesystem->Size( szPath, "GAME" );
+    int flen = filesystem->Size( path, "GAME" );
 
-    if ( len <= 0 )
+    if ( flen <= 0 )
     {
-        DevMsg( "No map info in '%s'!\n", szPath );
+        DevMsg( "No map info in '%s'!\n", path );
         return false;
     }
 
-    if ( len >= OBJ_MAX_FILE_SIZE )
+    if ( flen >= len )
     {
-        Warning( "Map info '%s' exceeds maximum size (%i)!\n", szPath, OBJ_MAX_FILE_SIZE );
+        Warning( "Map info '%s' exceeds maximum size (%i)!\n", path, len );
         return false;
     }
 
 
-    FileHandle_t file = filesystem->Open( szPath, "rb", "GAME" );
+    FileHandle_t file = filesystem->Open( path, "rb", "GAME" );
 
     if ( file == FILESYSTEM_INVALID_HANDLE )
     {
-        DevMsg( "Couldn't open map info '%s' for read!\n", szPath );
+        DevMsg( "Couldn't open map info '%s' for read!\n", path );
         return false;
     }
 
 
-    char* szBuffer = new char[len + 1];
 
-    filesystem->Read( szBuffer, len, file );
+    filesystem->Read( buffer, flen, file );
     filesystem->Close( file );
 
-    szBuffer[len] = 0;
-
-    g_pStringTableInfoPanel->AddString( false, OBJ_STRINGTABLE_ENTRY, len + 1, szBuffer );
-
-    delete[] szBuffer;
+    buffer[flen] = NULL;
 
     return true;
 }
@@ -110,7 +143,7 @@ void ZMLegacyObjPanel::ShowPanel()
 {
     if ( !ObjectivesExist() )
     {
-        if ( !LoadObjectivesFromFile() )
+        if ( !SaveToStringTable( engine->GetLevelName() ) )
             return;
     }
 
@@ -127,7 +160,7 @@ void ZMLegacyObjPanel::ShowPanel()
     KeyValues* kv = new KeyValues( "I hope nobody will read this... MEMES ARE FUNNY" );
 
     kv->SetString( "title", "Objectives" );
-    kv->SetString( "msg", OBJ_STRINGTABLE_ENTRY );
+    kv->SetString( "msg", ZM_OBJ_STRINGTABLE_ENTRY );
     kv->SetInt( "type", 1 ); // We're an index to a string table.
 
 

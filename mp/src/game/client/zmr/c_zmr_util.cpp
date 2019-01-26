@@ -10,6 +10,7 @@
 #include "zmr/ui/zmr_hud_tooltips.h"
 
 #include "zmr/zmr_global_shared.h"
+#include "c_zmr_tips.h"
 #include "c_zmr_util.h"
 
 
@@ -84,10 +85,7 @@ void ZMClientUtil::QueueTooltip( const char* name, float delay )
 
     if ( tips )
     {
-        CZMTip* tip = tips->FindMessageByName( name );
-
-        if ( tip )
-            tips->QueueTip( tip, delay );
+        tips->QueueTip( name, delay );
     }
 }
 

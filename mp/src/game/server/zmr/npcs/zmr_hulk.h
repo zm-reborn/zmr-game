@@ -4,10 +4,10 @@
 
 #include "zmr_zombiebase.h"
 
-class CZMHulkMotor : public NPCR::CNonPlayerMotor
+class CZMHulkMotor : public CZMBaseZombieMotor
 {
 public:
-    CZMHulkMotor( CZMBaseZombie* pOuter ) : NPCR::CNonPlayerMotor( pOuter )
+    CZMHulkMotor( CZMBaseZombie* pOuter ) : CZMBaseZombieMotor( pOuter )
     {
     }
 
@@ -51,4 +51,8 @@ public:
     virtual float IdleSound() OVERRIDE;
     virtual void AlertSound() OVERRIDE;
     virtual void DeathSound() OVERRIDE;
+
+
+    // Shared
+    virtual bool    CanBePenetrated() const OVERRIDE;
 };

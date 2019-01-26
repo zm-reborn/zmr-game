@@ -227,6 +227,16 @@ void CZMImmolator::HandleAnimEvent( animevent_t* pEvent )
     BaseClass::HandleAnimEvent( pEvent );
 }
 
+bool CZMImmolator::ScaleDamageByHitgroup( int iHitGroup, CTakeDamageInfo& info ) const
+{
+    //if ( iHitGroup == HITGROUP_HEAD )
+    //{
+    //    return BaseClass::ScaleDamageByHitgroup( iHitGroup, info );
+    //}
+
+    return false;
+}
+
 bool CZMImmolator::ShouldPlayIdleSound() const
 {
     /*

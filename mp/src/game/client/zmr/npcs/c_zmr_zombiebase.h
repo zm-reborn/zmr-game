@@ -77,6 +77,8 @@ public:
     virtual int             GetAnimationRandomSeed() OVERRIDE;
     bool                    IsPlayerControlled() const;
     int                     GetControllerIndex() const;
+    virtual bool            CanBePenetrated() const;
+
 protected:
     void                    SetZombieClass( ZombieClass_t zclass );
 

@@ -27,6 +27,8 @@ public:
     CZMBuildMenuNew( vgui::Panel* pParent );
     ~CZMBuildMenuNew();
 
+    virtual void Paint() OVERRIDE;
+
     virtual void ShowPanel( bool state ) OVERRIDE;
 	virtual void OnThink() OVERRIDE;
 
