@@ -1,0 +1,25 @@
+"VertexLitGeneric"
+
+{
+	"$basetexture" 	"models/weapons/sporting/engravheight"
+	$translucent 	1
+	
+	"$bumpmap" "models\weapons\sporting\engrav2_normspec225512"
+	"$normalmapalphaenvmapmask" "1"
+	"$envmap" "env_cubemap"
+
+	"$envmaptint" "[0.13 0.13 0.13]"
+
+	//$fresnelreflection 1
+
+	"$halflambert" "1"
+	"$model" 1
+
+	$phong 1
+	$phongexponenttexture models\weapons\sporting\engrav2_normspec225512
+	$phongboost	1
+	$phongfresnelranges	"[.03 0.05 0.1]"
+	$phongexponentfactor 15
+
+
+}

@@ -36,6 +36,7 @@ ItemBaseData_t const CZMMapItemSystem::m_vItemData[] =
 {
     // Weapons
     ITEMDATA( weapon_zm_shotgun, CLASS_WEAPON|CLASS_SHOTGUN|CLASS_PRIMARY ),
+    ITEMDATA( weapon_zm_shotgun_sporting, CLASS_WEAPON|CLASS_SHOTGUN|CLASS_PRIMARY ),
     ITEMDATA( weapon_zm_mac10, CLASS_WEAPON|CLASS_PRIMARY|CLASS_SMG ),
     ITEMDATA( weapon_zm_rifle, CLASS_WEAPON|CLASS_PRIMARY|CLASS_RIFLE ),
     ITEMDATA( weapon_zm_pistol, CLASS_WEAPON|CLASS_PISTOL|CLASS_SECONDARY ),
