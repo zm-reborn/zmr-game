@@ -46,7 +46,6 @@ public:
 
     virtual void VPhysicsUpdate( IPhysicsObject* pPhys ) OVERRIDE;
     virtual void PerformCustomPhysics( Vector* pNewPosition, Vector* pNewVelocity, QAngle* pNewAngles, QAngle* pNewAngVelocity ) OVERRIDE;
-    virtual void VPhysicsCollision( int index, gamevcollisionevent_t *pEvent ) OVERRIDE;
 
 
     virtual void HandleAnimEvent( animevent_t* pEvent ) OVERRIDE;
