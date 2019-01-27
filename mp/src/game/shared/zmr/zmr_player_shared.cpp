@@ -43,6 +43,8 @@ extern ConVar zm_sv_resource_max;
 
 ConVar zm_sv_bulletspassplayers( "zm_sv_bulletspassplayers", "1", FCVAR_NOTIFY | FCVAR_ARCHIVE | FCVAR_REPLICATED, "Do bullets players shoot pass through other players?" );
 
+ConVar zm_sv_bulletpenetration( "zm_sv_bulletpenetration", "2", FCVAR_NOTIFY | FCVAR_ARCHIVE | FCVAR_REPLICATED, "0 = No penetration, 1 = Only zombies, 2 = Zombies and world" );
+
 ConVar zm_sv_debug_penetration( "zm_sv_debug_penetration", "0", FCVAR_REPLICATED | FCVAR_CHEAT );
 
 
@@ -804,6 +806,10 @@ void CZMPlayer::SimulateBullet( ZMFireBulletsInfo_t& bulletinfo )
 
 bool CZMPlayer::HandleBulletPenetration( trace_t& tr, const ZMFireBulletsInfo_t& bulletinfo, Vector& vecNextSrc, float& flDistance )
 {
+    if ( !zm_sv_bulletpenetration.GetBool() )
+        return false;
+
+
     // Make sure we are inside/outside the volume by nudging the trace forward/back.
     const float epsilon = 0.1f;
 
@@ -829,7 +835,7 @@ bool CZMPlayer::HandleBulletPenetration( trace_t& tr, const ZMFireBulletsInfo_t&
         // Only penetrate through the world
         // There may be maps that rely on things NOT being penetrable
         //
-        if ( tr.m_pEnt->IsWorld() )
+        if ( tr.m_pEnt->IsWorld() && zm_sv_bulletpenetration.GetInt() >= 2 )
         {
             if ( tr.surface.flags & (SURF_SKY|SURF_SKY2D|SURF_NODRAW) )
             {
