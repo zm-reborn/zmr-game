@@ -91,6 +91,7 @@ void NPCR::CNonPlayerMotor::Move()
         {
             // Woah, vector projection.
             Vector left( -veldir.y, veldir.x, 0.0f );
+            left.NormalizeInPlace();
             Vector movedir = CrossProduct( left, GetGroundNormal() );
 
             m_vecVelocity = movedir * m_vecVelocity.Dot( movedir );
