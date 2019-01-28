@@ -148,7 +148,8 @@ public:
     virtual void IncrementClip();
     virtual bool ShouldIncrementClip() const;
     virtual void CancelReload();
-    virtual bool ShouldCancelReload() const { return false; }
+    virtual bool ShouldCancelReload() const;
+    virtual void StopReload();
 
     // We have animations for when the gun is empty?
     virtual bool UsesDryActivity( Activity act );
