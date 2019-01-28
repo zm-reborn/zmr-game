@@ -30,7 +30,6 @@ public:
     virtual	void CheckReload( void ) OVERRIDE;
     virtual bool Reload( void ) OVERRIDE;
     virtual void ItemPostFrame( void ) OVERRIDE;
-    virtual void StopReload();
     virtual void FinishReload( void ) OVERRIDE;
 
     virtual Activity GetReloadStartAct() { return ACT_VM_RELOAD_START; }
@@ -39,6 +38,7 @@ public:
     virtual void StartReload( void );
     virtual void Pump();
 
+    virtual void StopReload() OVERRIDE;
     virtual void CancelReload() OVERRIDE;
     virtual bool ShouldCancelReload() const OVERRIDE;
 

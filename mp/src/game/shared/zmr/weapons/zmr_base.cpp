@@ -271,25 +271,40 @@ void CZMBaseWeapon::CheckReload()
         {
             if ( m_bReloadsSingly && m_iClip1 < GetMaxClip1() )
             {
-                if ( !Reload() )
-                    m_bInReload = false;
+                Reload();
             }
             else
             {
-                m_bInReload = false;
+                StopReload();
             }
         }
     }
 }
 
+bool CZMBaseWeapon::ShouldCancelReload() const
+{
+    CZMPlayer* pOwner = GetPlayerOwner();
+    if  ( !pOwner )
+        return false;
+
+    return pOwner->GetAmmoCount( m_iPrimaryAmmoType ) <= 0;
+}
+
 void CZMBaseWeapon::CancelReload()
 {
+    SendWeaponAnim( ACT_VM_IDLE );
+
     m_bInReload = false;
 
     // Make sure we don't attack instantly when stopping the reload.
     // Add a bit more time.
-    m_flNextPrimaryAttack += 0.1f;
-    m_flNextSecondaryAttack += 0.1f;
+    m_flNextPrimaryAttack = gpGlobals->curtime + 0.2f;
+    m_flNextSecondaryAttack = m_flNextPrimaryAttack;
+}
+
+void CZMBaseWeapon::StopReload()
+{
+    m_bInReload = false;
 }
 
 bool CZMBaseWeapon::ShouldIncrementClip() const
@@ -473,7 +488,7 @@ void CZMBaseWeapon::PrimaryAttack( void )
     }
 
 
-    m_flNextPrimaryAttack = m_flNextPrimaryAttack + GetFireRate();
+    m_flNextPrimaryAttack = gpGlobals->curtime + GetFireRate();
     Shoot();
 }
 
