@@ -19,8 +19,8 @@ WeaponData
 
 	"weight"				"4"
 	"item_flags"			"0"
-	// Was 6
-	"damage"			"8" // Previously damage was 9. This was when buckshot damage was scaled by 0.625 .
+	// Was 6 (8)
+	"damage"			"9" // Previously damage was 9. This was when buckshot damage was scaled by 0.625 .
 
 	// Sounds for the weapon. There is a max of 16 sounds per category (i.e. max 16 "single_shot" sounds)
 	SoundData
