@@ -49,9 +49,14 @@ public:
 
     virtual void ItemPostFrame() OVERRIDE;
 
+    virtual bool Deploy() OVERRIDE;
+    virtual bool DefaultDeploy();
+
     virtual Activity GetPrimaryAttackActivity() OVERRIDE;
     //virtual Activity GetSecondaryAttackActivity() OVERRIDE;
     virtual Activity GetDrawActivity() OVERRIDE;
+    virtual Activity GetIdleActivity() const;
+
     virtual void WeaponIdle() OVERRIDE;
 
     bool DefaultReload( int iClipSize1, int iClipSize2, int iActivity );

@@ -149,9 +149,62 @@ Activity CZMBaseWeapon::GetPrimaryAttackActivity()
     // If we have last bullet, play fitting animation if we have it.
     bool bUseLastAct =  !IsMeleeWeapon()
                     &&  m_iClip1 == 1
-                    &&  ::SelectHeaviestSequence( pVM->GetModelPtr(), ACT_ZM_VM_PRIMARYATTACK_LAST ) != ACTIVITY_NOT_AVAILABLE;
+                    &&  ::SelectHeaviestSequence( pVM->GetModelPtr(), ACT_VM_PRIMARYATTACK_EMPTY ) != ACTIVITY_NOT_AVAILABLE;
 
-    return bUseLastAct ? ACT_ZM_VM_PRIMARYATTACK_LAST : ACT_VM_PRIMARYATTACK;
+    return bUseLastAct ? ACT_VM_PRIMARYATTACK_EMPTY : ACT_VM_PRIMARYATTACK;
+}
+
+bool CZMBaseWeapon::Deploy()
+{
+    MDLCACHE_CRITICAL_SECTION();
+    bool bResult = DefaultDeploy();
+
+
+    PoseParameterOverride( false );
+
+    return bResult;
+}
+
+bool CZMBaseWeapon::DefaultDeploy()
+{
+    // Weapons that don't autoswitch away when they run out of ammo 
+    // can still be deployed when they have no ammo.
+    if ( !HasAnyAmmo() && AllowsAutoSwitchFrom() )
+        return false;
+
+    auto* pOwner = GetPlayerOwner();
+    if ( pOwner )
+    {
+        if ( !pOwner->IsAlive() )
+            return false;
+
+
+        pOwner->SetAnimationExtension( GetAnimPrefix() );
+
+        SetViewModel();
+        SendWeaponAnim( GetDrawActivity() );
+
+        pOwner->SetNextAttack( gpGlobals->curtime + SequenceDuration() );
+    }
+
+
+    // Can't shoot again until we've finished deploying
+    m_flNextPrimaryAttack = gpGlobals->curtime + SequenceDuration();
+    m_flNextSecondaryAttack	= m_flNextPrimaryAttack;
+
+    //m_flHudHintMinDisplayTime = 0;
+
+    //m_bAltFireHudHintDisplayed = false;
+    //m_bReloadHudHintDisplayed = false;
+    //m_flHudHintPollTime = gpGlobals->curtime + 5.0f;
+    
+    WeaponSound( DEPLOY );
+
+    SetWeaponVisible( true );
+
+    SetContextThink( nullptr, 0, "BaseCombatWeapon_HideThink" );
+
+    return true;
 }
 
 //Activity CZMBaseWeapon::GetSecondaryAttackActivity()
@@ -161,7 +214,13 @@ Activity CZMBaseWeapon::GetPrimaryAttackActivity()
 
 Activity CZMBaseWeapon::GetDrawActivity()
 {
-    return UsesDryActivity( ACT_ZM_VM_DRAW_DRY ) ? ACT_ZM_VM_DRAW_DRY : ACT_VM_DRAW;
+    return UsesDryActivity( ACT_VM_DRAW_EMPTY ) ? ACT_VM_DRAW_EMPTY : ACT_VM_DRAW;
+}
+
+Activity CZMBaseWeapon::GetIdleActivity() const
+{
+    auto* pMe = const_cast<CZMBaseWeapon*>( this );
+    return pMe->UsesDryActivity( ACT_VM_IDLE_EMPTY ) ? ACT_VM_IDLE_EMPTY : ACT_VM_IDLE;
 }
 
 bool CZMBaseWeapon::UsesDryActivity( Activity act )
@@ -182,9 +241,7 @@ void CZMBaseWeapon::WeaponIdle()
 {
     if ( HasWeaponIdleTimeElapsed() )
     {
-        Activity act = UsesDryActivity( ACT_ZM_VM_IDLE_DRY ) ? ACT_ZM_VM_IDLE_DRY : ACT_VM_IDLE;
-
-        SendWeaponAnim( act );
+        SendWeaponAnim( GetIdleActivity() );
     }
 }
 
@@ -292,7 +349,7 @@ bool CZMBaseWeapon::ShouldCancelReload() const
 
 void CZMBaseWeapon::CancelReload()
 {
-    SendWeaponAnim( ACT_VM_IDLE );
+    SendWeaponAnim( GetIdleActivity() );
 
     m_bInReload = false;
 
@@ -351,7 +408,7 @@ bool CZMBaseWeapon::Reload()
     bool ret = DefaultReload(
                     GetMaxClip1(),
                     GetMaxClip2(),
-                    UsesDryActivity( ACT_ZM_VM_RELOAD_DRY ) ? ACT_ZM_VM_RELOAD_DRY : ACT_VM_RELOAD );
+                    UsesDryActivity( ACT_VM_RELOAD_EMPTY ) ? ACT_VM_RELOAD_EMPTY : ACT_VM_RELOAD );
 
     if ( ret )
     {
