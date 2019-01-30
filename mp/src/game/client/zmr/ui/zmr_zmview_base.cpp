@@ -271,6 +271,13 @@ void CZMViewBase::OnMousePressed( MouseCode code )
     }
 }
 
+// OnMousePressed is actually never fired for double presses.
+// The effect is "missing" clicks which is incredibly annoying.
+void CZMViewBase::OnMouseDoublePressed( MouseCode code )
+{
+    OnMousePressed( code );
+}
+
 void CZMViewBase::OnMouseWheeled( int delta )
 {
     BaseClass::OnMouseWheeled( delta );
