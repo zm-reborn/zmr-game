@@ -56,6 +56,7 @@ private:
     virtual void OnCursorMoved( int x, int y ) OVERRIDE;
     virtual void OnMouseReleased( MouseCode code ) OVERRIDE;
     virtual void OnMousePressed( MouseCode code ) OVERRIDE;
+    virtual void OnMouseDoublePressed( MouseCode code ) OVERRIDE;
     virtual void OnMouseWheeled( int delta ) OVERRIDE;
 public:
 
