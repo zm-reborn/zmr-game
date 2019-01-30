@@ -20,18 +20,6 @@
 
 extern ConVar zm_sv_zombiemax;
 
-extern ConVar zm_sv_popcost_shambler;
-extern ConVar zm_sv_popcost_banshee;
-extern ConVar zm_sv_popcost_hulk;
-extern ConVar zm_sv_popcost_drifter;
-extern ConVar zm_sv_popcost_immolator;
-
-extern ConVar zm_sv_cost_shambler;
-extern ConVar zm_sv_cost_banshee;
-extern ConVar zm_sv_cost_hulk;
-extern ConVar zm_sv_cost_drifter;
-extern ConVar zm_sv_cost_immolator;
-
 
 enum
 {
