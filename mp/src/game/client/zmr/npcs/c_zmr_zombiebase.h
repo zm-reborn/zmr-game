@@ -65,6 +65,7 @@ public:
     static const char*      ClassToName( ZombieClass_t zclass );
     static int              GetPopCost( ZombieClass_t zclass );
     static int              GetCost( ZombieClass_t zclass );
+    static float            GetSpawnDelay( ZombieClass_t zclass );
     static bool             HasEnoughPopToSpawn( ZombieClass_t zclass );
     int                     GetSelectorIndex() const;
     C_ZMPlayer*             GetSelector() const;
