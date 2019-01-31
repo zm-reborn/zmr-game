@@ -35,9 +35,11 @@ BEGIN_NETWORK_TABLE( CZMBaseWeapon, DT_ZM_BaseWeapon )
 #ifdef CLIENT_DLL
     RecvPropInt( RECVINFO( m_nOverrideClip1 ) ),
     RecvPropTime( RECVINFO( m_flNextClipFillTime ) ),
+    RecvPropBool( RECVINFO( m_bCanCancelReload ) ),
 #else
     SendPropInt( SENDINFO( m_nOverrideClip1 ) ),
     SendPropTime( SENDINFO( m_flNextClipFillTime ) ),
+    SendPropBool( SENDINFO( m_bCanCancelReload ) ),
 #endif
 END_NETWORK_TABLE()
 
@@ -74,6 +76,7 @@ CZMBaseWeapon::CZMBaseWeapon()
 #endif
 
     m_flNextClipFillTime = 0.0f;
+    m_bCanCancelReload = true;
 }
 
 CZMBaseWeapon::~CZMBaseWeapon()
@@ -303,6 +306,7 @@ bool CZMBaseWeapon::DefaultReload( int iClipSize1, int iClipSize2, int iActivity
     m_flNextClipFillTime = gpGlobals->curtime + flReloadTime;
 
     m_bInReload = true;
+    m_bCanCancelReload = true;
 
     return true;
 }
@@ -340,6 +344,9 @@ void CZMBaseWeapon::CheckReload()
 
 bool CZMBaseWeapon::ShouldCancelReload() const
 {
+    if ( !m_bCanCancelReload )
+        return false;
+
     CZMPlayer* pOwner = GetPlayerOwner();
     if  ( !pOwner )
         return false;
@@ -373,6 +380,7 @@ void CZMBaseWeapon::IncrementClip()
 {
     // We don't want to increment the clip more than once per reload.
     m_flNextClipFillTime = 0.0f;
+    m_bCanCancelReload = false;
 
 
     auto* pOwner = GetPlayerOwner();

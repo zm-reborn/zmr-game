@@ -214,6 +214,7 @@ private:
 
 
     CNetworkVar( float, m_flNextClipFillTime );
+    CNetworkVar( bool, m_bCanCancelReload );
 };
 
 inline CZMBaseWeapon* ToZMBaseWeapon( CBaseEntity* pEnt )
