@@ -1,8 +1,10 @@
 #include "cbase.h"
 
 
-#include "zmr_util.h"
-#include "zmr_entities.h"
+#ifdef GAME_DLL
+#include "zmr/zmr_util.h"
+#include "zmr/zmr_entities.h"
+#endif
 #include "zmr_global_shared.h"
 #include "zmr_shareddefs.h"
 
@@ -14,10 +16,10 @@
 
 
 
-ConVar zm_hidden_cost_shambler( "zm_hidden_cost_shambler", "100", FCVAR_NOTIFY );
-ConVar zm_hidden_mindistance( "zm_hidden_mindistance", "144", FCVAR_NOTIFY, "The closest distance (in units) to survivors that the ZM can spawn zombies in." );
-ConVar zm_hidden_zombiedistmult( "zm_hidden_zombiedistmult", "256", FCVAR_NOTIFY, "Zombie further away than this will have minimum cost." );
-ConVar zm_hidden_mincost( "zm_hidden_mincost", "10", FCVAR_NOTIFY, "The minimum amount a hidden spawn will cost." );
+ConVar zm_hidden_cost_shambler( "zm_hidden_cost_shambler", "100", FCVAR_NOTIFY | FCVAR_REPLICATED );
+ConVar zm_hidden_mindistance( "zm_hidden_mindistance", "144", FCVAR_NOTIFY | FCVAR_REPLICATED, "The closest distance (in units) to survivors that the ZM can spawn zombies in." );
+ConVar zm_hidden_zombiedistmult( "zm_hidden_zombiedistmult", "256", FCVAR_NOTIFY | FCVAR_REPLICATED, "Zombie further away than this will have minimum cost." );
+ConVar zm_hidden_mincost( "zm_hidden_mincost", "10", FCVAR_NOTIFY | FCVAR_REPLICATED, "The minimum amount a hidden spawn will cost." );
 
 
 
@@ -106,24 +108,27 @@ bool CZMHiddenSpawnSystem::CanSpawnClass( ZombieClass_t zclass ) const
     return zclass == ZMCLASS_SHAMBLER;
 }
 
-bool CZMHiddenSpawnSystem::Spawn( ZombieClass_t zclass, CZMPlayer* pZM, const Vector& pos )
+HiddenSpawnError_t CZMHiddenSpawnSystem::Spawn( ZombieClass_t zclass, CZMPlayer* pZM, const Vector& pos, int* pResourceCost )
 {
     if ( !CanSpawnClass( zclass ) )
     {
-        return false;
+        return HSERROR_BADCLASS;
     }
 
 
     if ( !CZMBaseZombie::HasEnoughPopToSpawn( zclass ) )
     {
+#ifdef GAME_DLL
         ZMUtil::PrintNotify( pZM, ZMCHATNOTIFY_ZM, "#ZMNotEnoughPop" );
-        return false;
+#endif
+        return HSERROR_NOTENOUGHPOP;
     }
 
 
     //
     // Check for any block triggers
     //
+#ifdef GAME_DLL
     CZMEntTriggerBlockHidden* pBlock;
     for ( int i = 0; i < g_pBlockHidden->Count(); i++ )
     {
@@ -134,9 +139,10 @@ bool CZMHiddenSpawnSystem::Spawn( ZombieClass_t zclass, CZMPlayer* pZM, const Ve
         &&  pBlock->CollisionProp()->IsPointInBounds( pos ))
         {
             ZMUtil::PrintNotify( pZM, ZMCHATNOTIFY_ZM, "#ZMHiddenCreateBlocked" );
-            return false;
+            return HSERROR_BLOCKEDSPOT;
         }
     }
+#endif
 
 
     //
@@ -160,14 +166,18 @@ bool CZMHiddenSpawnSystem::Spawn( ZombieClass_t zclass, CZMPlayer* pZM, const Ve
         Vector plypos = pPlayer->GetAbsOrigin();
         if ( plypos.DistToSqr( pos ) < flMinDistSqr )
         {
+#ifdef GAME_DLL
             ZMUtil::PrintNotify( pZM, ZMCHATNOTIFY_ZM, "#ZMHiddenCreateHumanClose" );
-            return false;
+#endif
+            return HSERROR_TOOCLOSE;
         }
 
         if ( CanSee( pPlayer, pos ) )
         {
+#ifdef GAME_DLL
             ZMUtil::PrintNotify( pZM, ZMCHATNOTIFY_ZM, "#ZMHiddenCreateHumanSee" );
-            return false;
+#endif
+            return HSERROR_CANSEE;
         }
     }
 
@@ -189,21 +199,27 @@ bool CZMHiddenSpawnSystem::Spawn( ZombieClass_t zclass, CZMPlayer* pZM, const Ve
 
     int iResCost = ComputeResourceCost( zclass, closestZombie );
 
+    if ( pResourceCost )
+        *pResourceCost = iResCost;
+
 
     if ( !pZM->HasEnoughRes( iResCost ) )
     {
+#ifdef GAME_DLL
         ZMUtil::PrintNotify( pZM, ZMCHATNOTIFY_ZM, "#ZMNotEnoughRes" );
-        return false;
+#endif
+        return HSERROR_NOTENOUGHRES;
     }
 
 
     //
     // Do the actual spawning
     //
+#ifdef GAME_DLL
     auto* pZombie =
         static_cast<CZMBaseZombie*>( CreateEntityByName( CZMBaseZombie::ClassToName( zclass ) ) );
 
-    if ( !pZombie ) return false;
+    if ( !pZombie ) return HSERROR_UNKNOWN;
 
 
     DispatchSpawn( pZombie );
@@ -240,7 +256,7 @@ bool CZMHiddenSpawnSystem::Spawn( ZombieClass_t zclass, CZMPlayer* pZM, const Ve
 
         pZombie->SUB_Remove();
 
-        return false;
+        return HSERROR_INVALIDSPOT;
     }
 
     
@@ -253,10 +269,10 @@ bool CZMHiddenSpawnSystem::Spawn( ZombieClass_t zclass, CZMPlayer* pZM, const Ve
 
     pZombie->Activate();
 
-
     pZM->IncResources( -iResCost );
+#endif
 
-    return true;
+    return HSERROR_OK;
 }
 //
 //

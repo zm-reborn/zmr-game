@@ -71,7 +71,7 @@ void __MsgFunc_ZMBuildMenuUpdate( bf_read &msg )
     CZMBuildMenuBase* pMenu = g_pZMView->GetBuildMenu();
 
 
-	//read spawn entindex
+
 	int spawnidx = msg.ReadShort();
 
     // We don't care about this spawn since we don't have it open...
@@ -81,22 +81,35 @@ void __MsgFunc_ZMBuildMenuUpdate( bf_read &msg )
 
 	bool force_open = msg.ReadOneBit() == 1;
 
-	//read queue from usermessage
-	int queue[BM_QUEUE_SIZE];
-	for ( int i = 0; i < ARRAYSIZE( queue ); i++ )
+
+    int count = msg.ReadByte();
+
+
+	ZMQueueSlotData_t* pQueue = nullptr;
+
+    if ( count > 0 )
+    {
+        pQueue = new ZMQueueSlotData_t[count];
+    }
+
+	for ( int i = 0; i < count; i++ )
 	{
-		//every type was increased by 1 so that type_invalid could be 0 (byte is unsigned)
-		queue[i] = ( msg.ReadByte() - 1 );
+		// Every type is increased by 1 so we can send/recv unsigned.
+		pQueue[i].zclass = (ZombieClass_t)msg.ReadByte();
+		pQueue[i].nCount = msg.ReadByte();
 	}
 
 	if ( force_open )
 	{
-		//if we weren't visible, this is also an opening message
+		// If we weren't visible, this is also an opening message
 		gViewPortInterface->ShowPanel( pMenu, true );
 	}
 
 
-	pMenu->UpdateQueue( queue, ARRAYSIZE( queue ) );
+	pMenu->UpdateQueue( pQueue, count );
+
+    if ( pQueue )
+        delete[] pQueue;
 }
 
 USER_MESSAGE_REGISTER( ZMBuildMenuUpdate );

@@ -11,6 +11,12 @@
 #include "zmr/c_zmr_entities.h"
 
 
+struct ZMQueueSlotData_t
+{
+    uint8 nCount;
+    ZombieClass_t zclass;
+};
+
 abstract_class CZMBuildMenuBase : public vgui::Frame, public IViewPortPanel
 {
 public:
@@ -37,7 +43,7 @@ public:
 
 
     virtual void ShowMenu( C_ZMEntZombieSpawn* pSpawn );
-    virtual void UpdateQueue( const int q[], int size ) {};
+    virtual void UpdateQueue( const ZMQueueSlotData_t q[], int size ) {};
 
     inline int GetLastSpawnIndex() { return m_iLastSpawnIndex; };
     inline int GetSpawnIndex() { return m_iSpawnIndex; };

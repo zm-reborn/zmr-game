@@ -32,6 +32,7 @@ extern IGameUIFuncs *gameuifuncs; // for key binding details
 
 #include "zmr_manimenu.h"
 #include "zmr_buildmenu.h"
+#include "zmr_buildmenu_spawnicon.h"
 #include "zmr/zmr_gamerules.h"
 #include "zmr/zmr_player_shared.h"
 #include "zmr/npcs/c_zmr_zombiebase.h"
@@ -152,7 +153,7 @@ CZMBuildMenu::CZMBuildMenu( Panel* pParent ) : CZMBuildMenuBase( pParent, "ZMBui
     {
         char buffer[10];
         Q_snprintf(buffer, sizeof(buffer), "queue%02d", i);
-        queueimages[i] = dynamic_cast<vgui::ImagePanel*>(FindChildByName(buffer));
+        queueimages[i] = dynamic_cast<CZMImageRowItemSpawn*>( FindChildByName( buffer ) );
     }
 }
 
@@ -292,19 +293,22 @@ void CZMBuildMenu::ShowZombieInfo( int type )
 //--------------------------------------------------------------
 // Update the queue images to reflect the types in the given array 
 //--------------------------------------------------------------
-void CZMBuildMenu::UpdateQueue( const int q[], int size )
+void CZMBuildMenu::UpdateQueue( const ZMQueueSlotData_t q[], int size )
 {
-    bool zombies_present = false;
-    for ( int i = 0; i < size; i++ )
-    {
-        const int type = q[i];
+    char buf[64];
 
+
+    bool zombies_present = false;
+    for ( int i = 0; i < BM_QUEUE_SIZE; i++ )
+    {
         if (!queueimages[i])
             return;
 
-        // Is there a zombie queued at this spot?
-        if ( C_ZMBaseZombie::IsValidClass( (ZombieClass_t)type ) )
+
+        if ( i < size )
         {
+            const int type = q[i].zclass;
+
             vgui::IImage *given_img = zombiequeue[type];
 
             if (given_img != queueimages[i]->GetImage())
@@ -314,14 +318,22 @@ void CZMBuildMenu::UpdateQueue( const int q[], int size )
             }
             queueimages[i]->SetVisible(true);
 
+
+            Q_snprintf( buf, sizeof( buf ), "%ix", (int)q[i].nCount );
+            queueimages[i]->SetText( buf );
+
+            queueimages[i]->UpdateData( q[i].nCount, q[i].zclass );
+
+
             zombies_present = true;
         }
         else
         {
             // no valid type, so don't draw an image
             queueimages[i]->SetVisible(false);
+
+            queueimages[i]->UpdateData( 0, ZMCLASS_INVALID );
         }
-        
     }
 
     if (removelast)

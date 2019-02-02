@@ -41,6 +41,17 @@ namespace ZMItemAction
     struct ItemEntData_t;
     class CZMMapItemAction;
 
+    typedef CUtlVector<ItemEntData_t*> ZMItems_t;
+
+
+    //
+    struct ZMMapData_t
+    {
+        bool bIsOldMap;
+        ZMItems_t items;
+    };
+    //
+
 
     //
     class CZMMapItemSystem : public CAutoGameSystem
@@ -62,6 +73,7 @@ namespace ZMItemAction
         static bool         AffectsItem( const char* classname );
         static unsigned int GetItemFlags( const char* classname );
         static unsigned int GetClassFlag( const char* classname );
+        static const ItemBaseData_t* GetItemData( int index );
         static bool         GetMapItemsByClass( unsigned int flags, CUtlVector<const ItemBaseData_t*>& items );
 
 
@@ -76,13 +88,17 @@ namespace ZMItemAction
         bool LoadActionsFromFile( const char* filename );
         bool LoadActionsFromMapFile();
 
-        void GetCopiedData( CUtlVector<ItemEntData_t*>& items );
+        void GetCopiedData( ZMItems_t& items );
         void LoadItemsFromMap();
+        void ComputeMapVersion();
 
 
 
-        CUtlVector<ItemEntData_t*> m_vEntData;
+        ZMItems_t m_vEntData;
         CUtlVector<CZMMapItemAction*> m_vActions;
+
+
+        bool m_bIsOldMap;
     };
     //
 
@@ -91,7 +107,7 @@ namespace ZMItemAction
     class CZMMapItemAction
     {
     public:
-        virtual int     PerformAction( CUtlVector<ItemEntData_t*>& items, ItemSpawnTime_t status ) { return false; }
+        virtual int     PerformAction( ZMMapData_t& mapdata, ItemSpawnTime_t status ) { return false; }
         virtual bool    AffectsItem( ItemEntData_t& itemEntData, ItemSpawnTime_t status ) const { return false; }
     };
     //
@@ -109,7 +125,7 @@ namespace ZMItemAction
         static void                 LoadActions( KeyValues* kv, CUtlVector<CZMMapItemAction*>& actions );
         static CZMMapItemActionAdd* Create( KeyValues* kv );
 
-        virtual int PerformAction( CUtlVector<ItemEntData_t*>& items, ItemSpawnTime_t status ) { return false; }
+        virtual int PerformAction( ZMMapData_t& mapdata, ItemSpawnTime_t status ) { return false; }
     };
     //
 
@@ -127,12 +143,12 @@ namespace ZMItemAction
         static CZMMapItemActionReplace* Create( KeyValues* kv );
 
 
-        virtual int     PerformAction( CUtlVector<ItemEntData_t*>& items, ItemSpawnTime_t status ) OVERRIDE;
+        virtual int     PerformAction( ZMMapData_t& mapdata, ItemSpawnTime_t status ) OVERRIDE;
         virtual bool    AffectsItem( ItemEntData_t& itemEntData, ItemSpawnTime_t status ) const OVERRIDE;
 
     private:
         bool CalcChance();
-        void ReplacePerc( CUtlVector<ItemEntData_t*>& items );
+        void ReplacePerc( ZMItems_t& items );
 
 
         bool ParseReplaceTarget( const char* target );
@@ -155,8 +171,11 @@ namespace ZMItemAction
         float m_flRangeCheck;
         Vector m_vecRangeCheckPos;
         unsigned int m_fFilterFlags;
+        int m_iFilterItemIndex;
 
         bool m_bMapItemsOnly;
+
+        bool m_bOnlyOldMaps;
 
 
         friend class CZMMapItemActionReplace;
