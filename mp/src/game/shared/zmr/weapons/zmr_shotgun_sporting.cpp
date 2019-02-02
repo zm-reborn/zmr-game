@@ -24,7 +24,7 @@ public:
     CZMWeaponShotgunSporting();
 
 #ifdef CLIENT_DLL
-    virtual CZMBaseCrosshair* GetWeaponCrosshair() const OVERRIDE { return ZMGetCrosshair( "Shotgun" ); }
+    virtual CZMBaseCrosshair* GetWeaponCrosshair() const OVERRIDE { return ZMGetCrosshair( "ShotgunSporting" ); }
 #endif
 
 
