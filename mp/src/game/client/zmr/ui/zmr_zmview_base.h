@@ -12,6 +12,8 @@
 
 
 
+class C_ZMTempModel;
+
 
 #define MASK_ZMVIEW             ( CONTENTS_SOLID | CONTENTS_MOVEABLE ) // When testing box select.
 #define MASK_ZMSELECTUSABLE     ( MASK_SOLID & ~(CONTENTS_WINDOW|CONTENTS_GRATE) ) // When left clicking (not setting rallypoint, etc.)
@@ -49,6 +51,7 @@ public:
     virtual bool ShouldDraw() OVERRIDE;
 
     // Panel
+    virtual void Paint() OVERRIDE;
     virtual void OnThink() OVERRIDE;
     virtual void SetVisible( bool visible ) OVERRIDE;
     virtual bool IsVisible() OVERRIDE; // Need to override some functions to make them public
@@ -61,9 +64,16 @@ private:
 public:
 
 
-
     virtual void CloseChildMenus();
     virtual void HideMouseTools();
+
+    void UpdateHiddenSpawnSpot( int mx, int my );
+    const char* GetTempHiddenSpawnModel( ZombieClass_t zclass ) const;
+private:
+    float m_flLastHiddenSpawnUpdate;
+    wchar_t m_wszHiddenSpawnTxt[64];
+    Color m_HiddenSpawnTxtColor;
+public:
 
 
     virtual CZMBuildMenuBase* GetBuildMenu() { return nullptr; }
@@ -108,6 +118,13 @@ protected:
     CZMBoxSelect* GetBoxSelect() const { return m_BoxSelect; }
     CZMLineTool* GetLineTool() const { return m_LineTool; }
 
+
+    C_ZMTempModel* CreateTempHiddenZombie() const;
+    void FreeTempHiddenZombie();
+
+
+    C_ZMTempModel* m_pTempHiddenZombie;
+
 private:
     ZMClickMode_t m_iClickMode;
 
@@ -121,6 +138,9 @@ private:
 
     bool m_bDraggingLeft;
     bool m_bDraggingRight;
+
+
+    vgui::HFont m_hCursorFont;
 
 
     // Client mode will call some of our functions.
