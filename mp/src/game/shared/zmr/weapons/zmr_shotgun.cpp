@@ -33,8 +33,8 @@ public:
 
     virtual const Vector& GetBulletSpread( void ) OVERRIDE
     {
-#define CONE_25DEGREES      0.2170625f
-        static Vector cone = Vector( CONE_25DEGREES, CONE_25DEGREES * 0.3f, 0.0f );
+//#define CONE_25DEGREES      0.2170625f
+        static Vector cone = Vector( VECTOR_CONE_15DEGREES.x, VECTOR_CONE_15DEGREES.x * 0.3f, 0.0f );
         return cone;
     }
     
