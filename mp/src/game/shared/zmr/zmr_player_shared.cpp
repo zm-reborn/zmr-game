@@ -572,7 +572,7 @@ void CZMPlayer::SimulateBullet( ZMFireBulletsInfo_t& bulletinfo )
     Vector          vecSrc = info.m_vecSrc;
     Vector          vecDir = bulletinfo.vecDir;
     Vector          vecFirstStart = vec3_origin;
-    Vector          vecFirstEnd = vec3_origin;
+    Vector          vecFirstEnd = vecSrc + vecDir * flDistanceLeft;
     int             nPenetrations = 0;
 
 

@@ -84,6 +84,7 @@ public:
 
     
     virtual void OnMousePressed( vgui::MouseCode code ) OVERRIDE;
+    virtual void OnMouseDoublePressed( vgui::MouseCode code ) OVERRIDE;
     virtual void OnThink() OVERRIDE;
     virtual void ApplySettings( KeyValues* inResourceData ) OVERRIDE;
 

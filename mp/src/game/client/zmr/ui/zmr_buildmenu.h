@@ -8,6 +8,7 @@
 
 
 #include <vgui_controls/EditablePanel.h>
+#include <vgui_controls/Label.h>
 #include <game/client/iviewport.h>
 
 
@@ -19,6 +20,8 @@
 
 #define TYPE_TOTAL 5
 #define BM_QUEUE_SIZE 10
+
+class CZMImageRowItemSpawn;
 
 class CZMBuildMenu : public CZMBuildMenuBase
 {
@@ -43,7 +46,7 @@ public:
 	void AutoAssign();
 	int m_iLastFlags;
 	
-	virtual void UpdateQueue( const int q[], int size ) OVERRIDE;
+	virtual void UpdateQueue( const ZMQueueSlotData_t q[], int size ) OVERRIDE;
 
 protected:
 
@@ -79,7 +82,7 @@ protected:
 
 	//queue
 	//CUtlLinkedList<vgui::ImagePanel*> queueimages; //we'll be allocating these
-	vgui::ImagePanel *queueimages[BM_QUEUE_SIZE];
+	CZMImageRowItemSpawn *queueimages[BM_QUEUE_SIZE];
 
 	vgui::Button	*removelast;
 	vgui::Button	*clearqueue;
