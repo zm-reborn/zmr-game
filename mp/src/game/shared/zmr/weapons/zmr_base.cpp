@@ -300,7 +300,13 @@ bool CZMBaseWeapon::DefaultReload( int iClipSize1, int iClipSize2, int iActivity
     if ( flReloadTime == -1.0f )
         flReloadTime = flSeqTime;
 
-    m_flNextPrimaryAttack = m_flNextSecondaryAttack = gpGlobals->curtime + flSeqTime;
+
+    float flReadyTime = GetFirstInstanceOfAnimEventTime( GetSequence(), (int)AE_WPN_PRIMARYATTACK );
+    if ( flReadyTime == -1.0f )
+        flReadyTime = flSeqTime;
+    
+
+    m_flNextPrimaryAttack = m_flNextSecondaryAttack = gpGlobals->curtime + flReadyTime;
 
 
     m_flNextClipFillTime = gpGlobals->curtime + flReloadTime;
@@ -508,7 +514,7 @@ void CZMBaseWeapon::FireBullets( int numShots, int iAmmoType, float flMaxDist )
     FireBullets( info );
 }
 
-float CZMBaseWeapon::GetFirstInstanceOfAnimEventTime( int iSeq, int iAnimEvent ) const
+float CZMBaseWeapon::GetFirstInstanceOfAnimEventTime( int iSeq, int iAnimEvent, bool bReturnOption ) const
 {
     CZMBaseWeapon* me = const_cast<CZMBaseWeapon*>( this );
 
@@ -532,6 +538,8 @@ float CZMBaseWeapon::GetFirstInstanceOfAnimEventTime( int iSeq, int iAnimEvent )
     {
         if ( pevent[i].event == iAnimEvent )
         {
+            if ( bReturnOption && pevent[i].pszOptions()[0] != NULL )
+                return atof( pevent[i].pszOptions() );
             return pevent[i].cycle * me->SequenceDuration( hdr, iSeq );
         }
     }
