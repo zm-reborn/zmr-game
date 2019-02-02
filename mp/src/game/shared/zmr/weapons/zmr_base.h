@@ -167,7 +167,7 @@ public:
     virtual int     GetMaxPenetrations() const { return 0; }
     virtual float   GetMaxPenetrationDist() const { return 16.0f; }
 
-    float           GetFirstInstanceOfAnimEventTime( int iSeq, int iAnimEvent ) const;
+    float           GetFirstInstanceOfAnimEventTime( int iSeq, int iAnimEvent, bool bReturnOption = false ) const;
 
 
     inline int GetSlotFlag() const { return m_iSlotFlag; }

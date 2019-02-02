@@ -1,5 +1,6 @@
 #include "cbase.h"
 #include "in_buttons.h"
+#include "eventlist.h"
 
 #ifndef CLIENT_DLL
 #include "items.h"
@@ -107,9 +108,16 @@ void CZMBasePumpWeapon::Pump()
     // Finish reload animation
     SendWeaponAnim( GetPumpAct() );
     
-    float delay = SequenceDuration();
-    pOwner->m_flNextAttack = gpGlobals->curtime + delay;
-    m_flNextPrimaryAttack = gpGlobals->curtime + delay;
+
+    float flSeqTime = SequenceDuration();
+
+    float flReadyTime = GetFirstInstanceOfAnimEventTime( GetSequence(), (int)AE_WPN_PRIMARYATTACK, true );
+    if ( flReadyTime == -1.0f )
+        flReadyTime = flSeqTime;
+
+    
+    pOwner->m_flNextAttack = gpGlobals->curtime + flReadyTime;
+    m_flNextPrimaryAttack = m_flNextSecondaryAttack = gpGlobals->curtime + flReadyTime;
 }
 
 void CZMBasePumpWeapon::CheckReload( void )
