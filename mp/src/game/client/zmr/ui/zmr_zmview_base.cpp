@@ -10,13 +10,19 @@
 #include "zmr/npcs/zmr_zombiebase_shared.h"
 #include "zmr/c_zmr_util.h"
 #include "zmr/c_zmr_clientmode.h"
+#include "zmr/zmr_hiddenspawn.h"
+#include "zmr/c_zmr_tempmodel.h"
 #include "zmr_zmview_base.h"
 
+
+
+#define TEMPHIDDENSPAWN_MODEL           "models/zombie/zm_classic_01.mdl"
 
 
 CZMViewBase* g_pZMView = nullptr;
 
 
+ConVar zm_cl_zmview_hiddenspawneffect( "zm_cl_zmview_hiddenspawneffect", "1", FCVAR_ARCHIVE );
 ConVar zm_cl_zmview_doubleclick( "zm_cl_zmview_doubleclick", "0.4", FCVAR_ARCHIVE );
 
 
@@ -88,6 +94,8 @@ CON_COMMAND( zm_hiddenspawn, "" )
 
 CZMViewBase::CZMViewBase( const char* pElementName ) : CHudElement( pElementName ), CZMFramePanel( g_pClientMode->GetViewport(), pElementName )
 {
+    SetScheme( vgui::scheme()->LoadSchemeFromFile( "resource/ClientScheme.res", "ClientScheme" ) );
+
     // Proportional doesn't stretch with widescreen anyway
     SetProportional( false );
     SetBounds( 0, 0, ScreenWidth(), ScreenHeight() );
@@ -110,12 +118,22 @@ CZMViewBase::CZMViewBase( const char* pElementName ) : CHudElement( pElementName
 
     m_BoxSelect = new CZMBoxSelect( this );
     m_LineTool = new CZMLineTool( this );
+
+
+    m_pTempHiddenZombie = nullptr;
+    m_flLastHiddenSpawnUpdate = 0.0f;
+
+
+    m_hCursorFont = vgui::scheme()->GetIScheme( GetScheme() )->GetFont( "ZMCursorFont" );
+    m_wszHiddenSpawnTxt[0] = NULL;
 }
 
 CZMViewBase::~CZMViewBase()
 {
     delete m_BoxSelect;
     delete m_LineTool;
+
+    delete m_pTempHiddenZombie;
 }
 
 void CZMViewBase::LevelInit()
@@ -214,6 +232,9 @@ void CZMViewBase::SetVisible( bool state )
 
 
     HideMouseTools();
+
+
+    FreeTempHiddenZombie();
 }
 
 bool CZMViewBase::IsVisible()
@@ -289,6 +310,35 @@ void CZMViewBase::OnMouseWheeled( int delta )
         pPlayer->SetMouseWheelMove( (float)delta );
 }
 
+void CZMViewBase::Paint()
+{
+    if ( GetClickMode() == ZMCLICKMODE_HIDDEN )
+    {
+        int mx, my;
+        
+        if ( IsMouseInputEnabled() )
+        {
+            ::input->GetFullscreenMousePos( &mx, &my );
+        }
+        else
+        {
+            mx = ScreenWidth() / 2;
+            my = ScreenHeight() / 2;
+        }
+
+
+        mx += 16;
+
+        if ( m_wszHiddenSpawnTxt[0] != NULL )
+        {
+            surface()->DrawSetTextPos( mx, my );
+            surface()->DrawSetTextColor( m_HiddenSpawnTxtColor );
+            surface()->DrawSetTextFont( m_hCursorFont );
+            surface()->DrawUnicodeString( m_wszHiddenSpawnTxt );
+        }
+    }
+}
+
 void CZMViewBase::OnThink()
 {
     C_ZMPlayer* pPlayer = C_ZMPlayer::GetLocalPlayer();
@@ -361,6 +411,29 @@ void CZMViewBase::OnThink()
             engine->ClientCmd( "-lookup" );
             engine->ClientCmd( "-lookdown" );
         }
+    }
+
+
+
+    if ( GetClickMode() == ZMCLICKMODE_HIDDEN )
+    {
+        int mx, my;
+        
+        if ( IsMouseInputEnabled() )
+        {
+            ::input->GetFullscreenMousePos( &mx, &my );
+        }
+        else
+        {
+            mx = ScreenWidth() / 2;
+            my = ScreenHeight() / 2;
+        }
+
+        UpdateHiddenSpawnSpot( mx, my );
+    }
+    else
+    {
+        FreeTempHiddenZombie();
     }
 }
 
@@ -763,6 +836,99 @@ void CZMViewBase::TraceScreenToWorld( int mx, int my, trace_t* res, CTraceFilter
 
     UTIL_TraceZMView( res, MainViewOrigin() + ray * MAX_COORD_FLOAT, mask, filter, pPlayer );
 }
+
+const char* CZMViewBase::GetTempHiddenSpawnModel( ZombieClass_t zclass ) const
+{
+    return TEMPHIDDENSPAWN_MODEL;
+}
+
+C_ZMTempModel* CZMViewBase::CreateTempHiddenZombie() const
+{
+    auto* pTemp = new C_ZMTempModel;
+
+    pTemp->Initialize( GetTempHiddenSpawnModel( ZMCLASS_SHAMBLER ) );
+    pTemp->SetRenderColorA( 100 );
+    pTemp->SetRenderMode( kRenderTransColor );
+
+    return pTemp;
+}
+
+void CZMViewBase::FreeTempHiddenZombie()
+{
+    delete m_pTempHiddenZombie;
+    m_pTempHiddenZombie = nullptr;
+}
+
+void CZMViewBase::UpdateHiddenSpawnSpot( int mx, int my )
+{
+    // Don't update every frame
+    if ( (gpGlobals->curtime - m_flLastHiddenSpawnUpdate) < 0.05f )
+        return;
+
+
+    m_flLastHiddenSpawnUpdate = gpGlobals->curtime;
+
+
+    m_wszHiddenSpawnTxt[0] = NULL;
+
+
+    trace_t tr;
+    CTraceFilterNoNPCsOrPlayer filter( nullptr, COLLISION_GROUP_NONE );
+    TraceScreenToWorld( mx, my, &tr, &filter, MASK_ZMCREATE );
+
+
+    if ( tr.fraction == 1.0f )
+        return;
+
+
+    // Create a temporary model to visualize the zombie.
+    if ( !m_pTempHiddenZombie && zm_cl_zmview_hiddenspawneffect.GetBool() )
+    {
+        m_pTempHiddenZombie = CreateTempHiddenZombie();
+    }
+            
+
+    auto* pLocal = C_ZMPlayer::GetLocalPlayer();
+
+
+    // Update the effect.
+    if ( m_pTempHiddenZombie )
+    {
+        QAngle ang = pLocal->GetAbsAngles();
+        ang.x = ang.z = 0.0f;
+
+
+        m_pTempHiddenZombie->SetAbsOrigin( tr.endpos );
+        m_pTempHiddenZombie->SetAbsAngles( ang );
+    }
+
+
+    // Get the hidden spawn data.
+    int rescost = -1;
+
+    auto res = g_ZMHiddenSpawn.Spawn( ZMCLASS_SHAMBLER, pLocal, tr.endpos, &rescost );
+
+
+    m_HiddenSpawnTxtColor = Color( 255, 0, 0, 255 );
+
+    switch ( res )
+    {
+    case HSERROR_OK :
+        //V_wcsncpy( buf, L"OK", sizeof( buf ) );
+        V_snwprintf( m_wszHiddenSpawnTxt, sizeof( m_wszHiddenSpawnTxt ), L"Cost: %i", rescost );
+        break;
+    //case HSERROR_TOOCLOSE :
+    //case HSERROR_CANSEE :
+    //case HSERROR_NOTENOUGHRES :
+    //case HSERROR_NOTENOUGHPOP :
+    //case HSERROR_BADCLASS :
+    default :
+        m_HiddenSpawnTxtColor[0] = 150;
+        V_wcsncpy( m_wszHiddenSpawnTxt, L"X", sizeof( m_wszHiddenSpawnTxt ) );
+        break;
+    }
+}
+
 
 void UTIL_TraceZMView( trace_t* trace, Vector endpos, int mask, CTraceFilterSimple* filter, C_BaseEntity* pEnt, int collisionGroup )
 {

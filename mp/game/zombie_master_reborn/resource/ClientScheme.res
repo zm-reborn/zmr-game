@@ -935,6 +935,15 @@ Scheme
 				"antialias" "1"
 			}
 		}
+		"ZMCursorFont"
+		{
+			"1"
+			{
+				"name"		"Verdana"
+				"tall"		"16"
+				"antialias" "1"
+			}
+		}
 		HudNumbersSmall
 		{
 			"1"

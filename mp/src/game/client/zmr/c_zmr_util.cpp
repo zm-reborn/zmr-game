@@ -17,6 +17,24 @@
 ConVar zm_hudchat_color( "zm_hudchat_color", "c13c3c", FCVAR_ARCHIVE );
 ConVar zm_hudchat_color_zm( "zm_hudchat_color_zm", "49ff59", FCVAR_ARCHIVE );
 
+
+
+int UTIL_CreateClientModel( const char* pszModel )
+{
+    int index;
+    index = modelinfo->GetModelIndex( pszModel );
+
+    if ( index == -1 )
+    {
+        // No model found, register our own.
+        index = modelinfo->RegisterDynamicModel( pszModel, true );
+    }
+    
+    return index;
+}
+
+
+
 void ZMClientUtil::PrintNotify( const char* msg, ZMChatNotifyType_t type )
 {
     char buf[7];

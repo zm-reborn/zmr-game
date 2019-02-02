@@ -1,6 +1,24 @@
 #pragma once
 
 
+enum HiddenSpawnError_t
+{
+    HSERROR_OK = 0,
+
+    // Shared
+    HSERROR_TOOCLOSE,
+    HSERROR_CANSEE,
+    HSERROR_NOTENOUGHRES,
+    HSERROR_NOTENOUGHPOP,
+    HSERROR_BADCLASS,
+
+    // Server
+    HSERROR_BLOCKEDSPOT,
+    HSERROR_INVALIDSPOT,
+
+    HSERROR_UNKNOWN,
+};
+
 class CZMHiddenSpawnSystem
 {
 public:
@@ -8,7 +26,7 @@ public:
     ~CZMHiddenSpawnSystem();
 
 
-    bool Spawn( ZombieClass_t zclass, CZMPlayer* pZM, const Vector& pos );
+    HiddenSpawnError_t Spawn( ZombieClass_t zclass, CZMPlayer* pZM, const Vector& pos, int* pResourceCost = nullptr );
 
 
     float   GetMinimumDistance() const;
