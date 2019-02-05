@@ -115,18 +115,23 @@ int ClientModeZMNormal::ZMKeyInput( int down, ButtonCode_t keynum, const char* p
     C_ZMPlayer* pPlayer = C_ZMPlayer::GetLocalPlayer();
 
 
+    int ret = g_pZMView->ZMKeyInput( keynum, down );
+    if ( ret != -1 )
+        return ret;
+
 
     // Group select
     if ( down && keynum >= KEY_0 && keynum <= KEY_9 )
     {
-        int group = keynum - KEY_0;
+        int num = keynum - KEY_0;
+
         if ( IsZMHoldingCtrl() )
         {
-            ZMClientUtil::SetSelectedGroup( group );
+            ZMClientUtil::SetSelectedGroup( num );
         }
         else
         {
-            ZMClientUtil::SelectGroup( group );
+            ZMClientUtil::SelectGroup( num );
         }
     }
 
