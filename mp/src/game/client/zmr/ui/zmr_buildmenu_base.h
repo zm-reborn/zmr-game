@@ -41,6 +41,7 @@ public:
     virtual void OnClose() OVERRIDE;
 
 
+    virtual int ZMKeyInput( ButtonCode_t keynum, int down );
 
     virtual void ShowMenu( C_ZMEntZombieSpawn* pSpawn );
     virtual void UpdateQueue( const ZMQueueSlotData_t q[], int size ) {};
@@ -51,6 +52,8 @@ public:
 
     inline int GetZombieFlags() { return m_fSpawnZombieFlags; };
     inline void SetZombieFlags( int flags ) { m_fSpawnZombieFlags = flags; };
+
+    int GetAltSpawnAmount() const;
 
 private:
     int m_iLastSpawnIndex;
