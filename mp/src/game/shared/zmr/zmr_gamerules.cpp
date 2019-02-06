@@ -1307,6 +1307,24 @@ void CZMRules::RestoreMap()
     ZMItemAction::g_ZMMapItemSystem.SpawnItems();
 }
 
+void CZMRules::PlayerSpawn( CBasePlayer* pPlayer )
+{
+    auto* pZMPlayer = ToZMPlayer( pPlayer );
+    if ( !pZMPlayer->IsHuman() )
+        return;
+
+
+    // Fire game_player_equip
+
+    CBaseEntity* pEquip = nullptr;
+
+
+    while ( (pEquip = gEntList.FindEntityByClassname( pEquip, "game_player_equip" )) != nullptr )
+    {
+        pEquip->Touch( pPlayer );
+    }
+}
+
 static ConVar zm_sv_resource_rate( "zm_sv_resource_rate", "5", FCVAR_NOTIFY );
 static ConVar zm_sv_resource_refill_min( "zm_sv_resource_refill_min", "35", FCVAR_NOTIFY );
 static ConVar zm_sv_resource_refill_max( "zm_sv_resource_refill_max", "100", FCVAR_NOTIFY );
