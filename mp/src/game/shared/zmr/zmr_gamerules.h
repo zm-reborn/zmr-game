@@ -116,6 +116,7 @@ public:
 
     virtual void Think() OVERRIDE;
 
+    virtual void PlayerSpawn( CBasePlayer* pPlayer ) OVERRIDE;
     virtual void PlayerThink( CBasePlayer* ) OVERRIDE;
 
     virtual const char* GetChatFormat( bool bTeamOnly, CBasePlayer* ) OVERRIDE;
