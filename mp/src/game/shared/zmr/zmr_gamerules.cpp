@@ -125,6 +125,7 @@ static const char* g_PreserveEnts[] =
 
     "zm_objectives_manager",
     "zm_viewmodel",
+    "env_fog_controller_zm",
 
     "vote_controller",
 
@@ -304,6 +305,12 @@ void CZMRules::CreateStandardEntities()
     {
         new CZMVoteRoundRestart();
     }
+
+
+    pEnt = CBaseEntity::Create( "env_fog_controller_zm", vec3_origin, vec3_angle );
+    Assert( pEnt );
+
+    m_pZMFog = static_cast<CZMEntFogController*>( pEnt );
 }
 
 void CZMRules::LevelInitPostEntity()
@@ -1175,6 +1182,13 @@ void CZMRules::ResetWorld()
 
     RestoreMap();
 
+
+
+    // Reset ZM fog in case the values were updated.
+    if ( GetZMFogController() )
+    {
+        GetZMFogController()->InitFog();
+    }
 
     // Reset our loadout distribution.
     if ( GetLoadoutEnt() )
