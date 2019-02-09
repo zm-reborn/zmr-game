@@ -116,6 +116,7 @@ public:
 
     virtual void Think() OVERRIDE;
 
+    virtual void PlayerSpawn( CBasePlayer* pPlayer ) OVERRIDE;
     virtual void PlayerThink( CBasePlayer* ) OVERRIDE;
 
     virtual const char* GetChatFormat( bool bTeamOnly, CBasePlayer* ) OVERRIDE;
@@ -177,6 +178,8 @@ public:
 
     inline CZMEntObjectivesManager* GetObjManager() { return m_pObjManager; };
     inline void SetObjManager( CZMEntObjectivesManager* pEnt ) { m_pObjManager = pEnt; }
+
+    CZMEntFogController* GetZMFogController() const { return m_pZMFog; }
 #endif
 
     inline int GetZombiePop() { return m_nZombiePop; };
@@ -210,6 +213,7 @@ private:
 
     CZMEntLoadout* m_pLoadoutEnt;
     CZMEntObjectivesManager* m_pObjManager;
+    CZMEntFogController* m_pZMFog;
 #endif
 };
 

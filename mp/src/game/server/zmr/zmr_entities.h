@@ -458,3 +458,22 @@ public:
 private:
     bool m_bIsEnabled;
 };
+
+/*
+    ZM specific fog controller
+*/
+class CZMEntFogController : public CFogController
+{
+public:
+    DECLARE_CLASS( CZMEntFogController, CFogController );
+    DECLARE_DATADESC();
+
+
+    static bool IsEnabled();
+
+    void InitFog();
+
+
+    float m_flSkyboxFarZ;
+};
+

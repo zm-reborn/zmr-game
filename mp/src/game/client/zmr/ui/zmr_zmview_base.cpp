@@ -437,7 +437,33 @@ void CZMViewBase::OnThink()
     }
 }
 
+// Return -1 to pass through.
+int CZMViewBase::ZMKeyInput( ButtonCode_t keynum, int down )
+{
+    // We only care about number keys right now.
+    bool bNumber = keynum >= KEY_0 && keynum <= KEY_9;
+    bool bNumpad = keynum >= KEY_PAD_0 && keynum <= KEY_PAD_9;
 
+    if ( !bNumber && !bNumpad )
+        return -1;
+
+
+    auto* pBuild = GetBuildMenu();
+    auto* pMani = GetManiMenu();
+    if ( pBuild && pBuild->IsVisible() )
+    {
+        pBuild->ZMKeyInput( keynum, down );
+        return 0;
+    }
+
+    if ( pMani && pMani->IsVisible() )
+    {
+        // Nothing for mani right now
+        return 0;
+    }
+
+    return -1;
+}
 
 void CZMViewBase::OnLeftClick()
 {

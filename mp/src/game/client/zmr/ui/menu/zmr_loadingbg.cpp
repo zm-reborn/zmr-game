@@ -6,6 +6,7 @@
 #include <vgui_controls/TextEntry.h>
 #include <vgui/ISurface.h>
 #include <GameUI/IGameUI.h>
+#include <ienginevgui.h>
 //#include "game_controls/vguitextwindow.h"
 
 #include "zmr/c_zmr_legacy_objpanel.h"
@@ -64,7 +65,7 @@ public:
     virtual void ApplySchemeSettings( vgui::IScheme* pScheme ) OVERRIDE;
 
     virtual void PaintBackground() OVERRIDE;
-    //virtual void Paint() OVERRIDE;
+    virtual void Paint() OVERRIDE;
 
 
     MESSAGE_FUNC( OnActivate, "activate" );
@@ -83,6 +84,9 @@ private:
     void SetMapNameText( const char* mapname );
     void SetTipText( const char* msg );
 
+
+    void FindLoadingPanel();
+    vgui::VPANEL m_loadingDialog;
 
 
     vgui::Label* m_pMapNameLabel;
@@ -132,6 +136,8 @@ IZMUi* g_pZMLoadingUI = static_cast<IZMUi*>( &g_ZMLoadingUIInt );
 
 CZMLoadingPanel::CZMLoadingPanel( VPANEL parent ) : BaseClass( nullptr, "ZMLoadingPanel" )
 {
+    m_loadingDialog = NULL;
+
     m_bHasMapName = false;
 
     m_pMapNameLabel = new Label( this, "MapNameLabel", "" );
@@ -269,6 +275,12 @@ void CZMLoadingPanel::OnActivate()
     auto mainMenuPanel = g_pZMMainMenu->GetPanel()->GetVPanel();
     auto myPanel = GetVPanel();
     ipanel()->SendMessage( mainMenuPanel, new KeyValues( "loadingstart" ), myPanel );
+
+
+    // Find the loading dialog so we can draw it manually.
+    FindLoadingPanel();
+
+    surface()->RestrictPaintToSinglePanel( GetVPanel() );
 }
 
 void CZMLoadingPanel::OnDeactivate()
@@ -277,6 +289,8 @@ void CZMLoadingPanel::OnDeactivate()
     auto mainMenuPanel = g_pZMMainMenu->GetPanel()->GetVPanel();
     auto myPanel = GetVPanel();
     ipanel()->SendMessage( mainMenuPanel, new KeyValues( "loadingend" ), myPanel );
+
+    surface()->RestrictPaintToSinglePanel( NULL );
 }
 
 void CZMLoadingPanel::PaintBackground()
@@ -340,6 +354,60 @@ void CZMLoadingPanel::PaintBackground()
 
         //surface()->DrawSetTexture( m_nTexTipBgId );
         //surface()->DrawTexturedRect( x - padding_x, y - padding_y, x + w + padding_x, y + h + padding_y );
+    }
+}
+
+void CZMLoadingPanel::Paint()
+{
+    BaseClass::Paint();
+
+
+    // Unfortunately, we have to draw the loading dialog manually,
+    // because we have to restrict the drawing to this panel, because
+    // we other main menu panels will draw on top of us.
+    // Blah.
+    if ( m_loadingDialog != NULL )
+    {
+        surface()->RestrictPaintToSinglePanel( NULL );
+
+        //int prevZ = ipanel()->GetZPos( m_loadingDialog );
+
+        //ipanel()->SetZPos( m_loadingDialog, 1337 );
+        ipanel()->PaintTraverse( m_loadingDialog, true );
+        //ipanel()->SetZPos( m_loadingDialog, prevZ );
+
+
+        surface()->RestrictPaintToSinglePanel( GetVPanel() );
+    }
+}
+
+void CZMLoadingPanel::FindLoadingPanel()
+{
+    VPANEL root = enginevgui->GetPanel( VGuiPanel_t::PANEL_GAMEUIDLL );
+
+    if ( root )
+    {
+        VPANEL panel1, panel2;
+        const char* name;
+        for ( int i = 0; i < ipanel()->GetChildCount( root ); i++ )
+        {
+            panel1 = ipanel()->GetChild( root, i );
+            if ( Q_stricmp( ipanel()->GetName( panel1 ), "BaseGameUIPanel" ) == 0 )
+            {
+                for ( int i = 0; i < ipanel()->GetChildCount( panel1 ); i++ )
+                {
+                    panel2 = ipanel()->GetChild( panel1, i );
+                    name = ipanel()->GetName( panel2 );
+                    if ( Q_stricmp( name, "LoadingDialog" ) == 0 )
+                    {
+                        m_loadingDialog = panel2;
+                        return;
+                    }
+                }
+
+                return;
+            }
+        }
     }
 }
 

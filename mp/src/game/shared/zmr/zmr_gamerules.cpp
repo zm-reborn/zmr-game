@@ -125,6 +125,7 @@ static const char* g_PreserveEnts[] =
 
     "zm_objectives_manager",
     "zm_viewmodel",
+    "env_fog_controller_zm",
 
     "vote_controller",
 
@@ -304,6 +305,12 @@ void CZMRules::CreateStandardEntities()
     {
         new CZMVoteRoundRestart();
     }
+
+
+    pEnt = CBaseEntity::Create( "env_fog_controller_zm", vec3_origin, vec3_angle );
+    Assert( pEnt );
+
+    m_pZMFog = static_cast<CZMEntFogController*>( pEnt );
 }
 
 void CZMRules::LevelInitPostEntity()
@@ -1176,6 +1183,13 @@ void CZMRules::ResetWorld()
     RestoreMap();
 
 
+
+    // Reset ZM fog in case the values were updated.
+    if ( GetZMFogController() )
+    {
+        GetZMFogController()->InitFog();
+    }
+
     // Reset our loadout distribution.
     if ( GetLoadoutEnt() )
     {
@@ -1305,6 +1319,24 @@ void CZMRules::RestoreMap()
 
 
     ZMItemAction::g_ZMMapItemSystem.SpawnItems();
+}
+
+void CZMRules::PlayerSpawn( CBasePlayer* pPlayer )
+{
+    auto* pZMPlayer = ToZMPlayer( pPlayer );
+    if ( !pZMPlayer->IsHuman() )
+        return;
+
+
+    // Fire game_player_equip
+
+    CBaseEntity* pEquip = nullptr;
+
+
+    while ( (pEquip = gEntList.FindEntityByClassname( pEquip, "game_player_equip" )) != nullptr )
+    {
+        pEquip->Touch( pPlayer );
+    }
 }
 
 static ConVar zm_sv_resource_rate( "zm_sv_resource_rate", "5", FCVAR_NOTIFY );
