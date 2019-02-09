@@ -285,18 +285,13 @@ void CNPCRNonPlayer::PerformCustomPhysics( Vector* pNewPosition, Vector* pNewVel
 
     if ( VPhysicsGetObject() )
     {
-        //VPhysicsGetObject()->UpdateShadow( *pNewPosition, vec3_angle, true, GetUpdateInterval() );
-        VPhysicsGetObject()->UpdateShadow( *pNewPosition, vec3_angle, true, 0.0f );
+        //VPhysicsGetObject()->UpdateShadow( *pNewPosition, vec3_angle, true, 0.0f );
+        VPhysicsGetObject()->UpdateShadow( *pNewPosition, vec3_angle, false, GetUpdateInterval() );
         
         // This will not apply any force to objects nearby.
         // Will get players stuck (if called alone?)
         VPhysicsGetObject()->SetPosition( *pNewPosition, vec3_angle, true );
     }
-}
-
-void CNPCRNonPlayer::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
-{
-
 }
 
 float CNPCRNonPlayer::GetMoveActivityMovementSpeed()

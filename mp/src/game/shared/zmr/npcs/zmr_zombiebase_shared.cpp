@@ -10,6 +10,29 @@
 
 
 
+ConVar zm_sv_popcost_shambler( "zm_sv_popcost_shambler", "1", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE );
+ConVar zm_sv_popcost_banshee( "zm_sv_popcost_banshee", "6", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE );
+ConVar zm_sv_popcost_hulk( "zm_sv_popcost_hulk", "5", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE );
+ConVar zm_sv_popcost_drifter( "zm_sv_popcost_drifter", "2", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE );
+ConVar zm_sv_popcost_immolator( "zm_sv_popcost_immolator", "8", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE );
+
+ConVar zm_sv_cost_shambler( "zm_sv_cost_shambler", "10", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE );
+ConVar zm_sv_cost_banshee( "zm_sv_cost_banshee", "60", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE );
+ConVar zm_sv_cost_hulk( "zm_sv_cost_hulk", "70", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE );
+ConVar zm_sv_cost_drifter( "zm_sv_cost_drifter", "35", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE );
+ConVar zm_sv_cost_immolator( "zm_sv_cost_immolator", "100", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE );
+
+
+ConVar zm_sv_spawndelay_shambler( "zm_sv_spawndelay_shambler", "0.5", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE );
+ConVar zm_sv_spawndelay_banshee( "zm_sv_spawndelay_banshee", "0.7", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE );
+ConVar zm_sv_spawndelay_hulk( "zm_sv_spawndelay_hulk", "0.75", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE );
+ConVar zm_sv_spawndelay_drifter( "zm_sv_spawndelay_drifter", "0.6", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE );
+ConVar zm_sv_spawndelay_immolator( "zm_sv_spawndelay_immolator", "0.75", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE );
+
+
+ConVar zm_sv_happyzombies( "zm_sv_happyzombies", "0", FCVAR_REPLICATED, "Happy, happy zombies :)" );
+
+
 
 CZMZombieManager g_ZombieManager;
 
@@ -88,6 +111,19 @@ int CZMBaseZombie::GetCost( ZombieClass_t zclass )
     case ZMCLASS_DRIFTER : return zm_sv_cost_drifter.GetInt();
     case ZMCLASS_IMMOLATOR : return zm_sv_cost_immolator.GetInt();
     default : return 0;
+    }
+}
+
+float CZMBaseZombie::GetSpawnDelay( ZombieClass_t zclass )
+{
+    switch ( zclass )
+    {
+    case ZMCLASS_SHAMBLER : return zm_sv_spawndelay_shambler.GetFloat();
+    case ZMCLASS_BANSHEE : return zm_sv_spawndelay_banshee.GetFloat();
+    case ZMCLASS_HULK : return zm_sv_spawndelay_hulk.GetFloat();
+    case ZMCLASS_DRIFTER : return zm_sv_spawndelay_drifter.GetFloat();
+    case ZMCLASS_IMMOLATOR : return zm_sv_spawndelay_immolator.GetFloat();
+    default : return zm_sv_spawndelay_shambler.GetFloat();
     }
 }
 

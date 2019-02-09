@@ -782,7 +782,7 @@
 	}
 	"queue00"
 	{
-		"ControlName"		"ImagePanel"
+		"ControlName"		"CZMImageRowItemSpawn"
 		"fieldName"		"queue00"
 		"xpos"		"310"
 		"ypos"		"60"
@@ -797,10 +797,12 @@
 		"border"		"DepressedBorderHighlighted"
 		"scaleImage"		"0"
 		"tooltiptext"	"This zombie will be spawned next"
+		
+		"isprimary"		"1"
 	}
 	"queue01"
 	{
-		"ControlName"		"ImagePanel"
+		"ControlName"		"CZMImageRowItemSpawn"
 		"fieldName"		"queue01"
 		"xpos"		"350"
 		"ypos"		"60"
@@ -817,7 +819,7 @@
 	}
 	"queue02"
 	{
-		"ControlName"		"ImagePanel"
+		"ControlName"		"CZMImageRowItemSpawn"
 		"fieldName"		"queue02"
 		"xpos"		"310"
 		"ypos"		"100"
@@ -834,7 +836,7 @@
 	}
 	"queue03"
 	{
-		"ControlName"		"ImagePanel"
+		"ControlName"		"CZMImageRowItemSpawn"
 		"fieldName"		"queue03"
 		"xpos"		"350"
 		"ypos"		"100"
@@ -851,7 +853,7 @@
 	}
 	"queue04"
 	{
-		"ControlName"		"ImagePanel"
+		"ControlName"		"CZMImageRowItemSpawn"
 		"fieldName"		"queue04"
 		"xpos"		"310"
 		"ypos"		"140"
@@ -868,7 +870,7 @@
 	}
 	"queue05"
 	{
-		"ControlName"		"ImagePanel"
+		"ControlName"		"CZMImageRowItemSpawn"
 		"fieldName"		"queue05"
 		"xpos"		"350"
 		"ypos"		"140"
@@ -885,7 +887,7 @@
 	}
 	"queue06"
 	{
-		"ControlName"		"ImagePanel"
+		"ControlName"		"CZMImageRowItemSpawn"
 		"fieldName"		"queue06"
 		"xpos"		"310"
 		"ypos"		"180"
@@ -902,7 +904,7 @@
 	}
 	"queue07"
 	{
-		"ControlName"		"ImagePanel"
+		"ControlName"		"CZMImageRowItemSpawn"
 		"fieldName"		"queue07"
 		"xpos"		"350"
 		"ypos"		"180"
@@ -919,7 +921,7 @@
 	}
 	"queue08"
 	{
-		"ControlName"		"ImagePanel"
+		"ControlName"		"CZMImageRowItemSpawn"
 		"fieldName"		"queue08"
 		"xpos"		"310"
 		"ypos"		"220"
@@ -936,7 +938,7 @@
 	}
 	"queue09"
 	{
-		"ControlName"		"ImagePanel"
+		"ControlName"		"CZMImageRowItemSpawn"
 		"fieldName"		"queue09"
 		"xpos"		"350"
 		"ypos"		"220"

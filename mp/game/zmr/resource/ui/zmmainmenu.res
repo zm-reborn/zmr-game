@@ -87,21 +87,21 @@
 		"imagealign"		"0"
 		"subbuttons"
 		{
-			"playonline"
-			{
-				"fieldName"		"PlayOnline"
-				"allcaps"		"1"
-				"labelText"		"#GameUI_GameMenu_FindServers"
-				"command"		"OpenServerBrowser"
-				
-				"sound_released"		"zmr_mainmenu/buttonclickrelease.wav"
-			}
 			"createserver"
 			{
 				"fieldName"		"CreateServer"
 				"allcaps"		"1"
 				"labelText"		"#GameUI_CreateServer"
 				"command"		"OpenCreateMultiplayerGameDialog"
+				
+				"sound_released"		"zmr_mainmenu/buttonclickrelease.wav"
+			}
+			"playonline"
+			{
+				"fieldName"		"PlayOnline"
+				"allcaps"		"1"
+				"labelText"		"#GameUI_GameMenu_FindServers"
+				"command"		"OpenServerBrowser"
 				
 				"sound_released"		"zmr_mainmenu/buttonclickrelease.wav"
 			}
@@ -140,21 +140,21 @@
 		"imagematerial"		"zmr_mainmenu/menuicon_gear"
 		"subbuttons"
 		{
-			"defoptions"
-			{
-				"fieldName"		"DefaultOptions"
-				"allcaps"		"1"
-				"labelText"		"Input/Video"
-				"command"		"OpenOptionsDialog"
-				
-				"sound_released"		"zmr_mainmenu/buttonclickrelease.wav"
-			}
 			"modoptions"
 			{
 				"fieldName"		"ModOptions"
 				"allcaps"		"1"
 				"labelText"		"Mod Options"
 				"command"		"engine ToggleZMOptions"
+				
+				"sound_released"		"zmr_mainmenu/buttonclickrelease.wav"
+			}
+			"defoptions"
+			{
+				"fieldName"		"DefaultOptions"
+				"allcaps"		"1"
+				"labelText"		"Input/Video"
+				"command"		"OpenOptionsDialog"
 				
 				"sound_released"		"zmr_mainmenu/buttonclickrelease.wav"
 			}

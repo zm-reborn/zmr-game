@@ -17,7 +17,9 @@
 #include "zmr_entities.h"
 
 
-extern ConVar zm_sv_spawndelay;
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 
 #define MODEL_MANIPULATE        "models/manipulatable.mdl"
@@ -292,25 +294,36 @@ bool CZMEntZombieSpawn::QueueUnit( CZMPlayer* pPlayer, ZombieClass_t zclass, int
     }
 
 
-    if ( m_vSpawnQueue.Count() >= 10 )
-        return false;
-
     if ( !CanSpawn( zclass ) ) return false;
 
 
-    queue_info_t queue;
+    int plyindex = pPlayer ? pPlayer->entindex() : 0;
+    bool added = false;
 
-    queue.m_zclass = zclass;
-    queue.m_iSpawnerIndex = ( pPlayer ) ? pPlayer->entindex() : 0;
+    if ( m_vSpawnQueue.Count() )
+    {
+        queue_info_t& queue = m_vSpawnQueue.Element( m_vSpawnQueue.Count() - 1 );
+        if ( queue.m_zclass == zclass && queue.m_iSpawnerIndex == plyindex )
+        {
+            queue.m_nCount += amount;
+            if ( queue.m_nCount > 99 )
+                queue.m_nCount = 99;
+
+            added = true;
+        }
+    }
 
 
-    int left = 10 - m_vSpawnQueue.Count();
-    
-    if ( amount > left ) amount = left;
-    
+    if ( !added && m_vSpawnQueue.Count() < 10 )
+    {
+        queue_info_t queue;
 
-    for ( int i = 0; i < amount; i++ )
+        queue.m_zclass = zclass;
+        queue.m_nCount = (uint8)amount;
+        queue.m_iSpawnerIndex = plyindex;
+
         m_vSpawnQueue.AddToTail( queue );
+    }
 
 
     StartSpawning();
@@ -350,13 +363,20 @@ void CZMEntZombieSpawn::StartSpawning()
     SetNextSpawnThink();
 }
 
+float CZMEntZombieSpawn::GetSpawnDelay() const
+{
+    return CZMBaseZombie::GetSpawnDelay( !m_vSpawnQueue.Count() ? ZMCLASS_INVALID : m_vSpawnQueue[0].m_zclass );
+}
+
 void CZMEntZombieSpawn::SetNextSpawnThink()
 {
     // ZMRTODO: See if this causes any problems.
     // Only set next spawn think if we're not already thinking.
-    if ( GetNextThink() == TICK_NEVER_THINK || (GetNextThink() - gpGlobals->curtime) > zm_sv_spawndelay.GetFloat() )
+    float delay = GetSpawnDelay();
+
+    if ( GetNextThink() == TICK_NEVER_THINK || (GetNextThink() - gpGlobals->curtime) > delay )
     {
-        SetNextThink( gpGlobals->curtime + zm_sv_spawndelay.GetFloat() );
+        SetNextThink( gpGlobals->curtime + delay );
     }
 }
 
@@ -386,22 +406,22 @@ void CZMEntZombieSpawn::SendMenuUpdate()
 
 
 	UserMessageBegin( filter, "ZMBuildMenuUpdate" );
+    {
 		WRITE_SHORT( entindex() );
 
 		WRITE_BOOL( false ); // Force open
 
-		for ( int i=0; i < 10; i++ )
+        int count = m_vSpawnQueue.Count();
+        WRITE_BYTE( count );
+
+		for ( int i = 0; i < count; i++ )
 		{
-			//have to increment by 1 so that type_invalid fits into the unsigned byte
-			if ( m_vSpawnQueue.IsValidIndex( i ) )
-			{
-				WRITE_BYTE( m_vSpawnQueue[i].m_zclass + 1 );
-			}
-			else
-			{
-				WRITE_BYTE( ZMCLASS_INVALID + 1 );
-			}
+            Assert( m_vSpawnQueue[i].m_zclass != ZMCLASS_INVALID );
+
+			WRITE_BYTE( m_vSpawnQueue[i].m_zclass );
+			WRITE_BYTE( m_vSpawnQueue[i].m_nCount );
 		}
+    }
 	MessageEnd();
 }
 
@@ -430,7 +450,8 @@ void CZMEntZombieSpawn::SpawnThink()
         return;
     }
 
-    queue_info_t queue = m_vSpawnQueue.Element( 0 );
+
+    queue_info_t& queue = m_vSpawnQueue.Element( 0 );
 
     ZombieClass_t zclass = queue.m_zclass;
 
@@ -443,8 +464,17 @@ void CZMEntZombieSpawn::SpawnThink()
     {
         pPlayer = ToZMPlayer( UTIL_PlayerByIndex( queue.m_iSpawnerIndex ) );
 
-        if ( pPlayer && !pPlayer->HasEnoughRes( cost ) )
+
+        if ( pPlayer )
+        {
+            bCreate = pPlayer->HasEnoughRes( cost );
+        }
+        else
+        {
+            // That player no longer exists, just remove his shit from queue.
             bCreate = false;
+            m_vSpawnQueue.Remove( 0 );
+        }
     }
 
     if ( bCreate && !CZMBaseZombie::HasEnoughPopToSpawn( zclass ) )
@@ -453,7 +483,15 @@ void CZMEntZombieSpawn::SpawnThink()
     
     if ( bCreate && CreateZombie( zclass ) )
     {
-        m_vSpawnQueue.Remove( 0 );
+        queue.m_nCount--;
+
+
+        // We no longer have zombies in this slot, remove us.
+        if ( !queue.m_nCount )
+        {
+            m_vSpawnQueue.Remove( 0 );
+        }
+        
 
         if ( pPlayer )
         {
@@ -466,7 +504,16 @@ void CZMEntZombieSpawn::SpawnThink()
     }
 
 
-    SetNextSpawnThink();
+    
+    if ( m_vSpawnQueue.Count() )
+    {
+        SetNextSpawnThink();
+    }
+    else
+    {
+        // Nothing more in queue, stop spawning think.
+        StopSpawning();
+    }
 }
 
 CZMBaseZombie* CZMEntZombieSpawn::CreateZombie( ZombieClass_t zclass )
@@ -1992,3 +2039,51 @@ LINK_ENTITY_TO_CLASS( info_player_start, CZMEntSpawnPoint );
 LINK_ENTITY_TO_CLASS( info_player_deathmatch, CZMEntSpawnPoint );
 LINK_ENTITY_TO_CLASS( info_player_survivor, CZMEntSpawnPoint );
 LINK_ENTITY_TO_CLASS( info_player_zombiemaster, CZMEntSpawnPoint );
+
+
+
+/*
+    ZM fog controller
+*/
+static ConVar zm_sv_zmfog_enabled( "zm_sv_zmfog_enabled", "0", 0 );
+static ConVar zm_sv_zmfog_color( "zm_sv_zmfog_color", "14 0 0", 0 );
+static ConVar zm_sv_zmfog_density( "zm_sv_zmfog_density", "1", 0 );
+static ConVar zm_sv_zmfog_start( "zm_sv_zmfog_start", "1200", 0 );
+static ConVar zm_sv_zmfog_end( "zm_sv_zmfog_end", "2000", 0 );
+static ConVar zm_sv_zmfog_farz( "zm_sv_zmfog_farz", "-1", 0 );
+static ConVar zm_sv_zmfog_farz_skybox( "zm_sv_zmfog_farz_skybox", "-1", 0 );
+
+BEGIN_DATADESC( CZMEntFogController )
+END_DATADESC()
+
+LINK_ENTITY_TO_CLASS( env_fog_controller_zm, CZMEntFogController );
+
+
+bool CZMEntFogController::IsEnabled()
+{
+    return zm_sv_zmfog_enabled.GetBool();
+}
+
+void CZMEntFogController::InitFog()
+{
+    color32 clr;
+    int tempclr[3];
+    sscanf( zm_sv_zmfog_color.GetString(), "%i %i %i", &tempclr[0], &tempclr[1], &tempclr[2] );
+    clr.r = tempclr[0]; clr.g = tempclr[1]; clr.b = tempclr[2]; clr.a = 255;
+
+
+    m_fog.enable = true;
+    m_fog.blend = false;
+
+    m_fog.colorPrimary = m_fog.colorSecondary = clr;
+
+    m_fog.start = zm_sv_zmfog_start.GetFloat();
+    m_fog.end = zm_sv_zmfog_end.GetFloat();
+
+    m_fog.maxdensity = zm_sv_zmfog_density.GetFloat();
+    m_fog.farz = zm_sv_zmfog_farz.GetFloat();
+
+    m_fog.lerptime = -1.0f;
+
+    m_flSkyboxFarZ = zm_sv_zmfog_farz_skybox.GetFloat();
+}

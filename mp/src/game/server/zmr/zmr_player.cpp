@@ -928,6 +928,36 @@ void CZMPlayer::InitialSpawn()
     GetZMRejoinSystem()->OnPlayerJoin( this );
 }
 
+void CZMPlayer::InitZMFog()
+{
+    if ( !CZMEntFogController::IsEnabled() )
+        return;
+
+
+    auto* pFog = ZMRules()->GetZMFogController();
+    if ( !pFog )
+        return;
+
+
+    m_Local.m_PlayerFog.m_hCtrl.Set( pFog );
+
+
+    // Skybox data is separate.
+    {
+        m_Local.m_skybox3d.fog.enable = pFog->m_fog.enable;
+
+        m_Local.m_skybox3d.fog.colorPrimary = m_Local.m_skybox3d.fog.colorSecondary = pFog->m_fog.colorPrimary;
+
+        m_Local.m_skybox3d.fog.start = pFog->m_fog.start;
+        m_Local.m_skybox3d.fog.end = pFog->m_fog.end;
+
+        m_Local.m_skybox3d.fog.maxdensity = pFog->m_fog.maxdensity;
+        m_Local.m_skybox3d.fog.farz = pFog->m_flSkyboxFarZ;
+
+        m_Local.m_skybox3d.fog.lerptime = -1.0f;
+    }
+}
+
 void CZMPlayer::Spawn()
 {
     m_iSpawnInterpCounter = (m_iSpawnInterpCounter + 1) % 8;
@@ -942,6 +972,17 @@ void CZMPlayer::Spawn()
     SetCollisionGroup( COLLISION_GROUP_PLAYER );
 
     CBasePlayer::Spawn();
+
+
+    if ( GetTeamNumber() == ZMTEAM_ZM )
+    {
+        InitZMFog();
+    }
+
+    if ( !m_Local.m_PlayerFog.m_hCtrl.Get() )
+    {
+        m_Local.m_skybox3d.fog.enable = false;
+    }
 
 
     SetTeamSpecificProps();

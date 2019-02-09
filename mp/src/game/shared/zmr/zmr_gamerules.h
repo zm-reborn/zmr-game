@@ -20,18 +20,6 @@
 
 extern ConVar zm_sv_zombiemax;
 
-extern ConVar zm_sv_popcost_shambler;
-extern ConVar zm_sv_popcost_banshee;
-extern ConVar zm_sv_popcost_hulk;
-extern ConVar zm_sv_popcost_drifter;
-extern ConVar zm_sv_popcost_immolator;
-
-extern ConVar zm_sv_cost_shambler;
-extern ConVar zm_sv_cost_banshee;
-extern ConVar zm_sv_cost_hulk;
-extern ConVar zm_sv_cost_drifter;
-extern ConVar zm_sv_cost_immolator;
-
 
 enum
 {
@@ -128,6 +116,7 @@ public:
 
     virtual void Think() OVERRIDE;
 
+    virtual void PlayerSpawn( CBasePlayer* pPlayer ) OVERRIDE;
     virtual void PlayerThink( CBasePlayer* ) OVERRIDE;
 
     virtual const char* GetChatFormat( bool bTeamOnly, CBasePlayer* ) OVERRIDE;
@@ -189,6 +178,8 @@ public:
 
     inline CZMEntObjectivesManager* GetObjManager() { return m_pObjManager; };
     inline void SetObjManager( CZMEntObjectivesManager* pEnt ) { m_pObjManager = pEnt; }
+
+    CZMEntFogController* GetZMFogController() const { return m_pZMFog; }
 #endif
 
     inline int GetZombiePop() { return m_nZombiePop; };
@@ -222,6 +213,7 @@ private:
 
     CZMEntLoadout* m_pLoadoutEnt;
     CZMEntObjectivesManager* m_pObjManager;
+    CZMEntFogController* m_pZMFog;
 #endif
 };
 

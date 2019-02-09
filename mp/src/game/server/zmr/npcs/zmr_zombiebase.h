@@ -70,6 +70,7 @@ public:
 
     virtual bool ShouldUpdate() const OVERRIDE;
 
+    virtual NPCR::QueryResult_t ShouldChase( CBaseEntity* pEnemy ) const OVERRIDE;
     virtual NPCR::QueryResult_t ShouldTouch( CBaseEntity* pEnt ) const OVERRIDE;
 
 
@@ -117,6 +118,7 @@ public:
     static const char*      ClassToName( ZombieClass_t zclass );
     static int              GetPopCost( ZombieClass_t zclass );
     static int              GetCost( ZombieClass_t zclass );
+    static float            GetSpawnDelay( ZombieClass_t zclass );
     static bool             HasEnoughPopToSpawn( ZombieClass_t zclass );
     int                     GetSelectorIndex() const;
     CZMPlayer*              GetSelector() const;

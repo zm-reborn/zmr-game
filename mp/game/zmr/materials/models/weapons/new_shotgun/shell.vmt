@@ -1,0 +1,13 @@
+"vertexlitgeneric"
+{
+	"$basetexture" "models/weapons/new_shotgun/shell_diffuse"
+	"$bumpmap" "models/weapons/new_shotgun/shell_normal"
+	
+	"$surfaceprop" "metal"
+	
+	"$envmap" "env_cubemap"
+	"$envmapcontrast" ".6" // More contrast is usually good
+	"$envmaptint" "[.5 .5 .5]" // Tone down the reflection
+	"$envmapsaturation" "[.8 .8 .8]" // Saturate the reflection a bit
+	"$normalmapalphaenvmapmask" 1
+}

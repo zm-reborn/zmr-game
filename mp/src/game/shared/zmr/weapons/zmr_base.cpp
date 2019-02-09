@@ -35,9 +35,11 @@ BEGIN_NETWORK_TABLE( CZMBaseWeapon, DT_ZM_BaseWeapon )
 #ifdef CLIENT_DLL
     RecvPropInt( RECVINFO( m_nOverrideClip1 ) ),
     RecvPropTime( RECVINFO( m_flNextClipFillTime ) ),
+    RecvPropBool( RECVINFO( m_bCanCancelReload ) ),
 #else
     SendPropInt( SENDINFO( m_nOverrideClip1 ) ),
     SendPropTime( SENDINFO( m_flNextClipFillTime ) ),
+    SendPropBool( SENDINFO( m_bCanCancelReload ) ),
 #endif
 END_NETWORK_TABLE()
 
@@ -74,6 +76,7 @@ CZMBaseWeapon::CZMBaseWeapon()
 #endif
 
     m_flNextClipFillTime = 0.0f;
+    m_bCanCancelReload = true;
 }
 
 CZMBaseWeapon::~CZMBaseWeapon()
@@ -149,9 +152,62 @@ Activity CZMBaseWeapon::GetPrimaryAttackActivity()
     // If we have last bullet, play fitting animation if we have it.
     bool bUseLastAct =  !IsMeleeWeapon()
                     &&  m_iClip1 == 1
-                    &&  ::SelectHeaviestSequence( pVM->GetModelPtr(), ACT_ZM_VM_PRIMARYATTACK_LAST ) != ACTIVITY_NOT_AVAILABLE;
+                    &&  ::SelectHeaviestSequence( pVM->GetModelPtr(), ACT_VM_PRIMARYATTACK_EMPTY ) != ACTIVITY_NOT_AVAILABLE;
 
-    return bUseLastAct ? ACT_ZM_VM_PRIMARYATTACK_LAST : ACT_VM_PRIMARYATTACK;
+    return bUseLastAct ? ACT_VM_PRIMARYATTACK_EMPTY : ACT_VM_PRIMARYATTACK;
+}
+
+bool CZMBaseWeapon::Deploy()
+{
+    MDLCACHE_CRITICAL_SECTION();
+    bool bResult = DefaultDeploy();
+
+
+    PoseParameterOverride( false );
+
+    return bResult;
+}
+
+bool CZMBaseWeapon::DefaultDeploy()
+{
+    // Weapons that don't autoswitch away when they run out of ammo 
+    // can still be deployed when they have no ammo.
+    if ( !HasAnyAmmo() && AllowsAutoSwitchFrom() )
+        return false;
+
+    auto* pOwner = GetPlayerOwner();
+    if ( pOwner )
+    {
+        if ( !pOwner->IsAlive() )
+            return false;
+
+
+        pOwner->SetAnimationExtension( GetAnimPrefix() );
+
+        SetViewModel();
+        SendWeaponAnim( GetDrawActivity() );
+
+        pOwner->SetNextAttack( gpGlobals->curtime + SequenceDuration() );
+    }
+
+
+    // Can't shoot again until we've finished deploying
+    m_flNextPrimaryAttack = gpGlobals->curtime + SequenceDuration();
+    m_flNextSecondaryAttack	= m_flNextPrimaryAttack;
+
+    //m_flHudHintMinDisplayTime = 0;
+
+    //m_bAltFireHudHintDisplayed = false;
+    //m_bReloadHudHintDisplayed = false;
+    //m_flHudHintPollTime = gpGlobals->curtime + 5.0f;
+    
+    WeaponSound( DEPLOY );
+
+    SetWeaponVisible( true );
+
+    SetContextThink( nullptr, 0, "BaseCombatWeapon_HideThink" );
+
+    return true;
 }
 
 //Activity CZMBaseWeapon::GetSecondaryAttackActivity()
@@ -161,7 +217,13 @@ Activity CZMBaseWeapon::GetPrimaryAttackActivity()
 
 Activity CZMBaseWeapon::GetDrawActivity()
 {
-    return UsesDryActivity( ACT_ZM_VM_DRAW_DRY ) ? ACT_ZM_VM_DRAW_DRY : ACT_VM_DRAW;
+    return UsesDryActivity( ACT_VM_DRAW_EMPTY ) ? ACT_VM_DRAW_EMPTY : ACT_VM_DRAW;
+}
+
+Activity CZMBaseWeapon::GetIdleActivity() const
+{
+    auto* pMe = const_cast<CZMBaseWeapon*>( this );
+    return pMe->UsesDryActivity( ACT_VM_IDLE_EMPTY ) ? ACT_VM_IDLE_EMPTY : ACT_VM_IDLE;
 }
 
 bool CZMBaseWeapon::UsesDryActivity( Activity act )
@@ -182,9 +244,7 @@ void CZMBaseWeapon::WeaponIdle()
 {
     if ( HasWeaponIdleTimeElapsed() )
     {
-        Activity act = UsesDryActivity( ACT_ZM_VM_IDLE_DRY ) ? ACT_ZM_VM_IDLE_DRY : ACT_VM_IDLE;
-
-        SendWeaponAnim( act );
+        SendWeaponAnim( GetIdleActivity() );
     }
 }
 
@@ -240,12 +300,19 @@ bool CZMBaseWeapon::DefaultReload( int iClipSize1, int iClipSize2, int iActivity
     if ( flReloadTime == -1.0f )
         flReloadTime = flSeqTime;
 
-    m_flNextPrimaryAttack = m_flNextSecondaryAttack = gpGlobals->curtime + flSeqTime;
+
+    float flReadyTime = GetFirstInstanceOfAnimEventTime( GetSequence(), (int)AE_WPN_PRIMARYATTACK );
+    if ( flReadyTime == -1.0f )
+        flReadyTime = flSeqTime;
+    
+
+    m_flNextPrimaryAttack = m_flNextSecondaryAttack = gpGlobals->curtime + flReadyTime;
 
 
     m_flNextClipFillTime = gpGlobals->curtime + flReloadTime;
 
     m_bInReload = true;
+    m_bCanCancelReload = true;
 
     return true;
 }
@@ -271,25 +338,43 @@ void CZMBaseWeapon::CheckReload()
         {
             if ( m_bReloadsSingly && m_iClip1 < GetMaxClip1() )
             {
-                if ( !Reload() )
-                    m_bInReload = false;
+                Reload();
             }
             else
             {
-                m_bInReload = false;
+                StopReload();
             }
         }
     }
 }
 
+bool CZMBaseWeapon::ShouldCancelReload() const
+{
+    if ( !m_bCanCancelReload )
+        return false;
+
+    CZMPlayer* pOwner = GetPlayerOwner();
+    if  ( !pOwner )
+        return false;
+
+    return pOwner->GetAmmoCount( m_iPrimaryAmmoType ) <= 0;
+}
+
 void CZMBaseWeapon::CancelReload()
 {
+    SendWeaponAnim( GetIdleActivity() );
+
     m_bInReload = false;
 
     // Make sure we don't attack instantly when stopping the reload.
     // Add a bit more time.
-    m_flNextPrimaryAttack += 0.1f;
-    m_flNextSecondaryAttack += 0.1f;
+    m_flNextPrimaryAttack = gpGlobals->curtime + 0.2f;
+    m_flNextSecondaryAttack = m_flNextPrimaryAttack;
+}
+
+void CZMBaseWeapon::StopReload()
+{
+    m_bInReload = false;
 }
 
 bool CZMBaseWeapon::ShouldIncrementClip() const
@@ -301,6 +386,7 @@ void CZMBaseWeapon::IncrementClip()
 {
     // We don't want to increment the clip more than once per reload.
     m_flNextClipFillTime = 0.0f;
+    m_bCanCancelReload = false;
 
 
     auto* pOwner = GetPlayerOwner();
@@ -336,7 +422,7 @@ bool CZMBaseWeapon::Reload()
     bool ret = DefaultReload(
                     GetMaxClip1(),
                     GetMaxClip2(),
-                    UsesDryActivity( ACT_ZM_VM_RELOAD_DRY ) ? ACT_ZM_VM_RELOAD_DRY : ACT_VM_RELOAD );
+                    UsesDryActivity( ACT_VM_RELOAD_EMPTY ) ? ACT_VM_RELOAD_EMPTY : ACT_VM_RELOAD );
 
     if ( ret )
     {
@@ -428,7 +514,7 @@ void CZMBaseWeapon::FireBullets( int numShots, int iAmmoType, float flMaxDist )
     FireBullets( info );
 }
 
-float CZMBaseWeapon::GetFirstInstanceOfAnimEventTime( int iSeq, int iAnimEvent ) const
+float CZMBaseWeapon::GetFirstInstanceOfAnimEventTime( int iSeq, int iAnimEvent, bool bReturnOption ) const
 {
     CZMBaseWeapon* me = const_cast<CZMBaseWeapon*>( this );
 
@@ -452,6 +538,8 @@ float CZMBaseWeapon::GetFirstInstanceOfAnimEventTime( int iSeq, int iAnimEvent )
     {
         if ( pevent[i].event == iAnimEvent )
         {
+            if ( bReturnOption && pevent[i].pszOptions()[0] != NULL )
+                return atof( pevent[i].pszOptions() );
             return pevent[i].cycle * me->SequenceDuration( hdr, iSeq );
         }
     }
@@ -473,7 +561,7 @@ void CZMBaseWeapon::PrimaryAttack( void )
     }
 
 
-    m_flNextPrimaryAttack = m_flNextPrimaryAttack + GetFireRate();
+    m_flNextPrimaryAttack = gpGlobals->curtime + GetFireRate();
     Shoot();
 }
 

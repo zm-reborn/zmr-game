@@ -33,7 +33,8 @@ public:
 
     virtual const Vector& GetBulletSpread( void ) OVERRIDE
     {
-        static Vector cone = VECTOR_CONE_15DEGREES;
+//#define CONE_25DEGREES      0.2170625f
+        static Vector cone = Vector( VECTOR_CONE_15DEGREES.x, VECTOR_CONE_15DEGREES.x * 0.3f, 0.0f );
         return cone;
     }
     
@@ -46,7 +47,7 @@ public:
 
         QAngle viewPunch;
 
-        viewPunch.x = SharedRandomFloat( "shotgunpax", -5.0f, -2.0f );
+        viewPunch.x = SharedRandomFloat( "shotgunpax", -9.0f, -5.0f );
         viewPunch.y = SharedRandomFloat( "shotgunpay", -3.5f, 3.5f );
         viewPunch.z = 0.0f;
 

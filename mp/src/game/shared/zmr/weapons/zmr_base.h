@@ -49,9 +49,14 @@ public:
 
     virtual void ItemPostFrame() OVERRIDE;
 
+    virtual bool Deploy() OVERRIDE;
+    virtual bool DefaultDeploy();
+
     virtual Activity GetPrimaryAttackActivity() OVERRIDE;
     //virtual Activity GetSecondaryAttackActivity() OVERRIDE;
     virtual Activity GetDrawActivity() OVERRIDE;
+    virtual Activity GetIdleActivity() const;
+
     virtual void WeaponIdle() OVERRIDE;
 
     bool DefaultReload( int iClipSize1, int iClipSize2, int iActivity );
@@ -148,7 +153,8 @@ public:
     virtual void IncrementClip();
     virtual bool ShouldIncrementClip() const;
     virtual void CancelReload();
-    virtual bool ShouldCancelReload() const { return false; }
+    virtual bool ShouldCancelReload() const;
+    virtual void StopReload();
 
     // We have animations for when the gun is empty?
     virtual bool UsesDryActivity( Activity act );
@@ -162,7 +168,7 @@ public:
     virtual int     GetMaxPenetrations() const { return 0; }
     virtual float   GetMaxPenetrationDist() const { return 16.0f; }
 
-    float           GetFirstInstanceOfAnimEventTime( int iSeq, int iAnimEvent ) const;
+    float           GetFirstInstanceOfAnimEventTime( int iSeq, int iAnimEvent, bool bReturnOption = false ) const;
 
 
     inline int GetSlotFlag() const { return m_iSlotFlag; }
@@ -209,6 +215,7 @@ private:
 
 
     CNetworkVar( float, m_flNextClipFillTime );
+    CNetworkVar( bool, m_bCanCancelReload );
 };
 
 inline CZMBaseWeapon* ToZMBaseWeapon( CBaseEntity* pEnt )

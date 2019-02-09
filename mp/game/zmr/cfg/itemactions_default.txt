@@ -5,6 +5,8 @@
 	{
 		"Stock_SpawnOtherShotgunTypes"
 		{
+			"onlyoldmaps"		"1"
+			
 			"filter_class"		"weapon_zm_shotgun"
 			
 			"replace"		"Shotgun"

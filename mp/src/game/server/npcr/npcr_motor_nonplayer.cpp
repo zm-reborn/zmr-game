@@ -91,6 +91,7 @@ void NPCR::CNonPlayerMotor::Move()
         {
             // Woah, vector projection.
             Vector left( -veldir.y, veldir.x, 0.0f );
+            left.NormalizeInPlace();
             Vector movedir = CrossProduct( left, GetGroundNormal() );
 
             m_vecVelocity = movedir * m_vecVelocity.Dot( movedir );
@@ -118,7 +119,7 @@ void NPCR::CNonPlayerMotor::Move()
         if ( bDidMove )
         {
             // Apply special friction when moving.
-            Vector right( m_vecMoveDir.y, -m_vecMoveDir.x, m_vecMoveDir.z );
+            Vector right( m_vecMoveDir.y, -m_vecMoveDir.x, 0.0f );
             Vector rightVel = DotProduct( m_vecVelocity, right ) * right;
             Vector swFriction = -GetFrictionSideways() * rightVel;
 

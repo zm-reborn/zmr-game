@@ -1210,6 +1210,14 @@ NPCR::CFollowNavPath* CZMBaseZombie::GetFollowPath() const
     return new NPCR::CFollowNavPath;
 }
 
+NPCR::QueryResult_t CZMBaseZombie::ShouldChase( CBaseEntity* pEnemy ) const
+{
+    if ( (gpGlobals->curtime - GetLastTimeCommanded()) < 1.0f )
+        return NPCR::RES_NO;
+
+    return BaseClass::ShouldChase( pEnemy );
+}
+
 NPCR::QueryResult_t CZMBaseZombie::ShouldTouch( CBaseEntity* pEnt ) const
 {
     // Fixes a few PARTICULAR maps that use this old terrible method of letting zombies pass through brushes.

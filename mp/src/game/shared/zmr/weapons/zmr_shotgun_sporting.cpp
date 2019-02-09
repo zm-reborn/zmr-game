@@ -24,7 +24,7 @@ public:
     CZMWeaponShotgunSporting();
 
 #ifdef CLIENT_DLL
-    virtual CZMBaseCrosshair* GetWeaponCrosshair() const OVERRIDE { return ZMGetCrosshair( "Shotgun" ); }
+    virtual CZMBaseCrosshair* GetWeaponCrosshair() const OVERRIDE { return ZMGetCrosshair( "ShotgunSporting" ); }
 #endif
 
 
@@ -46,8 +46,8 @@ public:
 
     virtual const Vector& GetBulletSpread( void ) OVERRIDE
     {
-        static Vector cone = VECTOR_CONE_5DEGREES;
-        static Vector cone2 = VECTOR_CONE_8DEGREES;
+        static Vector cone = VECTOR_CONE_6DEGREES;
+        static Vector cone2 = VECTOR_CONE_15DEGREES;
 
         return IsFiringBothBarrels() ? cone2 : cone;
     }
@@ -61,8 +61,17 @@ public:
 
         QAngle viewPunch;
 
-        viewPunch.x = SharedRandomFloat( "shotgunpax", -5.0f, -2.0f );
-        viewPunch.y = SharedRandomFloat( "shotgunpay", -3.5f, 3.5f );
+        if ( IsFiringBothBarrels() )
+        {
+            viewPunch.x = SharedRandomFloat( "sportingpax", -16.0f, -8.0f );
+            viewPunch.y = SharedRandomFloat( "sportingpay", -4.0f, 4.0f );
+        }
+        else
+        {
+            viewPunch.x = SharedRandomFloat( "sportingpax", -8.0f, -6.0f );
+            viewPunch.y = SharedRandomFloat( "sportingpay", -4.0f, 4.0f );
+        }
+
         viewPunch.z = 0.0f;
 
         pPlayer->ViewPunch( viewPunch );
@@ -70,7 +79,7 @@ public:
     
 
     virtual int GetBulletsPerShot() const OVERRIDE { return 7; }
-    virtual float GetFireRate( void ) OVERRIDE { return 0.7f; }
+    virtual float GetFireRate( void ) OVERRIDE { return 0.45f; }
 };
 
 IMPLEMENT_NETWORKCLASS_ALIASED( ZMWeaponShotgunSporting, DT_ZM_WeaponShotgunSporting )
@@ -144,8 +153,6 @@ void CZMWeaponShotgunSporting::ShootBarrels( bool bWantBoth )
 
 
     float delay = GetFireRate();
-    if ( bShootSingle )
-        delay *= 0.75f;
 
     m_flNextSecondaryAttack = gpGlobals->curtime + delay;
     m_flNextPrimaryAttack = m_flNextSecondaryAttack;

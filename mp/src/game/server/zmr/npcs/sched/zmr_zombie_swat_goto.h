@@ -173,6 +173,11 @@ public:
         }
     }
 
+    virtual void OnChase( CBaseEntity* pEnemy ) OVERRIDE
+    {
+        TryEnd( "We're chasing an enemy, can't swat anymore!" );
+    }
+
     virtual void OnCommanded( ZombieCommandType_t com ) OVERRIDE
     {
         TryEnd( "We were commanded to do something else!" );

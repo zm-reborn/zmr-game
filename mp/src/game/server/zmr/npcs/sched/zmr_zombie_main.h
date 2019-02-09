@@ -152,9 +152,6 @@ public:
     {
         CZMBaseZombie* pOuter = GetOuter();
 
-        if ( (gpGlobals->curtime - pOuter->GetLastTimeCommanded()) < 1.0f )
-            return NPCR::RES_NO;
-
         if ( pOuter->GetZombieMode() == ZOMBIEMODE_AMBUSH )
             return NPCR::RES_NO;
 
@@ -222,7 +219,7 @@ public:
 
 
         CZMBaseZombie* pOuter = GetOuter();
-
+        pOuter->UpdateLastTimeCommanded();
             
         pOuter->SetSwatObject( pEnt );
 

@@ -89,6 +89,7 @@ private:
 struct queue_info_t
 {
     ZombieClass_t m_zclass;
+    uint8 m_nCount;
     int m_iSpawnerIndex;
 };
 
@@ -134,6 +135,7 @@ private:
     bool FindSpawnPoint( CZMBaseZombie* pZombie, Vector& output, QAngle& outang );
 
     void SetNextSpawnThink();
+    float GetSpawnDelay() const;
 
     CUtlVector<queue_info_t> m_vSpawnQueue;
 
@@ -456,3 +458,22 @@ public:
 private:
     bool m_bIsEnabled;
 };
+
+/*
+    ZM specific fog controller
+*/
+class CZMEntFogController : public CFogController
+{
+public:
+    DECLARE_CLASS( CZMEntFogController, CFogController );
+    DECLARE_DATADESC();
+
+
+    static bool IsEnabled();
+
+    void InitFog();
+
+
+    float m_flSkyboxFarZ;
+};
+

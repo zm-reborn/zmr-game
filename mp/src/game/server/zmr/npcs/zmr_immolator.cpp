@@ -15,6 +15,7 @@ ConVar zm_sv_immolator_burndist( "zm_sv_immolator_burndist", "250", FCVAR_NOTIFY
 ConVar zm_sv_immolator_burndmgdist( "zm_sv_immolator_burndmgdist", "132", FCVAR_NOTIFY, "The distance at which we will hurt others when burning." );
 ConVar zm_sv_immolator_burndmgtime( "zm_sv_immolator_burndmgtime", "8", FCVAR_NOTIFY, "The time those near me will burn for." );
 ConVar zm_sv_immolator_burndmg( "zm_sv_immolator_burndmg", "1", FCVAR_NOTIFY );
+ConVar zm_sv_immolator_burnhealthcap( "zm_sv_immolator_burnhealthcap", "1", FCVAR_NOTIFY, "The health cap at which the immolator will ignite the player." );
 
 #define BURNOTHER_INTERVAL          1.0f
 
@@ -148,7 +149,8 @@ void CZMImmolator::BurnHurtOthers()
                 CTakeDamageInfo info( this, this, zm_sv_immolator_burndmg.GetFloat(), DMG_BURN );
                 pEnt->TakeDamage( info );
 
-                if ( pEnt->GetHealth() < (pEnt->GetMaxHealth() / 5.0f) )
+                // Finish them off by burning them alive!
+                if ( pEnt->GetHealth() <= zm_sv_immolator_burnhealthcap.GetInt() )
                 {
                     pChar->Ignite( flBurnTime, false );
                 }
