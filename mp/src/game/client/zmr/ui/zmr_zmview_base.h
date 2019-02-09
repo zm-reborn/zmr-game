@@ -64,6 +64,8 @@ private:
 public:
 
 
+    virtual int ZMKeyInput( ButtonCode_t keynum, int down );
+
     virtual void CloseChildMenus();
     virtual void HideMouseTools();
 

@@ -70,6 +70,7 @@ public:
 
     virtual bool ShouldUpdate() const OVERRIDE;
 
+    virtual NPCR::QueryResult_t ShouldChase( CBaseEntity* pEnemy ) const OVERRIDE;
     virtual NPCR::QueryResult_t ShouldTouch( CBaseEntity* pEnt ) const OVERRIDE;
 
 

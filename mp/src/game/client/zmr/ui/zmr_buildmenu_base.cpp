@@ -5,6 +5,8 @@
 #include "zmr_buildmenu.h"
 #include "zmr_zmview_base.h"
 #include "zmr/c_zmr_entities.h"
+#include "zmr/npcs/c_zmr_zombiebase.h"
+#include "zmr/c_zmr_clientmode.h"
 #include "zmr_buildmenu_base.h"
 
 
@@ -45,11 +47,55 @@ void CZMBuildMenuBase::OnCommand( const char *command )
 	BaseClass::OnCommand( command );
 }
 
+int CZMBuildMenuBase::ZMKeyInput( ButtonCode_t keynum, int down )
+{
+    if ( !down )
+        return -1;
+
+    int num = -1;
+
+
+    // Spawn menu only cares about number keys, at least for now
+
+    if ( keynum >= KEY_0 && keynum <= KEY_9 )
+        num = keynum - KEY_0;
+    if ( keynum >= KEY_PAD_0 && keynum <= KEY_PAD_9 )
+        num = keynum - KEY_PAD_0;
+
+    if ( num < 0 )
+        return -1;
+
+
+    
+    // Translate the key number to zombie class
+    ZombieClass_t zclass = (ZombieClass_t)( num - 1 );
+
+    if ( !C_ZMBaseZombie::IsValidClass( zclass ) )
+        return 0;
+
+
+    bool bDoAltAmount = GetZMClientMode()->IsZMHoldingCtrl();
+
+    // Tell server to spawn em.
+    engine->ClientCmd( VarArgs( "zm_cmd_queue %i %i %i",
+        GetSpawnIndex(),
+        (int)zclass,
+        bDoAltAmount ? GetAltSpawnAmount() : 1 ) );
+    
+    return 1;
+}
+
 void CZMBuildMenuBase::ShowMenu( C_ZMEntZombieSpawn* pSpawn )
 {
     SetSpawnIndex( pSpawn->entindex() );
     SetZombieFlags( pSpawn->GetZombieFlags() );
     ShowPanel( true );
+}
+
+int CZMBuildMenuBase::GetAltSpawnAmount() const
+{
+    // ZMRTODO: Add cvar or something.
+    return 5;
 }
 
 void CZMBuildMenuBase::OnClose()

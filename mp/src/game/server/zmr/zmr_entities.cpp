@@ -2039,3 +2039,51 @@ LINK_ENTITY_TO_CLASS( info_player_start, CZMEntSpawnPoint );
 LINK_ENTITY_TO_CLASS( info_player_deathmatch, CZMEntSpawnPoint );
 LINK_ENTITY_TO_CLASS( info_player_survivor, CZMEntSpawnPoint );
 LINK_ENTITY_TO_CLASS( info_player_zombiemaster, CZMEntSpawnPoint );
+
+
+
+/*
+    ZM fog controller
+*/
+static ConVar zm_sv_zmfog_enabled( "zm_sv_zmfog_enabled", "0", 0 );
+static ConVar zm_sv_zmfog_color( "zm_sv_zmfog_color", "14 0 0", 0 );
+static ConVar zm_sv_zmfog_density( "zm_sv_zmfog_density", "1", 0 );
+static ConVar zm_sv_zmfog_start( "zm_sv_zmfog_start", "1200", 0 );
+static ConVar zm_sv_zmfog_end( "zm_sv_zmfog_end", "2000", 0 );
+static ConVar zm_sv_zmfog_farz( "zm_sv_zmfog_farz", "-1", 0 );
+static ConVar zm_sv_zmfog_farz_skybox( "zm_sv_zmfog_farz_skybox", "-1", 0 );
+
+BEGIN_DATADESC( CZMEntFogController )
+END_DATADESC()
+
+LINK_ENTITY_TO_CLASS( env_fog_controller_zm, CZMEntFogController );
+
+
+bool CZMEntFogController::IsEnabled()
+{
+    return zm_sv_zmfog_enabled.GetBool();
+}
+
+void CZMEntFogController::InitFog()
+{
+    color32 clr;
+    int tempclr[3];
+    sscanf( zm_sv_zmfog_color.GetString(), "%i %i %i", &tempclr[0], &tempclr[1], &tempclr[2] );
+    clr.r = tempclr[0]; clr.g = tempclr[1]; clr.b = tempclr[2]; clr.a = 255;
+
+
+    m_fog.enable = true;
+    m_fog.blend = false;
+
+    m_fog.colorPrimary = m_fog.colorSecondary = clr;
+
+    m_fog.start = zm_sv_zmfog_start.GetFloat();
+    m_fog.end = zm_sv_zmfog_end.GetFloat();
+
+    m_fog.maxdensity = zm_sv_zmfog_density.GetFloat();
+    m_fog.farz = zm_sv_zmfog_farz.GetFloat();
+
+    m_fog.lerptime = -1.0f;
+
+    m_flSkyboxFarZ = zm_sv_zmfog_farz_skybox.GetFloat();
+}

@@ -252,6 +252,8 @@ public:
 
     void            UpdatePlayerZMVars();
 
+    void InitZMFog();
+
 
     void CopyWeaponDamage( CZMBaseWeapon* pWeapon, const FireBulletsInfo_t& info );
     void CopyMeleeDamage( CZMBaseWeapon* pWeapon, const Vector& vecSrc, float flDamage );
