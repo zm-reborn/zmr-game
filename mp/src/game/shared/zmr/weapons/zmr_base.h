@@ -32,9 +32,10 @@ class CZMBaseWeapon : public CBaseCombatWeapon, public CZMUserCmdHitWepValidator
 {
 public:
 	DECLARE_CLASS( CZMBaseWeapon, CBaseCombatWeapon );
-	DECLARE_NETWORKCLASS(); 
+	DECLARE_NETWORKCLASS();
+#ifdef CLIENT_DLL
 	DECLARE_PREDICTABLE();
-#ifndef CLIENT_DLL
+#else
     DECLARE_DATADESC();
 #endif
 
