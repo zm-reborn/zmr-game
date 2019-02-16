@@ -548,7 +548,7 @@ float CZMBaseWeapon::GetFirstInstanceOfAnimEventTime( int iSeq, int iAnimEvent, 
 }
 
 
-void CZMBaseWeapon::PrimaryAttack( void )
+void CZMBaseWeapon::PrimaryAttack()
 {
     if ( !CanAct() ) return;
 
@@ -660,7 +660,7 @@ void CZMBaseWeapon::PlayAISound() const
 }
 #endif
 
-void CZMBaseWeapon::SecondaryAttack( void )
+void CZMBaseWeapon::SecondaryAttack()
 {
     if ( !CanAct() ) return;
 
@@ -938,7 +938,7 @@ bool CZMBaseWeapon::IsTemplate()
     return BaseClass::IsTemplate();
 }
 
-void CZMBaseWeapon::Materialize( void )
+void CZMBaseWeapon::Materialize()
 {
 	if ( IsEffectActive( EF_NODRAW ) )
 	{
@@ -974,7 +974,7 @@ void CZMBaseWeapon::Materialize( void )
 }
 #endif
 
-void CZMBaseWeapon::FallInit( void )
+void CZMBaseWeapon::FallInit()
 {
 #ifndef CLIENT_DLL
 	SetModel( GetWorldModel() );
@@ -1045,7 +1045,7 @@ void CZMBaseWeapon::FallInit( void )
 #endif
 }
 
-void CZMBaseWeapon::SetPickupTouch( void )
+void CZMBaseWeapon::SetPickupTouch()
 {
 #ifndef CLIENT_DLL
     SetTouch( &CBaseCombatWeapon::DefaultTouch );
@@ -1099,7 +1099,7 @@ void CZMBaseWeapon::DoMachineGunKick( float dampEasy, float maxVerticleKickAngle
     pPlayer->ViewPunch( vecScratch * 0.5 );
 }
 
-bool CZMBaseWeapon::CanBeSelected( void )
+bool CZMBaseWeapon::CanBeSelected()
 {
 	if ( !VisibleInWeaponSelection() )
 		return false;
@@ -1161,7 +1161,7 @@ ConVar cl_bobenable( "cl_bobenable", "1" );
 extern float g_lateralBob;
 extern float g_verticalBob;
 
-float CZMBaseWeapon::CalcViewmodelBob( void )
+float CZMBaseWeapon::CalcViewmodelBob()
 {
     static float    bobtime;
     static float    lastbobtime;
@@ -1276,7 +1276,7 @@ const WeaponProficiencyInfo_t* CZMBaseWeapon::GetProficiencyValues()
 #else
 
 // Server stubs
-float CZMBaseWeapon::CalcViewmodelBob( void )
+float CZMBaseWeapon::CalcViewmodelBob()
 {
     return 0.0f;
 }

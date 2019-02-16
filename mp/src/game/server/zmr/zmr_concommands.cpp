@@ -7,7 +7,6 @@
 #include "zmr/weapons/zmr_base.h"
 #include "zmr/zmr_shareddefs.h"
 #include "zmr_player.h"
-#include "zmr/zmr_global_shared.h"
 #include "zmr/zmr_gamerules.h"
 #include "zmr_voicelines.h"
 

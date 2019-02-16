@@ -83,8 +83,8 @@ public:
     virtual bool                ShouldInterpolate() OVERRIDE;
 
     // Custom...
-    inline bool IsZM() { return GetTeamNumber() == ZMTEAM_ZM; };
-    inline bool IsHuman() { return GetTeamNumber() == ZMTEAM_HUMAN; };
+    inline bool IsZM() const { return GetTeamNumber() == ZMTEAM_ZM; }
+    inline bool IsHuman() const { return GetTeamNumber() == ZMTEAM_HUMAN; }
 
     static C_ZMPlayer* GetLocalPlayer();
 

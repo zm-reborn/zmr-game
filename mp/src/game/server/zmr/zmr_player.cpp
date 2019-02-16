@@ -14,7 +14,6 @@
 #include "zmr/zmr_viewmodel.h"
 #include "zmr_entities.h"
 #include "zmr/zmr_gamerules.h"
-#include "zmr/zmr_global_shared.h"
 #include "zmr/zmr_playermodels.h"
 #include "weapons/zmr_carry.h"
 #include "zmr_player.h"

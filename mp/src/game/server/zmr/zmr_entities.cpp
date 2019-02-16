@@ -11,7 +11,6 @@
 #include "zmr/zmr_player.h"
 #include "zmr/zmr_shareddefs.h"
 #include "npcs/zmr_zombiebase_shared.h"
-#include "zmr/zmr_global_shared.h"
 #include "zmr/weapons/zmr_base.h"
 
 #include "zmr_entities.h"
@@ -1598,6 +1597,8 @@ void CZMEntLoadout::GiveWeapon( CZMPlayer* pPlayer, int loadout_wep )
 /*
     Block hidden trigger
 */
+extern CUtlVector<CZMEntTriggerBlockHidden*>* g_pBlockHidden;
+
 BEGIN_DATADESC( CZMEntTriggerBlockHidden )
     DEFINE_KEYFIELD( m_bActive, FIELD_BOOLEAN, "Active" ),
 
@@ -1645,6 +1646,8 @@ void CZMEntTriggerBlockHidden::InputDisable( inputdata_t &inputData )
 /*
     Block phys explosion
 */
+CUtlVector<CZMEntTriggerBlockPhysExp*>* g_pBlockPhysExp;
+
 BEGIN_DATADESC( CZMEntTriggerBlockPhysExp )
     DEFINE_KEYFIELD( m_bActive, FIELD_BOOLEAN, "Active" ),
 

@@ -60,10 +60,10 @@ public:
     virtual void WeaponIdle() OVERRIDE;
 
     bool DefaultReload( int iClipSize1, int iClipSize2, int iActivity );
-    virtual	void CheckReload( void ) OVERRIDE;
+    virtual	void CheckReload() OVERRIDE;
     virtual bool Reload() OVERRIDE;
     // NOTE: Always use this to get the damage from .txt file.
-    virtual void FireBullets( const FireBulletsInfo_t &info ) OVERRIDE;
+    virtual void FireBullets( const FireBulletsInfo_t& info ) OVERRIDE;
     virtual void FireBullets( int numShots, int iAmmoType, float flMaxDist );
     virtual void PrimaryAttack() OVERRIDE;
     virtual void Shoot();
@@ -82,8 +82,8 @@ public:
     virtual void    GetGlowEffectColor( float& r, float& g, float& b ) OVERRIDE;
     void            UpdateGlow();
 
-    virtual bool    GlowOccluded() OVERRIDE { return false; };
-    virtual bool    GlowUnoccluded() OVERRIDE { return true; };
+    virtual bool    GlowOccluded() OVERRIDE { return false; }
+    virtual bool    GlowUnoccluded() OVERRIDE { return true; }
 
 
     virtual ShadowType_t ShadowCastType() OVERRIDE;
@@ -95,9 +95,9 @@ public:
 
     virtual void SetWeaponVisible( bool visible ) OVERRIDE;
 
-    void WeaponSound( WeaponSound_t, float soundtime = 0.0f ) OVERRIDE;
+    void WeaponSound( WeaponSound_t sound_type, float soundtime = 0.0f ) OVERRIDE;
 
-    void DoMachineGunKick( float, float, float, float );
+    void DoMachineGunKick( float dampEasy, float maxVerticleKickAngle, float fireDurationTime, float slideLimitTime );
 
 #ifdef CLIENT_DLL
     virtual CZMBaseCrosshair* GetWeaponCrosshair() const { return nullptr; }
@@ -106,8 +106,8 @@ public:
     // How many bullets we fire per one "bullet", or clip "unit".
     virtual int GetBulletsPerShot() const { return 1; }
 
-    virtual int GetMinBurst( void ) OVERRIDE { return 1; }
-    virtual int GetMaxBurst( void ) OVERRIDE { return 1; }
+    virtual int GetMinBurst() OVERRIDE { return 1; }
+    virtual int GetMaxBurst() OVERRIDE { return 1; }
     
 #ifndef CLIENT_DLL
     // Volume = distance
@@ -117,27 +117,27 @@ public:
 
     virtual bool IsTemplate() OVERRIDE;
 
-    virtual void Materialize( void ) OVERRIDE;
+    virtual void Materialize() OVERRIDE;
 #endif
     // Makes our weapons not cry about spawning.
-    virtual void FallInit( void );
+    virtual void FallInit();
     // Override this so our guns don't disappear.
-    virtual void SetPickupTouch( void ) OVERRIDE;
-    virtual bool CanBeSelected( void ) OVERRIDE;
+    virtual void SetPickupTouch() OVERRIDE;
+    virtual bool CanBeSelected() OVERRIDE;
     // Never let anybody tell you're not beautiful even without any ammo, alright?
     // Let us always select this weapon even when we don't have any ammo for it.
-    virtual bool AllowsAutoSwitchFrom( void ) const OVERRIDE { return false; }
-    virtual void Drop( const Vector& ) OVERRIDE;
+    virtual bool AllowsAutoSwitchFrom() const OVERRIDE { return false; }
+    virtual void Drop( const Vector& vecVelocity ) OVERRIDE;
 
     // Add weapon slot flag.
-    virtual void Equip( CBaseCombatCharacter* ) OVERRIDE;
+    virtual void Equip( CBaseCombatCharacter* pCharacter ) OVERRIDE;
 
 
     // Viewmodel/misc stuff
-    float   CalcViewmodelBob( void ) OVERRIDE;
-    void    AddViewmodelBob( CBaseViewModel*, Vector&, QAngle& ) OVERRIDE;
-    Vector  GetBulletSpread( WeaponProficiency_t ) OVERRIDE;
-    float   GetSpreadBias( WeaponProficiency_t ) OVERRIDE;
+    float   CalcViewmodelBob() OVERRIDE;
+    void    AddViewmodelBob( CBaseViewModel* pVM, Vector& origin, QAngle& angles ) OVERRIDE;
+    Vector  GetBulletSpread( WeaponProficiency_t proficiency ) OVERRIDE;
+    float   GetSpreadBias( WeaponProficiency_t proficiency ) OVERRIDE;
 
     const WeaponProficiencyInfo_t*          GetProficiencyValues() OVERRIDE;
     static const WeaponProficiencyInfo_t*   GetDefaultProficiencyValues();
@@ -184,8 +184,8 @@ public:
     
 protected:
 #ifndef CLIENT_DLL
-    void SaveReserveAmmo( CBaseCombatCharacter* );
-    void TransferReserveAmmo( CBaseCombatCharacter* );
+    void SaveReserveAmmo( CBaseCombatCharacter* pOwner );
+    void TransferReserveAmmo( CBaseCombatCharacter* pOwner );
     // No support for secondary ammo since we'll never use it anyway, RIGHT?
     int m_nReserveAmmo;
 

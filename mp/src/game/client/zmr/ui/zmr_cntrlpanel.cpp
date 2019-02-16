@@ -6,7 +6,7 @@
 #include "vgui_bitmapbutton.h"
 
 
-#include "zmr_global_shared.h"
+#include "zmr/npcs/zmr_zombiebase_shared.h"
 #include "zmr_zmview_base.h"
 #include "zmr_cntrlpanel.h"
 #include "zmr/c_zmr_zmvision.h"

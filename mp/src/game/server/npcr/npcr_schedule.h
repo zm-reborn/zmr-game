@@ -6,8 +6,6 @@
 #include "npcr_component.h"
 
 
-extern ConVar npcr_debug_schedules;
-
 namespace NPCR
 {
     class CScheduleInterface;
@@ -96,6 +94,12 @@ namespace NPCR
         ScheduleState_t GetState() const { return m_State; }
         EventState_t GetEventState() const { return m_EventState; }
 
+        static bool IsDebugging()
+        {
+            extern ConVar npcr_debug_schedules;
+            return npcr_debug_schedules.GetInt() > 0;
+        }
+
     protected:
         virtual CSchedule<NPCRChar>* CreateFriendSchedule() { return nullptr; }
 
@@ -109,7 +113,7 @@ namespace NPCR
 
             Assert( sched != nullptr );
 
-            if ( npcr_debug_schedules.GetBool() )
+            if ( IsDebugging() )
                 Msg( "[NPCR] Trying to intercept '%s' with '%s' because '%s'.\n", GetName(), sched->GetName(), szReason );
 
 
@@ -129,7 +133,7 @@ namespace NPCR
 
             Assert( sched != nullptr );
 
-            if ( npcr_debug_schedules.GetBool() )
+            if ( IsDebugging() )
                 Msg( "[NPCR] Intercepted '%s' with '%s' because '%s'.\n", GetName(), sched->GetName(), szReason );
 
 
@@ -159,7 +163,7 @@ namespace NPCR
                 return;
             }
 
-            if ( npcr_debug_schedules.GetBool() )
+            if ( IsDebugging() )
                 Msg( "[NPCR] Trying to end '%s' because '%s'.\n", GetName(), szReason );
 
 
@@ -176,7 +180,7 @@ namespace NPCR
                 return;
             }
 
-            if ( npcr_debug_schedules.GetBool() )
+            if ( IsDebugging() )
                 Msg( "[NPCR] Ended '%s' because '%s'.\n", GetName(), szReason );
 
 
@@ -237,7 +241,7 @@ namespace NPCR
             GetParentInterface()->AddComponent( this );
 
 
-            if ( npcr_debug_schedules.GetBool() )
+            if ( IsDebugging() )
                 Msg( "[NPCR] Continuing '%s'\n", GetName() );
 
             OnContinue();
