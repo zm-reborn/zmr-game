@@ -5,11 +5,10 @@
 #include <engine/IEngineSound.h>
 #include "c_user_message_register.h"
 
-
+#include "zmr/npcs/zmr_zombiebase_shared.h"
 #include "zmr/ui/zmr_hud_chat.h"
 #include "zmr/ui/zmr_hud_tooltips.h"
 
-#include "zmr/zmr_global_shared.h"
 #include "c_zmr_tips.h"
 #include "c_zmr_util.h"
 

@@ -5,7 +5,8 @@
 #include "zmr/zmr_util.h"
 #include "zmr/zmr_entities.h"
 #endif
-#include "zmr_global_shared.h"
+#include "zmr/npcs/zmr_zombiebase_shared.h"
+#include "zmr_player_shared.h"
 #include "zmr_shareddefs.h"
 
 #include "zmr_hiddenspawn.h"
@@ -14,6 +15,11 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+
+
+#ifdef GAME_DLL
+CUtlVector<CZMEntTriggerBlockHidden*>* g_pBlockHidden;
+#endif
 
 
 ConVar zm_hidden_cost_shambler( "zm_hidden_cost_shambler", "100", FCVAR_NOTIFY | FCVAR_REPLICATED );

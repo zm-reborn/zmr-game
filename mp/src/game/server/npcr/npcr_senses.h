@@ -19,7 +19,7 @@ namespace NPCR
         ~VisionEntity() {}
 
 
-        CBaseEntity*    GetEntity() { return m_pEnt.Get(); };
+        CBaseEntity*    GetEntity() const { return m_pEnt.Get(); }
 
         float   LastSeen() const { return m_flLastSeen; }
         void    UpdateLastSeen()

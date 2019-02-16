@@ -23,6 +23,9 @@ namespace NPCR
         void            SetMaxPathLength( float l ) { m_flMaxPathLength = l; }
 
 
+        virtual float   GetJumpCostMultiplier() const { return 2.0f; }
+
+
         // NAV
         virtual float operator()( CNavArea* area, CNavArea* fromArea, const CNavLadder* ladder, const CFuncElevator* elevator, float length ) const = 0;
 

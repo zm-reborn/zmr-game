@@ -16,7 +16,6 @@
 #include "zmr/ui/zmr_zmview_base.h"
 
 #include "npcs/c_zmr_zombiebase.h"
-#include "zmr/zmr_global_shared.h"
 #include "zmr/zmr_viewmodel.h"
 #include "c_zmr_entities.h"
 #include "zmr/zmr_softcollisions.h"

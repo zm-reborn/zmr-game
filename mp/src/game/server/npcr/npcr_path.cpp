@@ -204,6 +204,9 @@ bool NPCR::CBaseNavPath::BuildSimplePath( const Vector& vecStart, const Vector& 
 
 bool NPCR::CBaseNavPath::ComputeNavPathDetails( int count, const Vector& vecStart, CNavArea* pLastArea, const Vector& vecGoal, const NPCR::CBasePathCost& cost )
 {
+    Vector center;
+    float halfWidth;
+
     if ( count >= MAX_PATH_LINKS-1 )
     {
         count = MAX_PATH_LINKS-1;
@@ -260,7 +263,7 @@ bool NPCR::CBaseNavPath::ComputeNavPathDetails( int count, const Vector& vecStar
         // Only handle ground traveling for now.
         Assert( to->navTraverse <= GO_WEST );
 
-        from->area->ComputePortal( to->area, (NavDirType)to->navTraverse, &to->portalCenter, &to->portalHalfWidth );
+        from->area->ComputePortal( to->area, (NavDirType)to->navTraverse, &center, &halfWidth );
 
         from->area->ComputeClosestPointInPortal( to->area, (NavDirType)to->navTraverse, from->pos, &to->pos );
         to->pos.z = from->area->GetZ( to->pos );
@@ -308,7 +311,7 @@ bool NPCR::CBaseNavPath::ComputeNavPathDetails( int count, const Vector& vecStar
     last->navTraverse = prev->navTraverse;
     last->navTravel = TRAVEL_ONGROUND; // Assume we'll be traveling on ground.
 
-    prev->area->ComputePortal( last->area, (NavDirType)last->navTraverse, &last->portalCenter, &last->portalHalfWidth );
+    prev->area->ComputePortal( last->area, (NavDirType)last->navTraverse, &center, &halfWidth );
 
     if ( last->area->Contains( vecGoal ) )
     {

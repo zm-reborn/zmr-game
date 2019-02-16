@@ -35,11 +35,8 @@ namespace NPCR
         NavTravel_t navTravel;
         NavTraverseType navTraverse;
         Vector fwd; // Unit vector to next segment.
-        float fwd_dot; // Dot product of previous segment fwd and our fwd.
+        float fwd_dot; // Dot product of previous link fwd and our fwd.
         float length;
-
-        Vector portalCenter;
-        float portalHalfWidth;
     };
 
     class CBaseNavPath : public CAIGraphPath

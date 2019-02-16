@@ -56,7 +56,7 @@ bool CZMBasePumpWeapon::Holster( CBaseCombatWeapon* pSwitchTo )
     return res;
 }
 
-void CZMBasePumpWeapon::PrimaryAttack( void )
+void CZMBasePumpWeapon::PrimaryAttack()
 {
     if ( !CanAct() ) return;
 
@@ -66,7 +66,7 @@ void CZMBasePumpWeapon::PrimaryAttack( void )
     BaseClass::PrimaryAttack();
 }
 
-void CZMBasePumpWeapon::ItemPostFrame( void )
+void CZMBasePumpWeapon::ItemPostFrame()
 {
     if ( IsInReload() )
     {
@@ -120,7 +120,7 @@ void CZMBasePumpWeapon::Pump()
     m_flNextPrimaryAttack = m_flNextSecondaryAttack = gpGlobals->curtime + flReadyTime;
 }
 
-void CZMBasePumpWeapon::CheckReload( void )
+void CZMBasePumpWeapon::CheckReload()
 {
     if ( !CanAct() )
     {
@@ -133,7 +133,7 @@ void CZMBasePumpWeapon::CheckReload( void )
     BaseClass::CheckReload();
 }
 
-void CZMBasePumpWeapon::StartReload( void )
+void CZMBasePumpWeapon::StartReload()
 {
     if ( m_iReloadState != RELOADSTATE_NONE ) return;
 
@@ -189,7 +189,7 @@ void CZMBasePumpWeapon::StopReload()
     BaseClass::StopReload();
 }
 
-void CZMBasePumpWeapon::FinishReload( void )
+void CZMBasePumpWeapon::FinishReload()
 {
     BaseClass::FinishReload();
 
@@ -197,7 +197,7 @@ void CZMBasePumpWeapon::FinishReload( void )
     StopReload();
 }
 
-bool CZMBasePumpWeapon::Reload( void )
+bool CZMBasePumpWeapon::Reload()
 {
     if ( m_iReloadState == RELOADSTATE_NONE )
     {

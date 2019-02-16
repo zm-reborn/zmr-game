@@ -10,7 +10,6 @@
 #include "npcs/zmr_zombiebase_shared.h"
 #include "npcs/zmr_banshee.h"
 //#include "npcs/zmr_fastzombie.h"
-#include "zmr/zmr_global_shared.h"
 #include "zmr/zmr_util.h"
 
 #include "zmr_player.h"
@@ -549,8 +548,10 @@ static ConCommand zm_cmd_closebuildmenu( "zm_cmd_closebuildmenu", ZM_Cmd_CloseBu
 
 
 /*
-    Open manipulate menu
+    Phys explosion
 */
+extern CUtlVector<CZMEntTriggerBlockPhysExp*>* g_pBlockPhysExp;
+
 static ConVar zm_sv_physexp_cost( "zm_sv_physexp_cost", "400", FCVAR_NOTIFY | FCVAR_ARCHIVE );
 static ConVar zm_sv_physexp_radius( "zm_sv_physexp_radius", "222", FCVAR_NOTIFY | FCVAR_ARCHIVE );
 static ConVar zm_sv_physexp_magnitude( "zm_sv_physexp_magnitude", "17500", FCVAR_NOTIFY | FCVAR_ARCHIVE );

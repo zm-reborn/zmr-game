@@ -43,7 +43,7 @@ public:
     int GetDropAmmoAmount() const OVERRIDE { return SIZE_ZMAMMO_REVOLVER; }
 #endif
 
-    virtual const Vector& GetBulletSpread( void ) OVERRIDE
+    virtual const Vector& GetBulletSpread() OVERRIDE
     {
         static Vector cone = Vector( 0.0f, 0.0f, 0.0f );
 
@@ -85,7 +85,7 @@ public:
     virtual int GetMaxPenetrations() const OVERRIDE { return 1; }
 
     
-    virtual void AddViewKick( void ) OVERRIDE;
+    virtual void AddViewKick() OVERRIDE;
 
     virtual void PrimaryAttack() OVERRIDE;
     virtual void PrimaryAttackEffects() OVERRIDE;
@@ -93,16 +93,16 @@ public:
 
     virtual void Shoot() OVERRIDE;
     
-    virtual float GetFireRate( void ) OVERRIDE { return 1.0f; }
+    virtual float GetFireRate() OVERRIDE { return 1.0f; }
 
     void ItemPostFrame() OVERRIDE;
 
     void HandleAnimEventRevolver();
 
 #ifndef CLIENT_DLL
-    void Operator_HandleAnimEvent( animevent_t*, CBaseCombatCharacter* ) OVERRIDE;
+    void Operator_HandleAnimEvent( animevent_t* pEvent, CBaseCombatCharacter* pOperator ) OVERRIDE;
 #else
-    bool OnFireEvent( C_BaseViewModel*, const Vector&, const QAngle&, int event, const char* ) OVERRIDE;
+    bool OnFireEvent( C_BaseViewModel* pViewModel, const Vector& origin, const QAngle& angles, int event, const char* options ) OVERRIDE;
 #endif
 
 protected:
@@ -270,7 +270,7 @@ void CZMWeaponRevolver::HandleAnimEventRevolver()
 }
 
 #ifndef CLIENT_DLL
-void CZMWeaponRevolver::Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCharacter *pOperator )
+void CZMWeaponRevolver::Operator_HandleAnimEvent( animevent_t* pEvent, CBaseCombatCharacter* pOperator )
 {
 	switch( pEvent->event )
 	{

@@ -172,7 +172,7 @@ public:
                 m_vecFaceTowards = sndOrigin;
                 m_FaceTimer.Start( 2.0f );
 
-                if ( npcr_debug_schedules.GetBool() )
+                if ( IsDebugging() )
                     Msg( "Facing zombie %i towards sound.\n", pOuter->entindex() );
             }
         }
@@ -203,7 +203,7 @@ public:
         m_Path.Compute( vecStart, vecEnd, start, goal, m_PathCost );
         if ( !m_Path.IsValid() )
         {
-            if ( npcr_debug_schedules.GetBool() )
+            if ( IsDebugging() )
                 Msg( "Couldn't compute combat check path!\n" );
             return false;
         }
@@ -216,7 +216,7 @@ public:
 
 
 
-        if ( npcr_debug_schedules.GetBool() )
+        if ( IsDebugging() )
             Msg( "Moving zombie %i towards sound.\n", pOuter->entindex() );
 
 
