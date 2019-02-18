@@ -814,7 +814,22 @@ void CZMViewBase::FindZMObject( int x, int y, bool bSticky )
 
         if ( pZombie )
         {
+            // We clicked on a zombie.
+
+            // If we have already selected this zombie,
+            // check if the player wants to select of type.
+            bool bSelectOfType = pZombie->GetSelectorIndex() == GetLocalPlayerIndex();
+            float flLastSelect = pZombie->GetLastLocalSelect();
+
+
             ZMClientUtil::SelectSingleZombie( pZombie, bSticky );
+
+            if (bSelectOfType
+            &&  (gpGlobals->curtime - flLastSelect) <= GetDoubleClickDelta() )
+            {
+                SelectZombiesOfType( pZombie->GetZombieClass(), true );
+            }
+
 
             bHit = true;
             return;
@@ -826,9 +841,44 @@ void CZMViewBase::FindZMObject( int x, int y, bool bSticky )
         ZMClientUtil::DeselectAllZombies();
 }
 
+void CZMViewBase::SelectZombiesOfType( ZombieClass_t zclass, bool bSticky )
+{
+    Vector screen;
+    trace_t tr;
+    CTraceFilterNoNPCsOrPlayer filter( nullptr, COLLISION_GROUP_NONE );
+
+    CUtlVector<C_ZMBaseZombie*> vZombies;
+    
+    int myindex = GetLocalPlayerIndex();
 
 
+    g_ZombieManager.ForEachAliveZombie( [ &vZombies, &tr, &filter, &screen, &myindex ]( C_ZMBaseZombie* pZombie )
+    {
+        if ( pZombie->GetSelectorIndex() == myindex )
+            return;
 
+
+        int x, y;
+        // Do we see the mad man?
+        if ( !zm_cl_poweruser_boxselect.GetBool() )
+        {
+            UTIL_TraceZMView( &tr, pZombie->GetAbsOrigin() + Vector( 0, 0, 8 ), MASK_ZMVIEW, &filter );
+
+            if ( tr.fraction != 1.0f && !tr.startsolid ) return;
+        }
+
+        if ( !ZMClientUtil::WorldToScreen( pZombie->GetAbsOrigin(), screen, x, y ) )
+            return;
+
+        if ( x > 0 && x < ScreenWidth() && y > 0 && y < ScreenHeight() )
+        {
+            vZombies.AddToTail( pZombie );
+        }
+    } );
+
+
+    ZMClientUtil::SelectZombies( vZombies, bSticky );
+}
 
 void CZMViewBase::TraceScreenToWorld( int mx, int my, trace_t* res, CTraceFilterSimple* filter, int mask )
 {

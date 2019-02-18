@@ -85,6 +85,7 @@ C_ZMBaseZombie::C_ZMBaseZombie()
     m_fxInner = nullptr;
 
     m_iGroup = INVALID_GROUP_INDEX;
+    m_flLastLocalSelect = 0.0f;
 
     m_pHat = nullptr;
 
