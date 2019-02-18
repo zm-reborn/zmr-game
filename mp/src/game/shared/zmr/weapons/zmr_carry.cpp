@@ -519,7 +519,31 @@ void CGrabController::AttachEntity( CBasePlayer *pPlayer, CBaseEntity *pEntity, 
     pPhys->GetPosition( &position, &angles );
     // If it has a preferred orientation, use that instead.
 #ifndef CLIENT_DLL
-    Pickup_GetPreferredCarryAngles( pEntity, pPlayer, pPlayer->EntityToWorldTransform(), angles );
+    // ZMR
+    // Apply preferred carry angles fix
+    
+    // This only applies carry angles if:
+    // It has a special prop interaction. Only sawblade and a few other props use it.
+    // It's a func_physbox with custom carry angles defined.
+    bool bHasAngles = Pickup_GetPreferredCarryAngles( pEntity, pPlayer, pPlayer->EntityToWorldTransform(), angles );
+
+
+    // If it's a prop, see if it has desired carry angles
+    // Yes, this is separate from the above one.
+    CPhysicsProp* pProp = dynamic_cast<CPhysicsProp*>( pEntity );
+    if ( pProp )
+    {
+        m_bHasPreferredCarryAngles = pProp->GetPropDataAngles( "preferred_carryangles", m_vecPreferredCarryAngles );
+        if ( !bHasAngles && m_bHasPreferredCarryAngles )
+            angles = m_vecPreferredCarryAngles;
+    }
+    else
+    {
+        m_bHasPreferredCarryAngles = false;
+    }
+#else
+
+    m_bHasPreferredCarryAngles = false;
 #endif
 
 //	ComputeMaxSpeed( pEntity, pPhys );
@@ -572,23 +596,6 @@ void CGrabController::AttachEntity( CBasePlayer *pPlayer, CBaseEntity *pEntity, 
     }
 
     VectorITransform( pEntity->WorldSpaceCenter(), pEntity->EntityToWorldTransform(), m_attachedPositionObjectSpace );
-
-#ifndef CLIENT_DLL
-    // If it's a prop, see if it has desired carry angles
-    CPhysicsProp *pProp = dynamic_cast<CPhysicsProp *>(pEntity);
-    if ( pProp )
-    {
-        m_bHasPreferredCarryAngles = pProp->GetPropDataAngles( "preferred_carryangles", m_vecPreferredCarryAngles );
-    }
-    else
-    {
-        m_bHasPreferredCarryAngles = false;
-    }
-#else
-
-    m_bHasPreferredCarryAngles = false;
-#endif
-
 }
 
 static void ClampPhysicsVelocity( IPhysicsObject *pPhys, float linearLimit, float angularLimit )
