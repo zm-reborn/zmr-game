@@ -87,6 +87,10 @@ public:
     inline int  GetGroup() const { return m_iGroup; };
     inline void SetGroup( int group ) { m_iGroup = group; };
 
+    float GetLastLocalSelect() const { return m_flLastLocalSelect; }
+    void UpdateLastLocalSelect() { m_flLastLocalSelect = gpGlobals->curtime; }
+
+
 
     virtual CStudioHdr* OnNewModel() OVERRIDE;
     virtual C_BaseAnimating* BecomeRagdollOnClient() OVERRIDE;
@@ -117,6 +121,9 @@ private:
     C_ZMHolidayHat* m_pHat;
 
     CZMZombieAnimState* m_pAnimState;
+
+
+    float m_flLastLocalSelect;
 };
 
 inline C_ZMBaseZombie* ToZMBaseZombie( C_BaseEntity* pEnt )

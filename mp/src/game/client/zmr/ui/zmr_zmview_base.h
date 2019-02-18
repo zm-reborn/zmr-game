@@ -113,6 +113,7 @@ protected:
     void FindZombiesInBox( int start_x, int start_y, int end_x, int end_y, bool bSticky );
     void FindZMObject( int x, int y, bool bSticky );
 
+    void SelectZombiesOfType( ZombieClass_t zclass, bool bSticky );
     void DoMoveLine();
 
 
