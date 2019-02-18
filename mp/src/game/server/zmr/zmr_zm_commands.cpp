@@ -550,7 +550,7 @@ static ConCommand zm_cmd_closebuildmenu( "zm_cmd_closebuildmenu", ZM_Cmd_CloseBu
 /*
     Phys explosion
 */
-extern CUtlVector<CZMEntTriggerBlockPhysExp*>* g_pBlockPhysExp;
+extern CUtlVector<CZMEntTriggerBlockPhysExp*> g_ZMBlockPhysExp;
 
 static ConVar zm_sv_physexp_cost( "zm_sv_physexp_cost", "400", FCVAR_NOTIFY | FCVAR_ARCHIVE );
 static ConVar zm_sv_physexp_radius( "zm_sv_physexp_radius", "222", FCVAR_NOTIFY | FCVAR_ARCHIVE );
@@ -586,9 +586,9 @@ void ZM_Cmd_PhysExp( const CCommand &args )
 
 
     CZMEntTriggerBlockPhysExp* pBlock;
-    for ( int i = 0; i < g_pBlockPhysExp->Count(); i++ )
+    for ( int i = 0; i < g_ZMBlockPhysExp.Count(); i++ )
     {
-        pBlock = g_pBlockPhysExp->Element( i );
+        pBlock = g_ZMBlockPhysExp.Element( i );
 
         if (pBlock && pBlock->IsActive()
         &&  pBlock->CollisionProp()

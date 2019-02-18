@@ -18,7 +18,7 @@
 
 
 #ifdef GAME_DLL
-CUtlVector<CZMEntTriggerBlockHidden*>* g_pBlockHidden;
+CUtlVector<CZMEntTriggerBlockHidden*> g_ZMBlockHidden;
 #endif
 
 
@@ -136,9 +136,9 @@ HiddenSpawnError_t CZMHiddenSpawnSystem::Spawn( ZombieClass_t zclass, CZMPlayer*
     //
 #ifdef GAME_DLL
     CZMEntTriggerBlockHidden* pBlock;
-    for ( int i = 0; i < g_pBlockHidden->Count(); i++ )
+    for ( int i = 0; i < g_ZMBlockHidden.Count(); i++ )
     {
-        pBlock = g_pBlockHidden->Element( i );
+        pBlock = g_ZMBlockHidden.Element( i );
 
         if (pBlock && pBlock->IsActive()
         &&  pBlock->CollisionProp()
