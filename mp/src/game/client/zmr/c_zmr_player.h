@@ -39,7 +39,8 @@ public:
     virtual bool CreateMove( float delta, CUserCmd* cmd ) OVERRIDE;
 
     void            OnSpawn();
-    virtual void    TeamChange( int ) OVERRIDE;
+    virtual void    TeamChange( int iNewTeam ) OVERRIDE;
+    static void     TeamChangeStatic( int iNewTeam );
 
 
     virtual void            Simulate() OVERRIDE;
