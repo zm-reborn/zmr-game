@@ -98,6 +98,7 @@ public:
 
     static void TraceScreenToWorld( int mx, int my, trace_t* res, CTraceFilterSimple* filter, int mask );
 
+    static bool UsesZMView();
 
 protected:
 
