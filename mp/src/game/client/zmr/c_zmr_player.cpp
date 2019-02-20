@@ -372,31 +372,39 @@ void C_ZMPlayer::TeamChange( int iNewTeam )
 
     // Reset back to old team just in case something uses it.
     C_BaseEntity::ChangeTeam( iOldTeam );
-    
-
-
-    if ( g_pZMView )
-        g_pZMView->SetVisible( iNewTeam == ZMTEAM_ZM );
-
-
-
-
-    // Execute team config.
-    CZMTeamKeysConfig::ExecuteTeamConfig( iNewTeam );
 
 
     if ( iNewTeam == ZMTEAM_ZM )
     {
         ZMClientUtil::QueueTooltip( "zmintro", 1.0f );
         ZMClientUtil::QueueTooltip( "zmmoving", 12.0f );
+    }
+}
+
+void C_ZMPlayer::TeamChangeStatic( int iNewTeam )
+{
+    // It's possible to receive events from the server before our local player is created.
+    // All crucial things that don't rely on local player
+    // should be put here.
+
+
+    if ( g_pZMView )
+        g_pZMView->SetVisible( iNewTeam == ZMTEAM_ZM );
+
+
+    // Execute team config.
+    CZMTeamKeysConfig::ExecuteTeamConfig( iNewTeam );
 
 
 
-        engine->ClientCmd( "exec zm.cfg" );
+
+    if ( iNewTeam == ZMTEAM_ZM )
+    {
+        engine->ClientCmd_Unrestricted( "exec zm.cfg" );
     }
     else if ( iNewTeam == ZMTEAM_HUMAN )
     {
-        engine->ClientCmd( "exec survivor.cfg" );
+        engine->ClientCmd_Unrestricted( "exec survivor.cfg" );
     }
 }
 
