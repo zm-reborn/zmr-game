@@ -72,7 +72,7 @@ public:
 
 CON_COMMAND( zm_observermode, "" )
 {
-    if ( g_pZMView )
+    if ( g_pZMView && CZMViewBase::UsesZMView() )
     {
         bool state = !g_pZMView->IsVisible();
 
@@ -85,7 +85,7 @@ CON_COMMAND( zm_observermode, "" )
 
 CON_COMMAND( zm_hiddenspawn, "" )
 {
-    if ( g_pZMView )
+    if ( g_pZMView && CZMViewBase::UsesZMView() )
     {
         g_pZMView->SetClickMode( ZMCLICKMODE_HIDDEN );
     }
@@ -911,6 +911,15 @@ void CZMViewBase::TraceScreenToWorld( int mx, int my, trace_t* res, CTraceFilter
     VectorNormalize( ray );
 
     UTIL_TraceZMView( res, MainViewOrigin() + ray * MAX_COORD_FLOAT, mask, filter, pPlayer );
+}
+
+bool CZMViewBase::UsesZMView()
+{
+    if ( !g_pZMView )
+        return false;
+
+    auto* pPlayer = C_ZMPlayer::GetLocalPlayer();
+    return pPlayer && pPlayer->IsZM();
 }
 
 const char* CZMViewBase::GetTempHiddenSpawnModel( ZombieClass_t zclass ) const
