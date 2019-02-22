@@ -21,7 +21,7 @@
 #include "c_zmr_entities.h"
 #include "zmr/zmr_softcollisions.h"
 #include "c_zmr_player_ragdoll.h"
-#include "c_zmr_zmkeys.h"
+#include "c_zmr_teamkeys.h"
 
 #include "c_zmr_player.h"
 #include "c_zmr_zmvision.h"

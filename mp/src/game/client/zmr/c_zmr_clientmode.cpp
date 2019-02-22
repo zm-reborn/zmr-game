@@ -11,7 +11,7 @@
 #include "c_zmr_zmvision.h"
 #include "c_zmr_util.h"
 #include "c_zmr_player.h"
-#include "c_zmr_zmkeys.h"
+#include "c_zmr_teamkeys.h"
 #include "c_zmr_clientmode.h"
 
 

@@ -5,8 +5,8 @@
 //-----------------------------------------------------------------------------
 
 $Macro SRCDIR		"..\.."
-$Macro GAMENAME 	"zmr" [!$SOURCESDK]
-$Macro GAMENAME 	"zombie_master_reborn" [$SOURCESDK]
+$Macro GAMENAME 	"zmr" [$ZMR_STEAM]
+$Macro GAMENAME 	"zombie_master_reborn" [!$ZMR_STEAM]
 
 $Include "$SRCDIR\game\client\client_base.vpc"
 
@@ -236,18 +236,188 @@ $Project "Client (ZMR)"
 				}
 				$Folder "Options"
 				{
-					$File	"zmr\ui\vcontrolslistpanel.cpp"
-					$File	"zmr\ui\vcontrolslistpanel.h"
+					$Folder "GameUI"
+					{
+						$File	"$SRCDIR\gameui\bitmapimagepanel.cpp" 
+						{
+							$Configuration
+							{
+								$Compiler
+								{
+									$Create/UsePrecompiledHeader	"Not Using Precompiled Headers"
+								}
+							}
+						}
+						$File	"$SRCDIR\gameui\cvarnegatecheckbutton.cpp" 
+						{
+							$Configuration
+							{
+								$Compiler
+								{
+									$Create/UsePrecompiledHeader	"Not Using Precompiled Headers"
+								}
+							}
+						}
+						$File	"$SRCDIR\gameui\cvarslider.cpp" 
+						{
+							$Configuration
+							{
+								$Compiler
+								{
+									$Create/UsePrecompiledHeader	"Not Using Precompiled Headers"
+								}
+							}
+						}
+						$File	"$SRCDIR\gameui\cvartogglecheckbutton.cpp" 
+						{
+							$Configuration
+							{
+								$Compiler
+								{
+									$Create/UsePrecompiledHeader	"Not Using Precompiled Headers"
+								}
+							}
+						}
+						$File	"$SRCDIR\gameui\labeledcommandcombobox.cpp" 
+						{
+							$Configuration
+							{
+								$Compiler
+								{
+									$Create/UsePrecompiledHeader	"Not Using Precompiled Headers"
+								}
+							}
+						}
+						$File	"$SRCDIR\gameui\modinfo.cpp" 
+						{
+							$Configuration
+							{
+								$Compiler
+								{
+									$Create/UsePrecompiledHeader	"Not Using Precompiled Headers"
+								}
+							}
+						}
+						$File	"$SRCDIR\gameui\optionsdialog.cpp" 
+						{
+							$Configuration
+							{
+								$Compiler
+								{
+									$Create/UsePrecompiledHeader	"Not Using Precompiled Headers"
+								}
+							}
+						}
+						$File	"$SRCDIR\gameui\optionssubaudio.cpp"
+						{
+							$Configuration
+							{
+								$Compiler
+								{
+									$Create/UsePrecompiledHeader	"Not Using Precompiled Headers"
+								}
+							}
+						}
+						$File	"$SRCDIR\gameui\optionssubkeyboard.cpp"
+						{
+							$Configuration
+							{
+								$Compiler
+								{
+									$Create/UsePrecompiledHeader	"Not Using Precompiled Headers"
+								}
+							}
+						}
+						$File	"$SRCDIR\gameui\optionssubmouse.cpp"
+						{
+							$Configuration
+							{
+								$Compiler
+								{
+									$Create/UsePrecompiledHeader	"Not Using Precompiled Headers"
+								}
+							}
+						}
+						$File	"$SRCDIR\gameui\optionssubmultiplayer.cpp"
+						{
+							$Configuration
+							{
+								$Compiler
+								{
+									$Create/UsePrecompiledHeader	"Not Using Precompiled Headers"
+								}
+							}
+						}
+						$File	"$SRCDIR\gameui\optionssubvideo.cpp"
+						{
+							$Configuration
+							{
+								$Compiler
+								{
+									$Create/UsePrecompiledHeader	"Not Using Precompiled Headers"
+								}
+							}
+						}
+						$File	"$SRCDIR\gameui\optionssubvoice.cpp"
+						{
+							$Configuration
+							{
+								$Compiler
+								{
+									$Create/UsePrecompiledHeader	"Not Using Precompiled Headers"
+								}
+							}
+						}
+						$File	"$SRCDIR\gameui\urlbutton.cpp"
+						{
+							$Configuration
+							{
+								$Compiler
+								{
+									$Create/UsePrecompiledHeader	"Not Using Precompiled Headers"
+								}
+							}
+						}
+						$File	"$SRCDIR\gameui\vcontrolslistpanel.cpp"
+						{
+							$Configuration
+							{
+								$Compiler
+								{
+									$Create/UsePrecompiledHeader	"Not Using Precompiled Headers"
+								}
+							}
+						}
+					}
+					$Folder "GameUI Header Files"
+					{
+						$File	"$SRCDIR\gameui\bitmapimagepanel.h"
+						$File	"$SRCDIR\gameui\cvarnegatecheckbutton.h"
+						$File	"$SRCDIR\gameui\cvarslider.h"
+						$File	"$SRCDIR\gameui\cvartogglecheckbutton.h"
+						$File	"$SRCDIR\gameui\labeledcommandcombobox.h"
+						$File	"$SRCDIR\gameui\modinfo.h"
+						$File	"$SRCDIR\gameui\optionsdialog.h"
+						$File	"$SRCDIR\gameui\optionssubaudio.h"
+						$File	"$SRCDIR\gameui\optionssubkeyboard.h"
+						$File	"$SRCDIR\gameui\optionssubmouse.h"
+						$File	"$SRCDIR\gameui\optionssubmultiplayer.h"
+						$File	"$SRCDIR\gameui\optionssubvideo.h"
+						$File	"$SRCDIR\gameui\optionssubvoice.h"
+						$File	"$SRCDIR\gameui\urlbutton.h"
+						$File	"$SRCDIR\gameui\vcontrolslistpanel.h"
+					}
+					
+					$File	"zmr\ui\zmr_gameuioptions.cpp"
 					$File	"zmr\ui\zmr_options.cpp"
-					$File	"zmr\ui\zmr_options.h"
 					$File	"zmr\ui\zmr_options_crosshair.cpp"
 					$File	"zmr\ui\zmr_options_crosshair.h"
 					$File	"zmr\ui\zmr_options_general.cpp"
 					$File	"zmr\ui\zmr_options_general.h"
 					$File	"zmr\ui\zmr_options_graphics.cpp"
 					$File	"zmr\ui\zmr_options_graphics.h"
-					$File	"zmr\ui\zmr_options_keys.cpp"
-					$File	"zmr\ui\zmr_options_keys.h"
+					//$File	"zmr\ui\zmr_options_keys.cpp"
+					//$File	"zmr\ui\zmr_options_keys.h"
 					$File	"zmr\ui\zmr_options_misc.cpp"
 					$File	"zmr\ui\zmr_options_misc.h"
 					$File	"zmr\ui\zmr_options_tab.cpp"
@@ -315,7 +485,6 @@ $Project "Client (ZMR)"
 				$File	"zmr\ui\zmr_radial.cpp"
 				$File	"zmr\ui\zmr_radial.h"
 				$File	"zmr\ui\zmr_newversion.cpp"
-				$File	"zmr\ui\zmr_newversion.h"
 				$File	"zmr\ui\zmr_resources.cpp"
 				$File	"zmr\ui\zmr_scoreboard.cpp"
 				$File	"zmr\ui\zmr_scoreboard.h"
@@ -365,14 +534,14 @@ $Project "Client (ZMR)"
 			$File	"zmr\c_zmr_player_resource.h"
 			$File	"zmr\c_zmr_playeranimevent.cpp"
 			$File	"zmr\c_zmr_playeranimevent.h"
+			$File	"zmr\c_zmr_teamkeys.cpp"
+			$File	"zmr\c_zmr_teamkeys.h"
 			$File	"zmr\c_zmr_tempmodel.cpp"
 			$File	"zmr\c_zmr_tempmodel.h"
 			$File	"zmr\c_zmr_tips.cpp"
 			$File	"zmr\c_zmr_tips.h"
 			$File	"zmr\c_zmr_util.cpp"
 			$File	"zmr\c_zmr_util.h"
-			$File	"zmr\c_zmr_zmkeys.cpp"
-			$File	"zmr\c_zmr_zmkeys.h"
 			$File	"zmr\c_zmr_zmvision.cpp"
 			$File	"zmr\c_zmr_zmvision.h"
 			

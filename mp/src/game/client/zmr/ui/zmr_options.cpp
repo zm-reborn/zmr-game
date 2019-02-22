@@ -1,18 +1,22 @@
 #include "cbase.h"
-#include "vgui_controls/PropertyDialog.h"
+#include "cdll_client_int.h"
+#include "ienginevgui.h"
 
 #include <vgui/IVGui.h>
 #include <vgui/ISurface.h>
+#include <vgui_controls/PropertyDialog.h>
 #include <vgui_controls/AnimationController.h>
 #include <vgui_controls/PropertySheet.h>
 
-#include "zmr_options.h"
 #include "zmr/c_zmr_player.h"
 #include "zmr_options_general.h"
 #include "zmr_options_graphics.h"
 #include "zmr_options_misc.h"
 #include "zmr_options_crosshair.h"
-#include "zmr_options_keys.h"
+//#include "zmr_options_keys.h"
+
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
 
 
 class CZMOptionsMenu : public vgui::PropertyDialog
@@ -22,51 +26,40 @@ public:
 
     CZMOptionsMenu( vgui::VPANEL parent );
     ~CZMOptionsMenu();
-    
-    
-    virtual void OnTick() OVERRIDE;
-    virtual void OnThink() OVERRIDE;
-    
-    virtual void OnCommand( const char* command ) OVERRIDE;
-
-private:
-    void UpdateMenu();
-    void CenterMe();
 };
 
-class CZMOptionsMenuInterface : public IZMUi
-{
-public:
-    CZMOptionsMenuInterface() { m_Panel = nullptr; }
 
-    void Create( vgui::VPANEL parent ) OVERRIDE
+
+static vgui::DHANDLE<CZMOptionsMenu> g_hZMOptions;
+
+CON_COMMAND( OpenZMOptions, "" )
+{
+    if ( !g_hZMOptions.Get() )
     {
-        m_Panel = new CZMOptionsMenu( parent );
-    }
-    void Destroy() OVERRIDE
-    {
-        if ( m_Panel )
+        vgui::VPANEL parent = enginevgui->GetPanel( PANEL_GAMEUIDLL );
+        if ( parent == NULL )
         {
-            m_Panel->SetParent( nullptr );
-            delete m_Panel;
+            Assert( 0 );
+            return;
         }
+
+        g_hZMOptions.Set( new CZMOptionsMenu( parent ) );
     }
-    vgui::Panel* GetPanel() OVERRIDE { return m_Panel; }
-
-private:
-    CZMOptionsMenu* m_Panel;
-};
-
-static CZMOptionsMenuInterface g_ZMOptionsMenuInt;
-IZMUi* g_pZMOptionsMenu = (IZMUi*)&g_ZMOptionsMenuInt;
 
 
+    auto* pPanel = g_hZMOptions.Get();
 
-static bool g_bZMOptionsShow = false;
 
-CON_COMMAND( ToggleZMOptions, "" )
-{
-    g_bZMOptionsShow = !g_bZMOptionsShow;
+    // Center
+    int x, y, w, h;
+    vgui::surface()->GetWorkspaceBounds( x, y, w, h );
+    
+    int mw = pPanel->GetWide();
+    int mh = pPanel->GetTall();
+    pPanel->SetPos( x + w / 2 - mw / 2, y + h / 2 - mh / 2 );
+
+
+    pPanel->Activate();
 }
 
 
@@ -77,9 +70,9 @@ CZMOptionsMenu::CZMOptionsMenu( VPANEL parent ) : BaseClass( nullptr, "ZMOptions
     SetParent( parent );
 
 
-    SetBounds( 150, 100, 420, 350 );
+    SetBounds( 0, 0, 420, 350 );
 
-    SetVisible( false );
+	SetDeleteSelfOnClose( true );
     SetSizeable( false );
 
     SetTitle( "#GameUI_Options", true );
@@ -89,82 +82,9 @@ CZMOptionsMenu::CZMOptionsMenu( VPANEL parent ) : BaseClass( nullptr, "ZMOptions
     AddPage( new CZMOptionsSubGraphics( this ), "Video" );
     AddPage( new CZMOptionsSubCrosshair( this ), "Crosshair" );
     AddPage( new CZMOptionsSubMisc( this ), "Misc" );
-    AddPage( new CZMOptionsSubKeys( this ), "Keys" );
-
-
-    vgui::ivgui()->AddTickSignal( GetVPanel(), 100 );
+    //AddPage( new CZMOptionsSubKeys( this ), "Keys" );
 }
 
 CZMOptionsMenu::~CZMOptionsMenu()
 {
-}
-
-void CZMOptionsMenu::OnTick()
-{
-    BaseClass::OnTick();
-
-    
-    if ( g_bZMOptionsShow != IsVisible() )
-    {
-        SetVisible( g_bZMOptionsShow );
-
-        if ( IsVisible() )
-        {
-            UpdateMenu();
-            CenterMe();
-
-            Activate();
-        }
-
-        return;
-    }
-}
-
-void CZMOptionsMenu::OnThink()
-{
-    
-}
-
-void CZMOptionsMenu::OnCommand( const char* command )
-{
-    if ( Q_stricmp( command, "Close" ) == 0 || Q_stricmp( command, "Cancel" ) == 0 )
-    {
-        // Don't do fade in/out effects right now.
-        g_bZMOptionsShow = false;
-        return;
-    }
-    else if ( Q_stricmp( command, "Ok" ) == 0 )
-    {
-        //ApplySettings();
-
-        g_bZMOptionsShow = false;
-    }
-
-    BaseClass::OnCommand( command );
-}
-
-void CZMOptionsMenu::UpdateMenu()
-{
-    PropertySheet* pSheet = GetPropertySheet();
-
-    int len = pSheet->GetNumPages();
-    for ( int i = 0; i < len; i++ )
-    {
-        PropertyPage* pPage = dynamic_cast<PropertyPage*>( pSheet->GetPage( i ) );
-
-        if ( pPage )
-        {
-            pPage->OnResetData();
-        }
-    }
-}
-
-void CZMOptionsMenu::CenterMe()
-{
-    int x, y, w, h;
-    surface()->GetWorkspaceBounds( x, y, w, h );
-    
-    int mw = GetWide();
-    int mh = GetTall();
-    SetPos( x + w / 2 - mw / 2, y + h / 2 - mh / 2 );
 }

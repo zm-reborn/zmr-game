@@ -3,10 +3,6 @@
 #include "zmr/zmr_shareddefs.h"
 #include "zmr/zmr_web.h"
 
-#ifdef CLIENT_DLL
-#include "zmr/ui/zmr_newversion.h"
-#endif
-
 #ifndef CLIENT_DLL
 #include "steam/steam_gameserver.h"
 
@@ -14,6 +10,9 @@
 #else
 #define STEAM_API     steamapicontext
 #endif
+
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
 
 
 #define VERSION_URL     "https://raw.githubusercontent.com/zm-reborn/zmr-game/master/version.txt"
@@ -110,8 +109,7 @@ void CZMWeb::ParseVersion( const char* data )
         if ( !FStrEq( &(strs[i][1]), ZMR_VERSION ) )
         {
 #ifdef CLIENT_DLL
-            if ( g_pZMNewVerMenu )
-                g_pZMNewVerMenu->Activate();
+			engine->ClientCmd_Unrestricted( "OpenZMNewVersion" );
 #else
             UTIL_LogPrintf( "New version of %s is available!\n", ZMR_NAME );
 #endif
