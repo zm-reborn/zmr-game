@@ -1,23 +1,20 @@
-//========= Copyright ï¿½ 1996-2005, Valve Corporation, All rights reserved. ============//
+//========= Copyright © 1996-2005, Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
 //
 // $NoKeywords: $
 //=============================================================================//
 
-#include "cbase.h"
 #include "vcontrolslistpanel.h"
-//#include "GameUI_Interface.h"
-//#include "EngineInterface.h"
+#include "GameUI_Interface.h"
+#include "EngineInterface.h"
 
 #include <vgui/IInput.h>
-//#include <vgui/IScheme.h>
+#include <vgui/IScheme.h>
 #include <vgui/ISurface.h>
-//#include <vgui/IVGui.h>
-//#include <vgui/Cursor.h>
-//#include <KeyValues.h>
-
-#include "cdll_client_int.h"
+#include <vgui/IVGui.h>
+#include <vgui/Cursor.h>
+#include <KeyValues.h>
 
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -41,7 +38,7 @@ public:
 		GetSize(wide, tall);
 
 		// Draw a white rectangle around that cell
-		vgui::surface()->DrawSetColor( 255, 165, 0, 255 );
+		vgui::surface()->DrawSetColor( 0, 165, 255, 255 );
 		vgui::surface()->DrawFilledRect( x, y, x + wide, y + tall );
 	}
 
