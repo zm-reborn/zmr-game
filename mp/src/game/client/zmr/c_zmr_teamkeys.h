@@ -21,8 +21,9 @@ struct zmkeydata_t
 enum ZMKeyTeam_t
 {
     KEYTEAM_NEUTRAL = 0, // It can be used by any team
-    KEYTEAM_SURVIVOR, // Survivor/spectator
+    KEYTEAM_SURVIVOR,
     KEYTEAM_ZM,
+	KEYTEAM_SPEC,
 };
 
 
@@ -37,6 +38,7 @@ public:
 
     static bool IsZMCommand( const char* cmd );
     static bool IsSurvivorCommand( const char* cmd );
+    static bool IsSpectatorCommand( const char* cmd );
     static bool IsNeutralCommand( const char* cmd );
 
     static ZMKeyTeam_t GetCommandType( const char* cmd );
@@ -50,6 +52,9 @@ public:
     // Force survivor config execution no matter what.
     static void ExecuteTeamConfig( bool bForce = false );
     static void ExecuteTeamConfig( int iTeam );
+    
+    static const char* TeamNumberToConfigPath( int iTeam, bool bDefault = false );
+    static const char* TeamNumberToConfigName( int iTeam, bool bDefault = false );
 
 
     static zmkeydata_t* FindKeyDataFromList( const char* cmd, zmkeydatalist_t& list );

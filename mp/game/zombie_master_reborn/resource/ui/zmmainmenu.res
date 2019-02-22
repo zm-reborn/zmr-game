@@ -145,7 +145,7 @@
 				"fieldName"		"ModOptions"
 				"allcaps"		"1"
 				"labelText"		"Mod Options"
-				"command"		"engine ToggleZMOptions"
+				"command"		"engine OpenZMOptions"
 				
 				"sound_released"		"zmr_mainmenu/buttonclickrelease.wav"
 			}
@@ -153,8 +153,8 @@
 			{
 				"fieldName"		"DefaultOptions"
 				"allcaps"		"1"
-				"labelText"		"Input/Video"
-				"command"		"OpenOptionsDialog"
+				"labelText"		"#GameUI_Options"
+				"command"		"engine OpenZMGameUIOptions"
 				
 				"sound_released"		"zmr_mainmenu/buttonclickrelease.wav"
 			}

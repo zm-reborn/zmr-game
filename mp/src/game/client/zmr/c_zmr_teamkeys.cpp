@@ -1,10 +1,10 @@
 #include "cbase.h"
+
 #include "filesystem.h"
 #include <inputsystem/iinputsystem.h>
 
 #include "c_zmr_player.h"
-#include "zmr_shareddefs.h"
-#include "c_zmr_zmkeys.h"
+#include "c_zmr_teamkeys.h"
 
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -37,10 +37,13 @@ static const char* g_szSurvivorCommands[] = {
     "kill",
     "dropweapon",
     "dropammo",
-    "zm_observezombie",
     "invnext",
     "invprev",
     "lastinv",
+};
+
+static const char* g_szSpectatorCommands[] = {
+    "zm_observezombie",
 };
 
 
@@ -74,9 +77,20 @@ bool CZMTeamKeysConfig::IsSurvivorCommand( const char* cmd )
     return false;
 }
 
+bool CZMTeamKeysConfig::IsSpectatorCommand( const char* cmd )
+{
+    for ( int i = 0; i < ARRAYSIZE( g_szSpectatorCommands ); i++ )
+    {
+        if ( Q_stricmp( cmd, g_szSpectatorCommands[i] ) == 0 )
+            return true;
+    }
+   
+    return false;
+}
+
 bool CZMTeamKeysConfig::IsNeutralCommand( const char* cmd )
 {
-    return !IsZMCommand( cmd ) && !IsSurvivorCommand( cmd );
+    return !IsZMCommand( cmd ) && !IsSurvivorCommand( cmd ) && !IsSpectatorCommand( cmd );
 }
 
 void CZMTeamKeysConfig::ExecuteTeamConfig( bool bForce )
@@ -94,8 +108,8 @@ void CZMTeamKeysConfig::ExecuteTeamConfig( bool bForce )
 
 void CZMTeamKeysConfig::ExecuteTeamConfig( int iTeam )
 {
-    const char* cfg = iTeam != ZMTEAM_ZM ? KEYCONFIG_NAME_SURVIVOR : KEYCONFIG_NAME_ZM;
-    const char* defcfg = iTeam != ZMTEAM_ZM ? KEYCONFIG_NAME_SURVIVOR"_default" : KEYCONFIG_NAME_ZM"_default";
+    const char* cfg = TeamNumberToConfigName( iTeam, false );
+    const char* defcfg = TeamNumberToConfigName( iTeam, true );
 
 
     // Execute the default config if we can't find the player's own config.
@@ -104,12 +118,40 @@ void CZMTeamKeysConfig::ExecuteTeamConfig( int iTeam )
 
     if ( filesystem->FileExists( cfgpath ) )
     {
-        engine->ClientCmd_Unrestricted( VarArgs( "exec %s.cfg", cfg ) );
+		Q_snprintf( cfgpath, sizeof( cfgpath ), "exec %s.cfg", cfg );
+        engine->ClientCmd_Unrestricted( cfgpath );
     }
     else
     {
-        engine->ClientCmd_Unrestricted( VarArgs( "exec %s.cfg", defcfg ) );
+		Q_snprintf( cfgpath, sizeof( cfgpath ), "exec %s.cfg", defcfg );
+        engine->ClientCmd_Unrestricted( cfgpath );
     }
+}
+
+const char* CZMTeamKeysConfig::TeamNumberToConfigPath( int iTeam, bool bDefault )
+{
+	switch ( iTeam )
+	{
+	case 3 : // ZM
+		return bDefault ? KEYCONFIG_ZM_DEF : KEYCONFIG_ZM;
+	case 1 : // Spectator
+	case 2 : // Survivor
+	default :
+		return bDefault ? KEYCONFIG_SURVIVOR_DEF : KEYCONFIG_SURVIVOR;
+	}
+}
+
+const char* CZMTeamKeysConfig::TeamNumberToConfigName( int iTeam, bool bDefault )
+{
+	switch ( iTeam )
+	{
+	case 3 : // ZM
+		return bDefault ? KEYCONFIG_NAME_ZM"_default" : KEYCONFIG_NAME_ZM;
+	case 1 : // Spectator
+	case 2 : // Survivor
+	default :
+		return bDefault ? KEYCONFIG_NAME_SURVIVOR"_default" : KEYCONFIG_NAME_SURVIVOR;
+	}
 }
 
 ZMKeyTeam_t CZMTeamKeysConfig::GetCommandType( const char* cmd )
@@ -122,6 +164,10 @@ ZMKeyTeam_t CZMTeamKeysConfig::GetCommandType( const char* cmd )
     {
         return KEYTEAM_SURVIVOR;
     }
+	if ( IsSpectatorCommand( cmd ) )
+	{
+		return KEYTEAM_SPEC;
+	}
 
     return KEYTEAM_NEUTRAL;
 }
