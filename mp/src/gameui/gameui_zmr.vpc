@@ -1,0 +1,45 @@
+//-----------------------------------------------------------------------------
+//	GAMEUI_ZMR.VPC
+//
+//	Project Script
+//-----------------------------------------------------------------------------
+
+$Macro SRCDIR		".."
+$Macro GAMENAME 	"zmr" [$ZMR_STEAM]
+$Macro GAMENAME 	"zombie_master_reborn" [!$ZMR_STEAM]
+
+$Include "$SRCDIR\gameui\gameui_base.vpc"
+
+
+$Configuration
+{
+	$Compiler
+	{
+		$AdditionalIncludeDirectories	"$BASE;"
+		$PreprocessorDefinitions		"$BASE;NO_STEAM;ZMR"
+	}
+}
+
+$Project "GameUI (ZMR)"
+{
+	$Folder	"Source Files"
+	{
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
