@@ -10,6 +10,7 @@
 "blank"			"=========================="
 "+attack"				"#Valve_Primary_Attack"
 "+attack2"				"#Valve_Secondary_Attack"
+"+attack3"				"Tertiary Attack"
 //"phys_swap"				"#Valve_Gravity_Gun"
 "slot1"					"#Valve_Weapon_Category_1"
 "slot2"					"#Valve_Weapon_Category_2"
