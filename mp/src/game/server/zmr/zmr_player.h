@@ -128,6 +128,9 @@ public:
     virtual bool Weapon_Lower() OVERRIDE { return false; };
     
     virtual void PickupObject( CBaseEntity *pObject, bool bLimitMassAndSize ) OVERRIDE;
+    virtual	bool IsHoldingEntity( CBaseEntity *pEnt ) OVERRIDE;
+    virtual float GetHeldObjectMass( IPhysicsObject *pHeldObject ) OVERRIDE;
+
     virtual bool BumpWeapon( CBaseCombatWeapon *pWeapon ) OVERRIDE;
 
     // Lag compensation stuff...

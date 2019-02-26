@@ -1,19 +1,14 @@
-// fists
-
 WeaponData
 {
 	// Weapon data is loaded by both the Game and Client DLLs.
-	"printname"	"Fists"
-
-//	"viewmodel"				"models/weapons/sledgehammer_zm.mdl"
-//	"playermodel"			"models/weapons/sledgehammer3rd_zm.mdl" //LAWYER:  Debugging
+	"printname"	"Hands"
 
 	"viewmodel"				"models/weapons/c_fists_zm.mdl"
 	"usenewhands"		"1"
 	"playermodel"			"models/weapons/w_null.mdl"
 	"anim_prefix"			"fists"
 	"bucket"				"0"
-	"bucket_position"		"1"
+	"bucket_position"		"0"
 
 	"clip_size"				"-1"
 	"primary_ammo"			"None"
