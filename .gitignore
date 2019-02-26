@@ -81,6 +81,7 @@ settings.scr
 **/zombie_master_reborn/downloadlists/
 *.ain
 *.csv
+*.ztmp
 mp/game/zombie_master_reborn/resource/zmtips_hudtips_used.txt
 mp/game/zombie_master_reborn/resource/zmtips_loadingscreen_used.txt
 mp/game/zombie_master_reborn/resource/zmcrosshairs.txt
