@@ -102,7 +102,9 @@ public:
 
     // Sounds
     virtual bool ShouldPlayIdleSound() const;
+    virtual bool ShouldPlayPainSound( const CTakeDamageInfo& info ) const;
     virtual float IdleSound() { return 0.0f; } // Return delay for the next idle sound.
+    virtual float PainSound( const CTakeDamageInfo& info ) { return 0.0f; }
     virtual void AlertSound() {}
     virtual void DeathSound() {}
 
@@ -225,9 +227,14 @@ public:
         const Vector* vecDir = nullptr );
 
 
+    static float g_flLastZombieSound;
+
 protected:
     CZMZombieAnimState* GetAnimState() const { return m_pAnimState; }
 
+
+    float m_flNextIdleSound;
+    float m_flNextPainSound;
 
 private:
     float m_flNextAttack;
@@ -265,8 +272,6 @@ private:
 
     float m_flBurnDamage;
     float m_flBurnDamageTime;
-
-    float m_flNextIdleSound;
 
 
 public:

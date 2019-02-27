@@ -263,4 +263,7 @@ void CZMImmolator::AlertSound()
 void CZMImmolator::DeathSound()
 {
     EmitSound( "NPC_BurnZombie.Die" );
+    EmitSound( "NPC_BurnZombie.Scream" );
+
+    g_flLastZombieSound = gpGlobals->curtime;
 }

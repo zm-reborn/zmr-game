@@ -315,6 +315,8 @@ void CZMRules::CreateStandardEntities()
 
 void CZMRules::LevelInitPostEntity()
 {
+    CZMBaseZombie::g_flLastZombieSound = 0.0f;
+
     BaseClass::LevelInitPostEntity();
 }
 #endif

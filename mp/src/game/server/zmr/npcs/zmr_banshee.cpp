@@ -397,14 +397,17 @@ void CZMBanshee::AlertSound()
 void CZMBanshee::DeathSound()
 {
     EmitSound( "NPC_FastZombie.Die" );
+    g_flLastZombieSound = gpGlobals->curtime;
 }
 
 void CZMBanshee::ClawImpactSound( bool bHit )
 {
     EmitSound( bHit ? "NPC_FastZombie.AttackHit" : "NPC_FastZombie.AttackMiss" );
+    g_flLastZombieSound = gpGlobals->curtime;
 }
 
 void CZMBanshee::LeapAttackSound()
 {
     EmitSound( "NPC_FastZombie.LeapAttack" );
+    g_flLastZombieSound = gpGlobals->curtime;
 }
