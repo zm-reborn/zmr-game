@@ -1236,7 +1236,19 @@ void CZMBaseZombie::GetAnimRandomSeed( int iEvent, int& nData )
     }
 }
 
-CON_COMMAND( zm_zombie_create, "Creates a zombie at your crosshair." )
+
+static int zm_zombie_create_completion( const char *partial, char commands[ COMMAND_COMPLETION_MAXITEMS ][ COMMAND_COMPLETION_ITEM_LENGTH ] )
+{
+    Q_strncpy( commands[0], "zm_zombie_create npc_zombie", COMMAND_COMPLETION_ITEM_LENGTH );
+    Q_strncpy( commands[1], "zm_zombie_create npc_fastzombie", COMMAND_COMPLETION_ITEM_LENGTH );
+    Q_strncpy( commands[2], "zm_zombie_create npc_poisonzombie", COMMAND_COMPLETION_ITEM_LENGTH );
+    Q_strncpy( commands[3], "zm_zombie_create npc_dragzombie", COMMAND_COMPLETION_ITEM_LENGTH );
+    Q_strncpy( commands[4], "zm_zombie_create npc_burnzombie", COMMAND_COMPLETION_ITEM_LENGTH );
+
+    return 5;
+}
+
+CON_COMMAND_F_COMPLETION( zm_zombie_create, "Creates a zombie at your crosshair.", 0, zm_zombie_create_completion )
 {
     CBasePlayer* pPlayer = UTIL_GetCommandClient();
     if ( !pPlayer ) return;
