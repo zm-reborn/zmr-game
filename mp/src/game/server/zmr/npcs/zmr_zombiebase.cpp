@@ -19,6 +19,12 @@
 #include "sched/zmr_zombie_main.h"
 
 
+
+
+
+ConVar zm_sv_debug_zombie_flinch( "zm_sv_debug_zombie_flinch", "0", 0, "Play flinching animations every time a zombie g ets shot." );
+
+
 class CZMLOSFilter : public CTraceFilter
 {
 public:
@@ -751,6 +757,24 @@ void CZMBaseZombie::TraceAttack( const CTakeDamageInfo& inputInfo, const Vector&
 {
     // The force bone will be used for proper ragdolling.
     m_nForceBone = pTrace->physicsbone;
+
+
+    if ( zm_sv_debug_zombie_flinch.GetBool() )
+    {
+        if ( pTrace->hitgroup == HITGROUP_HEAD )
+        {
+            DoAnimationEvent( ZOMBIEANIMEVENT_GESTURE, ACT_GESTURE_FLINCH_CHEST );
+        }
+        else if ( pTrace->hitgroup == HITGROUP_RIGHTARM )
+        {
+            DoAnimationEvent( ZOMBIEANIMEVENT_GESTURE, ACT_GESTURE_FLINCH_RIGHTARM );
+        }
+        else if ( pTrace->hitgroup == HITGROUP_LEFTARM )
+        {
+            DoAnimationEvent( ZOMBIEANIMEVENT_GESTURE, ACT_GESTURE_FLINCH_LEFTARM );
+        }
+    }
+
 
 
     CTakeDamageInfo info = inputInfo;

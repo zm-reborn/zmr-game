@@ -24,7 +24,8 @@ void TE_ZombieAnimEvent( CZMBaseZombie* pZombie, ZMZombieAnimEvent_t anim, int n
     CPVSFilter filter( pZombie->WorldSpaceCenter() );
 
 
-    filter.UsePredictionRules();
+    // It's possible to get here from the player class.
+    //filter.UsePredictionRules();
     
     g_ZMTEZombieAnimEvent.m_hZombie = pZombie;
     g_ZMTEZombieAnimEvent.m_iEvent = anim;
