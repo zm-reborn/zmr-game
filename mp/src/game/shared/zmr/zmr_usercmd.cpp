@@ -378,7 +378,7 @@ bool CZMUserCmdSystem::ComputeTraceEnd( CBaseEntity* pVictim, trace_t& tr )
 
         tr.surface.flags = SURF_HITBOX;
         tr.surface.surfaceProps = physprops->GetSurfaceIndex( pBone->pszSurfaceProp() );
-
+        tr.physicsbone = pBone->physicsbone; // We need the physics bone for proper ragdolling.
 
 
         matrix3x4_t* pMatrix = pAnim->GetBoneCache()->GetCachedBone( iBone );

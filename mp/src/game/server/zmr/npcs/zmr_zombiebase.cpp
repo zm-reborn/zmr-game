@@ -749,6 +749,10 @@ bool CZMBaseZombie::CanBreakObject( CBaseEntity* pEnt, bool bSwat ) const
 
 void CZMBaseZombie::TraceAttack( const CTakeDamageInfo& inputInfo, const Vector& vecDir, trace_t* pTrace, CDmgAccumulator* pAccumulator )
 {
+    // The force bone will be used for proper ragdolling.
+    m_nForceBone = pTrace->physicsbone;
+
+
     CTakeDamageInfo info = inputInfo;
 
     ScaleDamageByHitgroup( pTrace->hitgroup, info );
