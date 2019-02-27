@@ -144,12 +144,21 @@ bool CZMHulk::ShouldPlayIdleSound() const
 float CZMHulk::IdleSound()
 {
     EmitSound( "NPC_PoisonZombie.Idle" );
-    return 1.0f;
+    return 2.0f;
+}
+
+float CZMHulk::PainSound( const CTakeDamageInfo& info )
+{
+    EmitSound( "NPC_PoisonZombie.Pain" );
+    g_flLastZombieSound = gpGlobals->curtime;
+    return 6.0f;
 }
 
 void CZMHulk::AlertSound()
 {
     EmitSound( "NPC_PoisonZombie.Alert" );
+    g_flLastZombieSound = gpGlobals->curtime;
+    m_flNextIdleSound = m_flNextPainSound = g_flLastZombieSound + 3.0f;
 }
 
 void CZMHulk::DeathSound()

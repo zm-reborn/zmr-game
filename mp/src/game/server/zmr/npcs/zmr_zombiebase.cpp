@@ -128,6 +128,8 @@ int CZMBaseZombie::AE_ZOMBIE_GET_UP = AE_INVALID;
 int CZMBaseZombie::AE_ZOMBIE_POUND = AE_INVALID;
 int CZMBaseZombie::AE_ZOMBIE_ALERTSOUND = AE_INVALID;
 
+float CZMBaseZombie::g_flLastZombieSound = 0.0f;
+
 
 
 ConVar zm_sv_swatmaxmass( "zm_sv_swatmaxmass", "200", FCVAR_NOTIFY );
@@ -869,7 +871,7 @@ int CZMBaseZombie::OnTakeDamage_Alive( const CTakeDamageInfo& inputInfo )
     CTakeDamageInfo info = inputInfo;
 
     
-    if( info.GetDamageType() & DMG_BURN )
+    if ( info.GetDamageType() & DMG_BURN )
     {
         // If a zombie is on fire it only takes damage from the fire that's attached to it. (DMG_DIRECT)
         // This is to stop zombies from burning to death 10x faster when they're standing around
@@ -901,16 +903,14 @@ int CZMBaseZombie::OnTakeDamage_Alive( const CTakeDamageInfo& inputInfo )
         m_flHealthRatio = m_iHealth / (float)(m_iMaxHealth > 0 ? m_iMaxHealth : 1);
     }
 
-    // flDamageThreshold is what percentage of the creature's max health
-    // this amount of damage represents. (clips at 1.0)
-    /*float flDamageThreshold = MIN( 1, info.GetDamage() / m_iMaxHealth );
 
-   if( tookDamage > 0 && (info.GetDamageType() & (DMG_BURN|DMG_DIRECT)) && m_ActBusyBehavior.IsActive() ) 
+    if ( ShouldPlayPainSound( info ) )
     {
-        //!!!HACKHACK- Stuff a light_damage condition if an actbusying zombie takes direct burn damage. This will cause an
-        // ignited zombie to 'wake up' and rise out of its actbusy slump. (sjb)
-        SetCondition( COND_LIGHT_DAMAGE );
-    }*/
+        float delay = PainSound( info );
+
+        m_flNextPainSound = gpGlobals->curtime + delay;
+    }
+
 
     return tookDamage;
 }
@@ -1231,6 +1231,11 @@ float CZMBaseZombie::GetMoveActivityMovementSpeed()
 
 bool CZMBaseZombie::ShouldPlayIdleSound() const
 {
+    // Don't spam zombie sounds.
+    if ( (g_flLastZombieSound + 0.05f) > gpGlobals->curtime )
+        return false;
+
+
     if ( m_lifeState != LIFE_ALIVE )
         return false;
 
@@ -1240,6 +1245,28 @@ bool CZMBaseZombie::ShouldPlayIdleSound() const
     if ( m_flNextIdleSound > gpGlobals->curtime )
         return false;
 
+
+    return true;
+}
+
+bool CZMBaseZombie::ShouldPlayPainSound( const CTakeDamageInfo& info ) const
+{
+    // Don't spam zombie sounds.
+    if ( (g_flLastZombieSound + 0.05f) > gpGlobals->curtime )
+        return false;
+
+    if ( m_flNextPainSound > gpGlobals->curtime )
+        return false;
+
+    if ( m_lifeState != LIFE_ALIVE || m_iHealth <= 0 )
+        return false;
+
+    if ( HasSpawnFlags( SF_NPC_GAG ) )
+        return false;
+
+    int fDmg = info.GetDamageType();
+    if ( fDmg == DMG_GENERIC || fDmg & DMG_ALWAYSGIB )
+        return false;
 
     return true;
 }
