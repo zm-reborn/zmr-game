@@ -379,6 +379,9 @@ void C_ZMPlayer::TeamChange( int iNewTeam )
         ZMClientUtil::QueueTooltip( "zmintro", 1.0f );
         ZMClientUtil::QueueTooltip( "zmmoving", 12.0f );
     }
+
+
+    TeamChangeStatic( iNewTeam );
 }
 
 void C_ZMPlayer::TeamChangeStatic( int iNewTeam )
