@@ -8,6 +8,7 @@
 
 
 extern ConVar zm_cl_usenewmenus;
+extern ConVar zm_cl_zmview_switchmousebuttons;
 extern ConVar zm_cl_poweruser;
 extern ConVar zm_cl_poweruser_boxselect;
 
@@ -21,6 +22,7 @@ CZMOptionsSubGeneral::CZMOptionsSubGeneral( Panel* parent ) : BaseClass( parent 
 
     LoadItem( &m_pPartBox, "ParticipationType" );
     LoadItem( &m_pCheck_NewMenus, "CheckNewMenus" );
+    LoadItem( &m_pCheck_SwitchMouseBtns, "CheckSwitchMouseBtns" );
     LoadItem( &m_pCheck_PowerUser, "CheckPowerUser" );
     LoadItem( &m_pCheck_BoxPowerUser, "CheckPowerUserBox" );
     LoadItem( &m_pSlider_Yaw, "SliderScrollHor" );
@@ -88,6 +90,8 @@ void CZMOptionsSubGeneral::OnApplyChanges()
 
     zm_cl_usenewmenus.SetValue( m_pCheck_NewMenus->IsSelected() ? 1 : 0 );
 
+    zm_cl_zmview_switchmousebuttons.SetValue( m_pCheck_SwitchMouseBtns->IsSelected() ? 1 : 0 );
+
     zm_cl_poweruser.SetValue( m_pCheck_PowerUser->IsSelected() ? 1 : 0 );
     zm_cl_poweruser_boxselect.SetValue( m_pCheck_BoxPowerUser->IsSelected() ? 1 : 0 );
 
@@ -110,6 +114,7 @@ void CZMOptionsSubGeneral::OnResetData()
 
 
     m_pCheck_NewMenus->SetSelected( zm_cl_usenewmenus.GetBool() );
+    m_pCheck_SwitchMouseBtns->SetSelected( zm_cl_zmview_switchmousebuttons.GetBool() );
     m_pCheck_PowerUser->SetSelected( zm_cl_poweruser.GetBool() );
     m_pCheck_BoxPowerUser->SetSelected( zm_cl_poweruser_boxselect.GetBool() );
 

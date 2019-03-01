@@ -94,6 +94,8 @@ public:
     bool IsDraggingLeft() const;
     bool IsDraggingRight() const;
 
+    bool UseSwitchedButtons() const;
+
 
 
     static void TraceScreenToWorld( int mx, int my, trace_t* res, CTraceFilterSimple* filter, int mask );
@@ -125,6 +127,8 @@ protected:
 
     C_ZMTempModel* CreateTempHiddenZombie() const;
     void FreeTempHiddenZombie();
+
+    MouseCode SwitchMouseButtons( MouseCode code );
 
 
     C_ZMTempModel* m_pTempHiddenZombie;

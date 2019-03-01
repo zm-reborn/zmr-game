@@ -25,6 +25,8 @@ CZMViewBase* g_pZMView = nullptr;
 ConVar zm_cl_zmview_hiddenspawneffect( "zm_cl_zmview_hiddenspawneffect", "1", FCVAR_ARCHIVE );
 ConVar zm_cl_zmview_doubleclick( "zm_cl_zmview_doubleclick", "0.4", FCVAR_ARCHIVE );
 
+ConVar zm_cl_zmview_switchmousebuttons( "zm_cl_zmview_switchmousebuttons", "0", FCVAR_ARCHIVE );
+
 
 ConVar zm_cl_poweruser_boxselect( "zm_cl_poweruser_boxselect", "0", FCVAR_ARCHIVE, "Select zombies through walls with box select." );
 ConVar zm_cl_poweruser( "zm_cl_poweruser", "0", FCVAR_ARCHIVE, "Select spawns/traps/zombies through walls." );
@@ -206,6 +208,21 @@ bool CZMViewBase::IsDraggingRight() const
     return m_bDraggingRight;
 }
 
+bool CZMViewBase::UseSwitchedButtons() const
+{
+    return zm_cl_zmview_switchmousebuttons.GetBool();
+}
+
+MouseCode CZMViewBase::SwitchMouseButtons( MouseCode code )
+{
+    switch ( code )
+    {
+        case MOUSE_LEFT : return MOUSE_RIGHT;
+        case MOUSE_RIGHT : return MOUSE_LEFT;
+        default : return code;
+    }
+}
+
 void CZMViewBase::CloseChildMenus()
 {
 
@@ -257,6 +274,12 @@ void CZMViewBase::OnCursorMoved( int x, int y )
 
 void CZMViewBase::OnMouseReleased( MouseCode code )
 {
+    if ( UseSwitchedButtons() )
+    {
+        code = SwitchMouseButtons( code );
+    }
+
+
     switch ( code )
     {
     case MOUSE_RIGHT :
@@ -276,6 +299,12 @@ void CZMViewBase::OnMouseReleased( MouseCode code )
 void CZMViewBase::OnMousePressed( MouseCode code )
 {
     CloseChildMenus();
+
+
+    if ( UseSwitchedButtons() )
+    {
+        code = SwitchMouseButtons( code );
+    }
 
 
     switch ( code )
