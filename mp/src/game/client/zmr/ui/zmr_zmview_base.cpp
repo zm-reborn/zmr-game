@@ -6,6 +6,7 @@
 #include "input.h"
 #include "clienteffectprecachesystem.h"
 #include "fx_quad.h"
+#include "IGameUIFuncs.h"
 
 #include "zmr/npcs/zmr_zombiebase_shared.h"
 #include "zmr/c_zmr_util.h"
@@ -298,6 +299,19 @@ void CZMViewBase::OnMouseReleased( MouseCode code )
 
 void CZMViewBase::OnMousePressed( MouseCode code )
 {
+    // HACK: We don't use these buttons, so pass them through to engine.
+    if ( code != MOUSE_LEFT && code != MOUSE_RIGHT )
+    {
+        const char* binding = gameuifuncs->GetBindingForButtonCode( code );
+        if ( binding && *binding )
+        {
+            engine->ClientCmd_Unrestricted( binding );
+        }
+
+        return;
+    }
+
+
     CloseChildMenus();
 
 
