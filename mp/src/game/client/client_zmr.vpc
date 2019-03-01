@@ -327,6 +327,7 @@ $Project "Client (ZMR)"
 					$File	"zmr\ui\zmr_zmview_old.h"
 				}
 				
+				$File	"zmr\ui\zmr_credits.cpp"
 				$File	"zmr\ui\zmr_framepanel.cpp"
 				$File	"zmr\ui\zmr_framepanel.h"
 				$File	"zmr\ui\zmr_hud_ammo.cpp"
