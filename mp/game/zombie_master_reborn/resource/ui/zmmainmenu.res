@@ -94,6 +94,7 @@
 				"labelText"		"#GameUI_CreateServer"
 				"command"		"OpenCreateMultiplayerGameDialog"
 				
+				"sound_armed"		"zmr_mainmenu/subbuttonrollover.wav"
 				"sound_released"		"zmr_mainmenu/buttonclickrelease.wav"
 			}
 			"playonline"
@@ -103,6 +104,7 @@
 				"labelText"		"#GameUI_GameMenu_FindServers"
 				"command"		"OpenServerBrowser"
 				
+				"sound_armed"		"zmr_mainmenu/subbuttonrollover.wav"
 				"sound_released"		"zmr_mainmenu/buttonclickrelease.wav"
 			}
 			"playtutorial"
@@ -113,6 +115,7 @@
 				"command"		""
 				"enabled"		"0"
 				
+				"sound_armed"		"zmr_mainmenu/subbuttonrollover.wav"
 				"sound_released"		"zmr_mainmenu/buttonclickrelease.wav"
 			}
 		}
@@ -147,6 +150,7 @@
 				"labelText"		"Mod Options"
 				"command"		"engine OpenZMOptions"
 				
+				"sound_armed"		"zmr_mainmenu/subbuttonrollover.wav"
 				"sound_released"		"zmr_mainmenu/buttonclickrelease.wav"
 			}
 			"defoptions"
@@ -156,6 +160,7 @@
 				"labelText"		"#GameUI_Options"
 				"command"		"engine OpenZMGameUIOptions"
 				
+				"sound_armed"		"zmr_mainmenu/subbuttonrollover.wav"
 				"sound_released"		"zmr_mainmenu/buttonclickrelease.wav"
 			}
 		}
@@ -191,6 +196,7 @@
 				"labelText"		"Restart Round"
 				"command"		"engine callvote ZMVoteRoundRestart"
 				
+				"sound_armed"		"zmr_mainmenu/subbuttonrollover.wav"
 				"sound_released"		"zmr_mainmenu/buttonclickrelease.wav"
 			}
 		}
