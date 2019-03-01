@@ -238,147 +238,22 @@ $Project "Client (ZMR)"
 				{
 					$Folder "GameUI"
 					{
-						$File	"$SRCDIR\gameui\bitmapimagepanel.cpp" 
-						{
-							$Configuration
-							{
-								$Compiler
-								{
-									$Create/UsePrecompiledHeader	"Not Using Precompiled Headers"
-								}
-							}
-						}
-						$File	"$SRCDIR\gameui\cvarnegatecheckbutton.cpp" 
-						{
-							$Configuration
-							{
-								$Compiler
-								{
-									$Create/UsePrecompiledHeader	"Not Using Precompiled Headers"
-								}
-							}
-						}
-						$File	"$SRCDIR\gameui\cvarslider.cpp" 
-						{
-							$Configuration
-							{
-								$Compiler
-								{
-									$Create/UsePrecompiledHeader	"Not Using Precompiled Headers"
-								}
-							}
-						}
-						$File	"$SRCDIR\gameui\cvartogglecheckbutton.cpp" 
-						{
-							$Configuration
-							{
-								$Compiler
-								{
-									$Create/UsePrecompiledHeader	"Not Using Precompiled Headers"
-								}
-							}
-						}
-						$File	"$SRCDIR\gameui\labeledcommandcombobox.cpp" 
-						{
-							$Configuration
-							{
-								$Compiler
-								{
-									$Create/UsePrecompiledHeader	"Not Using Precompiled Headers"
-								}
-							}
-						}
-						$File	"$SRCDIR\gameui\modinfo.cpp" 
-						{
-							$Configuration
-							{
-								$Compiler
-								{
-									$Create/UsePrecompiledHeader	"Not Using Precompiled Headers"
-								}
-							}
-						}
-						$File	"$SRCDIR\gameui\optionsdialog.cpp" 
-						{
-							$Configuration
-							{
-								$Compiler
-								{
-									$Create/UsePrecompiledHeader	"Not Using Precompiled Headers"
-								}
-							}
-						}
-						$File	"$SRCDIR\gameui\optionssubaudio.cpp"
-						{
-							$Configuration
-							{
-								$Compiler
-								{
-									$Create/UsePrecompiledHeader	"Not Using Precompiled Headers"
-								}
-							}
-						}
-						$File	"$SRCDIR\gameui\optionssubkeyboard.cpp"
-						{
-							$Configuration
-							{
-								$Compiler
-								{
-									$Create/UsePrecompiledHeader	"Not Using Precompiled Headers"
-								}
-							}
-						}
-						$File	"$SRCDIR\gameui\optionssubmouse.cpp"
-						{
-							$Configuration
-							{
-								$Compiler
-								{
-									$Create/UsePrecompiledHeader	"Not Using Precompiled Headers"
-								}
-							}
-						}
-						$File	"$SRCDIR\gameui\optionssubmultiplayer.cpp"
-						{
-							$Configuration
-							{
-								$Compiler
-								{
-									$Create/UsePrecompiledHeader	"Not Using Precompiled Headers"
-								}
-							}
-						}
-						$File	"$SRCDIR\gameui\optionssubvideo.cpp"
-						{
-							$Configuration
-							{
-								$Compiler
-								{
-									$Create/UsePrecompiledHeader	"Not Using Precompiled Headers"
-								}
-							}
-						}
-						$File	"$SRCDIR\gameui\optionssubvoice.cpp"
-						{
-							$Configuration
-							{
-								$Compiler
-								{
-									$Create/UsePrecompiledHeader	"Not Using Precompiled Headers"
-								}
-							}
-						}
-						$File	"$SRCDIR\gameui\urlbutton.cpp"
-						{
-							$Configuration
-							{
-								$Compiler
-								{
-									$Create/UsePrecompiledHeader	"Not Using Precompiled Headers"
-								}
-							}
-						}
-						$File	"$SRCDIR\gameui\vcontrolslistpanel.cpp"
+						$File	"$SRCDIR\gameui\bitmapimagepanel.cpp" \
+								"$SRCDIR\gameui\cvarnegatecheckbutton.cpp" \
+								"$SRCDIR\gameui\cvarslider.cpp" \
+								"$SRCDIR\gameui\cvartogglecheckbutton.cpp" \
+								"$SRCDIR\gameui\labeledcommandcombobox.cpp" \
+								"$SRCDIR\gameui\modinfo.cpp" \
+								"$SRCDIR\gameui\optionsdialog.cpp"  \
+								"$SRCDIR\gameui\optionssubaudio.cpp" \
+								"$SRCDIR\gameui\optionssubkeyboard.cpp" \
+								"$SRCDIR\gameui\optionssubmouse.cpp" \
+								"$SRCDIR\gameui\optionssubmultiplayer.cpp" \
+								"$SRCDIR\gameui\optionssubvideo.cpp" \
+								"$SRCDIR\gameui\optionssubvoice.cpp" \
+								"$SRCDIR\gameui\urlbutton.cpp" \
+								"$SRCDIR\gameui\vcontrolslistpanel.cpp"
+						
 						{
 							$Configuration
 							{
