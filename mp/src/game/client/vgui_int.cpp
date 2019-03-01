@@ -228,9 +228,9 @@ void VGui_CreateGlobalPanels( void )
 
 #ifdef ZMR
     g_pZMMainMenu->Create( NULL );
-    g_pZMLoadingUI->Create( NULL );
+    //g_pZMLoadingUI->Create( NULL );
     ZMOverrideGameUI();
-    ZMOverrideLoadingUI();
+    //ZMOverrideLoadingUI();
 #endif
 }
 
@@ -238,7 +238,7 @@ void VGui_Shutdown()
 {
 #ifdef ZMR
     g_pZMMainMenu->Destroy();
-    g_pZMLoadingUI->Destroy();
+    //g_pZMLoadingUI->Destroy();
 #endif
 
 	VGUI_DestroyClientDLLRootPanel();
