@@ -201,6 +201,31 @@
 			}
 		}
 	}
+	"CreditsButton"
+	{
+		"ControlName"		"CZMMainMenuButton"
+		"fieldName"		"CreditsButton"
+		"xpos"		"r210"
+		"ypos"		"400"
+		"wide"		"100"
+		"tall"		"40"
+		"autoResize"		"0"
+		"visible"		"1"
+		"enabled"		"1"
+		"labelText"		"CREDITS"
+		"textAlignment"		"east"
+		"dulltext"		"0"
+		"brighttext"		"0"
+		"wrap"		"0"
+		"command"		"engine OpenZMCreditsMenu"
+		//"imagematerial"		"zmr_mainmenu/menuicon_vote"
+		"font"		"ZMMainMenuButton"
+		"allcaps"		"1"
+		"sound_armed"		"zmr_mainmenu/buttonrollover.wav"
+		"sound_released"		"zmr_mainmenu/buttonclickrelease.wav"
+		
+		"onlynotingame"		"1"
+	}
 	"ExitButton"
 	{
 		"ControlName"		"CZMMainMenuButton"
