@@ -1074,8 +1074,7 @@ bool CZMWeaponHands::PullObject( CBaseEntity* pEnt )
 
 void CZMWeaponHands::LaunchObject()
 {
-    CBaseEntity* pObject = m_grabController.GetAttached();
-    Assert( GetHeldObject() == pObject );
+    Assert( GetHeldObject() == m_grabController.GetAttached() );
 
 
     DetachObject( true );
