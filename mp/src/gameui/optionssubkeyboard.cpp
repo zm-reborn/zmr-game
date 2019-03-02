@@ -50,7 +50,6 @@ COptionsSubKeyboard::COptionsSubKeyboard(vgui::Panel *parent) : PropertyPage(par
 	SetScheme(scheme);
 #endif
 
-	Q_memset( m_Bindings, 0, sizeof( m_Bindings ));
 
 	m_nSplitScreenUser = 0;
 
@@ -73,8 +72,6 @@ COptionsSubKeyboard::COptionsSubKeyboard(vgui::Panel *parent) : PropertyPage(par
 
 	// create the key bindings list
 	CreateKeyBindingList();
-	// Store all current key bindings
-	SaveCurrentBindings();
 	// Parse default descriptions
 	ParseActionDescriptions();
 	
@@ -93,7 +90,6 @@ COptionsSubKeyboard::COptionsSubKeyboard(vgui::Panel *parent) : PropertyPage(par
 //-----------------------------------------------------------------------------
 COptionsSubKeyboard::~COptionsSubKeyboard()
 {
-	DeleteSavedBindings();
 }
 
 //-----------------------------------------------------------------------------
@@ -324,7 +320,23 @@ void COptionsSubKeyboard::AddBinding( KeyValues *item, const char *keyname )
 	if ( !stricmp( item->GetString( "Key", "" ), keyname ) )
 		return;
 
+
+    ButtonCode_t buttoncode = g_pInputSystem->StringToButtonCode( keyname );
+
+
+	// Make sure we don't accidentally unbind this.
+	{
+		int index = m_KeysToUnbind.Find( buttoncode );
+		if ( index != -1 )
+		{
+			m_KeysToUnbind.Remove( index );
+		}
+	}
+
+
+
 	static int bindingSymbol = KeyValuesSystem()->GetSymbolForString( "Binding" );
+	static int keySymbol = KeyValuesSystem()->GetSymbolForString( "Key" );
 
 	// Make sure it doesn't live anywhere
 	RemoveKeyFromBindItems( item, keyname );
@@ -344,8 +356,15 @@ void COptionsSubKeyboard::AddBinding( KeyValues *item, const char *keyname )
 
 		if (!stricmp(curbinding, binding))
 		{
+			ButtonCode_t oldcode = g_pInputSystem->StringToButtonCode( curitem->GetString( keySymbol ) );
+
 			curitem->SetString( "Key", keyname );
 			m_pKeyBindList->InvalidateItem(i);
+
+            // We need to unbind the old key
+            
+            if ( m_KeysToUnbind.Find( oldcode ) == -1 && oldcode > KEY_NONE && oldcode != buttoncode )
+                m_KeysToUnbind.AddToTail( oldcode );
 		}
 	}
 }
@@ -525,38 +544,6 @@ void COptionsSubKeyboard::FillInCurrentBindings( void )
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: Clean up memory used by saved bindings
-//-----------------------------------------------------------------------------
-void COptionsSubKeyboard::DeleteSavedBindings( void )
-{
-	for ( int i = 0; i < BUTTON_CODE_LAST; i++ )
-	{
-		if ( m_Bindings[ i ].binding )
-		{
-			delete[] m_Bindings[ i ].binding;
-			m_Bindings[ i ].binding = NULL;
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: Copy all bindings into save array
-//-----------------------------------------------------------------------------
-void COptionsSubKeyboard::SaveCurrentBindings( void )
-{
-    DeleteSavedBindings();
-	for (int i = 0; i < BUTTON_CODE_LAST; i++)
-	{
-		const char *binding = gameuifuncs->GetBindingForButtonCode( (ButtonCode_t)i );
-		if ( !binding || !binding[0])
-			continue;
-
-		// Copy the binding string
-		m_Bindings[ i ].binding = UTIL_CopyString( binding );
-	}
-}
-
-//-----------------------------------------------------------------------------
 // Purpose: Tells the engine to bind a key
 //-----------------------------------------------------------------------------
 void COptionsSubKeyboard::BindKey( ButtonCode_t bc, const char *binding )
@@ -566,8 +553,8 @@ void COptionsSubKeyboard::BindKey( ButtonCode_t bc, const char *binding )
 	if ( !pszKeyName || !*pszKeyName )
 		return;
 
-	int nSlot = GetJoystickForCode( bc );
-	engine->ClientCmd_Unrestricted( UTIL_va( "cmd%d bind \"%s\" \"%s\"\n", nSlot + 1, pszKeyName, binding ) );
+	//int nSlot = GetJoystickForCode( bc );
+	engine->ClientCmd_Unrestricted( UTIL_va( "bind \"%s\" \"%s\"\n", pszKeyName, binding ) );
 }
 
 //-----------------------------------------------------------------------------
@@ -580,8 +567,8 @@ void COptionsSubKeyboard::UnbindKey( ButtonCode_t bc )
 	if ( !pszKeyName || !*pszKeyName )
 		return;
 
-	int nSlot = GetJoystickForCode( bc );
-	engine->ClientCmd_Unrestricted( UTIL_va( "cmd%d unbind \"%s\"\n", nSlot + 1, pszKeyName ) );
+	//int nSlot = GetJoystickForCode( bc );
+	engine->ClientCmd_Unrestricted( UTIL_va( "unbind \"%s\"\n", pszKeyName ) );
 }
 
 //-----------------------------------------------------------------------------
@@ -596,9 +583,6 @@ void COptionsSubKeyboard::ApplyAllBindings( void )
 		UnbindKey( bc );
 	}
 	m_KeysToUnbind.RemoveAll();
-
-	// free binding memory
-    DeleteSavedBindings();
 
 
 	static int bindingSymbol = KeyValuesSystem()->GetSymbolForString( "Binding" );
@@ -895,10 +879,22 @@ void COptionsSubKeyboard::OnKeyCodePressed(vgui::KeyCode code)
 		{
 			if ( KEY_DELETE == code )
 			{
+                static int keySymbol = KeyValuesSystem()->GetSymbolForString( "Key" );
+
+
 				// find the current binding and remove it
 				KeyValues *kv = m_pKeyBindList->GetItemData(r);
 
 
+                // Make sure we truly unbind this button.
+                {
+                    ButtonCode_t code = g_pInputSystem->StringToButtonCode( kv->GetString( keySymbol ) );
+
+                    if ( m_KeysToUnbind.Find( code ) == -1 )
+                        m_KeysToUnbind.AddToTail( code );
+                }
+                
+                
 				kv->SetString( "Key", "" );
 
 
