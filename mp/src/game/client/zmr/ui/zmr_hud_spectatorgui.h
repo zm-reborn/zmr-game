@@ -26,6 +26,7 @@ public:
     virtual void OnThink() OVERRIDE;
     virtual void Paint() OVERRIDE;
 
+    virtual bool ShouldDraw() OVERRIDE;
     virtual bool IsVisible() OVERRIDE;
 
 protected:

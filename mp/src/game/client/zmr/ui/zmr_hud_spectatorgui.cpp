@@ -104,6 +104,11 @@ void CZMHudSpectatorUI::Reset()
     }
 }
 
+bool CZMHudSpectatorUI::ShouldDraw()
+{
+    return CHudElement::ShouldDraw() && !engine->IsLevelMainMenuBackground();
+}
+
 bool CZMHudSpectatorUI::IsVisible()
 {
     return BaseClass::IsVisible();
