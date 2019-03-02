@@ -58,9 +58,6 @@ private:
 	void			BindKey( ButtonCode_t bc, const char *binding );
 	void			UnbindKey( ButtonCode_t bc );
 
-	// Save/restore/cleanup engine's current bindings ( for handling cancel button )
-	void			SaveCurrentBindings( void );
-	void			DeleteSavedBindings( void );
 
 	// Get column 0 action descriptions for all keys
 	void			ParseActionDescriptions( void );
@@ -92,9 +89,6 @@ private:
 
 	vgui::Button *m_pSetBindingButton;
 	vgui::Button *m_pClearBindingButton;
-
-	// List of saved bindings for the keys
-	KeyBinding m_Bindings[ BUTTON_CODE_LAST ];
 
 	// List of all the keys that need to have their binding removed
 	CUtlVector<ButtonCode_t> m_KeysToUnbind;
