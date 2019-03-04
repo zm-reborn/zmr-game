@@ -224,13 +224,14 @@
 		"sound_armed"		"zmr_mainmenu/buttonrollover.wav"
 		"sound_released"		"zmr_mainmenu/buttonclickrelease.wav"
 		
+		"imagematerial"		"zmr_mainmenu/menuicon_credits"
 		"onlynotingame"		"1"
 	}
 	"ExitButtonNotInGame"
 	{
 		"ControlName"		"CZMMainMenuButton"
 		"fieldName"		"ExitButtonNotInGame"
-		"xpos"		"350"
+		"xpos"		"370"
 		"ypos"		"400"
 		"wide"		"100"
 		"tall"		"40"
@@ -248,6 +249,7 @@
 		"sound_armed"		"zmr_mainmenu/buttonrollover.wav"
 		"sound_released"		"zmr_mainmenu/buttonclickrelease.wav"
 		
+		"imagematerial"		"zmr_mainmenu/menuicon_exit"
 		"onlynotingame"		"1"
 	}
 	"ExitButton"
@@ -272,6 +274,7 @@
 		"sound_armed"		"zmr_mainmenu/buttonrollover.wav"
 		"sound_released"		"zmr_mainmenu/buttonclickrelease.wav"
 		
+		"imagematerial"		"zmr_mainmenu/menuicon_exit"
 		"onlyingame"		"1"
 	}
 	"ImagePanel"
