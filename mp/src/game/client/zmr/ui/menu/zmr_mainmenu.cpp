@@ -192,7 +192,7 @@ void CZMMainMenu::PaintBackground()
 
 
         float unarmedtime = pButton->GetUnarmedTime();
-        float unarmeddelta = (gpGlobals->curtime - pButton->GetUnarmedTime());
+        float unarmeddelta = (gpGlobals->realtime - pButton->GetUnarmedTime());
 
         bool bFadeOut = unarmedtime != 0.0f && unarmeddelta < SECTION_FADEOUT_TIME;
 
@@ -228,7 +228,7 @@ void CZMMainMenu::PaintBackground()
 
 
             // Get our alpha
-            float armeddelta = gpGlobals->curtime - pButton->GetArmedTime();
+            float armeddelta = gpGlobals->realtime - pButton->GetArmedTime();
             if ( bFadeOut )
             {
                 int a = (1.0f - (unarmeddelta / SECTION_FADEOUT_TIME)) * 255;
