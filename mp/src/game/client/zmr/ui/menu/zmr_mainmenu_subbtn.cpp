@@ -36,20 +36,21 @@ CZMMainMenuSubButton::~CZMMainMenuSubButton()
 
 void CZMMainMenuSubButton::Paint()
 {
+    // We always need to repaint
     if ( m_flFadeIn != 0.0f )
     {
         int a = (gpGlobals->curtime - m_flFadeIn) / m_flFadeInTime * 255;
 
-        Color clr = GetButtonDefaultFgColor();
-        clr[3] = a;
-
         if ( a >= 255 )
         {
-            clr[3] = 255;
+            a = 255;
             m_flFadeIn = 0.0f;
         }
 
-        SetDefaultColor( clr, GetButtonDefaultBgColor() );
+        
+        _defaultFgColor[3] = a;
+        SetFgColor( _defaultFgColor );
+        Repaint();
     }
     else if ( m_flFadeOut != 0.0f )
     {
@@ -62,9 +63,9 @@ void CZMMainMenuSubButton::Paint()
         }
         else
         {
-            Color clr = GetButtonDefaultFgColor();
-            clr[3] = a;
-            SetDefaultColor( clr, GetButtonDefaultBgColor() );
+            _defaultFgColor[3] = a;
+            SetFgColor( _defaultFgColor );
+            Repaint();
         }
     }
 
@@ -102,6 +103,7 @@ void CZMMainMenuSubButton::FadeIn( float fade )
 
 
     SetVisible( true );
+    Repaint();
 }
 
 void CZMMainMenuSubButton::FadeOut( float fade )
@@ -114,4 +116,6 @@ void CZMMainMenuSubButton::FadeOut( float fade )
 
     m_flFadeOutTime = fade;
     m_flFadeIn = 0.0f;
+
+    Repaint();
 }
