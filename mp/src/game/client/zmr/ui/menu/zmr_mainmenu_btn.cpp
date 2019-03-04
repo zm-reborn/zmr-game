@@ -83,14 +83,14 @@ void CZMMainMenuButton::SetArmed( bool state )
 
         if ( state )
         {
-            m_flArmedTime = gpGlobals->curtime;
+            m_flArmedTime = gpGlobals->realtime;
             m_flUnarmedTime = 0.0f;
             ShowSubButtons();
         }
         else
         {
             m_flArmedTime = 0.0f;
-            m_flUnarmedTime = gpGlobals->curtime;
+            m_flUnarmedTime = gpGlobals->realtime;
             HideSubButtons();
         }
 

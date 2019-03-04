@@ -39,7 +39,7 @@ void CZMMainMenuSubButton::Paint()
     // We always need to repaint
     if ( m_flFadeIn != 0.0f )
     {
-        int a = (gpGlobals->curtime - m_flFadeIn) / m_flFadeInTime * 255;
+        int a = (gpGlobals->realtime - m_flFadeIn) / m_flFadeInTime * 255;
 
         if ( a >= 255 )
         {
@@ -54,7 +54,7 @@ void CZMMainMenuSubButton::Paint()
     }
     else if ( m_flFadeOut != 0.0f )
     {
-        int a = (m_flFadeOut - gpGlobals->curtime) / m_flFadeOutTime * 255;
+        int a = (m_flFadeOut - gpGlobals->realtime) / m_flFadeOutTime * 255;
 
         if ( a <= 0 )
         {
@@ -92,11 +92,11 @@ void CZMMainMenuSubButton::ApplySchemeSettings( IScheme* pScheme )
 
 void CZMMainMenuSubButton::FadeIn( float fade )
 {
-    if ( m_flFadeIn != 0.0f && m_flFadeIn > gpGlobals->curtime )
+    if ( m_flFadeIn != 0.0f && m_flFadeIn > gpGlobals->realtime )
         return;
 
 
-    m_flFadeIn = gpGlobals->curtime;
+    m_flFadeIn = gpGlobals->realtime;
     
     m_flFadeInTime = fade;
     m_flFadeOut = 0.0f;
@@ -108,11 +108,11 @@ void CZMMainMenuSubButton::FadeIn( float fade )
 
 void CZMMainMenuSubButton::FadeOut( float fade )
 {
-    if ( m_flFadeOut != 0.0f && m_flFadeOut <= (gpGlobals->curtime+2.0f) )
+    if ( m_flFadeOut != 0.0f && m_flFadeOut <= (gpGlobals->realtime+2.0f) )
         return;
 
 
-    m_flFadeOut = gpGlobals->curtime + fade;
+    m_flFadeOut = gpGlobals->realtime + fade;
 
     m_flFadeOutTime = fade;
     m_flFadeIn = 0.0f;
