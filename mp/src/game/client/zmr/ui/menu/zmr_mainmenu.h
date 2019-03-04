@@ -26,6 +26,9 @@ public:
     virtual void OnKeyCodePressed( vgui::KeyCode code ) OVERRIDE;
     virtual void OnMousePressed( vgui::KeyCode code ) OVERRIDE;
 
+
+    virtual void Repaint() OVERRIDE;
+
     virtual void PaintBackground() OVERRIDE;
 
     virtual bool IsVisible() OVERRIDE;
@@ -54,12 +57,14 @@ private:
 
     int m_nTexBgId;
     Color m_BgColor;
-
+    int m_nTexSectionBgId;
 
     bool m_bInLoadingScreen;
 
     int m_iBottomStripChildIndex;
     char m_szBottomStrip[64];
+
+    CUtlVector<CZMMainMenuButton*> m_vBtns;
 };
 
 
