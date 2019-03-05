@@ -32,9 +32,10 @@ class CZMBaseWeapon : public CBaseCombatWeapon, public CZMUserCmdHitWepValidator
 {
 public:
 	DECLARE_CLASS( CZMBaseWeapon, CBaseCombatWeapon );
-	DECLARE_NETWORKCLASS(); 
+	DECLARE_NETWORKCLASS();
+#ifdef CLIENT_DLL
 	DECLARE_PREDICTABLE();
-#ifndef CLIENT_DLL
+#else
     DECLARE_DATADESC();
 #endif
 
@@ -66,8 +67,9 @@ public:
     virtual void FireBullets( const FireBulletsInfo_t& info ) OVERRIDE;
     virtual void FireBullets( int numShots, int iAmmoType, float flMaxDist );
     virtual void PrimaryAttack() OVERRIDE;
-    virtual void Shoot();
+    virtual void Shoot( int iAmmoType = -1, int nBullets = -1, int nAmmo = -1, float flMaxRange = -1.0f, bool bUseClip1 = true, bool bSecondaryEffects = false );
     virtual void PrimaryAttackEffects();
+    virtual void SecondaryAttackEffects();
     virtual void SecondaryAttack() OVERRIDE;
     
     const CZMWeaponInfo& GetWpnData() const;

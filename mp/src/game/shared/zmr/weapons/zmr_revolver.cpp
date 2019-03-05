@@ -91,7 +91,6 @@ public:
     virtual void PrimaryAttackEffects() OVERRIDE;
     virtual void SecondaryAttack() OVERRIDE;
 
-    virtual void Shoot() OVERRIDE;
     
     virtual float GetFireRate() OVERRIDE { return 1.0f; }
 
@@ -235,11 +234,6 @@ void CZMWeaponRevolver::ItemPostFrame()
 
         m_flShootTime = 0.0f;
     }
-}
-
-void CZMWeaponRevolver::Shoot()
-{
-    BaseClass::Shoot();
 }
 
 void CZMWeaponRevolver::PrimaryAttackEffects()
