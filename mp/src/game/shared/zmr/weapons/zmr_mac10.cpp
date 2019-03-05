@@ -43,7 +43,7 @@ public:
 
     virtual const Vector& GetBulletSpread() OVERRIDE
     {
-        static Vector cone = VECTOR_CONE_2DEGREES;
+        static Vector cone = VECTOR_CONE_4DEGREES;
         return cone;
     }
     
