@@ -486,6 +486,8 @@ void MapEntity_ParseAllEntities(const char *pMapData, IMapEntityFilter *pFilter,
 	}
 
 	SpawnHierarchicalList( nEntities, pSpawnList, bActivateEntities );
+    ZMItemAction::g_ZMMapItemSystem.SpawnItems();
+
 
 	delete [] pSpawnMapData;
 	delete [] pSpawnList;

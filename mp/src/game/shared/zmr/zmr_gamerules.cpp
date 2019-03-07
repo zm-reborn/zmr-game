@@ -1313,9 +1313,6 @@ void CZMRules::RestoreMap()
     // DO NOT CALL SPAWN ON info_node ENTITIES!
 
     MapEntity_ParseAllEntities( engine->GetMapEntitiesString(), &filter, true );
-
-
-    ZMItemAction::g_ZMMapItemSystem.SpawnItems();
 }
 
 void CZMRules::PlayerSpawn( CBasePlayer* pPlayer )
