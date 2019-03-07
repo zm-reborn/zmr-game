@@ -13,7 +13,6 @@
 #include "ammodef.h"
 
 #include "zmr/zmr_voting.h"
-#include "zmr/zmr_mapitemaction.h"
 #include "zmr/zmr_rejoindata.h"
 
 #include "zmr/zmr_player.h"
@@ -1276,10 +1275,6 @@ void CZMRules::RestoreMap()
 
         virtual CBaseEntity* CreateNextEntity( const char *pClassname )
         {
-            if ( ZMItemAction::g_ZMMapItemSystem.AffectsItem( pClassname ) )
-                return nullptr;
-
-
             if ( m_iIterator == g_MapEntityRefs.InvalidIndex() )
             {
                 // This shouldn't be possible. When we loaded the map, it should have used 
