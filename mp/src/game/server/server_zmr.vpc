@@ -5,8 +5,8 @@
 //-----------------------------------------------------------------------------
 
 $Macro SRCDIR		"..\.."
-$Macro GAMENAME 	"zmr" [$ZMR_STEAM]
 $Macro GAMENAME 	"zombie_master_reborn" [!$ZMR_STEAM]
+$Macro GAMENAME 	"zmr" [$ZMR_STEAM]
 
 $Include "$SRCDIR\game\server\server_base.vpc"
 $Include "$SRCDIR\game\server\nav_mesh.vpc" [$SOURCESDK]
