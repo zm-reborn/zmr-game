@@ -18,7 +18,7 @@ $Games
 $Conditional "SOURCESDK" "1"
 
 // Switch on when building for steam.
-$Conditional "ZMR_STEAM" "0"
+$Conditional "ZMR_STEAM" "1"
 
 $Include "vpc_scripts\projects.vgc"
 $Include "vpc_scripts\groups.vgc"
