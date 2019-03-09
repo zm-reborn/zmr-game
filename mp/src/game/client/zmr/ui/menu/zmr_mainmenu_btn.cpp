@@ -21,6 +21,11 @@ using namespace vgui;
 CZMMainMenuButton::CZMMainMenuButton( Panel* pParent, const char* name ) : BaseClass( pParent, name )
 {
     m_bOnlyInGame = false;
+
+    m_nMaxSubTextWidth = 0;
+    m_nSubBtnHeight = 0;
+    m_flArmedTime = 0.0f;
+    m_flUnarmedTime = 0.0f;
 }
 
 CZMMainMenuButton::~CZMMainMenuButton()
@@ -76,8 +81,18 @@ void CZMMainMenuButton::SetArmed( bool state )
         }
 
 
-        if ( state ) ShowSubButtons(); else HideSubButtons();
-
+        if ( state )
+        {
+            m_flArmedTime = gpGlobals->realtime;
+            m_flUnarmedTime = 0.0f;
+            ShowSubButtons();
+        }
+        else
+        {
+            m_flArmedTime = 0.0f;
+            m_flUnarmedTime = gpGlobals->realtime;
+            HideSubButtons();
+        }
 
         RecalculateDepressedState();
         InvalidateLayout( false );
@@ -94,6 +109,7 @@ void CZMMainMenuButton::ApplySchemeSettings( IScheme* pScheme )
 void CZMMainMenuButton::ApplySettings( KeyValues* kv )
 {
     m_bOnlyInGame = kv->GetBool( "onlyingame" );
+    m_bOnlyNotInGame = kv->GetBool( "onlynotingame" );
 
 
     KeyValues* subkv = kv->FindKey( "subbuttons" );
@@ -106,6 +122,41 @@ void CZMMainMenuButton::ApplySettings( KeyValues* kv )
     }
 
     BaseClass::ApplySettings( kv );
+}
+
+void CZMMainMenuButton::PerformLayout()
+{
+    BaseClass::PerformLayout();
+
+
+    ComputeMaxTextWidth();
+}
+
+void CZMMainMenuButton::ComputeMaxTextWidth()
+{
+    int w, h;
+
+    m_nMaxSubTextWidth = 0;
+
+    int len = m_vSubBtns.Count();
+    for ( int i = 0; i < len; i++ )
+    {
+        m_vSubBtns[i]->GetContentSize( w, h );
+        if ( m_nMaxSubTextWidth < w )
+        {
+            m_nMaxSubTextWidth = w;
+        }
+    }
+
+    if ( !m_nMaxSubTextWidth )
+    {
+        GetContentSize( m_nMaxSubTextWidth, h );
+
+        if ( !m_nMaxSubTextWidth )
+            m_nMaxSubTextWidth = GetWide();
+    }
+
+    Assert( m_nMaxSubTextWidth > 0 );
 }
 
 bool CZMMainMenuButton::IsSubButtonsVisible() const
@@ -140,6 +191,8 @@ void CZMMainMenuButton::ShowSubButtons()
     {
         m_vSubBtns[i]->FadeIn( 0.1f + (i * 0.1f) );
     }
+
+    GetParent()->Repaint();
 }
 
 void CZMMainMenuButton::HideSubButtons()
@@ -149,6 +202,8 @@ void CZMMainMenuButton::HideSubButtons()
     {
         m_vSubBtns[i]->FadeOut( 0.1f + ((len-i-1) * 0.1f) );
     }
+
+    GetParent()->Repaint();
 }
 
 void CZMMainMenuButton::PositionSubButtons()
@@ -158,6 +213,10 @@ void CZMMainMenuButton::PositionSubButtons()
 
     const int size_x = GetWide();
     const int size_y = GetTall() * 0.6f;
+
+
+    m_nSubBtnHeight = size_y;
+
 
     const int offset_x = 0;
     const int offset_y = -size_y;

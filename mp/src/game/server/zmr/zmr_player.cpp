@@ -14,9 +14,8 @@
 #include "zmr/zmr_viewmodel.h"
 #include "zmr_entities.h"
 #include "zmr/zmr_gamerules.h"
-#include "zmr/zmr_global_shared.h"
 #include "zmr/zmr_playermodels.h"
-#include "weapons/zmr_carry.h"
+#include "weapons/zmr_fistscarry.h"
 #include "zmr_player.h"
 
 
@@ -681,8 +680,7 @@ void CZMPlayer::GiveDefaultItems()
         EquipSuit( false ); // Don't play "effects" (hand showcase anim)
     
 
-    GiveNamedItem( "weapon_zm_carry" );
-    GiveNamedItem( "weapon_zm_fists" );
+    GiveNamedItem( "weapon_zm_fistscarry" );
 
 
     CZMRules* pRules = ZMRules();
@@ -1280,6 +1278,21 @@ void CZMPlayer::PickupObject( CBaseEntity *pObject, bool bLimitMassAndSize )
     PlayerAttemptPickup( this, pObject );
 }
 
+bool CZMPlayer::IsHoldingEntity( CBaseEntity *pEnt )
+{
+    // Ask our carrying weapon if we're holding it
+    CZMWeaponHands* pWeapon = static_cast<CZMWeaponHands*>( Weapon_OwnsThisType( "weapon_zm_fistscarry" ) );
+    return pWeapon ? pWeapon->IsCarryingObject( pEnt ) : false;
+}
+
+float CZMPlayer::GetHeldObjectMass( IPhysicsObject *pHeldObject )
+{
+    // Ask our carrying weapon
+    CZMWeaponHands* pWeapon = static_cast<CZMWeaponHands*>( Weapon_OwnsThisType( "weapon_zm_fistscarry" ) );
+
+    return pWeapon ? pWeapon->GetHeldObjectMass() : 0.0f;
+}
+
 void CZMPlayer::SetHandsModel( const char* model )
 {
     if ( !model || !(*model) ) return;
@@ -1516,7 +1529,7 @@ CZMBaseWeapon* CZMPlayer::GetWeaponOfHighestSlot()
         return pWep;
 
     // Just default to fists.
-    return ToZMBaseWeapon( Weapon_OwnsThisType( "weapon_zm_fists" ) );
+    return ToZMBaseWeapon( Weapon_OwnsThisType( "weapon_zm_fistscarry" ) );
 }
 
 CZMBaseWeapon* CZMPlayer::GetWeaponOfSlot( int slot )

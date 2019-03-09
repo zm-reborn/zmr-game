@@ -45,8 +45,12 @@ END_NETWORK_TABLE()
 
 IMPLEMENT_NETWORKCLASS_ALIASED( ZMBaseWeapon, DT_ZM_BaseWeapon )
 
+#ifdef CLIENT_DLL
 BEGIN_PREDICTION_DATA( CZMBaseWeapon )
+    DEFINE_PRED_FIELD_TOL( m_flNextClipFillTime, FIELD_FLOAT, FTYPEDESC_INSENDTABLE, TD_MSECTOLERANCE ),
+    DEFINE_PRED_FIELD( m_bCanCancelReload, FIELD_BOOLEAN, FTYPEDESC_INSENDTABLE ),
 END_PREDICTION_DATA()
+#endif
 
 #ifndef CLIENT_DLL
 BEGIN_DATADESC( CZMBaseWeapon )
@@ -548,7 +552,7 @@ float CZMBaseWeapon::GetFirstInstanceOfAnimEventTime( int iSeq, int iAnimEvent, 
 }
 
 
-void CZMBaseWeapon::PrimaryAttack( void )
+void CZMBaseWeapon::PrimaryAttack()
 {
     if ( !CanAct() ) return;
 
@@ -697,7 +701,7 @@ void CZMBaseWeapon::PlayAISound() const
 }
 #endif
 
-void CZMBaseWeapon::SecondaryAttack( void )
+void CZMBaseWeapon::SecondaryAttack()
 {
     if ( !CanAct() ) return;
 
@@ -975,7 +979,7 @@ bool CZMBaseWeapon::IsTemplate()
     return BaseClass::IsTemplate();
 }
 
-void CZMBaseWeapon::Materialize( void )
+void CZMBaseWeapon::Materialize()
 {
 	if ( IsEffectActive( EF_NODRAW ) )
 	{
@@ -1011,7 +1015,7 @@ void CZMBaseWeapon::Materialize( void )
 }
 #endif
 
-void CZMBaseWeapon::FallInit( void )
+void CZMBaseWeapon::FallInit()
 {
 #ifndef CLIENT_DLL
 	SetModel( GetWorldModel() );
@@ -1082,7 +1086,7 @@ void CZMBaseWeapon::FallInit( void )
 #endif
 }
 
-void CZMBaseWeapon::SetPickupTouch( void )
+void CZMBaseWeapon::SetPickupTouch()
 {
 #ifndef CLIENT_DLL
     SetTouch( &CBaseCombatWeapon::DefaultTouch );
@@ -1136,7 +1140,7 @@ void CZMBaseWeapon::DoMachineGunKick( float dampEasy, float maxVerticleKickAngle
     pPlayer->ViewPunch( vecScratch * 0.5 );
 }
 
-bool CZMBaseWeapon::CanBeSelected( void )
+bool CZMBaseWeapon::CanBeSelected()
 {
 	if ( !VisibleInWeaponSelection() )
 		return false;
@@ -1198,7 +1202,7 @@ ConVar cl_bobenable( "cl_bobenable", "1" );
 extern float g_lateralBob;
 extern float g_verticalBob;
 
-float CZMBaseWeapon::CalcViewmodelBob( void )
+float CZMBaseWeapon::CalcViewmodelBob()
 {
     static float    bobtime;
     static float    lastbobtime;
@@ -1313,7 +1317,7 @@ const WeaponProficiencyInfo_t* CZMBaseWeapon::GetProficiencyValues()
 #else
 
 // Server stubs
-float CZMBaseWeapon::CalcViewmodelBob( void )
+float CZMBaseWeapon::CalcViewmodelBob()
 {
     return 0.0f;
 }

@@ -13,6 +13,8 @@ public:
 
     virtual void Init() OVERRIDE;
 
+    virtual void FireGameEvent( IGameEvent* pEvent ) OVERRIDE;
+
     virtual bool DoPostScreenSpaceEffects( const CViewSetup* pSetup ) OVERRIDE;
     virtual void PostRender() OVERRIDE;
 

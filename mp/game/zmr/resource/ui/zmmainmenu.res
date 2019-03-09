@@ -94,6 +94,7 @@
 				"labelText"		"#GameUI_CreateServer"
 				"command"		"OpenCreateMultiplayerGameDialog"
 				
+				"sound_armed"		"zmr_mainmenu/subbuttonrollover.wav"
 				"sound_released"		"zmr_mainmenu/buttonclickrelease.wav"
 			}
 			"playonline"
@@ -103,6 +104,7 @@
 				"labelText"		"#GameUI_GameMenu_FindServers"
 				"command"		"OpenServerBrowser"
 				
+				"sound_armed"		"zmr_mainmenu/subbuttonrollover.wav"
 				"sound_released"		"zmr_mainmenu/buttonclickrelease.wav"
 			}
 			"playtutorial"
@@ -113,6 +115,7 @@
 				"command"		""
 				"enabled"		"0"
 				
+				"sound_armed"		"zmr_mainmenu/subbuttonrollover.wav"
 				"sound_released"		"zmr_mainmenu/buttonclickrelease.wav"
 			}
 		}
@@ -145,17 +148,19 @@
 				"fieldName"		"ModOptions"
 				"allcaps"		"1"
 				"labelText"		"Mod Options"
-				"command"		"engine ToggleZMOptions"
+				"command"		"engine OpenZMOptions"
 				
+				"sound_armed"		"zmr_mainmenu/subbuttonrollover.wav"
 				"sound_released"		"zmr_mainmenu/buttonclickrelease.wav"
 			}
 			"defoptions"
 			{
 				"fieldName"		"DefaultOptions"
 				"allcaps"		"1"
-				"labelText"		"Input/Video"
-				"command"		"OpenOptionsDialog"
+				"labelText"		"#GameUI_Options"
+				"command"		"engine OpenZMGameUIOptions"
 				
+				"sound_armed"		"zmr_mainmenu/subbuttonrollover.wav"
 				"sound_released"		"zmr_mainmenu/buttonclickrelease.wav"
 			}
 		}
@@ -191,9 +196,61 @@
 				"labelText"		"Restart Round"
 				"command"		"engine callvote ZMVoteRoundRestart"
 				
+				"sound_armed"		"zmr_mainmenu/subbuttonrollover.wav"
 				"sound_released"		"zmr_mainmenu/buttonclickrelease.wav"
 			}
 		}
+	}
+	"CreditsButton"
+	{
+		"ControlName"		"CZMMainMenuButton"
+		"fieldName"		"CreditsButton"
+		"xpos"		"250"
+		"ypos"		"400"
+		"wide"		"100"
+		"tall"		"40"
+		"autoResize"		"0"
+		"visible"		"1"
+		"enabled"		"1"
+		"labelText"		"CREDITS"
+		"textAlignment"		"west"
+		"dulltext"		"0"
+		"brighttext"		"0"
+		"wrap"		"0"
+		"command"		"engine OpenZMCreditsMenu"
+		//"imagematerial"		"zmr_mainmenu/menuicon_vote"
+		"font"		"ZMMainMenuButton"
+		"allcaps"		"1"
+		"sound_armed"		"zmr_mainmenu/buttonrollover.wav"
+		"sound_released"		"zmr_mainmenu/buttonclickrelease.wav"
+		
+		"imagematerial"		"zmr_mainmenu/menuicon_credits"
+		"onlynotingame"		"1"
+	}
+	"ExitButtonNotInGame"
+	{
+		"ControlName"		"CZMMainMenuButton"
+		"fieldName"		"ExitButtonNotInGame"
+		"xpos"		"370"
+		"ypos"		"400"
+		"wide"		"100"
+		"tall"		"40"
+		"autoResize"		"0"
+		"visible"		"1"
+		"enabled"		"1"
+		"labelText"		"#GameUI_GameMenu_Quit"
+		"textAlignment"		"west"
+		"dulltext"		"0"
+		"brighttext"		"0"
+		"wrap"		"0"
+		"command"		"Quit"
+		"font"		"ZMMainMenuButton"
+		"allcaps"		"1"
+		"sound_armed"		"zmr_mainmenu/buttonrollover.wav"
+		"sound_released"		"zmr_mainmenu/buttonclickrelease.wav"
+		
+		"imagematerial"		"zmr_mainmenu/menuicon_exit"
+		"onlynotingame"		"1"
 	}
 	"ExitButton"
 	{
@@ -204,7 +261,7 @@
 		"wide"		"100"
 		"tall"		"40"
 		"autoResize"		"0"
-		"visible"		"1"
+		"visible"		"0"
 		"enabled"		"1"
 		"labelText"		"#GameUI_GameMenu_Quit"
 		"textAlignment"		"center"
@@ -217,8 +274,8 @@
 		"sound_armed"		"zmr_mainmenu/buttonrollover.wav"
 		"sound_released"		"zmr_mainmenu/buttonclickrelease.wav"
 		
-		//"imagematerial"		"zmr_mainmenu/menuicon_test"
-		//"imagealign"		"1"
+		"imagematerial"		"zmr_mainmenu/menuicon_exit"
+		"onlyingame"		"1"
 	}
 	"ImagePanel"
 	{

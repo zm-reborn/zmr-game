@@ -27,14 +27,14 @@ CAmmoDef* GetAmmoDef()
 
 
         // Stuff we use.
-        ADD_ZM_AMMOTYPE( def, "Pistol", DMG_BULLET, TRACER_LINE_AND_WHIZ, 80, BULLET_IMPULSE( 200, 1225 ) );
-        ADD_ZM_AMMOTYPE( def, "357", DMG_BULLET, TRACER_LINE_AND_WHIZ, 21, BULLET_IMPULSE( 800, 5000 ) ); // Rifle
-        ADD_ZM_AMMOTYPE( def, "Buckshot", DMG_BULLET | DMG_BUCKSHOT, TRACER_LINE_AND_WHIZ, 24, BULLET_IMPULSE( 400, 1200 ) ); // Shotgun
-        ADD_ZM_AMMOTYPE( def, "SMG1", DMG_BULLET, TRACER_LINE_AND_WHIZ, 60, BULLET_IMPULSE( 200, 1225 ) ); // Mac-10
+        ADD_ZM_AMMOTYPE( def, "Pistol", DMG_BULLET, TRACER_LINE_AND_WHIZ, 80, 2400 );
+        ADD_ZM_AMMOTYPE( def, "357", DMG_BULLET, TRACER_LINE_AND_WHIZ, 21, 3800 ); // Rifle
+        ADD_ZM_AMMOTYPE( def, "Buckshot", DMG_BULLET | DMG_BUCKSHOT, TRACER_LINE_AND_WHIZ, 24, 1300 ); // Shotgun
+        ADD_ZM_AMMOTYPE( def, "SMG1", DMG_BULLET, TRACER_LINE_AND_WHIZ, 60, 2200 ); // Mac-10
         
         // ZM Custom
         ADD_ZM_AMMOTYPE( def, "Molotov", DMG_BURN, TRACER_NONE, 1, 0 );
-        ADD_ZM_AMMOTYPE( def, "Revolver", DMG_BULLET, TRACER_LINE_AND_WHIZ, 36, BULLET_IMPULSE( 800, 2000 ) );
+        ADD_ZM_AMMOTYPE( def, "Revolver", DMG_BULLET, TRACER_LINE_AND_WHIZ, 36, 3200 );
 
 
         // This is used by func_tank. (eg. zm_desert_laboratory)

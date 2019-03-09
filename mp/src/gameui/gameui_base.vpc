@@ -1,0 +1,177 @@
+//-----------------------------------------------------------------------------
+//	GAMEUI_BASE.VPC
+//
+//	Project Script
+//-----------------------------------------------------------------------------
+
+$Macro OUTBINNAME	"gameui"
+$Macro OUTBINDIR	"$SRCDIR\..\game\bin"
+
+$MacroRequired "GAMENAME"
+
+
+$Include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
+
+
+$Configuration	"Debug"
+{
+	$General
+	{
+		$OutputDirectory			".\Debug_$GAMENAME"			[$WIN32]
+		$IntermediateDirectory		".\Debug_$GAMENAME"			[$WIN32]
+
+		$OutputDirectory			".\Debug_$GAMENAME_360"		[$X360]
+		$IntermediateDirectory		".\Debug_$GAMENAME_360"		[$X360]
+	}
+}
+
+$Configuration	"Release"
+{
+	$General
+	{
+		$OutputDirectory			".\Release_$GAMENAME"		[$WIN32]
+		$IntermediateDirectory		".\Release_$GAMENAME"		[$WIN32]
+
+		$OutputDirectory			".\Release_$GAMENAME_360"	[$X360]
+		$IntermediateDirectory		".\Release_$GAMENAME_360"	[$X360]
+	}
+}
+
+$Configuration
+{
+	$General
+	{
+		$OutputDirectory			".\$GAMENAME"		[$OSXALL]
+	}
+
+	$Compiler
+	{
+		$AdditionalIncludeDirectories	".\;$BASE;$SRCDIR\vgui2\include;$SRCDIR\vgui2\controls"
+		$PreprocessorDefinitions		"$BASE;VERSION_SAFE_STEAM_API_INTERFACES;GAMEUI_EXPORTS" 
+	}
+}
+
+$Project
+{
+	$Folder	"Source Files"
+	{
+		$File	"backgroundmenubutton.cpp"
+		$File	"basepanel.cpp"
+		$File	"gameconsole.cpp"
+		$File	"gameui_interface.cpp"
+		$File	"logofile.cpp"
+		$File	"modinfo.cpp"
+		$File	"mousemessageforwardingpanel.cpp"
+		$File	"panellistpanel.cpp"
+		$File	"rungameengine.cpp"
+		$File	"scriptobject.cpp"
+		$File	"sys_utils.cpp"
+		$File	"textentrybox.cpp"
+		$File	"$srcdir\public\vgui_controls\vgui_controls.cpp"
+		$File	"vguisystemmoduleloader.cpp"
+		$File	"$srcdir\common\language.cpp"
+		$File	"$srcdir\vgui2\vgui_controls\controls.cpp"
+	}
+
+	$Folder	"Header Files"
+	{
+		$File	"backgroundmenubutton.h"
+		$File	"basepanel.h"
+		$File	"createmultiplayergamebotpage.h"
+		$File	"createmultiplayergamedialog.h"
+		$File	"createmultiplayergamegameplaypage.h"
+		$File	"createmultiplayergameserverpage.h"
+		$File	"engineinterface.h"
+		$File	"gameconsole.h"
+		$File	"gameui_interface.h"
+		$File	"loadingdialog.h"
+		$File	"modinfo.h"
+		$File	"mousemessageforwardingpanel.h"
+		$File	"panellistpanel.h"
+		$File	"scriptobject.h"
+		$File	"sys_utils.h"
+		$File	"textentrybox.h"
+		$File	"vguisystemmoduleloader.h"
+	}
+
+	$Folder	"Public Header Files"
+	{
+		$File	"$srcdir\public\iachievementmgr.h"
+		$File	"$srcdir\public\game\client\igameclientexports.h"
+		$File	"$srcdir\common\gameui\igameui.h"
+		$File	"$srcdir\public\igameuifuncs.h"
+		$File	"$srcdir\public\tier1\interface.h"
+		$File	"$srcdir\common\irungameengine.h"
+		$File	"$srcdir\common\ivguimodule.h"
+		$File	"$srcdir\common\ivguimoduleloader.h"
+		$File	"$srcdir\public\savegame_version.h"
+		$File	"$srcdir\common\language.h"		
+	}
+
+	$Folder	"Controls"
+	{
+		$File	"bitmapimagepanel.cpp"
+		$File	"bitmapimagepanel.h"
+		$File	"commandcheckbutton.cpp"
+		$File	"commandcheckbutton.h"
+		$File	"cvarnegatecheckbutton.cpp"
+		$File	"cvarnegatecheckbutton.h"
+		$File	"cvarslider.cpp"
+		$File	"cvarslider.h"
+		$File	"cvartextentry.cpp"
+		$File	"cvartextentry.h"
+		$File	"cvartogglecheckbutton.cpp"
+		$File	"cvartogglecheckbutton.h"
+		$File	"keytogglecheckbutton.cpp"
+		$File	"keytogglecheckbutton.h"
+		$File	"labeledcommandcombobox.cpp"
+		$File	"labeledcommandcombobox.h"
+		$File	"urlbutton.cpp"
+		$File	"urlbutton.h"
+		$File	"vcontrolslistpanel.cpp"
+		$File	"vcontrolslistpanel.h"
+	}
+
+	$Folder	"Dialogs"
+	{
+		$File	"gameconsoledialog.cpp"
+		$File	"gameconsoledialog.h"
+		$File	"multiplayeradvanceddialog.cpp"
+		$File	"multiplayeradvanceddialog.h"
+		$File	"loadingdialog.cpp"
+		$File	"createmultiplayergamebotpage.cpp"
+		$File	"createmultiplayergamedialog.cpp"
+		$File	"createmultiplayergamegameplaypage.cpp"
+		$File	"createmultiplayergameserverpage.cpp"
+	}
+
+	$Folder	"Link Libraries"
+	{
+		$Lib		bitmap
+		$Lib		mathlib
+		$Lib		matsys_controls
+		$Lib		tier1
+		$Lib		tier2
+		$Lib		tier3
+		$Lib		vgui_controls
+		$Lib		vtf
+		$ImpLib		steam_api
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

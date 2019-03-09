@@ -10,7 +10,6 @@
 
 
 #include "zmr/zmr_player_shared.h"
-#include "zmr/zmr_global_shared.h"
 #include "zmr/c_zmr_zmvision.h"
 #include "zmr/npcs/zmr_zombieanimstate.h"
 #include "zmr/npcs/zmr_zombiebase_shared.h"
@@ -87,6 +86,7 @@ C_ZMBaseZombie::C_ZMBaseZombie()
     m_fxInner = nullptr;
 
     m_iGroup = INVALID_GROUP_INDEX;
+    m_flLastLocalSelect = 0.0f;
 
     m_pHat = nullptr;
 

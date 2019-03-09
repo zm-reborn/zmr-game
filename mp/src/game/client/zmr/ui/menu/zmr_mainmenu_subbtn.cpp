@@ -36,24 +36,25 @@ CZMMainMenuSubButton::~CZMMainMenuSubButton()
 
 void CZMMainMenuSubButton::Paint()
 {
+    // We always need to repaint
     if ( m_flFadeIn != 0.0f )
     {
-        int a = (gpGlobals->curtime - m_flFadeIn) / m_flFadeInTime * 255;
-
-        Color clr = GetButtonDefaultFgColor();
-        clr[3] = a;
+        int a = (gpGlobals->realtime - m_flFadeIn) / m_flFadeInTime * 255;
 
         if ( a >= 255 )
         {
-            clr[3] = 255;
+            a = 255;
             m_flFadeIn = 0.0f;
         }
 
-        SetDefaultColor( clr, GetButtonDefaultBgColor() );
+        
+        _defaultFgColor[3] = a;
+        SetFgColor( _defaultFgColor );
+        Repaint();
     }
     else if ( m_flFadeOut != 0.0f )
     {
-        int a = (m_flFadeOut - gpGlobals->curtime) / m_flFadeOutTime * 255;
+        int a = (m_flFadeOut - gpGlobals->realtime) / m_flFadeOutTime * 255;
 
         if ( a <= 0 )
         {
@@ -62,9 +63,9 @@ void CZMMainMenuSubButton::Paint()
         }
         else
         {
-            Color clr = GetButtonDefaultFgColor();
-            clr[3] = a;
-            SetDefaultColor( clr, GetButtonDefaultBgColor() );
+            _defaultFgColor[3] = a;
+            SetFgColor( _defaultFgColor );
+            Repaint();
         }
     }
 
@@ -91,27 +92,30 @@ void CZMMainMenuSubButton::ApplySchemeSettings( IScheme* pScheme )
 
 void CZMMainMenuSubButton::FadeIn( float fade )
 {
-    if ( m_flFadeIn != 0.0f && m_flFadeIn > gpGlobals->curtime )
+    if ( m_flFadeIn != 0.0f && m_flFadeIn > gpGlobals->realtime )
         return;
 
 
-    m_flFadeIn = gpGlobals->curtime;
+    m_flFadeIn = gpGlobals->realtime;
     
     m_flFadeInTime = fade;
     m_flFadeOut = 0.0f;
 
 
     SetVisible( true );
+    Repaint();
 }
 
 void CZMMainMenuSubButton::FadeOut( float fade )
 {
-    if ( m_flFadeOut != 0.0f && m_flFadeOut <= (gpGlobals->curtime+2.0f) )
+    if ( m_flFadeOut != 0.0f && m_flFadeOut <= (gpGlobals->realtime+2.0f) )
         return;
 
 
-    m_flFadeOut = gpGlobals->curtime + fade;
+    m_flFadeOut = gpGlobals->realtime + fade;
 
     m_flFadeOutTime = fade;
     m_flFadeIn = 0.0f;
+
+    Repaint();
 }

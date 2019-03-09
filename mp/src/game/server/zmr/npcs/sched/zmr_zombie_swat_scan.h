@@ -224,7 +224,7 @@ public:
             flNearestDist = flDist;
         }
 
-        if ( npcr_debug_schedules.GetBool() )
+        if ( IsDebugging() )
             NDebugOverlay::Box( vecBoxOrigin, -vecDelta, vecDelta, pNearest ? 255 : 0, (!pNearest) ? 255 : 0, 0, 0, 0.5f );
 
         return pNearest;

@@ -14,11 +14,16 @@
 #include "zmr_blockerfinder.h"
 #include "zmr/npcs/zmr_zombieanimstate.h"
 #include "zmr/npcs/zmr_zombie_senses.h"
-#include "zmr_global_shared.h"
 #include "zmr_zombiebase.h"
 #include "zmr/zmr_softcollisions.h"
 #include "zmr/npcs/zmr_zombiebase_shared.h"
 #include "sched/zmr_zombie_main.h"
+
+
+
+
+
+ConVar zm_sv_debug_zombie_flinch( "zm_sv_debug_zombie_flinch", "0", 0, "Play flinching animations every time a zombie g ets shot." );
 
 
 class CZMLOSFilter : public CTraceFilter
@@ -123,6 +128,8 @@ int CZMBaseZombie::AE_ZOMBIE_SWATITEM = AE_INVALID;
 int CZMBaseZombie::AE_ZOMBIE_GET_UP = AE_INVALID;
 int CZMBaseZombie::AE_ZOMBIE_POUND = AE_INVALID;
 int CZMBaseZombie::AE_ZOMBIE_ALERTSOUND = AE_INVALID;
+
+float CZMBaseZombie::g_flLastZombieSound = 0.0f;
 
 
 
@@ -856,6 +863,28 @@ bool CZMBaseZombie::CanBreakObject( CBaseEntity* pEnt, bool bSwat ) const
 
 void CZMBaseZombie::TraceAttack( const CTakeDamageInfo& inputInfo, const Vector& vecDir, trace_t* pTrace, CDmgAccumulator* pAccumulator )
 {
+    // The force bone will be used for proper ragdolling.
+    m_nForceBone = pTrace->physicsbone;
+
+
+    if ( zm_sv_debug_zombie_flinch.GetBool() )
+    {
+        if ( pTrace->hitgroup == HITGROUP_HEAD )
+        {
+            DoAnimationEvent( ZOMBIEANIMEVENT_GESTURE, ACT_GESTURE_FLINCH_CHEST );
+        }
+        else if ( pTrace->hitgroup == HITGROUP_RIGHTARM )
+        {
+            DoAnimationEvent( ZOMBIEANIMEVENT_GESTURE, ACT_GESTURE_FLINCH_RIGHTARM );
+        }
+        else if ( pTrace->hitgroup == HITGROUP_LEFTARM )
+        {
+            DoAnimationEvent( ZOMBIEANIMEVENT_GESTURE, ACT_GESTURE_FLINCH_LEFTARM );
+        }
+    }
+
+
+
     CTakeDamageInfo info = inputInfo;
 
     ScaleDamageByHitgroup( pTrace->hitgroup, info );
@@ -948,7 +977,7 @@ int CZMBaseZombie::OnTakeDamage_Alive( const CTakeDamageInfo& inputInfo )
     CTakeDamageInfo info = inputInfo;
 
     
-    if( info.GetDamageType() & DMG_BURN )
+    if ( info.GetDamageType() & DMG_BURN )
     {
         // If a zombie is on fire it only takes damage from the fire that's attached to it. (DMG_DIRECT)
         // This is to stop zombies from burning to death 10x faster when they're standing around
@@ -980,16 +1009,14 @@ int CZMBaseZombie::OnTakeDamage_Alive( const CTakeDamageInfo& inputInfo )
         m_flHealthRatio = m_iHealth / (float)(m_iMaxHealth > 0 ? m_iMaxHealth : 1);
     }
 
-    // flDamageThreshold is what percentage of the creature's max health
-    // this amount of damage represents. (clips at 1.0)
-    /*float flDamageThreshold = MIN( 1, info.GetDamage() / m_iMaxHealth );
 
-   if( tookDamage > 0 && (info.GetDamageType() & (DMG_BURN|DMG_DIRECT)) && m_ActBusyBehavior.IsActive() ) 
+    if ( ShouldPlayPainSound( info ) )
     {
-        //!!!HACKHACK- Stuff a light_damage condition if an actbusying zombie takes direct burn damage. This will cause an
-        // ignited zombie to 'wake up' and rise out of its actbusy slump. (sjb)
-        SetCondition( COND_LIGHT_DAMAGE );
-    }*/
+        float delay = PainSound( info );
+
+        m_flNextPainSound = gpGlobals->curtime + delay;
+    }
+
 
     return tookDamage;
 }
@@ -1310,6 +1337,11 @@ float CZMBaseZombie::GetMoveActivityMovementSpeed()
 
 bool CZMBaseZombie::ShouldPlayIdleSound() const
 {
+    // Don't spam zombie sounds.
+    if ( (g_flLastZombieSound + 0.05f) > gpGlobals->curtime )
+        return false;
+
+
     if ( m_lifeState != LIFE_ALIVE )
         return false;
 
@@ -1319,6 +1351,28 @@ bool CZMBaseZombie::ShouldPlayIdleSound() const
     if ( m_flNextIdleSound > gpGlobals->curtime )
         return false;
 
+
+    return true;
+}
+
+bool CZMBaseZombie::ShouldPlayPainSound( const CTakeDamageInfo& info ) const
+{
+    // Don't spam zombie sounds.
+    if ( (g_flLastZombieSound + 0.05f) > gpGlobals->curtime )
+        return false;
+
+    if ( m_flNextPainSound > gpGlobals->curtime )
+        return false;
+
+    if ( m_lifeState != LIFE_ALIVE || m_iHealth <= 0 )
+        return false;
+
+    if ( HasSpawnFlags( SF_NPC_GAG ) )
+        return false;
+
+    int fDmg = info.GetDamageType();
+    if ( fDmg == DMG_GENERIC || fDmg & DMG_ALWAYSGIB )
+        return false;
 
     return true;
 }
@@ -1339,7 +1393,19 @@ void CZMBaseZombie::GetAnimRandomSeed( int iEvent, int& nData )
     }
 }
 
-CON_COMMAND( zm_zombie_create, "Creates a zombie at your crosshair." )
+
+static int zm_zombie_create_completion( const char *partial, char commands[ COMMAND_COMPLETION_MAXITEMS ][ COMMAND_COMPLETION_ITEM_LENGTH ] )
+{
+    Q_strncpy( commands[0], "zm_zombie_create npc_zombie", COMMAND_COMPLETION_ITEM_LENGTH );
+    Q_strncpy( commands[1], "zm_zombie_create npc_fastzombie", COMMAND_COMPLETION_ITEM_LENGTH );
+    Q_strncpy( commands[2], "zm_zombie_create npc_poisonzombie", COMMAND_COMPLETION_ITEM_LENGTH );
+    Q_strncpy( commands[3], "zm_zombie_create npc_dragzombie", COMMAND_COMPLETION_ITEM_LENGTH );
+    Q_strncpy( commands[4], "zm_zombie_create npc_burnzombie", COMMAND_COMPLETION_ITEM_LENGTH );
+
+    return 5;
+}
+
+CON_COMMAND_F_COMPLETION( zm_zombie_create, "Creates a zombie at your crosshair.", 0, zm_zombie_create_completion )
 {
     CBasePlayer* pPlayer = UTIL_GetCommandClient();
     if ( !pPlayer ) return;

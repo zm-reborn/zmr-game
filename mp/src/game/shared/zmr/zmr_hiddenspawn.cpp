@@ -5,7 +5,8 @@
 #include "zmr/zmr_util.h"
 #include "zmr/zmr_entities.h"
 #endif
-#include "zmr_global_shared.h"
+#include "zmr/npcs/zmr_zombiebase_shared.h"
+#include "zmr_player_shared.h"
 #include "zmr_shareddefs.h"
 
 #include "zmr_hiddenspawn.h"
@@ -14,6 +15,11 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+
+
+#ifdef GAME_DLL
+CUtlVector<CZMEntTriggerBlockHidden*> g_ZMBlockHidden;
+#endif
 
 
 ConVar zm_hidden_cost_shambler( "zm_hidden_cost_shambler", "100", FCVAR_NOTIFY | FCVAR_REPLICATED );
@@ -130,9 +136,9 @@ HiddenSpawnError_t CZMHiddenSpawnSystem::Spawn( ZombieClass_t zclass, CZMPlayer*
     //
 #ifdef GAME_DLL
     CZMEntTriggerBlockHidden* pBlock;
-    for ( int i = 0; i < g_pBlockHidden->Count(); i++ )
+    for ( int i = 0; i < g_ZMBlockHidden.Count(); i++ )
     {
-        pBlock = g_pBlockHidden->Element( i );
+        pBlock = g_ZMBlockHidden.Element( i );
 
         if (pBlock && pBlock->IsActive()
         &&  pBlock->CollisionProp()

@@ -74,6 +74,10 @@ ZMZombieAnimEvent_t CZMZombieAnimState::ActivityToAnimEvent( int iActivity, int&
     case ACT_HOVER :
     case ACT_HOP :
         nData = iActivity; return ZOMBIEANIMEVENT_BANSHEEANIM;
+    case ACT_GESTURE_FLINCH_CHEST :
+    case ACT_GESTURE_FLINCH_LEFTARM :
+    case ACT_GESTURE_FLINCH_RIGHTARM :
+        nData = iActivity; return ZOMBIEANIMEVENT_GESTURE;
     default : break;
     }
 
@@ -116,6 +120,12 @@ bool CZMZombieAnimState::HandleAnimEvent( ZMZombieAnimEvent_t iEvent, int nData 
         SetIdleActivity( ACT_IDLE );
         SetMoveActivity( ACT_WALK );
         return true;
+    case ZOMBIEANIMEVENT_GESTURE :
+        AddLayeredSequence( GetOuterRandomSequence( (Activity)nData ), ANIMOVERLAY_SLOT_GESTURE );
+        SetLayerLooping( ANIMOVERLAY_SLOT_GESTURE, false );
+        SetLayerCycle( ANIMOVERLAY_SLOT_GESTURE, 0.0f );
+        SetLayerWeight( ANIMOVERLAY_SLOT_GESTURE, 1.0f );
+        return true;
     default : break;
     }
 
@@ -133,7 +143,7 @@ bool CZMZombieAnimState::InitParams()
     // Apparently the constructor doesn't set the order...
     for ( int i = 0; i < pOuter->m_AnimOverlay.Count(); i++ )
     {
-        pOuter->m_AnimOverlay[i].m_nOrder = 0;
+        pOuter->m_AnimOverlay[i].m_nOrder = i;
     }
 #endif
 
@@ -363,16 +373,19 @@ void CZMZombieAnimState::UpdateLayers()
 
         if( flCycle > 1.0f )
         {
-            //RunGestureSlotAnimEventsToCompletion( pGesture );
-            /*
-            if ( pGesture->m_bAutoKill )
+            animlayer->m_flCycle = 0.0f;
+
+
+            ZMAnimLayerSlot_t slot = FindSlotByLayerIndex( i );
+            if ( slot == ZMAnimLayerSlot_t::ANIMOVERLAY_SLOT_MAX )
             {
-                ResetGestureSlot( pGesture->m_iGestureSlot );
-                return;
+                continue;
             }
-            else*/
+
+
+            if ( !IsLayerLooping( slot ) )
             {
-                animlayer->m_flCycle = 0.0f;
+                FastRemoveLayer( slot );
             }
         }
     }
@@ -415,14 +428,19 @@ void CZMZombieAnimState::FastRemoveLayer( ZMAnimLayerSlot_t index )
     m_AnimOverlay[index].FastRemove();
 }
 
-bool CZMZombieAnimState::HasLayeredSequence( ZMAnimLayerSlot_t index )
+bool CZMZombieAnimState::HasLayeredSequence( ZMAnimLayerSlot_t index ) const
 {
     return m_AnimOverlay[index].IsUsed();
 }
 
-bool CZMZombieAnimState::IsLayerDying( ZMAnimLayerSlot_t index )
+bool CZMZombieAnimState::IsLayerDying( ZMAnimLayerSlot_t index ) const
 {
     return m_AnimOverlay[index].IsDying();
+}
+
+bool CZMZombieAnimState::IsLayerLooping( ZMAnimLayerSlot_t index ) const
+{
+    return m_AnimOverlay[index].IsLayerLooping();
 }
 
 float CZMZombieAnimState::GetLayerCycle( ZMAnimLayerSlot_t index )
@@ -603,6 +621,21 @@ void CZMZombieAnimState::SetIdleActivity( Activity act )
     m_actIdle = act;
 }
 
+ZMAnimLayerSlot_t CZMZombieAnimState::FindSlotByLayerIndex( int index )
+{
+    for ( int i = 0; i < ARRAYSIZE( m_AnimOverlay ); i++ )
+    {
+        if ( !m_AnimOverlay[i].IsUsed() )
+            continue;
+
+        if ( m_AnimOverlay[i].GetLayerIndex() == index )
+            return (ZMAnimLayerSlot_t)i;
+    }
+
+    return ANIMOVERLAY_SLOT_MAX;
+}
+
+
 CZMAnimOverlay::CZMAnimOverlay()
 {
     m_pOuter = nullptr;
@@ -640,13 +673,13 @@ void CZMAnimOverlay::Create( CZMBaseZombie* pOuter, int iSeq, ZMAnimLayerSlot_t 
     m_pOuter = pOuter;
 
 #ifdef GAME_DLL
-    m_iLayerIndex = pOuter->AddLayeredSequence( iSeq, 0 );
+    m_iLayerIndex = pOuter->AddLayeredSequence( iSeq, CBaseAnimatingOverlay::MAX_OVERLAYS - 1 - index );
 #else
     C_AnimationLayer* overlay = &pOuter->m_AnimOverlay[index];
 
-    overlay->m_nOrder = 0;
+    overlay->m_nOrder = (int)index;
     overlay->m_nSequence = iSeq;
-    overlay->m_flWeight = 0.0f;
+    overlay->m_flWeight = 1.0f;
     overlay->m_bClientBlend = false;
     overlay->m_flCycle = 0.0f;
     overlay->m_flPrevCycle = 0.0f;
@@ -736,10 +769,17 @@ void CZMAnimOverlay::SetLayerWeight( float flWeight )
 #endif
 }
 
+bool CZMAnimOverlay::IsLayerLooping() const
+{
+    return m_bLooping;
+}
+
 void CZMAnimOverlay::SetLayerLooping( bool bLoop )
 {
-#ifdef CLIENT_DLL
-#else
+    m_bLooping = bLoop;
+
+#ifdef GAME_DLL
     m_pOuter->SetLayerLooping( m_iLayerIndex, bLoop );
 #endif
+    
 }

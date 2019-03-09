@@ -6,6 +6,7 @@
 #include "input.h"
 #include "clienteffectprecachesystem.h"
 #include "fx_quad.h"
+#include "IGameUIFuncs.h"
 
 #include "zmr/npcs/zmr_zombiebase_shared.h"
 #include "zmr/c_zmr_util.h"
@@ -24,6 +25,8 @@ CZMViewBase* g_pZMView = nullptr;
 
 ConVar zm_cl_zmview_hiddenspawneffect( "zm_cl_zmview_hiddenspawneffect", "1", FCVAR_ARCHIVE );
 ConVar zm_cl_zmview_doubleclick( "zm_cl_zmview_doubleclick", "0.4", FCVAR_ARCHIVE );
+
+ConVar zm_cl_zmview_switchmousebuttons( "zm_cl_zmview_switchmousebuttons", "0", FCVAR_ARCHIVE );
 
 
 ConVar zm_cl_poweruser_boxselect( "zm_cl_poweruser_boxselect", "0", FCVAR_ARCHIVE, "Select zombies through walls with box select." );
@@ -72,7 +75,7 @@ public:
 
 CON_COMMAND( zm_observermode, "" )
 {
-    if ( g_pZMView )
+    if ( g_pZMView && CZMViewBase::UsesZMView() )
     {
         bool state = !g_pZMView->IsVisible();
 
@@ -85,7 +88,7 @@ CON_COMMAND( zm_observermode, "" )
 
 CON_COMMAND( zm_hiddenspawn, "" )
 {
-    if ( g_pZMView )
+    if ( g_pZMView && CZMViewBase::UsesZMView() )
     {
         g_pZMView->SetClickMode( ZMCLICKMODE_HIDDEN );
     }
@@ -206,6 +209,21 @@ bool CZMViewBase::IsDraggingRight() const
     return m_bDraggingRight;
 }
 
+bool CZMViewBase::UseSwitchedButtons() const
+{
+    return zm_cl_zmview_switchmousebuttons.GetBool();
+}
+
+MouseCode CZMViewBase::SwitchMouseButtons( MouseCode code )
+{
+    switch ( code )
+    {
+        case MOUSE_LEFT : return MOUSE_RIGHT;
+        case MOUSE_RIGHT : return MOUSE_LEFT;
+        default : return code;
+    }
+}
+
 void CZMViewBase::CloseChildMenus()
 {
 
@@ -257,6 +275,12 @@ void CZMViewBase::OnCursorMoved( int x, int y )
 
 void CZMViewBase::OnMouseReleased( MouseCode code )
 {
+    if ( UseSwitchedButtons() )
+    {
+        code = SwitchMouseButtons( code );
+    }
+
+
     switch ( code )
     {
     case MOUSE_RIGHT :
@@ -275,7 +299,26 @@ void CZMViewBase::OnMouseReleased( MouseCode code )
 
 void CZMViewBase::OnMousePressed( MouseCode code )
 {
+    // HACK: We don't use these buttons, so pass them through to engine.
+    if ( code != MOUSE_LEFT && code != MOUSE_RIGHT )
+    {
+        const char* binding = gameuifuncs->GetBindingForButtonCode( code );
+        if ( binding && *binding )
+        {
+            engine->ClientCmd_Unrestricted( binding );
+        }
+
+        return;
+    }
+
+
     CloseChildMenus();
+
+
+    if ( UseSwitchedButtons() )
+    {
+        code = SwitchMouseButtons( code );
+    }
 
 
     switch ( code )
@@ -814,7 +857,22 @@ void CZMViewBase::FindZMObject( int x, int y, bool bSticky )
 
         if ( pZombie )
         {
+            // We clicked on a zombie.
+
+            // If we have already selected this zombie,
+            // check if the player wants to select of type.
+            bool bSelectOfType = pZombie->GetSelectorIndex() == GetLocalPlayerIndex();
+            float flLastSelect = pZombie->GetLastLocalSelect();
+
+
             ZMClientUtil::SelectSingleZombie( pZombie, bSticky );
+
+            if (bSelectOfType
+            &&  (gpGlobals->curtime - flLastSelect) <= GetDoubleClickDelta() )
+            {
+                SelectZombiesOfType( pZombie->GetZombieClass(), true );
+            }
+
 
             bHit = true;
             return;
@@ -826,9 +884,44 @@ void CZMViewBase::FindZMObject( int x, int y, bool bSticky )
         ZMClientUtil::DeselectAllZombies();
 }
 
+void CZMViewBase::SelectZombiesOfType( ZombieClass_t zclass, bool bSticky )
+{
+    Vector screen;
+    trace_t tr;
+    CTraceFilterNoNPCsOrPlayer filter( nullptr, COLLISION_GROUP_NONE );
+
+    CUtlVector<C_ZMBaseZombie*> vZombies;
+    
+    int myindex = GetLocalPlayerIndex();
 
 
+    g_ZombieManager.ForEachAliveZombie( [ &vZombies, &tr, &filter, &screen, &myindex ]( C_ZMBaseZombie* pZombie )
+    {
+        if ( pZombie->GetSelectorIndex() == myindex )
+            return;
 
+
+        int x, y;
+        // Do we see the mad man?
+        if ( !zm_cl_poweruser_boxselect.GetBool() )
+        {
+            UTIL_TraceZMView( &tr, pZombie->GetAbsOrigin() + Vector( 0, 0, 8 ), MASK_ZMVIEW, &filter );
+
+            if ( tr.fraction != 1.0f && !tr.startsolid ) return;
+        }
+
+        if ( !ZMClientUtil::WorldToScreen( pZombie->GetAbsOrigin(), screen, x, y ) )
+            return;
+
+        if ( x > 0 && x < ScreenWidth() && y > 0 && y < ScreenHeight() )
+        {
+            vZombies.AddToTail( pZombie );
+        }
+    } );
+
+
+    ZMClientUtil::SelectZombies( vZombies, bSticky );
+}
 
 void CZMViewBase::TraceScreenToWorld( int mx, int my, trace_t* res, CTraceFilterSimple* filter, int mask )
 {
@@ -861,6 +954,15 @@ void CZMViewBase::TraceScreenToWorld( int mx, int my, trace_t* res, CTraceFilter
     VectorNormalize( ray );
 
     UTIL_TraceZMView( res, MainViewOrigin() + ray * MAX_COORD_FLOAT, mask, filter, pPlayer );
+}
+
+bool CZMViewBase::UsesZMView()
+{
+    if ( !g_pZMView )
+        return false;
+
+    auto* pPlayer = C_ZMPlayer::GetLocalPlayer();
+    return pPlayer && pPlayer->IsZM();
 }
 
 const char* CZMViewBase::GetTempHiddenSpawnModel( ZombieClass_t zclass ) const

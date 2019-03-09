@@ -16,12 +16,11 @@
 #include "zmr/ui/zmr_zmview_base.h"
 
 #include "npcs/c_zmr_zombiebase.h"
-#include "zmr/zmr_global_shared.h"
 #include "zmr/zmr_viewmodel.h"
 #include "c_zmr_entities.h"
 #include "zmr/zmr_softcollisions.h"
 #include "c_zmr_player_ragdoll.h"
-#include "c_zmr_zmkeys.h"
+#include "c_zmr_teamkeys.h"
 
 #include "c_zmr_player.h"
 #include "c_zmr_zmvision.h"
@@ -373,31 +372,42 @@ void C_ZMPlayer::TeamChange( int iNewTeam )
 
     // Reset back to old team just in case something uses it.
     C_BaseEntity::ChangeTeam( iOldTeam );
-    
-
-
-    if ( g_pZMView )
-        g_pZMView->SetVisible( iNewTeam == ZMTEAM_ZM );
-
-
-
-
-    // Execute team config.
-    CZMTeamKeysConfig::ExecuteTeamConfig( iNewTeam );
 
 
     if ( iNewTeam == ZMTEAM_ZM )
     {
         ZMClientUtil::QueueTooltip( "zmintro", 1.0f );
         ZMClientUtil::QueueTooltip( "zmmoving", 12.0f );
+    }
+
+
+    TeamChangeStatic( iNewTeam );
+}
+
+void C_ZMPlayer::TeamChangeStatic( int iNewTeam )
+{
+    // It's possible to receive events from the server before our local player is created.
+    // All crucial things that don't rely on local player
+    // should be put here.
+
+
+    if ( g_pZMView )
+        g_pZMView->SetVisible( iNewTeam == ZMTEAM_ZM );
+
+
+    // Execute team config.
+    CZMTeamKeysConfig::ExecuteTeamConfig( iNewTeam );
 
 
 
-        engine->ClientCmd( "exec zm.cfg" );
+
+    if ( iNewTeam == ZMTEAM_ZM )
+    {
+        engine->ClientCmd_Unrestricted( "exec zm.cfg" );
     }
     else if ( iNewTeam == ZMTEAM_HUMAN )
     {
-        engine->ClientCmd( "exec survivor.cfg" );
+        engine->ClientCmd_Unrestricted( "exec survivor.cfg" );
     }
 }
 

@@ -99,11 +99,13 @@ CZMMainMenu::CZMMainMenu( VPANEL parent ) : BaseClass( nullptr, "ZMMainMenu" )
     //MakePopup( false );
     GetFocusNavGroup().SetFocusTopLevel( true );
 
-
+    
 
     m_nTexBgId = surface()->CreateNewTextureID();
     surface()->DrawSetTextureFile( m_nTexBgId, "zmr_mainmenu/bg_mainmenu", true, false );
 
+    m_nTexSectionBgId = surface()->CreateNewTextureID();
+    surface()->DrawSetTextureFile( m_nTexSectionBgId, "zmr_mainmenu/bg_section", true, false );
 
     RequestFocus();
 }
@@ -170,14 +172,98 @@ bool CZMMainMenu::IsVisible()
 
 void CZMMainMenu::PaintBackground()
 {
+    //
+    // Draw the sub button background
+    //
+#define SECTION_PADDING_SIDES       20
+#define SECTION_PADDING_TOP         50
+#define SECTION_PADDING_BOTTOM      10
+#define SECTION_FADEOUT_TIME        0.25f
+#define SECTION_FADEIN_TIME         0.3f
+
+    int len = m_vBtns.Count();
+    for ( int i = 0; i < len; i++ )
+    {
+        auto* pButton = m_vBtns[i];
+
+
+        if ( !pButton->GetSubButtonCount() )
+            continue;
+
+
+        float unarmedtime = pButton->GetUnarmedTime();
+        float unarmeddelta = (gpGlobals->realtime - pButton->GetUnarmedTime());
+
+        bool bFadeOut = unarmedtime != 0.0f && unarmeddelta < SECTION_FADEOUT_TIME;
+
+
+        if ( pButton->IsSubButtonsVisible() || bFadeOut )
+        {
+            Color clr = m_BgColor;
+
+            int px = pButton->GetXPos();
+            int py = pButton->GetYPos();
+
+            int totalheight = pButton->GetSubButtonHeight() * pButton->GetSubButtonCount();
+
+
+            int start_x = px - SECTION_PADDING_SIDES;
+            int start_y = py - totalheight - SECTION_PADDING_TOP;
+
+            int end_x = start_x + (pButton->GetMaxSubTextWidth() + SECTION_PADDING_SIDES*2);
+            int end_y = py + SECTION_PADDING_BOTTOM;
+
+
+
+            int size_x = end_x - start_x;
+            int size_y = end_y - start_y;
+            Assert( size_x > 0 );
+
+
+            int wantedsize = size_x * 2;
+            
+
+            // Don't stretch y-axis
+            float tex = size_y / (float)wantedsize;
+
+
+            // Get our alpha
+            float armeddelta = gpGlobals->realtime - pButton->GetArmedTime();
+            if ( bFadeOut )
+            {
+                int a = (1.0f - (unarmeddelta / SECTION_FADEOUT_TIME)) * 255;
+                if ( a > 255 ) a = 255;
+
+                clr[3] = a;
+                Repaint();
+            }
+            else if ( armeddelta < SECTION_FADEIN_TIME )
+            {
+                int a = armeddelta / SECTION_FADEIN_TIME * 255;
+                if ( a > 255 ) a = 255;
+
+                clr[3] = a;
+                Repaint();
+            }
+
+
+            surface()->DrawSetColor( clr );
+            surface()->DrawSetTexture( m_nTexSectionBgId );
+            surface()->DrawTexturedSubRect( start_x, start_y, end_x, end_y, 0.0f, 0.0f, 1.0f, tex );
+        }
+    }
+
+
+    //
     // Draw the "line" strip
-    const int nTexHeight = 512;
-    const int nTexWidth = 1024;
-    const int w = GetWide();
-
-
+    //
     if ( m_iBottomStripChildIndex >= 0 && m_iBottomStripChildIndex < GetChildCount() )
     {
+        const int nTexHeight = 512;
+        const int nTexWidth = 1024;
+        const int w = GetWide();
+
+
         auto* pPanel = GetChild( m_iBottomStripChildIndex );
 
 
@@ -204,15 +290,20 @@ void CZMMainMenu::PaintBackground()
 
 void CZMMainMenu::CheckInGameButtons( bool bInGame )
 {
-    int len = GetChildCount();
+    int len = m_vBtns.Count();
     for ( int i = 0; i < len; i++ )
     {
-        auto* pButton = dynamic_cast<CZMMainMenuButton*>( GetChild( i ) );
-        if ( pButton && pButton->DrawOnlyInGame() )
+        auto* pButton = m_vBtns[i];
+        if ( pButton && (pButton->DrawOnlyInGame() || pButton->DrawOnlyNotInGame()) )
         {
-            pButton->SetVisible( bInGame );
+            pButton->SetVisible( pButton->DrawOnlyInGame() ? bInGame : (!bInGame) );
         }
     }
+}
+
+void CZMMainMenu::Repaint()
+{
+    BaseClass::Repaint();
 }
 
 void CZMMainMenu::PerformLayout()
@@ -249,6 +340,15 @@ void CZMMainMenu::ApplySchemeSettings( IScheme* pScheme )
 
 
     LoadControlSettings( "resource/ui/zmmainmenu.res" );
+
+
+    m_vBtns.RemoveAll();
+    for ( int i = 0; i < GetChildCount(); i++ )
+    {
+        auto* pButton = dynamic_cast<CZMMainMenuButton*>( GetChild( i ) );
+        if ( pButton )
+            m_vBtns.AddToTail( pButton );
+    }
     
 
     if ( m_szBottomStrip[0] != NULL )
@@ -302,11 +402,11 @@ void CZMMainMenu::OnMousePressed( KeyCode code )
 
 void CZMMainMenu::HideSubButtons( CZMMainMenuButton* pIgnore )
 {
-    int len = GetChildCount();
+    int len = m_vBtns.Count();
     for ( int i = 0; i < len; i++ )
     {
-        auto* pButton = dynamic_cast<CZMMainMenuButton*>( GetChild( i ) );
-        if ( pButton && pButton != pIgnore )
+        auto* pButton = m_vBtns[i];
+        if ( pButton != pIgnore )
         {
             pButton->SetSelected( false );
         }

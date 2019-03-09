@@ -5,11 +5,10 @@
 #include <engine/IEngineSound.h>
 #include "c_user_message_register.h"
 
-
+#include "zmr/npcs/zmr_zombiebase_shared.h"
 #include "zmr/ui/zmr_hud_chat.h"
 #include "zmr/ui/zmr_hud_tooltips.h"
 
-#include "zmr/zmr_global_shared.h"
 #include "c_zmr_tips.h"
 #include "c_zmr_util.h"
 
@@ -263,22 +262,46 @@ void ZMClientUtil::SelectZombies( const CUtlVector<C_ZMBaseZombie*>& vZombies, b
         return;
     }
 
+
+    // We need to send selection commands in batches.
+    // It's very easy to go over the argument / command size limit.
+    const int nBatchLimit = 30;
+
+    const int nTotalCount = vZombies.Count();
+
+
     char cmdbuffer[512];
-    cmdbuffer[0] = 0;
+    int i = 0;
+    
+    int count = MIN( nBatchLimit, nTotalCount );
 
-    for ( int i = 0; i < vZombies.Count(); i++ )
+    do
     {
-        pZombie = vZombies.Element( i );
+        cmdbuffer[0] = NULL;
 
-        pZombie->SetSelector( index );
+        for ( ; i < count; i++ )
+        {
+            pZombie = vZombies.Element( i );
 
-        Q_snprintf( cmdbuffer, sizeof( cmdbuffer ), "%s%i ", cmdbuffer, pZombie->entindex() );
+            pZombie->SetSelector( index );
+
+            Q_snprintf( cmdbuffer, sizeof( cmdbuffer ), "%s%i ", cmdbuffer, pZombie->entindex() );
+        }
+
+        if ( cmdbuffer[0] )
+        {
+            engine->ClientCmd( VarArgs( "zm_cmd_selectmult %s %s",  bSticky ? "1": "0", cmdbuffer ) );
+        }
+
+
+        count += nBatchLimit;
+        if ( count > nTotalCount )
+            count = nTotalCount;
+
+        // Send it as a sticky in the next batch.
+        bSticky = true;
     }
-
-    if ( cmdbuffer[0] )
-    {
-        engine->ClientCmd( VarArgs( "zm_cmd_selectmult %s %s",  bSticky ? "1": "0", cmdbuffer ) );
-    }
+    while ( i < nTotalCount );
 }
 
 int ZMClientUtil::GetGroupZombieCount( int group )

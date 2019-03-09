@@ -37,7 +37,7 @@ public:
 #endif
 
 
-    virtual const Vector& GetBulletSpread( void ) OVERRIDE
+    virtual const Vector& GetBulletSpread() OVERRIDE
     {
         static Vector cone( 0.0f, 0.0f, 0.0f );
 
@@ -63,7 +63,7 @@ public:
     virtual int GetMaxPenetrations() const OVERRIDE { return 4; }
 
 
-    virtual void AddViewKick( void ) OVERRIDE
+    virtual void AddViewKick() OVERRIDE
     {
         CZMPlayer* pPlayer = ToZMPlayer( GetOwner() );
 
@@ -79,25 +79,25 @@ public:
         pPlayer->ViewPunch( viewPunch );
     }
     
-    virtual float GetFireRate( void ) OVERRIDE { return 0.9f; }
+    virtual float GetFireRate() OVERRIDE { return 0.9f; }
 
 
     virtual bool Holster( CBaseCombatWeapon* pSwitchTo = nullptr ) OVERRIDE;
-    virtual void Drop( const Vector& ) OVERRIDE;
+    virtual void Drop( const Vector& vecVelocity ) OVERRIDE;
     virtual void ItemBusyFrame() OVERRIDE;
-    virtual void ItemPostFrame( void ) OVERRIDE;
+    virtual void ItemPostFrame() OVERRIDE;
 
 
     virtual Activity GetReloadStartAct() OVERRIDE { return ACT_VM_RELOAD_START; }
     virtual Activity GetReloadEndAct() OVERRIDE { return ACT_VM_RELOAD_FINISH; }
     virtual Activity GetPumpAct() OVERRIDE { return ACT_SHOTGUN_PUMP; }
 
-    inline bool IsZoomed() { return m_bInZoom; }
+    inline bool IsZoomed() const { return m_bInZoom; }
     void CheckToggleZoom();
     void CheckUnZoom();
     void ToggleZoom();
-    void Zoom( CZMPlayer* ); // ZMRTODO: Do something more reasonable...
-    void UnZoom( CZMPlayer* );
+    void Zoom( CZMPlayer* pOwner ); // ZMRTODO: Do something more reasonable...
+    void UnZoom( CZMPlayer* pOwner );
 
 protected:
     CNetworkVar( bool, m_bInZoom );

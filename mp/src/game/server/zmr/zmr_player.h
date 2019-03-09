@@ -82,7 +82,7 @@ public:
     DECLARE_DATADESC()
     
     CZMPlayer();
-    ~CZMPlayer( void );
+    ~CZMPlayer();
 
     
     static CZMPlayer* CreatePlayer( const char* className, edict_t* ed )
@@ -128,6 +128,9 @@ public:
     virtual bool Weapon_Lower() OVERRIDE { return false; };
     
     virtual void PickupObject( CBaseEntity *pObject, bool bLimitMassAndSize ) OVERRIDE;
+    virtual	bool IsHoldingEntity( CBaseEntity *pEnt ) OVERRIDE;
+    virtual float GetHeldObjectMass( IPhysicsObject *pHeldObject ) OVERRIDE;
+
     virtual bool BumpWeapon( CBaseCombatWeapon *pWeapon ) OVERRIDE;
 
     // Lag compensation stuff...
@@ -171,8 +174,8 @@ public:
     virtual void StopObserverMode( void ) OVERRIDE;
 
     
-    inline bool IsZM() { return GetTeamNumber() == ZMTEAM_ZM; };
-    inline bool IsHuman() { return GetTeamNumber() == ZMTEAM_HUMAN; };
+    inline bool IsZM() const { return GetTeamNumber() == ZMTEAM_ZM; }
+    inline bool IsHuman() const { return GetTeamNumber() == ZMTEAM_HUMAN; }
 
     float m_flNextResourceInc;
 
@@ -232,18 +235,18 @@ public:
     CZMBaseWeapon*  GetWeaponOfHighestSlot();
     CZMBaseWeapon*  GetWeaponOfSlot( const char* szSlotName );
     CZMBaseWeapon*  GetWeaponOfSlot( int slot );
-    void            SetWeaponSlotFlags( int flags ) { m_ZMLocal.m_fWeaponSlotFlags = flags; };
-    void            AddWeaponSlotFlag( int flag ) { m_ZMLocal.m_fWeaponSlotFlags |= flag; };
-    void            RemoveWeaponSlotFlag( int flag ) { m_ZMLocal.m_fWeaponSlotFlags &= ~flag; };
+    void            SetWeaponSlotFlags( int flags ) { m_ZMLocal.m_fWeaponSlotFlags = flags; }
+    void            AddWeaponSlotFlag( int flag ) { m_ZMLocal.m_fWeaponSlotFlags |= flag; }
+    void            RemoveWeaponSlotFlag( int flag ) { m_ZMLocal.m_fWeaponSlotFlags &= ~flag; }
 
-    inline int  GetPickPriority() { return m_nPickPriority; };
-    inline void SetPickPriority( int i ) { m_nPickPriority = i; };
+    inline int  GetPickPriority() const { return m_nPickPriority; }
+    inline void SetPickPriority( int i ) { m_nPickPriority = i; }
     
-    inline float    GetLastActivity() { return m_flLastActivity; };
-    inline bool     IsCloseToAFK() { return zm_sv_antiafk.GetInt() > 0 && (gpGlobals->curtime - GetLastActivity()) > (zm_sv_antiafk.GetFloat() * 0.8f); };
-    inline bool     IsAFK() { return zm_sv_antiafk.GetInt() > 0 && (gpGlobals->curtime - GetLastActivity()) > zm_sv_antiafk.GetFloat(); };
+    inline float    GetLastActivity() const { return m_flLastActivity; }
+    inline bool     IsCloseToAFK() const { return zm_sv_antiafk.GetInt() > 0 && (gpGlobals->curtime - GetLastActivity()) > (zm_sv_antiafk.GetFloat() * 0.8f); }
+    inline bool     IsAFK() const { return zm_sv_antiafk.GetInt() > 0 && (gpGlobals->curtime - GetLastActivity()) > zm_sv_antiafk.GetFloat(); }
 
-    inline float    GetNextModelChangeTime() { return m_flNextModelChangeTime; };
+    inline float    GetNextModelChangeTime() const { return m_flNextModelChangeTime; }
     inline float    GetNextVoiceLineTime() const { return m_flNextVoiceLineTime; }
     inline void     SetNextVoiceLineTime( float t ) { m_flNextVoiceLineTime = t; }
 

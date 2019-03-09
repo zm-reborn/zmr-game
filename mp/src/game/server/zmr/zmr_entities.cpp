@@ -11,7 +11,6 @@
 #include "zmr/zmr_player.h"
 #include "zmr/zmr_shareddefs.h"
 #include "npcs/zmr_zombiebase_shared.h"
-#include "zmr/zmr_global_shared.h"
 #include "zmr/weapons/zmr_base.h"
 
 #include "zmr_entities.h"
@@ -1598,6 +1597,8 @@ void CZMEntLoadout::GiveWeapon( CZMPlayer* pPlayer, int loadout_wep )
 /*
     Block hidden trigger
 */
+extern CUtlVector<CZMEntTriggerBlockHidden*> g_ZMBlockHidden;
+
 BEGIN_DATADESC( CZMEntTriggerBlockHidden )
     DEFINE_KEYFIELD( m_bActive, FIELD_BOOLEAN, "Active" ),
 
@@ -1611,12 +1612,12 @@ LINK_ENTITY_TO_CLASS( trigger_blockspotcreate, CZMEntTriggerBlockHidden );
 
 CZMEntTriggerBlockHidden::CZMEntTriggerBlockHidden()
 {
-    g_pBlockHidden->AddToTail( this );
+    g_ZMBlockHidden.AddToTail( this );
 }
 
 CZMEntTriggerBlockHidden::~CZMEntTriggerBlockHidden()
 {
-    g_pBlockHidden->FindAndRemove( this );
+    g_ZMBlockHidden.FindAndRemove( this );
 }
 
 void CZMEntTriggerBlockHidden::Spawn()
@@ -1645,6 +1646,8 @@ void CZMEntTriggerBlockHidden::InputDisable( inputdata_t &inputData )
 /*
     Block phys explosion
 */
+CUtlVector<CZMEntTriggerBlockPhysExp*> g_ZMBlockPhysExp;
+
 BEGIN_DATADESC( CZMEntTriggerBlockPhysExp )
     DEFINE_KEYFIELD( m_bActive, FIELD_BOOLEAN, "Active" ),
 
@@ -1658,12 +1661,12 @@ LINK_ENTITY_TO_CLASS( trigger_blockphysexplosion, CZMEntTriggerBlockPhysExp );
 
 CZMEntTriggerBlockPhysExp::CZMEntTriggerBlockPhysExp()
 {
-    g_pBlockPhysExp->AddToTail( this );
+    g_ZMBlockPhysExp.AddToTail( this );
 }
 
 CZMEntTriggerBlockPhysExp::~CZMEntTriggerBlockPhysExp()
 {
-    g_pBlockPhysExp->FindAndRemove( this );
+    g_ZMBlockPhysExp.FindAndRemove( this );
 }
 
 void CZMEntTriggerBlockPhysExp::Spawn()

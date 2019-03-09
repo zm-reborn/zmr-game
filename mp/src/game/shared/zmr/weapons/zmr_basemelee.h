@@ -1,4 +1,4 @@
-//#include "basecombatcharacter.h"
+#pragma once
 
 #include "zmr_base.h"
 

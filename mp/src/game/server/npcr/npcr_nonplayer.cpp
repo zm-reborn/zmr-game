@@ -180,6 +180,15 @@ void CNPCRNonPlayer::Event_Killed( const CTakeDamageInfo& info )
 
 
     BaseClass::Event_Killed( info );
+
+
+    // IMPORTANT: We need this check or the entity will never be removed.
+    // The ragdolling process will mark us for removal.
+    // If you don't get a ragdoll, you never get removed! :(
+    if ( info.GetDamageType() & DMG_REMOVENORAGDOLL )
+    {
+        RemoveDeferred();
+    }
 }
 
 void CNPCRNonPlayer::SetDefaultEyeOffset()

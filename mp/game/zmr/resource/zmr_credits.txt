@@ -1,0 +1,66 @@
+___________________________
+Zombie Master: Reborn  Credits:
+
+brendaym			- Viewmodel animations
+BurntCornFlakes	- MAC-10 model and textures, various model edits
+Mehis			- Code, various maps/textures/models
+Reborn			- Various sounds
+Sage J. Fox		- Various model edits
+The Renegadist		- Various textures
+Yeckoh			- Various models, model edits
+____________
+Contributors:
+
+Asg_alligator		- Model edits
+Forrest Mark X		- Viewmodel c-arm edits
+Game Zombie		- Model edits
+KnechtRuprecht		- Winchester M1912 model and textures
+Marphy Black		- Zombie textures, model edits
+MaxOfS2D			- Viewmodel arms (c-arms, model and textures)
+Noodum			- P220 model textures
+PazerOP			- Glow outline performance + feature fixes
+-Rusty-			- Zombie textures
+ryandmaclean		- VRAD optimization
+SAM61			- P220 model
+Tony Sergi		- Multiplayer friendly animations code
+tgnottingham		- VBSP smoothing group fix
+wouterpleizier		- VBSP/VVIS/VRAD edits
+Yogensia			- Shotgun shell model
+__________
+Thanks to:
+
+Tannerbondy		- Ideas & inspiration
+ZMR Discord		- Keeping the game alive
+YOU				- For playing ;)
+__________
+Licenses:
+
+P220				- https://gamebanana.com/models/4220
+Winchester M1912	- https://gamebanana.com/models/3472
+Shotgun shell		- https://gamebanana.com/models/3434
+
+
+____________________________________
+Original Zombie Master was developed by:
+
+Angry Lawyer	- Founder, coder, various maps/models/textures/bits.
+DjArcas		- Sound
+Ficcy			- Models, textures
+Pi|Mu|Rho	- Mapper, various models/textures.
+qckles		- Coder
+theGreenBunny	- Coder, various models/textures, website, various sounds.
+____________
+Contributors:
+Barnz		- Shotgun ammo box model edit
+Edcrab		- Writing
+Flyingdebris	- "Zombie Hunter" concept art (used in loading screen)
+Marphy Black	- Various environment and object textures, other minor fixes
+Mechagodzilla	- Concept art
+racer445		- Pistol and rifle textures
+-Rusty-		- Survivor textures
+Sinistar		- Immolator animations
+Suicide42		- Concept art, writing
+Tannerbondy	- Weapon selection icons
+
+
+If you feel left out or you're not happy that we're using your work, please contact one of the developers.

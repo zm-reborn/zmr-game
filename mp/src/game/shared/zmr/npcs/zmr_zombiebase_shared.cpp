@@ -166,6 +166,13 @@ void CZMBaseZombie::SetSelector( CZMPlayer* pPlayer )
 void CZMBaseZombie::SetSelector( int index )
 {
     m_iSelectorIndex = index;
+#ifdef CLIENT_DLL
+#ifdef _DEBUG
+    // We should only be updating the local select time if we're the local player!
+    Assert( !index || GetLocalPlayerIndex() == index );
+#endif // DEBUG
+    UpdateLastLocalSelect();
+#endif // CLIENT_DLL
 }
 
 ZombieClass_t CZMBaseZombie::GetZombieClass() const

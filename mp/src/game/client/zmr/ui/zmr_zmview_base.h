@@ -94,10 +94,13 @@ public:
     bool IsDraggingLeft() const;
     bool IsDraggingRight() const;
 
+    bool UseSwitchedButtons() const;
+
 
 
     static void TraceScreenToWorld( int mx, int my, trace_t* res, CTraceFilterSimple* filter, int mask );
 
+    static bool UsesZMView();
 
 protected:
 
@@ -113,6 +116,7 @@ protected:
     void FindZombiesInBox( int start_x, int start_y, int end_x, int end_y, bool bSticky );
     void FindZMObject( int x, int y, bool bSticky );
 
+    void SelectZombiesOfType( ZombieClass_t zclass, bool bSticky );
     void DoMoveLine();
 
 
@@ -123,6 +127,8 @@ protected:
 
     C_ZMTempModel* CreateTempHiddenZombie() const;
     void FreeTempHiddenZombie();
+
+    MouseCode SwitchMouseButtons( MouseCode code );
 
 
     C_ZMTempModel* m_pTempHiddenZombie;
