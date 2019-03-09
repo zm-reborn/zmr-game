@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2005, Valve Corporation, All rights reserved. ============//
+//========= Copyright ï¿½ 1996-2005, Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
 //
@@ -9,7 +9,7 @@
 #include "cvarslider.h"
 #include "engineinterface.h"
 #include "basepanel.h"
-#include "igameuifuncs.h"
+#include "IGameUIFuncs.h"
 #include "modes.h"
 #include "materialsystem/materialsystem_config.h"
 #include "filesystem.h"
@@ -23,7 +23,7 @@
 #include "vgui/IInput.h"
 #include "vgui/ILocalize.h"
 #include "vgui/ISystem.h"
-#include "tier0/ICommandLine.h"
+#include "tier0/icommandline.h"
 #include "tier1/convar.h"
 #include "modinfo.h"
 

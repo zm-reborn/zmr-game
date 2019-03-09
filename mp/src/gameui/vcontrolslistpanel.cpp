@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2005, Valve Corporation, All rights reserved. ============//
+//========= Copyright ï¿½ 1996-2005, Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
 //
@@ -6,8 +6,8 @@
 //=============================================================================//
 
 #include "vcontrolslistpanel.h"
-#include "GameUI_Interface.h"
-#include "EngineInterface.h"
+#include "gameui_interface.h"
+#include "engineinterface.h"
 
 #include <vgui/IInput.h>
 #include <vgui/IScheme.h>

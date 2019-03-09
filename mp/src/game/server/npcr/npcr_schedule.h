@@ -10,6 +10,8 @@ namespace NPCR
 {
     class CScheduleInterface;
 
+    extern ConVar npcr_debug_schedules;
+
     enum ScheduleState_t
     {
         SCHED_INSTART = 0, // We haven't started yet.
@@ -96,7 +98,6 @@ namespace NPCR
 
         static bool IsDebugging()
         {
-            extern ConVar npcr_debug_schedules;
             return npcr_debug_schedules.GetInt() > 0;
         }
 
