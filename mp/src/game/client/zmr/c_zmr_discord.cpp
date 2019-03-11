@@ -152,7 +152,7 @@ int CZMDiscordSystem::GetPlayerCount() const
 
 bool CZMDiscordSystem::IsInGame()
 {
-    return !engine->IsInGame() || engine->IsLevelMainMenuBackground();
+    return engine->IsInGame() && !engine->IsLevelMainMenuBackground();
 }
 
 void CZMDiscordSystem::SetDisconnected()
