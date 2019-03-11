@@ -114,7 +114,7 @@ public:
         CZMCommandBase* pQueued = pOuter->GetCommandQueue()->NextCommand();
         if ( pQueued )
         {
-            if ( IsBusy() != NPCR::RES_YES )
+            if ( pOuter->IsBusy() != NPCR::RES_YES )
             {
                 bool bRes = true;
 
