@@ -140,6 +140,9 @@ void CZMDiscordSystem::Update( float frametime )
 
 int CZMDiscordSystem::GetPlayerCount() const
 {
+    if ( !g_PR )
+        return 0;
+
     int nPlayers = 0;
     for ( int i = 0; i < gpGlobals->maxClients; i++ )
     {
