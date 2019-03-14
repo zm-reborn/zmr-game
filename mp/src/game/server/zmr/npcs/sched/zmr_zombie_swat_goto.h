@@ -178,12 +178,12 @@ public:
         TryEnd( "We're chasing an enemy, can't swat anymore!" );
     }
 
-    virtual void OnCommanded( ZombieCommandType_t com ) OVERRIDE
+    virtual void OnQueuedCommand( CBasePlayer* pPlayer, ZombieCommandType_t com ) OVERRIDE
     {
         TryEnd( "We were commanded to do something else!" );
     }
 
-    virtual void OnQueuedCommand( CBasePlayer* pPlayer, ZombieCommandType_t com ) OVERRIDE
+    virtual void OnCommanded( ZombieCommandType_t com ) OVERRIDE
     {
         TryEnd( "We were commanded to do something else!" );
     }

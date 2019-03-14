@@ -208,6 +208,6 @@ public:
 
     virtual void OnCommanded( ZombieCommandType_t com ) OVERRIDE
     {
-        End( "We were commanded to do something else!" );
+        TryEnd( "We were commanded to do something else!" );
     }
 };
