@@ -246,6 +246,7 @@ CZMBaseZombie::CZMBaseZombie()
     m_flBurnDamageTime = 0.0f;
 
     m_flNextIdleSound = 0.0f;
+    m_flNextPainSound = 0.0f;
 
 
     m_strModelGroup = NULL_STRING;
