@@ -15,5 +15,12 @@ public:
     // Override to make these do nothing.
     virtual void ComputeHidingSpots() OVERRIDE;
     virtual void ComputeSniperSpots() OVERRIDE;
-    virtual void ComputeSpotEncounters() OVERRIDE;	
+    virtual void ComputeSpotEncounters() OVERRIDE;
+
+
+    virtual bool IsBlocked( int teamID, bool ignoreNavBlockers = false ) const OVERRIDE;
+    void SetNoFloor( bool state ) { m_bHasNoFloor = state; }
+
+private:
+    bool m_bHasNoFloor;
 };
