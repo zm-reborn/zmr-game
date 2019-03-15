@@ -48,8 +48,6 @@ public:
 #ifndef CLIENT_DLL
     // Lower the sound distance a bit.
     virtual float GetAISoundVolume() const OVERRIDE { return 500.0f; }
-#else
-    virtual bool ShouldDrawCrosshair() OVERRIDE { return false; }
 #endif
 
 #ifdef GAME_DLL
