@@ -3,8 +3,14 @@
 #include "npcr_path_cost.h"
 
 
+ConVar npcr_path_simplepathvischeck( "npcr_path_simplepathvischeck", "0" );
+
+
 bool NPCR::CBasePathCost::CanBuildSimpleRoute( const Vector& vecStart, const Vector& vecGoal ) const
 {
+    if ( !npcr_path_simplepathvischeck.GetBool() )
+        return true;
+
     //float delta_z = abs( vecGoal.z - vecStart.z );
 
     //if ( delta_z > 72.0f )
