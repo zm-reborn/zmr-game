@@ -15,6 +15,9 @@
 #include "tier1/utlsymbol.h"
 
 #include "vgui_controls/PropertyPage.h"
+
+#include "zmr/c_zmr_teamkeys.h"
+
 class VControlsListPanel;
 
 //-----------------------------------------------------------------------------
@@ -75,7 +78,7 @@ private:
 	void			AddBinding( KeyValues *item, const char *keyname );
 
 	// Remove all instances of a key from all bindings
-	void			RemoveKeyFromBindItems( KeyValues *org_item, const char *key );
+	void			RemoveKeyFromBindItems( ZMKeyTeam_t bindTeam, const char *key );
 
 	// Find item by binding name
 	KeyValues *GetItemForBinding( const char *binding );
