@@ -304,12 +304,6 @@ void CZMRules::CreateStandardEntities()
     {
         new CZMVoteRoundRestart();
     }
-
-
-    pEnt = CBaseEntity::Create( "env_fog_controller_zm", vec3_origin, vec3_angle );
-    Assert( pEnt );
-
-    m_pZMFog = static_cast<CZMEntFogController*>( pEnt );
 }
 
 void CZMRules::LevelInitPostEntity()
@@ -317,6 +311,20 @@ void CZMRules::LevelInitPostEntity()
     CZMBaseZombie::g_flLastZombieSound = 0.0f;
 
     BaseClass::LevelInitPostEntity();
+
+
+    // Find / create ZM fog entity.
+    CZMEntFogController* pEnt = static_cast<CZMEntFogController*>( gEntList.FindEntityByClassname( nullptr, "env_fog_controller_zm" ) );
+
+    if ( !pEnt )
+    {
+        pEnt = static_cast<CZMEntFogController*>( CBaseEntity::Create( "env_fog_controller_zm", vec3_origin, vec3_angle ) );
+        pEnt->SetGameCreated();
+    }
+    
+
+    Assert( pEnt );
+    m_pZMFog = pEnt;
 }
 #endif
 
