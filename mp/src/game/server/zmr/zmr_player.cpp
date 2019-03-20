@@ -927,12 +927,11 @@ void CZMPlayer::InitialSpawn()
 
 void CZMPlayer::InitZMFog()
 {
-    if ( !CZMEntFogController::IsEnabled() )
-        return;
-
-
     auto* pFog = ZMRules()->GetZMFogController();
     if ( !pFog )
+        return;
+
+    if ( pFog->IsGameCreated() && !CZMEntFogController::IsEnabled() )
         return;
 
 

@@ -2062,6 +2062,11 @@ END_DATADESC()
 LINK_ENTITY_TO_CLASS( env_fog_controller_zm, CZMEntFogController );
 
 
+CZMEntFogController::CZMEntFogController()
+{
+    m_bNeedsInit = false;
+}
+
 bool CZMEntFogController::IsEnabled()
 {
     return zm_sv_zmfog_enabled.GetBool();
@@ -2069,6 +2074,10 @@ bool CZMEntFogController::IsEnabled()
 
 void CZMEntFogController::InitFog()
 {
+    if ( !m_bNeedsInit )
+        return;
+
+
     color32 clr;
     int tempclr[3];
     sscanf( zm_sv_zmfog_color.GetString(), "%i %i %i", &tempclr[0], &tempclr[1], &tempclr[2] );
