@@ -571,6 +571,58 @@
 	input SetSpawnFrequency(float) : "Sets how often (in seconds) a new NPC will be spawned."
 ]
 
+@BaseClass base(Targetname, DXLevelChoice, Angles) = BaseFogController : 
+	"An entity that controls the fog and view distance in the map."
+[
+	// Inputs
+	input SetStartDist(float) : "Set the fog start distance."
+	input SetEndDist(float) : "Set the fog end distance."
+	input TurnOn(void) : "Turn the fog on."
+	input TurnOff(void) : "Turn the fog off."
+	input SetColor(color255) : "Set the primary fog color."
+	input SetColorSecondary(color255) : "Set the secondary fog color."
+	input SetFarZ(integer): "Set the far clip plane distance."
+	input SetAngles(string) : "Set the angles to use for the secondary fog direction."
+
+	input SetColorLerpTo(color255) : "Set the primary fog color."
+	input SetColorSecondaryLerpTo(color255) : "Set the secondary fog color."
+	input SetStartDistLerpTo(float) : "Set the fog start distance."
+	input SetEndDistLerpTo(float) : "Set the fog end distance."
+	input StartFogTransition(void) : "Start fog transition."
+
+	// Starting fog parameters for the level. These are selectable per LOD.	
+	fogenable(choices) : "Fog Enable" : 0 =
+	[
+		0 : "No"
+		1 : "Yes"
+	]
+	fogblend(choices) : "Fog Blend" : 0 =
+	[
+		0 : "No"
+		1 : "Yes"
+	]
+	use_angles(choices) : "Use Angles for Fog Dir" : 0 =
+	[
+		0 : "No"
+		1 : "Yes"
+	]
+	fogcolor(color255) : "Primary Fog Color" : "255 255 255"
+	fogcolor2(color255) : "Secondary Fog Color" : "255 255 255"
+	fogdir(string) : "Primary Fog Direction" : "1 0 0"
+	fogstart(string) : "Fog Start" : "500.0"
+	fogend(string) : "Fog End" : "2000.0"
+	fogmaxdensity(float) : "Fog Max Density [0..1]" : "1"
+
+	foglerptime(float) : "Interpolate time" : "0"
+	
+	farz(string) : "Far Z Clip Plane" : "-1"
+	
+	spawnflags(flags) =
+	[
+		1 : "Master (Has priority if multiple env_fog_controllers exist)" : 0
+	]
+]
+
 @PointClass base(Angles, BaseNPCMaker) iconsprite("editor/npc_maker.vmt") = npc_maker : "NPC Maker"
 [
 	spawnflags(Flags) = 
@@ -1841,56 +1893,9 @@
 	input Ignite(void) : "Ignite the target entity."
 ]
 
-@PointClass base(Targetname, DXLevelChoice, Angles) iconsprite("editor/fog_controller.vmt") color(255 255 255) = env_fog_controller : 
+@PointClass base(BaseFogController) iconsprite("editor/fog_controller.vmt") color(255 255 255) = env_fog_controller : 
 	"An entity that controls the fog and view distance in the map."
 [
-	// Inputs
-	input SetStartDist(float) : "Set the fog start distance."
-	input SetEndDist(float) : "Set the fog end distance."
-	input TurnOn(void) : "Turn the fog on."
-	input TurnOff(void) : "Turn the fog off."
-	input SetColor(color255) : "Set the primary fog color."
-	input SetColorSecondary(color255) : "Set the secondary fog color."
-	input SetFarZ(integer): "Set the far clip plane distance."
-	input SetAngles(string) : "Set the angles to use for the secondary fog direction."
-
-	input SetColorLerpTo(color255) : "Set the primary fog color."
-	input SetColorSecondaryLerpTo(color255) : "Set the secondary fog color."
-	input SetStartDistLerpTo(float) : "Set the fog start distance."
-	input SetEndDistLerpTo(float) : "Set the fog end distance."
-	input StartFogTransition(void) : "Start fog transition."
-
-	// Starting fog parameters for the level. These are selectable per LOD.	
-	fogenable(choices) : "Fog Enable" : 0 =
-	[
-		0 : "No"
-		1 : "Yes"
-	]
-	fogblend(choices) : "Fog Blend" : 0 =
-	[
-		0 : "No"
-		1 : "Yes"
-	]
-	use_angles(choices) : "Use Angles for Fog Dir" : 0 =
-	[
-		0 : "No"
-		1 : "Yes"
-	]
-	fogcolor(color255) : "Primary Fog Color" : "255 255 255"
-	fogcolor2(color255) : "Secondary Fog Color" : "255 255 255"
-	fogdir(string) : "Primary Fog Direction" : "1 0 0"
-	fogstart(string) : "Fog Start" : "500.0"
-	fogend(string) : "Fog End" : "2000.0"
-	fogmaxdensity(float) : "Fog Max Density [0..1]" : "1"
-
-	foglerptime(float) : "Interpolate time" : "0"
-	
-	farz(string) : "Far Z Clip Plane" : "-1"
-	
-	spawnflags(flags) =
-	[
-		1 : "Master (Has priority if multiple env_fog_controllers exist)" : 0
-	]
 ]
 
 @PointClass base(Targetname, Parentname, Angles) studioprop("models/editor/spot_cone.mdl") color(255 255 255) = env_steam : 
