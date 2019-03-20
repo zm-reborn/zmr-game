@@ -1,0 +1,5 @@
+"VertexLitGeneric"
+{
+	"$basetexture"	"models/Zombie_Classic/naomi_facemap"
+	"$halflambert" 1
+}
