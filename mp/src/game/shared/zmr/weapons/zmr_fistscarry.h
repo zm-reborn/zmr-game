@@ -45,6 +45,7 @@ public:
 
 #ifdef CLIENT_DLL
     virtual bool	ShouldDrawPickup() OVERRIDE { return false; }
+    virtual bool    IsOverridingViewmodel() OVERRIDE;
 #endif
     virtual bool	HasAnyAmmo() OVERRIDE { return true; }
     virtual bool	CanBeDropped() const OVERRIDE { return false; }

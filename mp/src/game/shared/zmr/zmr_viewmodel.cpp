@@ -63,6 +63,31 @@ CZMViewModel::~CZMViewModel()
 {
 }
 
+CBaseCombatWeapon* CZMViewModel::GetOwningWeapon()
+{
+    auto* pOwner = BaseClass::GetOwningWeapon();
+    if ( pOwner )
+        return pOwner;
+
+
+    if ( ViewModelIndex() == VMINDEX_HANDS )
+    {
+        auto* pPlayer = static_cast<C_ZMPlayer*>( GetOwner() );
+
+        if ( pPlayer )
+        {
+            CBaseViewModel* vm = pPlayer->GetViewModel( VMINDEX_WEP );
+
+            if ( vm )
+            {
+                return vm->GetOwningWeapon();
+            }
+        }
+    }
+
+    return nullptr;
+}
+
 #ifdef CLIENT_DLL
 int C_ZMViewModel::DrawModel( int flags )
 {
