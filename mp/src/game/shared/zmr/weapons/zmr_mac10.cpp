@@ -56,7 +56,7 @@ public:
 	    DoMachineGunKick( EASY_DAMPEN, MAX_VERTICAL_KICK, m_fFireDuration, SLIDE_LIMIT );
     }
     
-    virtual float GetFireRate() OVERRIDE { return 0.066f; };
+    virtual float GetFireRate() OVERRIDE { return 0.06f; };
 };
 
 IMPLEMENT_NETWORKCLASS_ALIASED( ZMWeaponMac10, DT_ZM_WeaponMac10 )
