@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2005, Valve Corporation, All rights reserved. ============//
+//========= Copyright ï¿½ 1996-2005, Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
 //
@@ -7,7 +7,7 @@
 
 #undef fopen
 
-#if !defined( _X360 )
+#if !defined( _X360 ) && defined( _WIN32 )
 #include <windows.h> // SRC only!!
 #endif
 
@@ -27,7 +27,7 @@
 #include <vgui_controls/ImagePanel.h>
 #include <vgui_controls/FileOpenDialog.h>
 #include <vgui_controls/MessageBox.h>
-#include <vgui/IVgui.h>
+#include <vgui/IVGui.h>
 #include <vgui/ILocalize.h>
 #include <vgui/IPanel.h>
 #include <vgui_controls/MessageBox.h>
@@ -44,8 +44,8 @@
 #include "tier1/convar.h"
 
 
-#include "materialsystem/IMaterial.h"
-#include "materialsystem/IMesh.h"
+#include "materialsystem/imaterial.h"
+#include "materialsystem/imesh.h"
 #include "materialsystem/imaterialvar.h"
 
 // use the JPEGLIB_USE_STDIO define so that we can read in jpeg's from outside the game directory tree.  For Spray Import.
@@ -57,7 +57,9 @@
 
 #include "bitmap/tgawriter.h"
 #include "ivtex.h"
+#if defined( _WIN32 )
 #include <io.h>
+#endif
 
 #if defined( _X360 )
 #include "xbox/xbox_win32stubs.h"
@@ -601,7 +603,7 @@ void COptionsSubMultiplayer::OnCommand( const char *command )
 // file selected.  This can only happen when someone selects an image to be imported as a spray logo.
 void COptionsSubMultiplayer::OnFileSelected(const char *fullpath)
 {
-#ifndef _XBOX
+#if !defined( _XBOX ) && defined( _WIN32 )
 	if ((fullpath == NULL) || (fullpath[0] == 0))
 	{
 		return;
@@ -1070,6 +1072,7 @@ ConversionErrorType COptionsSubMultiplayer::ConvertJPEGToTGA(const char *jpegpat
 // convert the bmp file given to a TGA file at the given destination path.
 ConversionErrorType COptionsSubMultiplayer::ConvertBMPToTGA(const char *bmpPath, const char *tgaPath)
 {
+#if defined( _WIN32 )
 	if ( !IsPC() )
 		return CE_SOURCE_FILE_FORMAT_NOT_SUPPORTED;
 
@@ -1290,6 +1293,9 @@ ConversionErrorType COptionsSubMultiplayer::ConvertBMPToTGA(const char *bmpPath,
 	}
 	DeleteObject(hBitmap);
 	return retval ? CE_SUCCESS : CE_ERROR_WRITING_OUTPUT_FILE;
+#else
+	return CE_SOURCE_FILE_FORMAT_NOT_SUPPORTED;
+#endif
 }
 
 // read a TGA header from the current point in the file stream.
@@ -2349,6 +2355,7 @@ void COptionsSubMultiplayer::OnApplyButtonEnable()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+#if defined( _WIN32 )
 static void PaletteHueReplace( RGBQUAD *palSrc, int newHue, int Start, int end )
 {
 	int i;
@@ -2420,12 +2427,14 @@ static void PaletteHueReplace( RGBQUAD *palSrc, int newHue, int Start, int end )
 		palSrc[ i ].rgbRed = (unsigned char)(r * 255);
 	}
 }
+#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
 void COptionsSubMultiplayer::RemapPalette( char *filename, int topcolor, int bottomcolor )
 {
+#if defined( _WIN32 )
 	char infile[ 256 ];
 	char outfile[ 256 ];
 
@@ -2483,6 +2492,7 @@ void COptionsSubMultiplayer::RemapPalette( char *filename, int topcolor, int bot
 		g_pFullFileSystem->Write( outbuffer.Base(), outbuffer.TellPut(), file );
 		g_pFullFileSystem->Close( file );
 	}
+#endif
 }
 
 //-----------------------------------------------------------------------------
