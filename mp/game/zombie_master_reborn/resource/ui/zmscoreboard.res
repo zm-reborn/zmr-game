@@ -165,6 +165,13 @@
 						"clickable"		"1"
 						"is_image"		"1"
 					}
+					"importance"
+					{
+						"width"		"24"
+						"colalign_right"		"1"
+						"clickable"		"1"
+						"is_image"		"1"
+					}
 				}
 			}
 			"SectionHumanName"
