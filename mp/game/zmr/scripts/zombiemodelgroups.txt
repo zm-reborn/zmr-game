@@ -52,6 +52,36 @@
 				"path"	"models/zombie/zm_classic_09.mdl"
 				"randomskin"	"1"
 			}
+			"Model10"
+			{
+				"path"	"models/zombie/zm_classic_f01.mdl"
+				"randomskin"	"1"
+			}
+			"Model11"
+			{
+				"path"	"models/zombie/zm_classic_f02.mdl"
+				"randomskin"	"1"
+			}
+			"Model12"
+			{
+				"path"	"models/zombie/zm_classic_f03.mdl"
+				"randomskin"	"1"
+			}
+			"Model13"
+			{
+				"path"	"models/zombie/zm_classic_f04.mdl"
+				"randomskin"	"1"
+			}
+			"Model14"
+			{
+				"path"	"models/zombie/zm_classic_f06.mdl"
+				"randomskin"	"1"
+			}
+			"Model15"
+			{
+				"path"	"models/zombie/zm_classic_f07.mdl"
+				"randomskin"	"1"
+			}
 		}
 		"Banshee"
 		{

@@ -148,6 +148,7 @@ const char* CZMTeamKeysConfig::TeamNumberToConfigName( int iTeam, bool bDefault 
 	case 3 : // ZM
 		return bDefault ? KEYCONFIG_NAME_ZM"_default" : KEYCONFIG_NAME_ZM;
 	case 1 : // Spectator
+        return bDefault ? KEYCONFIG_NAME_SPEC"_default" : KEYCONFIG_NAME_SPEC;
 	case 2 : // Survivor
 	default :
 		return bDefault ? KEYCONFIG_NAME_SURVIVOR"_default" : KEYCONFIG_NAME_SURVIVOR;
@@ -172,20 +173,76 @@ ZMKeyTeam_t CZMTeamKeysConfig::GetCommandType( const char* cmd )
     return KEYTEAM_NEUTRAL;
 }
 
+bool CZMTeamKeysConfig::IsKeyConflicted( ZMKeyTeam_t team1, ZMKeyTeam_t team2 )
+{
+    // We're in the same team, we conflict!
+    if ( team1 == team2 )
+        return true;
+
+
+    // We're different teams.
+
+    bool bHasNeutral = team1 == KEYTEAM_NEUTRAL || team2 == KEYTEAM_NEUTRAL;
+
+    // Neutral command will always conflict with a team key.
+    if ( bHasNeutral )
+        return true;
+
+    // ZM key does not conflict with survivor key, etc.
+    return false;
+}
+
 bool CZMTeamKeysConfig::LoadConfigByTeam( ZMKeyTeam_t team, zmkeydatalist_t& list )
 {
-    const char* cfg = team == KEYTEAM_SURVIVOR ? KEYCONFIG_SURVIVOR : KEYCONFIG_ZM;
-    const char* defcfg = team == KEYTEAM_SURVIVOR ? KEYCONFIG_SURVIVOR_DEF : KEYCONFIG_ZM_DEF;
+    const char* cfg = "";
 
+    switch ( team )
+    {
+    case KEYTEAM_ZM :
+        cfg = KEYCONFIG_ZM;
+        break;
+    case KEYTEAM_SURVIVOR :
+        cfg = KEYCONFIG_SURVIVOR;
+        break;
+    case KEYTEAM_SPEC :
+        cfg = KEYCONFIG_SPEC;
+        break;
+    default :
+        Assert( 0 );
+        break;
+    }
 
     bool res = CZMTeamKeysConfig::ParseConfig( cfg, list );
 
     if ( !res )
     {
-        res = CZMTeamKeysConfig::ParseConfig( defcfg, list );
+        res = LoadDefaultConfigByTeam( team, list );
     }
 
     return res;
+}
+
+bool CZMTeamKeysConfig::LoadDefaultConfigByTeam( ZMKeyTeam_t team, zmkeydatalist_t& list )
+{
+    const char* defcfg = "";
+
+    switch ( team )
+    {
+    case KEYTEAM_ZM :
+        defcfg = KEYCONFIG_ZM_DEF;
+        break;
+    case KEYTEAM_SURVIVOR :
+        defcfg = KEYCONFIG_SURVIVOR_DEF;
+        break;
+    case KEYTEAM_SPEC :
+        defcfg = KEYCONFIG_SPEC_DEF;
+        break;
+    default :
+        Assert( 0 );
+        break;
+    }
+
+    return CZMTeamKeysConfig::ParseConfig( defcfg, list );
 }
 
 bool CZMTeamKeysConfig::ParseConfig( const char* cfg, zmkeydatalist_t& list )

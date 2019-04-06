@@ -45,6 +45,7 @@ public:
 
 #ifdef CLIENT_DLL
     virtual bool	ShouldDrawPickup() OVERRIDE { return false; }
+    virtual bool    IsOverridingViewmodel() OVERRIDE;
 #endif
     virtual bool	HasAnyAmmo() OVERRIDE { return true; }
     virtual bool	CanBeDropped() const OVERRIDE { return false; }
@@ -77,6 +78,9 @@ public:
     virtual float		GetDamageForActivity( Activity act ) const OVERRIDE { return 5.0f; }
     virtual void		Hit( trace_t& traceHit, Activity iHitActivity ) OVERRIDE;
 
+#ifdef CLIENT_DLL
+    virtual CZMBaseCrosshair* GetWeaponCrosshair() const OVERRIDE { return ZMGetCrosshair( "Hands" ); }
+#endif
 
 
 protected:

@@ -468,6 +468,7 @@ public:
     DECLARE_CLASS( CZMEntFogController, CFogController );
     DECLARE_DATADESC();
 
+    CZMEntFogController();
 
     static bool IsEnabled();
 
@@ -475,5 +476,12 @@ public:
 
 
     float m_flSkyboxFarZ;
+
+    // If we're game created, we can't use the cvars.
+    void SetGameCreated() { m_bNeedsInit = true; }
+    bool IsGameCreated() const { return m_bNeedsInit; }
+
+private:
+    bool m_bNeedsInit;
 };
 

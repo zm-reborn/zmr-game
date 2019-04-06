@@ -21,12 +21,20 @@ private:
     NPCR::CFollowNavPath m_Path;
     NPCR::CPathCostGroundOnly m_PathCost;
     CountdownTimer m_NextMove;
+
+
+    CHandle<CBaseEntity> m_hLastEnemy;
+    float m_flLastAlertSoundTime;
 public:
     CombatSchedule()
     {
         m_vecFaceTowards = vec3_origin;
 
         m_pChaseSched = new ChaseSched;
+
+
+        m_hLastEnemy.Set( nullptr );
+        m_flLastAlertSoundTime = 0.0f;
     }
 
     ~CombatSchedule()
@@ -38,7 +46,6 @@ public:
 
     virtual void OnStart() OVERRIDE
     {
-            
     }
 
     virtual void OnContinue() OVERRIDE
@@ -112,16 +119,30 @@ public:
 
             CBaseEntity* pEnemy = pClosest && pOuter->IsEnemy( pClosest ) ? pClosest : pOldEnemy;
 
-            if ( pEnemy && pOuter->ShouldChase( pEnemy ) != NPCR::RES_NO )
+            if ( bCanMove && pEnemy && pOuter->ShouldChase( pEnemy ) != NPCR::RES_NO )
             {
                 pOuter->AcquireEnemy( pEnemy );
 
+                CBaseEntity* pLastEnemy = m_hLastEnemy.Get();
+
                 if ( !pOldEnemy )
                 {
-                    pOuter->AlertSound();
+                    // Don't spam alert sound if we recently played it.
+                    float quietTime = pLastEnemy == pEnemy ? 12.0f : 5.0f;
+
+                    if ( (m_flLastAlertSoundTime+quietTime) < gpGlobals->curtime )
+                    {
+                        pOuter->AlertSound();
+
+                        m_flLastAlertSoundTime = gpGlobals->curtime;
+                    }
 
                     pOuter->RemoveSpawnFlags( SF_NPC_GAG );
                 }
+
+
+                m_hLastEnemy.Set( pEnemy );
+                
 
                 Intercept( m_pChaseSched, "We see a potential enemy!" );
                 return;

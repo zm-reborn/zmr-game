@@ -85,6 +85,7 @@ mp/game/zmr/downloadlists/
 mp/game/zmr/resource/zmtips_hudtips_used.txt
 mp/game/zmr/resource/zmtips_loadingscreen_used.txt
 mp/game/zmr/resource/zmcrosshairs.txt
+keys_spectator.cfg
 keys_survivor.cfg
 keys_zm.cfg
 # Tool (vbsp/vvis/vrad) compilation output

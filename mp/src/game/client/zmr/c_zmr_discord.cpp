@@ -34,7 +34,7 @@ public:
     void PresenceEmpty();
     void PresenceInGame();
     void UpdateGameStartTime();
-    void Connect();
+    void InitDiscord();
 
     bool IsConnected() const { return m_bConnected; }
 
@@ -71,6 +71,11 @@ static void Discord_Event_Disconnected( int errorCode, const char* message )
     CZMDiscordSystem::SetDisconnected();
 }
 
+static void Discord_Event_Error( int errorCode, const char* message )
+{
+    DevWarning( "Discord error (%i): %s", errorCode, message );
+}
+
 
 
 //
@@ -90,7 +95,7 @@ CZMDiscordSystem::~CZMDiscordSystem()
 
 void CZMDiscordSystem::PostInit()
 {
-    Connect();
+    InitDiscord();
 
 
     UpdateGameStartTime();
@@ -121,6 +126,9 @@ void CZMDiscordSystem::Update( float frametime )
 {
     if ( m_flNextDiscordUpdateTime <= gpGlobals->realtime )
     {
+        Discord_RunCallbacks();
+
+
         if ( IsConnected() )
         {
             if ( IsInGame() )
@@ -128,18 +136,17 @@ void CZMDiscordSystem::Update( float frametime )
             else
                 PresenceEmpty();
         }
-        else
-        {
-            Connect();
-        }
-        
 
-        m_flNextDiscordUpdateTime = gpGlobals->realtime + 5.0f;
+
+        m_flNextDiscordUpdateTime = gpGlobals->realtime + 2.0f;
     }
 }
 
 int CZMDiscordSystem::GetPlayerCount() const
 {
+    if ( !g_PR )
+        return 0;
+
     int nPlayers = 0;
     for ( int i = 0; i < gpGlobals->maxClients; i++ )
     {
@@ -152,7 +159,7 @@ int CZMDiscordSystem::GetPlayerCount() const
 
 bool CZMDiscordSystem::IsInGame()
 {
-    return !engine->IsInGame() || engine->IsLevelMainMenuBackground();
+    return engine->IsInGame() && !engine->IsLevelMainMenuBackground();
 }
 
 void CZMDiscordSystem::SetDisconnected()
@@ -239,13 +246,13 @@ void CZMDiscordSystem::UpdateGameStartTime()
     m_GameStartTime = curtime;
 }
 
-void CZMDiscordSystem::Connect()
+void CZMDiscordSystem::InitDiscord()
 {
     DiscordEventHandlers hndlrs = { 0 };
     hndlrs.ready = Discord_Event_Ready;
     hndlrs.disconnected = Discord_Event_Disconnected;
+    hndlrs.errored = Discord_Event_Error;
 
 
     Discord_Initialize( DISCORD_APP_ID, &hndlrs, 1, nullptr );
-    SetConnected();
 }

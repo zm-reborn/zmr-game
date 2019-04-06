@@ -387,6 +387,13 @@ void CZMWeaponHands::TertiaryAttack()
 }
 
 #ifdef CLIENT_DLL
+ConVar zm_cl_drawhands( "zm_cl_drawhands", "1", FCVAR_ARCHIVE );
+
+bool CZMWeaponHands::IsOverridingViewmodel()
+{
+    return !zm_cl_drawhands.GetBool();
+}
+
 void CZMWeaponHands::OnDataChanged( DataUpdateType_t type )
 {
     BaseClass::OnDataChanged( type );

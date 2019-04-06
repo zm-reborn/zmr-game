@@ -32,13 +32,92 @@
 #include "tier2/tier2.h"
 #include "inputsystem/iinputsystem.h"
 
-#include "zmr/c_zmr_teamkeys.h"
-
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
 using namespace vgui;
 
+
+
+//-----------------------------------------------------------------------------
+// Purpose: advanced keyboard settings dialog
+//-----------------------------------------------------------------------------
+class COptionsSubKeyboardAdvancedDlg : public vgui::Frame
+{
+	DECLARE_CLASS_SIMPLE( COptionsSubKeyboardAdvancedDlg, vgui::Frame );
+public:
+	COptionsSubKeyboardAdvancedDlg( vgui::VPANEL hParent ) : BaseClass( NULL, NULL )
+	{
+		// parent is ignored, since we want look like we're steal focus from the parent (we'll become modal below)
+
+		SetTitle("#GameUI_KeyboardAdvanced_Title", true);
+		SetSize( 280, 140 );
+		LoadControlSettings( "resource/OptionsSubKeyboardAdvancedDlg.res" );
+		MoveToCenterOfScreen();
+		SetSizeable( false );
+		SetDeleteSelfOnClose( true );
+	}
+
+	virtual void Activate()
+	{
+		BaseClass::Activate();
+
+		input()->SetAppModalSurface(GetVPanel());
+	}
+
+	virtual void OnResetData()
+	{
+		// reset the data
+		ConVarRef con_enable( "con_enable" );
+		if ( con_enable.IsValid() )
+		{
+			SetControlInt("ConsoleCheck", con_enable.GetBool() ? 1 : 0);
+		}
+
+		ConVarRef hud_fastswitch( "hud_fastswitch", true );
+		if ( hud_fastswitch.IsValid() )
+		{
+			SetControlInt("FastSwitchCheck", hud_fastswitch.GetBool() ? 1 : 0);
+		}
+	}
+
+	virtual void OnApplyChanges()
+	{
+		// apply data
+		ConVarRef con_enable( "con_enable" );
+		con_enable.SetValue( GetControlInt( "ConsoleCheck", 0 ) );
+
+		ConVarRef hud_fastswitch( "hud_fastswitch", true );
+		hud_fastswitch.SetValue( GetControlInt( "FastSwitchCheck", 0 ) );
+	}
+
+	virtual void OnCommand( const char *command )
+	{
+		if ( !stricmp(command, "OK") )
+		{
+			// apply the data
+			OnApplyChanges();
+			Close();
+		}
+		else
+		{
+			BaseClass::OnCommand( command );
+		}
+	}
+
+	void OnKeyCodeTyped(KeyCode code)
+	{
+		// force ourselves to be closed if the escape key it pressed
+		if (code == KEY_ESCAPE)
+		{
+			Close();
+		}
+		else
+		{
+			BaseClass::OnKeyCodeTyped(code);
+		}
+	}
+};
 
 //-----------------------------------------------------------------------------
 // Purpose: Constructor
@@ -103,6 +182,11 @@ void COptionsSubKeyboard::OnResetData()
 	{
 		m_pKeyBindList->SetSelectedItem(0);
 	}
+
+	if ( m_OptionsSubKeyboardAdvancedDlg.Get() != nullptr )
+	{
+		m_OptionsSubKeyboardAdvancedDlg.Get()->OnResetData();
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -112,8 +196,10 @@ void COptionsSubKeyboard::OnApplyChanges()
 {
 	ApplyAllBindings();
 
-	ConVarRef con_enable( "con_enable" );
-	con_enable.SetValue( GetControlInt( "ConsoleCheck", 0 ) );
+	if ( m_OptionsSubKeyboardAdvancedDlg.Get() != nullptr )
+	{
+		m_OptionsSubKeyboardAdvancedDlg.Get()->OnApplyChanges();
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -339,7 +425,9 @@ void COptionsSubKeyboard::AddBinding( KeyValues *item, const char *keyname )
 	static int keySymbol = KeyValuesSystem()->GetSymbolForString( "Key" );
 
 	// Make sure it doesn't live anywhere
-	RemoveKeyFromBindItems( item, keyname );
+    auto myKeyTeam = CZMTeamKeysConfig::GetCommandType( item->GetString( bindingSymbol, "" ) );
+
+	RemoveKeyFromBindItems( myKeyTeam, keyname );
 
 	const char *binding = item->GetString( bindingSymbol, "" );
 
@@ -393,28 +481,16 @@ void COptionsSubKeyboard::ClearBindItems( void )
 //-----------------------------------------------------------------------------
 // Purpose: Remove all instances of the specified key from bindings
 //-----------------------------------------------------------------------------
-void COptionsSubKeyboard::RemoveKeyFromBindItems( KeyValues *org_item, const char *key )
+void COptionsSubKeyboard::RemoveKeyFromBindItems( ZMKeyTeam_t bindTeam, const char *key )
 {
-	Assert( key && key[ 0 ] );
-	if ( !key || !key[ 0 ] )
+	Assert( key && *key );
+	if ( !key || !(*key) )
 		return;
 
-	int len = Q_strlen( key );
-	char *pszKey = new char[len + 1];
-
-	if ( !pszKey )
-		return;
-
-	Q_memcpy( pszKey, key, len+1 );
 
 
 	static int bindingSymbol = KeyValuesSystem()->GetSymbolForString( "Binding" );
-
-
-	Assert( org_item );
-
-	ZMKeyTeam_t keyTeam = CZMTeamKeysConfig::GetCommandType( org_item->GetString( bindingSymbol, "" ) );
-
+	static int keySymbol = KeyValuesSystem()->GetSymbolForString( "Key" );
 
 
 	for (int i = 0; i < m_pKeyBindList->GetItemCount(); i++)
@@ -424,30 +500,18 @@ void COptionsSubKeyboard::RemoveKeyFromBindItems( KeyValues *org_item, const cha
 			continue;
 
 		// If it's bound to the primary: then remove it
-		if ( !stricmp( pszKey, item->GetString( "Key", "" ) ) )
+		if ( !stricmp( key, item->GetString( keySymbol, "" ) ) )
 		{
 			bool bClearEntry = true;
 
-			if ( org_item )
+
+			auto myKeyTeam = CZMTeamKeysConfig::GetCommandType( item->GetString( bindingSymbol, "" ) );
+
+			if ( !CZMTeamKeysConfig::IsKeyConflicted( myKeyTeam, bindTeam ) )
 			{
-				// Only clear it out if the actual binding isn't the same. This allows
-				// us to have the same key bound to multiple entries in the keybinding list
-				// if they point to the same command.
-				const char *org_binding = org_item->GetString( bindingSymbol, "" );
-				const char *binding = item->GetString( bindingSymbol, "" );
-				if ( !stricmp( org_binding, binding ) )
-				{
-					bClearEntry = false;
-				}
-
-
-				auto myKeyTeam = CZMTeamKeysConfig::GetCommandType( item->GetString( bindingSymbol, "" ) );
-
-				if ( myKeyTeam != keyTeam && (myKeyTeam != KEYTEAM_NEUTRAL || keyTeam != KEYTEAM_NEUTRAL) )
-				{
-					bClearEntry = false;
-				}
+				bClearEntry = false;
 			}
+
 
 			if ( bClearEntry )
 			{
@@ -457,7 +521,6 @@ void COptionsSubKeyboard::RemoveKeyFromBindItems( KeyValues *org_item, const cha
 		}
 	}
 
-	delete [] pszKey;
 
 	// Make sure the display is up to date
 	m_pKeyBindList->InvalidateLayout();
@@ -482,21 +545,15 @@ void COptionsSubKeyboard::FillInCurrentBindings( void )
 		bJoystick = var.GetBool();
 	}
 
-	ConVarRef con_enable( "con_enable" );
-	if ( con_enable.IsValid() )
-	{
-		SetControlInt("ConsoleCheck", con_enable.GetInt() ? 1 : 0);
-	}
-
 
 
 	static int bindingSymbol = KeyValuesSystem()->GetSymbolForString( "Binding" );
 
 
-	zmkeydatalist_t zmkeys;
-	zmkeydatalist_t survivorkeys;
+	zmkeydatalist_t zmkeys, survivorkeys, speckeys;
 	CZMTeamKeysConfig::LoadConfigByTeam( KEYTEAM_ZM, zmkeys );
 	CZMTeamKeysConfig::LoadConfigByTeam( KEYTEAM_SURVIVOR, survivorkeys );
+	CZMTeamKeysConfig::LoadConfigByTeam( KEYTEAM_SPEC, speckeys );
 
 
 
@@ -521,11 +578,20 @@ void COptionsSubKeyboard::FillInCurrentBindings( void )
 			{
 				zmkeydata_t* pKey = nullptr;
 			
-				if ( bindTeam == KEYTEAM_ZM )
-					pKey = CZMTeamKeysConfig::FindKeyDataFromList( binding, zmkeys );
-				else if ( bindTeam == KEYTEAM_SURVIVOR )
-					pKey = CZMTeamKeysConfig::FindKeyDataFromList( binding, survivorkeys );
-			
+
+                switch ( bindTeam )
+                {
+                case KEYTEAM_ZM :
+                    pKey = CZMTeamKeysConfig::FindKeyDataFromList( binding, zmkeys );
+                    break;
+                case KEYTEAM_SURVIVOR :
+                    pKey = CZMTeamKeysConfig::FindKeyDataFromList( binding, survivorkeys );
+                    break;
+                case KEYTEAM_SPEC :
+                    pKey = CZMTeamKeysConfig::FindKeyDataFromList( binding, speckeys );
+                    break;
+                }
+
 				if ( pKey )
 					bindingCode = pKey->key;
 			}
@@ -535,12 +601,18 @@ void COptionsSubKeyboard::FillInCurrentBindings( void )
 		const char* keyname =
 			bindingCode > KEY_NONE ? g_pInputSystem->ButtonCodeToString( bindingCode ) : "";
 
+        if ( bindingCode > KEY_NONE )
+        {
+            RemoveKeyFromBindItems( bindTeam, keyname );
+        }
+
 		itemData->SetString( "Key", keyname );
 	}
 
 
 	zmkeys.PurgeAndDeleteElements();
 	survivorkeys.PurgeAndDeleteElements();
+	speckeys.PurgeAndDeleteElements();
 }
 
 //-----------------------------------------------------------------------------
@@ -591,12 +663,12 @@ void COptionsSubKeyboard::ApplyAllBindings( void )
 
 
 
-    zmkeydatalist_t zmkeys;
-    zmkeydatalist_t survivorkeys;
+    zmkeydatalist_t zmkeys, survivorkeys, speckeys;
 
     // Loads the keys from configs as well to make sure we don't accidentally remove some bind.
     CZMTeamKeysConfig::LoadConfigByTeam( KEYTEAM_ZM, zmkeys );
     CZMTeamKeysConfig::LoadConfigByTeam( KEYTEAM_SURVIVOR, survivorkeys );
+    CZMTeamKeysConfig::LoadConfigByTeam( KEYTEAM_SPEC, speckeys );
 
 	zmkeydata_t keydata;
 
@@ -636,6 +708,8 @@ void COptionsSubKeyboard::ApplyAllBindings( void )
         case KEYTEAM_SURVIVOR :
             pKeyList = &survivorkeys;
             break;
+        case KEYTEAM_SPEC :
+            pKeyList = &speckeys;
         default :
             // It's a neutral command, just execute it right now.
 			BindKey( keydata.key, binding );
@@ -668,6 +742,15 @@ void COptionsSubKeyboard::ApplyAllBindings( void )
             }
         }
 	}
+
+
+    CZMTeamKeysConfig::SaveConfig( KEYCONFIG_ZM, zmkeys );
+    CZMTeamKeysConfig::SaveConfig( KEYCONFIG_SURVIVOR, survivorkeys );
+    CZMTeamKeysConfig::SaveConfig( KEYCONFIG_SPEC, speckeys );
+
+    zmkeys.PurgeAndDeleteElements();
+    survivorkeys.PurgeAndDeleteElements();
+    speckeys.PurgeAndDeleteElements();
 
 
 	// Now exec their custom bindings
@@ -760,14 +843,34 @@ void COptionsSubKeyboard::FillInDefaultBindings( void )
 	
 	PostActionSignal(new KeyValues("ApplyButtonEnable"));
 
-	// Make sure console and escape key are always valid
-    KeyValues *item = GetItemForBinding( "toggleconsole" );
-    if ( item )
+
+
+    // Loads the keys from default config
+    zmkeydatalist_t keylists[3];
+
+    CZMTeamKeysConfig::LoadDefaultConfigByTeam( KEYTEAM_ZM, keylists[0] );
+    CZMTeamKeysConfig::LoadDefaultConfigByTeam( KEYTEAM_SURVIVOR, keylists[1] );
+    CZMTeamKeysConfig::LoadDefaultConfigByTeam( KEYTEAM_SPEC, keylists[2] );
+
+
+    for ( int i = 0; i < 3; i++ )
     {
-        // Bind it
-        AddBinding( item, "`" );
+        for ( int j = 0; j < keylists[i].Count(); j++ )
+        {
+            auto* item = GetItemForBinding( keylists[i][j]->cmd );
+            if ( item )
+            {
+                AddBinding( item, g_pInputSystem->ButtonCodeToString( keylists[i][j]->key ) );
+            }
+        }
+
+        keylists[i].PurgeAndDeleteElements();
     }
-    item = GetItemForBinding( "cancelselect" );
+
+
+
+	// Make sure escape key is always valid
+    KeyValues* item = GetItemForBinding( "cancelselect" );
     if ( item )
     {
         // Bind it
@@ -912,84 +1015,6 @@ void COptionsSubKeyboard::OnKeyCodePressed(vgui::KeyCode code)
 	BaseClass::OnKeyCodePressed( code );
 }
 
-
-//-----------------------------------------------------------------------------
-// Purpose: advanced keyboard settings dialog
-//-----------------------------------------------------------------------------
-class COptionsSubKeyboardAdvancedDlg : public vgui::Frame
-{
-	DECLARE_CLASS_SIMPLE( COptionsSubKeyboardAdvancedDlg, vgui::Frame );
-public:
-	COptionsSubKeyboardAdvancedDlg( vgui::VPANEL hParent ) : BaseClass( NULL, NULL )
-	{
-		// parent is ignored, since we want look like we're steal focus from the parent (we'll become modal below)
-
-		SetTitle("#GameUI_KeyboardAdvanced_Title", true);
-		SetSize( 280, 140 );
-		LoadControlSettings( "resource/OptionsSubKeyboardAdvancedDlg.res" );
-		MoveToCenterOfScreen();
-		SetSizeable( false );
-		SetDeleteSelfOnClose( true );
-	}
-
-	virtual void Activate()
-	{
-		BaseClass::Activate();
-
-		input()->SetAppModalSurface(GetVPanel());
-
-		// reset the data
-		ConVarRef con_enable( "con_enable" );
-		if ( con_enable.IsValid() )
-		{
-			SetControlInt("ConsoleCheck", con_enable.GetInt() ? 1 : 0);
-		}
-
-		ConVarRef hud_fastswitch( "hud_fastswitch", true );
-		if ( hud_fastswitch.IsValid() )
-		{
-			SetControlInt("FastSwitchCheck", hud_fastswitch.GetInt() ? 1 : 0);
-		}
-	}
-
-	virtual void OnApplyData()
-	{
-		// apply data
-		ConVarRef con_enable( "con_enable" );
-		con_enable.SetValue( GetControlInt( "ConsoleCheck", 0 ) );
-
-		ConVarRef hud_fastswitch( "hud_fastswitch", true );
-		hud_fastswitch.SetValue( GetControlInt( "FastSwitchCheck", 0 ) );
-	}
-
-	virtual void OnCommand( const char *command )
-	{
-		if ( !stricmp(command, "OK") )
-		{
-			// apply the data
-			OnApplyData();
-			Close();
-		}
-		else
-		{
-			BaseClass::OnCommand( command );
-		}
-	}
-
-	void OnKeyCodeTyped(KeyCode code)
-	{
-		// force ourselves to be closed if the escape key it pressed
-		if (code == KEY_ESCAPE)
-		{
-			Close();
-		}
-		else
-		{
-			BaseClass::OnKeyCodeTyped(code);
-		}
-	}
-};
-
 //-----------------------------------------------------------------------------
 // Purpose: Open advanced keyboard options
 //-----------------------------------------------------------------------------
@@ -998,6 +1023,7 @@ void COptionsSubKeyboard::OpenKeyboardAdvancedDialog()
 	if (!m_OptionsSubKeyboardAdvancedDlg.Get())
 	{
 		m_OptionsSubKeyboardAdvancedDlg = new COptionsSubKeyboardAdvancedDlg(GetVParent());
+        m_OptionsSubKeyboardAdvancedDlg->OnResetData();
 	}
 	m_OptionsSubKeyboardAdvancedDlg->Activate();
 }

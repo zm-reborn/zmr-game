@@ -180,6 +180,15 @@
 
 
 // weapon_zm_smg.txt
+"Weapon_SMG_ZM.Draw"
+{
+	"channel"		"CHAN_ITEM"
+	"volume"		"0.6"
+	"soundlevel"	"SNDLVL_NORM"
+
+	"wave"		"weapons/smg_zm/smg_draw.wav"
+}
+
 "Weapon_SMG_ZM.Reload1"
 {
 	"channel"		"CHAN_ITEM"
