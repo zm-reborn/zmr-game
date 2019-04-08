@@ -109,6 +109,7 @@ public:
 
     Activity    GetOuterActivity() const;
     bool        SetOuterActivity( Activity act ) const;
+    void        SetOuterCycle( float cycle ) const;
 
     Vector      GetOuterVelocity() const;
     int         GetOuterRandomSequence( Activity act ) const;
@@ -165,6 +166,7 @@ protected:
     ZMAnimLayerSlot_t FindSlotByLayerIndex( int index );
 
 private:
+    int m_iMoveRandomSeed;
     bool m_bWasMoving;
     float m_flMoveWeight;
     float m_flMoveActSpeed;
