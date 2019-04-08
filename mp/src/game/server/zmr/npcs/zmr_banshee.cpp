@@ -131,6 +131,11 @@ void CZMBanshee::Spawn()
     BaseClass::Spawn();
 }
 
+CZMBansheeMotor* CZMBanshee::GetBansheeMotor() const
+{
+    return static_cast<CZMBansheeMotor*>( GetMotor() );
+}
+
 NPCR::CPathCostGroundOnly* CZMBanshee::GetPathCost() const
 {
     static NPCR::CPathCostGroundOnly* cost = nullptr;
@@ -157,6 +162,14 @@ void CZMBanshee::OnNavJump()
     //SetActivity( ACT_JUMP );
 
     BaseClass::OnNavJump();
+}
+
+NPCR::QueryResult_t CZMBanshee::ShouldChase( CBaseEntity* pEnemy ) const
+{
+    if ( GetBansheeMotor()->IsInNavJump() )
+        return NPCR::RES_NO;
+
+    return BaseClass::ShouldChase( pEnemy );
 }
 
 bool CZMBanshee::IsAttacking() const
