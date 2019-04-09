@@ -409,6 +409,8 @@ $Project "Client (ZMR)"
 			$File	"zmr\c_zmr_discord.cpp" [$WIN32]
 			$File	"zmr\c_zmr_entities.cpp"
 			$File	"zmr\c_zmr_entities.h"
+			$File	"zmr\c_zmr_importancesystem.cpp"
+			$File	"zmr\c_zmr_importancesystem.h"
 			$File	"zmr\c_zmr_legacy_objpanel.cpp"
 			$File	"zmr\c_zmr_legacy_objpanel.h"
 			$File	"zmr\c_zmr_player.cpp"
