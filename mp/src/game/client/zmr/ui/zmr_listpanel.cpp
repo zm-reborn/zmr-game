@@ -112,6 +112,7 @@ void CZMListRow::OnMousePressed( vgui::MouseCode code )
     if ( m_pKvData )
     {
         kv = m_pKvData->MakeCopy();
+        kv->SetString( "column_name", kv->GetName() );
         kv->SetName( "OnRowItemPressed" );
     }
     else

@@ -57,9 +57,9 @@
 	{
 		"ControlName"		"CZMListPanel"
 		"fieldName"		"PlayerList"
-		"xpos"		"32"
+		"xpos"		"26"
 		"ypos"		"60"
-		"wide"		"316"
+		"wide"		"332"
 		"tall"		"270"
 		"autoResize"		"0"
 		"visible"		"1"
@@ -117,6 +117,11 @@
 						"width"		"24"
 						"colalign_right"		"1"
 					}
+					"importance"
+					{
+						"width"		"24"
+						"colalign_right"		"1"
+					}
 				}
 				"Items"
 				{
@@ -163,6 +168,12 @@
 						"width"		"24"
 						"colalign_right"		"1"
 						"clickable"		"1"
+						"is_image"		"1"
+					}
+					"importance"
+					{
+						"width"		"24"
+						"colalign_right"		"1"
 						"is_image"		"1"
 					}
 				}
@@ -224,6 +235,11 @@
 						"width"		"24"
 						"colalign_right"		"1"
 					}
+					"importance"
+					{
+						"width"		"24"
+						"colalign_right"		"1"
+					}
 				}
 				"Items"
 				{
@@ -277,6 +293,12 @@
 						"width"		"24"
 						"colalign_right"		"1"
 						"clickable"		"1"
+						"is_image"		"1"
+					}
+					"importance"
+					{
+						"width"		"24"
+						"colalign_right"		"1"
 						"is_image"		"1"
 					}
 				}
