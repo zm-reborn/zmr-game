@@ -143,6 +143,11 @@ public:
         GetOuter()->LostEnemy();
     }
 
+    virtual void OnQueuedCommand( CBasePlayer* pPlayer, ZombieCommandType_t com ) OVERRIDE
+    {
+        m_pPath->Invalidate();
+    }
+
     virtual void OnChase( CBaseEntity* pEnt ) OVERRIDE
     {
         m_pPath->Invalidate();
@@ -161,6 +166,12 @@ public:
         }
 
         return NPCR::RES_NONE;
+    }
+
+    // Wait for us to finish before doing something else.
+    virtual NPCR::QueryResult_t IsBusy() const OVERRIDE
+    {
+        return m_pPath->IsValid() ? NPCR::RES_YES : NPCR::RES_NONE;
     }
 
     bool Command( const Vector& vecPos )
