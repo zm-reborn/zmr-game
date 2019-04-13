@@ -199,6 +199,19 @@ public:
         }
     }
 
+    virtual void OnCommanded( ZombieCommandType_t com ) OVERRIDE
+    {
+        if ( m_Path.IsValid() )
+            m_Path.Invalidate();
+
+        m_FaceTimer.Invalidate();
+    }
+
+    virtual void OnQueuedCommand( CBasePlayer* pPlayer, ZombieCommandType_t com ) OVERRIDE
+    {
+        OnCommanded( com );
+    }
+
     bool GotoThreatPosition( const Vector& vecEnd )
     {
         if ( !m_NextMove.IsElapsed() )
@@ -206,6 +219,11 @@ public:
 
 
         CZMBaseZombie* pOuter = GetOuter();
+
+
+        // Don't bother investigating if we're moving right now.
+        if ( pOuter->IsMoving() )
+            return false;
 
 
         const Vector vecStart = pOuter->GetAbsOrigin();
