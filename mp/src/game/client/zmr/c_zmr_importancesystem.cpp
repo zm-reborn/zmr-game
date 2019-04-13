@@ -8,6 +8,8 @@
 #include <vgui_controls/Controls.h>
 
 
+#undef min
+#undef max
 #include <algorithm>
 
 
