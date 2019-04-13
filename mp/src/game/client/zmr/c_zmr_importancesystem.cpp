@@ -138,6 +138,9 @@ int C_ZMImportanceSystem::FindSteamIdIndex( uint64 steamId )
     if ( found == end )
         return -1;
 
+    if ( *found != steamId )
+        return -1;
+
     return (int)(found - begin);
 }
 
