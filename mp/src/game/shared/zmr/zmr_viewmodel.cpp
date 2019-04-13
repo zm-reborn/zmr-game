@@ -76,9 +76,11 @@ CBaseCombatWeapon* CZMViewModel::GetOwningWeapon()
 
         if ( pPlayer )
         {
-            CBaseViewModel* vm = pPlayer->GetViewModel( VMINDEX_WEP );
+            CBaseViewModel* vm = pPlayer->GetViewModel( VMINDEX_WEP, false );
 
-            if ( vm )
+            // Apparently this is possible...
+            // ???
+            if ( vm && vm->ViewModelIndex() == VMINDEX_WEP )
             {
                 return vm->GetOwningWeapon();
             }
