@@ -688,12 +688,13 @@ void COptionsSubKeyboard::ApplyAllBindings( void )
 		
 		// Check main binding
 		keyname = item->GetString( keySymbol, "" );
-		if ( !keyname || !keyname[ 0 ] )
-			continue;
 
 
         Q_strncpy( keydata.cmd, binding, sizeof( keydata.cmd ) );
         keydata.key = g_pInputSystem->StringToButtonCode( keyname );
+
+
+        bool bKeyIsBound = keydata.key > BUTTON_CODE_NONE;
 
 
         zmkeydatalist_t* pKeyList = nullptr;
@@ -712,7 +713,11 @@ void COptionsSubKeyboard::ApplyAllBindings( void )
             pKeyList = &speckeys;
         default :
             // It's a neutral command, just execute it right now.
-			BindKey( keydata.key, binding );
+            if ( bKeyIsBound )
+            {
+                BindKey( keydata.key, binding );
+            }
+
             //engine->ClientCmd_Unrestricted( VarArgs( "bind \"%s\" \"%s\"", keyname, cmd ) );
             break;
         }
@@ -721,6 +726,19 @@ void COptionsSubKeyboard::ApplyAllBindings( void )
         if ( pKeyList )
         {
             auto* pKey = CZMTeamKeysConfig::FindKeyDataFromList( binding, *pKeyList );
+
+            // We don't have a key to bind this to, just remove it.
+            if ( !bKeyIsBound )
+            {
+                if ( pKey )
+                {
+                    pKeyList->FindAndRemove( pKey );
+                    delete pKey;
+                }
+
+                continue;
+            }
+
             auto* pOldKey = CZMTeamKeysConfig::FindKeyDataFromListByKey( keydata.key, *pKeyList );
 
             if ( pOldKey )

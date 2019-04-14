@@ -330,6 +330,8 @@ bool CZMTeamKeysConfig::SaveConfig( const char* cfg, const zmkeydatalist_t& list
     
     FOR_EACH_VEC( list, i )
     {
+        Assert( list[i]->key > KEY_NONE );
+
         Q_snprintf( buf, sizeof( buf ), "bind \"%s\" \"%s\"\n",
             inputsystem->ButtonCodeToString( list[i]->key ),
             list[i]->cmd );
