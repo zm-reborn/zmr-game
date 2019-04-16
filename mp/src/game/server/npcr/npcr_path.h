@@ -75,6 +75,7 @@ namespace NPCR
         bool CheckSimpleLOS( const Vector& vecStart, const Vector& vecEnd, trace_t& tr ) const;
 
 
+        float ComputeLength();
 
 
         bool ShouldDraw();

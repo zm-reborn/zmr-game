@@ -8,6 +8,9 @@
 #include "zmr_zombie_chase.h"
 
 
+ConVar zm_sv_zombie_threat_investigation_dist( "zm_sv_zombie_threat_investigation_maxdist", "700" );
+
+
 class CombatSchedule : public NPCR::CSchedule<CZMBaseZombie>
 {
 private:
@@ -228,6 +231,19 @@ public:
 
         const Vector vecStart = pOuter->GetAbsOrigin();
 
+
+        float flInvestigationDist = zm_sv_zombie_threat_investigation_dist.GetFloat();
+
+        if ( vecStart.DistTo( vecEnd ) > flInvestigationDist )
+        {
+            if ( IsDebugging() )
+                Msg( "Investigation sound origin for %i is too far away!\n", pOuter->entindex() );
+
+            return false;
+        }
+
+
+
         CNavArea* start = TheNavMesh->GetNearestNavArea( vecStart, true, 10000.0f, true );
         CNavArea* goal = TheNavMesh->GetNearestNavArea( vecEnd, true, 10000.0f, true );
 
@@ -244,6 +260,22 @@ public:
         {
             if ( IsDebugging() )
                 Msg( "Couldn't compute combat check path!\n" );
+            return false;
+        }
+
+
+        float flPathLength = m_Path.ComputeLength();
+
+        if ( flPathLength > flInvestigationDist )
+        {
+            if ( IsDebugging() )
+                Msg( "Investigation path for %i is too long! (%.1f)\n", pOuter->entindex(), flPathLength );
+            
+            m_Path.Invalidate();
+
+            // Don't attempt this path again for a while, it sounds expensive.
+            m_NextMove.Start( 2.0f );
+
             return false;
         }
 
