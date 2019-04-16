@@ -89,6 +89,11 @@ public:
         return NPCR::RES_YES;
     }
 
+    virtual NPCR::QueryResult_t ShouldChase( CBaseEntity* pEnemy ) const OVERRIDE
+    {
+        return NPCR::RES_NO;
+    }
+
     virtual void OnAttacked() OVERRIDE
     {
         m_bDidAttack = true;
