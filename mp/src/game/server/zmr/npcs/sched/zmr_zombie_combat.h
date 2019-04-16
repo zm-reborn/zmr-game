@@ -119,7 +119,7 @@ public:
 
             CBaseEntity* pEnemy = pClosest && pOuter->IsEnemy( pClosest ) ? pClosest : pOldEnemy;
 
-            if ( bCanMove && pEnemy && pOuter->ShouldChase( pEnemy ) != NPCR::RES_NO )
+            if ( pEnemy && pOuter->ShouldChase( pEnemy ) != NPCR::RES_NO )
             {
                 pOuter->AcquireEnemy( pEnemy );
 
