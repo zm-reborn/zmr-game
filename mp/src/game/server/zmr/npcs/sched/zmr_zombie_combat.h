@@ -18,6 +18,9 @@ private:
 
     Vector m_vecFaceTowards;
     CountdownTimer m_FaceTimer;
+    CountdownTimer m_NextThreat;
+
+
     CountdownTimer m_NextEnemyScan;
 
     // For checking a potential threat
@@ -54,6 +57,8 @@ public:
     virtual void OnContinue() OVERRIDE
     {
         m_FaceTimer.Invalidate();
+        m_NextThreat.Invalidate();
+
         m_NextEnemyScan.Invalidate();
 
         m_Path.Invalidate();
@@ -195,6 +200,7 @@ public:
             {
                 m_vecFaceTowards = sndOrigin;
                 m_FaceTimer.Start( 2.0f );
+                m_NextThreat.Start( 5.0f );
 
                 if ( IsDebugging() )
                     Msg( "Facing zombie %i towards sound.\n", pOuter->entindex() );
@@ -204,15 +210,18 @@ public:
 
     virtual void OnCommanded( ZombieCommandType_t com ) OVERRIDE
     {
-        if ( m_Path.IsValid() )
-            m_Path.Invalidate();
+        OnContinue();
 
-        m_FaceTimer.Invalidate();
+        // We were command to do something else,
+        // don't care about threats for a while.
+        m_NextThreat.Start( 3.0f );
+        // Definitely don't move for a while!
+        m_NextMove.Start( 6.0f );
     }
 
     virtual void OnQueuedCommand( CBasePlayer* pPlayer, ZombieCommandType_t com ) OVERRIDE
     {
-        OnCommanded( com );
+        OnContinue();
     }
 
     bool ShouldCareAboutThreat() const
@@ -221,7 +230,7 @@ public:
         if ( m_FaceTimer.HasStarted() && !m_FaceTimer.IsElapsed() )
             return false;
 
-        return true;
+        return !m_NextThreat.HasStarted() || m_NextThreat.IsElapsed();
     }
 
     bool GotoThreatPosition( const Vector& vecEnd )
@@ -304,6 +313,7 @@ public:
 
         // Don't recompute this path again for a while.
         m_NextMove.Start( 2.0f );
+        m_NextThreat.Start( 8.0f );
 
 
         return true;
