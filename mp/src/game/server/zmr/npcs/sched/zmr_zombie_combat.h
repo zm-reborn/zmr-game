@@ -179,7 +179,7 @@ public:
         auto* pOuter = GetOuter();
 
         // Try to look for any enemies we can hear.
-        if ( !pOuter->GetEnemy() && !m_FaceTimer.HasStarted() && pSound->IsSoundType( SOUND_COMBAT | SOUND_PLAYER ) )
+        if ( !pOuter->GetEnemy() && ShouldCareAboutThreat() && pSound->IsSoundType( SOUND_COMBAT | SOUND_PLAYER ) )
         {
             const Vector sndOrigin = pSound->GetSoundReactOrigin();
             
@@ -213,6 +213,15 @@ public:
     virtual void OnQueuedCommand( CBasePlayer* pPlayer, ZombieCommandType_t com ) OVERRIDE
     {
         OnCommanded( com );
+    }
+
+    bool ShouldCareAboutThreat() const
+    {
+        // We're currently trying to face towards something, not now!
+        if ( m_FaceTimer.HasStarted() && !m_FaceTimer.IsElapsed() )
+            return false;
+
+        return true;
     }
 
     bool GotoThreatPosition( const Vector& vecEnd )
