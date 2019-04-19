@@ -123,9 +123,10 @@ CBaseEntity* NPCR::CBaseMotor::UpdateGround()
     }
 
 
-    bool bValidGround = tr.fraction < 1.0f && !tr.startsolid;
+    bool bValidPos = true;
 
-    if ( bValidGround )
+    // We hit something!
+    if ( tr.fraction < 1.0f && !tr.startsolid )
     {
         bool bCanStand = CanStandOnNormal( tr.plane.normal );
 
@@ -145,7 +146,7 @@ CBaseEntity* NPCR::CBaseMotor::UpdateGround()
         else
         {
             // Nope, go back to a valid pos.
-            bValidGround = false;
+            bValidPos = false;
         }
 
 
@@ -169,7 +170,7 @@ CBaseEntity* NPCR::CBaseMotor::UpdateGround()
     }
 
     // This is not a valid position, go back to valid one.
-    if ( !bValidGround )
+    if ( !bValidPos )
     {
         GetNPC()->SetPosition( m_vecLastValidPos );
 
