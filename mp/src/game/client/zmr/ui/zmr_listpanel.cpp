@@ -112,7 +112,6 @@ void CZMListRow::OnMousePressed( vgui::MouseCode code )
     if ( m_pKvData )
     {
         kv = m_pKvData->MakeCopy();
-        kv->SetString( "column_name", kv->GetName() );
         kv->SetName( "OnRowItemPressed" );
     }
     else
@@ -120,7 +119,10 @@ void CZMListRow::OnMousePressed( vgui::MouseCode code )
         kv = new KeyValues( "OnRowItemPressed" );
     }
 
+
+    kv->SetString( "pressed_name", GetSection()->GetColumnName( m_iLastHovered ) );
     kv->SetInt( "pressed_index", m_iLastHovered );
+
 
     Panel* pParent = GetSection()->GetParent()->GetParent();
     PostMessage( pParent, kv );

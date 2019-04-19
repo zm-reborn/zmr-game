@@ -205,9 +205,9 @@ void CZMClientScoreBoardDialog::OnListLayout( KeyValues* kv )
 void CZMClientScoreBoardDialog::OnRowItemPressed( KeyValues* kv )
 {
 #ifdef _DEBUG
-    DevMsg( "On Row Item Pressed (Scoreboard) %s\n", kv->GetString( "column_name" ) );
+    DevMsg( "On Row Item Pressed (Scoreboard) %s\n", kv->GetString( "pressed_name" ) );
 #endif
-    if ( Q_stricmp( "mutestatus", kv->GetString( "column_name" ) ) == 0 )
+    if ( Q_stricmp( "mutestatus", kv->GetString( "pressed_name" ) ) == 0 )
     {
         ToggleVoiceMute( kv->GetInt( m_iPlayerIndexSymbol ) );
     }
