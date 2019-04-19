@@ -29,7 +29,7 @@ CNPCRNonPlayer* NPCR::CNonPlayerMotor::GetOuter() const
 
 bool NPCR::CNonPlayerMotor::ShouldApplyGroundMove() const
 {
-    return GetGroundNormal().z > GetSlopeLimit();
+    return CanStandOnNormal( GetGroundNormal() );
 }
 
 void NPCR::CNonPlayerMotor::Approach( const Vector& vecDesiredGoal )
