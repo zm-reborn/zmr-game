@@ -28,6 +28,8 @@ namespace NPCR
         virtual bool IsMoving() const { return m_MoveTimer.HasStarted() && !m_MoveTimer.IsElapsed(); }
         bool IsAttemptingToMove() const { return m_bDoMove; }
 
+        bool CanStandOnNormal( const Vector& vecNormal ) const { return vecNormal.z >= GetSlopeLimit(); }
+
 
         const Vector& GetMoveDir() const { return m_vecMoveDir; }
         virtual const Vector& GetVelocity() const { return GetNPC()->GetVel(); }

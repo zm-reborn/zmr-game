@@ -134,7 +134,7 @@ CBaseEntity* NPCR::CBaseMotor::UpdateGround()
 
         GetNPC()->SetPosition( tr.endpos );
 
-        if ( tr.plane.normal.z > GetSlopeLimit() )
+        if ( CanStandOnNormal( tr.plane.normal ) )
         {
             m_vecGroundNormal = tr.plane.normal;
 
@@ -355,7 +355,7 @@ Vector NPCR::CBaseMotor::HandleCollisions( const Vector& vecGoal )
 
         // We presumably hit ground, start tracing for steps again.
         // NOTE: Fixes not having a ground ent on moving lifts
-        if ( tr.plane.normal.z >= GetSlopeLimit() )
+        if ( CanStandOnNormal( tr.plane.normal ) )
             m_bDoStepDownTrace = true;
 
         m_bAdjustVel = true;
@@ -409,7 +409,7 @@ Vector NPCR::CBaseMotor::HandleCollisions( const Vector& vecGoal )
 
         // Don't bother going down when we're on ground and there's a slanted wall.
         // This stops npcs getting stuck in the ground.
-        if (tr.plane.normal.z < GetSlopeLimit()
+        if (!CanStandOnNormal( tr.plane.normal )
         &&  IsOnGround() )
         //&&  fullMove.z > 0.0f )
         {
