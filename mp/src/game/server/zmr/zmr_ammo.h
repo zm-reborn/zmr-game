@@ -20,14 +20,18 @@ public:
 
     void                SetNextPickupTouch( float delay = 1.0f );
 
+
+    virtual const char* GetItemModel() const { return nullptr; }
+    virtual const char* GetAmmoName() const { return nullptr; }
+    int GetAmmoCount() const { return m_nAmmo; }
+    int GetMaxAmmoCount() const { return m_nMaxAmmo; }
+
 protected:
     void                NoPickupThink();
     void                EmptyTouch( CBaseEntity* pOther );
 
-    virtual const char* GetItemModel() { return nullptr; };
-    virtual const char* GetAmmoName() { return nullptr; };
-    virtual int         GetAmmoCount() { return 0; };
-
 
     CNetworkVar( int, m_iAmmoType );
+    CNetworkVar( int, m_nAmmo );
+    CNetworkVar( int, m_nMaxAmmo );
 };

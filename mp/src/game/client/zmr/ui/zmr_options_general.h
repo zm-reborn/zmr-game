@@ -27,11 +27,12 @@ private:
     vgui::ComboBox*     m_pModelCombo;
     vgui::ComboBox*     m_pPartBox;
     vgui::CheckButton*  m_pCheck_NewMenus;
+    vgui::CheckButton*  m_pCheck_SwitchMouseBtns;
     vgui::CheckButton*  m_pCheck_PowerUser;
     vgui::CheckButton*  m_pCheck_BoxPowerUser;
     vgui::Slider*       m_pSlider_Pitch;
     vgui::Slider*       m_pSlider_Yaw;
-
+    
     const char* GetCurrentPlayerModel();
     void AppendCustomModels();
 };

@@ -76,25 +76,41 @@ public:
 
     virtual void OnAnimActivityInterrupted( Activity newActivity ) OVERRIDE
     {
-        if ( IsDone() )
-            return;
-
         if ( GetOuter()->GetActivity() != ACT_MELEE_ATTACK1 )
             return;
 
 
-        End( "Claw attack was interrupted!" );
+        TryEnd( "Claw attack was interrupted!" );
     }
 
     // Wait for us to finish before doing something else.
+    virtual NPCR::QueryResult_t IsBusy() const OVERRIDE
+    {
+        return NPCR::RES_YES;
+    }
+
     virtual NPCR::QueryResult_t ShouldChase( CBaseEntity* pEnemy ) const OVERRIDE
     {
-        return (!IsDone()) ? NPCR::RES_NO : NPCR::RES_NONE;
+        return NPCR::RES_NO;
     }
 
     virtual void OnAttacked() OVERRIDE
     {
         m_bDidAttack = true;
+    }
+
+    virtual void OnEnd() OVERRIDE
+    {
+        auto* pOuter = GetOuter();
+        if ( pOuter->GetActivity() == ACT_MELEE_ATTACK1 && !pOuter->IsSequenceFinished() )
+        {
+            pOuter->DoAnimationEvent( ZOMBIEANIMEVENT_IDLE );
+        }
+    }
+
+    virtual void OnCommanded( ZombieCommandType_t com ) OVERRIDE
+    {
+        TryEnd( "We were commanded to do something else!" );
     }
 
     virtual void OnQueuedCommand( CBasePlayer* pPlayer, ZombieCommandType_t com ) OVERRIDE
@@ -112,10 +128,5 @@ public:
 
 
         TryEnd( "We were commanded to do something else!" );
-
-        if ( GetOuter()->GetActivity() == ACT_MELEE_ATTACK1 )
-        {
-            GetOuter()->DoAnimationEvent( ZOMBIEANIMEVENT_IDLE );
-        }
     }
 };

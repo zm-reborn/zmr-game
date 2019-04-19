@@ -271,3 +271,8 @@
 	// Inputs
 	input Award(integer) : "Give the specified number of points to players inside the area"
 ]
+
+@PointClass base(BaseFogController) iconsprite("editor/fog_controller.vmt") color(255 255 255) = env_fog_controller_zm : 
+	"An entity that controls the fog and view distance in the map."
+[
+]

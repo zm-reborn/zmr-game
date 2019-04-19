@@ -156,15 +156,18 @@ bool CZMDrifter::ShouldPlayIdleSound() const
 float CZMDrifter::IdleSound()
 {
     EmitSound( "NPC_DragZombie.Idle" );
+    g_flLastZombieSound = gpGlobals->curtime;
     return 1.0f;
 }
 
 void CZMDrifter::AlertSound()
 {
     EmitSound( "NPC_DragZombie.Alert" );
+    g_flLastZombieSound = gpGlobals->curtime;
 }
 
 void CZMDrifter::DeathSound()
 {
     EmitSound( "NPC_DragZombie.Die" );
+    g_flLastZombieSound = gpGlobals->curtime;
 }

@@ -26,8 +26,24 @@ BEGIN_NETWORK_TABLE( CZMViewModel, DT_ZM_ViewModel )
     SendPropFloat( SENDINFO_ARRAYELEM( m_flClr, 0 ), -1, 0, 0.0f, 1.0f ),
     SendPropFloat( SENDINFO_ARRAYELEM( m_flClr, 1 ), -1, 0, 0.0f, 1.0f ),
     SendPropFloat( SENDINFO_ARRAYELEM( m_flClr, 2 ), -1, 0, 0.0f, 1.0f ),
+
+
+    //SendPropExclude( "DT_BaseAnimating", "m_flPoseParameter" ),
+    //SendPropExclude( "DT_BaseAnimating", "m_flPlaybackRate" ),
+    //SendPropExclude( "DT_BaseAnimating", "m_nSequence" ),
+    //SendPropExclude( "DT_BaseAnimatingOverlay", "overlay_vars" ),
+
+    //SendPropExclude( "DT_ServerAnimationData" , "m_flCycle" ),	
+    //SendPropExclude( "DT_AnimTimeMustBeFirst" , "m_flAnimTime" ),
 #endif
 END_NETWORK_TABLE()
+
+
+BEGIN_PREDICTION_DATA( C_ZMViewModel )
+#ifdef CLIENT_DLL
+    //DEFINE_PRED_ARRAY( m_flPoseParameter, FIELD_FLOAT, MAXSTUDIOPOSEPARAM, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
+#endif
+END_PREDICTION_DATA()
 
 
 CZMViewModel::CZMViewModel()
@@ -37,10 +53,41 @@ CZMViewModel::CZMViewModel()
 #else
     SetModelColor2( 1.0f, 1.0f, 1.0f );
 #endif
+
+    //UseClientSideAnimation();
+
+    //m_flPlaybackRate = 1.0f;
 }
 
 CZMViewModel::~CZMViewModel()
 {
+}
+
+CBaseCombatWeapon* CZMViewModel::GetOwningWeapon()
+{
+    auto* pOwner = BaseClass::GetOwningWeapon();
+    if ( pOwner )
+        return pOwner;
+
+
+    if ( ViewModelIndex() == VMINDEX_HANDS )
+    {
+        auto* pPlayer = static_cast<C_ZMPlayer*>( GetOwner() );
+
+        if ( pPlayer )
+        {
+            CBaseViewModel* vm = pPlayer->GetViewModel( VMINDEX_WEP, false );
+
+            // Apparently this is possible...
+            // ???
+            if ( vm && vm->ViewModelIndex() == VMINDEX_WEP )
+            {
+                return vm->GetOwningWeapon();
+            }
+        }
+    }
+
+    return nullptr;
 }
 
 #ifdef CLIENT_DLL

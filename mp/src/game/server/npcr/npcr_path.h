@@ -35,11 +35,8 @@ namespace NPCR
         NavTravel_t navTravel;
         NavTraverseType navTraverse;
         Vector fwd; // Unit vector to next segment.
-        float fwd_dot; // Dot product of previous segment fwd and our fwd.
+        float fwd_dot; // Dot product of previous link fwd and our fwd.
         float length;
-
-        Vector portalCenter;
-        float portalHalfWidth;
     };
 
     class CBaseNavPath : public CAIGraphPath
@@ -78,6 +75,7 @@ namespace NPCR
         bool CheckSimpleLOS( const Vector& vecStart, const Vector& vecEnd, trace_t& tr ) const;
 
 
+        float ComputeLength();
 
 
         bool ShouldDraw();

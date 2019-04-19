@@ -1,11 +1,27 @@
 #include "cbase.h"
 
-
-#include "zmr_player_shared.h"
+#include "ammodef.h"
+#include "decals.h"
+#include "rumble_shared.h"
+#include "shot_manipulator.h"
+#include "takedamageinfo.h"
 
 #ifdef CLIENT_DLL
 #include "prediction.h"
+#include "c_te_effect_dispatch.h"
+#else
+#include "ilagcompensationmanager.h"
+#include "hl2mp/te_hl2mp_shotgun_shot.h"
+#include "iservervehicle.h"
+//#include "vehicle_baseserver.h"
+#include "te_effect_dispatch.h"
+#endif
 
+
+#include "zmr_player_shared.h"
+
+
+#ifdef CLIENT_DLL
 #include "zmr/c_zmr_player.h"
 #include "zmr/npcs/c_zmr_zombiebase.h"
 #else
@@ -27,13 +43,23 @@ extern ConVar zm_sv_resource_max;
 
 ConVar zm_sv_bulletspassplayers( "zm_sv_bulletspassplayers", "1", FCVAR_NOTIFY | FCVAR_ARCHIVE | FCVAR_REPLICATED, "Do bullets players shoot pass through other players?" );
 
+ConVar zm_sv_bulletpenetration( "zm_sv_bulletpenetration", "2", FCVAR_NOTIFY | FCVAR_ARCHIVE | FCVAR_REPLICATED, "0 = No penetration, 1 = Only zombies, 2 = Zombies and world" );
+
+ConVar zm_sv_debug_penetration( "zm_sv_debug_penetration", "0", FCVAR_REPLICATED | FCVAR_CHEAT );
+
 
 //
 CZMPlayerAttackTraceFilter::CZMPlayerAttackTraceFilter( CBaseEntity* pAttacker, CBaseEntity* pIgnore, int collisionGroup ) : CTraceFilter()
 {
     Assert( pAttacker != nullptr && pAttacker->IsPlayer() );
     m_pAttacker = pAttacker;
-    m_pIgnore = pIgnore;
+    
+    if ( pIgnore )
+    {
+        AddToIgnoreList( pIgnore );
+    }
+
+    m_nPenetrations = 0;
 }
 
 bool CZMPlayerAttackTraceFilter::ShouldHitEntity( IHandleEntity* pHandleEntity, int contentsMask )
@@ -42,7 +68,14 @@ bool CZMPlayerAttackTraceFilter::ShouldHitEntity( IHandleEntity* pHandleEntity, 
 
     if ( !pEntity ) return false;
     if ( pEntity == m_pAttacker ) return false;
-    if ( pEntity == m_pIgnore ) return false;
+    
+    FOR_EACH_VEC( m_vIgnore, i )
+    {
+        if ( m_vIgnore[i] == pEntity )
+        {
+            return false;
+        }
+    }
 
 
     // It's a bone follower of the entity to ignore (toml 8/3/2007)
@@ -56,7 +89,10 @@ bool CZMPlayerAttackTraceFilter::ShouldHitEntity( IHandleEntity* pHandleEntity, 
 
         // Clientside hit reg will do this for us.
         if ( !pPlayer->IsBot() && g_ZMUserCmdSystem.UsesClientsideDetection( pEntity ) )
+        {
+            ++m_nPenetrations;
             return false;
+        }
 #endif
         if (pEntity->IsPlayer()
         &&  pEntity->GetTeamNumber() == m_pAttacker->GetTeamNumber()
@@ -66,6 +102,57 @@ bool CZMPlayerAttackTraceFilter::ShouldHitEntity( IHandleEntity* pHandleEntity, 
 
     return true;
 }
+
+int CZMPlayerAttackTraceFilter::AddToIgnoreList( CBaseEntity* pIgnore )
+{
+    int index = m_vIgnore.Find( pIgnore );
+    return ( index == -1 ) ? m_vIgnore.AddToTail( pIgnore ) : -1;
+}
+
+bool CZMPlayerAttackTraceFilter::RemoveFromIgnoreList( CBaseEntity* pIgnore )
+{
+    return m_vIgnore.FindAndRemove( pIgnore );
+}
+
+void CZMPlayerAttackTraceFilter::ClearIgnoreList()
+{
+    m_vIgnore.RemoveAll();
+}
+//
+
+
+//
+struct ZMFireBulletsInfo_t
+{
+    ZMFireBulletsInfo_t( const FireBulletsInfo_t& bulletinfo, Vector vecDir, CZMPlayerAttackTraceFilter* filter ) : info( bulletinfo ), Manipulator( vecDir ), pFilter( filter )
+    {
+        bStartedInWater = false;
+        bDoImpacts = false;
+        bDoTracers = false;
+        flCumulativeDamage = 0.0f;
+        this->vecDir = vecDir;
+    }
+
+    void ClearPerBulletData()
+    {
+        pFilter->ClearIgnoreList();
+        pFilter->ClearPenetrations();
+    }
+
+
+    int iPlayerDamage;
+    CZMBaseWeapon* pWeapon;
+
+    bool bStartedInWater;
+    bool bDoImpacts;
+    bool bDoTracers;
+    float flCumulativeDamage;
+
+    const FireBulletsInfo_t& info;
+    CShotManipulator Manipulator;
+    CZMPlayerAttackTraceFilter* pFilter;
+    Vector vecDir;
+};
 //
 
 
@@ -323,4 +410,599 @@ void CZMPlayer::GetZMMovementVars( float& maxspd, float& accel, float& decel ) c
     accel = m_flZMMoveAccel;
     decel = m_flZMMoveDecel;
 #endif
+}
+
+
+#ifdef _DEBUG
+static ConVar zm_sv_debugbullets( "zm_sv_debugbullets", "0", FCVAR_NOTIFY | FCVAR_REPLICATED, "" );
+static ConVar zm_sv_debugbullets_time( "zm_sv_debugbullets_time", "1", FCVAR_NOTIFY | FCVAR_REPLICATED, "" );
+#endif // _DEBUG
+
+
+
+// Override FireBullets
+// This is no longer called recursively.
+void CZMPlayer::FireBullets( const FireBulletsInfo_t& info )
+{
+    Assert( info.m_flDamage > 0.0f || info.m_iPlayerDamage > 0 );
+
+    AssertMsg( info.m_iAmmoType != -1, "Can't shoot invalid ammo type!" );
+
+
+
+#ifdef GAME_DLL
+    lagcompensation->StartLagCompensation( this, GetCurrentCommand() );
+    NoteWeaponFired();
+#endif
+
+    static int  tracerCount = 0;
+    CAmmoDef*   pAmmoDef    = GetAmmoDef();
+    int         nDamageType = pAmmoDef->DamageType( info.m_iAmmoType );
+    int         nAmmoFlags  = pAmmoDef->Flags( info.m_iAmmoType );
+    
+    auto*       pWeapon = static_cast<CZMBaseWeapon*>( GetActiveWeapon() );
+
+
+#if defined( GAME_DLL )
+    if ( IsPlayer() )
+    {
+        CBasePlayer* pPlayer = this;
+
+        int rumbleEffect = pPlayer->GetActiveWeapon()->GetRumbleEffect();
+
+        if ( rumbleEffect != RUMBLE_INVALID )
+        {
+            pPlayer->RumbleEffect( rumbleEffect, 0, RUMBLE_FLAG_RESTART );
+        }
+    }
+#endif// GAME_DLL
+
+    int iPlayerDamage = info.m_iPlayerDamage;
+    if ( iPlayerDamage == 0 )
+    {
+        if ( nAmmoFlags & AMMO_INTERPRET_PLRDAMAGE_AS_DAMAGE_TO_PLAYER )
+        {
+            iPlayerDamage = pAmmoDef->PlrDamage( info.m_iAmmoType );
+        }
+    }
+
+
+    // Make sure we don't have a dangling damage target from a recursive call
+    if ( g_MultiDamage.GetTarget() != NULL )
+    {
+        ApplyMultiDamage();
+    }
+      
+    ClearMultiDamage();
+    g_MultiDamage.SetDamageType( nDamageType | DMG_NEVERGIB );
+
+
+    
+
+    // ZMR
+    CZMPlayerAttackTraceFilter traceFilter( this, info.m_pAdditionalIgnoreEnt, COLLISION_GROUP_NONE );
+
+    ZMFireBulletsInfo_t bulletinfo( info, info.m_vecDirShooting, &traceFilter );
+    bulletinfo.iPlayerDamage = iPlayerDamage;
+    bulletinfo.pWeapon = pWeapon;
+
+
+    bulletinfo.bStartedInWater = ( enginetrace->GetPointContents( info.m_vecSrc ) & (CONTENTS_WATER|CONTENTS_SLIME) ) != 0;
+
+    //bool bUnderwaterBullets = ShouldDrawUnderwaterBulletBubbles();
+
+
+    
+
+    
+
+    // Prediction is only usable on players
+    int iSeed = CBaseEntity::GetPredictionRandomSeed( info.m_bUseServerRandomSeed ) & 255;
+
+
+#if defined( HL2MP ) && defined( GAME_DLL )
+    int iEffectSeed = iSeed;
+#endif
+
+
+    for ( int iShot = 0; iShot < info.m_iShots; iShot++ )
+    {
+        RandomSeed( iSeed ); // Init random system with this seed
+
+
+        // If we're firing multiple shots, and the first shot has to be bang on target, ignore spread
+        if ( !iShot && info.m_iShots > 1 && (info.m_nFlags & FIRE_BULLETS_FIRST_SHOT_ACCURATE) )
+        {
+            bulletinfo.vecDir = bulletinfo.Manipulator.GetShotDirection();
+        }
+        else
+        {
+            // Don't run the biasing code for the player at the moment.
+            bulletinfo.vecDir = bulletinfo.Manipulator.ApplySpread( info.m_vecSpread );
+        }
+
+
+        if ( info.m_iTracerFreq && ( tracerCount++ % info.m_iTracerFreq ) == 0 /*&& !bHitGlass*/ )
+        {
+            bulletinfo.bDoTracers = true;
+        }
+
+        // Do the actual shooting
+        SimulateBullet( bulletinfo );
+
+        bulletinfo.ClearPerBulletData();
+
+        iSeed++;
+    }
+
+#ifdef GAME_DLL
+    TE_HL2MPFireBullets( entindex(), info.m_vecSrc, info.m_vecDirShooting, info.m_iAmmoType, iEffectSeed, info.m_iShots, info.m_vecSpread.x, bulletinfo.bDoTracers, bulletinfo.bDoImpacts );
+#endif
+
+#ifdef GAME_DLL
+    ApplyMultiDamage();
+
+#if 0 // ZMR: This was causing crashes. Commenting it out since we're not using stats.
+    if ( IsPlayer() && flCumulativeDamage > 0.0f )
+    {
+        CBasePlayer *pPlayer = static_cast< CBasePlayer * >( this );
+        CTakeDamageInfo dmgInfo( this, pAttacker, flCumulativeDamage, nDamageType );
+        gamestats->Event_WeaponHit( pPlayer, info.m_bPrimaryAttack, pPlayer->GetActiveWeapon()->GetClassname(), dmgInfo );
+    }
+#endif
+
+    // Move ents back to their original positions.
+    lagcompensation->FinishLagCompensation( this );
+#endif
+}
+
+void CZMPlayer::SimulateBullet( ZMFireBulletsInfo_t& bulletinfo )
+{
+    trace_t tr;
+    Vector vecEnd;
+
+    auto&   info = bulletinfo.info;
+    int     iPlayerDamage = bulletinfo.iPlayerDamage;
+    bool    bStartedInWater = bulletinfo.bStartedInWater;
+    auto*   pFilter = bulletinfo.pFilter;
+
+
+    CBaseEntity*    pAttacker = info.m_pAttacker ? info.m_pAttacker : this;
+    float           flDistanceLeft = info.m_flDistance;
+    Vector          vecSrc = info.m_vecSrc;
+    Vector          vecDir = bulletinfo.vecDir;
+    Vector          vecFirstStart = vec3_origin;
+    Vector          vecFirstEnd = vecSrc + vecDir * flDistanceLeft;
+    int             nPenetrations = 0;
+
+
+    CAmmoDef*       pAmmoDef = GetAmmoDef();
+    int             nDamageType = pAmmoDef->DamageType( info.m_iAmmoType );
+#ifdef GAME_DLL
+    int             nAmmoFlags = pAmmoDef->Flags( info.m_iAmmoType );
+#endif
+
+#ifdef CLIENT_DLL
+    bool bDoEffects = IsLocalPlayer();
+#endif
+
+    bool bHitWater = bStartedInWater;
+    //bool bHitGlass = false;
+
+    bool bFirstValidShot = true;
+
+
+    int iSanityCheck = 0;
+
+    //
+    // Keep going till we can't penetrate anymore.
+    // The reason why we don't do it the old way where we recursively call FireBullets,
+    // is because we want to keep track of how many times we penetrated.
+    //
+    while ( flDistanceLeft > 0.0f )
+    {
+        if ( ++iSanityCheck > 16 )
+        {
+            Warning( "CZMPlayer::SimulateBullet failed sanity check!!\n" );
+            break;
+        }
+
+
+        vecEnd = vecSrc + vecDir * flDistanceLeft;
+
+        //
+        // Do the trace
+        //
+        UTIL_TraceLine( vecSrc, vecEnd, MASK_SHOT, pFilter, &tr );
+
+
+        if ( !tr.startsolid )
+        {
+            flDistanceLeft *= (1.0f - tr.fraction);
+        }
+
+
+        //
+        // Build the damage info
+        //
+        float flActualDamage = info.m_flDamage;
+        int nActualDamageType = nDamageType;
+
+
+        if ( tr.m_pEnt )
+        {
+            // If we hit a player, and we have player damage specified, use that instead
+            // Adrian: Make sure to use the currect value if we hit a vehicle the player is currently driving.
+            if ( iPlayerDamage && tr.m_pEnt->IsPlayer() )
+            {
+                flActualDamage = iPlayerDamage;
+            }
+
+            if ( flActualDamage == 0.0f )
+            {
+                flActualDamage = g_pGameRules->GetAmmoDamage( pAttacker, tr.m_pEnt, info.m_iAmmoType );
+            }
+#if 0 // ZMR: Never gib us from bullets...
+            else
+            {
+                nActualDamageType = nDamageType | ((flActualDamage > 16) ? DMG_ALWAYSGIB : DMG_NEVERGIB );
+            }
+#endif
+        }
+
+
+        CTakeDamageInfo dmgInfo( this, pAttacker, flActualDamage, nActualDamageType );
+        ModifyFireBulletsDamage( &dmgInfo );
+        CalculateBulletDamageForce( &dmgInfo, info.m_iAmmoType, vecDir, tr.endpos );
+        dmgInfo.ScaleDamageForce( info.m_flDamageForceScale );
+        dmgInfo.SetAmmoType( info.m_iAmmoType );
+
+        
+#ifdef GAME_DLL
+        // Hit all triggers along the ray
+        TraceAttackToTriggers( dmgInfo, tr.startpos, tr.endpos, vecDir );
+#endif
+
+
+        //
+        // Alright, we're done with the bullet if we didn't actually hit anything.
+        //
+        if ( tr.fraction == 1.0f )
+        {
+            break;
+        }
+
+        // Is this even possible?
+        if ( !tr.m_pEnt )
+        {
+            Assert( 0 );
+            break;
+        }
+
+
+        //
+        // Do damage, paint decals
+        //
+
+
+        if ( bFirstValidShot && !tr.startsolid )
+        {
+            vecFirstStart = tr.startpos;
+            vecFirstEnd = tr.endpos;
+
+            bFirstValidShot = false;
+        }
+
+
+        // No point in alerting zombies from bullet impact sounds.
+//#ifdef GAME_DLL
+//        //UpdateShotStatistics( tr );
+//
+//        // For shots that don't need persistance
+//        int soundEntChannel = ( info.m_nFlags & FIRE_BULLETS_TEMPORARY_DANGER_SOUND ) ? SOUNDENT_CHANNEL_BULLET_IMPACT : SOUNDENT_CHANNEL_UNSPECIFIED;
+//
+//        CSoundEnt::InsertSound( SOUND_BULLET_IMPACT, tr.endpos, 200, 0.5, this, soundEntChannel );
+//#endif
+
+
+
+        // See if the bullet ended up underwater + started out of the water
+        if ( !bHitWater && ( enginetrace->GetPointContents( tr.endpos ) & (CONTENTS_WATER|CONTENTS_SLIME) ) )
+        {
+            bHitWater = HandleShotImpactingWater( info, vecEnd, pFilter );
+        }
+
+
+        if ( !bHitWater || ((info.m_nFlags & FIRE_BULLETS_DONT_HIT_UNDERWATER) == 0) )
+        {
+            // Damage specified by function parameter
+            tr.m_pEnt->DispatchTraceAttack( dmgInfo, vecDir, &tr );
+            
+            if ( ToBaseCombatCharacter( tr.m_pEnt ) )
+            {
+                bulletinfo.flCumulativeDamage += dmgInfo.GetDamage();
+            }
+
+            if ( bStartedInWater || !bHitWater || (info.m_nFlags & FIRE_BULLETS_ALLOW_WATER_SURFACE_IMPACTS) )
+            {
+                bulletinfo.bDoImpacts = true;
+            }
+            else
+            {
+                // We may not impact, but we DO need to affect ragdolls on the client
+                CEffectData data;
+                data.m_vStart = tr.startpos;
+                data.m_vOrigin = tr.endpos;
+                data.m_nDamageType = nDamageType;
+                    
+                DispatchEffect( "RagdollImpact", data );
+            }
+    
+#ifdef GAME_DLL
+            if ( nAmmoFlags & AMMO_FORCE_DROP_IF_CARRIED )
+            {
+                // Make sure if the player is holding this, he drops it
+                Pickup_ForcePlayerToDropThisObject( tr.m_pEnt );		
+            }
+#endif
+        }
+
+        
+        //
+        // We hit something, attempt penetration.
+        //
+        if (nPenetrations < bulletinfo.pWeapon->GetMaxPenetrations()
+        &&  HandleBulletPenetration( tr, bulletinfo, vecSrc, flDistanceLeft ) )
+        {
+            ++nPenetrations;
+        }
+        else
+        {
+            // Can't go any further than this.
+            flDistanceLeft = 0.0f;
+        }
+
+
+#ifdef CLIENT_DLL
+        if ( bDoEffects )
+        {
+            DoImpactEffect( tr, nDamageType );
+        }
+#endif
+
+
+        //
+        // Draw debug shit
+        //
+#if defined( _DEBUG )
+        if ( zm_sv_debugbullets.GetBool() )
+        {
+#ifdef CLIENT_DLL
+            const int dbgclr[3] = { 255, 0, 0 };
+#else
+            const int dbgclr[3] = { 0, 0, 255 };
+#endif // CLIENT_DLL
+
+            DebugDrawLine( tr.startpos, tr.endpos, dbgclr[0], dbgclr[1], dbgclr[2], false, abs( zm_sv_debugbullets_time.GetFloat() ) );
+        }
+#endif // ZMR - DEBUG
+    }
+
+
+#ifdef CLIENT_DLL
+    if ( bDoEffects )
+    {
+        tr.endpos = vecFirstEnd;
+        MakeTracer( vecFirstStart, tr, pAmmoDef->TracerType( info.m_iAmmoType ) );
+    }
+#endif
+}
+
+bool CZMPlayer::HandleBulletPenetration( trace_t& tr, const ZMFireBulletsInfo_t& bulletinfo, Vector& vecNextSrc, float& flDistance )
+{
+    if ( !zm_sv_bulletpenetration.GetBool() )
+        return false;
+
+
+    // Make sure we are inside/outside the volume by nudging the trace forward/back.
+    const float epsilon = 0.1f;
+
+
+    if ( tr.fraction == 1.0f )
+        return false;
+
+    if ( tr.allsolid )
+        return false;
+
+
+    float flSurfaceMult = 1.0f;
+
+    bool bPenetrate = tr.startsolid;
+
+
+
+    bool bIsCharacter = ToBaseCombatCharacter( tr.m_pEnt ) != nullptr;
+
+    if ( !bPenetrate && tr.m_pEnt )
+    {
+        //
+        // Only penetrate through the world
+        // There may be maps that rely on things NOT being penetrable
+        //
+        if ( tr.m_pEnt->IsWorld() && zm_sv_bulletpenetration.GetInt() >= 2 )
+        {
+            if ( tr.surface.flags & (SURF_SKY|SURF_SKY2D|SURF_NODRAW) )
+            {
+                return false;
+            }
+        
+            auto* pSurf = physprops->GetSurfaceData( tr.surface.surfaceProps );
+            if ( pSurf )
+            {
+                switch ( pSurf->game.material )
+                {
+                case CHAR_TEX_CLIP : flSurfaceMult = 0.0f; break;
+                case CHAR_TEX_VENT :
+                case CHAR_TEX_METAL : flSurfaceMult = 0.25f; break;
+                case CHAR_TEX_DIRT :
+                case CHAR_TEX_CONCRETE : flSurfaceMult = 0.3f; break;
+                case CHAR_TEX_WOOD : flSurfaceMult = 0.9f; break;
+                default : break;
+                }
+                // Query the func_breakable for whether it wants to allow for bullet penetration
+                //if ( !tr.m_pEnt->HasSpawnFlags( SF_BREAK_NO_BULLET_PENETRATION ) )
+            }
+
+            bPenetrate = true;
+        }
+        else
+        {
+            bPenetrate = bIsCharacter;
+        }
+    }
+
+
+
+    const float flMaxPenetration =
+        bulletinfo.pWeapon->GetMaxPenetrationDist() * flSurfaceMult;
+
+
+
+    if ( !bPenetrate )
+    {
+        return false;
+    }
+
+
+    //
+    // If they're a character, we can't use fractionleftsolid
+    // due to it not working with hitboxes.
+    // Instead, we'll just have to simply ignore it.
+    //
+    if ( bIsCharacter )
+    {
+        auto* pZombie = ToZMBaseZombie( tr.m_pEnt );
+
+        if ( pZombie && pZombie->CanBePenetrated() )
+        {
+            auto dir = tr.endpos - tr.startpos;
+            dir.NormalizeInPlace();
+
+            vecNextSrc = tr.endpos + dir * epsilon;
+
+            bulletinfo.pFilter->AddToIgnoreList( tr.m_pEnt );
+            return true;
+        }
+
+        return false;
+    }
+
+
+
+    trace_t peneTrace;
+
+
+    auto dir = tr.endpos - tr.startpos;
+    dir.NormalizeInPlace();
+
+
+    float distToTrace = MIN( flDistance, flMaxPenetration );
+    
+    auto start = tr.endpos + dir * epsilon;
+
+
+    if ( tr.startsolid )
+    {
+        peneTrace = tr;
+    }
+    else
+    {
+        auto end = start + dir * distToTrace;
+
+        UTIL_TraceLine( start, end, MASK_SHOT, bulletinfo.pFilter, &peneTrace );
+    }
+
+
+    if ( !peneTrace.startsolid )
+    {
+        Assert( 0 );
+        return false;
+    }
+
+
+
+    float frac = peneTrace.fractionleftsolid;
+
+    if ( frac == 0.0f )
+    {
+        Assert( peneTrace.allsolid );
+        return false;
+    }
+
+    // We never left solid!
+    if ( frac == 1.0f || tr.allsolid )
+    {
+        return false;
+    }
+
+
+
+    float distInSolid = distToTrace * frac;
+
+    bool bPasses = distInSolid < flMaxPenetration;
+
+    if ( zm_sv_debug_penetration.GetFloat() > 0.0f )
+    {
+        DebugDrawLine(
+            peneTrace.startpos,
+            peneTrace.startpos + dir * distInSolid,
+            bPasses ? 0 : 255,
+            (!bPasses) ? 0 : 255,
+            0,
+            true,
+            zm_sv_debug_penetration.GetFloat() );
+    }
+
+    if ( !bPasses )
+    {
+        return false;
+    }
+
+
+    vecNextSrc = start + (dir * distInSolid) + (dir * epsilon);
+
+    flDistance -= distInSolid;
+
+
+    return true;
+}
+
+bool CZMPlayer::HandleShotImpactingWater( const FireBulletsInfo_t& info, const Vector& vecEnd, CTraceFilter* pFilter )
+{
+    trace_t	tr;
+
+    // Trace again with water enabled
+    UTIL_TraceLine( info.m_vecSrc, vecEnd, (MASK_SHOT|CONTENTS_WATER|CONTENTS_SLIME), pFilter, &tr );
+    
+
+    // See if this is the point we entered
+    if ( ( enginetrace->GetPointContents( tr.endpos - Vector( 0, 0, 0.1f ) ) & (CONTENTS_WATER|CONTENTS_SLIME) ) == 0 )
+        return false;
+
+
+    int	nMinSplashSize = GetAmmoDef()->MinSplashSize(info.m_iAmmoType);
+    int	nMaxSplashSize = GetAmmoDef()->MaxSplashSize(info.m_iAmmoType);
+
+    CEffectData	data;
+    data.m_vOrigin = tr.endpos;
+    data.m_vNormal = tr.plane.normal;
+    data.m_flScale = random->RandomFloat( nMinSplashSize, nMaxSplashSize );
+    if ( tr.contents & CONTENTS_SLIME )
+    {
+        data.m_fFlags |= FX_WATER_IN_SLIME;
+    }
+
+    DispatchEffect( "gunshotsplash", data );
+
+    return true;
 }

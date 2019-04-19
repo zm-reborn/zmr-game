@@ -20,6 +20,9 @@ public:
     virtual void OnLandedGround( CBaseEntity* pGround ) OVERRIDE;
     virtual void NavJump( const Vector& vecGoal, float flOverrideHeight = 0.0f ) OVERRIDE;
 
+
+    bool IsInNavJump() const { return m_bIsInNavJump; }
+
 protected:
     virtual bool ShouldAdjustVelocity() const OVERRIDE;
 
@@ -39,6 +42,7 @@ public:
     ~CZMBanshee();
 
 
+    CZMBansheeMotor* GetBansheeMotor() const;
     virtual CZMBansheeMotor* CreateMotor() OVERRIDE { return new CZMBansheeMotor( this ); }
 
 
@@ -54,6 +58,7 @@ public:
     virtual void OnNavJump() OVERRIDE;
 
 
+    virtual NPCR::QueryResult_t ShouldChase( CBaseEntity* pEnemy ) const OVERRIDE;
     virtual bool IsAttacking() const OVERRIDE;
 
 

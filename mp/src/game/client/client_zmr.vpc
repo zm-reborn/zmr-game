@@ -5,8 +5,8 @@
 //-----------------------------------------------------------------------------
 
 $Macro SRCDIR		"..\.."
-$Macro GAMENAME 	"zmr" [!$SOURCESDK]
-$Macro GAMENAME 	"zombie_master_reborn" [$SOURCESDK]
+$Macro GAMENAME 	"zmr" [$ZMR_STEAM]
+$Macro GAMENAME 	"zombie_master_reborn" [!$ZMR_STEAM]
 
 $Include "$SRCDIR\game\client\client_base.vpc"
 
@@ -21,6 +21,12 @@ $Configuration
 
 $Project "Client (ZMR)"
 {
+	$Folder "Libs (ZMR)"
+	{
+		$Lib		discord-rpc [$WIN32]
+		//$Lib		libdiscord-rpc [$LINUXALL]
+	}
+	
 	$Folder	"Source Files"
 	{
 		-$File	"$SRCDIR\game\shared\weapon_parse_default.cpp"
@@ -218,16 +224,81 @@ $Project "Client (ZMR)"
 			}
 			$Folder "UI"
 			{
+				$Folder "Main Menu"
+				{
+					$File	"zmr\ui\menu\zmr_loadingbg.cpp"
+					$File	"zmr\ui\menu\zmr_loadingbg.h"
+					$File	"zmr\ui\menu\zmr_mainmenu.cpp"
+					$File	"zmr\ui\menu\zmr_mainmenu.h"
+					$File	"zmr\ui\menu\zmr_mainmenu_basebtn.cpp"
+					$File	"zmr\ui\menu\zmr_mainmenu_basebtn.h"
+					$File	"zmr\ui\menu\zmr_mainmenu_btn.cpp"
+					$File	"zmr\ui\menu\zmr_mainmenu_btn.h"
+					$File	"zmr\ui\menu\zmr_mainmenu_contactbuttons.cpp"
+					$File	"zmr\ui\menu\zmr_mainmenu_contactbuttons.h"
+					$File	"zmr\ui\menu\zmr_mainmenu_imagepanel.cpp"
+					$File	"zmr\ui\menu\zmr_mainmenu_subbtn.cpp"
+					$File	"zmr\ui\menu\zmr_mainmenu_subbtn.h"
+				}
 				$Folder "Options"
 				{
+					$Folder "GameUI"
+					{
+						$File	"$SRCDIR\gameui\bitmapimagepanel.cpp" \
+								"$SRCDIR\gameui\cvarnegatecheckbutton.cpp" \
+								"$SRCDIR\gameui\cvarslider.cpp" \
+								"$SRCDIR\gameui\cvartogglecheckbutton.cpp" \
+								"$SRCDIR\gameui\labeledcommandcombobox.cpp" \
+								"$SRCDIR\gameui\modinfo.cpp" \
+								"$SRCDIR\gameui\optionsdialog.cpp"  \
+								"$SRCDIR\gameui\optionssubaudio.cpp" \
+								"$SRCDIR\gameui\optionssubkeyboard.cpp" \
+								"$SRCDIR\gameui\optionssubmouse.cpp" \
+								"$SRCDIR\gameui\optionssubmultiplayer.cpp" \
+								"$SRCDIR\gameui\optionssubvideo.cpp" \
+								"$SRCDIR\gameui\optionssubvoice.cpp" \
+								"$SRCDIR\gameui\urlbutton.cpp" \
+								"$SRCDIR\gameui\vcontrolslistpanel.cpp"
+						
+						{
+							$Configuration
+							{
+								$Compiler
+								{
+									$Create/UsePrecompiledHeader	"Not Using Precompiled Headers"
+								}
+							}
+						}
+					}
+					$Folder "GameUI Header Files"
+					{
+						$File	"$SRCDIR\gameui\bitmapimagepanel.h"
+						$File	"$SRCDIR\gameui\cvarnegatecheckbutton.h"
+						$File	"$SRCDIR\gameui\cvarslider.h"
+						$File	"$SRCDIR\gameui\cvartogglecheckbutton.h"
+						$File	"$SRCDIR\gameui\labeledcommandcombobox.h"
+						$File	"$SRCDIR\gameui\modinfo.h"
+						$File	"$SRCDIR\gameui\optionsdialog.h"
+						$File	"$SRCDIR\gameui\optionssubaudio.h"
+						$File	"$SRCDIR\gameui\optionssubkeyboard.h"
+						$File	"$SRCDIR\gameui\optionssubmouse.h"
+						$File	"$SRCDIR\gameui\optionssubmultiplayer.h"
+						$File	"$SRCDIR\gameui\optionssubvideo.h"
+						$File	"$SRCDIR\gameui\optionssubvoice.h"
+						$File	"$SRCDIR\gameui\urlbutton.h"
+						$File	"$SRCDIR\gameui\vcontrolslistpanel.h"
+					}
+					
+					$File	"zmr\ui\zmr_gameuioptions.cpp"
 					$File	"zmr\ui\zmr_options.cpp"
-					$File	"zmr\ui\zmr_options.h"
 					$File	"zmr\ui\zmr_options_crosshair.cpp"
 					$File	"zmr\ui\zmr_options_crosshair.h"
 					$File	"zmr\ui\zmr_options_general.cpp"
 					$File	"zmr\ui\zmr_options_general.h"
 					$File	"zmr\ui\zmr_options_graphics.cpp"
 					$File	"zmr\ui\zmr_options_graphics.h"
+					//$File	"zmr\ui\zmr_options_keys.cpp"
+					//$File	"zmr\ui\zmr_options_keys.h"
 					$File	"zmr\ui\zmr_options_misc.cpp"
 					$File	"zmr\ui\zmr_options_misc.h"
 					$File	"zmr\ui\zmr_options_tab.cpp"
@@ -243,6 +314,8 @@ $Project "Client (ZMR)"
 					$File	"zmr\ui\zmr_buildmenu_base.h"
 					$File	"zmr\ui\zmr_buildmenu_new.cpp"
 					$File	"zmr\ui\zmr_buildmenu_new.h"
+					$File	"zmr\ui\zmr_buildmenu_spawnicon.cpp"
+					$File	"zmr\ui\zmr_buildmenu_spawnicon.h"
 					$File	"zmr\ui\zmr_cntrlpanel.cpp"
 					$File	"zmr\ui\zmr_cntrlpanel.h"
 					$File	"zmr\ui\zmr_linetool.cpp"
@@ -260,6 +333,7 @@ $Project "Client (ZMR)"
 					$File	"zmr\ui\zmr_zmview_old.h"
 				}
 				
+				$File	"zmr\ui\zmr_credits.cpp"
 				$File	"zmr\ui\zmr_framepanel.cpp"
 				$File	"zmr\ui\zmr_framepanel.h"
 				$File	"zmr\ui\zmr_hud_ammo.cpp"
@@ -293,7 +367,6 @@ $Project "Client (ZMR)"
 				$File	"zmr\ui\zmr_radial.cpp"
 				$File	"zmr\ui\zmr_radial.h"
 				$File	"zmr\ui\zmr_newversion.cpp"
-				$File	"zmr\ui\zmr_newversion.h"
 				$File	"zmr\ui\zmr_resources.cpp"
 				$File	"zmr\ui\zmr_scoreboard.cpp"
 				$File	"zmr\ui\zmr_scoreboard.h"
@@ -308,9 +381,10 @@ $Project "Client (ZMR)"
 				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_basemelee.h"
 				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_basepump.cpp"
 				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_basepump.h"
-				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_carry.cpp"
-				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_carry.h"
-				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_fists.cpp"
+				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_fistscarry.cpp"
+				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_fistscarry.h"
+				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_grabcontroller.cpp"
+				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_grabcontroller.h"
 				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_improvised.cpp"
 				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_mac10.cpp"
 				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_molotov.cpp"
@@ -318,6 +392,7 @@ $Project "Client (ZMR)"
 				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_revolver.cpp"
 				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_rifle.cpp"
 				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_shotgun.cpp"
+				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_shotgun_sporting.cpp"
 				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_sledge.cpp"
 				//$File	"$SRCDIR\game\shared\zmr\weapons\zmr_usercmdvalid.cpp"
 				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_usercmdvalid.h"
@@ -327,11 +402,15 @@ $Project "Client (ZMR)"
 			$File	"zmr\c_zmr_charcircle.cpp"
 			$File	"zmr\c_zmr_charcircle.h"
 			$File	"zmr\c_zmr_clientmode.cpp"
+			$File	"zmr\c_zmr_clientmode.h"
 			$File	"zmr\c_zmr_concommands.cpp"
 			$File	"zmr\c_zmr_crosshair.cpp"
 			$File	"zmr\c_zmr_crosshair.h"
+			$File	"zmr\c_zmr_discord.cpp" [$WIN32]
 			$File	"zmr\c_zmr_entities.cpp"
 			$File	"zmr\c_zmr_entities.h"
+			$File	"zmr\c_zmr_importancesystem.cpp"
+			$File	"zmr\c_zmr_importancesystem.h"
 			$File	"zmr\c_zmr_legacy_objpanel.cpp"
 			$File	"zmr\c_zmr_legacy_objpanel.h"
 			$File	"zmr\c_zmr_player.cpp"
@@ -342,6 +421,12 @@ $Project "Client (ZMR)"
 			$File	"zmr\c_zmr_player_resource.h"
 			$File	"zmr\c_zmr_playeranimevent.cpp"
 			$File	"zmr\c_zmr_playeranimevent.h"
+			$File	"zmr\c_zmr_teamkeys.cpp"
+			$File	"zmr\c_zmr_teamkeys.h"
+			$File	"zmr\c_zmr_tempmodel.cpp"
+			$File	"zmr\c_zmr_tempmodel.h"
+			$File	"zmr\c_zmr_tips.cpp"
+			$File	"zmr\c_zmr_tips.h"
 			$File	"zmr\c_zmr_util.cpp"
 			$File	"zmr\c_zmr_util.h"
 			$File	"zmr\c_zmr_zmvision.cpp"
@@ -354,8 +439,8 @@ $Project "Client (ZMR)"
 			$File	"$SRCDIR\game\shared\zmr\zmr_gamemovement.h"
 			$File	"$SRCDIR\game\shared\zmr\zmr_gamerules.cpp"
 			$File	"$SRCDIR\game\shared\zmr\zmr_gamerules.h"
-			$File	"$SRCDIR\game\shared\zmr\zmr_global_shared.cpp"
-			$File	"$SRCDIR\game\shared\zmr\zmr_global_shared.h"
+			$File	"$SRCDIR\game\shared\zmr\zmr_hiddenspawn.cpp"
+			$File	"$SRCDIR\game\shared\zmr\zmr_hiddenspawn.h"
 			$File	"$SRCDIR\game\shared\zmr\zmr_player_shared.cpp"
 			$File	"$SRCDIR\game\shared\zmr\zmr_player_shared.h"
 			$File	"$SRCDIR\game\shared\zmr\zmr_playeranimstate.cpp"

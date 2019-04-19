@@ -1,0 +1,5 @@
+"VertexLitGeneric"
+{
+	"$basetexture"	"models/Zombie_Classic/chau_facemap"
+	"$halflambert" 1
+}

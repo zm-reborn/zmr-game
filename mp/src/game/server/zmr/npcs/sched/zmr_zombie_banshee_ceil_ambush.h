@@ -156,9 +156,6 @@ public:
 
     virtual void OnAnimActivityInterrupted( Activity newActivity ) OVERRIDE
     {
-        if ( IsDone() )
-            return;
-
         if ( newActivity == ACT_HOVER )
             return;
 
@@ -166,12 +163,7 @@ public:
             return;
 
 
-        End( "Banshee ceiling ambush was interrupted by another activity!" );
-    }
-
-    virtual void OnCommanded( ZombieCommandType_t com ) OVERRIDE
-    {
-        TryEnd( "We were commanded to do something else!" );
+        TryEnd( "Banshee ceiling ambush was interrupted by another activity!" );
     }
 
     virtual void OnLandedGround( CBaseEntity* pEnt ) OVERRIDE
@@ -230,17 +222,31 @@ public:
         }
     }
 
+    virtual void OnCommanded( ZombieCommandType_t com ) OVERRIDE
+    {
+        TryEnd( "We were commanded to do something else!" );
+    }
+
     virtual void OnQueuedCommand( CBasePlayer* pPlayer, ZombieCommandType_t com ) OVERRIDE
     {
-        if ( com == COMMAND_CEILINGAMBUSH && !IsDone() )
+        if ( com == COMMAND_CEILINGAMBUSH )
         {
             GetOuter()->GetCommandQueue()->RemoveCommand( COMMAND_CEILINGAMBUSH );
+        }
+        else
+        {
+            TryEnd( "We were commanded to do something else!" );
         }
     }
 
     virtual NPCR::QueryResult_t IsBusy() const OVERRIDE
     {
-        return (!IsDone() && m_bInLeap) ? NPCR::RES_YES : NPCR::RES_NONE;
+        return m_bInLeap ? NPCR::RES_YES : NPCR::RES_NONE;
+    }
+
+    virtual NPCR::QueryResult_t ShouldChase( CBaseEntity* pEnemy ) const OVERRIDE
+    {
+        return NPCR::RES_NO;
     }
 
     bool IsCeilingFlat( const Vector& plane )

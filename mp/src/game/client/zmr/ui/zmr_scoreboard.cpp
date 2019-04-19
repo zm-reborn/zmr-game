@@ -24,6 +24,7 @@
 
 #include "zmr/zmr_shareddefs.h"
 #include "zmr/zmr_gamerules.h"
+#include "zmr/c_zmr_importancesystem.h"
 
 #include "zmr_listpanel.h"
 #include "zmr_scoreboard.h"
@@ -157,6 +158,9 @@ CZMClientScoreBoardDialog::CZMClientScoreBoardDialog( IViewPort* pViewPort ) : C
 
     m_iVoiceOff = m_pList->AddImage( scheme()->GetImage( "zmr_misc/voice_off", true ) );
     m_iVoiceOn = m_pList->AddImage( scheme()->GetImage( "zmr_misc/voice_on", true ) );
+
+
+    g_ZMImportanceSystem.InitImages();
 }
 
 CZMClientScoreBoardDialog::~CZMClientScoreBoardDialog()
@@ -201,10 +205,12 @@ void CZMClientScoreBoardDialog::OnListLayout( KeyValues* kv )
 void CZMClientScoreBoardDialog::OnRowItemPressed( KeyValues* kv )
 {
 #ifdef _DEBUG
-    DevMsg( "On Row Item Pressed (Scoreboard)\n" );
+    DevMsg( "On Row Item Pressed (Scoreboard) %s\n", kv->GetString( "pressed_name" ) );
 #endif
-    //if ( kv->GetInt( "pressed_index" ) )
-    ToggleVoiceMute( kv->GetInt( m_iPlayerIndexSymbol ) );
+    if ( Q_stricmp( "mutestatus", kv->GetString( "pressed_name" ) ) == 0 )
+    {
+        ToggleVoiceMute( kv->GetInt( m_iPlayerIndexSymbol ) );
+    }
 }
 
 void CZMClientScoreBoardDialog::OnThink()
@@ -551,6 +557,18 @@ void CZMClientScoreBoardDialog::GetPlayerScoreInfo( int playerIndex, KeyValues* 
 
 
     kv->SetInt( "mutestatus", iMuteIcon );
+
+
+    // Importance
+    auto* pImage = g_ZMImportanceSystem.GetPlayerImportanceImageIndex( playerIndex );
+    int iImage = -1;
+
+    if ( pImage )
+    {
+        iImage = m_pList->AddImage( pImage );
+    }
+
+    kv->SetInt( "importance", iImage );
 }
 
 void CZMClientScoreBoardDialog::UpdatePlayerAvatar( int playerIndex, KeyValues* kv )

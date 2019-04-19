@@ -1,0 +1,5 @@
+"VertexLitGeneric"
+{
+	"$basetexture"	"models/Zombie_Classic/lakeetra_facemap"
+	"$halflambert" 1
+}

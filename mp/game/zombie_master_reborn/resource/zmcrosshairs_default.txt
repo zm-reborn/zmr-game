@@ -28,6 +28,17 @@
 		"outlinecolor"	"0 0 0 255"
 		"offsetfromcenter"	"52"
 	}
+	"ShotgunSporting"
+	{
+		"name"	"Over-under"
+		"type"	"material"
+		"material0"	"zmr_crosshairs/hollow_4_small"
+		"dot"	"0"
+		"outline"	"0"
+		"color"	"255 255 255 255"
+		"outlinecolor"	"0 0 0 255"
+		"offsetfromcenter"	"37"
+	}
 	"Mac10"
 	{
 		"name"	"Mac-10"
@@ -83,10 +94,23 @@
 		"color"	"255 255 255 255"
 		"outlinecolor"	"0 0 0 255"
 	}
+	"Hands"
+	{
+		"name"	"Hands"
+		"type"	"dotonly"
+		"dot"	"0"
+		"outline"	"0"
+		"color"	"255 255 255 255"
+		"outlinecolor"	"0 0 0 255"
+	}
 	"Throwable"
 	{
 		"name"	"Throwable"
-		"type"	"none"
+		"type"	"dotonly"
+		"dot"	"0"
+		"outline"	"0"
+		"color"	"255 255 255 255"
+		"outlinecolor"	"0 0 0 255"
 	}
 	"ZM"
 	{

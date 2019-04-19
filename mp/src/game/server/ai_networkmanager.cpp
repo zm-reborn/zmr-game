@@ -26,6 +26,10 @@
 #include "ai_hint.h"
 #include "tier0/icommandline.h"
 
+#ifdef ZMR
+#include "nav_mesh.h"
+#endif
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -1054,6 +1058,13 @@ void CAI_NetworkManager::DelayedInit( void )
 		// ----------------------------------------------------------
 		if (m_bNeedGraphRebuild)
 		{
+#ifdef ZMR // ZMRCHANGE: Don't generate a node graph if we have a nav mesh.
+            if ( TheNavMesh->IsLoaded() )
+            {
+                SetThink( nullptr );
+                return;
+            }
+#endif
 			Assert( !m_bDontSaveGraph );
 
 			BuildNetworkGraph();	// For now only one AI Network

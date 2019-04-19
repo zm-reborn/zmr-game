@@ -1,0 +1,5 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/Zombie_Classic/fem_survivor7"
+	"$halflambert" 1
+}

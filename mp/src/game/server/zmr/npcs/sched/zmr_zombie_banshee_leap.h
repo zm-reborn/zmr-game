@@ -95,7 +95,7 @@ public:
             }
             else
             {
-                End( "Failed to start leap movement!" );
+                TryEnd( "Failed to start leap movement!" );
                 return;
             }
 
@@ -158,9 +158,6 @@ public:
 
     virtual void OnAnimActivityInterrupted( Activity newActivity ) OVERRIDE
     {
-        if ( IsDone() )
-            return;
-
         if ( newActivity == ACT_RANGE_ATTACK1 )
             return;
 
@@ -174,7 +171,7 @@ public:
             return;
 
 
-        End( "Banshee leap was interrupted by another activity!" );
+        TryEnd( "Banshee leap was interrupted by another activity!" );
     }
 
     virtual void OnAnimActivityFinished( Activity completedActivity ) OVERRIDE
@@ -185,7 +182,7 @@ public:
 
             if ( !pOuter->DoAnimationEvent( ZOMBIEANIMEVENT_BANSHEEANIM, ACT_FASTZOMBIE_LEAP_STRIKE ) )
             {
-                End( "Couldn't start the leap strike activity!" );
+                TryEnd( "Couldn't start the leap strike activity!" );
             }
 
             return;
@@ -199,14 +196,34 @@ public:
             GetOuter()->DoAnimationEvent( ZOMBIEANIMEVENT_IDLE );
     }
 
+    virtual NPCR::QueryResult_t IsBusy() const OVERRIDE
+    {
+        return NPCR::RES_YES;
+    }
+
     virtual void OnCommanded( ZombieCommandType_t com ) OVERRIDE
     {
         TryEnd( "We were commanded to do something else!" );
     }
 
-    virtual NPCR::QueryResult_t IsBusy() const OVERRIDE
+    virtual void OnQueuedCommand( CBasePlayer* pPlayer, ZombieCommandType_t com ) OVERRIDE
     {
-        return (!IsDone() && m_bInLeap) ? NPCR::RES_YES : NPCR::RES_NONE;
+        // ZM wants us to do something else.
+        if ( m_bInLeap )
+            return;
+
+
+        if ( pPlayer )
+        {
+            // Check if ZM wants for our attack to be interrupted.
+            int flags = ToZMPlayer( pPlayer )->GetZMCommandInterruptFlags();
+
+            if ( !(flags & ZCO_ATTACK) )
+                return;
+        }
+
+
+        TryEnd( "We were commanded to do something else!" );
     }
 
     void DoLeapStart()

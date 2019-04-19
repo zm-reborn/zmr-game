@@ -366,7 +366,16 @@ void CZMZombieModelGroupSystem::OnZombieSpawn( CZMBaseZombie* pZombie )
                     vSkins.AddToTail( i );
             }
 
-            pZombie->m_nSkin = random->RandomInt( 0, vSkins.Count() - 1 );
+
+            if ( vSkins.Count() > 0 )
+            {
+                pZombie->m_nSkin = vSkins[random->RandomInt( 0, vSkins.Count() - 1 )];
+            }
+            else
+            {
+                pZombie->m_nSkin = 0;
+            }
+
             //pZombie->SetBodygroup()
         }
     }

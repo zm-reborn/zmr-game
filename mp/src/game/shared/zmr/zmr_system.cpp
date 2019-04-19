@@ -75,7 +75,7 @@ void CZMSystem::PostInit()
 #endif
 
     // Server Steam API hasn't been initialized yet.
-#ifdef CLIENT_DLL
+#if defined( CLIENT_DLL ) && !defined( _DEBUG ) && !defined( ZMR_STEAM )
     g_pZMWeb->QueryVersionNumber();
 #endif
 }
@@ -137,8 +137,10 @@ void CZMSystem::LevelInitPostEntity()
         {
             steamgameserverapicontext->Init();
         }
-
+        
+#if !defined( _DEBUG ) && !defined( ZMR_STEAM )
         g_pZMWeb->QueryVersionNumber();
+#endif
     }
 
     CheckSpecialDates();

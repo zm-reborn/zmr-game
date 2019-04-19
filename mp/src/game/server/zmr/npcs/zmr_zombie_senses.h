@@ -14,5 +14,4 @@ public:
 
 
     virtual void OnDamaged( const CTakeDamageInfo& info ) OVERRIDE;
-    virtual void OnHeardSound( CSound* pSound ) OVERRIDE;
 };

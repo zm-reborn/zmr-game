@@ -216,15 +216,26 @@ bool CZMShambler::ShouldPlayIdleSound() const
 float CZMShambler::IdleSound()
 {
     EmitSound( "Zombie.Idle" );
-    return 2.0f;
+    g_flLastZombieSound = gpGlobals->curtime;
+    return random->RandomFloat( 2.0f, 3.0f );
+}
+
+float CZMShambler::PainSound( const CTakeDamageInfo& info )
+{
+    EmitSound( "Zombie.Pain" );
+    g_flLastZombieSound = gpGlobals->curtime;
+    return random->RandomFloat( 3.0f, 5.0f );
 }
 
 void CZMShambler::AlertSound()
 {
     EmitSound( "Zombie.Alert" );
+    g_flLastZombieSound = gpGlobals->curtime;
+    m_flNextIdleSound = m_flNextPainSound = g_flLastZombieSound + 2.0f;
 }
 
 void CZMShambler::DeathSound()
 {
     EmitSound( "Zombie.Die" );
+    g_flLastZombieSound = gpGlobals->curtime;
 }

@@ -4,7 +4,6 @@
 
 #include "player_pickup.h"
 
-#include "ilagcompensationmanager.h"
 #include "predicted_viewmodel.h"
 #include "filesystem.h"
 #include "EntityFlame.h"
@@ -15,9 +14,8 @@
 #include "zmr/zmr_viewmodel.h"
 #include "zmr_entities.h"
 #include "zmr/zmr_gamerules.h"
-#include "zmr/zmr_global_shared.h"
 #include "zmr/zmr_playermodels.h"
-#include "weapons/zmr_carry.h"
+#include "weapons/zmr_fistscarry.h"
 #include "zmr_player.h"
 
 
@@ -681,8 +679,7 @@ void CZMPlayer::GiveDefaultItems()
         EquipSuit( false ); // Don't play "effects" (hand showcase anim)
     
 
-    GiveNamedItem( "weapon_zm_carry" );
-    GiveNamedItem( "weapon_zm_fists" );
+    GiveNamedItem( "weapon_zm_fistscarry" );
 
 
     CZMRules* pRules = ZMRules();
@@ -928,6 +925,35 @@ void CZMPlayer::InitialSpawn()
     GetZMRejoinSystem()->OnPlayerJoin( this );
 }
 
+void CZMPlayer::InitZMFog()
+{
+    auto* pFog = ZMRules()->GetZMFogController();
+    if ( !pFog )
+        return;
+
+    if ( pFog->IsGameCreated() && !CZMEntFogController::IsEnabled() )
+        return;
+
+
+    m_Local.m_PlayerFog.m_hCtrl.Set( pFog );
+
+
+    // Skybox data is separate.
+    {
+        m_Local.m_skybox3d.fog.enable = pFog->m_fog.enable;
+
+        m_Local.m_skybox3d.fog.colorPrimary = m_Local.m_skybox3d.fog.colorSecondary = pFog->m_fog.colorPrimary;
+
+        m_Local.m_skybox3d.fog.start = pFog->m_fog.start;
+        m_Local.m_skybox3d.fog.end = pFog->m_fog.end;
+
+        m_Local.m_skybox3d.fog.maxdensity = pFog->m_fog.maxdensity;
+        m_Local.m_skybox3d.fog.farz = pFog->m_flSkyboxFarZ;
+
+        m_Local.m_skybox3d.fog.lerptime = -1.0f;
+    }
+}
+
 void CZMPlayer::Spawn()
 {
     m_iSpawnInterpCounter = (m_iSpawnInterpCounter + 1) % 8;
@@ -942,6 +968,17 @@ void CZMPlayer::Spawn()
     SetCollisionGroup( COLLISION_GROUP_PLAYER );
 
     CBasePlayer::Spawn();
+
+
+    if ( GetTeamNumber() == ZMTEAM_ZM )
+    {
+        InitZMFog();
+    }
+
+    if ( !m_Local.m_PlayerFog.m_hCtrl.Get() )
+    {
+        m_Local.m_skybox3d.fog.enable = false;
+    }
 
 
     SetTeamSpecificProps();
@@ -1059,35 +1096,6 @@ void CZMPlayer::CreateRagdollEntity()
 
     // ragdolls will be removed on round restart automatically
     m_hRagdoll.Set( pRagdoll );
-}
-
-void CZMPlayer::FireBullets( const FireBulletsInfo_t& info )
-{
-    // Make sure we don't lag compensate twice.
-    // This is called recursively from HandleShotImpactingGlass.
-    if ( !m_bIsFireBulletsRecursive )
-    {
-        // Move ents back to history positions based on local player's lag
-        lagcompensation->StartLagCompensation( this, this->GetCurrentCommand() );
-
-
-        NoteWeaponFired();
-        
-
-        m_bIsFireBulletsRecursive = true;
-        CBaseEntity::FireBullets( info );
-        m_bIsFireBulletsRecursive = false;
-
-
-        // Move ents back to their original positions.
-        lagcompensation->FinishLagCompensation( this );
-    }
-    else
-    {
-        DevMsg( "Called FireBullets recursively!\n" );
-
-        CBaseEntity::FireBullets( info );
-    }
 }
 
 extern ConVar sv_maxunlag;
@@ -1268,6 +1276,21 @@ void CZMPlayer::PickupObject( CBaseEntity *pObject, bool bLimitMassAndSize )
     PlayerAttemptPickup( this, pObject );
 }
 
+bool CZMPlayer::IsHoldingEntity( CBaseEntity *pEnt )
+{
+    // Ask our carrying weapon if we're holding it
+    CZMWeaponHands* pWeapon = static_cast<CZMWeaponHands*>( Weapon_OwnsThisType( "weapon_zm_fistscarry" ) );
+    return pWeapon ? pWeapon->IsCarryingObject( pEnt ) : false;
+}
+
+float CZMPlayer::GetHeldObjectMass( IPhysicsObject *pHeldObject )
+{
+    // Ask our carrying weapon
+    CZMWeaponHands* pWeapon = static_cast<CZMWeaponHands*>( Weapon_OwnsThisType( "weapon_zm_fistscarry" ) );
+
+    return pWeapon ? pWeapon->GetHeldObjectMass() : 0.0f;
+}
+
 void CZMPlayer::SetHandsModel( const char* model )
 {
     if ( !model || !(*model) ) return;
@@ -1332,7 +1355,7 @@ void CZMPlayer::CreateViewModel( int index )
     }
 
 
-    CBaseViewModel* vm = static_cast<CBaseViewModel*>( CreateEntityByName( "predicted_viewmodel" ) );
+    CZMViewModel* vm = static_cast<CZMViewModel*>( CreateEntityByName( "zm_viewmodel" ) );
     
     if ( vm )
     {
@@ -1504,7 +1527,7 @@ CZMBaseWeapon* CZMPlayer::GetWeaponOfHighestSlot()
         return pWep;
 
     // Just default to fists.
-    return ToZMBaseWeapon( Weapon_OwnsThisType( "weapon_zm_fists" ) );
+    return ToZMBaseWeapon( Weapon_OwnsThisType( "weapon_zm_fistscarry" ) );
 }
 
 CZMBaseWeapon* CZMPlayer::GetWeaponOfSlot( int slot )

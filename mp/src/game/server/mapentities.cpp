@@ -19,6 +19,10 @@
 #include "world.h"
 #include "toolframework/iserverenginetools.h"
 
+#ifdef ZMR
+#include "zmr/zmr_mapitemaction.h"
+#endif
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -482,6 +486,8 @@ void MapEntity_ParseAllEntities(const char *pMapData, IMapEntityFilter *pFilter,
 	}
 
 	SpawnHierarchicalList( nEntities, pSpawnList, bActivateEntities );
+    ZMItemAction::g_ZMMapItemSystem.SpawnItems();
+
 
 	delete [] pSpawnMapData;
 	delete [] pSpawnList;
@@ -556,7 +562,12 @@ const char *MapEntity_ParseEntity(CBaseEntity *&pEntity, const char *pEntData, I
 	}
 
 	pEntity = NULL;
+#ifdef ZMR
+    char temp[MAPKEY_MAXLENGTH];
+    if ( !pFilter || (pFilter->ShouldCreateEntity( className ) && !ZMItemAction::g_ZMMapItemSystem.ShouldAffectEntity( entData, temp )) )
+#else
 	if ( !pFilter || pFilter->ShouldCreateEntity( className ) )
+#endif
 	{
 		//
 		// Construct via the LINK_ENTITY_TO_CLASS factory.
@@ -580,6 +591,7 @@ const char *MapEntity_ParseEntity(CBaseEntity *&pEntity, const char *pEntData, I
 	}
 	else
 	{
+#ifndef ZMR // ZMRCHANGE: You really don't need to do this.
 		// Just skip past all the keys.
 		char keyName[MAPKEY_MAXLENGTH];
 		char value[MAPKEY_MAXLENGTH];
@@ -590,6 +602,7 @@ const char *MapEntity_ParseEntity(CBaseEntity *&pEntity, const char *pEntData, I
 			} 
 			while ( entData.GetNextKey(keyName, value) );
 		}
+#endif
 	}
 
 	//

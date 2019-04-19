@@ -1,0 +1,97 @@
+// Make a copy of this and remove '_example'.
+// IMPORTANT: Using this will completely override any actions done in itemactions_default.txt!
+
+
+// Classes:
+//    Weapons:
+//		Weapon
+//		Primary
+//		Secondary
+//		Shotgun
+//		SMG
+//		Rifle
+//		Pistol
+//		BigPistol
+//		Melee
+//    Ammo:
+//		Ammo
+//		RifleAmmo
+//		ShotgunAmmo
+//		SMGAmmo
+//		RifleAmmo
+//		PistolAmmo
+//		BigPistolAmmo
+//
+// Please note that classes are case insensitive
+
+"ItemActions"
+{
+	"Replace"
+	{
+		//
+		// Example: Replacing pistols with revolvers.
+		//
+		// Replace pistols with revolvers.
+		// Also replace pistol ammo with revolver ammo.
+		//
+		//
+		
+		
+		// Name of the action, use for documentation
+		"ReplacePistolsWithRevolvers"
+		{
+			// The class or entity classname to filter by.
+			// In this case we will affect pistols only.
+			"filter_class"		"Pistol"
+			
+			
+			// The class or entity classname to add.
+			"replace"		"BigPistol"
+			
+			
+
+			
+			// This is a sub-action. This will ONLY get run if the parent action was.
+			"ReplacePistolAmmoWithRevolverAmmo"
+			{
+				"filter_class"		"PistolAmmo"
+				
+				"replace"		"BigPistolAmmo"
+			}
+		}
+		
+		
+		
+		//
+		// Example: Replacing a fraction of shotguns with rifles.
+		//
+		// Replace 80% shotguns with rifles every other round (about).
+		// If this is a success, also replace 80% of shotgun ammo with rifle ammo.
+		//
+		//
+		
+		"ReplaceShotgunsWithRifles"
+		{
+			// The chance of this action occuring every round. By default it is 1 (100%). 
+			"chance"		"0.5"
+			
+			
+			"filter_class"		"Shotgun"
+			
+			
+			// The fraction of applicable items to apply this to. By default this is 1 (100%).
+			// In this case we will randomly affect 80% of shotguns
+			"replace_frac"		"0.8"
+			
+			
+			"ReplaceShotgunAmmoWithRifleAmmo"
+			{
+				"filter_class"		"ShotgunAmmo"
+				
+				"replace_frac"		"0.8"
+				
+				"replace"		"RifleAmmo"
+			}
+		}
+	}
+}

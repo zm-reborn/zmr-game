@@ -2,7 +2,7 @@
 
 
 #define ZMR_NAME        "Zombie Master: Reborn"
-#define ZMR_VERSION     "b3"
+#define ZMR_VERSION     "b4"
 
 
 #define ZMR_GAMEDESC    (ZMR_NAME" "ZMR_VERSION)

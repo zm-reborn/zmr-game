@@ -11,6 +11,7 @@ class CZMViewModel : public CPredictedViewModel
 public:
     DECLARE_CLASS( CZMViewModel, CPredictedViewModel );
     DECLARE_NETWORKCLASS();
+    DECLARE_PREDICTABLE();
 
     CZMViewModel();
     ~CZMViewModel();
@@ -19,6 +20,8 @@ public:
     virtual int                 DrawModel( int flags ) OVERRIDE;
     virtual C_BaseAnimating*    FindFollowedEntity() OVERRIDE;
 #endif
+
+    virtual CBaseCombatWeapon* GetOwningWeapon() OVERRIDE;
 
 #ifdef GAME_DLL
     void SetModelColor2( float r, float g, float b ) { m_flClr.Set( 0, r ); m_flClr.Set( 1, g ); m_flClr.Set( 2, b ); };
