@@ -3,20 +3,8 @@
 #include "c_zmr_hat.h"
 
 
-// ZMRTODO: Put this somewhere nice.
-static int UTIL_CreateClientModel( const char* pszModel )
-{
-    int index;
-    index = modelinfo->GetModelIndex( pszModel );
 
-    if ( index == -1 )
-    {
-        // No model found, register our own.
-        index = modelinfo->RegisterDynamicModel( pszModel, true );
-    }
-    
-    return index;
-}
+int UTIL_CreateClientModel( const char* pszModel );
 
 
 // ZMRTODO: If we ever care enough, we need to re-do this completely.

@@ -122,20 +122,44 @@ CBaseEntity* NPCR::CBaseMotor::UpdateGround()
         }
     }
 
+
+    bool bValidPos = true;
+
+    // We hit something!
     if ( tr.fraction < 1.0f && !tr.startsolid )
     {
-        // This ground z offset is used to fix npcs getting stuck to a ceiling.
-        if ( tr.endpos.z > startPos.z )
+        bool bCanStand = CanStandOnNormal( tr.plane.normal );
+
+
+        // NEVER get on a poor normal if we're on good ground.
+        //
+        // This fixes:
+        //
+        // Snapping when the npc is hugging something,
+        // with an absurd normal z, like 0.01. (essentially a straight wall, how did we hit it???)
+        //
+        // Npcs getting stuck on certain slanted surfaces (mostly props)
+        if ( bCanStand || !IsOnGround() )
         {
-            m_flGroundZOffset = tr.endpos.z - startPos.z;
+            GetNPC()->SetPosition( tr.endpos );
         }
-        else m_flGroundZOffset = 0.0f;
-
-
-        GetNPC()->SetPosition( tr.endpos );
-
-        if ( tr.plane.normal.z > GetSlopeLimit() )
+        else
         {
+            // Nope, go back to a valid pos.
+            bValidPos = false;
+        }
+
+
+        if ( bCanStand )
+        {
+            // This ground z offset is used to fix npcs getting stuck to a ceiling.
+            if ( tr.endpos.z > startPos.z )
+            {
+                m_flGroundZOffset = tr.endpos.z - startPos.z;
+            }
+            else m_flGroundZOffset = 0.0f;
+
+
             m_vecGroundNormal = tr.plane.normal;
 
             // We're done being in the air, step trace again.
@@ -146,7 +170,7 @@ CBaseEntity* NPCR::CBaseMotor::UpdateGround()
     }
 
     // This is not a valid position, go back to valid one.
-    if ( tr.startsolid )
+    if ( !bValidPos )
     {
         GetNPC()->SetPosition( m_vecLastValidPos );
 
@@ -355,7 +379,7 @@ Vector NPCR::CBaseMotor::HandleCollisions( const Vector& vecGoal )
 
         // We presumably hit ground, start tracing for steps again.
         // NOTE: Fixes not having a ground ent on moving lifts
-        if ( tr.plane.normal.z >= GetSlopeLimit() )
+        if ( CanStandOnNormal( tr.plane.normal ) )
             m_bDoStepDownTrace = true;
 
         m_bAdjustVel = true;
@@ -409,7 +433,7 @@ Vector NPCR::CBaseMotor::HandleCollisions( const Vector& vecGoal )
 
         // Don't bother going down when we're on ground and there's a slanted wall.
         // This stops npcs getting stuck in the ground.
-        if (tr.plane.normal.z < GetSlopeLimit()
+        if (!CanStandOnNormal( tr.plane.normal )
         &&  IsOnGround() )
         //&&  fullMove.z > 0.0f )
         {

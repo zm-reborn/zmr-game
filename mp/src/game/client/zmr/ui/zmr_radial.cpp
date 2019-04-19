@@ -380,6 +380,13 @@ void CZMRadialPanel::OnMousePressed( MouseCode code )
     }
 }
 
+// OnMousePressed is actually never fired for double presses.
+// The effect is "missing" clicks which is incredibly annoying.
+void CZMRadialPanel::OnMouseDoublePressed( MouseCode code )
+{
+	OnMousePressed(code);
+}
+
 void CZMRadialPanel::OnThink()
 {
     if ( !IsVisible() ) return;

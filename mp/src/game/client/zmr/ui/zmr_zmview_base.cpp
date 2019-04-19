@@ -6,18 +6,27 @@
 #include "input.h"
 #include "clienteffectprecachesystem.h"
 #include "fx_quad.h"
+#include "IGameUIFuncs.h"
 
 #include "zmr/npcs/zmr_zombiebase_shared.h"
 #include "zmr/c_zmr_util.h"
+#include "zmr/c_zmr_clientmode.h"
+#include "zmr/zmr_hiddenspawn.h"
+#include "zmr/c_zmr_tempmodel.h"
 #include "zmr_zmview_base.h"
 
 
+
+#define TEMPHIDDENSPAWN_MODEL           "models/zombie/zm_classic_01.mdl"
 
 
 CZMViewBase* g_pZMView = nullptr;
 
 
+ConVar zm_cl_zmview_hiddenspawneffect( "zm_cl_zmview_hiddenspawneffect", "1", FCVAR_ARCHIVE );
 ConVar zm_cl_zmview_doubleclick( "zm_cl_zmview_doubleclick", "0.4", FCVAR_ARCHIVE );
+
+ConVar zm_cl_zmview_switchmousebuttons( "zm_cl_zmview_switchmousebuttons", "0", FCVAR_ARCHIVE );
 
 
 ConVar zm_cl_poweruser_boxselect( "zm_cl_poweruser_boxselect", "0", FCVAR_ARCHIVE, "Select zombies through walls with box select." );
@@ -66,7 +75,7 @@ public:
 
 CON_COMMAND( zm_observermode, "" )
 {
-    if ( g_pZMView )
+    if ( g_pZMView && CZMViewBase::UsesZMView() )
     {
         bool state = !g_pZMView->IsVisible();
 
@@ -77,8 +86,19 @@ CON_COMMAND( zm_observermode, "" )
     }
 }
 
+CON_COMMAND( zm_hiddenspawn, "" )
+{
+    if ( g_pZMView && CZMViewBase::UsesZMView() )
+    {
+        g_pZMView->SetClickMode( ZMCLICKMODE_HIDDEN );
+    }
+}
+
+
 CZMViewBase::CZMViewBase( const char* pElementName ) : CHudElement( pElementName ), CZMFramePanel( g_pClientMode->GetViewport(), pElementName )
 {
+    SetScheme( vgui::scheme()->LoadSchemeFromFile( "resource/ClientScheme.res", "ClientScheme" ) );
+
     // Proportional doesn't stretch with widescreen anyway
     SetProportional( false );
     SetBounds( 0, 0, ScreenWidth(), ScreenHeight() );
@@ -101,12 +121,22 @@ CZMViewBase::CZMViewBase( const char* pElementName ) : CHudElement( pElementName
 
     m_BoxSelect = new CZMBoxSelect( this );
     m_LineTool = new CZMLineTool( this );
+
+
+    m_pTempHiddenZombie = nullptr;
+    m_flLastHiddenSpawnUpdate = 0.0f;
+
+
+    m_hCursorFont = vgui::scheme()->GetIScheme( GetScheme() )->GetFont( "ZMCursorFont" );
+    m_wszHiddenSpawnTxt[0] = NULL;
 }
 
 CZMViewBase::~CZMViewBase()
 {
     delete m_BoxSelect;
     delete m_LineTool;
+
+    delete m_pTempHiddenZombie;
 }
 
 void CZMViewBase::LevelInit()
@@ -179,6 +209,21 @@ bool CZMViewBase::IsDraggingRight() const
     return m_bDraggingRight;
 }
 
+bool CZMViewBase::UseSwitchedButtons() const
+{
+    return zm_cl_zmview_switchmousebuttons.GetBool();
+}
+
+MouseCode CZMViewBase::SwitchMouseButtons( MouseCode code )
+{
+    switch ( code )
+    {
+        case MOUSE_LEFT : return MOUSE_RIGHT;
+        case MOUSE_RIGHT : return MOUSE_LEFT;
+        default : return code;
+    }
+}
+
 void CZMViewBase::CloseChildMenus()
 {
 
@@ -205,6 +250,9 @@ void CZMViewBase::SetVisible( bool state )
 
 
     HideMouseTools();
+
+
+    FreeTempHiddenZombie();
 }
 
 bool CZMViewBase::IsVisible()
@@ -227,6 +275,12 @@ void CZMViewBase::OnCursorMoved( int x, int y )
 
 void CZMViewBase::OnMouseReleased( MouseCode code )
 {
+    if ( UseSwitchedButtons() )
+    {
+        code = SwitchMouseButtons( code );
+    }
+
+
     switch ( code )
     {
     case MOUSE_RIGHT :
@@ -245,7 +299,26 @@ void CZMViewBase::OnMouseReleased( MouseCode code )
 
 void CZMViewBase::OnMousePressed( MouseCode code )
 {
+    // HACK: We don't use these buttons, so pass them through to engine.
+    if ( code != MOUSE_LEFT && code != MOUSE_RIGHT )
+    {
+        const char* binding = gameuifuncs->GetBindingForButtonCode( code );
+        if ( binding && *binding )
+        {
+            engine->ClientCmd_Unrestricted( binding );
+        }
+
+        return;
+    }
+
+
     CloseChildMenus();
+
+
+    if ( UseSwitchedButtons() )
+    {
+        code = SwitchMouseButtons( code );
+    }
 
 
     switch ( code )
@@ -262,6 +335,13 @@ void CZMViewBase::OnMousePressed( MouseCode code )
     }
 }
 
+// OnMousePressed is actually never fired for double presses.
+// The effect is "missing" clicks which is incredibly annoying.
+void CZMViewBase::OnMouseDoublePressed( MouseCode code )
+{
+    OnMousePressed( code );
+}
+
 void CZMViewBase::OnMouseWheeled( int delta )
 {
     BaseClass::OnMouseWheeled( delta );
@@ -271,6 +351,35 @@ void CZMViewBase::OnMouseWheeled( int delta )
     
     if ( pPlayer )
         pPlayer->SetMouseWheelMove( (float)delta );
+}
+
+void CZMViewBase::Paint()
+{
+    if ( GetClickMode() == ZMCLICKMODE_HIDDEN )
+    {
+        int mx, my;
+        
+        if ( IsMouseInputEnabled() )
+        {
+            ::input->GetFullscreenMousePos( &mx, &my );
+        }
+        else
+        {
+            mx = ScreenWidth() / 2;
+            my = ScreenHeight() / 2;
+        }
+
+
+        mx += 16;
+
+        if ( m_wszHiddenSpawnTxt[0] != NULL )
+        {
+            surface()->DrawSetTextPos( mx, my );
+            surface()->DrawSetTextColor( m_HiddenSpawnTxtColor );
+            surface()->DrawSetTextFont( m_hCursorFont );
+            surface()->DrawUnicodeString( m_wszHiddenSpawnTxt );
+        }
+    }
 }
 
 void CZMViewBase::OnThink()
@@ -346,9 +455,58 @@ void CZMViewBase::OnThink()
             engine->ClientCmd( "-lookdown" );
         }
     }
+
+
+
+    if ( GetClickMode() == ZMCLICKMODE_HIDDEN )
+    {
+        int mx, my;
+        
+        if ( IsMouseInputEnabled() )
+        {
+            ::input->GetFullscreenMousePos( &mx, &my );
+        }
+        else
+        {
+            mx = ScreenWidth() / 2;
+            my = ScreenHeight() / 2;
+        }
+
+        UpdateHiddenSpawnSpot( mx, my );
+    }
+    else
+    {
+        FreeTempHiddenZombie();
+    }
 }
 
+// Return -1 to pass through.
+int CZMViewBase::ZMKeyInput( ButtonCode_t keynum, int down )
+{
+    // We only care about number keys right now.
+    bool bNumber = keynum >= KEY_0 && keynum <= KEY_9;
+    bool bNumpad = keynum >= KEY_PAD_0 && keynum <= KEY_PAD_9;
 
+    if ( !bNumber && !bNumpad )
+        return -1;
+
+
+    auto* pBuild = GetBuildMenu();
+    auto* pMani = GetManiMenu();
+    if ( pBuild && pBuild->IsVisible() )
+    {
+        pBuild->ZMKeyInput( keynum, down );
+        return 0;
+    }
+
+    if ( pMani && pMani->IsVisible() )
+    {
+        // Nothing for mani right now
+        return 0;
+    }
+
+    return -1;
+}
 
 void CZMViewBase::OnLeftClick()
 {
@@ -436,9 +594,7 @@ void CZMViewBase::OnLeftRelease()
     ::input->GetFullscreenMousePos( &mx, &my );
 
     m_BoxSelect->SetEnd( mx, my );
-    
 
-    C_BasePlayer* pPlayer = C_BasePlayer::GetLocalPlayer();
 
     // If our box is too small then don't use it.
     if ( m_BoxSelect->ShouldSelect() )
@@ -447,11 +603,12 @@ void CZMViewBase::OnLeftRelease()
         m_BoxSelect->GetBox( &i, &j, &k, &l );
 
         
-        FindZombiesInBox( i, j, k, l, (pPlayer && pPlayer->m_nButtons & IN_DUCK) ? true : false );
+        
+        FindZombiesInBox( i, j, k, l, GetZMClientMode()->IsZMHoldingCtrl() );
     }
     else
     {
-        FindZMObject( mx, my, (pPlayer && pPlayer->m_nButtons & IN_DUCK) ? true : false );
+        FindZMObject( mx, my, GetZMClientMode()->IsZMHoldingCtrl() );
     }
 }
 
@@ -700,7 +857,22 @@ void CZMViewBase::FindZMObject( int x, int y, bool bSticky )
 
         if ( pZombie )
         {
+            // We clicked on a zombie.
+
+            // If we have already selected this zombie,
+            // check if the player wants to select of type.
+            bool bSelectOfType = pZombie->GetSelectorIndex() == GetLocalPlayerIndex();
+            float flLastSelect = pZombie->GetLastLocalSelect();
+
+
             ZMClientUtil::SelectSingleZombie( pZombie, bSticky );
+
+            if (bSelectOfType
+            &&  (gpGlobals->curtime - flLastSelect) <= GetDoubleClickDelta() )
+            {
+                SelectZombiesOfType( pZombie->GetZombieClass(), true );
+            }
+
 
             bHit = true;
             return;
@@ -712,9 +884,44 @@ void CZMViewBase::FindZMObject( int x, int y, bool bSticky )
         ZMClientUtil::DeselectAllZombies();
 }
 
+void CZMViewBase::SelectZombiesOfType( ZombieClass_t zclass, bool bSticky )
+{
+    Vector screen;
+    trace_t tr;
+    CTraceFilterNoNPCsOrPlayer filter( nullptr, COLLISION_GROUP_NONE );
+
+    CUtlVector<C_ZMBaseZombie*> vZombies;
+    
+    int myindex = GetLocalPlayerIndex();
 
 
+    g_ZombieManager.ForEachAliveZombie( [ &vZombies, &tr, &filter, &screen, &myindex ]( C_ZMBaseZombie* pZombie )
+    {
+        if ( pZombie->GetSelectorIndex() == myindex )
+            return;
 
+
+        int x, y;
+        // Do we see the mad man?
+        if ( !zm_cl_poweruser_boxselect.GetBool() )
+        {
+            UTIL_TraceZMView( &tr, pZombie->GetAbsOrigin() + Vector( 0, 0, 8 ), MASK_ZMVIEW, &filter );
+
+            if ( tr.fraction != 1.0f && !tr.startsolid ) return;
+        }
+
+        if ( !ZMClientUtil::WorldToScreen( pZombie->GetAbsOrigin(), screen, x, y ) )
+            return;
+
+        if ( x > 0 && x < ScreenWidth() && y > 0 && y < ScreenHeight() )
+        {
+            vZombies.AddToTail( pZombie );
+        }
+    } );
+
+
+    ZMClientUtil::SelectZombies( vZombies, bSticky );
+}
 
 void CZMViewBase::TraceScreenToWorld( int mx, int my, trace_t* res, CTraceFilterSimple* filter, int mask )
 {
@@ -748,6 +955,108 @@ void CZMViewBase::TraceScreenToWorld( int mx, int my, trace_t* res, CTraceFilter
 
     UTIL_TraceZMView( res, MainViewOrigin() + ray * MAX_COORD_FLOAT, mask, filter, pPlayer );
 }
+
+bool CZMViewBase::UsesZMView()
+{
+    if ( !g_pZMView )
+        return false;
+
+    auto* pPlayer = C_ZMPlayer::GetLocalPlayer();
+    return pPlayer && pPlayer->IsZM();
+}
+
+const char* CZMViewBase::GetTempHiddenSpawnModel( ZombieClass_t zclass ) const
+{
+    return TEMPHIDDENSPAWN_MODEL;
+}
+
+C_ZMTempModel* CZMViewBase::CreateTempHiddenZombie() const
+{
+    auto* pTemp = new C_ZMTempModel;
+
+    pTemp->Initialize( GetTempHiddenSpawnModel( ZMCLASS_SHAMBLER ) );
+    pTemp->SetRenderColorA( 100 );
+    pTemp->SetRenderMode( kRenderTransColor );
+
+    return pTemp;
+}
+
+void CZMViewBase::FreeTempHiddenZombie()
+{
+    delete m_pTempHiddenZombie;
+    m_pTempHiddenZombie = nullptr;
+}
+
+void CZMViewBase::UpdateHiddenSpawnSpot( int mx, int my )
+{
+    // Don't update every frame
+    if ( (gpGlobals->curtime - m_flLastHiddenSpawnUpdate) < 0.05f )
+        return;
+
+
+    m_flLastHiddenSpawnUpdate = gpGlobals->curtime;
+
+
+    m_wszHiddenSpawnTxt[0] = NULL;
+
+
+    trace_t tr;
+    CTraceFilterNoNPCsOrPlayer filter( nullptr, COLLISION_GROUP_NONE );
+    TraceScreenToWorld( mx, my, &tr, &filter, MASK_ZMCREATE );
+
+
+    if ( tr.fraction == 1.0f )
+        return;
+
+
+    // Create a temporary model to visualize the zombie.
+    if ( !m_pTempHiddenZombie && zm_cl_zmview_hiddenspawneffect.GetBool() )
+    {
+        m_pTempHiddenZombie = CreateTempHiddenZombie();
+    }
+            
+
+    auto* pLocal = C_ZMPlayer::GetLocalPlayer();
+
+
+    // Update the effect.
+    if ( m_pTempHiddenZombie )
+    {
+        QAngle ang = pLocal->GetAbsAngles();
+        ang.x = ang.z = 0.0f;
+
+
+        m_pTempHiddenZombie->SetAbsOrigin( tr.endpos );
+        m_pTempHiddenZombie->SetAbsAngles( ang );
+    }
+
+
+    // Get the hidden spawn data.
+    int rescost = -1;
+
+    auto res = g_ZMHiddenSpawn.Spawn( ZMCLASS_SHAMBLER, pLocal, tr.endpos, &rescost );
+
+
+    m_HiddenSpawnTxtColor = Color( 255, 0, 0, 255 );
+
+    switch ( res )
+    {
+    case HSERROR_OK :
+        //V_wcsncpy( buf, L"OK", sizeof( buf ) );
+        V_snwprintf( m_wszHiddenSpawnTxt, sizeof( m_wszHiddenSpawnTxt ), L"Cost: %i", rescost );
+        break;
+    //case HSERROR_TOOCLOSE :
+    //case HSERROR_CANSEE :
+    //case HSERROR_NOTENOUGHRES :
+    //case HSERROR_NOTENOUGHPOP :
+    //case HSERROR_BADCLASS :
+    default :
+        m_HiddenSpawnTxtColor[0] = 150;
+        V_wcsncpy( m_wszHiddenSpawnTxt, L"X", sizeof( m_wszHiddenSpawnTxt ) );
+        break;
+    }
+}
+
 
 void UTIL_TraceZMView( trace_t* trace, Vector endpos, int mask, CTraceFilterSimple* filter, C_BaseEntity* pEnt, int collisionGroup )
 {

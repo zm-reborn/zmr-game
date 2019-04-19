@@ -131,6 +131,11 @@ void CZMBanshee::Spawn()
     BaseClass::Spawn();
 }
 
+CZMBansheeMotor* CZMBanshee::GetBansheeMotor() const
+{
+    return static_cast<CZMBansheeMotor*>( GetMotor() );
+}
+
 NPCR::CPathCostGroundOnly* CZMBanshee::GetPathCost() const
 {
     static NPCR::CPathCostGroundOnly* cost = nullptr;
@@ -157,6 +162,14 @@ void CZMBanshee::OnNavJump()
     //SetActivity( ACT_JUMP );
 
     BaseClass::OnNavJump();
+}
+
+NPCR::QueryResult_t CZMBanshee::ShouldChase( CBaseEntity* pEnemy ) const
+{
+    if ( GetBansheeMotor()->IsInNavJump() )
+        return NPCR::RES_NO;
+
+    return BaseClass::ShouldChase( pEnemy );
 }
 
 bool CZMBanshee::IsAttacking() const
@@ -397,14 +410,17 @@ void CZMBanshee::AlertSound()
 void CZMBanshee::DeathSound()
 {
     EmitSound( "NPC_FastZombie.Die" );
+    g_flLastZombieSound = gpGlobals->curtime;
 }
 
 void CZMBanshee::ClawImpactSound( bool bHit )
 {
     EmitSound( bHit ? "NPC_FastZombie.AttackHit" : "NPC_FastZombie.AttackMiss" );
+    g_flLastZombieSound = gpGlobals->curtime;
 }
 
 void CZMBanshee::LeapAttackSound()
 {
     EmitSound( "NPC_FastZombie.LeapAttack" );
+    g_flLastZombieSound = gpGlobals->curtime;
 }

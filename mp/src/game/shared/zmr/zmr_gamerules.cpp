@@ -28,17 +28,7 @@
 extern CAmmoDef* GetAmmoDef();
 #endif
 
-ConVar zm_sv_popcost_shambler( "zm_sv_popcost_shambler", "1", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE );
-ConVar zm_sv_popcost_banshee( "zm_sv_popcost_banshee", "6", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE );
-ConVar zm_sv_popcost_hulk( "zm_sv_popcost_hulk", "5", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE );
-ConVar zm_sv_popcost_drifter( "zm_sv_popcost_drifter", "2", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE );
-ConVar zm_sv_popcost_immolator( "zm_sv_popcost_immolator", "8", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE );
 
-ConVar zm_sv_cost_shambler( "zm_sv_cost_shambler", "10", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE );
-ConVar zm_sv_cost_banshee( "zm_sv_cost_banshee", "60", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE );
-ConVar zm_sv_cost_hulk( "zm_sv_cost_hulk", "70", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE );
-ConVar zm_sv_cost_drifter( "zm_sv_cost_drifter", "35", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE );
-ConVar zm_sv_cost_immolator( "zm_sv_cost_immolator", "100", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE );
 
 ConVar zm_sv_resource_max( "zm_sv_resource_max", "5000", FCVAR_NOTIFY | FCVAR_REPLICATED );
 
@@ -54,9 +44,6 @@ static ConVar zm_sv_reward_zombiekill( "zm_sv_reward_zombiekill", "200", FCVAR_N
 static ConVar zm_sv_reward_kill( "zm_sv_reward_kill", "100", FCVAR_NOTIFY | FCVAR_ARCHIVE, "How many resources ZM gets when a human dies." );
 #endif
 
-ConVar zm_sv_spawndelay( "zm_sv_spawndelay", "0.6", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE, "How frequently zombie spawns spawn zombies." );
-
-ConVar zm_sv_happyzombies( "zm_sv_happyzombies", "0", FCVAR_REPLICATED, "Happy, happy zombies :)" );
 
 
 static CZMViewVectors g_ZMViewVectors(
@@ -137,6 +124,7 @@ static const char* g_PreserveEnts[] =
 
     "zm_objectives_manager",
     "zm_viewmodel",
+    "env_fog_controller_zm",
 
     "vote_controller",
 
@@ -320,7 +308,23 @@ void CZMRules::CreateStandardEntities()
 
 void CZMRules::LevelInitPostEntity()
 {
+    CZMBaseZombie::g_flLastZombieSound = 0.0f;
+
     BaseClass::LevelInitPostEntity();
+
+
+    // Find / create ZM fog entity.
+    CZMEntFogController* pEnt = static_cast<CZMEntFogController*>( gEntList.FindEntityByClassname( nullptr, "env_fog_controller_zm" ) );
+
+    if ( !pEnt )
+    {
+        pEnt = static_cast<CZMEntFogController*>( CBaseEntity::Create( "env_fog_controller_zm", vec3_origin, vec3_angle ) );
+        pEnt->SetGameCreated();
+    }
+    
+
+    Assert( pEnt );
+    m_pZMFog = pEnt;
 }
 #endif
 
@@ -597,7 +601,7 @@ bool CZMRules::CanHaveAmmo( CBaseCombatCharacter* pPlayer, int iAmmoIndex )
 
     // Do we have enough room?
     int room = GetAmmoDef()->MaxCarry( iAmmoIndex ) - pPlayer->GetAmmoCount( iAmmoIndex );
-    if ( room > 0 && room > (pWep->GetDropAmmoAmount() * 0.5f) )
+    if ( room > 0 )
     {
         return true;
     }
@@ -1188,6 +1192,13 @@ void CZMRules::ResetWorld()
     RestoreMap();
 
 
+
+    // Reset ZM fog in case the values were updated.
+    if ( GetZMFogController() )
+    {
+        GetZMFogController()->InitFog();
+    }
+
     // Reset our loadout distribution.
     if ( GetLoadoutEnt() )
     {
@@ -1310,6 +1321,24 @@ void CZMRules::RestoreMap()
     // DO NOT CALL SPAWN ON info_node ENTITIES!
 
     MapEntity_ParseAllEntities( engine->GetMapEntitiesString(), &filter, true );
+}
+
+void CZMRules::PlayerSpawn( CBasePlayer* pPlayer )
+{
+    auto* pZMPlayer = ToZMPlayer( pPlayer );
+    if ( !pZMPlayer->IsHuman() )
+        return;
+
+
+    // Fire game_player_equip
+
+    CBaseEntity* pEquip = nullptr;
+
+
+    while ( (pEquip = gEntList.FindEntityByClassname( pEquip, "game_player_equip" )) != nullptr )
+    {
+        pEquip->Touch( pPlayer );
+    }
 }
 
 static ConVar zm_sv_resource_rate( "zm_sv_resource_rate", "5", FCVAR_NOTIFY );

@@ -114,7 +114,7 @@ public:
         CZMCommandBase* pQueued = pOuter->GetCommandQueue()->NextCommand();
         if ( pQueued )
         {
-            if ( IsBusy() != NPCR::RES_YES )
+            if ( pOuter->IsBusy() != NPCR::RES_YES )
             {
                 bool bRes = true;
 
@@ -143,6 +143,11 @@ public:
         GetOuter()->LostEnemy();
     }
 
+    virtual void OnQueuedCommand( CBasePlayer* pPlayer, ZombieCommandType_t com ) OVERRIDE
+    {
+        m_pPath->Invalidate();
+    }
+
     virtual void OnChase( CBaseEntity* pEnt ) OVERRIDE
     {
         m_pPath->Invalidate();
@@ -151,9 +156,6 @@ public:
     virtual NPCR::QueryResult_t ShouldChase( CBaseEntity* pEnemy ) const OVERRIDE
     {
         CZMBaseZombie* pOuter = GetOuter();
-
-        if ( (gpGlobals->curtime - pOuter->GetLastTimeCommanded()) < 1.0f )
-            return NPCR::RES_NO;
 
         if ( pOuter->GetZombieMode() == ZOMBIEMODE_AMBUSH )
             return NPCR::RES_NO;
@@ -164,6 +166,12 @@ public:
         }
 
         return NPCR::RES_NONE;
+    }
+
+    // Wait for us to finish before doing something else.
+    virtual NPCR::QueryResult_t IsBusy() const OVERRIDE
+    {
+        return m_pPath->IsValid() ? NPCR::RES_YES : NPCR::RES_NONE;
     }
 
     bool Command( const Vector& vecPos )
@@ -222,7 +230,7 @@ public:
 
 
         CZMBaseZombie* pOuter = GetOuter();
-
+        pOuter->UpdateLastTimeCommanded();
             
         pOuter->SetSwatObject( pEnt );
 

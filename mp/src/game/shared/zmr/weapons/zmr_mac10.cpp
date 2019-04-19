@@ -41,13 +41,13 @@ public:
 
 
 
-    virtual const Vector& GetBulletSpread( void ) OVERRIDE
+    virtual const Vector& GetBulletSpread() OVERRIDE
     {
-        static Vector cone = VECTOR_CONE_2DEGREES;
+        static Vector cone = VECTOR_CONE_4DEGREES;
         return cone;
     }
     
-    virtual void AddViewKick( void ) OVERRIDE
+    virtual void AddViewKick() OVERRIDE
     {
 #define	EASY_DAMPEN			0.5f
 #define	MAX_VERTICAL_KICK	2.0f	// Degrees
@@ -56,7 +56,7 @@ public:
 	    DoMachineGunKick( EASY_DAMPEN, MAX_VERTICAL_KICK, m_fFireDuration, SLIDE_LIMIT );
     }
     
-    virtual float GetFireRate( void ) OVERRIDE { return 0.066f; };
+    virtual float GetFireRate() OVERRIDE { return 0.06f; };
 };
 
 IMPLEMENT_NETWORKCLASS_ALIASED( ZMWeaponMac10, DT_ZM_WeaponMac10 )

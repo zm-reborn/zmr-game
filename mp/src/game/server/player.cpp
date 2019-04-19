@@ -6538,6 +6538,7 @@ bool CBasePlayer::ClientCommand( const CCommand &args )
 		return true;
 	}
 
+#ifndef ZMR
 	else if ( stricmp( cmd, "spec_goto" ) == 0 ) // chase next player
 	{
 		if ( ( GetObserverMode() == OBS_MODE_FIXED ||
@@ -6559,6 +6560,7 @@ bool CBasePlayer::ClientCommand( const CCommand &args )
 		
 		return true;
 	}
+#endif
 	else if ( stricmp( cmd, "playerperf" ) == 0 )
 	{
 		int nRecip = entindex();

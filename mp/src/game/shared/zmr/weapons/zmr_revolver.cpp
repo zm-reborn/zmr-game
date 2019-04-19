@@ -43,7 +43,7 @@ public:
     int GetDropAmmoAmount() const OVERRIDE { return SIZE_ZMAMMO_REVOLVER; }
 #endif
 
-    virtual const Vector& GetBulletSpread( void ) OVERRIDE
+    virtual const Vector& GetBulletSpread() OVERRIDE
     {
         static Vector cone = Vector( 0.0f, 0.0f, 0.0f );
 
@@ -82,25 +82,26 @@ public:
     virtual float GetAccuracyIncreaseRate() const OVERRIDE { return 2.9f; }
     virtual float GetAccuracyDecreaseRate() const OVERRIDE { return 5.1f; }
 
+    virtual int GetMaxPenetrations() const OVERRIDE { return 1; }
+
     
-    virtual void AddViewKick( void ) OVERRIDE;
+    virtual void AddViewKick() OVERRIDE;
 
     virtual void PrimaryAttack() OVERRIDE;
     virtual void PrimaryAttackEffects() OVERRIDE;
     virtual void SecondaryAttack() OVERRIDE;
 
-    virtual void Shoot() OVERRIDE;
     
-    virtual float GetFireRate( void ) OVERRIDE { return 1.0f; }
+    virtual float GetFireRate() OVERRIDE { return 1.0f; }
 
     void ItemPostFrame() OVERRIDE;
 
     void HandleAnimEventRevolver();
 
 #ifndef CLIENT_DLL
-    void Operator_HandleAnimEvent( animevent_t*, CBaseCombatCharacter* ) OVERRIDE;
+    void Operator_HandleAnimEvent( animevent_t* pEvent, CBaseCombatCharacter* pOperator ) OVERRIDE;
 #else
-    bool OnFireEvent( C_BaseViewModel*, const Vector&, const QAngle&, int event, const char* ) OVERRIDE;
+    bool OnFireEvent( C_BaseViewModel* pViewModel, const Vector& origin, const QAngle& angles, int event, const char* options ) OVERRIDE;
 #endif
 
 protected:
@@ -235,11 +236,6 @@ void CZMWeaponRevolver::ItemPostFrame()
     }
 }
 
-void CZMWeaponRevolver::Shoot()
-{
-    BaseClass::Shoot();
-}
-
 void CZMWeaponRevolver::PrimaryAttackEffects()
 {
     CZMPlayer* pPlayer = GetPlayerOwner();
@@ -268,7 +264,7 @@ void CZMWeaponRevolver::HandleAnimEventRevolver()
 }
 
 #ifndef CLIENT_DLL
-void CZMWeaponRevolver::Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCharacter *pOperator )
+void CZMWeaponRevolver::Operator_HandleAnimEvent( animevent_t* pEvent, CBaseCombatCharacter* pOperator )
 {
 	switch( pEvent->event )
 	{

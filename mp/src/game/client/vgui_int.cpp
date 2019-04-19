@@ -33,8 +33,8 @@
 #endif
 
 #ifdef ZMR
-#include "zmr/ui/zmr_options.h"
-#include "zmr/ui/zmr_newversion.h"
+#include "zmr/ui/menu/zmr_mainmenu.h"
+#include "zmr/ui/menu/zmr_loadingbg.h"
 #endif
 
 using namespace vgui;
@@ -227,18 +227,18 @@ void VGui_CreateGlobalPanels( void )
 #endif
 
 #ifdef ZMR
-    VPANEL parent = enginevgui->GetPanel( PANEL_GAMEUIDLL );
-
-    g_pZMOptionsMenu->Create( parent );
-    g_pZMNewVerMenuInt->Create( parent );
+    g_pZMMainMenu->Create( NULL );
+    //g_pZMLoadingUI->Create( NULL );
+    ZMOverrideGameUI();
+    //ZMOverrideLoadingUI();
 #endif
 }
 
 void VGui_Shutdown()
 {
 #ifdef ZMR
-    g_pZMOptionsMenu->Destroy();
-    g_pZMNewVerMenuInt->Destroy();
+    g_pZMMainMenu->Destroy();
+    //g_pZMLoadingUI->Destroy();
 #endif
 
 	VGUI_DestroyClientDLLRootPanel();

@@ -103,8 +103,8 @@ public:
     DECLARE_DATADESC();
 
 
-    void Spawn( void ) OVERRIDE;
-    void Precache( void ) OVERRIDE;
+    void Spawn() OVERRIDE;
+    void Precache() OVERRIDE;
 
     void MolotovTouch( CBaseEntity* pOther );
     void MolotovThink();
@@ -127,7 +127,7 @@ END_DATADESC()
 
 LINK_ENTITY_TO_CLASS( grenade_molotov, CZMGrenadeMolotov );
 
-void CZMGrenadeMolotov::Precache( void )
+void CZMGrenadeMolotov::Precache()
 {
     PrecacheModel( "models/weapons/molotov3rd_zm.mdl" );
 
@@ -135,7 +135,7 @@ void CZMGrenadeMolotov::Precache( void )
     PrecacheScriptSound( "Grenade_Molotov.Detonate2" );
 }
 
-void CZMGrenadeMolotov::Spawn( void )
+void CZMGrenadeMolotov::Spawn()
 {
     Precache();
 
@@ -329,15 +329,15 @@ public:
 #endif
 
 
-    void Precache( void ) OVERRIDE;
+    void Precache() OVERRIDE;
     void PrimaryAttack() OVERRIDE;
-    void Equip( CBaseCombatCharacter* ) OVERRIDE;
+    void Equip( CBaseCombatCharacter* pCharacter ) OVERRIDE;
     bool Deploy() OVERRIDE;
-    bool CanHolster( void ) const OVERRIDE { return m_iThrowState < MOLOTOVSTATE_DRAWBACK && m_iThrowState >= MOLOTOVSTATE_IDLE; }
+    bool CanHolster() const OVERRIDE { return m_iThrowState < MOLOTOVSTATE_DRAWBACK && m_iThrowState >= MOLOTOVSTATE_IDLE; }
     bool CanBeDropped() const OVERRIDE { return CanHolster(); }
     
 #ifndef CLIENT_DLL
-    void Drop( const Vector& ) OVERRIDE;
+    void Drop( const Vector& vecVelocity ) OVERRIDE;
 #endif
     
     void ItemPostFrame() OVERRIDE;
@@ -347,7 +347,7 @@ public:
     
 
     void Throw( CZMPlayer* pPlayer );
-    void GetThrowPos( CZMPlayer* pPlayer, Vector& );
+    void GetThrowPos( CZMPlayer* pPlayer, Vector& outpos );
 };
 
 IMPLEMENT_NETWORKCLASS_ALIASED( ZMWeaponMolotov, DT_ZM_WeaponMolotov )
@@ -403,7 +403,7 @@ CZMWeaponMolotov::CZMWeaponMolotov()
 #endif
 }
 
-void CZMWeaponMolotov::Precache( void )
+void CZMWeaponMolotov::Precache()
 {
     BaseClass::Precache();
     

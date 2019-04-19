@@ -12,6 +12,8 @@
 
 
 
+class C_ZMTempModel;
+
 
 #define MASK_ZMVIEW             ( CONTENTS_SOLID | CONTENTS_MOVEABLE ) // When testing box select.
 #define MASK_ZMSELECTUSABLE     ( MASK_SOLID & ~(CONTENTS_WINDOW|CONTENTS_GRATE) ) // When left clicking (not setting rallypoint, etc.)
@@ -49,6 +51,7 @@ public:
     virtual bool ShouldDraw() OVERRIDE;
 
     // Panel
+    virtual void Paint() OVERRIDE;
     virtual void OnThink() OVERRIDE;
     virtual void SetVisible( bool visible ) OVERRIDE;
     virtual bool IsVisible() OVERRIDE; // Need to override some functions to make them public
@@ -56,13 +59,23 @@ private:
     virtual void OnCursorMoved( int x, int y ) OVERRIDE;
     virtual void OnMouseReleased( MouseCode code ) OVERRIDE;
     virtual void OnMousePressed( MouseCode code ) OVERRIDE;
+    virtual void OnMouseDoublePressed( MouseCode code ) OVERRIDE;
     virtual void OnMouseWheeled( int delta ) OVERRIDE;
 public:
 
 
+    virtual int ZMKeyInput( ButtonCode_t keynum, int down );
 
     virtual void CloseChildMenus();
     virtual void HideMouseTools();
+
+    void UpdateHiddenSpawnSpot( int mx, int my );
+    const char* GetTempHiddenSpawnModel( ZombieClass_t zclass ) const;
+private:
+    float m_flLastHiddenSpawnUpdate;
+    wchar_t m_wszHiddenSpawnTxt[64];
+    Color m_HiddenSpawnTxtColor;
+public:
 
 
     virtual CZMBuildMenuBase* GetBuildMenu() { return nullptr; }
@@ -81,10 +94,13 @@ public:
     bool IsDraggingLeft() const;
     bool IsDraggingRight() const;
 
+    bool UseSwitchedButtons() const;
+
 
 
     static void TraceScreenToWorld( int mx, int my, trace_t* res, CTraceFilterSimple* filter, int mask );
 
+    static bool UsesZMView();
 
 protected:
 
@@ -100,12 +116,22 @@ protected:
     void FindZombiesInBox( int start_x, int start_y, int end_x, int end_y, bool bSticky );
     void FindZMObject( int x, int y, bool bSticky );
 
+    void SelectZombiesOfType( ZombieClass_t zclass, bool bSticky );
     void DoMoveLine();
 
 
 
     CZMBoxSelect* GetBoxSelect() const { return m_BoxSelect; }
     CZMLineTool* GetLineTool() const { return m_LineTool; }
+
+
+    C_ZMTempModel* CreateTempHiddenZombie() const;
+    void FreeTempHiddenZombie();
+
+    MouseCode SwitchMouseButtons( MouseCode code );
+
+
+    C_ZMTempModel* m_pTempHiddenZombie;
 
 private:
     ZMClickMode_t m_iClickMode;
@@ -120,6 +146,9 @@ private:
 
     bool m_bDraggingLeft;
     bool m_bDraggingRight;
+
+
+    vgui::HFont m_hCursorFont;
 
 
     // Client mode will call some of our functions.

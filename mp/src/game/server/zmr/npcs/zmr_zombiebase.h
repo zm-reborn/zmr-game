@@ -70,6 +70,7 @@ public:
 
     virtual bool ShouldUpdate() const OVERRIDE;
 
+    virtual NPCR::QueryResult_t ShouldChase( CBaseEntity* pEnemy ) const OVERRIDE;
     virtual NPCR::QueryResult_t ShouldTouch( CBaseEntity* pEnt ) const OVERRIDE;
 
 
@@ -101,7 +102,9 @@ public:
 
     // Sounds
     virtual bool ShouldPlayIdleSound() const;
+    virtual bool ShouldPlayPainSound( const CTakeDamageInfo& info ) const;
     virtual float IdleSound() { return 0.0f; } // Return delay for the next idle sound.
+    virtual float PainSound( const CTakeDamageInfo& info ) { return 0.0f; }
     virtual void AlertSound() {}
     virtual void DeathSound() {}
 
@@ -116,6 +119,7 @@ public:
     static const char*      ClassToName( ZombieClass_t zclass );
     static int              GetPopCost( ZombieClass_t zclass );
     static int              GetCost( ZombieClass_t zclass );
+    static float            GetSpawnDelay( ZombieClass_t zclass );
     static bool             HasEnoughPopToSpawn( ZombieClass_t zclass );
     int                     GetSelectorIndex() const;
     CZMPlayer*              GetSelector() const;
@@ -126,6 +130,7 @@ public:
     int                     GetCost() const;
     bool                    DoAnimationEvent( int iEvent, int nData = 0 );
     virtual int             GetAnimationRandomSeed() OVERRIDE;
+    virtual bool            CanBePenetrated() const;
 protected:
     void                    SetZombieClass( ZombieClass_t zclass );
 
@@ -222,9 +227,14 @@ public:
         const Vector* vecDir = nullptr );
 
 
+    static float g_flLastZombieSound;
+
 protected:
     CZMZombieAnimState* GetAnimState() const { return m_pAnimState; }
 
+
+    float m_flNextIdleSound;
+    float m_flNextPainSound;
 
 private:
     float m_flNextAttack;
@@ -262,8 +272,6 @@ private:
 
     float m_flBurnDamage;
     float m_flBurnDamageTime;
-
-    float m_flNextIdleSound;
 
 
 public:

@@ -32,9 +32,10 @@ class CZMBaseWeapon : public CBaseCombatWeapon, public CZMUserCmdHitWepValidator
 {
 public:
 	DECLARE_CLASS( CZMBaseWeapon, CBaseCombatWeapon );
-	DECLARE_NETWORKCLASS(); 
+	DECLARE_NETWORKCLASS();
+#ifdef CLIENT_DLL
 	DECLARE_PREDICTABLE();
-#ifndef CLIENT_DLL
+#else
     DECLARE_DATADESC();
 #endif
 
@@ -46,13 +47,29 @@ public:
 #else
     virtual void Precache() OVERRIDE;
 #endif
+
+    virtual void ItemPostFrame() OVERRIDE;
+
+    virtual bool Deploy() OVERRIDE;
+    virtual bool DefaultDeploy();
+
+    virtual Activity GetPrimaryAttackActivity() OVERRIDE;
+    //virtual Activity GetSecondaryAttackActivity() OVERRIDE;
+    virtual Activity GetDrawActivity() OVERRIDE;
+    virtual Activity GetIdleActivity() const;
+
+    virtual void WeaponIdle() OVERRIDE;
+
+    bool DefaultReload( int iClipSize1, int iClipSize2, int iActivity );
+    virtual	void CheckReload() OVERRIDE;
     virtual bool Reload() OVERRIDE;
     // NOTE: Always use this to get the damage from .txt file.
-    virtual void FireBullets( const FireBulletsInfo_t &info ) OVERRIDE;
-    virtual void FireBullets( int numShots, int iAmmoType );
+    virtual void FireBullets( const FireBulletsInfo_t& info ) OVERRIDE;
+    virtual void FireBullets( int numShots, int iAmmoType, float flMaxDist );
     virtual void PrimaryAttack() OVERRIDE;
-    virtual void Shoot();
+    virtual void Shoot( int iAmmoType = -1, int nBullets = -1, int nAmmo = -1, float flMaxRange = -1.0f, bool bUseClip1 = true, bool bSecondaryEffects = false );
     virtual void PrimaryAttackEffects();
+    virtual void SecondaryAttackEffects();
     virtual void SecondaryAttack() OVERRIDE;
     
     const CZMWeaponInfo& GetWpnData() const;
@@ -67,9 +84,11 @@ public:
     virtual void    GetGlowEffectColor( float& r, float& g, float& b ) OVERRIDE;
     void            UpdateGlow();
 
-    virtual bool    GlowOccluded() OVERRIDE { return false; };
-    virtual bool    GlowUnoccluded() OVERRIDE { return true; };
+    virtual bool    GlowOccluded() OVERRIDE { return false; }
+    virtual bool    GlowUnoccluded() OVERRIDE { return true; }
 
+
+    virtual ShadowType_t ShadowCastType() OVERRIDE;
 
     virtual void OnDataChanged( DataUpdateType_t ) OVERRIDE;
     virtual bool ShouldPredict() OVERRIDE;
@@ -78,9 +97,9 @@ public:
 
     virtual void SetWeaponVisible( bool visible ) OVERRIDE;
 
-    void WeaponSound( WeaponSound_t, float soundtime = 0.0f ) OVERRIDE;
+    void WeaponSound( WeaponSound_t sound_type, float soundtime = 0.0f ) OVERRIDE;
 
-    void DoMachineGunKick( float, float, float, float );
+    void DoMachineGunKick( float dampEasy, float maxVerticleKickAngle, float fireDurationTime, float slideLimitTime );
 
 #ifdef CLIENT_DLL
     virtual CZMBaseCrosshair* GetWeaponCrosshair() const { return nullptr; }
@@ -89,8 +108,8 @@ public:
     // How many bullets we fire per one "bullet", or clip "unit".
     virtual int GetBulletsPerShot() const { return 1; }
 
-    virtual int GetMinBurst( void ) OVERRIDE { return 1; }
-    virtual int GetMaxBurst( void ) OVERRIDE { return 1; }
+    virtual int GetMinBurst() OVERRIDE { return 1; }
+    virtual int GetMaxBurst() OVERRIDE { return 1; }
     
 #ifndef CLIENT_DLL
     // Volume = distance
@@ -100,27 +119,27 @@ public:
 
     virtual bool IsTemplate() OVERRIDE;
 
-    virtual void Materialize( void ) OVERRIDE;
+    virtual void Materialize() OVERRIDE;
 #endif
     // Makes our weapons not cry about spawning.
-    virtual void FallInit( void );
+    virtual void FallInit();
     // Override this so our guns don't disappear.
-    virtual void SetPickupTouch( void ) OVERRIDE;
-    virtual bool CanBeSelected( void ) OVERRIDE;
+    virtual void SetPickupTouch() OVERRIDE;
+    virtual bool CanBeSelected() OVERRIDE;
     // Never let anybody tell you're not beautiful even without any ammo, alright?
     // Let us always select this weapon even when we don't have any ammo for it.
-    virtual bool AllowsAutoSwitchFrom( void ) const OVERRIDE { return false; }
-    virtual void Drop( const Vector& ) OVERRIDE;
+    virtual bool AllowsAutoSwitchFrom() const OVERRIDE { return false; }
+    virtual void Drop( const Vector& vecVelocity ) OVERRIDE;
 
     // Add weapon slot flag.
-    virtual void Equip( CBaseCombatCharacter* ) OVERRIDE;
+    virtual void Equip( CBaseCombatCharacter* pCharacter ) OVERRIDE;
 
 
     // Viewmodel/misc stuff
-    float   CalcViewmodelBob( void ) OVERRIDE;
-    void    AddViewmodelBob( CBaseViewModel*, Vector&, QAngle& ) OVERRIDE;
-    Vector  GetBulletSpread( WeaponProficiency_t ) OVERRIDE;
-    float   GetSpreadBias( WeaponProficiency_t ) OVERRIDE;
+    float   CalcViewmodelBob() OVERRIDE;
+    void    AddViewmodelBob( CBaseViewModel* pVM, Vector& origin, QAngle& angles ) OVERRIDE;
+    Vector  GetBulletSpread( WeaponProficiency_t proficiency ) OVERRIDE;
+    float   GetSpreadBias( WeaponProficiency_t proficiency ) OVERRIDE;
 
     const WeaponProficiencyInfo_t*          GetProficiencyValues() OVERRIDE;
     static const WeaponProficiencyInfo_t*   GetDefaultProficiencyValues();
@@ -132,12 +151,25 @@ public:
     virtual bool    IsInReload() const { return const_cast<CZMBaseWeapon*>( this )->CanReload() && m_bInReload; }
     virtual bool    CanAct() const; // Can we reload/attack?
 
+    virtual void IncrementClip();
+    virtual bool ShouldIncrementClip() const;
+    virtual void CancelReload();
+    virtual bool ShouldCancelReload() const;
+    virtual void StopReload();
+
+    // We have animations for when the gun is empty?
+    virtual bool UsesDryActivity( Activity act );
+
 
     // ZMRTODO: Use config to load these.
     virtual float   GetAccuracyIncreaseRate() const { return 2.0f; }
     virtual float   GetAccuracyDecreaseRate() const { return 2.0f; }
 
-    float           GetFirstInstanceOfAnimEventTime( int iSeq, int iAnimEvent ) const;
+    virtual float   GetPenetrationDmgMult() const { return 1.0f; }
+    virtual int     GetMaxPenetrations() const { return 0; }
+    virtual float   GetMaxPenetrationDist() const { return 16.0f; }
+
+    float           GetFirstInstanceOfAnimEventTime( int iSeq, int iAnimEvent, bool bReturnOption = false ) const;
 
 
     inline int GetSlotFlag() const { return m_iSlotFlag; }
@@ -154,8 +186,8 @@ public:
     
 protected:
 #ifndef CLIENT_DLL
-    void SaveReserveAmmo( CBaseCombatCharacter* );
-    void TransferReserveAmmo( CBaseCombatCharacter* );
+    void SaveReserveAmmo( CBaseCombatCharacter* pOwner );
+    void TransferReserveAmmo( CBaseCombatCharacter* pOwner );
     // No support for secondary ammo since we'll never use it anyway, RIGHT?
     int m_nReserveAmmo;
 
@@ -164,6 +196,7 @@ protected:
     // Client side hit reg stuff
     virtual float GetMaxDamageDist( ZMUserCmdValidData_t& data ) const OVERRIDE;
     virtual int GetMaxUserCmdBullets( ZMUserCmdValidData_t& data ) const OVERRIDE;
+    virtual int GetMaxNumPenetrate( ZMUserCmdValidData_t& data ) const OVERRIDE;
 
 
     inline int GetOverrideDamage() const { return m_nOverrideDamage; }
@@ -180,6 +213,10 @@ private:
     int             m_nOverrideDamage;
 #endif
     CNetworkVar( int, m_nOverrideClip1 );
+
+
+    CNetworkVar( float, m_flNextClipFillTime );
+    CNetworkVar( bool, m_bCanCancelReload );
 };
 
 inline CZMBaseWeapon* ToZMBaseWeapon( CBaseEntity* pEnt )

@@ -2,7 +2,13 @@
 
 #include "soundent.h"
 
+#include "npcr_path_cost.h"
+#include "npcr_path_follow.h"
+
 #include "zmr_zombie_chase.h"
+
+
+ConVar zm_sv_zombie_threat_investigation_dist( "zm_sv_zombie_threat_investigation_maxdist", "700" );
 
 
 class CombatSchedule : public NPCR::CSchedule<CZMBaseZombie>
@@ -12,13 +18,29 @@ private:
 
     Vector m_vecFaceTowards;
     CountdownTimer m_FaceTimer;
+    CountdownTimer m_NextThreat;
+
+
     CountdownTimer m_NextEnemyScan;
+
+    // For checking a potential threat
+    NPCR::CFollowNavPath m_Path;
+    NPCR::CPathCostGroundOnly m_PathCost;
+    CountdownTimer m_NextMove;
+
+
+    CHandle<CBaseEntity> m_hLastEnemy;
+    float m_flLastAlertSoundTime;
 public:
     CombatSchedule()
     {
         m_vecFaceTowards = vec3_origin;
 
         m_pChaseSched = new ChaseSched;
+
+
+        m_hLastEnemy.Set( nullptr );
+        m_flLastAlertSoundTime = 0.0f;
     }
 
     ~CombatSchedule()
@@ -30,13 +52,17 @@ public:
 
     virtual void OnStart() OVERRIDE
     {
-            
     }
 
     virtual void OnContinue() OVERRIDE
     {
         m_FaceTimer.Invalidate();
+        m_NextThreat.Invalidate();
+
         m_NextEnemyScan.Invalidate();
+
+        m_Path.Invalidate();
+        m_NextMove.Invalidate();
     }
 
     virtual void OnUpdate() OVERRIDE
@@ -54,16 +80,34 @@ public:
         }
 
 
-        // Face towards possible danger.
-        bool bCanMove = (pOuter->IsBusy() != NPCR::RES_YES && !pOuter->GetMotor()->IsMoving());
+        
+        bool bCanMove = pOuter->IsBusy() != NPCR::RES_YES;
 
-        if ( bCanMove && m_FaceTimer.HasStarted() && !m_FaceTimer.IsElapsed() )
+        if ( bCanMove )
         {
-            pOuter->GetMotor()->FaceTowards( m_vecFaceTowards );
-
-            if ( pOuter->GetMotor()->IsFacing( m_vecFaceTowards, 10.0f ) )
+            // Face towards possible danger.
+            if ( !pOuter->GetMotor()->IsMoving() && m_FaceTimer.HasStarted() && !m_FaceTimer.IsElapsed() )
             {
-                m_FaceTimer.Invalidate();
+                pOuter->GetMotor()->FaceTowards( m_vecFaceTowards );
+
+                if ( pOuter->GetMotor()->IsFacing( m_vecFaceTowards, 10.0f ) )
+                {
+                    m_FaceTimer.Invalidate();
+                }
+            }
+
+
+            // If we have a path, use that instead.
+            if ( m_Path.IsValid() )
+            {
+                m_Path.Update( pOuter );
+            }
+        }
+        else
+        {
+            if ( m_Path.IsValid() )
+            {
+                m_Path.Invalidate();
             }
         }
 
@@ -87,12 +131,26 @@ public:
             {
                 pOuter->AcquireEnemy( pEnemy );
 
+                CBaseEntity* pLastEnemy = m_hLastEnemy.Get();
+
                 if ( !pOldEnemy )
                 {
-                    pOuter->AlertSound();
+                    // Don't spam alert sound if we recently played it.
+                    float quietTime = pLastEnemy == pEnemy ? 12.0f : 5.0f;
+
+                    if ( (m_flLastAlertSoundTime+quietTime) < gpGlobals->curtime )
+                    {
+                        pOuter->AlertSound();
+
+                        m_flLastAlertSoundTime = gpGlobals->curtime;
+                    }
 
                     pOuter->RemoveSpawnFlags( SF_NPC_GAG );
                 }
+
+
+                m_hLastEnemy.Set( pEnemy );
+                
 
                 Intercept( m_pChaseSched, "We see a potential enemy!" );
                 return;
@@ -123,11 +181,141 @@ public:
 
     virtual void OnHeardSound( CSound* pSound ) OVERRIDE
     {
-        // Try to look for any enemies.
-        if ( !GetOuter()->GetEnemy() && !m_FaceTimer.HasStarted() && pSound->IsSoundType( SOUND_COMBAT | SOUND_PLAYER ) )
+        auto* pOuter = GetOuter();
+
+        // Try to look for any enemies we can hear.
+        if ( !pOuter->GetEnemy() && ShouldCareAboutThreat() && pSound->IsSoundType( SOUND_COMBAT | SOUND_PLAYER ) )
         {
-            m_vecFaceTowards = pSound->GetSoundReactOrigin();
-            m_FaceTimer.Start( 2.0f );
+            const Vector sndOrigin = pSound->GetSoundReactOrigin();
+            
+            
+            
+            bool bFaceSound =
+                // We should be able to see that location, just turn around.
+                pOuter->GetSenses()->CanSee( sndOrigin )
+                // If we can't see it, and we're in offensive mode, try moving there.
+            ||  (pOuter->GetZombieMode() != ZOMBIEMODE_OFFENSIVE || !GotoThreatPosition( sndOrigin ));
+
+            if ( bFaceSound )
+            {
+                m_vecFaceTowards = sndOrigin;
+                m_FaceTimer.Start( 2.0f );
+                m_NextThreat.Start( 5.0f );
+
+                if ( IsDebugging() )
+                    Msg( "Facing zombie %i towards sound.\n", pOuter->entindex() );
+            }
         }
+    }
+
+    virtual void OnCommanded( ZombieCommandType_t com ) OVERRIDE
+    {
+        OnContinue();
+
+        // We were command to do something else,
+        // don't care about threats for a while.
+        m_NextThreat.Start( 3.0f );
+        // Definitely don't move for a while!
+        m_NextMove.Start( 6.0f );
+    }
+
+    virtual void OnQueuedCommand( CBasePlayer* pPlayer, ZombieCommandType_t com ) OVERRIDE
+    {
+        OnContinue();
+    }
+
+    bool ShouldCareAboutThreat() const
+    {
+        // We're currently trying to face towards something, not now!
+        if ( m_FaceTimer.HasStarted() && !m_FaceTimer.IsElapsed() )
+            return false;
+
+        return !m_NextThreat.HasStarted() || m_NextThreat.IsElapsed();
+    }
+
+    bool GotoThreatPosition( const Vector& vecEnd )
+    {
+        if ( !m_NextMove.IsElapsed() )
+            return false;
+
+
+        CZMBaseZombie* pOuter = GetOuter();
+
+
+        // Don't bother investigating if we're moving right now.
+        if ( pOuter->IsMoving() )
+            return false;
+
+
+        const Vector vecStart = pOuter->GetAbsOrigin();
+
+
+        float flInvestigationDist = zm_sv_zombie_threat_investigation_dist.GetFloat();
+
+        if ( vecStart.DistTo( vecEnd ) > flInvestigationDist )
+        {
+            if ( IsDebugging() )
+                Msg( "Investigation sound origin for %i is too far away!\n", pOuter->entindex() );
+
+            return false;
+        }
+
+
+
+        CNavArea* start = TheNavMesh->GetNearestNavArea( vecStart, true, 10000.0f, true );
+        CNavArea* goal = TheNavMesh->GetNearestNavArea( vecEnd, true, 10000.0f, true );
+
+
+        m_PathCost = *pOuter->GetPathCost();
+        m_PathCost.SetStepHeight( pOuter->GetMotor()->GetStepHeight() );
+
+        m_PathCost.SetStartPos( vecStart, start );
+        m_PathCost.SetGoalPos( vecEnd, goal );
+
+
+        m_Path.Compute( vecStart, vecEnd, start, goal, m_PathCost );
+        if ( !m_Path.IsValid() )
+        {
+            if ( IsDebugging() )
+                Msg( "Couldn't compute combat check path!\n" );
+            return false;
+        }
+
+
+        float flPathLength = m_Path.ComputeLength();
+
+        if ( flPathLength > flInvestigationDist )
+        {
+            if ( IsDebugging() )
+                Msg( "Investigation path for %i is too long! (%.1f)\n", pOuter->entindex(), flPathLength );
+            
+            m_Path.Invalidate();
+
+            // Don't attempt this path again for a while, it sounds expensive.
+            m_NextMove.Start( 2.0f );
+
+            return false;
+        }
+
+
+        pOuter->SetCurrentPath( &m_Path );
+
+        // We don't need to get too close
+        m_Path.SetGoalTolerance( 72.0f );
+
+
+
+        if ( IsDebugging() )
+            Msg( "Moving zombie %i towards sound.\n", pOuter->entindex() );
+
+
+        m_FaceTimer.Invalidate();
+
+        // Don't recompute this path again for a while.
+        m_NextMove.Start( 2.0f );
+        m_NextThreat.Start( 8.0f );
+
+
+        return true;
     }
 };

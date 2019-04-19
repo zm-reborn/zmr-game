@@ -104,6 +104,11 @@ void CZMHudSpectatorUI::Reset()
     }
 }
 
+bool CZMHudSpectatorUI::ShouldDraw()
+{
+    return CHudElement::ShouldDraw() && !engine->IsLevelMainMenuBackground();
+}
+
 bool CZMHudSpectatorUI::IsVisible()
 {
     return BaseClass::IsVisible();
@@ -268,7 +273,9 @@ bool CZMHudSpectatorUI::UpdateTargetText()
     }
     else
     {
-        g_pVGuiLocalize->ConvertANSIToUnicode( pszName, buffer, sizeof( buffer ) );
+        char safeName[128];
+        UTIL_MakeSafeName( pszName, safeName, sizeof( safeName ) );
+        g_pVGuiLocalize->ConvertANSIToUnicode( safeName, buffer, sizeof( buffer ) );
     }
     
     m_pNameLabel->SetText( buffer );

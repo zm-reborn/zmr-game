@@ -1,5 +1,6 @@
 #include "cbase.h"
 #include "in_buttons.h"
+#include "eventlist.h"
 
 #ifndef CLIENT_DLL
 #include "items.h"
@@ -55,7 +56,7 @@ bool CZMBasePumpWeapon::Holster( CBaseCombatWeapon* pSwitchTo )
     return res;
 }
 
-void CZMBasePumpWeapon::PrimaryAttack( void )
+void CZMBasePumpWeapon::PrimaryAttack()
 {
     if ( !CanAct() ) return;
 
@@ -65,7 +66,7 @@ void CZMBasePumpWeapon::PrimaryAttack( void )
     BaseClass::PrimaryAttack();
 }
 
-void CZMBasePumpWeapon::ItemPostFrame( void )
+void CZMBasePumpWeapon::ItemPostFrame()
 {
     if ( IsInReload() )
     {
@@ -107,12 +108,19 @@ void CZMBasePumpWeapon::Pump()
     // Finish reload animation
     SendWeaponAnim( GetPumpAct() );
     
-    float delay = SequenceDuration();
-    pOwner->m_flNextAttack = gpGlobals->curtime + delay;
-    m_flNextPrimaryAttack = gpGlobals->curtime + delay;
+
+    float flSeqTime = SequenceDuration();
+
+    float flReadyTime = GetFirstInstanceOfAnimEventTime( GetSequence(), (int)AE_WPN_PRIMARYATTACK, true );
+    if ( flReadyTime == -1.0f )
+        flReadyTime = flSeqTime;
+
+    
+    pOwner->m_flNextAttack = gpGlobals->curtime + flReadyTime;
+    m_flNextPrimaryAttack = m_flNextSecondaryAttack = gpGlobals->curtime + flReadyTime;
 }
 
-void CZMBasePumpWeapon::CheckReload( void )
+void CZMBasePumpWeapon::CheckReload()
 {
     if ( !CanAct() )
     {
@@ -122,56 +130,10 @@ void CZMBasePumpWeapon::CheckReload( void )
         return;
     }
 
-    // Override singly reload mechanic.
-    if ( m_bReloadsSingly && m_bInReload && (m_flNextPrimaryAttack <= gpGlobals->curtime) )
-    {
-        CZMPlayer* pOwner = GetPlayerOwner();
-        if ( !pOwner )
-            return;
-
-
-        // If out of ammo, end reload
-        if ( pOwner->GetAmmoCount( m_iPrimaryAmmoType ) <= 0 )
-        {
-            FinishReload();
-        }
-        // If clip not full, reload again
-        else if ( m_iClip1 < GetMaxClip1() )
-        {
-            // Add them to the clip
-            m_iClip1 += 1;
-            pOwner->RemoveAmmo( 1, m_iPrimaryAmmoType );
-
-
-            if ( ShouldCancelReload() )
-            {
-                // Make sure we don't attack instantly when stopping the reload.
-                StopReload();
-
-                // Add a bit more time.
-                m_flNextPrimaryAttack += 0.1f;
-                m_flNextSecondaryAttack += 0.1f;
-
-                return;
-            }
-
-            Reload();
-        }
-        // Clip full, stop reloading
-        else
-        {
-            FinishReload();
-            m_flNextPrimaryAttack	= gpGlobals->curtime;
-            m_flNextSecondaryAttack = gpGlobals->curtime;
-        }
-
-        return;
-    }
-
     BaseClass::CheckReload();
 }
 
-void CZMBasePumpWeapon::StartReload( void )
+void CZMBasePumpWeapon::StartReload()
 {
     if ( m_iReloadState != RELOADSTATE_NONE ) return;
 
@@ -223,10 +185,11 @@ void CZMBasePumpWeapon::StopReload()
     
     m_iReloadState = RELOADSTATE_NONE;
 
-    m_bInReload = false;
+
+    BaseClass::StopReload();
 }
 
-void CZMBasePumpWeapon::FinishReload( void )
+void CZMBasePumpWeapon::FinishReload()
 {
     BaseClass::FinishReload();
 
@@ -234,17 +197,16 @@ void CZMBasePumpWeapon::FinishReload( void )
     StopReload();
 }
 
-bool CZMBasePumpWeapon::Reload( void )
+bool CZMBasePumpWeapon::Reload()
 {
-    if ( m_iReloadState != RELOADSTATE_RELOADING )
+    if ( m_iReloadState == RELOADSTATE_NONE )
     {
-        if ( m_bNeedPump ) return false;
-
-        if ( m_iReloadState == RELOADSTATE_NONE )
+        if ( !m_bNeedPump )
         {
             StartReload();
-            return false;
         }
+
+        return false;
     }
 
     bool res = BaseClass::Reload();
@@ -252,6 +214,10 @@ bool CZMBasePumpWeapon::Reload( void )
     if ( res )
     {
         m_iReloadState = RELOADSTATE_RELOADING;
+    }
+    else if ( m_iReloadState != RELOADSTATE_NONE )
+    {
+        StopReload();
     }
 
     return res;
@@ -265,15 +231,26 @@ bool CZMBasePumpWeapon::IsInReload() const
     return BaseClass::IsInReload();
 }
 
+void CZMBasePumpWeapon::CancelReload()
+{
+    StopReload();
+}
+
 bool CZMBasePumpWeapon::ShouldCancelReload() const
 {
-    if ( m_iClip1 <= 0 )
-        return false;
-    
     CZMPlayer* pOwner = GetPlayerOwner();
     if  ( !pOwner )
         return false;
 
+    if ( pOwner->GetAmmoCount( m_iPrimaryAmmoType ) <= 0 )
+        return true;
 
-    return pOwner->m_nButtons & (IN_ATTACK | IN_ATTACK2) || m_bCancelReload;
+    if ( m_bCancelReload )
+    {
+        // Starting or we just ended reloading.
+        return  m_iReloadState == RELOADSTATE_START
+            ||  (m_flNextPrimaryAttack <= gpGlobals->curtime && m_iClip1 < GetMaxClip1());
+    }
+
+    return false;
 }

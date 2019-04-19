@@ -1,6 +1,7 @@
 #include "cbase.h"
 #include <vgui/ILocalize.h>
 
+#include "zmr_buildmenu_spawnicon.h"
 #include "zmr_imagerow.h"
 #include "zmr_radial.h"
 #include "zmr_buildmenu_new.h"
@@ -11,18 +12,18 @@
 using namespace vgui;
 
 
-static void SortZMQueueImages( Panel* pPanel, CUtlVector<CZMPlaceImage*>* pImages )
+static void SortZMQueueImages( Panel* pPanel, CUtlVector<CZMImageRowItem*>* pImages )
 {
     int size = pPanel->GetWide() > pPanel->GetTall() ? pPanel->GetTall() : pPanel->GetWide();
     int cx = size / 2;
     int cy = size / 2;
-    size = size / 2 - 40;
+    size = size / 2 - 32;
 
     float dir = -90.0f;
     float jump = 360.0f / 10.0f; // Update if queue sizes can be changed.
     for ( int i = 0; i < pImages->Count(); i++ )
     {
-        CZMPlaceImage* pImage = pImages->Element( i );
+        auto* pItem = pImages->Element( i );
 
         float vx, vy;
         int w, h;
@@ -31,11 +32,16 @@ static void SortZMQueueImages( Panel* pPanel, CUtlVector<CZMPlaceImage*>* pImage
         vx = cos( rad );
         vy = sin( rad );
 
-        pImage->GetSize( w, h );
-        pImage->SetPos( cx + vx * size - w / 2, cy + vy * size - h / 2 );
+        pItem->GetSize( w, h );
+        pItem->SetPos( cx + vx * size - w / 2, cy + vy * size - h / 2 );
 
         dir = AngleNormalize( dir + jump );
     }
+}
+
+static CZMImageRowItem* CreateRowItem( Panel* pParent )
+{
+    return new CZMImageRowItemSpawn( pParent, "" );
 }
 
 
@@ -64,6 +70,7 @@ CZMBuildMenuNew::CZMBuildMenuNew( Panel* pParent ) : CZMBuildMenuBase( pParent, 
     Assert( m_pImageList );
     m_pImageList->SetImagesSize( 32 );
     m_pImageList->SetLayoutFunc( SortZMQueueImages );
+    m_pImageList->SetCreateFunc( CreateRowItem );
 
 
     const char* queueImages[ZMCLASS_MAX] = {
@@ -248,22 +255,48 @@ void CZMBuildMenuNew::ShowMenu( C_ZMEntZombieSpawn* pSpawn )
     BaseClass::ShowMenu( pSpawn );
 }
 
-void CZMBuildMenuNew::UpdateQueue( const int queue[], int size )
+void CZMBuildMenuNew::UpdateQueue( const ZMQueueSlotData_t queue[], int size )
 {
     // Recreate the queue.
-    m_pImageList->RemoveImages();
+    char buf[64];
+
 
     for ( int i = 0; i < size; i++ )
     {
-        const ZombieClass_t type = (ZombieClass_t)queue[i];
+        ZombieClass_t zclass = queue[i].zclass;
+        int count = queue[i].nCount;
 
-        if ( C_ZMBaseZombie::IsValidClass( type ) )
+        Assert( C_ZMBaseZombie::IsValidClass( zclass ) );
+
+
+        auto* pImg = m_pQueueImages[(int)zclass];
+
+        int index = i;
+        CZMImageRowItemSpawn* pItem = static_cast<CZMImageRowItemSpawn*>( m_pImageList->GetItemByIndex( index ) );
+        if ( !pItem )
         {
-            IImage* pImg = m_pQueueImages[(int)type];
-            int w = m_pImageList->GetImagesSize();
-            pImg->SetSize( w, w );
-            m_pImageList->AddImage( pImg );
+            index = m_pImageList->AddImage( pImg );
+
+            pItem = static_cast<CZMImageRowItemSpawn*>( m_pImageList->GetItemByIndex( index ) );
+
+
+            if ( index == 0 )
+                pItem->SetPrimary();
         }
+        
+
+
+        Q_snprintf( buf, sizeof( buf ), "%ix", (int)queue[i].nCount );
+
+
+        pItem->SetImage( pImg );
+        pItem->SetText( buf );
+        pItem->UpdateData( count, zclass );
+    }
+
+    if ( m_pImageList->GetImageCount() > size )
+    {
+        while ( m_pImageList->RemoveImageByIndex( size ) ) {}
     }
 
     m_pImageList->PerformLayout();

@@ -99,9 +99,14 @@ public:
     }
 
     // Wait for us to finish before doing something else.
+    virtual NPCR::QueryResult_t IsBusy() const OVERRIDE
+    {
+        return NPCR::RES_YES;
+    }
+
     virtual NPCR::QueryResult_t ShouldChase( CBaseEntity* pEnemy ) const OVERRIDE
     {
-        return (!IsDone()) ? NPCR::RES_NO : NPCR::RES_NONE;
+        return NPCR::RES_NO;
     }
 
     virtual void OnQueuedCommand( CBasePlayer* pPlayer, ZombieCommandType_t com ) OVERRIDE

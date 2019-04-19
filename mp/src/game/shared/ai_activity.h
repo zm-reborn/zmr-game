@@ -2189,11 +2189,6 @@ typedef enum
 	ACT_MELEE_VM_INSPECT_END,
 
 #ifdef ZMR
-    // Viewmodel...
-	ACT_RIFLE_RELOAD_START,
-	ACT_RIFLE_RELOAD_FINISH,
-	ACT_RIFLE_LEVER,
-
     // Player model...
   	ACT_ZM_IDLE_SLEDGE,
 	ACT_ZM_RUN_SLEDGE,

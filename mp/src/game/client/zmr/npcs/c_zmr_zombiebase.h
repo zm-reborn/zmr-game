@@ -65,6 +65,7 @@ public:
     static const char*      ClassToName( ZombieClass_t zclass );
     static int              GetPopCost( ZombieClass_t zclass );
     static int              GetCost( ZombieClass_t zclass );
+    static float            GetSpawnDelay( ZombieClass_t zclass );
     static bool             HasEnoughPopToSpawn( ZombieClass_t zclass );
     int                     GetSelectorIndex() const;
     C_ZMPlayer*             GetSelector() const;
@@ -75,6 +76,7 @@ public:
     int                     GetCost() const;
     bool                    DoAnimationEvent( int iEvent, int nData );
     virtual int             GetAnimationRandomSeed() OVERRIDE;
+    virtual bool            CanBePenetrated() const;
 protected:
     void                    SetZombieClass( ZombieClass_t zclass );
 
@@ -84,6 +86,10 @@ public:
 
     inline int  GetGroup() const { return m_iGroup; };
     inline void SetGroup( int group ) { m_iGroup = group; };
+
+    float GetLastLocalSelect() const { return m_flLastLocalSelect; }
+    void UpdateLastLocalSelect() { m_flLastLocalSelect = gpGlobals->curtime; }
+
 
 
     virtual CStudioHdr* OnNewModel() OVERRIDE;
@@ -115,6 +121,9 @@ private:
     C_ZMHolidayHat* m_pHat;
 
     CZMZombieAnimState* m_pAnimState;
+
+
+    float m_flLastLocalSelect;
 };
 
 inline C_ZMBaseZombie* ToZMBaseZombie( C_BaseEntity* pEnt )

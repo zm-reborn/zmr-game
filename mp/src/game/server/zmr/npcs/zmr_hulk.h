@@ -49,6 +49,11 @@ public:
 
     virtual bool ShouldPlayIdleSound() const OVERRIDE;
     virtual float IdleSound() OVERRIDE;
+    virtual float PainSound( const CTakeDamageInfo& info ) OVERRIDE;
     virtual void AlertSound() OVERRIDE;
     virtual void DeathSound() OVERRIDE;
+
+
+    // Shared
+    virtual bool    CanBePenetrated() const OVERRIDE;
 };

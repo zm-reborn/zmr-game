@@ -1,56 +1,74 @@
 #include "cbase.h"
 
+#include <vgui/ISurface.h>
+#include <vgui_controls/Frame.h>
+
+#include "cdll_client_int.h"
+#include "ienginevgui.h"
+
+
 #include "zmr/c_zmr_player.h"
-#include "zmr_newversion.h"
+
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
 
 
-using namespace vgui;
-
-
-
-class CZMNewVerMenuInterface : public IZMUi
+class CZMNewVerMenu : public vgui::Frame
 {
 public:
-    CZMNewVerMenuInterface() { m_Panel = nullptr; };
+    DECLARE_CLASS_SIMPLE( CZMNewVerMenu, vgui::Frame );
 
-    void Create( VPANEL parent ) OVERRIDE
-    {
-        m_Panel = new CZMNewVerMenu( parent );
-    }
-    void Destroy() OVERRIDE
-    {
-        if ( m_Panel )
-        {
-            m_Panel->SetParent( nullptr );
-            delete m_Panel;
-        }
-    }
-    Panel* GetPanel() OVERRIDE { return m_Panel; }
-
-private:
-    CZMNewVerMenu* m_Panel;
+    CZMNewVerMenu( vgui::VPANEL parent );
+    ~CZMNewVerMenu();
 };
 
-static CZMNewVerMenuInterface g_ZMNewVerMenuInt;
-IZMUi* g_pZMNewVerMenuInt = (IZMUi*)&g_ZMNewVerMenuInt;
 
+static vgui::DHANDLE<CZMNewVerMenu> g_hZMNewVer;
 
-CZMNewVerMenu::CZMNewVerMenu( VPANEL parent ) : BaseClass( nullptr, "ZMNewVerMenu" )
+CON_COMMAND( OpenZMNewVersion, "" )
 {
-    g_pZMNewVerMenu = this;
+    if ( !g_hZMNewVer.Get() )
+    {
+        vgui::VPANEL parent = enginevgui->GetPanel( PANEL_GAMEUIDLL );
+        if ( parent == NULL )
+        {
+            Assert( 0 );
+            return;
+        }
+
+        g_hZMNewVer.Set( new CZMNewVerMenu( parent ) );
+    }
 
 
+    auto* pPanel = g_hZMNewVer.Get();
+
+
+    // Center
+    int x, y, w, h;
+    vgui::surface()->GetWorkspaceBounds( x, y, w, h );
+    
+    int mw = pPanel->GetWide();
+    int mh = pPanel->GetTall();
+    pPanel->SetPos( x + w / 2 - mw / 2, y + h / 2 - mh / 2 );
+
+
+    pPanel->Activate();
+}
+
+
+CZMNewVerMenu::CZMNewVerMenu( vgui::VPANEL parent ) : BaseClass( nullptr, "ZMNewVerMenu" )
+{
     SetParent( parent );
 
     SetMouseInputEnabled( true );
     SetKeyBoardInputEnabled( true );
     SetProportional( false );
-    SetVisible( false );
+    SetDeleteSelfOnClose( true );
     SetMoveable( true );
     SetSizeable( false );
 
 
-    SetScheme( scheme()->LoadSchemeFromFile( "resource/SourceScheme.res", "SourceScheme" ) );
+    //SetScheme( vgui::scheme()->LoadSchemeFromFile( "resource/SourceScheme.res", "SourceScheme" ) );
 
 
     LoadControlSettings( "resource/ui/zmnewver.res" );
@@ -59,5 +77,3 @@ CZMNewVerMenu::CZMNewVerMenu( VPANEL parent ) : BaseClass( nullptr, "ZMNewVerMen
 CZMNewVerMenu::~CZMNewVerMenu()
 {
 }
-
-CZMNewVerMenu* g_pZMNewVerMenu = nullptr;

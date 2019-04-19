@@ -40,31 +40,3 @@ void CZMZombieSenses::OnDamaged( const CTakeDamageInfo& info )
         pVision->SetLastSeen( gpGlobals->curtime + 3.0f );
     }
 }
-
-void CZMZombieSenses::OnHeardSound( CSound* pSound )
-{
-    // Give the zombie free knowledge of our sound origin.
-
-
-    CBaseEntity* pSrc = pSound->m_hOwner.Get();
-
-    // This specific type comes only from player movement.
-    // Ignore all other sound types.
-    if ( (pSound->SoundType() & SOUND_PLAYER) == SOUND_PLAYER && pSrc )
-    {
-        auto* pVision = GetEntityOf( pSrc );
-
-        if ( !pVision )
-        {
-            pVision = new NPCR::VisionEntity( pSrc );
-            
-
-            m_vVisionEnts.AddToTail( pVision );
-            
-            GetNPC()->OnSightGained( pSrc );
-        }
-
-        // Give them some time to think about it.
-        pVision->SetLastSeen( gpGlobals->curtime + 3.0f );
-    }
-}

@@ -19,6 +19,9 @@ enum ZMZombieAnimEvent_t
     ZOMBIEANIMEVENT_ON_BURN,
     ZOMBIEANIMEVENT_ON_EXTINGUISH,
 
+    ZOMBIEANIMEVENT_GESTURE,
+
+
     ZOMBIEANIMEVENT_MAX
 };
 
@@ -26,6 +29,7 @@ enum ZMZombieAnimEvent_t
 enum ZMAnimLayerSlot_t
 {
     ANIMOVERLAY_SLOT_IDLE = 0,
+    ANIMOVERLAY_SLOT_GESTURE,
 
     ANIMOVERLAY_SLOT_MAX
 };
@@ -51,6 +55,7 @@ public:
     float GetLayerWeight() const;
     void SetLayerWeight( float flWeight );
 
+    bool IsLayerLooping() const;
     void SetLayerLooping( bool bLoop );
 
     bool IsDying() const;
@@ -71,6 +76,8 @@ private:
     float m_flKillDelay;
     bool m_bKillMe;
 #endif
+
+    bool m_bLooping;
     CZMBaseZombie* m_pOuter;
     int m_iLayerIndex;
 };
@@ -102,6 +109,7 @@ public:
 
     Activity    GetOuterActivity() const;
     bool        SetOuterActivity( Activity act ) const;
+    void        SetOuterCycle( float cycle ) const;
 
     Vector      GetOuterVelocity() const;
     int         GetOuterRandomSequence( Activity act ) const;
@@ -148,14 +156,17 @@ protected:
     void    AddLayeredSequence( int iSeq, ZMAnimLayerSlot_t index );
     void    RemoveLayer( ZMAnimLayerSlot_t index, float rate = 0.2f, float delay = 0.0f );
     void    FastRemoveLayer( ZMAnimLayerSlot_t index );
-    bool    HasLayeredSequence( ZMAnimLayerSlot_t index );
-    bool    IsLayerDying( ZMAnimLayerSlot_t index );
+    bool    HasLayeredSequence( ZMAnimLayerSlot_t index ) const;
+    bool    IsLayerDying( ZMAnimLayerSlot_t index ) const;
+    bool    IsLayerLooping( ZMAnimLayerSlot_t index ) const;
     float   GetLayerCycle( ZMAnimLayerSlot_t index );
     void    SetLayerCycle( ZMAnimLayerSlot_t index, float cycle );
     void    SetLayerLooping( ZMAnimLayerSlot_t index, bool bLoop );
     void    SetLayerWeight( ZMAnimLayerSlot_t index, float flWeight );
+    ZMAnimLayerSlot_t FindSlotByLayerIndex( int index );
 
 private:
+    int m_iMoveRandomSeed;
     bool m_bWasMoving;
     float m_flMoveWeight;
     float m_flMoveActSpeed;

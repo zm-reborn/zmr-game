@@ -13,6 +13,9 @@
 #include "zmr/zmr_playerlocaldata.h"
 
 
+struct ZMFireBulletsInfo_t;
+class CZMPlayerAttackTraceFilter;
+
 class C_ZMRagdoll;
 class C_ZMBaseWeapon;
 
@@ -36,7 +39,8 @@ public:
     virtual bool CreateMove( float delta, CUserCmd* cmd ) OVERRIDE;
 
     void            OnSpawn();
-    virtual void    TeamChange( int ) OVERRIDE;
+    virtual void    TeamChange( int iNewTeam ) OVERRIDE;
+    static void     TeamChangeStatic( int iNewTeam );
 
 
     virtual void            Simulate() OVERRIDE;
@@ -80,8 +84,8 @@ public:
     virtual bool                ShouldInterpolate() OVERRIDE;
 
     // Custom...
-    inline bool IsZM() { return GetTeamNumber() == ZMTEAM_ZM; };
-    inline bool IsHuman() { return GetTeamNumber() == ZMTEAM_HUMAN; };
+    inline bool IsZM() const { return GetTeamNumber() == ZMTEAM_ZM; }
+    inline bool IsHuman() const { return GetTeamNumber() == ZMTEAM_HUMAN; }
 
     static C_ZMPlayer* GetLocalPlayer();
 
@@ -106,6 +110,10 @@ public:
     float                   GetAccuracyRatio() const;
     void                    UpdateAccuracyRatio();
     void                    GetZMMovementVars( float& maxspd, float& accel, float& decel ) const;
+    virtual void            FireBullets( const FireBulletsInfo_t& info ) OVERRIDE;
+    void                    SimulateBullet( ZMFireBulletsInfo_t& bulletinfo );
+    bool                    HandleBulletPenetration( trace_t& tr, const ZMFireBulletsInfo_t& bulletinfo, Vector& vecNextSrc, float& flDistance );
+    bool                    HandleShotImpactingWater( const FireBulletsInfo_t& info, const Vector& vecEnd, CTraceFilter* pFilter );
 
     void SetMouseWheelMove( float dir );
 

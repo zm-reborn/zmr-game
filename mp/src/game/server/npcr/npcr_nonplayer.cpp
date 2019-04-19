@@ -180,6 +180,15 @@ void CNPCRNonPlayer::Event_Killed( const CTakeDamageInfo& info )
 
 
     BaseClass::Event_Killed( info );
+
+
+    // IMPORTANT: We need this check or the entity will never be removed.
+    // The ragdolling process will mark us for removal.
+    // If you don't get a ragdoll, you never get removed! :(
+    if ( info.GetDamageType() & DMG_REMOVENORAGDOLL )
+    {
+        RemoveDeferred();
+    }
 }
 
 void CNPCRNonPlayer::SetDefaultEyeOffset()
@@ -285,18 +294,13 @@ void CNPCRNonPlayer::PerformCustomPhysics( Vector* pNewPosition, Vector* pNewVel
 
     if ( VPhysicsGetObject() )
     {
-        //VPhysicsGetObject()->UpdateShadow( *pNewPosition, vec3_angle, true, GetUpdateInterval() );
-        VPhysicsGetObject()->UpdateShadow( *pNewPosition, vec3_angle, true, 0.0f );
+        //VPhysicsGetObject()->UpdateShadow( *pNewPosition, vec3_angle, true, 0.0f );
+        VPhysicsGetObject()->UpdateShadow( *pNewPosition, vec3_angle, false, GetUpdateInterval() );
         
         // This will not apply any force to objects nearby.
         // Will get players stuck (if called alone?)
         VPhysicsGetObject()->SetPosition( *pNewPosition, vec3_angle, true );
     }
-}
-
-void CNPCRNonPlayer::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
-{
-
 }
 
 float CNPCRNonPlayer::GetMoveActivityMovementSpeed()

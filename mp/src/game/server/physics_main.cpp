@@ -237,7 +237,11 @@ bool CPhysicsPushedEntities::SpeculativelyCheckPush( PhysicsPushedInfo_t &info, 
 		info.m_bPusherIsGround = true;
 	}
 
+#ifdef ZMR // ZMRCHANGE: This was causing zombies to block ANY moveable when chained.
+	bool bIsUnblockable = (m_bIsUnblockableByPlayer && (pBlocker->IsPlayer() || pBlocker->MyNPCPointer() || pBlocker->MyNPCRPointer())) ? true : false;
+#else
 	bool bIsUnblockable = (m_bIsUnblockableByPlayer && (pBlocker->IsPlayer() || pBlocker->MyNPCPointer())) ? true : false;
+#endif
 	if ( bIsUnblockable )
 	{
 		pBlocker->SetAbsOrigin( pushDestPosition );

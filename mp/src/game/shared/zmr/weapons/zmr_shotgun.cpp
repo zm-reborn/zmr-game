@@ -31,13 +31,14 @@ public:
     int GetDropAmmoAmount() const OVERRIDE { return SIZE_AMMO_BUCKSHOT; }
 #endif
 
-    virtual const Vector& GetBulletSpread( void ) OVERRIDE
+    virtual const Vector& GetBulletSpread() OVERRIDE
     {
-        static Vector cone = VECTOR_CONE_10DEGREES;
+//#define CONE_25DEGREES      0.2170625f
+        static Vector cone = Vector( VECTOR_CONE_15DEGREES.x, VECTOR_CONE_15DEGREES.x * 0.3f, 0.0f );
         return cone;
     }
     
-    virtual void AddViewKick( void ) OVERRIDE
+    virtual void AddViewKick() OVERRIDE
     {
         CZMPlayer* pPlayer = ToZMPlayer( GetOwner() );
 
@@ -46,7 +47,7 @@ public:
 
         QAngle viewPunch;
 
-        viewPunch.x = SharedRandomFloat( "shotgunpax", -5.0f, -2.0f );
+        viewPunch.x = SharedRandomFloat( "shotgunpax", -9.0f, -5.0f );
         viewPunch.y = SharedRandomFloat( "shotgunpay", -3.5f, 3.5f );
         viewPunch.z = 0.0f;
 
@@ -55,7 +56,7 @@ public:
     
 
     virtual int GetBulletsPerShot() const OVERRIDE { return 7; }
-    virtual float GetFireRate( void ) OVERRIDE { return 0.55f; }
+    virtual float GetFireRate() OVERRIDE { return 0.55f; }
 
 
     virtual Activity GetReloadStartAct() OVERRIDE { return ACT_SHOTGUN_RELOAD_START; }
