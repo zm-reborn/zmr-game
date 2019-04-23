@@ -2,6 +2,8 @@
 #include "gameinterface.h"
 #include "mapentities.h"
 
+#include "zmr_mapentities.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -26,4 +28,5 @@ void CServerGameClients::GetPlayerLimits( int& minplayers, int& maxplayers, int 
 
 void CServerGameDLL::LevelInit_ParseAllEntities( const char *pMapEntities )
 {
+    g_ZMMapEntities.InitialSpawn( pMapEntities );
 }
