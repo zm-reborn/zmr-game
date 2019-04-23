@@ -11,6 +11,7 @@
 extern ConVar zm_sv_defense_chase_dist;
 extern ConVar zm_sv_defense_goal_tolerance;
 
+ConVar zm_sv_zombie_move_start_areafinddist( "zm_sv_zombie_move_start_areafinddist", "256" );
 
 
 class MoveSchedule : public NPCR::CSchedule<CZMBaseZombie>
@@ -189,7 +190,10 @@ public:
         CNavArea* pStart = pOuter->GetLastKnownArea();
         if ( !pStart ) // We might not have a position yet if we just spawned.
         {
-            pStart = TheNavMesh->GetNearestNavArea( pOuter->GetPosition(), true, 128.0f, true );
+            float flStartFindDist = zm_sv_zombie_move_start_areafinddist.GetFloat();
+            flStartFindDist = fabs( flStartFindDist );
+
+            pStart = TheNavMesh->GetNearestNavArea( pOuter->GetPosition(), true, flStartFindDist, true );
         }
 
         CNavArea* pGoal = TheNavMesh->GetNearestNavArea( vecPos, true, 128.0f, true );
