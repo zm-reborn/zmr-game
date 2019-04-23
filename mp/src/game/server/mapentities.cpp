@@ -20,7 +20,7 @@
 #include "toolframework/iserverenginetools.h"
 
 #ifdef ZMR
-#include "zmr/zmr_mapitemaction.h"
+#include "zmr/zmr_mapentities.h"
 #endif
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -486,7 +486,6 @@ void MapEntity_ParseAllEntities(const char *pMapData, IMapEntityFilter *pFilter,
 	}
 
 	SpawnHierarchicalList( nEntities, pSpawnList, bActivateEntities );
-    ZMItemAction::g_ZMMapItemSystem.SpawnItems();
 
 
 	delete [] pSpawnMapData;
@@ -562,9 +561,17 @@ const char *MapEntity_ParseEntity(CBaseEntity *&pEntity, const char *pEntData, I
 	}
 
 	pEntity = NULL;
-#ifdef ZMR
-    char temp[MAPKEY_MAXLENGTH];
-    if ( !pFilter || (pFilter->ShouldCreateEntity( className ) && !ZMItemAction::g_ZMMapItemSystem.ShouldAffectEntity( entData, temp )) )
+#ifdef ZMR // ZMRCHANGE: Super hack
+    if ( (void*)pFilter == (void*)&g_ZMMapEntities )
+    {
+        if ( g_ZMMapEntities.ShouldCreateEntity( className, entData ) )
+        {
+            pEntity = g_ZMMapEntities.CreateEntity( className );
+            if ( pEntity )
+                pEntity->ParseMapData( &entData );
+        }
+    }
+    else if ( !pFilter || pFilter->ShouldCreateEntity( className ) )
 #else
 	if ( !pFilter || pFilter->ShouldCreateEntity( className ) )
 #endif
