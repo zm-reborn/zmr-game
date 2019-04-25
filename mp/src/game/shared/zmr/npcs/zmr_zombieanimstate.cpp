@@ -484,7 +484,7 @@ void CZMZombieAnimState::UpdateMovement()
     Activity iCurAct = GetOuterActivity();
 
     // If some other activity is currently playing, ignore us.
-    if ( iCurAct != m_actMove && iCurAct != m_actIdle )
+    if ( iCurAct != m_actMove && iCurAct != m_actIdle && iCurAct != ACT_INVALID )
     {
         // The activity was finished, idle.
         if ( pOuter->IsSequenceFinished() && !pOuter->SequenceLoops() )
