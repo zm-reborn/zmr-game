@@ -16,6 +16,7 @@
 #include "zmr/zmr_rejoindata.h"
 
 #include "zmr/zmr_player.h"
+#include "zmr/zmr_mapentities.h"
 #else
 #include "zmr/c_zmr_player.h"
 #endif
@@ -71,66 +72,6 @@ static CZMViewVectors g_ZMViewVectors(
     Vector( 16, 16, 80 ),       //VEC_ZM_HULL_MAX (vZMHullMax)
     Vector( 0, 0, 64 )          //VEC_ZM_VIEW (vZMView)
 );
-
-
-#ifndef CLIENT_DLL
-static const char* g_PreserveEnts[] =
-{
-    "ai_network",
-    "ai_hint",
-    "hl2mp_gamerules", // Not used.
-    "team_manager",
-    "player_manager",
-    "env_soundscape",
-    "env_soundscape_proxy",
-    "env_soundscape_triggerable",
-    "env_sun",
-    "env_wind",
-    "env_fog_controller",
-    //"func_brush", // Yup, this causes problems (eg. zebra)
-    "func_wall",
-    "func_buyzone",
-    "func_illusionary",
-    "infodecal",
-    "info_projecteddecal",
-    "info_node",
-    "info_target",
-    "info_node_hint",
-    //"info_player_deathmatch",
-    //"info_player_combine",
-    //"info_player_rebel",
-    "info_map_parameters",
-    //"keyframe_rope", // Will fuck up maps that parent ropes to objects.
-    //"move_rope",
-    "info_ladder",
-    "player",
-    "point_viewcontrol",
-    "scene_manager",
-    "shadow_control",
-    "sky_camera",
-    "soundent",
-    "trigger_soundscape",
-    "viewmodel",
-    "predicted_viewmodel",
-    "worldspawn",
-    "point_devshot_camera",
-
-    // Our preserved ents...
-    "zm_gamerules",
-    "func_win",
-    //"info_player_zombiemaster",
-    //"info_player_survivor",
-    "info_loadout",
-
-    "zm_objectives_manager",
-    "zm_viewmodel",
-    "env_fog_controller_zm",
-
-    "vote_controller",
-
-    "", // END Marker
-};
-#endif
 
 
 REGISTER_GAMERULES_CLASS( CZMRules );
@@ -1236,91 +1177,7 @@ void CZMRules::RestoreMap()
 {
     DevMsg( "Restoring map...\n" );
 
-    // Recreate all the map entities from the map data (preserving their indices),
-    // then remove everything else except the players.
-
-    // Get rid of all entities except players.
-    CBaseEntity *pCur = gEntList.FirstEnt();
-    while ( pCur )
-    {
-        // remove entities that has to be restored on roundrestart (breakables etc)
-        if ( !FindInList( g_PreserveEnts, pCur->GetClassname() ) )
-        {
-            UTIL_Remove( pCur );
-        }
-
-        pCur = gEntList.NextEnt( pCur );
-    }
-
-    // Really remove the entities so we can have access to their slots below.
-    gEntList.CleanupDeleteList();
-
-    // Cancel all queued events, in case a func_bomb_target fired some delayed outputs that
-    // could kill respawning CTs
-    g_EventQueue.Clear();
-
-    // Now reload the map entities.
-    class CZMEntFilter : public IMapEntityFilter
-    {
-    public:
-        virtual bool ShouldCreateEntity( const char *pClassname )
-        {
-            // Don't recreate the preserved entities.
-            if ( !FindInList( g_PreserveEnts, pClassname ) )
-            {
-                return true;
-            }
-            else
-            {
-                // Increment our iterator since it's not going to call CreateNextEntity for this ent.
-                if ( m_iIterator != g_MapEntityRefs.InvalidIndex() )
-                    m_iIterator = g_MapEntityRefs.Next( m_iIterator );
-
-                return false;
-            }
-        }
-
-
-        virtual CBaseEntity* CreateNextEntity( const char *pClassname )
-        {
-            if ( m_iIterator == g_MapEntityRefs.InvalidIndex() )
-            {
-                // This shouldn't be possible. When we loaded the map, it should have used 
-                // CCSMapLoadEntityFilter, which should have built the g_MapEntityRefs list
-                // with the same list of entities we're referring to here.
-                Assert( false );
-                return NULL;
-            }
-            else
-            {
-                CMapEntityRef &ref = g_MapEntityRefs[m_iIterator];
-                m_iIterator = g_MapEntityRefs.Next( m_iIterator );	// Seek to the next entity.
-
-                if ( ref.m_iEdict == -1 || engine->PEntityOfEntIndex( ref.m_iEdict ) )
-                {
-                    // Doh! The entity was delete and its slot was reused.
-                    // Just use any old edict slot. This case sucks because we lose the baseline.
-                    return CreateEntityByName( pClassname );
-                }
-                else
-                {
-                    // Cool, the slot where this entity was is free again (most likely, the entity was 
-                    // freed above). Now create an entity with this specific index.
-                    return CreateEntityByName( pClassname, ref.m_iEdict );
-                }
-            }
-        }
-
-    public:
-        int m_iIterator; // Iterator into g_MapEntityRefs.
-    };
-
-    CZMEntFilter filter;
-    filter.m_iIterator = g_MapEntityRefs.Head();
-
-    // DO NOT CALL SPAWN ON info_node ENTITIES!
-
-    MapEntity_ParseAllEntities( engine->GetMapEntitiesString(), &filter, true );
+    g_ZMMapEntities.Restore();
 }
 
 void CZMRules::PlayerSpawn( CBasePlayer* pPlayer )

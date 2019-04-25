@@ -1040,8 +1040,10 @@ bool CServerGameDLL::LevelInit( const char *pMapName, char const *pMapEntities, 
 
 		// Clear out entity references, and parse the entities into it.
 		g_MapEntityRefs.Purge();
+#ifndef ZMR // ZMRCHANGE: We need to do our own thing.
 		CMapLoadEntityFilter filter;
 		MapEntity_ParseAllEntities( pMapEntities, &filter );
+#endif
 
 		g_pServerBenchmark->StartBenchmark();
 
