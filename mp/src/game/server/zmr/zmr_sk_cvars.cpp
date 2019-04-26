@@ -30,7 +30,7 @@ ConVar zm_sk_hulk_hitmult_chest( "zm_sk_hulk_hitmult_chest", "0.7" );
 ConVar zm_sk_hulk_hitmult_arms( "zm_sk_hulk_hitmult_arms", "0.2" );
 
 
-ConVar zm_sk_dragzombie_health( "zm_sk_dragzombie_health", "60" );
+ConVar zm_sk_dragzombie_health( "zm_sk_dragzombie_health", "50" );
 ConVar zm_sk_dragzombie_dmg( "zm_sk_dragzombie_dmg", "3" );
 
 ConVar zm_sk_burnzombie_health( "zm_sk_burnzombie_health", "55" );
