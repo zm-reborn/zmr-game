@@ -69,6 +69,7 @@ void CNPCRNonPlayer::Spawn()
     AddSolidFlags( FSOLID_NOT_STANDABLE );
     SetMoveType( MOVETYPE_CUSTOM );
     SetCollisionGroup( COLLISION_GROUP_NPC );
+    SetBlocksLOS( false );
 
     // This flag makes sure we can touch NPC triggers.
     AddFlag( FL_NPC );

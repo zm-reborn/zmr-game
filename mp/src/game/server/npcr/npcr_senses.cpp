@@ -8,6 +8,37 @@
 
 #define VISION_LASTSEEN_GRACE   0.5f
 
+
+class CVisionFilter : public CTraceFilterSimple
+{
+public:
+    DECLARE_CLASS( CVisionFilter, CTraceFilterSimple );
+
+    CVisionFilter( NPCR::CBaseNPC* pNPC ) : BaseClass( pNPC->GetCharacter(), COLLISION_GROUP_NONE, nullptr )
+    {
+        m_pSenses = pNPC->GetSenses();
+    }
+
+    virtual bool ShouldHitEntity( IHandleEntity* pHandleEntity, int contentsMask ) OVERRIDE
+    {
+        bool ret = BaseClass::ShouldHitEntity( pHandleEntity, contentsMask );
+        if ( !ret )
+            return false;
+
+
+        auto* pEnt = EntityFromEntityHandle( pHandleEntity );
+	    if ( !pEnt )
+		    return false;
+
+
+        return !m_pSenses->CanSeeThrough( pEnt );
+    }
+
+private:
+    NPCR::CBaseSenses* m_pSenses;
+};
+
+
 NPCR::CBaseSenses::CBaseSenses( NPCR::CBaseNPC* pNPC ) : NPCR::CEventListener( pNPC, pNPC )
 {
 }
@@ -71,6 +102,16 @@ void NPCR::CBaseSenses::UpdateHearing()
 int NPCR::CBaseSenses::GetSoundMask() const
 {
     return SOUND_WORLD | SOUND_COMBAT | SOUND_PLAYER | SOUND_BULLET_IMPACT;
+}
+
+unsigned int NPCR::CBaseSenses::GetVisionMask() const
+{
+    return MASK_VISIBLE | CONTENTS_BLOCKLOS | CONTENTS_MONSTER;
+}
+
+bool NPCR::CBaseSenses::CanSeeThrough( CBaseEntity* pEnt ) const
+{
+    return !pEnt->BlocksLOS();
 }
 
 bool NPCR::CBaseSenses::CanHearSound( CSound* pSound ) const
@@ -209,20 +250,21 @@ bool NPCR::CBaseSenses::CanSee( const Vector& vecPos ) const
         return false;
     }
 
+    if ( dir.NormalizeInPlace() > GetVisionDistance() )
+    {
+        return false;
+    }
+
 
     return HasLOS( vecPos );
 }
 
 bool NPCR::CBaseSenses::HasLOS( const Vector& vecPos ) const
 {
-    CBaseCombatCharacter* pChar = GetOuter();
-
-    Vector start = pChar->EyePosition();
-    Vector dir = vecPos - start;
-    float flToGoal = dir.NormalizeInPlace();
-
     trace_t tr;
-    UTIL_TraceLine( start, start + dir * MIN( flToGoal, GetVisionDistance() ), MASK_VISIBLE, pChar, COLLISION_GROUP_NONE, &tr );
+    CVisionFilter filter( GetNPC() );
+
+    UTIL_TraceLine( GetOuter()->EyePosition(), vecPos, GetVisionMask(), &filter, &tr );
     
     return tr.fraction == 1.0f;
 }
