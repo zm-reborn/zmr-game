@@ -119,7 +119,7 @@ void NPCR::CBaseSenses::UpdateVision()
         {
             if ( vListEnts[i] == m_vVisionEnts[j]->GetEntity() )
             {
-                m_vVisionEnts[j]->UpdateLastSeen();
+                //m_vVisionEnts[j]->UpdateLastSeen();
                 bSeen = true;
                 break;
             }
