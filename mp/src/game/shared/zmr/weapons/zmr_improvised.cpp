@@ -31,7 +31,7 @@ public:
 
     virtual float GetRange() const OVERRIDE { return 50.0f; }
     virtual float GetFireRate() OVERRIDE { return 1.0f; }
-    virtual float GetDamageForActivity( Activity hitActivity ) const OVERRIDE { return 20.0f; }
+    virtual float GetDamageForActivity( Activity hitActivity ) const OVERRIDE { return 15.0f; }
 
     virtual void AddViewKick() OVERRIDE
     {
