@@ -541,7 +541,7 @@ void C_ZMPlayer::UpdateOtherFlashlight()
 
         beams->UpdateBeamInfo( m_pFlashlightBeam, beamInfo );
 
-        dlight_t *el = effects->CL_AllocDlight( 0 );
+        dlight_t *el = effects->CL_AllocDlight( entindex() );
         el->origin = tr.endpos;
         el->radius = 50; 
         el->color.r = 200;
