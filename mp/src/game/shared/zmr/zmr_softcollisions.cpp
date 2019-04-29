@@ -144,28 +144,20 @@ CZMBaseSoftCol::SoftColRes_t CZMPlayerSoftCol::PerformCollision()
 
     // Don't apply soft collisions if we (the origin) are not moving.
     // Assume the other will perform the pushing to us.
-#ifdef GAME_DLL
-    // This button check is here to mitigate griefing.
-    // Player A is standing still in a corner (not pressing anything)
-    // Player B jumps inside A, trying to move him.
-    // Both players are now "not moving", hence A may get moved by B.
-    // The keys will make the difference.
-    const bool bMovingOrigin =
-        vel == vec3_origin
-    ||  (pOrigin->m_nButtons & (IN_MOVELEFT|IN_MOVERIGHT|IN_FORWARD|IN_BACK)) != 0;
-        
-    const bool bMovingOther =
-        vel2 != vec3_origin
-    ||  (pOther->m_nButtons & (IN_MOVELEFT|IN_MOVERIGHT|IN_FORWARD|IN_BACK)) != 0;
-#else
-    const bool bMovingOrigin = vel == vec3_origin;
-    const bool bMovingOther = vel2 != vec3_origin;
-#endif
+    bool bMovingOrigin = vel != vec3_origin;
+    bool bMovingOther = vel2 != vec3_origin;
+
     if ( !bMovingOrigin && bMovingOther )
     {
         return CZMBaseSoftCol::COLRES_NONE;
     }
 
+    if ( !bMovingOrigin && !bMovingOther )
+    {
+        // Both not moving, don't do anything if the origin didn't move at any point.
+        if ( !m_bOriginMovedLast )
+            return CZMBaseSoftCol::COLRES_NONE;
+    }
 
     float force = RemapValClamped( dist, 0.0f, flMaxDist, 1.0f, 5.0f );
     force *= zm_sv_softcollisions_player_force.GetFloat();
@@ -185,6 +177,7 @@ CZMBaseSoftCol::SoftColRes_t CZMPlayerSoftCol::PerformCollision()
         pOrigin->SetLocalVelocity( vel );
 
         vecLastDir = dir.AsVector2D();
+        m_bOriginMovedLast = bMovingOrigin;
 
         return CZMBaseSoftCol::COLRES_APPLIED;
     }

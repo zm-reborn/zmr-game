@@ -51,9 +51,12 @@ public:
 class CZMPlayerSoftCol : public CZMBaseSoftCol
 {
 public:
-    CZMPlayerSoftCol( CBaseEntity* pOrigin, CBaseEntity* pOther ) : CZMBaseSoftCol( pOrigin, pOther ) {}
+    CZMPlayerSoftCol( CBaseEntity* pOrigin, CBaseEntity* pOther ) : CZMBaseSoftCol( pOrigin, pOther ) { m_bOriginMovedLast = false; }
 
     SoftColRes_t PerformCollision();
+
+protected:
+    bool m_bOriginMovedLast;
 };
 //
 
