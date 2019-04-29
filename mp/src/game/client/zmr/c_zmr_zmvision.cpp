@@ -14,7 +14,6 @@ ConVar zm_cl_silhouette_onlyzmvision( "zm_cl_silhouette_onlyzmvision", "1", FCVA
 ConVar zm_cl_silhouette_strength( "zm_cl_silhouette_strength", "0.8", FCVAR_ARCHIVE );
 
 
-#define ZMVISION_DLIGHT_INDEX           666
 
 
 CZMVision g_ZMVision;
@@ -121,7 +120,7 @@ void CZMVision::UpdateLight()
     if ( !pPlayer ) return;
 
 
-    dlight_t* dl = effects->CL_AllocDlight( ZMVISION_DLIGHT_INDEX );
+    dlight_t* dl = effects->CL_AllocDlight( pPlayer->entindex() );
 
     if ( !dl ) return;
 
