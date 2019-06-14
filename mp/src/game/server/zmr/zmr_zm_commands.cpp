@@ -600,28 +600,11 @@ void ZM_Cmd_PhysExp( const CCommand &args )
     }
 
 
-    CZMPhysExplosion* pExp = dynamic_cast<CZMPhysExplosion*>( CreateEntityByName( "env_delayed_physexplosion" ) );
-
-    if ( !pExp ) return;
-
-
-    pExp->KeyValue( "magnitude", zm_sv_physexp_magnitude.GetString() );
-    pExp->KeyValue( "radius", zm_sv_physexp_radius.GetString() );
-
-
-#define SF_PHYSEXPLOSION_NODAMAGE           0x0001
-#define SF_PHYSEXPLOSION_DISORIENT_PLAYER   0x0010
-
-    pExp->AddSpawnFlags( SF_PHYSEXPLOSION_NODAMAGE );
-    pExp->AddSpawnFlags( SF_PHYSEXPLOSION_DISORIENT_PLAYER );
-
-
-    if ( DispatchSpawn( pExp ) != 0 )
-        return;
-
-    pExp->Teleport( &pos, nullptr, nullptr );
-    pExp->Activate();
-    pExp->DelayedExplode( zm_sv_physexp_delay.GetFloat() );
+    CZMPhysExplosion::CreatePhysExplosion(
+        pos,
+        zm_sv_physexp_delay.GetFloat(),
+        zm_sv_physexp_magnitude.GetFloat(),
+        zm_sv_physexp_radius.GetFloat() );
 
 
     pPlayer->IncResources( -zm_sv_physexp_cost.GetInt() );
