@@ -43,10 +43,9 @@ public:
     int GetDropAmmoAmount() const OVERRIDE { return SIZE_ZMAMMO_REVOLVER; }
 #endif
 
-    virtual const Vector& GetBulletSpread() OVERRIDE
+    virtual Vector GetBulletSpread() const OVERRIDE
     {
-        static Vector cone = Vector( 0.0f, 0.0f, 0.0f );
-
+        Vector cone = BaseClass::GetBulletSpread();
 
         CZMPlayer* pOwner = GetPlayerOwner();
 
@@ -59,10 +58,7 @@ public:
             // 2 degrees
 #define     SECONDARY_MIN_RATIO         0.1f
 
-            const bool bIsSecondary = GetActivity() == ACT_VM_SECONDARYATTACK;
-
-            // Secondary punishes moving a lot more.
-            float max = bIsSecondary ? VECTOR_CONE_20DEGREES.x : VECTOR_CONE_10DEGREES.x;
+            const bool bIsSecondary = IsInSecondaryAttack();
 
             // Secondary is not perfectly accurate.
             if ( bIsSecondary )
@@ -70,19 +66,13 @@ public:
 
 
 
-            cone.x = ratio * max;
-            cone.y = ratio * max;
-            cone.z = ratio * max;
+            cone.x = ratio * cone.x;
+            cone.y = ratio * cone.y;
+            cone.z = ratio * cone.z;
         }
 
         return cone;
     }
-
-
-    virtual float GetAccuracyIncreaseRate() const OVERRIDE { return 2.9f; }
-    virtual float GetAccuracyDecreaseRate() const OVERRIDE { return 5.1f; }
-
-    virtual int GetMaxPenetrations() const OVERRIDE { return 1; }
 
     
     virtual void AddViewKick() OVERRIDE;
@@ -90,9 +80,6 @@ public:
     virtual void PrimaryAttack() OVERRIDE;
     virtual void PrimaryAttackEffects() OVERRIDE;
     virtual void SecondaryAttack() OVERRIDE;
-
-    
-    virtual float GetFireRate() OVERRIDE { return 1.0f; }
 
     void ItemPostFrame() OVERRIDE;
 
@@ -162,6 +149,7 @@ CZMWeaponRevolver::CZMWeaponRevolver()
     m_bFiresUnderwater = false;
 
     SetSlotFlag( ZMWEAPONSLOT_SIDEARM );
+    SetConfigSlot( ZMWeaponConfig::ZMCONFIGSLOT_REVOLVER );
 }
 
 bool CZMWeaponRevolver::Deploy()
@@ -196,8 +184,7 @@ void CZMWeaponRevolver::PrimaryAttack()
         m_flShootTime = gpGlobals->curtime + waittime;
 
 
-    m_flNextPrimaryAttack = gpGlobals->curtime + 1.1f;
-    m_flNextSecondaryAttack = gpGlobals->curtime + 1.0f;
+    m_flNextSecondaryAttack = m_flNextPrimaryAttack = gpGlobals->curtime + GetFireRate();
 }
 
 void CZMWeaponRevolver::SecondaryAttack()
@@ -219,8 +206,7 @@ void CZMWeaponRevolver::SecondaryAttack()
         m_flShootTime = gpGlobals->curtime + waittime;
 
 
-    m_flNextPrimaryAttack = gpGlobals->curtime + 0.4f;
-    m_flNextSecondaryAttack = gpGlobals->curtime + 0.3f;
+    m_flNextSecondaryAttack = m_flNextPrimaryAttack = gpGlobals->curtime + GetFireRate();
 }
 
 void CZMWeaponRevolver::ItemPostFrame()
@@ -292,13 +278,9 @@ bool CZMWeaponRevolver::OnFireEvent( C_BaseViewModel* pViewModel, const Vector& 
 
 void CZMWeaponRevolver::AddViewKick()
 {
-    CZMPlayer* pPlayer = GetPlayerOwner();
-    if ( !pPlayer ) return;
+    auto* pPlayer = GetPlayerOwner();
 
-
-    Activity act = GetActivity();
-
-    if ( act == ACT_VM_SECONDARYATTACK )
+    if ( pPlayer && IsInSecondaryAttack() )
     {
         // Disorient the player.
         QAngle angles = pPlayer->GetLocalAngles();
@@ -314,19 +296,5 @@ void CZMWeaponRevolver::AddViewKick()
     }
 
 
-    QAngle ang;
-    ang.z = 0.0f;
-
-    if ( act == ACT_VM_PRIMARYATTACK ) // Slow
-    {
-        ang.x = -8.0f;
-        ang.y = SharedRandomFloat( "revolvery", -1, 1 );
-    }
-    else // Fast
-    {
-        ang.x = SharedRandomFloat( "revolverx", -8, 2 );
-        ang.y = SharedRandomFloat( "revolvery", -2, 2 );
-    }
-
-    pPlayer->ViewPunch( ang );
+    BaseClass::AddViewKick();
 }

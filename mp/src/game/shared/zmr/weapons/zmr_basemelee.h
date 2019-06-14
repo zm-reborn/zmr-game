@@ -23,6 +23,7 @@ public:
     virtual CZMBaseCrosshair* GetWeaponCrosshair() const OVERRIDE { return ZMGetCrosshair( "Melee" ); }
 #endif
 
+    virtual void ItemBusyFrame() OVERRIDE;
     virtual void ItemPostFrame() OVERRIDE;
 
     virtual bool Deploy() OVERRIDE;
@@ -34,8 +35,8 @@ public:
 
     virtual bool UsesAnimEvent( bool bSecondary ) const { return false; }
     
-    virtual float GetRange() const { return 10.0f; }
-    virtual	float GetDamageForActivity( Activity hitActivity ) const { return 1.0f; }
+    virtual float GetRange() const;
+    virtual	float GetDamageForActivity( Activity hitActivity ) const;
 
     virtual bool CanPrimaryAttack() const { return true; }
     virtual bool CanSecondaryAttack() const { return false; }

@@ -70,9 +70,6 @@ public:
 
 
     virtual float	GetRange() const OVERRIDE { return 45.0f; }
-    virtual float	GetFireRate() OVERRIDE { return 0.65f; }
-
-    virtual void	AddViewKick() OVERRIDE;
 
     virtual Activity	GetPrimaryAttackActivity() OVERRIDE { return ACT_VM_HITCENTER; }
     virtual float		GetDamageForActivity( Activity act ) const OVERRIDE { return 5.0f; }

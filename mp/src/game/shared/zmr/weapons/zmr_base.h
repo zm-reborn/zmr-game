@@ -10,6 +10,7 @@
 #endif
 #include "zmr/zmr_weapon_parse.h"
 #include "zmr_usercmdvalid.h"
+#include "zmr_weaponconfig.h"
 
 #include "zmr/zmr_player_shared.h"
 
@@ -28,6 +29,9 @@
 // 1 is constrained.
 #define SF_ZMWEAPON_TEMPLATE        ( 1 << 1 )
 
+
+class ZMWeaponConfig::CZMBaseWeaponConfig;
+
 class CZMBaseWeapon : public CBaseCombatWeapon, public CZMUserCmdHitWepValidator
 {
 public:
@@ -44,9 +48,8 @@ public:
     
 #ifdef CLIENT_DLL
     virtual void Spawn() OVERRIDE;
-#else
-    virtual void Precache() OVERRIDE;
 #endif
+    virtual void Precache() OVERRIDE;
 
     virtual void ItemPostFrame() OVERRIDE;
 
@@ -71,12 +74,8 @@ public:
     virtual void PrimaryAttackEffects();
     virtual void SecondaryAttackEffects();
     virtual void SecondaryAttack() OVERRIDE;
-    
-    const CZMWeaponInfo& GetWpnData() const;
 
-    virtual int         GetMaxClip1() const OVERRIDE;
-	virtual const char* GetViewModel( int vmIndex = 0 ) const OVERRIDE;
-	virtual const char* GetWorldModel() const OVERRIDE;
+
     virtual void        SetViewModel() OVERRIDE;
 
 #ifdef CLIENT_DLL
@@ -161,13 +160,34 @@ public:
     virtual bool UsesDryActivity( Activity act );
 
 
-    // ZMRTODO: Use config to load these.
-    virtual float   GetAccuracyIncreaseRate() const { return 2.0f; }
-    virtual float   GetAccuracyDecreaseRate() const { return 2.0f; }
+    virtual void AddViewKick() OVERRIDE;
 
-    virtual float   GetPenetrationDmgMult() const { return 1.0f; }
-    virtual int     GetMaxPenetrations() const { return 0; }
-    virtual float   GetMaxPenetrationDist() const { return 16.0f; }
+    virtual bool IsInSecondaryAttack() const;
+    const ZMWeaponConfig::CZMBaseWeaponConfig* GetWeaponConfig() const;
+	virtual CHudTexture const* GetSpriteActive() const OVERRIDE;
+	virtual CHudTexture const* GetSpriteInactive() const OVERRIDE;
+    virtual CHudTexture const* GetSpriteAmmo() const OVERRIDE;
+	virtual const char*     GetViewModel( int vmIndex = 0 ) const OVERRIDE;
+	virtual const char*     GetWorldModel() const OVERRIDE;
+    virtual int             GetMaxClip1() const OVERRIDE;
+    virtual int             GetMaxClip2() const OVERRIDE;
+    virtual int             GetDefaultClip1() const OVERRIDE;
+    virtual const char*     GetAnimPrefix() const;
+    virtual int             GetSlot() const OVERRIDE;
+    virtual int             GetPosition() const OVERRIDE;
+    virtual int             GetWeight() const OVERRIDE;
+    virtual char const*     GetName() const OVERRIDE;
+    virtual char const*     GetPrintName() const OVERRIDE;
+    virtual char const*     GetShootSound( int iIndex ) const OVERRIDE;
+    float                   GetPrimaryFireRate() const;
+    float                   GetAccuracyIncreaseRate() const;
+    float                   GetAccuracyDecreaseRate() const;
+    float                   GetPenetrationDmgMult() const;
+    int                     GetMaxPenetrations() const;
+    float                   GetMaxPenetrationDist() const;
+    virtual Vector          GetBulletSpread() const;
+    virtual float           GetFireRate() OVERRIDE;
+
 
     float           GetFirstInstanceOfAnimEventTime( int iSeq, int iAnimEvent, bool bReturnOption = false ) const;
 
@@ -205,6 +225,9 @@ protected:
     inline void SetSlotFlag( int flags ) { m_iSlotFlag = flags; }
     int m_iSlotFlag;
 
+    inline ZMWeaponConfig::WeaponConfigSlot_t GetConfigSlot() const { return m_iConfigSlot; }
+    inline void SetConfigSlot( ZMWeaponConfig::WeaponConfigSlot_t slot ) { m_iConfigSlot = slot; }
+
 private:
 #ifndef CLIENT_DLL
     string_t        m_OverrideViewModel;
@@ -217,6 +240,9 @@ private:
 
     CNetworkVar( float, m_flNextClipFillTime );
     CNetworkVar( bool, m_bCanCancelReload );
+
+
+    ZMWeaponConfig::WeaponConfigSlot_t m_iConfigSlot;
 };
 
 inline CZMBaseWeapon* ToZMBaseWeapon( CBaseEntity* pEnt )

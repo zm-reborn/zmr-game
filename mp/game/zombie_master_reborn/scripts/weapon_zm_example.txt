@@ -1,0 +1,98 @@
+WeaponData
+{
+	"printname"				"Example Name"
+
+	
+	// Model paths
+	"viewmodel"				"models/weapons/c_fists_zm.mdl"
+	"worldmodel"			"models/weapons/w_null.mdl"
+	
+	
+	
+	// Primary attack
+	//
+	// You can have "PrimaryAttack" and "SecondaryAttack"
+	//
+	//
+	"PrimaryAttack"
+	{
+		// Fire rate, in seconds. Can be set to a negative value to use animation length.
+		"firerate"			"1"
+		
+		// Damage
+		"damage"			"15"
+		
+		
+		// For melee weapons this means the range.
+		// For ranged weapons this is the furthest the bullet will travel.
+		// In units.
+		"range"				"50"
+		
+		
+		// Bullet spread diameter in degrees.
+		// A vector but only needs X and Y component.
+		"spread"			"15 4.5 0"
+		
+		// Viewpunch
+		"viewpunch_min"		"1 -2 0"
+		"viewpunch_max"		"2 -1 0"
+	}
+	
+	
+	// The slot of the weapon.
+	// 0 = slot1
+	// 1 = slot2
+	// etc.
+	"bucket"				"0"
+	
+	// Slot of a slot. Just leave at 0.
+	"bucket_position"		"0"
+	
+	// The higher the value the more important this gun is.
+	// Used for determining auto switching.
+	// 0 = molotov
+	// 1 = fists
+	// 2 = melee (crowbar)
+	// 3 = secondary (pistol)
+	// 4 = primary weapons (rifle)
+	"importance"			"1"
+
+	// Size of the "clip" / magazine.
+	// -1 means no clip.
+	"clip_size"				"1337"
+	
+	
+	
+	// The sound data the gun will use.
+	// Below are all valid entries you can have.
+	SoundData
+	{
+		"melee_hit"			"Weapon_Fists_ZM.Melee_Hit"
+		"empty"				"Weapon_Shotgun_ZM.Empty"
+		"reload"			"Weapon_Shotgun_ZM.Reload"
+		"special1"			"Weapon_Shotgun_ZM.Special1"
+		"single_shot"		"Weapon_pistol_zm.Single"
+		"deploy"			""
+	}
+	
+	TextureData
+	{
+		// The weapon selection icon.
+		"weapon"
+		{
+			"font"			"WeaponIcons"
+			"character"		"c"
+		}
+		// The weapon selection icon when the weapon is "selected".
+		"weapon_s"
+		{	
+			"font"			"WeaponIconsSelected"
+			"character"		"c"
+		}
+		"ammo"
+		{
+			"font"			"WeaponIcons"
+			"character"		"s"
+		}
+	}
+}
