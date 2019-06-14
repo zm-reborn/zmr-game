@@ -1797,6 +1797,8 @@ PRECACHE_REGISTER( env_delayed_physexplosion );
 
 
 ConVar zm_sv_physexp_debug( "zm_sv_physexp_debug", "0" );
+ConVar zm_sv_physexp_disorientateplayer( "zm_sv_physexp_disorientateplayer", "10", FCVAR_NOTIFY | FCVAR_ARCHIVE );
+ConVar zm_sv_physexp_player_mult( "zm_sv_physexp_player_mult", "0.05", FCVAR_NOTIFY | FCVAR_ARCHIVE );
 
 
 CZMPhysExplosion::CZMPhysExplosion()
@@ -1902,6 +1904,11 @@ void CZMPhysExplosion::Push()
         float dist = dir.NormalizeInPlace();
 
 
+        float ratio = 1.0f - dist / flRadius;
+        if ( ratio < 0.0f )
+            ratio = 0.0f;
+
+
 
         IPhysicsObject* pPhys = pEnt->VPhysicsGetObject();
 
@@ -1913,6 +1920,45 @@ void CZMPhysExplosion::Push()
         {
             auto* pPlayer = ToZMPlayer( pEnt );
 
+            //
+            // Disorient the player
+            //
+            if ( zm_sv_physexp_disorientateplayer.GetFloat() > 0.0f )
+            {
+                float f = zm_sv_physexp_disorientateplayer.GetFloat();
+
+                QAngle ang;
+                ang.x = random->RandomInt( -f, f );
+                ang.y = random->RandomInt( -f, f );
+                ang.z = 0.0f;
+
+                pPlayer->SnapEyeAngles( pPlayer->EyeAngles() + ang );
+                pPlayer->ViewPunch( ang );
+            }
+
+
+            //
+            // Push em.
+            //
+            if ( zm_sv_physexp_player_mult.GetFloat() > 0.0f )
+            {
+                float force = ratio * GetMagnitude() * zm_sv_physexp_player_mult.GetFloat();
+                force *= phys_pushscale.GetFloat();
+
+
+                Vector push = dir * force;
+
+                if ( pEnt->GetFlags() & FL_BASEVELOCITY )
+                {
+                    push += pEnt->GetBaseVelocity();
+                }
+
+                pEnt->SetGroundEntity( nullptr );
+                pEnt->SetBaseVelocity( push );
+                pEnt->AddFlag( FL_BASEVELOCITY );
+            }
+
+
             pPlayer->ForceDropOfCarriedPhysObjects( nullptr );
         }
         //
@@ -1920,13 +1966,17 @@ void CZMPhysExplosion::Push()
         //
         else if ( pPhys )
         {
-            float magnitude = GetMagnitude() - (dist * (1.0f / 2.5f));
-            if ( magnitude < 1.0f )
-                magnitude = 1.0f;
+            float force = GetMagnitude() * ratio;
+            if ( force < 1.0f )
+                force = 1.0f;
 
 
-		    CTakeDamageInfo info( this, this, magnitude, DMG_BLAST );
-		    CalculateExplosiveDamageForce( &info, dir, src );
+            CTakeDamageInfo info( this, this, force, DMG_BLAST );
+            CalculateExplosiveDamageForce( &info, dir, src );
+
+            //force *= phys_pushscale.GetFloat();
+            //info.SetDamagePosition( src );
+            //info.SetDamageForce( dir * force );
 
             if ( pPhys->GetGameFlags() & FVPHYSICS_PLAYER_HELD )
             {
