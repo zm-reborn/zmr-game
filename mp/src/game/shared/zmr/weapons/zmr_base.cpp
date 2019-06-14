@@ -1,6 +1,7 @@
 #include "cbase.h"
 #ifdef CLIENT_DLL
 #include "prediction.h"
+#include "view.h"
 #endif
 #include "datacache/imdlcache.h"
 #include "eventlist.h"
@@ -29,6 +30,10 @@ extern ConVar zm_sv_glow_item_enabled;
 #ifndef CLIENT_DLL
 static ConVar zm_sv_weaponreserveammo( "zm_sv_weaponreserveammo", "1", FCVAR_NOTIFY | FCVAR_ARCHIVE, "When player drops their weapon, their ammo gets dropped with the weapon as well." );
 #endif
+
+ConVar zm_sv_bulletsusemainview( "zm_sv_bulletsusemainview", "1", FCVAR_NOTIFY | FCVAR_REPLICATED, "When on, clients will use their current view's origin and angles instead of networked ones to determine the source of bullets." );
+
+
 
 
 BEGIN_NETWORK_TABLE( CZMBaseWeapon, DT_ZM_BaseWeapon )
@@ -482,9 +487,23 @@ void CZMBaseWeapon::FireBullets( int numShots, int iAmmoType, float flMaxDist )
 
 
     FireBulletsInfo_t info;
-    info.m_vecSrc           = pPlayer->Weapon_ShootPosition();
-    info.m_vecDirShooting   = pPlayer->CBasePlayer::GetAutoaimVector( AUTOAIM_SCALE_DEFAULT );
-    info.m_iShots           = numShots;
+
+    // This fixes a problem of the client's shooting being off.
+    // More noticeable with higher pings.
+#ifdef CLIENT_DLL
+    if ( zm_sv_bulletsusemainview.GetBool() )
+    {
+        info.m_vecSrc           = MainViewOrigin();
+        info.m_vecDirShooting   = MainViewForward();
+    }
+    else
+#endif
+    {
+        info.m_vecSrc           = pPlayer->Weapon_ShootPosition();
+        info.m_vecDirShooting   = pPlayer->CBasePlayer::GetAutoaimVector( AUTOAIM_SCALE_DEFAULT );
+    }
+
+    info.m_iShots = numShots;
 
     // ZMRTODO: See if this has any truth to it.
     // To make the firing framerate independent, we may have to fire more than one bullet here on low-framerate systems, 
