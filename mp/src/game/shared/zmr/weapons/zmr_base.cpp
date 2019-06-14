@@ -1299,21 +1299,6 @@ void CZMBaseWeapon::AddViewmodelBob( CBaseViewModel *viewmodel, Vector& origin, 
     VectorMA( origin, g_lateralBob * cl_boblatscale.GetFloat(), right, origin );
 }
 
-Vector CZMBaseWeapon::GetBulletSpread( WeaponProficiency_t proficiency )
-{
-    return BaseClass::GetBulletSpread( proficiency );
-}
-
-float CZMBaseWeapon::GetSpreadBias( WeaponProficiency_t proficiency )
-{
-    return BaseClass::GetSpreadBias( proficiency );
-}
-
-const WeaponProficiencyInfo_t* CZMBaseWeapon::GetProficiencyValues()
-{
-    return nullptr;
-}
-
 #else
 
 // Server stubs
@@ -1324,43 +1309,6 @@ float CZMBaseWeapon::CalcViewmodelBob()
 
 void CZMBaseWeapon::AddViewmodelBob( CBaseViewModel *viewmodel, Vector &origin, QAngle &angles )
 {
-}
-
-Vector CZMBaseWeapon::GetBulletSpread( WeaponProficiency_t proficiency )
-{
-    Vector baseSpread = BaseClass::GetBulletSpread( proficiency );
-
-    const WeaponProficiencyInfo_t *pProficiencyValues = GetProficiencyValues();
-    float flModifier = (pProficiencyValues)[ proficiency ].spreadscale;
-    return ( baseSpread * flModifier );
-}
-
-float CZMBaseWeapon::GetSpreadBias( WeaponProficiency_t proficiency )
-{
-    const WeaponProficiencyInfo_t *pProficiencyValues = GetProficiencyValues();
-    return (pProficiencyValues)[ proficiency ].bias;
-}
-
-const WeaponProficiencyInfo_t* CZMBaseWeapon::GetProficiencyValues()
-{
-    return GetDefaultProficiencyValues();
-}
-
-const WeaponProficiencyInfo_t* CZMBaseWeapon::GetDefaultProficiencyValues()
-{
-    // Weapon proficiency table. Keep this in sync with WeaponProficiency_t enum in the header!!
-    static WeaponProficiencyInfo_t g_BaseWeaponProficiencyTable[] =
-    {
-        { 2.50, 1.0	},
-        { 2.00, 1.0	},
-        { 1.50, 1.0	},
-        { 1.25, 1.0 },
-        { 1.00, 1.0	},
-    };
-
-    COMPILE_TIME_ASSERT( ARRAYSIZE(g_BaseWeaponProficiencyTable) == WEAPON_PROFICIENCY_PERFECT + 1);
-
-    return g_BaseWeaponProficiencyTable;
 }
 
 #endif
