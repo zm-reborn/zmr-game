@@ -1796,6 +1796,9 @@ LINK_ENTITY_TO_CLASS( env_delayed_physexplosion, CZMPhysExplosion );
 PRECACHE_REGISTER( env_delayed_physexplosion );
 
 
+ConVar zm_sv_physexp_debug( "zm_sv_physexp_debug", "0" );
+
+
 CZMPhysExplosion::CZMPhysExplosion()
 {
     m_hSpark = nullptr;
@@ -1807,6 +1810,35 @@ CZMPhysExplosion::~CZMPhysExplosion()
     {
         UTIL_Remove( m_hSpark );
     }
+}
+
+CZMPhysExplosion* CZMPhysExplosion::CreatePhysExplosion( const Vector& pos, float delay, float magnitude, float radius )
+{
+    auto* pExp = dynamic_cast<CZMPhysExplosion*>( CreateEntityByName( "env_delayed_physexplosion" ) );
+
+    if ( !pExp )
+    {
+        return nullptr;
+    }
+
+
+
+    pExp->SetMagnitude( magnitude );
+    pExp->SetRadius( radius );
+
+
+    if ( DispatchSpawn( pExp ) != 0 )
+    {
+        UTIL_RemoveImmediate( pExp );
+        return nullptr;
+    }
+
+
+    pExp->Teleport( &pos, nullptr, nullptr );
+    pExp->Activate();
+    pExp->DelayedExplode( delay );
+
+    return pExp;
 }
 
 void CZMPhysExplosion::Spawn()
@@ -1833,10 +1865,83 @@ void CZMPhysExplosion::DelayThink()
     g_pEffects->Sparks( GetAbsOrigin(), 15, 3 );
 
 
-    
-    Explode( nullptr, this );
+    Push();
 
     UTIL_Remove( this );
+}
+
+void CZMPhysExplosion::Push()
+{
+    CBaseEntity* pEnt = nullptr;
+    Vector src = GetAbsOrigin();
+    Vector end;
+
+    float flRadius = MAX( GetRadius(), 1.0f );
+
+
+    while ( (pEnt = gEntList.FindEntityInSphere( pEnt, src, flRadius )) != nullptr )
+    {
+        // Physics objects
+        bool bValid = pEnt->GetMoveType() == MOVETYPE_VPHYSICS;
+
+        if ( !bValid )
+        {
+            // Alive players
+            bValid = pEnt->IsPlayer() && pEnt->GetTeamNumber() == ZMTEAM_HUMAN && pEnt->IsAlive();
+
+            if ( !bValid )
+                continue;
+        }
+
+
+        end = pEnt->BodyTarget( src );
+
+
+
+        Vector dir = (end - src);
+        float dist = dir.NormalizeInPlace();
+
+
+
+        IPhysicsObject* pPhys = pEnt->VPhysicsGetObject();
+
+
+        //
+        // Player
+        //
+        if ( pEnt->IsPlayer() )
+        {
+            auto* pPlayer = ToZMPlayer( pEnt );
+
+            pPlayer->ForceDropOfCarriedPhysObjects( nullptr );
+        }
+        //
+        // Physics object
+        //
+        else if ( pPhys )
+        {
+            float magnitude = GetMagnitude() - (dist * (1.0f / 2.5f));
+            if ( magnitude < 1.0f )
+                magnitude = 1.0f;
+
+
+		    CTakeDamageInfo info( this, this, magnitude, DMG_BLAST );
+		    CalculateExplosiveDamageForce( &info, dir, src );
+
+            if ( pPhys->GetGameFlags() & FVPHYSICS_PLAYER_HELD )
+            {
+                auto* pOwner = pEnt->GetOwnerEntity();
+                if ( pOwner && pOwner->IsPlayer() )
+                {
+                    auto* pPlayer = ToZMPlayer( pOwner );
+
+                    pPlayer->ForceDropOfCarriedPhysObjects( pEnt );
+                }
+            }
+
+            pEnt->VPhysicsTakeDamage( info );
+        }
+    }
 }
 
 void CZMPhysExplosion::CreateEffects( float delay )
@@ -1887,6 +1992,12 @@ void CZMPhysExplosion::DelayedExplode( float delay )
 
     SetThink( &CZMPhysExplosion::DelayThink );
     SetNextThink( gpGlobals->curtime + delay );
+
+
+    if ( zm_sv_physexp_debug.GetBool() )
+    {
+        NDebugOverlay::Sphere( GetAbsOrigin(), GetRadius(), 255, 0, 0, false, delay );
+    }
 }
 
 /*
