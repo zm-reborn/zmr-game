@@ -197,6 +197,7 @@ CZMWeaponHands::CZMWeaponHands()
 #endif
 
     SetSlotFlag( ZMWEAPONSLOT_NONE );
+    SetConfigSlot( ZMWeaponConfig::ZMCONFIGSLOT_FISTSCARRY );
 }
 
 void CZMWeaponHands::ItemPreFrame()
@@ -262,7 +263,7 @@ void CZMWeaponHands::PrimaryAttack()
     Swing( false );
 
 
-    float delay = GetFireRate();
+    float delay = GetPrimaryFireRate();
 
     m_flNextPrimaryAttack = gpGlobals->curtime + delay;
     m_flNextSecondaryAttack = gpGlobals->curtime + delay;
@@ -435,21 +436,6 @@ bool CZMWeaponHands::Deploy()
     }
 
     return bReturn;
-}
-
-void CZMWeaponHands::AddViewKick()
-{
-    // This is the punch view kick.
-    CZMPlayer* pPlayer = GetPlayerOwner();
-    if ( !pPlayer ) return;
-
-
-    QAngle ang;
-    ang.x = SharedRandomFloat( "fistsx", -1.0f, 1.0f );
-    ang.y = SharedRandomFloat( "fistsy", -1.0f, 1.0f );
-    ang.z = 0.0f;
-
-    pPlayer->ViewPunch( ang );
 }
 
 void CZMWeaponHands::ForceDrop( CBaseEntity* pEnt )

@@ -33,7 +33,7 @@ public:
     int GetDropAmmoAmount() const OVERRIDE { return SIZE_AMMO_BUCKSHOT; }
 #endif
 
-    bool IsFiringBothBarrels() const { return GetActivity() == ACT_VM_SECONDARYATTACK; }
+    bool IsFiringBothBarrels() const { return IsInSecondaryAttack(); }
 
 
     virtual void PrimaryAttack() OVERRIDE;
@@ -42,44 +42,9 @@ public:
 
 
     void ShootBarrels( bool bWantBoth );
-
-
-    virtual const Vector& GetBulletSpread( void ) OVERRIDE
-    {
-        static Vector cone = VECTOR_CONE_6DEGREES;
-        static Vector cone2 = VECTOR_CONE_15DEGREES;
-
-        return IsFiringBothBarrels() ? cone2 : cone;
-    }
-    
-    virtual void AddViewKick( void ) OVERRIDE
-    {
-        CZMPlayer* pPlayer = ToZMPlayer( GetOwner() );
-
-        if ( !pPlayer ) return;
-
-
-        QAngle viewPunch;
-
-        if ( IsFiringBothBarrels() )
-        {
-            viewPunch.x = SharedRandomFloat( "sportingpax", -16.0f, -8.0f );
-            viewPunch.y = SharedRandomFloat( "sportingpay", -4.0f, 4.0f );
-        }
-        else
-        {
-            viewPunch.x = SharedRandomFloat( "sportingpax", -8.0f, -6.0f );
-            viewPunch.y = SharedRandomFloat( "sportingpay", -4.0f, 4.0f );
-        }
-
-        viewPunch.z = 0.0f;
-
-        pPlayer->ViewPunch( viewPunch );
-    }
     
 
     virtual int GetBulletsPerShot() const OVERRIDE { return 7; }
-    virtual float GetFireRate( void ) OVERRIDE { return 0.45f; }
 };
 
 IMPLEMENT_NETWORKCLASS_ALIASED( ZMWeaponShotgunSporting, DT_ZM_WeaponShotgunSporting )
@@ -112,14 +77,10 @@ IMPLEMENT_ACTTABLE( CZMWeaponShotgunSporting );
 
 CZMWeaponShotgunSporting::CZMWeaponShotgunSporting()
 {
-    m_fMinRange1 = m_fMinRange2 = 0.0f;
-    m_fMaxRange1 = 800.0f;
-    m_fMaxRange2 = 500.0f;
-
-
     m_bFiresUnderwater = false;
 
     SetSlotFlag( ZMWEAPONSLOT_LARGE );
+    SetConfigSlot( ZMWeaponConfig::ZMCONFIGSLOT_SHOTGUNSPORTING );
 }
 
 void CZMWeaponShotgunSporting::PrimaryAttack()
@@ -127,7 +88,7 @@ void CZMWeaponShotgunSporting::PrimaryAttack()
     ShootBarrels( false );
 }
 
-void CZMWeaponShotgunSporting::SecondaryAttack( void )
+void CZMWeaponShotgunSporting::SecondaryAttack()
 {
     ShootBarrels( true );
 }
@@ -160,11 +121,11 @@ void CZMWeaponShotgunSporting::ShootBarrels( bool bWantBoth )
 
     if ( bShootSingle )
     {
-        Shoot( -1, -1, -1, m_fMaxRange1 );
+        Shoot( -1, -1, -1, GetWeaponConfig()->flPrimaryRange );
     }
     else
     {
-        Shoot( m_iPrimaryAmmoType, GetBulletsPerShot() * 2, 2, m_fMaxRange2, true, true );
+        Shoot( m_iPrimaryAmmoType, GetBulletsPerShot() * 2, 2, GetWeaponConfig()->flSecondaryRange, true, true );
     }
 }
 

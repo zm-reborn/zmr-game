@@ -34,31 +34,6 @@ public:
     const char* GetDropAmmoName() const OVERRIDE { return "item_ammo_pistol"; }
     int GetDropAmmoAmount() const OVERRIDE { return SIZE_AMMO_PISTOL; }
 #endif
-
-    virtual const Vector& GetBulletSpread( void ) OVERRIDE
-    {
-        static Vector cone = VECTOR_CONE_2DEGREES;
-        return cone;
-    }
-    
-    virtual void AddViewKick( void ) OVERRIDE
-    {
-        CZMPlayer* pPlayer = ToZMPlayer( GetOwner() );
-
-        if ( !pPlayer ) return;
-
-
-	    QAngle	viewPunch;
-
-	    viewPunch.x = SharedRandomFloat( "pistolpax", 0.25f, 0.5f );
-	    viewPunch.y = SharedRandomFloat( "pistolpay", -.6f, .6f );
-	    viewPunch.z = 0.0f;
-
-	    //Add it to the view punch
-	    pPlayer->ViewPunch( viewPunch );
-    }
-    
-    virtual float GetFireRate( void ) OVERRIDE { return 0.375f; };
 };
 
 IMPLEMENT_NETWORKCLASS_ALIASED( ZMWeaponPistol, DT_ZM_WeaponPistol )
@@ -100,10 +75,8 @@ IMPLEMENT_ACTTABLE( CZMWeaponPistol );
 
 CZMWeaponPistol::CZMWeaponPistol()
 {
-    m_fMinRange1 = m_fMinRange2 = 24.0f;
-    m_fMaxRange1 = m_fMaxRange2 = 1500.0f;
-
     m_bFiresUnderwater = true;
 
     SetSlotFlag( ZMWEAPONSLOT_SIDEARM );
+    SetConfigSlot( ZMWeaponConfig::ZMCONFIGSLOT_PISTOL );
 }

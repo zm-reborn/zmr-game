@@ -55,8 +55,6 @@ public:
 	
 	    DoMachineGunKick( EASY_DAMPEN, MAX_VERTICAL_KICK, m_fFireDuration, SLIDE_LIMIT );
     }
-    
-    virtual float GetFireRate() OVERRIDE { return 0.06f; };
 };
 
 IMPLEMENT_NETWORKCLASS_ALIASED( ZMWeaponMac10, DT_ZM_WeaponMac10 )
@@ -98,12 +96,10 @@ IMPLEMENT_ACTTABLE( CZMWeaponMac10 );
 
 CZMWeaponMac10::CZMWeaponMac10()
 {
-    m_fMinRange1 = m_fMinRange2 = 0.0f;
-    m_fMaxRange1 = m_fMaxRange2 = 1400.0f;
-
     m_bFiresUnderwater = false;
 
     SetSlotFlag( ZMWEAPONSLOT_LARGE );
+    SetConfigSlot( ZMWeaponConfig::ZMCONFIGSLOT_MAC10 );
 }
 
 const WeaponProficiencyInfo_t *CZMWeaponMac10::GetProficiencyValues()

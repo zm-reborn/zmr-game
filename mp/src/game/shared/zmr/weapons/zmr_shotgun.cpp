@@ -30,13 +30,6 @@ public:
     const char* GetDropAmmoName() const OVERRIDE { return "item_box_buckshot"; }
     int GetDropAmmoAmount() const OVERRIDE { return SIZE_AMMO_BUCKSHOT; }
 #endif
-
-    virtual const Vector& GetBulletSpread() OVERRIDE
-    {
-//#define CONE_25DEGREES      0.2170625f
-        static Vector cone = Vector( VECTOR_CONE_15DEGREES.x, VECTOR_CONE_15DEGREES.x * 0.3f, 0.0f );
-        return cone;
-    }
     
     virtual void AddViewKick() OVERRIDE
     {
@@ -106,10 +99,8 @@ IMPLEMENT_ACTTABLE( CZMWeaponShotgun );
 
 CZMWeaponShotgun::CZMWeaponShotgun()
 {
-    m_fMinRange1 = m_fMinRange2 = 0.0f;
-    m_fMaxRange1 = m_fMaxRange2 = 500.0f;
-
     m_bFiresUnderwater = false;
 
     SetSlotFlag( ZMWEAPONSLOT_LARGE );
+    SetConfigSlot( ZMWeaponConfig::ZMCONFIGSLOT_SHOTGUN );
 }

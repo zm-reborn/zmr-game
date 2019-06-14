@@ -396,6 +396,7 @@ CZMWeaponMolotov::CZMWeaponMolotov()
     m_bFiresUnderwater = false;
     
     SetSlotFlag( ZMWEAPONSLOT_EQUIPMENT );
+    SetConfigSlot( ZMWeaponConfig::ZMCONFIGSLOT_MOLOTOV );
 
 
 #ifdef CLIENT_DLL
