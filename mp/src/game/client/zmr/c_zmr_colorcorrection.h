@@ -9,20 +9,31 @@
 class CZMBaseCCEffect
 {
 public:
-    CZMBaseCCEffect( ClientCCHandle_t hndl = INVALID_CLIENT_CCHANDLE );
+    CZMBaseCCEffect( const char* name, const char* filename );
     virtual ~CZMBaseCCEffect();
 
+
+    const char*         GetName() const;
+    const char*         GetFilename() const;
     ClientCCHandle_t    GetHandle() const;
 
-    virtual float       GetWeight() = 0;
-    virtual bool        IsDone() = 0;
+    void                SetHandle( ClientCCHandle_t hndl );
 
-    //virtual bool        OnChangeTeam();
-    //virtual bool        OnDeath();
+    bool                HasHandle() const;
 
 
-protected:
+    virtual float       GetWeight() const = 0;
+    virtual bool        IsDone() const = 0;
+
+    virtual bool        OnTeamChange( int iTeam ) { return false; }
+    virtual bool        OnDeath() { return false; }
+
+
+private:
     ClientCCHandle_t m_Hndl;
+
+    const char* m_pszName;
+    const char* m_pszFilename;
 };
 //
 
@@ -42,7 +53,7 @@ public:
 
     void AddCC( CZMBaseCCEffect* cc );
 
-private:
+
     CUtlVector<CZMBaseCCEffect*> m_vCCs;
 };
 //
@@ -63,10 +74,8 @@ public:
     virtual void FireGameEvent( IGameEvent* event ) OVERRIDE;
 
 
-    //void AddEffect( CZMBaseCCEffect* pEffect );
-    void RemoveEffect( CZMBaseCCEffect* pEffect );
-
-
+    void AddEffect( CZMBaseCCEffect* pEffect );
+    bool RemoveEffect( CZMBaseCCEffect* pEffect );
 
     void OnDeath();
     void OnTeamChange( int iTeam );
@@ -75,12 +84,10 @@ public:
 
     void ReleaseCCEnt();
 
-    bool IsReady() const;
-
 private:
     bool CheckCC();
-    void InitCC();
     void InitEnt();
+    void InitEffects();
 
     
 
@@ -95,4 +102,4 @@ private:
 //
 
 
-extern CZMColorCorrectionSystem g_ZMColorCorrection;
+extern CZMColorCorrectionSystem* ZMGetCCSystem();
