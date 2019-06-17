@@ -412,7 +412,7 @@ void C_ZMPlayer::TeamChangeStatic( int iNewTeam )
     }
 
 
-    g_ZMColorCorrection.OnTeamChange( iNewTeam );
+    ZMGetCCSystem()->OnTeamChange( iNewTeam );
 }
 
 bool C_ZMPlayer::ShouldUseLocalFlashlight() const

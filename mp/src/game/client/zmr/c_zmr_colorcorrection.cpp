@@ -6,28 +6,55 @@
 
 
 
+CZMColorCorrectionSystem* ZMGetCCSystem()
+{
+    static CZMColorCorrectionSystem s;
+    return &s;
+}
+
+
 ConVar zm_cl_colorcorrection_effects( "zm_cl_colorcorrection_effects", "1", FCVAR_ARCHIVE );
 
 
-#define ZMCC_NAME_DEATH         "materials/colorcorrection/game_death.raw"
-
-
 //
-CZMBaseCCEffect::CZMBaseCCEffect( ClientCCHandle_t hndl )
+CZMBaseCCEffect::CZMBaseCCEffect( const char* name, const char* filename )
 {
-    m_Hndl = hndl;
+    m_Hndl = INVALID_CLIENT_CCHANDLE;
 
+    m_pszName = name;
+    m_pszFilename = filename;
 
-    //g_ZMColorCorrection.AddEffect( this );
+    ZMGetCCSystem()->AddEffect( this );
 }
 
 CZMBaseCCEffect::~CZMBaseCCEffect()
 {
+    ZMGetCCSystem()->RemoveEffect( this );
+}
+
+bool CZMBaseCCEffect::HasHandle() const
+{
+    return GetHandle() != INVALID_CLIENT_CCHANDLE;
+}
+
+const char* CZMBaseCCEffect::GetName() const
+{
+    return m_pszName;
+}
+
+const char* CZMBaseCCEffect::GetFilename() const
+{
+    return m_pszFilename;
 }
 
 ClientCCHandle_t CZMBaseCCEffect::GetHandle() const
 {
     return m_Hndl;
+}
+
+void CZMBaseCCEffect::SetHandle( ClientCCHandle_t hndl )
+{
+    m_Hndl = hndl;
 }
 //
 
@@ -39,21 +66,21 @@ C_ZMEntColorCorrection::C_ZMEntColorCorrection()
 
 C_ZMEntColorCorrection::~C_ZMEntColorCorrection()
 {
-    m_vCCs.RemoveAll();
-
-    g_ZMColorCorrection.m_pCCEnt = nullptr;
+    ZMGetCCSystem()->m_pCCEnt = nullptr;
 }
 
 void C_ZMEntColorCorrection::ClientThink()
 {
     FOR_EACH_VEC( m_vCCs, i )
     {
-        CZMBaseCCEffect* eff = m_vCCs[i];
+        auto* eff = m_vCCs[i];
 
         g_pColorCorrectionMgr->SetColorCorrectionWeight( eff->GetHandle(), eff->GetWeight() );
 
         if ( eff->IsDone() )
         {
+            g_pColorCorrectionMgr->SetColorCorrectionWeight( eff->GetHandle(), 0.0f );
+
             m_vCCs.Remove( i );
             --i;
         }
@@ -62,6 +89,9 @@ void C_ZMEntColorCorrection::ClientThink()
 
 void C_ZMEntColorCorrection::AddCC( CZMBaseCCEffect* cc )
 {
+    if ( m_vCCs.Find( cc ) != m_vCCs.InvalidIndex() )
+        return;
+
     m_vCCs.AddToTail( cc );
 }
 //
@@ -80,7 +110,7 @@ CZMColorCorrectionSystem::~CZMColorCorrectionSystem()
 
 bool CZMColorCorrectionSystem::Init()
 {
-    //ListenForGameEvent( "player_death" );
+    ListenForGameEvent( "player_death" );
 
     return true;
 }
@@ -96,33 +126,45 @@ void CZMColorCorrectionSystem::FireGameEvent( IGameEvent* event )
     }
 }
 
-bool CZMColorCorrectionSystem::IsReady() const
+void CZMColorCorrectionSystem::AddEffect( CZMBaseCCEffect* eff )
 {
-    return true;//m_CC_Death != INVALID_CLIENT_CCHANDLE;
+    m_vEffects.AddToTail( eff );
+}
+
+bool CZMColorCorrectionSystem::RemoveEffect( CZMBaseCCEffect* eff )
+{
+    return m_vEffects.FindAndRemove( eff );
 }
 
 bool CZMColorCorrectionSystem::CheckCC()
 {
-    return false;
-    /*
     if ( !zm_cl_colorcorrection_effects.GetBool() )
         return false;
 
 
-    if ( !IsReady() )
-        InitCC();
+    //if ( !IsReady() )
+    //    InitCC();
 
 
     InitEnt();
 
+    InitEffects();
+
     return true;
-    */
+    
 }
 
-void CZMColorCorrectionSystem::InitCC()
+void CZMColorCorrectionSystem::InitEffects()
 {
-    //m_CC_Death = g_pColorCorrectionMgr->AddColorCorrection( ZMCC_NAME_DEATH );
+    FOR_EACH_VEC( m_vEffects, i )
+    {
+        auto* eff = m_vEffects[i];
 
+        if ( !eff->HasHandle() )
+        {
+            eff->SetHandle( g_pColorCorrectionMgr->AddColorCorrection( eff->GetName(), eff->GetFilename() ) );
+        }
+    }
 }
 
 void CZMColorCorrectionSystem::InitEnt()
@@ -150,44 +192,26 @@ void CZMColorCorrectionSystem::OnDeath()
 
     FOR_EACH_VEC( m_vEffects, i )
     {
-        m_pCCEnt->AddCC( m_vEffects[i] );
+        auto* eff = m_vEffects[i];
+        if ( eff->OnDeath() )
+        {
+            m_pCCEnt->AddCC( eff );
+        }
     }
-    
 }
 
 void CZMColorCorrectionSystem::OnTeamChange( int iTeam )
 {
-    CheckCC();
+    if ( !CheckCC() ) return;
+
+
+    FOR_EACH_VEC( m_vEffects, i )
+    {
+        auto* eff = m_vEffects[i];
+        if ( eff->OnTeamChange( iTeam ) )
+        {
+            m_pCCEnt->AddCC( eff );
+        }
+    }
 }
 //
-
-
-CZMColorCorrectionSystem g_ZMColorCorrection;
-
-
-
-
-class CZMDeathEffect : public CZMBaseCCEffect
-{
-public:
-    CZMDeathEffect( ClientCCHandle_t hndl ) : CZMBaseCCEffect( hndl )
-    {
-        m_flEnd = gpGlobals->curtime + 6.0f;
-    }
-
-    virtual float GetWeight() OVERRIDE
-    {
-        float v = m_flEnd - gpGlobals->curtime;
-        return clamp( v / 2.5f, 0.0f, 1.0f );
-    }
-
-    virtual bool IsDone() OVERRIDE
-    {
-        return (m_flEnd - gpGlobals->curtime) <= 0.0f;
-    }
-
-private:
-    float m_flEnd;
-};
-
-//CZMDeathEffect g_ZMCCDeathEffect;
