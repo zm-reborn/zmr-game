@@ -60,6 +60,8 @@ BEGIN_SEND_TABLE_NOBASE( CZMPlayer, DT_ZMNonLocalPlayerExclusive )
 
     SendPropFloat( SENDINFO_VECTORELEM( m_angEyeAngles, 0 ), 8, SPROP_CHANGES_OFTEN, -90.0f, 90.0f ),
     SendPropAngle( SENDINFO_VECTORELEM( m_angEyeAngles, 1 ), 10, SPROP_CHANGES_OFTEN ),
+
+    SendPropInt( SENDINFO( m_nMuzzleFlashParity ), EF_MUZZLEFLASH_BITS, SPROP_UNSIGNED ),
 END_SEND_TABLE()
 
 IMPLEMENT_SERVERCLASS_ST( CZMPlayer, DT_ZM_Player )
@@ -77,6 +79,9 @@ IMPLEMENT_SERVERCLASS_ST( CZMPlayer, DT_ZM_Player )
     // Other players' water level is networked for animations.
     SendPropInt( SENDINFO( m_nWaterLevel ), 2, SPROP_UNSIGNED ),
     SendPropExclude( "DT_LocalPlayerExclusive", "m_nWaterLevel" ),
+    
+    // We only want to send it to other players.
+    SendPropExclude( "DT_BaseAnimating", "m_nMuzzleFlashParity" ),
 
     
     SendPropExclude( "DT_BaseAnimating", "m_flPoseParameter" ),
