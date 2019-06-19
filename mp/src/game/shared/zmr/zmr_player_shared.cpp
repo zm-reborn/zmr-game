@@ -1006,3 +1006,10 @@ bool CZMPlayer::HandleShotImpactingWater( const FireBulletsInfo_t& info, const V
 
     return true;
 }
+
+void CZMPlayer::DoMuzzleFlash()
+{
+    // By default, the player muzzleflash will call into active weapon muzzleflash.
+    // We don't want that, because it might not be networked.
+    CBaseAnimating::DoMuzzleFlash();
+}

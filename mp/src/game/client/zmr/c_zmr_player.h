@@ -55,6 +55,7 @@ public:
     void                    SetLocalAngles( const QAngle& angles );
     virtual float           GetFOV() OVERRIDE;
     virtual float           GetMinFOV() const OVERRIDE { return 5.0f; };
+    virtual void            ProcessMuzzleFlashEvent() OVERRIDE;
 
     int GetIDTarget() const;
 
@@ -114,6 +115,7 @@ public:
     void                    SimulateBullet( ZMFireBulletsInfo_t& bulletinfo );
     bool                    HandleBulletPenetration( trace_t& tr, const ZMFireBulletsInfo_t& bulletinfo, Vector& vecNextSrc, float& flDistance );
     bool                    HandleShotImpactingWater( const FireBulletsInfo_t& info, const Vector& vecEnd, CTraceFilter* pFilter );
+    virtual void            DoMuzzleFlash() OVERRIDE;
 
     void SetMouseWheelMove( float dir );
 

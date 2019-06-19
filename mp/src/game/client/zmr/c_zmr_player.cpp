@@ -10,6 +10,7 @@
 #include "bone_setup.h"
 #include "flashlighteffect.h"
 #include "in_buttons.h"
+#include "debugoverlay_shared.h"
 
 
 #include "zmr/c_zmr_util.h"
@@ -81,6 +82,8 @@ BEGIN_RECV_TABLE_NOBASE( C_ZMPlayer, DT_ZMNonLocalPlayerExclusive )
 
     RecvPropFloat( RECVINFO( m_angEyeAngles[0] ) ),
     RecvPropFloat( RECVINFO( m_angEyeAngles[1] ) ),
+
+    RecvPropInt( RECVINFO( m_nMuzzleFlashParity ) ),
 END_RECV_TABLE()
 
 IMPLEMENT_CLIENTCLASS_DT( C_ZMPlayer, DT_ZM_Player, CZMPlayer )
@@ -573,6 +576,17 @@ void C_ZMPlayer::Simulate()
     }
 
 
+	if ( gpGlobals->frametime != 0.0f  )
+	{
+        if ( ShouldMuzzleFlash() )
+        {
+            DisableMuzzleFlash();
+		
+            ProcessMuzzleFlashEvent();
+        }
+
+		//DoAnimationEvents( GetModelPtr() );
+	}
 
     C_BaseEntity::Simulate();
 
@@ -1036,6 +1050,135 @@ void C_ZMPlayer::ReleaseOtherFlashlight()
 
         m_pFlashlightBeam = nullptr;
     }
+}
+
+
+
+#define FLASH_NONE              0
+#define FLASH_LOCAL_ONLY        1
+#define FLASH_ALL_PLAYERS       2
+
+extern ConVar muzzleflash_light;
+
+ConVar zm_cl_muzzleflash_light( "zm_cl_muzzleflash_light", "2", FCVAR_ARCHIVE, "0 = No light, 1 = Only local player, 2 = All players" );
+ConVar zm_cl_muzzleflash_light_color( "zm_cl_muzzleflash_light_color", "255 240 120", FCVAR_ARCHIVE, "Color of the muzzleflash light" );
+
+ConVar zm_cl_muzzleflash_light_size_min( "zm_cl_muzzleflash_light_size_min", "128", FCVAR_ARCHIVE, "", true, 0.0f, true, 512.0f );
+ConVar zm_cl_muzzleflash_light_size_max( "zm_cl_muzzleflash_light_size_max", "256", FCVAR_ARCHIVE, "", true, 0.0f, true, 512.0f );
+ConVar zm_cl_muzzleflash_light_lifetime( "zm_cl_muzzleflash_light_lifetime", "0.05", FCVAR_ARCHIVE, "", true, 0.01f, true, 0.1f );
+ConVar zm_cl_muzzleflash_light_exponent( "zm_cl_muzzleflash_light_exponent", "5", FCVAR_ARCHIVE, "", true, 1.0f, true, 20.0f );
+
+ConVar zm_cl_muzzleflash_light_debug( "zm_cl_muzzleflash_light_debug", "0", FCVAR_CHEAT );
+
+void C_ZMPlayer::ProcessMuzzleFlashEvent()
+{
+    // How many units we push the light forward from player's eyes.
+    const float flMuzzleflashFwd = 32.0f;
+
+
+    int allowed = zm_cl_muzzleflash_light.GetInt();
+
+    if ( allowed == FLASH_NONE )
+    {
+        return;
+    }
+
+
+    float lifetime = zm_cl_muzzleflash_light_lifetime.GetFloat();
+    if ( lifetime <= 0.0f )
+    {
+        return;
+    }
+
+
+    Vector pos = vec3_origin;
+    bool bHasPos = false;
+    
+
+    // Local player doesn't get rendered, so just estimate the position.
+    if ( IsLocalPlayer() )
+    {
+        pos = EyePosition() + MainViewForward() * flMuzzleflashFwd;
+
+        bHasPos = true;
+    }
+    else
+    {
+        if ( allowed != FLASH_ALL_PLAYERS )
+        {
+            return;
+        }
+
+
+        // ZMRTODO: Use the proper muzzle position.
+        // This doesn't seem to work, because the attachment abs position
+        // doesn't account the player angles, etc.
+        //auto* pWep = GetActiveWeapon();
+        //
+        //if ( pWep )
+        //{
+        //    QAngle ang;
+
+        //    if (pWep->GetAttachment( "muzzle", pos, ang )
+        //    ||  pWep->GetAttachment( 1, pos, ang ))
+        //    {
+        //        bHasPos = true;
+        //    }
+        //}
+
+        Vector fwd;
+        EyeVectors( &fwd );
+        
+        pos = EyePosition() + fwd * flMuzzleflashFwd;
+        bHasPos = true;
+    }
+    
+
+    if ( !bHasPos )
+    {
+        pos = WorldSpaceCenter();
+    }
+
+
+
+    //
+    // Perform the muzzleflash light
+    //
+    float radius = random->RandomInt(   zm_cl_muzzleflash_light_size_min.GetFloat(),
+                                        zm_cl_muzzleflash_light_size_max.GetFloat() );
+
+    float debugtime = zm_cl_muzzleflash_light_debug.GetFloat();
+
+    if ( debugtime > 0.0f )
+    {
+        NDebugOverlay::Sphere( pos, radius, 255, 0, 0, false, debugtime );
+    }
+
+
+    int r = 255;
+    int g = 255;
+    int b = 255;
+        
+    CSplitString split( zm_cl_muzzleflash_light_color.GetString(), " " );
+        
+    if ( split.Count() > 0 )
+        r = Q_atoi( split[0] );
+    if ( split.Count() > 1 )
+        g = Q_atoi( split[1] );
+    if ( split.Count() > 2 )
+        b = Q_atoi( split[2] );
+
+
+    // Dynamic light
+    dlight_t* el = effects->CL_AllocDlight( LIGHT_INDEX_MUZZLEFLASH + index );
+    el->origin = pos;
+    el->radius = radius; 
+    el->decay = el->radius / lifetime;
+    el->die = gpGlobals->curtime + lifetime;
+    el->color.r = (byte)r;
+    el->color.g = (byte)g;
+    el->color.b = (byte)b;
+    el->color.exponent = (signed char)zm_cl_muzzleflash_light_exponent.GetInt();
 }
 
 bool C_ZMPlayer::CreateMove( float delta, CUserCmd* cmd )
