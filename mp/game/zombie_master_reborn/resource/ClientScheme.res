@@ -896,10 +896,18 @@ Scheme
 			{
 				"name"		"Built Titling Rg"
 				"tall"		"28"
-				"weight"	"100"
+				"weight"	"0"
 				"antialias" "1"
 				"additive"	"0"
-				"custom"	"1"
+				"range"		"0x0000 0x007F"
+			}
+			"2"
+			{
+				"name"		"Verdana"
+				"tall"		"28"
+				"weight"	"500"
+				"antialias" "1"
+				"additive"	"0"
 			}
 		}
 		ZMMainMenuSubButton
@@ -908,10 +916,18 @@ Scheme
 			{
 				"name"		"Built Titling Rg"
 				"tall"		"18"
-				"weight"	"100"
+				"weight"	"0"
 				"antialias" "1"
 				"additive"	"0"
-				"custom"	"1"
+				"range"		"0x0000 0x007F"
+			}
+			"2"
+			{
+				"name"		"Verdana"
+				"tall"		"18"
+				"weight"	"500"
+				"antialias" "1"
+				"additive"	"0"
 			}
 		}
 		ZMLoadingScreenMain
