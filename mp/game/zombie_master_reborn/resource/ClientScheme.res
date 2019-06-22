@@ -577,7 +577,6 @@ Scheme
 				"weight"	"0"
 				"antialias" "1"
 				"additive"	"0"
-				"custom"	"1"
 			}
 		}
 		ZMHudNumbersGlow
@@ -591,7 +590,6 @@ Scheme
 				"scanlines" "2"
 				"antialias" "1"
 				"additive"	"1"
-				"custom"	"1"
 			}
 		}
 		ZMHudNumbersShadow
@@ -604,7 +602,6 @@ Scheme
 				"blur"		"6"
 				"antialias" "0"
 				"additive"	"0"
-				"custom"	"1"
 			}
 		}
 		ZMHudNumbersSmall
@@ -616,7 +613,6 @@ Scheme
 				"weight"	"0"
 				"antialias" "1"
 				"additive"	"0"
-				"custom"	"1"
 			}
 		}
 		ZMHudNumbersSmallGlow
@@ -630,7 +626,6 @@ Scheme
 				"scanlines" "2"
 				"antialias" "1"
 				"additive"	"1"
-				"custom"	"1"
 			}
 		}
 		ZMHudNumbersSmallShadow
@@ -643,7 +638,6 @@ Scheme
 				"blur"		"6"
 				"antialias" "0"
 				"additive"	"0"
-				"custom"	"1"
 			}
 		}
 		ZMHudVote
@@ -654,7 +648,6 @@ Scheme
 				"tall"		"28"
 				"weight"	"2000"
 				"antialias" "1"
-				"custom"	"1"
 			}
 		}
 		ZMHudVoteReason
@@ -665,7 +658,6 @@ Scheme
 				"tall"		"24"
 				"weight"	"2000"
 				"antialias" "1"
-				"custom"	"1"
 			}
 		}
 		ZMHudVoteText
@@ -687,7 +679,6 @@ Scheme
 				"weight"	"0"
 				"antialias" "1"
 				"additive"	"1"
-				"custom"	"1"
 			}
 		}
 		ZMHudObjectivesSmall
