@@ -215,6 +215,8 @@ $Project "Client (ZMR)"
 				$File	"zmr\npcs\c_zmr_zombieanimevent.h"
 				$File	"zmr\npcs\c_zmr_zombiebase.cpp"
 				$File	"zmr\npcs\c_zmr_zombiebase.h"
+				$File	"zmr\npcs\c_zmr_zombiegib.cpp"
+				$File	"zmr\npcs\c_zmr_zombiegib.h"
 				
 				// Shared
 				$File	"$SRCDIR\game\shared\zmr\npcs\zmr_zombieanimstate.cpp"
