@@ -11,6 +11,17 @@ C_NPCRNonPlayer::C_NPCRNonPlayer()
     m_iLastActivity = ACT_INVALID;
 }
 
+void C_NPCRNonPlayer::PostDataUpdate( DataUpdateType_t updateType )
+{
+    BaseClass::PostDataUpdate( updateType );
+
+    if ( updateType == DATA_UPDATE_CREATED )
+    {
+        // Default to idle animation when spawning.
+        SetActivity( ACT_IDLE );
+    }
+}
+
 void C_NPCRNonPlayer::DispatchAnimEvents()
 {
     // don't fire events if the framerate is 0
