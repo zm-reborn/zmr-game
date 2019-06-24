@@ -257,6 +257,9 @@ private:
     CNetworkVar( bool, m_bIsOnGround );
     CNetworkVar( int, m_iAnimationRandomSeed );
 
+    // When we die these change.
+    CNetworkVar( int, m_iGibType );
+
 
 
     CHandle<CZMEntAmbushTrigger> m_hAmbushEnt;
