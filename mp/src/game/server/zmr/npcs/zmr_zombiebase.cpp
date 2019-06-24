@@ -348,7 +348,6 @@ void CZMBaseZombie::Spawn()
 
     BaseClass::Spawn();
 
-    DoAnimationEvent( ZOMBIEANIMEVENT_IDLE );
 
     SetThink( &CZMBaseZombie::ZombieThink );
     SetNextThink( gpGlobals->curtime );

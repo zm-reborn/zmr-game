@@ -78,6 +78,11 @@ void CNPCRNonPlayer::Spawn()
     
     InitBoneControllers(); 
 
+    // Default to idle. Remember to set in client as well.
+    // Animation events may not get through to client, and it's better to have
+    // some animation, rather than model's default animation which can be anything.
+    SetActivity( ACT_IDLE );
+
 
     SetThink( &CNPCRNonPlayer::NPCThink );
     SetNextThink( gpGlobals->curtime );
