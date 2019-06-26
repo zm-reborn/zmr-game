@@ -634,6 +634,17 @@ bool CZMEntZombieSpawn::FindSpawnPoint( CZMBaseZombie* pZombie, Vector& outpos, 
                 }
             }
         }
+        else
+        {
+            CBaseEntity* pEnt = gEntList.FindEntityByName( nullptr, m_sFirstNodeName );
+
+            auto* pBrush = dynamic_cast<CZMEntTriggerSpawnVolume*>( pEnt );
+            if ( pBrush )
+            {
+                pBrush->GetPositionWithin( outpos );
+                return true;
+            }
+        }
     }
 
 
@@ -2259,4 +2270,113 @@ void CZMEntFogController::InitFog()
     m_fog.lerptime = -1.0f;
 
     m_flSkyboxFarZ = zm_sv_zmfog_farz_skybox.GetFloat();
+}
+
+/*
+    Brush spawn volume
+*/
+BEGIN_DATADESC( CZMEntTriggerSpawnVolume )
+    DEFINE_KEYFIELD( m_bActive, FIELD_BOOLEAN, "Active" ),
+
+    DEFINE_INPUTFUNC( FIELD_VOID, "Toggle", InputToggle ),
+    DEFINE_INPUTFUNC( FIELD_VOID, "Disable", InputDisable ),
+    DEFINE_INPUTFUNC( FIELD_VOID, "Enable", InputEnable ),
+END_DATADESC()
+
+LINK_ENTITY_TO_CLASS( trigger_zombiespawnvolume, CZMEntTriggerSpawnVolume );
+
+
+CZMEntTriggerSpawnVolume::CZMEntTriggerSpawnVolume()
+{
+
+}
+
+CZMEntTriggerSpawnVolume::~CZMEntTriggerSpawnVolume()
+{
+
+}
+
+void CZMEntTriggerSpawnVolume::Spawn()
+{
+    BaseClass::Spawn();
+
+    InitTrigger();
+}
+
+void CZMEntTriggerSpawnVolume::InputToggle( inputdata_t &inputData )
+{
+    m_bActive = !m_bActive;
+}
+
+void CZMEntTriggerSpawnVolume::InputEnable( inputdata_t &inputData )
+{
+    m_bActive = true;
+}
+
+void CZMEntTriggerSpawnVolume::InputDisable( inputdata_t &inputData )
+{
+    m_bActive = false;
+}
+
+void CZMEntTriggerSpawnVolume::GetPositionWithin( const CBaseEntity* pEnt, Vector& pos )
+{
+    auto* pNonConst = const_cast<CBaseEntity*>( pEnt );
+
+    auto* pModel = pNonConst->GetModel();
+    if ( !pModel )
+    {
+        Assert( 0 );
+        return;
+    }
+
+
+    float size = modelinfo->GetModelRadius( pModel ) + 10.0f;
+
+
+    Vector start, dir;
+    QAngle ang;
+    Ray_t ray;
+    trace_t tr;
+
+    
+    Vector origin = pEnt->GetAbsOrigin();
+    
+    // Try a few times.
+    for ( int i = 0; i < 3; i++ )
+    {
+        ang.x = random->RandomFloat( -20.0f, 20.0f );
+        ang.y = random->RandomFloat( -180.0f, 180.0f );
+        ang.z = 0.0f;
+
+        AngleVectors( ang, &dir );
+
+
+
+        start = origin + dir * size;
+
+        // Trace inwards to find a position on the surface.
+        ray.Init( start, origin );
+
+        enginetrace->ClipRayToEntity( ray, MASK_SOLID, pNonConst, &tr );
+        if ( tr.fraction == 1.0f )
+            continue;
+
+        Assert( tr.m_pEnt == pEnt );
+
+
+        // Get a random position between the surface and the origin.
+        // This assumes we're convex.
+        float dist = (tr.endpos - origin).Length();
+
+        float mult = random->RandomFloat( 0.1f, 0.95f );
+
+        pos = origin + dir * dist * mult;
+
+        break;
+    }
+}
+
+void CZMEntTriggerSpawnVolume::GetPositionWithin( Vector& pos ) const
+{
+    GetPositionWithin( this, pos );
 }
