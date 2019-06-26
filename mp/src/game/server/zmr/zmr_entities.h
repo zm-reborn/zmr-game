@@ -501,3 +501,33 @@ private:
     bool m_bNeedsInit;
 };
 
+/*
+    Brush spawn volume
+*/
+class CZMEntTriggerSpawnVolume : public CBaseTrigger
+{
+public:
+    DECLARE_CLASS( CZMEntTriggerSpawnVolume, CBaseTrigger );
+    DECLARE_DATADESC();
+
+
+    CZMEntTriggerSpawnVolume();
+    ~CZMEntTriggerSpawnVolume();
+
+    void Spawn() OVERRIDE;
+
+
+    static void GetPositionWithin( const CBaseEntity* pEnt, Vector& pos );
+    void GetPositionWithin( Vector& pos ) const;
+
+
+    inline bool IsActive() const { return m_bActive; }
+
+
+    void InputToggle( inputdata_t &inputdata );
+    void InputEnable( inputdata_t &inputdata );
+    void InputDisable( inputdata_t &inputdata );
+
+private:
+    bool m_bActive;
+};
