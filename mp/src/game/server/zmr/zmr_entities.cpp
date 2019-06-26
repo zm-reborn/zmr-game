@@ -1113,7 +1113,7 @@ BEGIN_DATADESC( CZMEntTriggerPlayerCount )
 
     DEFINE_INPUTFUNC( FIELD_VOID, "Toggle", InputToggle ),
     DEFINE_INPUTFUNC( FIELD_VOID, "Disable", InputDisable ),
-    DEFINE_INPUTFUNC( FIELD_VOID, "Enabled", InputEnable ),
+    DEFINE_INPUTFUNC( FIELD_VOID, "Enable", InputEnable ),
 
     DEFINE_OUTPUT( m_OnCount, "OnCount" ),
 END_DATADESC()
@@ -1259,7 +1259,7 @@ BEGIN_DATADESC( CZMEntTriggerEntityCount )
 
     DEFINE_INPUTFUNC( FIELD_VOID, "Toggle", InputToggle ),
     DEFINE_INPUTFUNC( FIELD_VOID, "Disable", InputDisable ),
-    DEFINE_INPUTFUNC( FIELD_VOID, "Enabled", InputEnable ),
+    DEFINE_INPUTFUNC( FIELD_VOID, "Enable", InputEnable ),
 
     DEFINE_INPUTFUNC( FIELD_VOID, "Count", InputCount ),
 
@@ -1615,7 +1615,7 @@ BEGIN_DATADESC( CZMEntTriggerBlockHidden )
 
     DEFINE_INPUTFUNC( FIELD_VOID, "Toggle", InputToggle ),
     DEFINE_INPUTFUNC( FIELD_VOID, "Disable", InputDisable ),
-    DEFINE_INPUTFUNC( FIELD_VOID, "Enabled", InputEnable ),
+    DEFINE_INPUTFUNC( FIELD_VOID, "Enable", InputEnable ),
 END_DATADESC()
 
 LINK_ENTITY_TO_CLASS( trigger_blockspotcreate, CZMEntTriggerBlockHidden );
@@ -1664,7 +1664,7 @@ BEGIN_DATADESC( CZMEntTriggerBlockPhysExp )
 
     DEFINE_INPUTFUNC( FIELD_VOID, "Toggle", InputToggle ),
     DEFINE_INPUTFUNC( FIELD_VOID, "Disable", InputDisable ),
-    DEFINE_INPUTFUNC( FIELD_VOID, "Enabled", InputEnable ),
+    DEFINE_INPUTFUNC( FIELD_VOID, "Enable", InputEnable ),
 END_DATADESC()
 
 LINK_ENTITY_TO_CLASS( trigger_blockphysexplosion, CZMEntTriggerBlockPhysExp );
