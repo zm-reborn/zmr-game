@@ -262,7 +262,11 @@ void CZMEntZombieSpawn::InputToggle( inputdata_t &inputdata )
     BaseClass::InputToggle( inputdata );
 
     if ( IsActive() ) StartSpawning();
-    else StopSpawning();
+    else
+    {
+        StopSpawning();
+        SendMenuUpdate(); // Make sure we close the menu.
+    }
 }
 
 void CZMEntZombieSpawn::InputHide( inputdata_t &inputdata )
@@ -270,6 +274,7 @@ void CZMEntZombieSpawn::InputHide( inputdata_t &inputdata )
     BaseClass::InputHide( inputdata );
 
     StopSpawning();
+    SendMenuUpdate(); // Make sure we close the menu.
 }
 
 void CZMEntZombieSpawn::InputUnhide( inputdata_t &inputdata )
@@ -408,7 +413,7 @@ void CZMEntZombieSpawn::SendMenuUpdate()
     {
 		WRITE_SHORT( entindex() );
 
-		WRITE_BOOL( false ); // Force open
+		WRITE_BOOL( IsActive() );
 
         int count = m_vSpawnQueue.Count();
         WRITE_BYTE( count );
