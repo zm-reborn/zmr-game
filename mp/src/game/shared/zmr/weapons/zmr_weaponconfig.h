@@ -40,14 +40,35 @@ namespace ZMWeaponConfig
 
 
     //
+    struct ZMAttackConfig_t
+    {
+        void Reset();
+        void ToKeyValues( KeyValues* kv ) const;
+        void FromKeyValues( KeyValues* kv );
+
+        float flDamage;
+
+        Vector vecViewPunch_Min;
+        Vector vecViewPunch_Max;
+
+        Vector vecSpread;
+
+        float flFireRate;
+
+        float flRange;
+    };
+    //
+
+    //
     class CZMBaseWeaponConfig
     {
     public:
-        CZMBaseWeaponConfig( const char* wepname );
+        CZMBaseWeaponConfig( const char* wepname, const char* configpath );
         ~CZMBaseWeaponConfig();
 
 
         virtual void LoadFromConfig( KeyValues* kv );
+        virtual KeyValues* ToKeyValues() const;
 
 
         static bool IsValidFirerate( float rate ) { return rate >= 0.0f; }
@@ -58,9 +79,11 @@ namespace ZMWeaponConfig
 
 
         virtual bool OverrideFromConfig( KeyValues* kv );
+        void OverrideAttack( KeyValues* kv, ZMAttackConfig_t& attack );
 
 
         char* pszWeaponName;
+        char* pszConfigFilePath;
         char* pszPrintName;
 
 
@@ -80,34 +103,10 @@ namespace ZMWeaponConfig
 
     
         //
-        // Primary Attack
+        // Attacks
         //
-        float flPrimaryDamage;
-
-        Vector vecPrimaryViewPunch_Min;
-        Vector vecPrimaryViewPunch_Max;
-
-        Vector vecPrimarySpread;
-
-        float flPrimaryFireRate;
-
-        float flPrimaryRange;
-        //
-
-
-        //
-        // Secondary Attack
-        //
-        float flSecondaryDamage;
-
-        Vector vecSecondaryViewPunch_Min;
-        Vector vecSecondaryViewPunch_Max;
-
-        Vector vecSecondarySpread;
-
-        float flSecondaryFireRate;
-
-        float flSecondaryRange;
+        ZMAttackConfig_t primary;
+        ZMAttackConfig_t secondary;
         //
 
 
@@ -147,16 +146,20 @@ namespace ZMWeaponConfig
         bool bUseHands;
         //
 
-    protected:
-        virtual void LoadPrimaryAttack( KeyValues* kv );
-        virtual void LoadSecondaryAttack( KeyValues* kv );
 
-        void ComputeSpread( const char* data, Vector& spread );
-        void CopyAllocString( const char* str, char** out );
+        static void ComputeSpread( const char* data, Vector& spread );
+        static void CopyAllocString( const char* str, char** out );
         void CopyAmmoIndex( const char* str, int& ammo );
-        void CopyVector( const char* str, Vector& vec );
+
+        static void CopyVector( const char* str, Vector& vec );
+        static void VectorToKv( KeyValues* kv, const char* name, const Vector& vec );
+
+
+    protected:
+
 #ifdef CLIENT_DLL
-        void CopyIcon( KeyValues* kv, CHudTexture** icon );
+        static void CopyIcon( KeyValues* kv, CHudTexture** icon );
+        static void IconToKv( KeyValues* kv, CHudTexture* icon );
 #endif
     };
     //
@@ -164,12 +167,12 @@ namespace ZMWeaponConfig
 
 
     //
-#define REGISTER_WEAPON_CONFIG(classname, slot, configclass) static CZMWepConfigReg reg_##className##( #classname, slot, []( const char* wepname ) { return (CZMBaseWeaponConfig*)(new configclass( wepname )); } );
+#define REGISTER_WEAPON_CONFIG(classname, slot, configclass) static CZMWepConfigReg reg_##classname##( #classname, slot, []( const char* wepname, const char* configpath ) { return (CZMBaseWeaponConfig*)(new configclass( wepname, configpath )); } );
     //
 
 
     //
-    typedef CZMBaseWeaponConfig* (CreateWeaponConfigFn)( const char* wepname );
+    typedef CZMBaseWeaponConfig* (CreateWeaponConfigFn)( const char* wepname, const char* configpath );
     //
 
     //
@@ -213,9 +216,18 @@ namespace ZMWeaponConfig
 
     
         WeaponConfigSlot_t RegisterBareBonesWeapon( const char* classname );
-        void RegisterConfig( const char* classname, WeaponConfigSlot_t slot, CreateWeaponConfigFn fn );
+
+        WeaponConfigSlot_t RegisterCustomWeapon( WeaponConfigSlot_t baseslot, const char* filename );
 
         const CZMBaseWeaponConfig* GetConfigBySlot( WeaponConfigSlot_t slot );
+
+    protected:
+        void RegisterConfig( const char* classname, WeaponConfigSlot_t slot, CreateWeaponConfigFn fn );
+        
+        WeaponConfigSlot_t FindCustomConfigByConfigPath( const char* configpath ) const;
+        WeaponConfigSlot_t FindEmptyCustomConfigSlot() const;
+
+        void ClearCustomConfigs();
 
     private:
         void InitConfigs();
@@ -227,6 +239,9 @@ namespace ZMWeaponConfig
 
 
         CreateWeaponConfig_t m_ConfigRegisters[ZMCONFIGSLOT_REGISTERED_END];
+
+
+        friend class CZMWepConfigReg;
     };
     //
 

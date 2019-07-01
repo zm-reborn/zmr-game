@@ -41,10 +41,12 @@ BEGIN_NETWORK_TABLE( CZMBaseWeapon, DT_ZM_BaseWeapon )
     RecvPropInt( RECVINFO( m_nOverrideClip1 ) ),
     RecvPropTime( RECVINFO( m_flNextClipFillTime ) ),
     RecvPropBool( RECVINFO( m_bCanCancelReload ) ),
+    RecvPropString( RECVINFO( m_sScriptFileName ) ),
 #else
     SendPropInt( SENDINFO( m_nOverrideClip1 ) ),
     SendPropTime( SENDINFO( m_flNextClipFillTime ) ),
     SendPropBool( SENDINFO( m_bCanCancelReload ) ),
+    SendPropStringT( SENDINFO( m_sScriptFileName ) ),
 #endif
 END_NETWORK_TABLE()
 
@@ -64,6 +66,8 @@ BEGIN_DATADESC( CZMBaseWeapon )
 
     DEFINE_KEYFIELD( m_nOverrideDamage, FIELD_INTEGER, "dmgoverride" ),
     DEFINE_KEYFIELD( m_nOverrideClip1, FIELD_INTEGER, "clip1override" ),
+
+    DEFINE_KEYFIELD( m_sScriptFileName, FIELD_STRING, "customscriptfile" ),
 END_DATADESC()
 
 
@@ -87,6 +91,12 @@ CZMBaseWeapon::CZMBaseWeapon()
 
     m_flNextClipFillTime = 0.0f;
     m_bCanCancelReload = true;
+
+#ifdef GAME_DLL
+    m_sScriptFileName = MAKE_STRING( "" );
+#else
+    m_sScriptFileName[0] = NULL;
+#endif
 }
 
 CZMBaseWeapon::~CZMBaseWeapon()
@@ -459,13 +469,13 @@ void CZMBaseWeapon::AddViewKick()
     
     if ( !IsInSecondaryAttack() )
     {
-        min = GetWeaponConfig()->vecPrimaryViewPunch_Min;
-        max = GetWeaponConfig()->vecPrimaryViewPunch_Max;
+        min = GetWeaponConfig()->primary.vecViewPunch_Min;
+        max = GetWeaponConfig()->primary.vecViewPunch_Max;
     }
     else
     {
-        min = GetWeaponConfig()->vecSecondaryViewPunch_Min;
-        max = GetWeaponConfig()->vecSecondaryViewPunch_Max;
+        min = GetWeaponConfig()->secondary.vecViewPunch_Min;
+        max = GetWeaponConfig()->secondary.vecViewPunch_Max;
     }
 
 
@@ -592,7 +602,7 @@ char const* CZMBaseWeapon::GetShootSound( int iIndex ) const
 
 float CZMBaseWeapon::GetPrimaryFireRate() const
 {
-    return GetWeaponConfig()->flPrimaryFireRate;
+    return GetWeaponConfig()->primary.flFireRate;
 }
 
 float CZMBaseWeapon::GetAccuracyIncreaseRate() const
@@ -623,15 +633,15 @@ float CZMBaseWeapon::GetMaxPenetrationDist() const
 Vector CZMBaseWeapon::GetBulletSpread() const
 {
     return (!IsInSecondaryAttack())
-                ? GetWeaponConfig()->vecPrimarySpread
-                : GetWeaponConfig()->vecSecondarySpread;
+                ? GetWeaponConfig()->primary.vecSpread
+                : GetWeaponConfig()->secondary.vecSpread;
 }
 
 float CZMBaseWeapon::GetFireRate()
 {
     float flConfigFireRate = (!IsInSecondaryAttack())
-                                ? GetWeaponConfig()->flPrimaryFireRate
-                                : GetWeaponConfig()->flSecondaryFireRate;
+                                ? GetWeaponConfig()->primary.flFireRate
+                                : GetWeaponConfig()->secondary.flFireRate;
 
     // If the fire rate is not set, use sequence duration
     if ( !CZMBaseWeaponConfig::IsValidFirerate( flConfigFireRate ) )
@@ -654,8 +664,8 @@ void CZMBaseWeapon::FireBullets( const FireBulletsInfo_t &info )
 
 
     float flConfigDamage = (!IsInSecondaryAttack())
-                                ? GetWeaponConfig()->flPrimaryDamage
-                                : GetWeaponConfig()->flPrimaryDamage;
+                                ? GetWeaponConfig()->primary.flDamage
+                                : GetWeaponConfig()->primary.flDamage;
 
 #ifndef CLIENT_DLL
     modinfo.m_flDamage = ( m_nOverrideDamage > -1 ) ? (float)m_nOverrideDamage : flConfigDamage;
@@ -775,7 +785,7 @@ void CZMBaseWeapon::Shoot( int iAmmoType, int nBullets, int nAmmo, float flMaxRa
     if ( nBullets <= -1 )
         nBullets = GetBulletsPerShot() * MAX( 1, nAmmo );
     if ( flMaxRange < 0.0f )
-        flMaxRange = GetWeaponConfig()->flPrimaryRange;
+        flMaxRange = GetWeaponConfig()->primary.flRange;
 
     int& iClip = (int&)m_iClip1;
     if ( !bUseClip1 )
@@ -950,8 +960,13 @@ void CZMBaseWeapon::SetWeaponVisible( bool visible )
     }
 }
 
-void CZMBaseWeapon::Precache()
+void CZMBaseWeapon::AssignWeaponConfigSlot()
 {
+#ifdef CLIENT_DLL
+    int index = entindex();
+    DevMsg( "Assigning weapon config slot to %i on client!\n", index );
+#endif
+
     if ( GetConfigSlot() == ZMCONFIGSLOT_INVALID )
     {
         WeaponConfigSlot_t slot = GetWeaponConfigSystem()->RegisterBareBonesWeapon( GetClassname() );
@@ -959,6 +974,25 @@ void CZMBaseWeapon::Precache()
         SetConfigSlot( slot );
     }
 
+
+    const char* customscript =
+#ifdef CLIENT_DLL
+        m_sScriptFileName;
+#else
+        STRING( m_sScriptFileName.Get() );
+#endif
+
+    if ( customscript[0] != NULL )
+    {
+        WeaponConfigSlot_t slot = GetWeaponConfigSystem()->RegisterCustomWeapon( GetConfigSlot(), customscript );
+
+        SetConfigSlot( slot );
+    }
+}
+
+void CZMBaseWeapon::Precache()
+{
+    AssignWeaponConfigSlot();
 
 	m_iPrimaryAmmoType = m_iSecondaryAmmoType = -1;
 
@@ -1027,6 +1061,16 @@ void CZMBaseWeapon::Spawn()
     BaseClass::Spawn();
 
     SetNextClientThink( gpGlobals->curtime + 0.1f );
+}
+
+void CZMBaseWeapon::PostDataUpdate( DataUpdateType_t updateType )
+{
+    BaseClass::PostDataUpdate( updateType );
+
+    if ( updateType == DATA_UPDATE_CREATED )
+    {
+        Precache();
+    }
 }
 
 void CZMBaseWeapon::ClientThink()
@@ -1613,7 +1657,7 @@ void CZMBaseWeapon::TransferReserveAmmo( CBaseCombatCharacter* pOwner )
 
 float CZMBaseWeapon::GetMaxDamageDist( ZMUserCmdValidData_t& data ) const
 {
-    return GetWeaponConfig()->flPrimaryRange;
+    return GetWeaponConfig()->primary.flRange;
 }
 
 int CZMBaseWeapon::GetMaxUserCmdBullets( ZMUserCmdValidData_t& data ) const

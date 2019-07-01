@@ -422,15 +422,15 @@ void CZMBaseMeleeWeapon::ImpactEffect( trace_t& traceHit )
 float CZMBaseMeleeWeapon::GetDamageForActivity( Activity hitActivity ) const
 {
     return (!IsInSecondaryAttack())
-            ? GetWeaponConfig()->flPrimaryDamage
-            : GetWeaponConfig()->flSecondaryDamage;
+            ? GetWeaponConfig()->primary.flDamage
+            : GetWeaponConfig()->secondary.flDamage;
 }
 
 float CZMBaseMeleeWeapon::GetRange() const
 {
     return (!IsInSecondaryAttack())
-            ? GetWeaponConfig()->flPrimaryRange
-            : GetWeaponConfig()->flSecondaryRange;
+            ? GetWeaponConfig()->primary.flRange
+            : GetWeaponConfig()->secondary.flRange;
 }
 
 
