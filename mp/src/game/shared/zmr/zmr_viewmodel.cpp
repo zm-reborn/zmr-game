@@ -101,6 +101,11 @@ int C_ZMViewModel::DrawModel( int flags )
     return 0;
 }
 
+bool C_ZMViewModel::ShouldReceiveProjectedTextures( int flags )
+{
+    return true;
+}
+
 C_BaseAnimating* C_ZMViewModel::FindFollowedEntity()
 {
     if ( ViewModelIndex() == VMINDEX_HANDS )

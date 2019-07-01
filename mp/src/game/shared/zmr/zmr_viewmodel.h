@@ -18,6 +18,7 @@ public:
 
 #ifdef CLIENT_DLL
     virtual int                 DrawModel( int flags ) OVERRIDE;
+    virtual bool                ShouldReceiveProjectedTextures( int flags ) OVERRIDE;
     virtual C_BaseAnimating*    FindFollowedEntity() OVERRIDE;
 #endif
 
