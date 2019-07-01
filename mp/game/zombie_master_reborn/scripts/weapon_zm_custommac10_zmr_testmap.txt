@@ -1,0 +1,30 @@
+WeaponData
+{
+	"printname"				"My Custom Weapon :)"
+
+	"viewmodel"				"models/weapons/v_irifle.mdl"
+	"worldmodel"			"models/weapons/w_irifle.mdl"
+	
+	PrimaryAttack
+	{
+		"firerate"			"0.12"
+		
+		"damage"			"1337"
+		
+		"range"				"2000"
+		
+		"spread"			"15 10 0"
+	}
+	
+	
+	"primary_ammo"			"Pistol"
+	
+	
+	"clip_size"				"100"
+	
+	
+	SoundData
+	{
+		"single_shot"		"Weapon_pistol_zm.Single"
+	}
+}

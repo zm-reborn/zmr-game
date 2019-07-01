@@ -48,6 +48,7 @@ public:
     
 #ifdef CLIENT_DLL
     virtual void Spawn() OVERRIDE;
+    virtual void PostDataUpdate( DataUpdateType_t updateType ) OVERRIDE;
 #endif
     virtual void Precache() OVERRIDE;
 
@@ -227,6 +228,7 @@ protected:
 
     inline ZMWeaponConfig::WeaponConfigSlot_t GetConfigSlot() const { return m_iConfigSlot; }
     inline void SetConfigSlot( ZMWeaponConfig::WeaponConfigSlot_t slot ) { m_iConfigSlot = slot; }
+    void AssignWeaponConfigSlot();
 
 private:
 #ifndef CLIENT_DLL
@@ -240,6 +242,13 @@ private:
 
     CNetworkVar( float, m_flNextClipFillTime );
     CNetworkVar( bool, m_bCanCancelReload );
+
+#define MAX_CUSTOM_SCRIPTFILENAME_LENGTH        128
+#ifdef GAME_DLL
+    CNetworkVar( string_t, m_sScriptFileName );
+#else
+    char m_sScriptFileName[MAX_CUSTOM_SCRIPTFILENAME_LENGTH];
+#endif
 
 
     ZMWeaponConfig::WeaponConfigSlot_t m_iConfigSlot;

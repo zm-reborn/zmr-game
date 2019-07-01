@@ -21,7 +21,7 @@ using namespace ZMWeaponConfig;
 class CZMSledgeConfig : public CZMBaseWeaponConfig
 {
 public:
-    CZMSledgeConfig( const char* wepname ) : CZMBaseWeaponConfig( wepname )
+    CZMSledgeConfig( const char* wepname, const char* configpath ) : CZMBaseWeaponConfig( wepname, configpath )
     {
         flPrimaryRandomMultMin = 1.0f;
         flPrimaryRandomMultMax = 1.0f;
@@ -30,20 +30,25 @@ public:
         flSecondaryRandomMultMax = 1.0f;
     }
 
-    virtual void LoadPrimaryAttack( KeyValues* kv ) OVERRIDE
+    virtual void LoadFromConfig( KeyValues* kv ) OVERRIDE
     {
-        CZMBaseWeaponConfig::LoadPrimaryAttack( kv );
+        CZMBaseWeaponConfig::LoadFromConfig( kv );
 
-        flPrimaryRandomMultMin = kv->GetFloat( "sledge_min_mult" );
-        flPrimaryRandomMultMax = kv->GetFloat( "sledge_max_mult" );
-    }
+        KeyValues* inner;
 
-    virtual void LoadSecondaryAttack( KeyValues* kv ) OVERRIDE
-    {
-        CZMBaseWeaponConfig::LoadSecondaryAttack( kv );
+        inner = kv->FindKey( "PrimaryAttack" );
+        if ( inner )
+        {
+            flPrimaryRandomMultMin = inner->GetFloat( "sledge_min_mult" );
+            flPrimaryRandomMultMax = inner->GetFloat( "sledge_max_mult" );
+        }
 
-        flSecondaryRandomMultMin = kv->GetFloat( "sledge_min_mult" );
-        flSecondaryRandomMultMax = kv->GetFloat( "sledge_max_mult" );
+        inner = kv->FindKey( "SecondaryAttack" );
+        if ( inner )
+        {
+            flSecondaryRandomMultMin = inner->GetFloat( "sledge_min_mult" );
+            flSecondaryRandomMultMax = inner->GetFloat( "sledge_max_mult" );
+        }
     }
 
     
