@@ -40,7 +40,6 @@ CZMTip::CZMTip( KeyValues* kv, int index )
     m_pszName = nullptr;
     m_pszMessage = nullptr;
     m_pszIcon = nullptr;
-    m_pszParam = nullptr;
     Reset();
 
 
@@ -56,7 +55,23 @@ CZMTip::CZMTip( KeyValues* kv, int index )
     SetName( kv->GetName() );
     SetMessage( kv->GetString( "msg" ) );
     SetIcon( kv->GetString( "icon" ) );
-    SetParam( kv->GetString( "param1" ) );
+    
+    
+    char key[32];
+    for ( int i = 1;; i++ )
+    {
+        Q_snprintf( key, sizeof( key ), "param%i", i );
+
+        const char* value = kv->GetString( key );
+
+        if ( value && *value )
+        {
+            AddParam( value );
+            continue;
+        }
+
+        break;
+    }
 }
 
 void CZMTip::WriteUsed( KeyValues* kv )
@@ -79,7 +94,8 @@ CZMTip::~CZMTip()
     delete[] m_pszName;
     delete[] m_pszMessage;
     delete[] m_pszIcon;
-    delete[] m_pszParam;
+    
+    m_vParams.PurgeAndDeleteElements();
 }
 
 void CZMTip::Reset()
@@ -137,52 +153,95 @@ void CZMTip::FormatMessage( char* buffer, int len ) const
     if ( !m_pszMessage ) return;
 
 
-    char param[128];
-    param[0] = NULL;
+    char szParam[128];
+    char format[1024];
+    bool formatted = false;
 
-    switch ( m_iParamType )
+    const char* pFormat = m_pszMessage;
+
+    if ( pFormat[0] == '#' )
     {
-    case TIPPARAMTYPE_KEY :
-    {
-        const char* key = vgui::Panel::KeyCodeToString( gameuifuncs->GetButtonCodeForBind( m_pszParam ) );
-
-        Q_strncpy( param, ( key && *key ) ? &key[4] : "(UNBOUND)", sizeof( param ) );
-
-        break;
-    }
-    case TIPPARAMTYPE_CVAR :
-    {
-        ConVar* pCon = cvar->FindVar( m_pszParam );
-
-        if ( pCon )
-            Q_strncpy( param, pCon->GetString(), sizeof( param ) );
-
-        break;
-    }
-    default : break;
+        pFormat = g_pVGuiLocalize->FindAsUTF8( m_pszMessage );
     }
 
+    if ( !pFormat || !(*pFormat) )
+        pFormat = m_pszMessage;
 
+    Q_strncpy( format, pFormat, sizeof( format ) );
 
-    if ( param )
+    // We can't have any '@' characters.
+    Assert( strchr( format, '@' ) == nullptr );
+
+    int nParams = m_vParams.Count();
+
+    for ( int i = 0; i < nParams; i++ )
     {
-        const char* pFormat = m_pszMessage;
+        szParam[0] = NULL;
 
-        if ( pFormat[0] == '#' )
+        zmtip_param_t* param = m_vParams[i];
+
+        switch ( param->iParamType )
         {
-            pFormat = g_pVGuiLocalize->FindAsUTF8( m_pszMessage );
+        case TIPPARAMTYPE_KEY :
+        {
+            const char* key = vgui::Panel::KeyCodeToString( gameuifuncs->GetButtonCodeForBind( param->pszParam ) );
+
+            Q_strncpy( szParam, ( key && *key ) ? &key[4] : "(UNBOUND)", sizeof( szParam ) );
+
+            break;
+        }
+        case TIPPARAMTYPE_CVAR :
+        {
+            ConVar* pCon = cvar->FindVar( param->pszParam );
+
+            if ( pCon )
+                Q_strncpy( szParam, pCon->GetString(), sizeof( szParam ) );
+
+            break;
+        }
+        default : break;
         }
 
-        if ( !pFormat )
-            pFormat = m_pszMessage;
+        if ( *szParam )
+        {
+            char* c;
+            bool bPerformedSafety = false;
+
+            // If we have more than one parameter, we have to "hide" other '%s' or otherwise
+            // shit will hit the fan.
+
+            // Hide '%' past the first one with '@' character.
+            int iParam = 0;
+            for ( c = format; (c = strchr( c, '%' )) != nullptr; ++c, ++iParam )
+            {
+                if ( iParam == 0 )
+                    continue;
+
+                *c = '@';
+                bPerformedSafety = true;
+            }
+
+            
+            Q_snprintf( buffer, len, format, szParam );
+            Q_strncpy( format, buffer, sizeof( format ) );
 
 
-        Q_snprintf( buffer, len, pFormat, param );
+            if ( bPerformedSafety )
+            {
+                // Reset the '@' back to '%'
+                for ( c = format; (c = strchr( c, '@' )) != nullptr; ++c )
+                {
+                    *c = '%';
+                }
+            }
+
+
+            formatted = true;
+        }
     }
-    else
-    {
-        Q_strncpy( buffer, m_pszMessage, len );
-    }
+
+    if ( !formatted )
+        Q_strncpy( buffer, format, len );
 }
 
 const char* CZMTip::GetMessage() const
@@ -219,14 +278,9 @@ void CZMTip::SetIcon( const char* icon )
     Q_strncpy( m_pszIcon, icon, len );
 }
 
-void CZMTip::SetParam( const char* invalue )
+void CZMTip::AddParam( const char* invalue )
 {
-    m_iParamType = TIPPARAMTYPE_NONE;
-    delete[] m_pszParam;
-
-
-    if ( !invalue ) return;
-
+    zmtip_param_t* param = new zmtip_param_t();
 
     char buffer[128];
     Q_strncpy( buffer, invalue, sizeof( buffer ) );
@@ -239,14 +293,16 @@ void CZMTip::SetParam( const char* invalue )
 
     *del = NULL;
 
-    char* param = del + 1;
+    char* paramvalue = del + 1;
 
 
-    m_iParamType = TipNameToType( buffer );
+    param->iParamType = TipNameToType( buffer );
 
-    int len = strlen( param ) + 1;
-    m_pszParam = new char[len];
-    Q_strncpy( m_pszParam, param, len );
+    int len = strlen( paramvalue ) + 1;
+    param->pszParam = new char[len];
+    Q_strncpy( param->pszParam, paramvalue, len );
+
+    m_vParams.AddToTail( param );
 }
 
 TipParamType_t CZMTip::TipNameToType( const char* type )
