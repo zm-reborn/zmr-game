@@ -69,6 +69,13 @@ public:
 void CZMSystem::PostInit()
 {
 #ifdef CLIENT_DLL
+    //
+    // https://developer.valvesoftware.com/wiki/Env_projectedtexture/fixes
+    //
+    ConVarRef r_flashlightscissor( "r_flashlightscissor" );
+    r_flashlightscissor.SetValue( "0" );
+
+
     ListenForGameEvent( "round_end_post" );
     ListenForGameEvent( "round_restart_post" );
     ListenForGameEvent( "player_spawn" );
