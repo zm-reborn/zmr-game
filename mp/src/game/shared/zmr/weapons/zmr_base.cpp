@@ -1016,10 +1016,13 @@ void CZMBaseWeapon::Precache()
 	// Precache sounds, too
 	for ( int i = 0; i < NUM_SHOOT_SOUND_TYPES; ++i )
 	{
-		const char *shootsound = GetShootSound( i );
-		if ( shootsound && shootsound[0] )
+		auto* pszSound = GetShootSound( i );
+		if ( pszSound && pszSound[0] )
 		{
-			CBaseEntity::PrecacheScriptSound( shootsound );
+			if ( !CBaseEntity::PrecacheScriptSound( pszSound ) && !PrecacheSound( pszSound ) )
+            {
+                Warning( "Failed to precache weapon sound called '%s' from '%s'!\n", GetWeaponConfig()->pszConfigFilePath, pszSound );
+            }
 		}
 	}
 
@@ -1167,20 +1170,47 @@ CZMPlayer* CZMBaseWeapon::GetPlayerOwner() const
 
 void CZMBaseWeapon::WeaponSound( WeaponSound_t sound_type, float soundtime /* = 0.0f */ )
 {
-#ifdef CLIENT_DLL
-		// If we have some sounds from the weapon classname.txt file, play a random one of them
-		const char *shootsound = GetShootSound( sound_type ); 
-		if ( !shootsound || !shootsound[0] )
-			return;
+	const char* pszSound = GetShootSound( sound_type ); 
+	if ( !pszSound || !pszSound[0] )
+		return;
 
-		CBroadcastRecipientFilter filter; // this is client side only
-		if ( !te->CanPredict() )
-			return;
-		
-		CBaseEntity::EmitSound( filter, GetOwner()->entindex(), shootsound, &GetOwner()->GetAbsOrigin() ); 
+
+    auto* pOwner = GetOwner();
+    Assert( pOwner );
+
+    Vector origin = pOwner->WorldSpaceCenter();
+
+	CSoundParameters params;
+	bool bIsSoundScript = GetParametersForSound( pszSound, params, nullptr );
+
+
+#ifdef CLIENT_DLL
+	CBroadcastRecipientFilter filter;
+	if ( !te->CanPredict() )
+		return;
 #else
-		BaseClass::WeaponSound( sound_type, soundtime );
+
+
+    CPASAttenuationFilter filter( pOwner, params.soundlevel );
+    if ( IsPredicted() && CBaseEntity::GetPredictionPlayer() )
+    {
+        filter.UsePredictionRules();
+    }
 #endif
+
+    if ( bIsSoundScript )
+    {
+        EmitSound( filter, pOwner->entindex(), pszSound, &origin, soundtime ); 
+    }
+    else
+    {
+        EmitSound_t snd;
+        snd.m_pSoundName = pszSound;
+        snd.m_pOrigin = &origin;
+
+        EmitSound( filter, pOwner->entindex(), snd );
+    }
+    
 }
 
 void CZMBaseWeapon::SetViewModel()
