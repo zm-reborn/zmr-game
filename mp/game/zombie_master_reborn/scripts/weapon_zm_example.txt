@@ -65,13 +65,14 @@ WeaponData
 	
 	// The sound data the gun will use.
 	// Below are all valid entries you can have.
+	// Can be a soundscript or a raw sound path.
 	SoundData
 	{
 		"melee_hit"			"Weapon_Fists_ZM.Melee_Hit"
 		"empty"				"Weapon_Shotgun_ZM.Empty"
 		"reload"			"Weapon_Shotgun_ZM.Reload"
 		"special1"			"Weapon_Shotgun_ZM.Special1"
-		"single_shot"		"Weapon_pistol_zm.Single"
+		"single_shot"		"vo/citadel/eli_dontstruggle.wav"
 		"deploy"			""
 	}
 	

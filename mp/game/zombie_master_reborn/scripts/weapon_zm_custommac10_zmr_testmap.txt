@@ -25,6 +25,6 @@ WeaponData
 	
 	SoundData
 	{
-		"single_shot"		"Weapon_pistol_zm.Single"
+		"single_shot"		"vo/citadel/eli_dontstruggle.wav"
 	}
 }
