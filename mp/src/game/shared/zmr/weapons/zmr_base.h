@@ -198,8 +198,8 @@ public:
     void                FreeWeaponSlot();
 
 
-    virtual const char* GetDropAmmoName() const { return nullptr; }
-    virtual int         GetDropAmmoAmount() const { return 1; }
+    virtual const char* GetDropAmmoName() const;
+    virtual int         GetDropAmmoAmount() const;
 
     inline int          GetReserveAmmo() const { return m_nReserveAmmo; }
     inline void         SetReserveAmmo( int ammo ) { m_nReserveAmmo = ammo; }

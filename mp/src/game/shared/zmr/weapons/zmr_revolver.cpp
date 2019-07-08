@@ -38,11 +38,6 @@ public:
     virtual CZMBaseCrosshair* GetWeaponCrosshair() const OVERRIDE { return ZMGetCrosshair( "Revolver" ); }
 #endif
 
-#ifndef CLIENT_DLL
-    const char* GetDropAmmoName() const OVERRIDE { return "item_ammo_revolver"; }
-    int GetDropAmmoAmount() const OVERRIDE { return SIZE_ZMAMMO_REVOLVER; }
-#endif
-
     virtual Vector GetBulletSpread() const OVERRIDE
     {
         Vector cone = BaseClass::GetBulletSpread();

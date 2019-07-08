@@ -29,11 +29,6 @@ public:
 #ifdef CLIENT_DLL
     virtual CZMBaseCrosshair* GetWeaponCrosshair() const OVERRIDE { return ZMGetCrosshair( "Pistol" ); }
 #endif
-
-#ifndef CLIENT_DLL
-    const char* GetDropAmmoName() const OVERRIDE { return "item_ammo_pistol"; }
-    int GetDropAmmoAmount() const OVERRIDE { return SIZE_AMMO_PISTOL; }
-#endif
 };
 
 IMPLEMENT_NETWORKCLASS_ALIASED( ZMWeaponPistol, DT_ZM_WeaponPistol )

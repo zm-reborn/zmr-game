@@ -12,6 +12,7 @@
 
 #include "zmr/zmr_gamerules.h"
 #include "zmr/zmr_viewmodel.h"
+#include "zmr/zmr_ammodef.h"
 #include "zmr/weapons/zmr_base.h"
 #include "zmr/zmr_shareddefs.h"
 
@@ -125,6 +126,22 @@ void CZMBaseWeapon::FreeWeaponSlot()
 
 
     pPlayer->RemoveWeaponSlotFlag( GetSlotFlag() );
+}
+
+const char* CZMBaseWeapon::GetDropAmmoName() const
+{
+    Assert( m_iPrimaryAmmoType != -1 );
+
+    auto* pAmmoDef = ZMAmmoDef();
+
+    return pAmmoDef->m_Additional[m_iPrimaryAmmoType].pszItemName;
+}
+
+int CZMBaseWeapon::GetDropAmmoAmount() const
+{
+    auto* pAmmoDef = ZMAmmoDef();
+
+    return pAmmoDef->m_Additional[m_iPrimaryAmmoType].nDropAmount;
 }
 #endif
 
