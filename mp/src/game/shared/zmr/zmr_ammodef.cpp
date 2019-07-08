@@ -1,5 +1,7 @@
 #include "cbase.h"
-#include "ammodef.h"
+
+
+#include "zmr_ammodef.h"
 
 /*
     NOTE: Remove GetAmmoDef() from hl2mp/hl2mp_gamerules.cpp
@@ -14,11 +16,27 @@
 #define BULLET_IMPULSE(grains, ftpersec)	((ftpersec)*12*BULLET_MASS_GRAINS_TO_KG(grains)*BULLET_IMPULSE_EXAGGERATION)
 
 
-#define ADD_ZM_AMMOTYPE(def,ammotype,dmg,tracer,maxcarry,force) def.AddAmmoType(ammotype,dmg,tracer,0,0,maxcarry,force,0);
+#define ADD_ZM_AMMOTYPE(def,ammotype,itemname,dropamount,dmg,tracer,maxcarry,force) \
+    i = def.m_nAmmoIndex; \
+    def.AddAmmoType(ammotype,dmg,tracer,0,0,maxcarry,force,0); \
+    def.SetAdditional(i,itemname,dropamount);
+
+void CZMAmmoDef::SetAdditional( int ammoindex, const char* itemname, int dropamount )
+{
+    m_Additional[ammoindex].pszItemName = itemname;
+    m_Additional[ammoindex].nDropAmount = dropamount;
+}
+
+CZMAmmoDef* ZMAmmoDef()
+{
+    return static_cast<CZMAmmoDef*>( GetAmmoDef() );
+}
+
+
 
 CAmmoDef* GetAmmoDef()
 {
-    static CAmmoDef def;
+    static CZMAmmoDef def;
     static bool bInitted = false;
     
     if ( !bInitted )
@@ -26,19 +44,21 @@ CAmmoDef* GetAmmoDef()
         bInitted = true;
 
 
+        int i;
+
         // Stuff we use.
-        ADD_ZM_AMMOTYPE( def, "Pistol", DMG_BULLET, TRACER_LINE_AND_WHIZ, 80, 2400 );
-        ADD_ZM_AMMOTYPE( def, "357", DMG_BULLET, TRACER_LINE_AND_WHIZ, 21, 3800 ); // Rifle
-        ADD_ZM_AMMOTYPE( def, "Buckshot", DMG_BULLET | DMG_BUCKSHOT, TRACER_LINE_AND_WHIZ, 24, 1300 ); // Shotgun
-        ADD_ZM_AMMOTYPE( def, "SMG1", DMG_BULLET, TRACER_LINE_AND_WHIZ, 60, 2200 ); // Mac-10
+        ADD_ZM_AMMOTYPE( def, "Pistol", "item_ammo_pistol", 20, DMG_BULLET, TRACER_LINE_AND_WHIZ, 80, 2400 );
+        ADD_ZM_AMMOTYPE( def, "357", "item_ammo_357", 11, DMG_BULLET, TRACER_LINE_AND_WHIZ, 21, 3800 ); // Rifle
+        ADD_ZM_AMMOTYPE( def, "Buckshot", "item_box_buckshot", 8, DMG_BULLET | DMG_BUCKSHOT, TRACER_LINE_AND_WHIZ, 24, 1300 ); // Shotgun
+        ADD_ZM_AMMOTYPE( def, "SMG1", "item_ammo_smg1", 30, DMG_BULLET, TRACER_LINE_AND_WHIZ, 60, 2200 ); // Mac-10
         
         // ZM Custom
-        ADD_ZM_AMMOTYPE( def, "Molotov", DMG_BURN, TRACER_NONE, 1, 0 );
-        ADD_ZM_AMMOTYPE( def, "Revolver", DMG_BULLET, TRACER_LINE_AND_WHIZ, 36, 3200 );
+        ADD_ZM_AMMOTYPE( def, "Molotov", "", 0, DMG_BURN, TRACER_NONE, 1, 0 );
+        ADD_ZM_AMMOTYPE( def, "Revolver", "item_ammo_revolver", 6, DMG_BULLET, TRACER_LINE_AND_WHIZ, 36, 3200 );
 
 
         // This is used by func_tank. (eg. zm_desert_laboratory)
-        ADD_ZM_AMMOTYPE( def, "AR2", DMG_BULLET, TRACER_LINE_AND_WHIZ, 60, BULLET_IMPULSE( 200, 1225 ) );
+        ADD_ZM_AMMOTYPE( def, "AR2", "", 0, DMG_BULLET, TRACER_LINE_AND_WHIZ, 60, BULLET_IMPULSE( 200, 1225 ) );
 
         // ZMRTODO: Remove these when removing the HL2DM stuff.
         /*

@@ -436,6 +436,7 @@ $Project "Client (ZMR)"
 			
 			// Shared
 			$File	"$SRCDIR\game\shared\zmr\zmr_ammodef.cpp"
+			$File	"$SRCDIR\game\shared\zmr\zmr_ammodef.h"
 			$File	"$SRCDIR\game\shared\zmr\zmr_animevents.cpp"
 			$File	"$SRCDIR\game\shared\zmr\zmr_gamemovement.cpp"
 			$File	"$SRCDIR\game\shared\zmr\zmr_gamemovement.h"

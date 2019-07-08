@@ -31,11 +31,6 @@ public:
     virtual CZMBaseCrosshair* GetWeaponCrosshair() const OVERRIDE { return ZMGetCrosshair( "Mac10" ); }
 #endif
 
-#ifndef CLIENT_DLL
-    const char* GetDropAmmoName() const OVERRIDE { return "item_ammo_smg1"; }
-    int GetDropAmmoAmount() const OVERRIDE { return SIZE_AMMO_SMG1; }
-#endif
-
 
     virtual const WeaponProficiencyInfo_t* GetProficiencyValues() OVERRIDE;
 

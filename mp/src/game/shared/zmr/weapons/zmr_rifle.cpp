@@ -31,12 +31,6 @@ public:
 #endif
 
 
-#ifndef CLIENT_DLL
-    const char* GetDropAmmoName() const OVERRIDE { return "item_ammo_357"; }
-    int GetDropAmmoAmount() const OVERRIDE { return SIZE_AMMO_357; }
-#endif
-
-
     virtual Vector GetBulletSpread() const OVERRIDE
     {
         Vector cone = BaseClass::GetBulletSpread();

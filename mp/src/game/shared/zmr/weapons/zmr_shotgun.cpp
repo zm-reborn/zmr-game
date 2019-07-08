@@ -24,12 +24,6 @@ public:
 #ifdef CLIENT_DLL
     virtual CZMBaseCrosshair* GetWeaponCrosshair() const OVERRIDE { return ZMGetCrosshair( "Shotgun" ); }
 #endif
-
-
-#ifndef CLIENT_DLL
-    const char* GetDropAmmoName() const OVERRIDE { return "item_box_buckshot"; }
-    int GetDropAmmoAmount() const OVERRIDE { return SIZE_AMMO_BUCKSHOT; }
-#endif
     
     virtual void AddViewKick() OVERRIDE
     {
