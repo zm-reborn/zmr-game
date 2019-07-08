@@ -47,6 +47,9 @@ BEGIN_NETWORK_TABLE( CZMBaseWeapon, DT_ZM_BaseWeapon )
     SendPropTime( SENDINFO( m_flNextClipFillTime ) ),
     SendPropBool( SENDINFO( m_bCanCancelReload ) ),
     SendPropStringT( SENDINFO( m_sScriptFileName ) ),
+
+    SendPropExclude( "DT_LocalWeaponData", "m_iClip2" ),
+    SendPropExclude( "DT_LocalWeaponData", "m_iSecondaryAmmoType" ),
 #endif
 END_NETWORK_TABLE()
 
