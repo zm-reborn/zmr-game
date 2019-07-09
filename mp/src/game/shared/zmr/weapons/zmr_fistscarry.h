@@ -75,10 +75,6 @@ public:
     virtual float		GetDamageForActivity( Activity act ) const OVERRIDE { return 5.0f; }
     virtual void		Hit( trace_t& traceHit, Activity iHitActivity ) OVERRIDE;
 
-#ifdef CLIENT_DLL
-    virtual CZMBaseCrosshair* GetWeaponCrosshair() const OVERRIDE { return ZMGetCrosshair( "Hands" ); }
-#endif
-
 
 protected:
     // Pickup and throw objects.

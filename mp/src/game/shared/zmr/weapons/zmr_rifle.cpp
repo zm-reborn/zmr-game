@@ -26,11 +26,6 @@ public:
     ~CZMWeaponRifle();
 
 
-#ifdef CLIENT_DLL
-    virtual CZMBaseCrosshair* GetWeaponCrosshair() const OVERRIDE { return ZMGetCrosshair( "Rifle" ); }
-#endif
-
-
     virtual Vector GetBulletSpread() const OVERRIDE
     {
         Vector cone = BaseClass::GetBulletSpread();

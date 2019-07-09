@@ -24,11 +24,6 @@ public:
 	DECLARE_ACTTABLE();
 
     CZMWeaponPistol();
-
-
-#ifdef CLIENT_DLL
-    virtual CZMBaseCrosshair* GetWeaponCrosshair() const OVERRIDE { return ZMGetCrosshair( "Pistol" ); }
-#endif
 };
 
 IMPLEMENT_NETWORKCLASS_ALIASED( ZMWeaponPistol, DT_ZM_WeaponPistol )

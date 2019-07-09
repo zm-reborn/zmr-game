@@ -27,11 +27,6 @@ public:
     CZMWeaponMac10();
 
 
-#ifdef CLIENT_DLL
-    virtual CZMBaseCrosshair* GetWeaponCrosshair() const OVERRIDE { return ZMGetCrosshair( "Mac10" ); }
-#endif
-
-
     virtual const WeaponProficiencyInfo_t* GetProficiencyValues() OVERRIDE;
 
 

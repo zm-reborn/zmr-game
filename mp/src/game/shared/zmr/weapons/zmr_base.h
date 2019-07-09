@@ -102,7 +102,7 @@ public:
     void DoMachineGunKick( float dampEasy, float maxVerticleKickAngle, float fireDurationTime, float slideLimitTime );
 
 #ifdef CLIENT_DLL
-    virtual CZMBaseCrosshair* GetWeaponCrosshair() const { return nullptr; }
+    virtual CZMBaseCrosshair* GetWeaponCrosshair() const;
 #endif
 
     // How many bullets we fire per one "bullet", or clip "unit".

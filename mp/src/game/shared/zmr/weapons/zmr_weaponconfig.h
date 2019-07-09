@@ -4,7 +4,6 @@
 
 #include "weapon_parse.h"
 
-
 namespace ZMWeaponConfig
 {
     enum WeaponConfigSlot_t
@@ -138,6 +137,8 @@ namespace ZMWeaponConfig
         CHudTexture* pIconActive;
         CHudTexture* pIconInactive;
         CHudTexture* pIconAmmo;
+
+        int iCrosshair;
 #endif
         //
 
