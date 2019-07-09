@@ -16,6 +16,11 @@ WeaponData
 		
 		// 4 degrees
 		"spread"			"4 4 0"
+		
+		// Viewpunch stuff specific to Mac-10
+		"easy_dampen"		"0.5"
+		"max_vertical_kick"	"2.0"
+		"slide_limit"		"1.0"
 	}
 	
 	
