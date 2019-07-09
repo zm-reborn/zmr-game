@@ -20,23 +20,6 @@ public:
     DECLARE_ACTTABLE();
 
     CZMWeaponShotgun();
-
-    
-    virtual void AddViewKick() OVERRIDE
-    {
-        CZMPlayer* pPlayer = ToZMPlayer( GetOwner() );
-
-        if ( !pPlayer ) return;
-
-
-        QAngle viewPunch;
-
-        viewPunch.x = SharedRandomFloat( "shotgunpax", -9.0f, -5.0f );
-        viewPunch.y = SharedRandomFloat( "shotgunpay", -3.5f, 3.5f );
-        viewPunch.z = 0.0f;
-
-        pPlayer->ViewPunch( viewPunch );
-    }
     
 
     virtual Activity GetReloadStartAct() OVERRIDE { return ACT_SHOTGUN_RELOAD_START; }
