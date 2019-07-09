@@ -671,6 +671,13 @@ float CZMBaseWeapon::GetFireRate()
 
     return flConfigFireRate;
 }
+
+int CZMBaseWeapon::GetBulletsPerShot() const
+{
+    return (!IsInSecondaryAttack())
+        ? GetWeaponConfig()->primary.nBulletsPerShot
+        : GetWeaponConfig()->secondary.nBulletsPerShot;
+}
 //
 
 
@@ -798,6 +805,15 @@ void CZMBaseWeapon::Shoot( int iAmmoType, int nBullets, int nAmmo, float flMaxRa
     if ( !pPlayer ) return;
 
 
+    // IMPORTANT: We NEED to set the animation first and foremost!
+    // Certain methods will check for secondary fire by
+    // comparing the weapon activity.
+    if ( !bSecondaryEffects )
+        PrimaryAttackEffects();
+    else
+        SecondaryAttackEffects();
+
+
     if ( iAmmoType == -1 )
         iAmmoType = m_iPrimaryAmmoType;
     if ( nAmmo <= -1 )
@@ -814,12 +830,6 @@ void CZMBaseWeapon::Shoot( int iAmmoType, int nBullets, int nAmmo, float flMaxRa
 
     Assert( nBullets > 0 );
 
-
-    // Effects need to be called AFTER setting next primary attack(?)
-    if ( !bSecondaryEffects )
-        PrimaryAttackEffects();
-    else
-        SecondaryAttackEffects();
 
 
     // ZMRTODO: Add burst firing here.

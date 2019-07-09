@@ -43,6 +43,7 @@ void ZMAttackConfig_t::Reset()
     flDamage = 0.0f;
     flRange = DEFAULT_MAX_RANGE;
     flFireRate = 1.0f;
+    nBulletsPerShot = 1;
 }
 
 void ZMAttackConfig_t::ToKeyValues( KeyValues* kv ) const
@@ -50,6 +51,7 @@ void ZMAttackConfig_t::ToKeyValues( KeyValues* kv ) const
     kv->SetFloat( "damage", flDamage );
     kv->SetFloat( "firerate", flFireRate );
     kv->SetFloat( "range", flRange );
+    kv->SetInt( "bulletspershot", nBulletsPerShot );
 
     
     Vector correctspread;
@@ -67,6 +69,8 @@ void ZMAttackConfig_t::FromKeyValues( KeyValues* kv )
     flDamage = kv->GetFloat( "damage", 0.0f );
     flFireRate = kv->GetFloat( "firerate", 0.0f );
     flRange = kv->GetFloat( "range", DEFAULT_MAX_RANGE );
+    nBulletsPerShot = kv->GetInt( "bulletspershot", 1 );
+
 
     CZMBaseWeaponConfig::ComputeSpread( kv->GetString( "spread" ), vecSpread );
     CZMBaseWeaponConfig::CopyVector( kv->GetString( "viewpunch_min" ), vecViewPunch_Min );

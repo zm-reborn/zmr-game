@@ -13,6 +13,7 @@ WeaponData
 		"firerate"			"0.45"
 		"damage"			"6"
 		"range"				"800"
+		"bulletspershot"	"7"
 		
 		// 6 degrees
 		"spread"			"6 6 0"
@@ -26,6 +27,7 @@ WeaponData
 		"firerate"			"0.45"
 		"damage"			"6"
 		"range"				"500"
+		"bulletspershot"	"14"
 		
 		// 15 degrees
 		"spread"			"0.13053 0.13053 0.13053"

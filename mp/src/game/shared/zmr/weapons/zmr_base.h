@@ -105,9 +105,7 @@ public:
     virtual CZMBaseCrosshair* GetWeaponCrosshair() const;
 #endif
 
-    // How many bullets we fire per one "bullet", or clip "unit".
-    virtual int GetBulletsPerShot() const { return 1; }
-
+    
     virtual int GetMinBurst() OVERRIDE { return 1; }
     virtual int GetMaxBurst() OVERRIDE { return 1; }
     
@@ -188,6 +186,8 @@ public:
     float                   GetMaxPenetrationDist() const;
     virtual Vector          GetBulletSpread() const;
     virtual float           GetFireRate() OVERRIDE;
+    // How many bullets we fire per one "bullet", or clip "unit".
+    virtual int             GetBulletsPerShot() const;
 
 
     float           GetFirstInstanceOfAnimEventTime( int iSeq, int iAnimEvent, bool bReturnOption = false ) const;

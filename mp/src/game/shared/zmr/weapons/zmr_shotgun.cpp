@@ -39,10 +39,6 @@ public:
     }
     
 
-    virtual int GetBulletsPerShot() const OVERRIDE { return 7; }
-    virtual float GetFireRate() OVERRIDE { return 0.55f; }
-
-
     virtual Activity GetReloadStartAct() OVERRIDE { return ACT_SHOTGUN_RELOAD_START; }
     virtual Activity GetReloadEndAct() OVERRIDE { return ACT_SHOTGUN_RELOAD_FINISH; }
     virtual Activity GetPumpAct() OVERRIDE { return ACT_SHOTGUN_PUMP; }

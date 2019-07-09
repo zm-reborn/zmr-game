@@ -55,6 +55,8 @@ namespace ZMWeaponConfig
         float flFireRate;
 
         float flRange;
+
+        int nBulletsPerShot;
     };
     //
 

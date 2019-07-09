@@ -33,9 +33,6 @@ public:
 
 
     void ShootBarrels( bool bWantBoth );
-    
-
-    virtual int GetBulletsPerShot() const OVERRIDE { return 7; }
 };
 
 IMPLEMENT_NETWORKCLASS_ALIASED( ZMWeaponShotgunSporting, DT_ZM_WeaponShotgunSporting )
@@ -116,7 +113,7 @@ void CZMWeaponShotgunSporting::ShootBarrels( bool bWantBoth )
     }
     else
     {
-        Shoot( m_iPrimaryAmmoType, GetBulletsPerShot() * 2, 2, GetWeaponConfig()->secondary.flRange, true, true );
+        Shoot( m_iPrimaryAmmoType, -1, 2, GetWeaponConfig()->secondary.flRange, true, true );
     }
 }
 
