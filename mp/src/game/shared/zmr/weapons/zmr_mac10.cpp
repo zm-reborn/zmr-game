@@ -25,13 +25,6 @@ public:
 	DECLARE_ACTTABLE();
 
     CZMWeaponMac10();
-
-
-    virtual const Vector& GetBulletSpread() OVERRIDE
-    {
-        static Vector cone = VECTOR_CONE_4DEGREES;
-        return cone;
-    }
     
     virtual void AddViewKick() OVERRIDE
     {
