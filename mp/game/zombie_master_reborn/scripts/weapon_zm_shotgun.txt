@@ -22,6 +22,8 @@ WeaponData
 	}
 	
 	
+	"crosshair"				"Shotgun"
+	
 	"primary_ammo"			"Buckshot"
 	
 	

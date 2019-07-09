@@ -34,6 +34,9 @@ WeaponData
 		"viewpunch_max"		"2 2 0"
 	}
 	
+	
+	"crosshair"				"Revolver"
+	
 	"accuracy_increase"		"2.9"
 	"accuracy_decrease"		"5.1"
 	

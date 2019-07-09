@@ -7,6 +7,8 @@
 
 
 #include <vgui/ISurface.h>
+
+#include "zmr/c_zmr_crosshair.h"
 #endif
 
 #include "zmr_weaponconfig.h"
@@ -102,6 +104,8 @@ CZMBaseWeaponConfig::CZMBaseWeaponConfig( const char* wepname, const char* confi
     pIconActive = nullptr;
     pIconInactive = nullptr;
     pIconAmmo = nullptr;
+
+    iCrosshair = -1;
 #endif
 
 
@@ -199,6 +203,9 @@ void CZMBaseWeaponConfig::LoadFromConfig( KeyValues* kv )
             }
         }
     }
+
+
+    iCrosshair = g_ZMCrosshairs.FindCrosshairByName( kv->GetString( "crosshair" ) );
 #endif
 
 
@@ -282,6 +289,14 @@ KeyValues* CZMBaseWeaponConfig::ToKeyValues() const
     if ( pIconAmmo )
     {
         IconToKv( texdata->FindKey( "ammo", true ), pIconAmmo );
+    }
+
+
+    // Crosshair
+    auto* pCrosshair = g_ZMCrosshairs.GetCrosshairByIndex( iCrosshair );
+    if ( pCrosshair )
+    {
+        kv->SetString( "crosshair", pCrosshair->GetName() );
     }
 #endif
     

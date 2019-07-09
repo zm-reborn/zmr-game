@@ -19,6 +19,7 @@ WeaponData
 	}
 	
 	
+	"crosshair"				"Melee"
 	
 	"bucket"				"2"
 	"bucket_position"		"0"

@@ -35,6 +35,8 @@ WeaponData
 	}
 	
 	
+	"crosshair"				"ShotgunSporting"
+	
 	"primary_ammo"			"Buckshot"
 	
 	

@@ -21,6 +21,9 @@ WeaponData
 		"viewpunch_max"		"-6 2 0"
 	}
 	
+	
+	"crosshair"				"Rifle"
+	
 	"accuracy_increase"		"6.7"
 	"accuracy_decrease"		"2.1"
 	

@@ -14,6 +14,8 @@ WeaponData
 	}
 	
 	
+	"crosshair"				"Throwable"
+	
 	"primary_ammo"		"Molotov"
 	
 	"bucket"				"4"

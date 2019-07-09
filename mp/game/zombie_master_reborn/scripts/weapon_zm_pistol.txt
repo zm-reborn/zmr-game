@@ -22,6 +22,8 @@ WeaponData
 	}
 	
 	
+	"crosshair"				"Pistol"
+	
 	"primary_ammo"			"Pistol"
 	
 	

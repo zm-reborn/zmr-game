@@ -19,6 +19,8 @@ WeaponData
 	}
 	
 	
+	"crosshair"				"Mac10"
+	
 	"primary_ammo"			"SMG1"
 	
 	"clip_size"				"30"

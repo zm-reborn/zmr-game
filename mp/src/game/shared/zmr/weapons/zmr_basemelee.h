@@ -19,10 +19,6 @@ public:
     CZMBaseMeleeWeapon();
 
 
-#ifdef CLIENT_DLL
-    virtual CZMBaseCrosshair* GetWeaponCrosshair() const OVERRIDE { return ZMGetCrosshair( "Melee" ); }
-#endif
-
     virtual void ItemBusyFrame() OVERRIDE;
     virtual void ItemPostFrame() OVERRIDE;
 

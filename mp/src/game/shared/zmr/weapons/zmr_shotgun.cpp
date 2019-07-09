@@ -21,9 +21,6 @@ public:
 
     CZMWeaponShotgun();
 
-#ifdef CLIENT_DLL
-    virtual CZMBaseCrosshair* GetWeaponCrosshair() const OVERRIDE { return ZMGetCrosshair( "Shotgun" ); }
-#endif
     
     virtual void AddViewKick() OVERRIDE
     {

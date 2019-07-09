@@ -23,9 +23,6 @@ public:
 
     CZMWeaponShotgunSporting();
 
-#ifdef CLIENT_DLL
-    virtual CZMBaseCrosshair* GetWeaponCrosshair() const OVERRIDE { return ZMGetCrosshair( "ShotgunSporting" ); }
-#endif
 
     bool IsFiringBothBarrels() const { return IsInSecondaryAttack(); }
 

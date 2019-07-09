@@ -1181,6 +1181,11 @@ bool CZMBaseWeapon::ShouldPredict()
 
     return BaseClass::ShouldPredict();
 }
+
+CZMBaseCrosshair* CZMBaseWeapon::GetWeaponCrosshair() const
+{
+    return g_ZMCrosshairs.GetCrosshairByIndex( GetWeaponConfig()->iCrosshair );
+}
 #endif
 
 CZMPlayer* CZMBaseWeapon::GetPlayerOwner() const
