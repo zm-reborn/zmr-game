@@ -113,7 +113,7 @@ void CZMWeaponShotgunSporting::ShootBarrels( bool bWantBoth )
     }
     else
     {
-        Shoot( m_iPrimaryAmmoType, -1, 2, GetWeaponConfig()->secondary.flRange, true, true );
+        Shoot( m_iPrimaryAmmoType, -1, 2, GetWeaponConfig()->secondary.flRange, true );
     }
 }
 

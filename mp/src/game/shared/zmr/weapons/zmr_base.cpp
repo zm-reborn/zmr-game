@@ -799,7 +799,7 @@ void CZMBaseWeapon::PrimaryAttack()
     Shoot();
 }
 
-void CZMBaseWeapon::Shoot( int iAmmoType, int nBullets, int nAmmo, float flMaxRange, bool bUseClip1, bool bSecondaryEffects )
+void CZMBaseWeapon::Shoot( int iAmmoType, int nBullets, int nAmmo, float flMaxRange, bool bSecondary )
 {
     CZMPlayer* pPlayer = GetPlayerOwner();
     if ( !pPlayer ) return;
@@ -808,7 +808,7 @@ void CZMBaseWeapon::Shoot( int iAmmoType, int nBullets, int nAmmo, float flMaxRa
     // IMPORTANT: We NEED to set the animation first and foremost!
     // Certain methods will check for secondary fire by
     // comparing the weapon activity.
-    if ( !bSecondaryEffects )
+    if ( !bSecondary )
         PrimaryAttackEffects();
     else
         SecondaryAttackEffects();
@@ -824,8 +824,6 @@ void CZMBaseWeapon::Shoot( int iAmmoType, int nBullets, int nAmmo, float flMaxRa
         flMaxRange = GetWeaponConfig()->primary.flRange;
 
     int& iClip = (int&)m_iClip1;
-    if ( !bUseClip1 )
-        iClip = (int&)m_iClip2;
 
 
     Assert( nBullets > 0 );
