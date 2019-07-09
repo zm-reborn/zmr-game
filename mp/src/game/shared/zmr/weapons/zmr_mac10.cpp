@@ -27,10 +27,6 @@ public:
     CZMWeaponMac10();
 
 
-    virtual const WeaponProficiencyInfo_t* GetProficiencyValues() OVERRIDE;
-
-
-
     virtual const Vector& GetBulletSpread() OVERRIDE
     {
         static Vector cone = VECTOR_CONE_4DEGREES;
@@ -90,20 +86,4 @@ CZMWeaponMac10::CZMWeaponMac10()
 
     SetSlotFlag( ZMWEAPONSLOT_LARGE );
     SetConfigSlot( ZMWeaponConfig::ZMCONFIGSLOT_MAC10 );
-}
-
-const WeaponProficiencyInfo_t *CZMWeaponMac10::GetProficiencyValues()
-{
-	static WeaponProficiencyInfo_t proficiencyTable[] =
-	{
-		{ 7.0,		0.75	},
-		{ 5.00,		0.75	},
-		{ 10.0/3.0, 0.75	},
-		{ 5.0/3.0,	0.75	},
-		{ 1.00,		1.0		},
-	};
-
-	COMPILE_TIME_ASSERT( ARRAYSIZE(proficiencyTable) == WEAPON_PROFICIENCY_PERFECT + 1);
-
-	return proficiencyTable;
 }
