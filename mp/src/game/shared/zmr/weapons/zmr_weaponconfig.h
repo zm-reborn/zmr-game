@@ -205,6 +205,9 @@ namespace ZMWeaponConfig
 
     //
     class CZMWeaponConfigSystem : public CAutoGameSystem
+#ifdef CLIENT_DLL
+        ,public CGameEventListener
+#endif
     {
     public:
         CZMWeaponConfigSystem();
@@ -214,8 +217,13 @@ namespace ZMWeaponConfig
         virtual void PostInit() OVERRIDE;
         virtual void LevelInitPreEntity() OVERRIDE;
 
+#ifdef CLIENT_DLL
+        virtual void FireGameEvent( IGameEvent* event ) OVERRIDE;
+#endif
 
         bool IsSlotRegistered( WeaponConfigSlot_t slot ) const;
+
+        void ReloadConfigs();
 
     
         WeaponConfigSlot_t RegisterBareBonesWeapon( const char* classname );
@@ -230,12 +238,15 @@ namespace ZMWeaponConfig
         WeaponConfigSlot_t FindCustomConfigByConfigPath( const char* configpath ) const;
         WeaponConfigSlot_t FindEmptyCustomConfigSlot() const;
 
+        WeaponConfigSlot_t FindBaseSlotByClassname( const char* classname ) const;
+
         void ClearCustomConfigs();
 
     private:
-        void InitConfigs();
+        void InitBaseConfigs();
 
         CZMBaseWeaponConfig* LoadConfigFromFile( const char* szWeaponName, CreateWeaponConfigFn fn );
+        CZMBaseWeaponConfig* LoadCustomConfigFromFile( WeaponConfigSlot_t baseslot, const char* filepath );
 
 
         CZMBaseWeaponConfig* m_pConfigs[ZMCONFIGSLOT_MAX];

@@ -30,6 +30,12 @@ CZMWeaponConfigSystem* ZMWeaponConfig::GetWeaponConfigSystem()
     return &system;
 }
 
+#ifdef GAME_DLL
+CON_COMMAND( zm_reload_weaponconfig, "" )
+{
+    GetWeaponConfigSystem()->ReloadConfigs();
+}
+#endif
 
 //
 //
@@ -589,7 +595,11 @@ CZMWeaponConfigSystem::~CZMWeaponConfigSystem()
 
 void CZMWeaponConfigSystem::PostInit()
 {
-    InitConfigs();
+#ifdef CLIENT_DLL
+    ListenForGameEvent( "reload_weapon_config" );
+#endif
+
+    InitBaseConfigs();
 }
 
 void CZMWeaponConfigSystem::LevelInitPreEntity()
@@ -597,7 +607,14 @@ void CZMWeaponConfigSystem::LevelInitPreEntity()
     ClearCustomConfigs();
 }
 
-void CZMWeaponConfigSystem::InitConfigs()
+#ifdef CLIENT_DLL
+void CZMWeaponConfigSystem::FireGameEvent( IGameEvent* event )
+{
+    ReloadConfigs();
+}
+#endif
+
+void CZMWeaponConfigSystem::InitBaseConfigs()
 {
     for ( int i = 0; i < ARRAYSIZE( m_ConfigRegisters ); i++ )
     {
@@ -617,6 +634,62 @@ void CZMWeaponConfigSystem::ClearCustomConfigs()
 bool CZMWeaponConfigSystem::IsSlotRegistered( WeaponConfigSlot_t slot ) const
 {
     return m_pConfigs[slot] != nullptr;
+}
+
+void CZMWeaponConfigSystem::ReloadConfigs()
+{
+#ifdef GAME_DLL
+    // Tell clients to reload theirs as well.
+    IGameEvent* pEvent = gameeventmanager->CreateEvent( "reload_weapon_config", true );
+    if ( pEvent )
+    {
+        gameeventmanager->FireEvent( pEvent, true );
+    }
+#endif
+
+
+    // Reload base configs.
+    for ( int i = 0; i < ARRAYSIZE( m_ConfigRegisters ); i++ )
+    {
+        delete m_pConfigs[i];
+    }
+
+    InitBaseConfigs();
+
+
+    // Reload custom configs.
+    for ( int i = ZMCONFIGSLOT_CUSTOM_START; i < ARRAYSIZE( m_pConfigs ); i++ )
+    {
+        auto* pOldConfig = m_pConfigs[i];
+
+        if ( !pOldConfig )
+        {
+            continue;
+        }
+
+
+        m_pConfigs[i] = nullptr;
+
+
+        auto slot = FindBaseSlotByClassname( pOldConfig->pszWeaponName );
+        if ( slot != ZMCONFIGSLOT_INVALID )
+        {
+            m_pConfigs[i] = LoadCustomConfigFromFile( slot, pOldConfig->pszConfigFilePath );
+        }
+
+        if ( m_pConfigs[i] != nullptr )
+        {
+            // Remove old config because we we're loaded successfully.
+            delete pOldConfig;
+        }
+        else
+        {
+            // Didn't work, reset back to old!
+            m_pConfigs[i] = pOldConfig;
+
+            DevWarning( "Failed to reload custom config '%s'!\n", pOldConfig->pszConfigFilePath );
+        }
+    }
 }
 
 WeaponConfigSlot_t CZMWeaponConfigSystem::RegisterBareBonesWeapon( const char* classname )
@@ -655,21 +728,7 @@ WeaponConfigSlot_t CZMWeaponConfigSystem::RegisterCustomWeapon( WeaponConfigSlot
     Assert( baseslot < ZMCONFIGSLOT_REGISTERED_END );
 
 
-    char file[256];
-    KeyValues* kv;
-
-
-    Q_snprintf( file, sizeof( file ), CONFIG_DIR"/%s.txt", filename );
-
-
-    auto slot = FindCustomConfigByConfigPath( file );
-    if ( slot != ZMCONFIGSLOT_INVALID )
-    {
-        return slot;
-    }
-
-
-    slot = FindEmptyCustomConfigSlot();
+    auto slot = FindEmptyCustomConfigSlot();
     // No more slots open!
     if ( slot == ZMCONFIGSLOT_INVALID )
     {
@@ -677,41 +736,23 @@ WeaponConfigSlot_t CZMWeaponConfigSystem::RegisterCustomWeapon( WeaponConfigSlot
     }
 
 
-    DevMsg( "Loading custom weapon config '%s'...\n", file );
+    char file[256];
+    Q_snprintf( file, sizeof( file ), CONFIG_DIR"/%s.txt", filename );
 
-    kv = new KeyValues( "WeaponData" );
-    if ( !kv->LoadFromFile( filesystem, file ) )
+
+    // We don't need to load this config if we have it loaded already!
+    auto existingslot = FindCustomConfigByConfigPath( file );
+    if ( existingslot != ZMCONFIGSLOT_INVALID )
     {
-        kv->deleteThis();
-
-        Warning( "Couldn't load weapon config '%s'!\n", file );
-        return baseslot;
+        return existingslot;
     }
 
 
-
-    auto* pBaseConfig = m_pConfigs[baseslot];
-
-    auto* basekv = pBaseConfig->ToKeyValues();
-
-
-    const char* wepname = m_ConfigRegisters[baseslot].pszWeaponName;
-
-    auto* pConfig = m_ConfigRegisters[baseslot].fn( wepname, file );
-
-
-    pConfig->LoadFromConfig( basekv );
-
-    pConfig->OverrideFromConfig( kv );
-
+    auto* pConfig = LoadCustomConfigFromFile( baseslot, filename );
 
     m_pConfigs[slot] = pConfig;
 
-
-    basekv->deleteThis();
-    kv->deleteThis();
-
-    return slot;
+    return pConfig ? slot : baseslot;
 }
 
 const CZMBaseWeaponConfig* CZMWeaponConfigSystem::GetConfigBySlot( WeaponConfigSlot_t slot )
@@ -745,6 +786,19 @@ WeaponConfigSlot_t CZMWeaponConfigSystem::FindEmptyCustomConfigSlot() const
     {
         if ( !m_pConfigs[i] )
             return (WeaponConfigSlot_t)i;
+    }
+
+    return ZMCONFIGSLOT_INVALID;
+}
+
+WeaponConfigSlot_t CZMWeaponConfigSystem::FindBaseSlotByClassname( const char* classname ) const
+{
+    for ( int i = 0; i < ARRAYSIZE( m_ConfigRegisters ); i++ )
+    {
+        if ( m_pConfigs[i] != nullptr && Q_stricmp( classname, m_pConfigs[i]->pszWeaponName ) == 0 )
+        {
+            return (WeaponConfigSlot_t)i;
+        }
     }
 
     return ZMCONFIGSLOT_INVALID;
@@ -797,6 +851,45 @@ CZMBaseWeaponConfig* CZMWeaponConfigSystem::LoadConfigFromFile( const char* szWe
     }
 
 
+    kv->deleteThis();
+
+
+    return pConfig;
+}
+
+CZMBaseWeaponConfig* CZMWeaponConfigSystem::LoadCustomConfigFromFile( WeaponConfigSlot_t baseslot, const char* filepath )
+{
+    DevMsg( "Loading custom weapon config '%s'...\n", filepath );
+
+
+    auto* kv = new KeyValues( "WeaponData" );
+    if ( !kv->LoadFromFile( filesystem, filepath ) )
+    {
+        kv->deleteThis();
+
+        Warning( "Couldn't load weapon config '%s'!\n", filepath );
+        return nullptr;
+    }
+
+
+
+    auto* pBaseConfig = m_pConfigs[baseslot];
+    Assert( pBaseConfig );
+
+    auto* basekv = pBaseConfig->ToKeyValues();
+
+
+    const char* wepname = m_ConfigRegisters[baseslot].pszWeaponName;
+
+    auto* pConfig = m_ConfigRegisters[baseslot].fn( wepname, filepath );
+
+
+    pConfig->LoadFromConfig( basekv );
+
+    pConfig->OverrideFromConfig( kv );
+
+
+    basekv->deleteThis();
     kv->deleteThis();
 
 
