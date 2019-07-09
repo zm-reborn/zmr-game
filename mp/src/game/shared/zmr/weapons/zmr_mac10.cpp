@@ -6,6 +6,7 @@
 
 
 #include "zmr/zmr_shareddefs.h"
+#include "zmr_weaponconfig.h"
 #include "zmr_base.h"
 
 
@@ -16,6 +17,60 @@
 #define CZMWeaponMac10 C_ZMWeaponMac10
 #endif
 
+
+using namespace ZMWeaponConfig;
+
+class CZMMac10Config : public CZMBaseWeaponConfig
+{
+public:
+    CZMMac10Config( const char* wepname, const char* configpath ) : CZMBaseWeaponConfig( wepname, configpath )
+    {
+        flEasyDampen = 0.0f;
+        flVerticalKick = 0.0f;
+        flSlideLimit = 0.0f;
+    }
+
+    virtual void LoadFromConfig( KeyValues* kv ) OVERRIDE
+    {
+        CZMBaseWeaponConfig::LoadFromConfig( kv );
+
+        KeyValues* inner;
+
+        inner = kv->FindKey( "PrimaryAttack" );
+        if ( inner )
+        {
+            flEasyDampen = inner->GetFloat( "easy_dampen", 0.5f );
+            flVerticalKick = inner->GetFloat( "max_vertical_kick", 2.0f );
+            flSlideLimit = inner->GetFloat( "slide_limit", 1.0f );
+        }
+    }
+
+    virtual KeyValues* ToKeyValues() const OVERRIDE
+    {
+        auto* kv = CZMBaseWeaponConfig::ToKeyValues();
+
+        KeyValues* inner;
+
+        inner = kv->FindKey( "PrimaryAttack" );
+        if ( inner )
+        {
+            inner->SetFloat( "easy_dampen", flEasyDampen );
+            inner->SetFloat( "max_vertical_kick", flVerticalKick );
+            inner->SetFloat( "slide_limit", flSlideLimit );
+        }
+
+        return kv;
+    }
+
+    
+    float flEasyDampen;
+    float flVerticalKick;
+    float flSlideLimit;
+};
+
+REGISTER_WEAPON_CONFIG( weapon_zm_mac10, ZMCONFIGSLOT_MAC10, CZMMac10Config );
+
+
 class CZMWeaponMac10 : public CZMBaseWeapon
 {
 public:
@@ -25,14 +80,20 @@ public:
 	DECLARE_ACTTABLE();
 
     CZMWeaponMac10();
+
+
+    const CZMMac10Config* GetMac10Config() const { return static_cast<const CZMMac10Config*>( GetWeaponConfig() ); }
+
     
     virtual void AddViewKick() OVERRIDE
     {
-#define	EASY_DAMPEN			0.5f
-#define	MAX_VERTICAL_KICK	2.0f	// Degrees
-#define	SLIDE_LIMIT			1.0f	// Seconds
-	
-	    DoMachineGunKick( EASY_DAMPEN, MAX_VERTICAL_KICK, m_fFireDuration, SLIDE_LIMIT );
+        auto* pConfig = GetMac10Config();
+
+	    DoMachineGunKick(
+            pConfig->flEasyDampen,
+            pConfig->flVerticalKick,
+            m_fFireDuration,
+            pConfig->flSlideLimit );
     }
 };
 
