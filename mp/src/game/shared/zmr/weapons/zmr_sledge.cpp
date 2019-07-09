@@ -51,6 +51,29 @@ public:
         }
     }
 
+    virtual KeyValues* ToKeyValues() const OVERRIDE
+    {
+        auto* kv = CZMBaseWeaponConfig::ToKeyValues();
+
+        KeyValues* inner;
+
+        inner = kv->FindKey( "PrimaryAttack" );
+        if ( inner )
+        {
+            inner->SetFloat( "sledge_min_mult", flPrimaryRandomMultMin );
+            inner->SetFloat( "sledge_max_mult", flPrimaryRandomMultMax );
+        }
+
+        inner = kv->FindKey( "SecondaryAttack" );
+        if ( inner )
+        {
+            inner->SetFloat( "sledge_min_mult", flSecondaryRandomMultMin );
+            inner->SetFloat( "sledge_max_mult", flSecondaryRandomMultMax );
+        }
+
+        return kv;
+    }
+
     
     float flPrimaryRandomMultMin;
     float flPrimaryRandomMultMax;
