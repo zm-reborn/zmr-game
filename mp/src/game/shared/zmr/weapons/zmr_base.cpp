@@ -607,7 +607,8 @@ int CZMBaseWeapon::GetWeight() const
 
 char const* CZMBaseWeapon::GetName() const
 {
-    return const_cast<CZMBaseWeapon*>( this )->GetClassname();
+    // GetClassname is bad for the client.
+    return GetWeaponConfig()->pszWeaponName;
 }
 
 char const* CZMBaseWeapon::GetPrintName() const
