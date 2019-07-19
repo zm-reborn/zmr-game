@@ -170,7 +170,7 @@ namespace ZMWeaponConfig
 
 
     //
-#define REGISTER_WEAPON_CONFIG(classname, slot, configclass) static CZMWepConfigReg reg_##classname##( #classname, slot, []( const char* wepname, const char* configpath ) { return (CZMBaseWeaponConfig*)(new configclass( wepname, configpath )); } );
+#define REGISTER_WEAPON_CONFIG(slot, configclass) static CZMWepConfigReg reg_##classname##( slot, []( const char* wepname, const char* configpath ) { return (CZMBaseWeaponConfig*)(new configclass( wepname, configpath )); } );
     //
 
 
@@ -198,7 +198,7 @@ namespace ZMWeaponConfig
     class CZMWepConfigReg
     {
     public:
-        CZMWepConfigReg( const char* classname, WeaponConfigSlot_t slot, CreateWeaponConfigFn fn );
+        CZMWepConfigReg( WeaponConfigSlot_t slot, CreateWeaponConfigFn fn );
     };
     //
 
@@ -233,12 +233,13 @@ namespace ZMWeaponConfig
         const CZMBaseWeaponConfig* GetConfigBySlot( WeaponConfigSlot_t slot );
 
     protected:
-        void RegisterConfig( const char* classname, WeaponConfigSlot_t slot, CreateWeaponConfigFn fn );
+        void RegisterBaseConfig( WeaponConfigSlot_t slot, CreateWeaponConfigFn fn );
         
         WeaponConfigSlot_t FindCustomConfigByConfigPath( const char* configpath ) const;
         WeaponConfigSlot_t FindEmptyCustomConfigSlot() const;
 
         WeaponConfigSlot_t FindBaseSlotByClassname( const char* classname ) const;
+        const char* GetBaseClassname( WeaponConfigSlot_t baseslot ) const;
 
         void ClearCustomConfigs();
 

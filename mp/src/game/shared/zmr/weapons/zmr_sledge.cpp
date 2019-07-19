@@ -83,7 +83,7 @@ public:
 };
 
 
-REGISTER_WEAPON_CONFIG( weapon_zm_sledge, ZMCONFIGSLOT_SLEDGE, CZMSledgeConfig );
+REGISTER_WEAPON_CONFIG( ZMCONFIGSLOT_SLEDGE, CZMSledgeConfig );
 
 
 

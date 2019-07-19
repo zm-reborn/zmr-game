@@ -550,9 +550,10 @@ void CZMBaseWeaponConfig::OverrideAttack( KeyValues* kv, ZMAttackConfig_t& attac
 //
 //
 //
-CZMWepConfigReg::CZMWepConfigReg( const char* classname, WeaponConfigSlot_t slot, CreateWeaponConfigFn fn )
+CZMWepConfigReg::CZMWepConfigReg( WeaponConfigSlot_t slot, CreateWeaponConfigFn fn )
 {
-    GetWeaponConfigSystem()->RegisterConfig( classname, slot, fn );
+    auto* pSystem = GetWeaponConfigSystem();
+    pSystem->RegisterBaseConfig( slot, fn );
 }
 
 
@@ -711,10 +712,9 @@ WeaponConfigSlot_t CZMWeaponConfigSystem::RegisterBareBonesWeapon( const char* c
     return slot;
 }
 
-void CZMWeaponConfigSystem::RegisterConfig( const char* classname, WeaponConfigSlot_t slot, CreateWeaponConfigFn fn )
+void CZMWeaponConfigSystem::RegisterBaseConfig( WeaponConfigSlot_t slot, CreateWeaponConfigFn fn )
 {
     m_ConfigRegisters[slot].fn = fn;
-    m_ConfigRegisters[slot].pszWeaponName = classname;
 }
 
 WeaponConfigSlot_t CZMWeaponConfigSystem::RegisterCustomWeapon( WeaponConfigSlot_t baseslot, const char* filename )
@@ -795,13 +795,18 @@ WeaponConfigSlot_t CZMWeaponConfigSystem::FindBaseSlotByClassname( const char* c
 {
     for ( int i = 0; i < ARRAYSIZE( m_ConfigRegisters ); i++ )
     {
-        if ( m_pConfigs[i] != nullptr && Q_stricmp( classname, m_pConfigs[i]->pszWeaponName ) == 0 )
+        if ( Q_stricmp( classname, m_ConfigRegisters[i].pszWeaponName ) == 0 )
         {
             return (WeaponConfigSlot_t)i;
         }
     }
 
     return ZMCONFIGSLOT_INVALID;
+}
+
+const char* CZMWeaponConfigSystem::GetBaseClassname( WeaponConfigSlot_t baseslot ) const
+{
+    return m_ConfigRegisters[baseslot].pszWeaponName;
 }
 
 //CreateWeaponConfigFn* CZMWeaponConfigSystem::FindWeaponCreator( const char* classname ) const

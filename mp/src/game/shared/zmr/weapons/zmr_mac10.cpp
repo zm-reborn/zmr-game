@@ -68,7 +68,7 @@ public:
     float flSlideLimit;
 };
 
-REGISTER_WEAPON_CONFIG( weapon_zm_mac10, ZMCONFIGSLOT_MAC10, CZMMac10Config );
+REGISTER_WEAPON_CONFIG( ZMCONFIGSLOT_MAC10, CZMMac10Config );
 
 
 class CZMWeaponMac10 : public CZMBaseWeapon
