@@ -1,0 +1,5 @@
+#!/bin/bash
+
+pushd `dirname $0`
+devtools/bin/vpc /zmr +shaders /mksln zmr-shaders
+popd

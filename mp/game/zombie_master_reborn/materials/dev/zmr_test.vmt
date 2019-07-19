@@ -1,0 +1,5 @@
+ZMR_Test
+{
+	$fbtexture			_rt_FullFrameFB
+	$vignettetexture	dev\vignette
+}
