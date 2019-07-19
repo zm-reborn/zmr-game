@@ -5,6 +5,7 @@
 #include "props.h"
 #include "IEffects.h"
 #include "envspark.h"
+#include "precipitation_shared.h"
 
 
 #include "zmr/zmr_gamerules.h"
@@ -2384,4 +2385,85 @@ void CZMEntTriggerSpawnVolume::GetPositionWithin( const CBaseEntity* pEnt, Vecto
 void CZMEntTriggerSpawnVolume::GetPositionWithin( Vector& pos ) const
 {
     GetPositionWithin( this, pos );
+}
+
+/*
+    Precipitation
+*/
+class CZMEntPrecipitation : public CBaseEntity
+{
+public:
+    DECLARE_CLASS( CZMEntPrecipitation, CBaseEntity );
+    DECLARE_DATADESC();
+    DECLARE_SERVERCLASS();
+
+    CZMEntPrecipitation();
+    ~CZMEntPrecipitation();
+
+
+    virtual void Spawn() OVERRIDE;
+    virtual int UpdateTransmitState() OVERRIDE;
+
+private:
+    CNetworkVar( PrecipitationType_t, m_nPrecipType );
+};
+
+LINK_ENTITY_TO_CLASS( func_precipitation, CZMEntPrecipitation );
+
+BEGIN_DATADESC( CZMEntPrecipitation )
+    DEFINE_KEYFIELD( m_nPrecipType, FIELD_INTEGER, "preciptype" ),
+END_DATADESC()
+
+// Just send the normal entity crap
+IMPLEMENT_SERVERCLASS_ST( CZMEntPrecipitation, DT_ZM_EntPrecipitation)
+    SendPropInt( SENDINFO( m_nPrecipType ), Q_log2( NUM_PRECIPITATION_TYPES ) + 1, SPROP_UNSIGNED ),
+END_SEND_TABLE()
+
+
+CZMEntPrecipitation::CZMEntPrecipitation()
+{
+    m_nPrecipType = PRECIPITATION_TYPE_RAIN;
+}
+
+CZMEntPrecipitation::~CZMEntPrecipitation()
+{
+}
+
+void CZMEntPrecipitation::Spawn()
+{
+    //SetTransmitState( FL_EDICT_ALWAYS );
+    SetTransmitState( FL_EDICT_PVSCHECK );
+
+    PrecacheMaterial( "effects/fleck_ash1" );
+    PrecacheMaterial( "effects/fleck_ash2" );
+    PrecacheMaterial( "effects/fleck_ash3" );
+    PrecacheMaterial( "effects/ember_swirling001" );
+    Precache();
+
+
+    // Default to rain.
+    if ( m_nPrecipType < 0 || m_nPrecipType > NUM_PRECIPITATION_TYPES )
+        m_nPrecipType = PRECIPITATION_TYPE_RAIN;
+
+
+    SetMoveType( MOVETYPE_NONE );
+    SetModel( STRING( GetModelName() ) );		// Set size
+    //if ( m_nPrecipType == PRECIPITATION_TYPE_PARTICLERAIN )
+    {
+        SetSolid( SOLID_VPHYSICS );
+        AddSolidFlags( FSOLID_NOT_SOLID );
+        AddSolidFlags( FSOLID_FORCE_WORLD_ALIGNED );
+        VPhysicsInitStatic();
+    }
+    //else
+    //{
+    //    SetSolid( SOLID_NONE );							// Remove model & collisions
+    //}
+
+    m_nRenderMode = kRenderEnvironmental;
+}
+
+int CZMEntPrecipitation::UpdateTransmitState()
+{
+    return SetTransmitState( FL_EDICT_ALWAYS );
 }
