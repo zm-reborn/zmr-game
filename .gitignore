@@ -91,3 +91,5 @@ keys_zm.cfg
 # Tool (vbsp/vvis/vrad) compilation output
 *.dll
 *.exe
+mp/src/materialsystem/stdshaders/filestocopy.txt
+mp/src/materialsystem/stdshaders/uniquefilestocopy.txt
