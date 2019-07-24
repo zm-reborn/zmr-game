@@ -10,7 +10,7 @@ void RegisterZMAnimEvents()
 	REGISTER_SHARED_ANIMEVENT( AE_ZM_BEAMON, AE_TYPE_SERVER );
 	REGISTER_SHARED_ANIMEVENT( AE_ZM_BEAMOFF, AE_TYPE_SERVER );
 	REGISTER_SHARED_ANIMEVENT( AE_ZM_LIGHTERFLAME, AE_TYPE_SERVER );
-	REGISTER_SHARED_ANIMEVENT( AE_ZM_CLOTHFLAME, AE_TYPE_SERVER );
+	REGISTER_SHARED_ANIMEVENT( AE_ZM_CLOTHFLAME, AE_TYPE_CLIENT | AE_TYPE_SERVER );
 
     // Zombies
     // Even though most of these are used on the client only, we'll have to register them for both to get them to work on client. For whatever reason.
