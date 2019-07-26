@@ -4,8 +4,8 @@
 #include "SDK_screenspaceeffect_vs20.inc"
 
 
-#include "zmr_test_pixelshader_ps20.inc"
-#include "zmr_test_pixelshader_ps20b.inc"
+#include "zmr_test_ps20.inc"
+#include "zmr_test_ps20b.inc"
 
 
 ConVar zm_cl_vignettestrength( "zm_cl_vignettestrength", "1" );
@@ -68,7 +68,7 @@ BEGIN_SHADER( ZMR_Test, "Help for my shader." )
 			SET_STATIC_VERTEX_SHADER(sdk_screenspaceeffect_vs20);
 
 
-            SET_STATIC_PS2X_PIXEL_SHADER_NO_COMBOS(zmr_test_pixelshader)
+            SET_STATIC_PS2X_PIXEL_SHADER_NO_COMBOS(zmr_test)
 		}
 
 
@@ -87,7 +87,7 @@ BEGIN_SHADER( ZMR_Test, "Help for my shader." )
 
 
             
-            SET_DYNAMIC_PS2X_PIXEL_SHADER_NO_COMBOS(zmr_test_pixelshader)
+            SET_DYNAMIC_PS2X_PIXEL_SHADER_NO_COMBOS(zmr_test)
 		}
 
 		Draw();
