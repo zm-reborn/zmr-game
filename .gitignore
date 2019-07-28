@@ -94,3 +94,10 @@ mp/game/zombie_master_reborn/cfg/pet.txt
 *.exe
 mp/src/materialsystem/stdshaders/filestocopy.txt
 mp/src/materialsystem/stdshaders/uniquefilestocopy.txt
+mp/src/materialsystem/stdshaders/shaders
+mp/src/materialsystem/stdshaders/fxctmp9_tmp
+mp/src/materialsystem/stdshaders/vcslist.txt
+mp/src/materialsystem/stdshaders/makefile.*
+mp/src/materialsystem/stdshaders/filelistgen.txt
+mp/src/materialsystem/stdshaders/filelist.txt
+mp/src/materialsystem/stdshaders/inclist.txt
