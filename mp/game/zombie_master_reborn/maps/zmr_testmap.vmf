@@ -2,7 +2,7 @@ versioninfo
 {
 	"editorversion" "400"
 	"editorbuild" "7538"
-	"mapversion" "175"
+	"mapversion" "179"
 	"formatversion" "100"
 	"prefab" "0"
 }
@@ -14,13 +14,13 @@ viewsettings
 	"bSnapToGrid" "1"
 	"bShowGrid" "1"
 	"bShowLogicalGrid" "0"
-	"nGridSpacing" "8"
+	"nGridSpacing" "1"
 	"bShow3DGrid" "0"
 }
 world
 {
 	"id" "1"
-	"mapversion" "175"
+	"mapversion" "179"
 	"classname" "worldspawn"
 	"detailmaterial" "detail/detailsprites"
 	"detailvbsp" "detail.vbsp"
@@ -10409,7 +10409,7 @@ entity
 entity
 {
 	"id" "112"
-	"classname" "info_player_survivor"
+	"classname" "info_player_deathmatch"
 	"angles" "0 0 0"
 	"enabled" "1"
 	"targetname" "normalspawns"
@@ -17702,8 +17702,8 @@ entity
 		{
 			"id" "2744"
 			"plane" "(216 2064 0) (232 2064 0) (232 2064 56)"
-			"material" "TOOLS/TOOLSNODRAW"
-			"uaxis" "[1 0 0 -32] 0.25"
+			"material" "DEV/DEV_MEASURECRATE01"
+			"uaxis" "[1 0 0 0] 0.25"
 			"vaxis" "[0 0 -1 0] 0.25"
 			"rotation" "0"
 			"lightmapscale" "16"
@@ -17941,8 +17941,8 @@ entity
 		{
 			"id" "2768"
 			"plane" "(408 2064 0) (424 2064 0) (424 2064 56)"
-			"material" "TOOLS/TOOLSNODRAW"
-			"uaxis" "[1 0 0 -32] 0.25"
+			"material" "DEV/DEV_MEASURECRATE01"
+			"uaxis" "[1 0 0 0] 0.25"
 			"vaxis" "[0 0 -1 0] 0.25"
 			"rotation" "0"
 			"lightmapscale" "16"
@@ -18182,8 +18182,8 @@ entity
 		{
 			"id" "2792"
 			"plane" "(600 2064 0) (616 2064 0) (616 2064 56)"
-			"material" "TOOLS/TOOLSNODRAW"
-			"uaxis" "[1 0 0 -32] 0.25"
+			"material" "DEV/DEV_MEASURECRATE01"
+			"uaxis" "[1 0 0 0] 0.25"
 			"vaxis" "[0 0 -1 0] 0.25"
 			"rotation" "0"
 			"lightmapscale" "16"
@@ -18425,8 +18425,8 @@ entity
 		{
 			"id" "2816"
 			"plane" "(792 2064 0) (808 2064 0) (808 2064 56)"
-			"material" "TOOLS/TOOLSNODRAW"
-			"uaxis" "[1 0 0 -32] 0.25"
+			"material" "DEV/DEV_MEASURECRATE01"
+			"uaxis" "[1 0 0 0] 0.25"
 			"vaxis" "[0 0 -1 0] 0.25"
 			"rotation" "0"
 			"lightmapscale" "16"
@@ -18572,6 +18572,7 @@ entity
 	"id" "11034"
 	"classname" "env_projectedtexture"
 	"angles" "0 90 0"
+	"enableshadows" "0"
 	"farz" "750.0"
 	"lightcolor" "255 255 255 200"
 	"lightfov" "75"
@@ -18842,6 +18843,170 @@ entity
 		"visgroupshown" "1"
 		"visgroupautoshown" "1"
 		"logicalpos" "[0 1000]"
+	}
+}
+entity
+{
+	"id" "11731"
+	"classname" "func_button"
+	"disablereceiveshadows" "0"
+	"health" "0"
+	"lip" "0"
+	"locked_sentence" "0"
+	"locked_sound" "0"
+	"movedir" "0 0 0"
+	"origin" "800 2059.5 22"
+	"renderamt" "255"
+	"rendercolor" "255 255 255"
+	"renderfx" "0"
+	"rendermode" "0"
+	"sounds" "3"
+	"spawnflags" "1025"
+	"speed" "5"
+	"unlocked_sentence" "0"
+	"unlocked_sound" "0"
+	"wait" "1"
+	connections
+	{
+		"OnPressed" "projectedtexture4_branch2,Test,,0,-1"
+	}
+	solid
+	{
+		"id" "11732"
+		side
+		{
+			"id" "2862"
+			"plane" "(796 2059 28) (796 2060 28) (804 2060 28)"
+			"material" "DEV/DEV_MEASURESWITCH01"
+			"uaxis" "[1 0 0 -16] 0.25"
+			"vaxis" "[0 1 0 -27] 0.25"
+			"rotation" "0"
+			"lightmapscale" "16"
+			"smoothing_groups" "0"
+		}
+		side
+		{
+			"id" "2861"
+			"plane" "(796 2060 16) (796 2059 16) (804 2059 16)"
+			"material" "DEV/DEV_MEASURESWITCH01"
+			"uaxis" "[1 0 0 -16] 0.25"
+			"vaxis" "[0 1 0 -27] 0.25"
+			"rotation" "0"
+			"lightmapscale" "16"
+			"smoothing_groups" "0"
+		}
+		side
+		{
+			"id" "2860"
+			"plane" "(796 2059 16) (796 2060 16) (796 2060 28)"
+			"material" "DEV/DEV_MEASURESWITCH01"
+			"uaxis" "[0 -1 0 12] 0.25"
+			"vaxis" "[0 0 -1 0] 0.25"
+			"rotation" "0"
+			"lightmapscale" "16"
+			"smoothing_groups" "0"
+		}
+		side
+		{
+			"id" "2859"
+			"plane" "(804 2060 16) (804 2059 16) (804 2059 28)"
+			"material" "DEV/DEV_MEASURESWITCH01"
+			"uaxis" "[0 1 0 -12] 0.25"
+			"vaxis" "[0 0 -1 0] 0.25"
+			"rotation" "0"
+			"lightmapscale" "16"
+			"smoothing_groups" "0"
+		}
+		side
+		{
+			"id" "2858"
+			"plane" "(796 2060 16) (804 2060 16) (804 2060 28)"
+			"material" "TOOLS/TOOLSNODRAW"
+			"uaxis" "[-1 0 0 48] 0.25"
+			"vaxis" "[0 0 -1 0] 0.25"
+			"rotation" "0"
+			"lightmapscale" "16"
+			"smoothing_groups" "0"
+		}
+		side
+		{
+			"id" "2857"
+			"plane" "(804 2059 16) (796 2059 16) (796 2059 28)"
+			"material" "DEV/DEV_MEASURESWITCH01"
+			"uaxis" "[1 0 0 -16] 0.25"
+			"vaxis" "[0 0 -1 0] 0.25"
+			"rotation" "0"
+			"lightmapscale" "16"
+			"smoothing_groups" "0"
+		}
+		editor
+		{
+			"color" "220 30 220"
+			"visgroupshown" "1"
+			"visgroupautoshown" "1"
+		}
+	}
+	editor
+	{
+		"color" "220 30 220"
+		"visgroupshown" "1"
+		"visgroupautoshown" "1"
+		"logicalpos" "[0 3000]"
+	}
+}
+entity
+{
+	"id" "11744"
+	"classname" "logic_branch"
+	"targetname" "projectedtexture4_branch2"
+	connections
+	{
+		"OnFalse" "projectedtexture4,AddOutput,enableshadows 1,0,-1"
+		"OnFalse" "!self,SetValue,1,0,-1"
+		"OnTrue" "!self,SetValue,0,0,-1"
+		"OnTrue" "projectedtexture4,AddOutput,enableshadows 0,0,-1"
+	}
+	"origin" "800 2040 8"
+	editor
+	{
+		"color" "220 30 220"
+		"visgroupshown" "1"
+		"visgroupautoshown" "1"
+		"logicalpos" "[0 14500]"
+	}
+}
+entity
+{
+	"id" "11807"
+	"classname" "prop_physics"
+	"angles" "0 0 0"
+	"damagetoenablemotion" "0"
+	"Damagetype" "0"
+	"fademindist" "-1"
+	"fadescale" "1"
+	"forcetoenablemotion" "0"
+	"glowcolor" "255 255 255"
+	"glowenable" "0"
+	"glowtype" "0"
+	"inertiaScale" "1.0"
+	"massScale" "0"
+	"minhealthdmg" "0"
+	"model" "models/props_c17/oildrum001.mdl"
+	"modelscale" "1.0"
+	"nodamageforces" "0"
+	"physdamagescale" "0.1"
+	"renderamt" "255"
+	"rendercolor" "255 255 255"
+	"shadowcastdist" "0"
+	"skin" "3"
+	"spawnflags" "257"
+	"origin" "992 1904 1"
+	editor
+	{
+		"color" "220 30 220"
+		"visgroupshown" "1"
+		"visgroupautoshown" "1"
+		"logicalpos" "[0 0]"
 	}
 }
 cameras
