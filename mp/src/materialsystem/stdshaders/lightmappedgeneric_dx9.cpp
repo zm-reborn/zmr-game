@@ -13,8 +13,8 @@
 static LightmappedGeneric_DX9_Vars_t s_info;
 
 
-BEGIN_VS_SHADER( LightmappedGeneric,
-				 "Help for LightmappedGeneric" )
+BEGIN_VS_SHADER( SDK_LightmappedGeneric,
+				 "Help for SDK_LightmappedGeneric" )
 
 	BEGIN_SHADER_PARAMS
 		SHADER_PARAM( ALBEDO, SHADER_PARAM_TYPE_TEXTURE, "shadertest/BaseTexture", "albedo (Base texture with no baked lighting)" )

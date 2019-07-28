@@ -16,5 +16,9 @@ $Project "Shaders (ZMR)"
 		{
 			$File	"zmr/zmr_test.cpp"
 		}
+		
+		$File	"lightmappedgeneric_dx9.cpp"
+		$File	"lightmappedgeneric_dx9_helper.cpp"
+		$File	"lightmappedgeneric_dx9_helper.h"
 	}
 }
