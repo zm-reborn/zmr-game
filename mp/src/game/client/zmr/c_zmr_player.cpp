@@ -2,7 +2,6 @@
 
 #include "baseviewport.h"
 #include "clienteffectprecachesystem.h"
-#include "iviewrender_beams.h"
 #include "dlight.h"
 #include "r_efx.h"
 #include "takedamageinfo.h"
@@ -23,6 +22,7 @@
 #include "c_zmr_player_ragdoll.h"
 #include "c_zmr_teamkeys.h"
 
+#include "c_zmr_flashlighteffect.h"
 #include "c_zmr_player.h"
 #include "c_zmr_zmvision.h"
 
@@ -40,11 +40,8 @@ CLIENTEFFECT_MATERIAL( MAT_INNERFLARE )
 CLIENTEFFECT_REGISTER_END()
 
 
-#define FLASHLIGHT_DISTANCE         1000.0f
 
 
-ConVar zm_cl_flashlight_spec_uselocal( "zm_cl_flashlight_spec_uselocal", "1", FCVAR_ARCHIVE, "Use better flashlight when spectating in firstperson" );
-ConVar zm_cl_flashlight_thirdperson( "zm_cl_flashlight_thirdperson", "1", FCVAR_ARCHIVE, "Do other players have a flashlight beam + dynamic light" );
 
 
 ConVar zm_cl_participation( "zm_cl_participation", "0", FCVAR_USERINFO | FCVAR_ARCHIVE, "Your participation setting. 0 = Want to be ZM, 1 = Only human, 2 = Only spectator" );
@@ -125,8 +122,7 @@ C_ZMPlayer::C_ZMPlayer() : m_iv_angEyeAngles( "C_ZMPlayer::m_iv_angEyeAngles" )
 
     //m_EntClientFlags |= ENTCLIENTFLAG_DONTUSEIK;
 
-    m_pLocalFlashlight = nullptr;
-    m_pFlashlightBeam = nullptr;
+    m_pFlashlight = nullptr;
     m_iIDEntIndex = 0;
     m_iSpawnInterpCounterCache = 0;
 
@@ -154,8 +150,7 @@ C_ZMPlayer::C_ZMPlayer() : m_iv_angEyeAngles( "C_ZMPlayer::m_iv_angEyeAngles" )
 
 C_ZMPlayer::~C_ZMPlayer()
 {
-    ReleaseLocalFlashlight();
-    ReleaseOtherFlashlight();
+    ReleaseFlashlight();
 
     m_pPlayerAnimState->Release();
 
@@ -414,153 +409,35 @@ void C_ZMPlayer::TeamChangeStatic( int iNewTeam )
     }
 }
 
-bool C_ZMPlayer::ShouldUseLocalFlashlight() const
+void C_ZMPlayer::UpdateFlashlight()
 {
-    C_ZMPlayer* pLocal = C_ZMPlayer::GetLocalPlayer();
-    if ( pLocal == this )
-    {
-        return true;
-    }
-    
-    if ( pLocal && pLocal->GetObserverMode() == OBS_MODE_IN_EYE && pLocal->GetObserverTarget() == this )
-    {
-        return zm_cl_flashlight_spec_uselocal.GetBool();
-    }
-
-    return false;
-}
-
-void C_ZMPlayer::UpdateLocalFlashlight()
-{
-    // Only use the local player's flashlight.
-    C_ZMPlayer* pLocal = C_ZMPlayer::GetLocalPlayer();
-    CFlashlightEffect* pFlashlight = pLocal->m_pLocalFlashlight;
-
     // Flashlight isn't on.
     if ( !IsEffectActive( EF_DIMLIGHT ) )
     {
-        //ReleaseLocalFlashlight();
-        if ( pFlashlight )
-            pFlashlight->TurnOff();
+        if ( m_pFlashlight )
+            m_pFlashlight->TurnOff();
         return;
     }
 
 
     // Create the flashlight.
-    if ( !pFlashlight )
+    if ( !m_pFlashlight )
     {
-        pFlashlight = new CFlashlightEffect( pLocal->index );
-        if ( !pFlashlight )
+        m_pFlashlight = new CZMFlashlightEffect( this );
+        if ( !m_pFlashlight )
             return;
-
-        pLocal->m_pLocalFlashlight = pFlashlight;
     }
 
-    Vector fwd, right, up;
-    AngleVectors( EyeAngles(), &fwd, &right, &up );
 
     // Update the light with the new position and direction.
-    pFlashlight->TurnOn();
-    pFlashlight->UpdateLight( EyePosition(), fwd, right, up, FLASHLIGHT_DISTANCE );
-}
-
-void C_ZMPlayer::UpdateOtherFlashlight()
-{
-    // We don't have a flashlight on.
-    if ( !IsEffectActive( EF_DIMLIGHT ) )
-    {
-        ReleaseOtherFlashlight();
-        return;
-    }
-
-    // We should use the local, fancy flashlight.
-    if ( ShouldUseLocalFlashlight() )
-    {
-        ReleaseOtherFlashlight();
-        UpdateLocalFlashlight();
-        return;
-    }
-
-    if ( !zm_cl_flashlight_thirdperson.GetBool() )
-    {
-        ReleaseOtherFlashlight();
-        return;
-    }
-
-    // We have nothing to attach the flashlight on to.
-    if ( m_iAttachmentRH == -1 )
-    {
-        return;
-    }
-
-
-    Vector vecOrigin;
-    QAngle eyeAngles;
-    
-    GetAttachment( m_iAttachmentRH, vecOrigin, eyeAngles );
-
-    Vector vForward;
-    AngleVectors( m_angEyeAngles, &vForward );
-                
-    trace_t tr;
-    UTIL_TraceLine( vecOrigin, vecOrigin + (vForward * 200), MASK_SOLID, this, COLLISION_GROUP_NONE, &tr );
-
-    if ( !m_pFlashlightBeam )
-    {
-        BeamInfo_t beamInfo;
-        beamInfo.m_nType = TE_BEAMPOINTS;
-        beamInfo.m_vecStart = tr.startpos;
-        beamInfo.m_vecEnd = tr.endpos;
-        beamInfo.m_pszModelName = "sprites/glow01.vmt";
-        beamInfo.m_pszHaloName = "sprites/glow01.vmt";
-        beamInfo.m_flHaloScale = 3.0;
-        beamInfo.m_flWidth = 8.0f;
-        beamInfo.m_flEndWidth = 35.0f;
-        beamInfo.m_flFadeLength = 300.0f;
-        beamInfo.m_flAmplitude = 0;
-        beamInfo.m_flBrightness = 60.0;
-        beamInfo.m_flSpeed = 0.0f;
-        beamInfo.m_nStartFrame = 0.0;
-        beamInfo.m_flFrameRate = 0.0;
-        beamInfo.m_flRed = 255.0;
-        beamInfo.m_flGreen = 255.0;
-        beamInfo.m_flBlue = 255.0;
-        beamInfo.m_nSegments = 8;
-        beamInfo.m_bRenderable = true;
-        beamInfo.m_flLife = 0.5;
-        beamInfo.m_nFlags = FBEAM_FOREVER | FBEAM_ONLYNOISEONCE | FBEAM_NOTILE | FBEAM_HALOBEAM;
-                
-        m_pFlashlightBeam = beams->CreateBeamPoints( beamInfo );
-    }
-
-    if ( m_pFlashlightBeam )
-    {
-        BeamInfo_t beamInfo;
-        beamInfo.m_vecStart = tr.startpos;
-        beamInfo.m_vecEnd = tr.endpos;
-        beamInfo.m_flRed = 255.0;
-        beamInfo.m_flGreen = 255.0;
-        beamInfo.m_flBlue = 255.0;
-
-        beams->UpdateBeamInfo( m_pFlashlightBeam, beamInfo );
-
-        dlight_t *el = effects->CL_AllocDlight( entindex() );
-        el->origin = tr.endpos;
-        el->radius = 50; 
-        el->color.r = 200;
-        el->color.g = 200;
-        el->color.b = 200;
-        el->die = gpGlobals->curtime + 0.1;
-    }
+    m_pFlashlight->TurnOn();
+    m_pFlashlight->UpdateLight();
 }
 
 void C_ZMPlayer::Simulate()
 {
     if ( IsLocalPlayer() )
     {
-        // Update our flashlight
-        UpdateLocalFlashlight();
-
         // Update the player's fog data if necessary.
         UpdateFogController();
     }
@@ -570,10 +447,10 @@ void C_ZMPlayer::Simulate()
         Vector vel;
         EstimateAbsVelocity( vel );
         UpdateStepSound( GetGroundSurface(), GetAbsOrigin(), vel );
-
-        // Their flashlight
-        UpdateOtherFlashlight();
     }
+
+    // Update player's flashlight
+    UpdateFlashlight();
 
 
 	if ( gpGlobals->frametime != 0.0f  )
@@ -977,7 +854,11 @@ void C_ZMPlayer::Initialize()
 
     // This is used for deathcam. Should be safe since we're using the same model as the ragdoll.
     m_iAttachmentEyes = LookupAttachment( "eyes" );
-    m_iAttachmentRH = LookupAttachment( "anim_attachment_RH" );
+    
+    if ( m_pFlashlight )
+    {
+        m_pFlashlight->SetRightHandAttachment( LookupAttachment( "anim_attachment_RH" ) );
+    }
 }
 
 bool C_ZMPlayer::ShouldInterpolate()
@@ -1002,9 +883,9 @@ void C_ZMPlayer::NotifyShouldTransmit( ShouldTransmitState_t state )
 {
     if ( state == SHOULDTRANSMIT_END )
     {
-        if ( m_pFlashlightBeam != NULL )
+        if ( m_pFlashlight )
         {
-            ReleaseOtherFlashlight();
+            ReleaseFlashlight();
         }
     }
 
@@ -1035,21 +916,10 @@ void C_ZMPlayer::PostDataUpdate( DataUpdateType_t updateType )
     BaseClass::PostDataUpdate( updateType );
 }
 
-void C_ZMPlayer::ReleaseLocalFlashlight()
+void C_ZMPlayer::ReleaseFlashlight()
 {
-    delete m_pLocalFlashlight;
-    m_pLocalFlashlight = nullptr;
-}
-
-void C_ZMPlayer::ReleaseOtherFlashlight()
-{
-    if ( m_pFlashlightBeam )
-    {
-        m_pFlashlightBeam->flags = 0;
-        m_pFlashlightBeam->die = gpGlobals->curtime - 1;
-
-        m_pFlashlightBeam = nullptr;
-    }
+    delete m_pFlashlight;
+    m_pFlashlight = nullptr;
 }
 
 
