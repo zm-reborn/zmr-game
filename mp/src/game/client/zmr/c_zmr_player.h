@@ -18,6 +18,7 @@ class CZMPlayerAttackTraceFilter;
 
 class C_ZMRagdoll;
 class C_ZMBaseWeapon;
+class CZMFlashlightEffect;
 
 
 class C_ZMPlayer : public C_BaseHLPlayer
@@ -120,9 +121,7 @@ public:
     void SetMouseWheelMove( float dir );
 
 protected:
-    bool ShouldUseLocalFlashlight() const;
-    void UpdateLocalFlashlight();
-    void UpdateOtherFlashlight();
+    void UpdateFlashlight();
 
 
     CZMCharCircle* m_fxInner;
@@ -145,11 +144,8 @@ private:
 
     int m_iIDEntIndex;
 
-    void ReleaseOtherFlashlight();
-    Beam_t* m_pFlashlightBeam;
-
-    void ReleaseLocalFlashlight();
-    CFlashlightEffect* m_pLocalFlashlight;
+    void ReleaseFlashlight();
+    CZMFlashlightEffect* m_pFlashlight;
 
 
     // Only used locally.
