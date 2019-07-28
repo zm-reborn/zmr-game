@@ -1014,8 +1014,24 @@ void C_ZMPlayer::ProcessMuzzleFlashEvent()
     //
     // Perform the muzzleflash light
     //
+
+    // Scale depending on how dark it is.
+    // It looks silly if we're in daylight getting ridiculous flashes.
+    Vector vecLight = engine->GetLightForPoint( pos, false );
+    float flBias = 0.3f;
+
+    float intensity = 1.0f - ((0.21f * vecLight.x) + (0.72f * vecLight.y) + (0.07f * vecLight.z) + flBias);
+    intensity = clamp( intensity, 0.0f, 1.0f );
+
+
+    float flRadiusMult = intensity < 0.7f ? intensity : 1.0f;
+    
     float radius = random->RandomInt(   zm_cl_muzzleflash_light_size_min.GetFloat(),
-                                        zm_cl_muzzleflash_light_size_max.GetFloat() );
+                                        zm_cl_muzzleflash_light_size_max.GetFloat() ) * flRadiusMult;
+
+
+
+
 
     float debugtime = zm_cl_muzzleflash_light_debug.GetFloat();
 
