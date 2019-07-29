@@ -60,6 +60,7 @@ void ZMAttackConfig_t::ToKeyValues( KeyValues* kv ) const
     kv->SetInt( "bulletspershot", nBulletsPerShot );
 
     
+    // Radius in radians to diameter in degrees
     Vector correctspread;
     for ( int i = 0; i < 3; i++ )
         correctspread[i] = RAD2DEG( asinf( vecSpread[i] ) ) * 2.0f;
@@ -121,11 +122,15 @@ CZMBaseWeaponConfig::CZMBaseWeaponConfig( const char* wepname, const char* confi
 
     primary.Reset();
     secondary.Reset();
+
+    bOverriddenViewmodel = false;
+    bOverriddenWorldmodel = false;
 }
 
 CZMBaseWeaponConfig::~CZMBaseWeaponConfig()
 {
     delete[] pszWeaponName;
+    delete[] pszConfigFilePath;
     delete[] pszAnimPrefix;
     delete[] pszModel_View;
     delete[] pszModel_World;
@@ -196,7 +201,10 @@ void CZMBaseWeaponConfig::LoadFromConfig( KeyValues* kv )
         CopyAllocString( snddata->GetString( "deploy" ), &pszSounds[WeaponSound_t::DEPLOY] );
     }
 
+
+    // Client
 #ifdef CLIENT_DLL
+    // Texture data
     auto* texdata = kv->FindKey( "TextureData" );
     if ( texdata )
     {
@@ -216,7 +224,7 @@ void CZMBaseWeaponConfig::LoadFromConfig( KeyValues* kv )
 
 
     iCrosshair = g_ZMCrosshairs.FindCrosshairByName( kv->GetString( "crosshair" ) );
-#endif
+#endif // CLIENT_DLL
 
 
 
@@ -281,9 +289,10 @@ KeyValues* CZMBaseWeaponConfig::ToKeyValues() const
 
 
     //
-    // Texture stuff
+    // Client stuff
     //
 #ifdef CLIENT_DLL
+    // Texture stuff
     auto* texdata = kv->FindKey( "TextureData", true );
 
     if ( pIconActive )
@@ -308,7 +317,7 @@ KeyValues* CZMBaseWeaponConfig::ToKeyValues() const
     {
         kv->SetString( "crosshair", pCrosshair->GetName() );
     }
-#endif
+#endif // CLIENT_DLL
     
 
 
@@ -350,6 +359,8 @@ const char* CZMBaseWeaponConfig::GetDebugName() const
 
 void CZMBaseWeaponConfig::ComputeSpread( const char* data, Vector& spread )
 {
+    // Spread is diameter in degrees in the config
+    // We want to transfer this to radius in radians.
     Vector temp = vec3_origin;
     CopyVector( data, temp );
 
@@ -416,8 +427,11 @@ void CZMBaseWeaponConfig::CopyIcon( KeyValues* kv, CHudTexture** icon )
 
     pTex->Precache();
 }
-#endif
+#endif // CLIENT_DLL
 
+//
+// Overrides only specific members, we don't want to override everything.
+//
 bool CZMBaseWeaponConfig::OverrideFromConfig( KeyValues* kv )
 {
     float invalid = -1337;
@@ -446,8 +460,9 @@ bool CZMBaseWeaponConfig::OverrideFromConfig( KeyValues* kv )
     }
 
 
-
+    //
     // Sounds
+    //
     auto* snddata = kv->FindKey( "SoundData" );
     if ( snddata )
     {
@@ -530,7 +545,7 @@ void CZMBaseWeaponConfig::OverrideAttack( KeyValues* kv, ZMAttackConfig_t& attac
 
 
 
-    pszTemp = kv->GetString( "spread" );
+    pszTemp = kv->GetString( "spread", nullptr );
     if ( pszTemp )
         ComputeSpread( pszTemp, attack.vecSpread );
 
@@ -574,6 +589,9 @@ CZMWeaponConfigSystem::CZMWeaponConfigSystem() : CAutoGameSystem( "ZMWeaponConfi
     }
 
 
+    //
+    // Add new weapons here.
+    //
     m_ConfigRegisters[ZMCONFIGSLOT_FISTSCARRY].pszWeaponName = "weapon_zm_fistscarry";
     m_ConfigRegisters[ZMCONFIGSLOT_IMPROVISED].pszWeaponName = "weapon_zm_improvised";
     m_ConfigRegisters[ZMCONFIGSLOT_SLEDGE].pszWeaponName = "weapon_zm_sledge";
@@ -847,6 +865,7 @@ CZMBaseWeaponConfig* CZMWeaponConfigSystem::LoadConfigFromFile( const char* szWe
     kv->deleteThis();
 
 
+    // Override
     Q_snprintf( file, sizeof( file ), CONFIG_DIR"/%s_custom.txt", szWeaponName );
     
     kv = new KeyValues( "WeaponData" );

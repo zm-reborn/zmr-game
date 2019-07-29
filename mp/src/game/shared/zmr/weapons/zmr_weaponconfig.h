@@ -6,6 +6,9 @@
 
 namespace ZMWeaponConfig
 {
+    //
+    // Add new weapons here. Also modify the CZMWeaponConfigSystem constructor.
+    //
     enum WeaponConfigSlot_t
     {
         ZMCONFIGSLOT_INVALID = -1,
