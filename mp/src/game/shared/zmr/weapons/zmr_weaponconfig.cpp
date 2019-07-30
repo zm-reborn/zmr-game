@@ -434,9 +434,10 @@ void CZMBaseWeaponConfig::CopyIcon( KeyValues* kv, CHudTexture** icon )
 //
 bool CZMBaseWeaponConfig::OverrideFromConfig( KeyValues* kv )
 {
-    float invalid = -1337;
-
     const char* pszTmp;
+    
+#ifdef GAME_DLL
+    float invalid = -1337;
     int tmp;
 
 
@@ -458,6 +459,7 @@ bool CZMBaseWeaponConfig::OverrideFromConfig( KeyValues* kv )
     {
         OverrideAttack( secattack, secondary );
     }
+
 
 
     //
@@ -488,22 +490,6 @@ bool CZMBaseWeaponConfig::OverrideFromConfig( KeyValues* kv )
     }
 
 
-
-    
-
-
-    pszTmp = kv->GetString( "printname", nullptr );
-    if ( pszTmp )
-        CopyAllocString( pszTmp, &pszPrintName );
-
-    pszTmp = kv->GetString( "viewmodel", nullptr );
-    if ( pszTmp )
-        CopyAllocString( pszTmp, &pszModel_View );
-
-    pszTmp = kv->GetString( "worldmodel", nullptr );
-    if ( pszTmp )
-        CopyAllocString( pszTmp, &pszModel_World );
-
     pszTmp = kv->GetString( "anim_prefix", nullptr );
     if ( pszTmp )
         CopyAllocString( pszTmp, &pszAnimPrefix );
@@ -511,12 +497,36 @@ bool CZMBaseWeaponConfig::OverrideFromConfig( KeyValues* kv )
     pszTmp = kv->GetString( "primary_ammo", nullptr );
     if ( pszTmp )
         CopyAllocString( pszTmp, &pszAmmoName );
+#endif // GAME_DLL
 
+
+    
+
+#ifdef CLIENT_DLL
+    pszTmp = kv->GetString( "printname", nullptr );
+    if ( pszTmp )
+        CopyAllocString( pszTmp, &pszPrintName );
 
     int hands = kv->GetInt( "usenewhands", -1 );
     if ( hands != -1 )
         bUseHands = ( hands > 0 ) ? true : false;
+#endif
 
+
+    // Shared
+    pszTmp = kv->GetString( "viewmodel", nullptr );
+    if ( pszTmp )
+    {
+        CopyAllocString( pszTmp, &pszModel_View );
+        bOverriddenViewmodel = true;
+    }
+
+    pszTmp = kv->GetString( "worldmodel", nullptr );
+    if ( pszTmp )
+    {
+        CopyAllocString( pszTmp, &pszModel_World );
+        bOverriddenWorldmodel = true;
+    }
 
     return true;
 }
@@ -855,6 +865,8 @@ CZMBaseWeaponConfig* CZMWeaponConfigSystem::LoadConfigFromFile( const char* szWe
     if ( !kv->LoadFromFile( filesystem, file ) )
     {
         Warning( "Couldn't load weapon config '%s'!\n", file );
+
+        kv->deleteThis();
         return nullptr;
     }
 
@@ -864,18 +876,35 @@ CZMBaseWeaponConfig* CZMWeaponConfigSystem::LoadConfigFromFile( const char* szWe
 
     kv->deleteThis();
 
-
+    //
     // Override
-    Q_snprintf( file, sizeof( file ), CONFIG_DIR"/%s_custom.txt", szWeaponName );
-    
-    kv = new KeyValues( "WeaponData" );
-    if ( kv->LoadFromFile( filesystem, file, "MOD" ) )
+    //
+
+    // Allow client and server to separate their files.
+    // This allows users to change client and server options separately.
+    const char* postfixes[] = {
+        "_custom",
+#ifdef GAME_DLL
+        "_custom_server"
+#else
+        "_custom_client"
+#endif
+    };
+
+    for ( int i = 0; i < ARRAYSIZE( postfixes ); i++ )
     {
-        pConfig->OverrideFromConfig( kv );
+        Q_snprintf( file, sizeof( file ), CONFIG_DIR"/%s%s.txt", szWeaponName, postfixes[i] );
+
+        kv = new KeyValues( "WeaponData" );
+        if ( kv->LoadFromFile( filesystem, file, "MOD" ) )
+        {
+            pConfig->OverrideFromConfig( kv );
+
+            i = ARRAYSIZE( postfixes ); // Break after this.
+        }
+
+        kv->deleteThis();
     }
-
-
-    kv->deleteThis();
 
 
     return pConfig;
