@@ -321,7 +321,8 @@ void CZMWeaponHands::SecondaryAttack()
             }
 
             // If all else fails, pull
-            if ( !bDone )
+            // Puller must be on ground.
+            if ( !bDone && pOwner->GetFlags() & FL_ONGROUND )
             {
                PullObject( pEnt );
 
@@ -372,8 +373,11 @@ void CZMWeaponHands::TertiaryAttack()
     if ( !pEntity )
         return;
 
-
-    PushObject( pEntity, hitPos );
+    // Allow pushing in the air in case they get stuck or something.
+    //if ( pOwner->GetFlags() & FL_ONGROUND )
+    {
+        PushObject( pEntity, hitPos );
+    }
 
 
     if ( GetActivity() != HOLD_ACTIVITY )
