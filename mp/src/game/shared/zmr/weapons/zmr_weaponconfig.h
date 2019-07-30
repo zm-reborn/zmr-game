@@ -103,6 +103,9 @@ namespace ZMWeaponConfig
         char* pszAnimPrefix;
         char* pszModel_View;
         char* pszModel_World;
+
+        bool bOverriddenViewmodel;
+        bool bOverriddenWorldmodel;
         //
 
     
