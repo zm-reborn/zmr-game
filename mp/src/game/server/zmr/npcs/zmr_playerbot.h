@@ -14,7 +14,6 @@ enum ZMBotWeaponTypeRange_t
     BOTWEPRANGE_LONGRANGE,
     BOTWEPRANGE_THROWABLE,
     BOTWEPRANGE_MELEE,
-    BOTWEPRANGE_CARRY,
 
     BOTWEPRANGE_MAX
 };
@@ -37,6 +36,8 @@ public:
     
     virtual bool ShouldUpdate() const OVERRIDE;    
     //
+
+    virtual void Spawn() OVERRIDE;
 
     //
     static CZMPlayer* CreateZMBot( const char* playername = "" );
@@ -61,8 +62,19 @@ public:
     bool            ShouldReload() const;
     bool            HasAnyEffectiveRangeWeapons() const;
     bool            CanReload() const;
+    bool            CanAttack() const;
+    bool            MustStopToShoot() const;
+    float           GetOptimalAttackDistance() const;
+    float           GetMaxAttackDistance() const;
 protected:
     CZMBaseWeapon*  FindWeaponOfType( ZMBotWeaponTypeRange_t wepType ) const;
 public:
     //
+
+
+    CBasePlayer*    GetFollowTarget() const { return m_hFollowTarget.Get(); }
+    void            SetFollowTarget( CBasePlayer* pPlayer ) { m_hFollowTarget.Set( pPlayer ); }
+
+private:
+    CHandle<CBasePlayer> m_hFollowTarget;
 };
