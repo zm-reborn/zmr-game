@@ -11,6 +11,7 @@
 #include "zmr_survivor_attack.h"
 #include "zmr_survivor_attack_closerange.h"
 #include "zmr_survivor_attack_longrange.h"
+#include "zmr_survivor_follow.h"
 
 
 extern ConVar zm_sv_debug_bot_lookat;
@@ -51,7 +52,7 @@ public:
 
     virtual const char* GetName() const OVERRIDE { return "SurvivorCombatMonitor"; }
 
-    virtual NPCR::CSchedule<CZMPlayerBot>* CreateFriendSchedule() OVERRIDE { return nullptr; }
+    virtual NPCR::CSchedule<CZMPlayerBot>* CreateFriendSchedule() OVERRIDE { return new SurvivorFollowSchedule; }
 
     virtual void OnStart() OVERRIDE
     {
@@ -68,6 +69,11 @@ public:
         m_NextLookAround.Start( 4.0f );
     }
 
+    virtual void OnIntercept() OVERRIDE
+    {
+        m_Path.Invalidate();
+    }
+
     virtual void OnUpdate() OVERRIDE
     {
         CZMPlayerBot* pOuter = GetOuter();
@@ -76,6 +82,7 @@ public:
         {
             return;
         }
+
 
 
         if ( !m_NextEnemyScan.HasStarted() || m_NextEnemyScan.IsElapsed() )
@@ -87,7 +94,7 @@ public:
 
             //CBaseEntity* pCurEnemy = m_hLastCombatTarget.Get();
 
-            if ( pClosestEnemy )
+            if ( pClosestEnemy && pOuter->ShouldChase( pClosestEnemy ) != NPCR::RES_NO )
             {
                 m_hLastCombatTarget.Set( pClosestEnemy );
 
@@ -102,18 +109,26 @@ public:
                     if ( !IsIntercepted() )
                     {
                         m_pAttackCloseRangeSched->SetAttackTarget( pClosestEnemy );
+                        m_pAttackCloseRangeSched->SetMeleeing( false );
                         Intercept( m_pAttackCloseRangeSched, "Trying to attack close range!" );
-                        return;
-                    }
-                    else
-                    {
-                        return;
                     }
                 }
+                else if ( pClosestEnemy->GetAbsOrigin().DistTo( pOuter->GetPosition() ) < 160.0f )
+                {
+                    m_pAttackCloseRangeSched->SetAttackTarget( pClosestEnemy );
+                    m_pAttackCloseRangeSched->SetMeleeing( true );
+                    Intercept( m_pAttackCloseRangeSched, "Trying to attack close range with melee!" );
+                }
+
+                if ( IsIntercepted() )
+                    return;
             }
         }
 
-        if ( !m_NextRangeCheck.HasStarted() || m_NextRangeCheck.IsElapsed() )
+
+        bool bBusy = pOuter->IsBusy() == NPCR::RES_YES;
+
+        if ( !bBusy && (!m_NextRangeCheck.HasStarted() || m_NextRangeCheck.IsElapsed()) )
         {
             m_NextRangeCheck.Start( 0.5f );
 
@@ -127,12 +142,14 @@ public:
         }
 
 
-        if ( m_Path.IsValid() )
+        if ( m_Path.IsValid() && !bBusy )
         {
             m_Path.Update( pOuter );
         }
         else
         {
+            m_Path.Invalidate();
+
             m_bMovingOutOfRange = false;
 
             if ( !m_NextLookAround.HasStarted() || m_NextLookAround.IsElapsed() )
@@ -173,6 +190,11 @@ public:
         }
     }
 
+    virtual void OnSpawn() OVERRIDE
+    {
+        m_Path.Invalidate();
+    }
+
     virtual void OnHeardSound( CSound* pSound ) OVERRIDE
     {
         if ( !m_bMovingOutOfRange && (!m_NextHeardLook.HasStarted() || m_NextHeardLook.IsElapsed()) )
@@ -181,6 +203,11 @@ public:
             m_NextLookAround.Start( 3.0f );
             m_vecLookAt = pSound->GetSoundOrigin();
         }
+    }
+
+    virtual NPCR::QueryResult_t IsBusy() const OVERRIDE
+    {
+        return m_Path.IsValid() ? NPCR::RES_YES : NPCR::RES_NONE;
     }
 
     bool ShouldMoveBack( CBaseEntity* pEnemy ) const
