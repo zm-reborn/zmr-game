@@ -25,6 +25,7 @@ namespace NPCR
     {
     public:
         // Events
+        virtual void OnSpawn() {}
         virtual void OnAnimEvent( animevent_t* pEvent ) {}
         virtual void OnAnimActivityInterrupted( Activity newActivity ) {}
         virtual void OnAnimActivityFinished( Activity completedActivity ) {}
@@ -152,6 +153,7 @@ namespace NPCR
         
 
         // Events
+        COMP_DISPATCH( OnSpawn )
         COMP_DISPATCH( OnNavJump )
         COMP_DISPATCH_1ARG( OnMoveSuccess, CBaseNavPath*, pPath )
         COMP_DISPATCH_1ARG( OnMoveFailed, CBaseNavPath*, pPath )
