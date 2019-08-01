@@ -101,3 +101,5 @@ mp/src/materialsystem/stdshaders/makefile.*
 mp/src/materialsystem/stdshaders/filelistgen.txt
 mp/src/materialsystem/stdshaders/filelist.txt
 mp/src/materialsystem/stdshaders/inclist.txt
+*.VC.*
+*.FileListAbsolute.txt
