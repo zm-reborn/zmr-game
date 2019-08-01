@@ -59,7 +59,7 @@ CFLAGS = $(BASE_CFLAGS) $(ENV_CFLAGS)
 # In -std=gnu++0x mode we get lots of errors about "error: narrowing conversion". -fpermissive
 # turns these into warnings in gcc, and -Wno-c++11-narrowing suppresses them entirely in clang 3.1+.
 ifeq ($(CLANG_BUILD),1)
-	CXXFLAGS = $(BASE_CFLAGS) -std=gnu++0x -Wno-c++11-narrowing -Wno-dangling-else $(ENV_CXXFLAGS)
+	CXXFLAGS = $(BASE_CFLAGS) -std=gnu++14 -Wno-c++11-narrowing -Wno-dangling-else $(ENV_CXXFLAGS)
 else
 	CXXFLAGS = $(BASE_CFLAGS) -std=gnu++0x -fpermissive $(ENV_CXXFLAGS)
 endif
@@ -90,7 +90,7 @@ ifdef MAKE_CHROOT
         $(info '$(SCHROOT_CHROOT_NAME)' is not '$(CHROOT_NAME)')
         $(error This makefile should be run from within a chroot. 'schroot --chroot $(CHROOT_NAME) -- $(MAKE) $(MAKEFLAGS)')  
 	endif
-	GCC_VER = -4.8
+	GCC_VER = -5
 	P4BIN = $(SRCROOT)/devtools/bin/linux/p4
 	CRYPTOPPDIR=ubuntu12_32_gcc48
 else ifeq ($(USE_VALVE_BINDIR),1)

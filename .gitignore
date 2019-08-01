@@ -93,3 +93,5 @@ keys_zm.cfg
 *.exe
 mp/src/materialsystem/stdshaders/filestocopy.txt
 mp/src/materialsystem/stdshaders/uniquefilestocopy.txt
+*.VC.*
+*.FileListAbsolute.txt
