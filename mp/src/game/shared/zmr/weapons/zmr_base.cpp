@@ -550,6 +550,13 @@ const char* CZMBaseWeapon::GetViewModel( int vmIndex ) const
     }
 #endif
 
+#ifdef CLIENT_DLL
+    if ( GetWeaponConfig()->bOverriddenViewmodel )
+    {
+        return modelinfo->GetModelName( modelinfo->GetModel( m_iViewModelIndex ) );
+    }
+#endif
+
     return GetWeaponConfig()->pszModel_View;
 }
 
@@ -1019,6 +1026,10 @@ void CZMBaseWeapon::AssignWeaponConfigSlot()
     }
 }
 
+#ifdef CLIENT_DLL
+int UTIL_CreateClientModel( const char* pszModel );
+#endif
+
 void CZMBaseWeapon::Precache()
 {
     AssignWeaponConfigSlot();
@@ -1065,7 +1076,16 @@ void CZMBaseWeapon::Precache()
     // It's possible to only precache the override model and the default one is left out.
     if ( GetWeaponConfig()->pszModel_View[0] != NULL )
     {
-        m_iViewModelIndex = PrecacheModel( GetWeaponConfig()->pszModel_View );
+#ifdef CLIENT_DLL
+        if ( GetWeaponConfig()->bOverriddenViewmodel )
+        {
+            m_iViewModelIndex = UTIL_CreateClientModel( GetWeaponConfig()->pszModel_View );
+        }
+        else
+#endif
+        {
+            m_iViewModelIndex = PrecacheModel( GetWeaponConfig()->pszModel_View );
+        }
     }
 
     if ( GetWeaponConfig()->pszModel_World[0] != NULL )
@@ -1252,7 +1272,7 @@ void CZMBaseWeapon::SetViewModel()
     CZMPlayer* pOwner = GetPlayerOwner();
     if ( !pOwner ) return;
 
-    CBaseViewModel* vm = pOwner->GetViewModel( m_nViewModelIndex, false );
+    auto* vm = static_cast<CZMViewModel*>( pOwner->GetViewModel( m_nViewModelIndex, false ) );
     if ( !vm ) return;
 
     Assert( vm->ViewModelIndex() == m_nViewModelIndex );
@@ -1275,7 +1295,12 @@ void CZMBaseWeapon::SetViewModel()
         pszModel = GetViewModel( m_nViewModelIndex );
     }
 
-    vm->SetWeaponModel( pszModel, this );
+    bool bOverridden = false;
+#ifdef CLIENT_DLL
+    bOverridden = GetWeaponConfig()->bOverriddenViewmodel;
+#endif
+
+    vm->SetWeaponModelEx( pszModel, this, bOverridden );
 }
 
 #ifndef CLIENT_DLL
