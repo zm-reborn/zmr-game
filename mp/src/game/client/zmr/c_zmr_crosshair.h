@@ -184,7 +184,8 @@ public:
     CUtlVector<CZMBaseCrosshair*>* GetCrosshairs() { return &m_vCrosshairs; }
 
     CZMBaseCrosshair* GetCrosshairByName( const char* name ) const;
-
+    CZMBaseCrosshair* GetCrosshairByIndex( int index ) const;
+    int FindCrosshairByName( const char* name ) const;
 
     void WriteCrosshairsToFile() const;
 
@@ -195,7 +196,6 @@ protected:
     void LoadFiles();
     void ReadCrosshairs( KeyValues* kv );
     int AddCrosshair( KeyValues* kv );
-    int FindCrosshairByName( const char* name ) const;
 
     CUtlVector<CZMBaseCrosshair*> m_vCrosshairs;
 };
@@ -204,17 +204,17 @@ extern CZMCrosshairSystem g_ZMCrosshairs;
 
 static CZMBaseCrosshair* ZMGetCrosshair( const char* name )
 {
-    static CZMBaseCrosshair* crosshair = nullptr;
-    if ( !crosshair )
+    static int iCrosshair = -1;
+    if ( iCrosshair == -1 )
     {
-        crosshair = g_ZMCrosshairs.GetCrosshairByName( name );
+        iCrosshair = g_ZMCrosshairs.FindCrosshairByName( name );
 
-        if ( !crosshair )
+        if ( iCrosshair == -1 )
         {
             DevWarning( "Crosshair %s can't be found!\n", name );
         }
     }
 
-    return crosshair;
+    return g_ZMCrosshairs.GetCrosshairByIndex( iCrosshair );
 }
 //

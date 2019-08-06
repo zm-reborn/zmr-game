@@ -6,6 +6,7 @@
 
 
 #include "zmr/zmr_shareddefs.h"
+#include "zmr_weaponconfig.h"
 #include "zmr_base.h"
 
 
@@ -15,6 +16,60 @@
 #ifdef CLIENT_DLL
 #define CZMWeaponMac10 C_ZMWeaponMac10
 #endif
+
+
+using namespace ZMWeaponConfig;
+
+class CZMMac10Config : public CZMBaseWeaponConfig
+{
+public:
+    CZMMac10Config( const char* wepname, const char* configpath ) : CZMBaseWeaponConfig( wepname, configpath )
+    {
+        flEasyDampen = 0.0f;
+        flVerticalKick = 0.0f;
+        flSlideLimit = 0.0f;
+    }
+
+    virtual void LoadFromConfig( KeyValues* kv ) OVERRIDE
+    {
+        CZMBaseWeaponConfig::LoadFromConfig( kv );
+
+        KeyValues* inner;
+
+        inner = kv->FindKey( "PrimaryAttack" );
+        if ( inner )
+        {
+            flEasyDampen = inner->GetFloat( "easy_dampen", 0.5f );
+            flVerticalKick = inner->GetFloat( "max_vertical_kick", 2.0f );
+            flSlideLimit = inner->GetFloat( "slide_limit", 1.0f );
+        }
+    }
+
+    virtual KeyValues* ToKeyValues() const OVERRIDE
+    {
+        auto* kv = CZMBaseWeaponConfig::ToKeyValues();
+
+        KeyValues* inner;
+
+        inner = kv->FindKey( "PrimaryAttack" );
+        if ( inner )
+        {
+            inner->SetFloat( "easy_dampen", flEasyDampen );
+            inner->SetFloat( "max_vertical_kick", flVerticalKick );
+            inner->SetFloat( "slide_limit", flSlideLimit );
+        }
+
+        return kv;
+    }
+
+    
+    float flEasyDampen;
+    float flVerticalKick;
+    float flSlideLimit;
+};
+
+REGISTER_WEAPON_CONFIG( ZMCONFIGSLOT_MAC10, CZMMac10Config );
+
 
 class CZMWeaponMac10 : public CZMBaseWeapon
 {
@@ -27,35 +82,19 @@ public:
     CZMWeaponMac10();
 
 
-#ifdef CLIENT_DLL
-    virtual CZMBaseCrosshair* GetWeaponCrosshair() const OVERRIDE { return ZMGetCrosshair( "Mac10" ); }
-#endif
+    const CZMMac10Config* GetMac10Config() const { return static_cast<const CZMMac10Config*>( GetWeaponConfig() ); }
 
-#ifndef CLIENT_DLL
-    const char* GetDropAmmoName() const OVERRIDE { return "item_ammo_smg1"; }
-    int GetDropAmmoAmount() const OVERRIDE { return SIZE_AMMO_SMG1; }
-#endif
-
-
-
-
-
-    virtual const Vector& GetBulletSpread() OVERRIDE
-    {
-        static Vector cone = VECTOR_CONE_4DEGREES;
-        return cone;
-    }
     
     virtual void AddViewKick() OVERRIDE
     {
-#define	EASY_DAMPEN			0.5f
-#define	MAX_VERTICAL_KICK	2.0f	// Degrees
-#define	SLIDE_LIMIT			1.0f	// Seconds
-	
-	    DoMachineGunKick( EASY_DAMPEN, MAX_VERTICAL_KICK, m_fFireDuration, SLIDE_LIMIT );
+        auto* pConfig = GetMac10Config();
+
+	    DoMachineGunKick(
+            pConfig->flEasyDampen,
+            pConfig->flVerticalKick,
+            m_fFireDuration,
+            pConfig->flSlideLimit );
     }
-    
-    virtual float GetFireRate() OVERRIDE { return 0.06f; };
 };
 
 IMPLEMENT_NETWORKCLASS_ALIASED( ZMWeaponMac10, DT_ZM_WeaponMac10 )
@@ -97,10 +136,8 @@ IMPLEMENT_ACTTABLE( CZMWeaponMac10 );
 
 CZMWeaponMac10::CZMWeaponMac10()
 {
-    m_fMinRange1 = m_fMinRange2 = 0.0f;
-    m_fMaxRange1 = m_fMaxRange2 = 1400.0f;
-
     m_bFiresUnderwater = false;
 
     SetSlotFlag( ZMWEAPONSLOT_LARGE );
+    SetConfigSlot( ZMWeaponConfig::ZMCONFIGSLOT_MAC10 );
 }

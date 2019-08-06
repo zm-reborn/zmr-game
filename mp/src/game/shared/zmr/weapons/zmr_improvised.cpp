@@ -27,25 +27,6 @@ public:
     virtual bool UsesAnimEvent( bool bSecondary ) const OVERRIDE { return false; }
 
     virtual bool CanSecondaryAttack() const OVERRIDE { return false; }
-
-
-    virtual float GetRange() const OVERRIDE { return 50.0f; }
-    virtual float GetFireRate() OVERRIDE { return 1.0f; }
-    virtual float GetDamageForActivity( Activity hitActivity ) const OVERRIDE { return 15.0f; }
-
-    virtual void AddViewKick() OVERRIDE
-    {
-        CZMPlayer* pPlayer = GetPlayerOwner();
-        if ( !pPlayer ) return;
-
-
-        QAngle ang;
-        ang.x = SharedRandomFloat( "impropax", 1.0f, 2.0f );
-        ang.y = SharedRandomFloat( "impropay", -2.0f, -1.0f );
-        ang.z = 0.0f;
-
-	    pPlayer->ViewPunch( ang );
-    }
 };
 
 IMPLEMENT_NETWORKCLASS_ALIASED( ZMWeaponImprovised, DT_ZM_WeaponImprovised )
@@ -91,4 +72,5 @@ IMPLEMENT_ACTTABLE( CZMWeaponImprovised );
 CZMWeaponImprovised::CZMWeaponImprovised()
 {
     SetSlotFlag( ZMWEAPONSLOT_MELEE );
+    SetConfigSlot( ZMWeaponConfig::ZMCONFIGSLOT_IMPROVISED );
 }

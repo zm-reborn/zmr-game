@@ -1,4 +1,5 @@
 #include "cbase.h"
+#include "ammodef.h"
 #ifdef CLIENT_DLL
 #include "prediction.h"
 #include "view.h"
@@ -12,8 +13,13 @@
 
 #include "zmr/zmr_gamerules.h"
 #include "zmr/zmr_viewmodel.h"
+#include "zmr/zmr_ammodef.h"
 #include "zmr/weapons/zmr_base.h"
 #include "zmr/zmr_shareddefs.h"
+
+
+
+using namespace ZMWeaponConfig;
 
 
 #ifdef CLIENT_DLL
@@ -41,10 +47,15 @@ BEGIN_NETWORK_TABLE( CZMBaseWeapon, DT_ZM_BaseWeapon )
     RecvPropInt( RECVINFO( m_nOverrideClip1 ) ),
     RecvPropTime( RECVINFO( m_flNextClipFillTime ) ),
     RecvPropBool( RECVINFO( m_bCanCancelReload ) ),
+    RecvPropString( RECVINFO( m_sScriptFileName ) ),
 #else
     SendPropInt( SENDINFO( m_nOverrideClip1 ) ),
     SendPropTime( SENDINFO( m_flNextClipFillTime ) ),
     SendPropBool( SENDINFO( m_bCanCancelReload ) ),
+    SendPropStringT( SENDINFO( m_sScriptFileName ) ),
+
+    SendPropExclude( "DT_LocalWeaponData", "m_iClip2" ),
+    SendPropExclude( "DT_LocalWeaponData", "m_iSecondaryAmmoType" ),
 #endif
 END_NETWORK_TABLE()
 
@@ -64,6 +75,8 @@ BEGIN_DATADESC( CZMBaseWeapon )
 
     DEFINE_KEYFIELD( m_nOverrideDamage, FIELD_INTEGER, "dmgoverride" ),
     DEFINE_KEYFIELD( m_nOverrideClip1, FIELD_INTEGER, "clip1override" ),
+
+    DEFINE_KEYFIELD( m_sScriptFileName, FIELD_STRING, "customscriptfile" ),
 END_DATADESC()
 
 
@@ -76,6 +89,7 @@ CZMBaseWeapon::CZMBaseWeapon()
 	AddSolidFlags( FSOLID_TRIGGER ); // Nothing collides with these but it gets touches.
 
 
+    SetConfigSlot( ZMCONFIGSLOT_INVALID );
     SetSlotFlag( ZMWEAPONSLOT_NONE );
 
 #ifndef CLIENT_DLL
@@ -86,6 +100,12 @@ CZMBaseWeapon::CZMBaseWeapon()
 
     m_flNextClipFillTime = 0.0f;
     m_bCanCancelReload = true;
+
+#ifdef GAME_DLL
+    m_sScriptFileName = MAKE_STRING( "" );
+#else
+    m_sScriptFileName[0] = NULL;
+#endif
 }
 
 CZMBaseWeapon::~CZMBaseWeapon()
@@ -111,6 +131,22 @@ void CZMBaseWeapon::FreeWeaponSlot()
 
 
     pPlayer->RemoveWeaponSlotFlag( GetSlotFlag() );
+}
+
+const char* CZMBaseWeapon::GetDropAmmoName() const
+{
+    Assert( m_iPrimaryAmmoType != -1 );
+
+    auto* pAmmoDef = ZMAmmoDef();
+
+    return pAmmoDef->m_Additional[m_iPrimaryAmmoType].pszItemName;
+}
+
+int CZMBaseWeapon::GetDropAmmoAmount() const
+{
+    auto* pAmmoDef = ZMAmmoDef();
+
+    return pAmmoDef->m_Additional[m_iPrimaryAmmoType].nDropAmount;
 }
 #endif
 
@@ -441,20 +477,223 @@ bool CZMBaseWeapon::Reload()
     return ret;
 }
 
-const CZMWeaponInfo& CZMBaseWeapon::GetWpnData() const
+bool CZMBaseWeapon::IsInSecondaryAttack() const
 {
-    const FileWeaponInfo_t *pBase = &CBaseCombatWeapon::GetWpnData();
-	const CZMWeaponInfo *pInfo;
+    auto* pMe = const_cast<CZMBaseWeapon*>( this );
+    return GetActivity() == pMe->GetSecondaryAttackActivity();
+}
 
-#ifdef _DEBUG
-    pInfo = dynamic_cast<const CZMWeaponInfo*>( pBase );
-    Assert( pInfo );
+void CZMBaseWeapon::AddViewKick()
+{
+    auto* pPlayer = GetPlayerOwner();
+
+    if ( !pPlayer ) return;
+
+
+    Vector min, max;
+    
+    if ( !IsInSecondaryAttack() )
+    {
+        min = GetWeaponConfig()->primary.vecViewPunch_Min;
+        max = GetWeaponConfig()->primary.vecViewPunch_Max;
+    }
+    else
+    {
+        min = GetWeaponConfig()->secondary.vecViewPunch_Min;
+        max = GetWeaponConfig()->secondary.vecViewPunch_Max;
+    }
+
+
+
+	QAngle punch;
+	punch.x = SharedRandomFloat( "gunx", min.x, max.x );
+	punch.y = SharedRandomFloat( "guny", min.y, max.y );
+	punch.z = SharedRandomFloat( "gunz", min.z, max.z );;
+
+	pPlayer->ViewPunch( punch );
+}
+
+//
+const CZMBaseWeaponConfig* CZMBaseWeapon::GetWeaponConfig() const
+{
+    return GetWeaponConfigSystem()->GetConfigBySlot( GetConfigSlot() );
+}
+
+CHudTexture const* CZMBaseWeapon::GetSpriteActive() const
+{
+#ifdef CLIENT_DLL
+    return GetWeaponConfig()->pIconActive;
 #else
-	pInfo = static_cast<const CZMWeaponInfo*>( pBase );
+    return nullptr;
+#endif
+}
+
+CHudTexture const* CZMBaseWeapon::GetSpriteInactive() const
+{
+#ifdef CLIENT_DLL
+    return GetWeaponConfig()->pIconInactive;
+#else
+    return nullptr;
+#endif
+}
+
+CHudTexture const* CZMBaseWeapon::GetSpriteAmmo() const
+{
+#ifdef CLIENT_DLL
+    return GetWeaponConfig()->pIconAmmo;
+#else
+    return nullptr;
+#endif
+}
+
+const char* CZMBaseWeapon::GetViewModel( int vmIndex ) const
+{
+#ifndef CLIENT_DLL
+    if ( m_OverrideViewModel != NULL_STRING )
+    {
+        return STRING( m_OverrideViewModel );
+    }
 #endif
 
-    return *pInfo;
+#ifdef CLIENT_DLL
+    if ( GetWeaponConfig()->bOverriddenViewmodel )
+    {
+        return modelinfo->GetModelName( modelinfo->GetModel( m_iViewModelIndex ) );
+    }
+#endif
+
+    return GetWeaponConfig()->pszModel_View;
 }
+
+const char* CZMBaseWeapon::GetWorldModel() const
+{
+#ifndef CLIENT_DLL
+    if ( m_OverrideWorldModel != NULL_STRING )
+    {
+        return STRING( m_OverrideWorldModel );
+    }
+#endif
+
+    return GetWeaponConfig()->pszModel_World;
+}
+
+const char* CZMBaseWeapon::GetAnimPrefix() const
+{
+    return GetWeaponConfig()->pszAnimPrefix;
+}
+
+int CZMBaseWeapon::GetMaxClip1() const
+{
+    if ( m_nOverrideClip1 >= 0 )
+    {
+        return m_nOverrideClip1;
+    }
+
+    return GetWeaponConfig()->nClipSize;
+}
+
+int CZMBaseWeapon::GetMaxClip2() const
+{
+    return WEAPON_NOCLIP;
+}
+
+int CZMBaseWeapon::GetDefaultClip1() const
+{
+    return GetWeaponConfig()->nDefaultClip;
+}
+
+int CZMBaseWeapon::GetSlot() const
+{
+    return GetWeaponConfig()->iSlot;
+}
+
+int CZMBaseWeapon::GetPosition() const
+{
+    return GetWeaponConfig()->iPosition;
+}
+
+int CZMBaseWeapon::GetWeight() const
+{
+    return GetWeaponConfig()->nWeight;
+}
+
+char const* CZMBaseWeapon::GetName() const
+{
+    // GetClassname is bad for the client.
+    return GetWeaponConfig()->pszWeaponName;
+}
+
+char const* CZMBaseWeapon::GetPrintName() const
+{
+    return GetWeaponConfig()->pszPrintName;
+}
+
+char const* CZMBaseWeapon::GetShootSound( int iIndex ) const
+{
+    return GetWeaponConfig()->pszSounds[iIndex];
+}
+
+float CZMBaseWeapon::GetPrimaryFireRate() const
+{
+    return GetWeaponConfig()->primary.flFireRate;
+}
+
+float CZMBaseWeapon::GetAccuracyIncreaseRate() const
+{
+    return GetWeaponConfig()->flAccuracyIncrease;
+}
+
+float CZMBaseWeapon::GetAccuracyDecreaseRate() const
+{
+    return GetWeaponConfig()->flAccuracyDecrease;
+}
+
+float CZMBaseWeapon::GetPenetrationDmgMult() const
+{
+    return GetWeaponConfig()->flPenetrationDmgMult;
+}
+
+int CZMBaseWeapon::GetMaxPenetrations() const
+{
+    return GetWeaponConfig()->nMaxPenetrations;
+}
+
+float CZMBaseWeapon::GetMaxPenetrationDist() const
+{
+    return GetWeaponConfig()->flMaxPenetrationDist;
+}
+
+Vector CZMBaseWeapon::GetBulletSpread() const
+{
+    return (!IsInSecondaryAttack())
+                ? GetWeaponConfig()->primary.vecSpread
+                : GetWeaponConfig()->secondary.vecSpread;
+}
+
+float CZMBaseWeapon::GetFireRate()
+{
+    float flConfigFireRate = (!IsInSecondaryAttack())
+                                ? GetWeaponConfig()->primary.flFireRate
+                                : GetWeaponConfig()->secondary.flFireRate;
+
+    // If the fire rate is not set, use sequence duration
+    if ( !CZMBaseWeaponConfig::IsValidFirerate( flConfigFireRate ) )
+    {
+        return SequenceDuration();
+    }
+
+    return flConfigFireRate;
+}
+
+int CZMBaseWeapon::GetBulletsPerShot() const
+{
+    return (!IsInSecondaryAttack())
+        ? GetWeaponConfig()->primary.nBulletsPerShot
+        : GetWeaponConfig()->secondary.nBulletsPerShot;
+}
+//
+
+
 
 void CZMBaseWeapon::FireBullets( const FireBulletsInfo_t &info )
 {
@@ -463,10 +702,15 @@ void CZMBaseWeapon::FireBullets( const FireBulletsInfo_t &info )
 
 	FireBulletsInfo_t modinfo = info;
 
+
+    float flConfigDamage = (!IsInSecondaryAttack())
+                                ? GetWeaponConfig()->primary.flDamage
+                                : GetWeaponConfig()->primary.flDamage;
+
 #ifndef CLIENT_DLL
-    modinfo.m_flDamage = ( m_nOverrideDamage > -1 ) ? (float)m_nOverrideDamage : GetWpnData().m_flDamage;
+    modinfo.m_flDamage = ( m_nOverrideDamage > -1 ) ? (float)m_nOverrideDamage : flConfigDamage;
 #else
-    modinfo.m_flDamage = GetWpnData().m_flDamage;
+    modinfo.m_flDamage = flConfigDamage;
 #endif
     
 	modinfo.m_iPlayerDamage = (int)modinfo.m_flDamage;
@@ -524,13 +768,7 @@ void CZMBaseWeapon::FireBullets( int numShots, int iAmmoType, float flMaxDist )
     info.m_flDistance = flMaxDist;
     info.m_iAmmoType = iAmmoType;
     info.m_iTracerFreq = 2;
-
-#ifndef CLIENT_DLL
-    info.m_vecSpread = pPlayer->GetAttackSpread( this );
-#else
-    //!!!HACKHACK - what does the client want this function for? 
-    info.m_vecSpread = GetActiveWeapon()->GetBulletSpread();
-#endif
+    info.m_vecSpread = GetBulletSpread();
 
     // Fire the bullets
     // Use our FireBullets to get the weapon damage from .txt file.
@@ -584,14 +822,23 @@ void CZMBaseWeapon::PrimaryAttack()
     }
 
 
-    m_flNextPrimaryAttack = gpGlobals->curtime + GetFireRate();
+    m_flNextPrimaryAttack = gpGlobals->curtime + GetPrimaryFireRate();
     Shoot();
 }
 
-void CZMBaseWeapon::Shoot( int iAmmoType, int nBullets, int nAmmo, float flMaxRange, bool bUseClip1, bool bSecondaryEffects )
+void CZMBaseWeapon::Shoot( int iAmmoType, int nBullets, int nAmmo, float flMaxRange, bool bSecondary )
 {
     CZMPlayer* pPlayer = GetPlayerOwner();
     if ( !pPlayer ) return;
+
+
+    // IMPORTANT: We NEED to set the animation first and foremost!
+    // Certain methods will check for secondary fire by
+    // comparing the weapon activity.
+    if ( !bSecondary )
+        PrimaryAttackEffects();
+    else
+        SecondaryAttackEffects();
 
 
     if ( iAmmoType == -1 )
@@ -601,21 +848,13 @@ void CZMBaseWeapon::Shoot( int iAmmoType, int nBullets, int nAmmo, float flMaxRa
     if ( nBullets <= -1 )
         nBullets = GetBulletsPerShot() * MAX( 1, nAmmo );
     if ( flMaxRange < 0.0f )
-        flMaxRange = m_fMaxRange1;
+        flMaxRange = GetWeaponConfig()->primary.flRange;
 
     int& iClip = (int&)m_iClip1;
-    if ( !bUseClip1 )
-        iClip = (int&)m_iClip2;
 
 
     Assert( nBullets > 0 );
 
-
-    // Effects need to be called AFTER setting next primary attack(?)
-    if ( !bSecondaryEffects )
-        PrimaryAttackEffects();
-    else
-        SecondaryAttackEffects();
 
 
     // ZMRTODO: Add burst firing here.
@@ -751,7 +990,7 @@ void CZMBaseWeapon::SetWeaponVisible( bool visible )
         if ( vm ) vm->RemoveEffects( EF_NODRAW );
         if ( vmhands )
         {
-            if ( GetWpnData().m_bUseHands )
+            if ( GetWeaponConfig()->bUseHands )
             {
                 vmhands->RemoveEffects( EF_NODRAW );
 #ifdef CLIENT_DLL // Let client override this if they are using a custom viewmodel that doesn't use the new hands system.
@@ -776,40 +1015,133 @@ void CZMBaseWeapon::SetWeaponVisible( bool visible )
     }
 }
 
-#ifndef CLIENT_DLL
+void CZMBaseWeapon::AssignWeaponConfigSlot()
+{
+#ifdef CLIENT_DLL
+    int index = entindex();
+    DevMsg( "Assigning weapon config slot to %i on client!\n", index );
+#endif
+
+    if ( GetConfigSlot() == ZMCONFIGSLOT_INVALID )
+    {
+        WeaponConfigSlot_t slot = GetWeaponConfigSystem()->RegisterBareBonesWeapon( GetClassname() );
+
+        SetConfigSlot( slot );
+    }
+
+
+    const char* customscript =
+#ifdef CLIENT_DLL
+        m_sScriptFileName;
+#else
+        STRING( m_sScriptFileName.Get() );
+#endif
+
+    if ( customscript[0] != NULL )
+    {
+        WeaponConfigSlot_t slot = GetWeaponConfigSystem()->RegisterCustomWeapon( GetConfigSlot(), customscript );
+
+        SetConfigSlot( slot );
+    }
+}
+
+#ifdef CLIENT_DLL
+int UTIL_CreateClientModel( const char* pszModel );
+#endif
+
 void CZMBaseWeapon::Precache()
 {
-    BaseClass::Precache();
+    AssignWeaponConfigSlot();
 
+	m_iPrimaryAmmoType = m_iSecondaryAmmoType = -1;
+
+
+	// Get the ammo indexes for the ammo's specified in the data file
+    const char* pszPrimAmmo = GetWeaponConfig()->pszAmmoName;
+	if ( pszPrimAmmo && pszPrimAmmo[0] != NULL )
+	{
+		m_iPrimaryAmmoType = GetWeaponConfig()->GetPrimaryAmmoIndex();
+		if (m_iPrimaryAmmoType == -1)
+		{
+			Msg("ERROR: Weapon (%s) using undefined primary ammo type (%s)\n", GetClassname(), GetWeaponConfig()->pszAmmoName );
+		}
+ 	}
+
+#if defined( CLIENT_DLL )
+	gWR.LoadWeaponSprites( GetWeaponFileInfoHandle() );
+#endif
+
+
+	// Precache sounds, too
+	for ( int i = 0; i < NUM_SHOOT_SOUND_TYPES; ++i )
+	{
+		auto* pszSound = GetShootSound( i );
+		if ( pszSound && pszSound[0] )
+		{
+			if ( !CBaseEntity::PrecacheScriptSound( pszSound ) && !PrecacheSound( pszSound ) )
+            {
+                Warning( "Failed to precache weapon sound called '%s' from '%s'!\n", GetWeaponConfig()->pszConfigFilePath, pszSound );
+            }
+		}
+	}
+
+
+
+	// Precache models (preload to avoid hitch)
+	m_iViewModelIndex = 0;
+	m_iWorldModelIndex = 0;
 
     // Make sure we precache all models.
     // It's possible to only precache the override model and the default one is left out.
-    if ( GetWpnData().szViewModel[0] != NULL )
+    if ( GetWeaponConfig()->pszModel_View[0] != NULL )
     {
-        PrecacheModel( GetWpnData().szViewModel );
+#ifdef CLIENT_DLL
+        if ( GetWeaponConfig()->bOverriddenViewmodel )
+        {
+            m_iViewModelIndex = UTIL_CreateClientModel( GetWeaponConfig()->pszModel_View );
+        }
+        else
+#endif
+        {
+            m_iViewModelIndex = PrecacheModel( GetWeaponConfig()->pszModel_View );
+        }
     }
 
-    if ( GetWpnData().szWorldModel[0] != NULL )
+    if ( GetWeaponConfig()->pszModel_World[0] != NULL )
     {
-        PrecacheModel( GetWpnData().szWorldModel );
+        m_iWorldModelIndex = PrecacheModel( GetWeaponConfig()->pszModel_World );
     }
 
+
+#ifdef GAME_DLL
     if ( m_OverrideViewModel != NULL_STRING )
     {
-        PrecacheModel( STRING( m_OverrideViewModel ) );
+        m_iViewModelIndex = PrecacheModel( STRING( m_OverrideViewModel ) );
     }
 
     if ( m_OverrideWorldModel != NULL_STRING )
     {
-        PrecacheModel( STRING( m_OverrideWorldModel ) );
+        m_iWorldModelIndex = PrecacheModel( STRING( m_OverrideWorldModel ) );
     }
+#endif
 }
-#else
+
+#ifdef CLIENT_DLL
 void CZMBaseWeapon::Spawn()
 {
     BaseClass::Spawn();
 
     SetNextClientThink( gpGlobals->curtime + 0.1f );
+}
+
+void CZMBaseWeapon::PostDataUpdate( DataUpdateType_t updateType )
+{
+    BaseClass::PostDataUpdate( updateType );
+
+    if ( updateType == DATA_UPDATE_CREATED )
+    {
+        Precache();
+    }
 }
 
 void CZMBaseWeapon::ClientThink()
@@ -897,6 +1229,11 @@ bool CZMBaseWeapon::ShouldPredict()
 
     return BaseClass::ShouldPredict();
 }
+
+CZMBaseCrosshair* CZMBaseWeapon::GetWeaponCrosshair() const
+{
+    return g_ZMCrosshairs.GetCrosshairByIndex( GetWeaponConfig()->iCrosshair );
+}
 #endif
 
 CZMPlayer* CZMBaseWeapon::GetPlayerOwner() const
@@ -906,54 +1243,47 @@ CZMPlayer* CZMBaseWeapon::GetPlayerOwner() const
 
 void CZMBaseWeapon::WeaponSound( WeaponSound_t sound_type, float soundtime /* = 0.0f */ )
 {
+	const char* pszSound = GetShootSound( sound_type ); 
+	if ( !pszSound || !pszSound[0] )
+		return;
+
+
+    auto* pOwner = GetOwner();
+    Assert( pOwner );
+
+    Vector origin = pOwner->WorldSpaceCenter();
+
+	CSoundParameters params;
+	bool bIsSoundScript = GetParametersForSound( pszSound, params, nullptr );
+
+
 #ifdef CLIENT_DLL
-		// If we have some sounds from the weapon classname.txt file, play a random one of them
-		const char *shootsound = GetWpnData().aShootSounds[ sound_type ]; 
-		if ( !shootsound || !shootsound[0] )
-			return;
-
-		CBroadcastRecipientFilter filter; // this is client side only
-		if ( !te->CanPredict() )
-			return;
-		
-		CBaseEntity::EmitSound( filter, GetOwner()->entindex(), shootsound, &GetOwner()->GetAbsOrigin() ); 
+	CBroadcastRecipientFilter filter;
+	if ( !te->CanPredict() )
+		return;
 #else
-		BaseClass::WeaponSound( sound_type, soundtime );
-#endif
-}
 
-int CZMBaseWeapon::GetMaxClip1() const
-{
-    if ( m_nOverrideClip1 >= 0 )
+
+    CPASAttenuationFilter filter( pOwner, params.soundlevel );
+    if ( IsPredicted() && CBaseEntity::GetPredictionPlayer() )
     {
-        return m_nOverrideClip1;
-    }
-
-    return BaseClass::GetMaxClip1();
-}
-
-const char* CZMBaseWeapon::GetViewModel( int vmIndex ) const
-{
-#ifndef CLIENT_DLL
-    if ( m_OverrideViewModel != NULL_STRING )
-    {
-        return STRING( m_OverrideViewModel );
+        filter.UsePredictionRules();
     }
 #endif
 
-    return BaseClass::GetViewModel( vmIndex );
-}
-
-const char* CZMBaseWeapon::GetWorldModel() const
-{
-#ifndef CLIENT_DLL
-    if ( m_OverrideWorldModel != NULL_STRING )
+    if ( bIsSoundScript )
     {
-        return STRING( m_OverrideWorldModel );
+        EmitSound( filter, pOwner->entindex(), pszSound, &origin, soundtime ); 
     }
-#endif
+    else
+    {
+        EmitSound_t snd;
+        snd.m_pSoundName = pszSound;
+        snd.m_pOrigin = &origin;
 
-    return BaseClass::GetWorldModel();
+        EmitSound( filter, pOwner->entindex(), snd );
+    }
+    
 }
 
 void CZMBaseWeapon::SetViewModel()
@@ -961,7 +1291,7 @@ void CZMBaseWeapon::SetViewModel()
     CZMPlayer* pOwner = GetPlayerOwner();
     if ( !pOwner ) return;
 
-    CBaseViewModel* vm = pOwner->GetViewModel( m_nViewModelIndex, false );
+    auto* vm = static_cast<CZMViewModel*>( pOwner->GetViewModel( m_nViewModelIndex, false ) );
     if ( !vm ) return;
 
     Assert( vm->ViewModelIndex() == m_nViewModelIndex );
@@ -984,7 +1314,12 @@ void CZMBaseWeapon::SetViewModel()
         pszModel = GetViewModel( m_nViewModelIndex );
     }
 
-    vm->SetWeaponModel( pszModel, this );
+    bool bOverridden = false;
+#ifdef CLIENT_DLL
+    bOverridden = GetWeaponConfig()->bOverriddenViewmodel;
+#endif
+
+    vm->SetWeaponModelEx( pszModel, this, bOverridden );
 }
 
 #ifndef CLIENT_DLL
@@ -1378,7 +1713,7 @@ void CZMBaseWeapon::TransferReserveAmmo( CBaseCombatCharacter* pOwner )
 
 float CZMBaseWeapon::GetMaxDamageDist( ZMUserCmdValidData_t& data ) const
 {
-    return m_fMaxRange1;
+    return GetWeaponConfig()->primary.flRange;
 }
 
 int CZMBaseWeapon::GetMaxUserCmdBullets( ZMUserCmdValidData_t& data ) const

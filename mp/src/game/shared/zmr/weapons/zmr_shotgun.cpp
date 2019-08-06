@@ -20,44 +20,7 @@ public:
     DECLARE_ACTTABLE();
 
     CZMWeaponShotgun();
-
-#ifdef CLIENT_DLL
-    virtual CZMBaseCrosshair* GetWeaponCrosshair() const OVERRIDE { return ZMGetCrosshair( "Shotgun" ); }
-#endif
-
-
-#ifndef CLIENT_DLL
-    const char* GetDropAmmoName() const OVERRIDE { return "item_box_buckshot"; }
-    int GetDropAmmoAmount() const OVERRIDE { return SIZE_AMMO_BUCKSHOT; }
-#endif
-
-    virtual const Vector& GetBulletSpread() OVERRIDE
-    {
-//#define CONE_25DEGREES      0.2170625f
-        static Vector cone = Vector( VECTOR_CONE_15DEGREES.x, VECTOR_CONE_15DEGREES.x * 0.3f, 0.0f );
-        return cone;
-    }
     
-    virtual void AddViewKick() OVERRIDE
-    {
-        CZMPlayer* pPlayer = ToZMPlayer( GetOwner() );
-
-        if ( !pPlayer ) return;
-
-
-        QAngle viewPunch;
-
-        viewPunch.x = SharedRandomFloat( "shotgunpax", -9.0f, -5.0f );
-        viewPunch.y = SharedRandomFloat( "shotgunpay", -3.5f, 3.5f );
-        viewPunch.z = 0.0f;
-
-        pPlayer->ViewPunch( viewPunch );
-    }
-    
-
-    virtual int GetBulletsPerShot() const OVERRIDE { return 7; }
-    virtual float GetFireRate() OVERRIDE { return 0.55f; }
-
 
     virtual Activity GetReloadStartAct() OVERRIDE { return ACT_SHOTGUN_RELOAD_START; }
     virtual Activity GetReloadEndAct() OVERRIDE { return ACT_SHOTGUN_RELOAD_FINISH; }
@@ -106,10 +69,8 @@ IMPLEMENT_ACTTABLE( CZMWeaponShotgun );
 
 CZMWeaponShotgun::CZMWeaponShotgun()
 {
-    m_fMinRange1 = m_fMinRange2 = 0.0f;
-    m_fMaxRange1 = m_fMaxRange2 = 500.0f;
-
     m_bFiresUnderwater = false;
 
     SetSlotFlag( ZMWEAPONSLOT_LARGE );
+    SetConfigSlot( ZMWeaponConfig::ZMCONFIGSLOT_SHOTGUN );
 }

@@ -17,10 +17,13 @@ public:
     ~CZMViewModel();
 
 #ifdef CLIENT_DLL
+    virtual int                 CalcOverrideModelIndex() OVERRIDE;
     virtual int                 DrawModel( int flags ) OVERRIDE;
     virtual bool                ShouldReceiveProjectedTextures( int flags ) OVERRIDE;
     virtual C_BaseAnimating*    FindFollowedEntity() OVERRIDE;
 #endif
+
+    void SetWeaponModelEx( const char* pszModel, CBaseCombatWeapon* pWep, bool bOverriden );
 
     virtual CBaseCombatWeapon* GetOwningWeapon() OVERRIDE;
 
@@ -37,6 +40,10 @@ private:
 
 #ifdef CLIENT_DLL
     bool m_bDrawVM; // We have to override this so the client can decide whether to draw it.
+
+    int m_iOverrideModelIndex;
+    CBaseCombatWeapon* m_pOverrideModelWeapon;
+    CBaseCombatWeapon* m_pLastWeapon;
 #endif
 };
 
