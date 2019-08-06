@@ -16,6 +16,7 @@
 #include "zmr/zmr_gamerules.h"
 #include "zmr/zmr_playermodels.h"
 #include "weapons/zmr_fistscarry.h"
+#include "zmr_ammodef.h"
 #include "zmr_player.h"
 
 
@@ -633,8 +634,9 @@ void CZMPlayer::PickDefaultSpawnTeam()
 int CZMPlayer::GiveAmmo( int nCount, int nAmmoIndex, bool bSuppressSound )
 {
     // Don't try to give the player invalid ammo indices.
-    if ( nAmmoIndex < 0 )
+    if ( nAmmoIndex < 0 || nAmmoIndex >= MAX_AMMO_SLOTS )
         return 0;
+
 
     bool bCheckAutoSwitch = false;
     if ( !HasAnyAmmoOfType( nAmmoIndex ) )
@@ -642,7 +644,32 @@ int CZMPlayer::GiveAmmo( int nCount, int nAmmoIndex, bool bSuppressSound )
         bCheckAutoSwitch = true;
     }
 
-    int nAdd = CBasePlayer::GiveAmmo( nCount, nAmmoIndex, bSuppressSound );
+
+    // Game rules say I can't have any more of this ammo type.
+    if ( !g_pGameRules->CanHaveAmmo( this, nAmmoIndex ) )
+    {
+        return 0;
+    }
+
+
+    int nRoom = GetAmmoRoom( nAmmoIndex ) - GetTotalAmmoAmount( nAmmoIndex );
+    int nAdd = MIN( nCount, nRoom );
+    nAdd = MAX( 0, nAdd );
+
+
+    if ( nAdd )
+    {
+        // Ammo pickup sound
+        if ( !bSuppressSound )
+        {
+            EmitSound( "BaseCombatCharacter.AmmoPickup" );
+        }
+
+        m_iAmmo.Set( nAmmoIndex, m_iAmmo[nAmmoIndex] + nAdd );
+    }
+    
+
+
 
     // We've been denied the pickup, display a hud icon to show that.
     // Make sure we don't send this usermessage multiple times a frame.
