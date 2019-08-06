@@ -48,7 +48,7 @@ CAmmoDef* GetAmmoDef()
 
         // Stuff we use.
         ADD_ZM_AMMOTYPE( def, "Pistol", "item_ammo_pistol", 20, DMG_BULLET, TRACER_LINE_AND_WHIZ, 80, 2400 );
-        ADD_ZM_AMMOTYPE( def, "357", "item_ammo_357", 11, DMG_BULLET, TRACER_LINE_AND_WHIZ, 21, 3800 ); // Rifle
+        ADD_ZM_AMMOTYPE( def, "357", "item_ammo_357", 11, DMG_BULLET, TRACER_LINE_AND_WHIZ, 22, 3800 ); // Rifle
         ADD_ZM_AMMOTYPE( def, "Buckshot", "item_box_buckshot", 8, DMG_BULLET | DMG_BUCKSHOT, TRACER_LINE_AND_WHIZ, 24, 1300 ); // Shotgun
         ADD_ZM_AMMOTYPE( def, "SMG1", "item_ammo_smg1", 30, DMG_BULLET, TRACER_LINE_AND_WHIZ, 60, 2200 ); // Mac-10
         
