@@ -117,6 +117,8 @@ public:
     bool                    HandleBulletPenetration( trace_t& tr, const ZMFireBulletsInfo_t& bulletinfo, Vector& vecNextSrc, float& flDistance );
     bool                    HandleShotImpactingWater( const FireBulletsInfo_t& info, const Vector& vecEnd, CTraceFilter* pFilter );
     virtual void            DoMuzzleFlash() OVERRIDE;
+    int                     GetTotalAmmoAmount( int iValidAmmoIndex ) const;
+    int                     GetAmmoRoom( int iValidAmmoIndex ) const;
 
     void SetMouseWheelMove( float dir );
 

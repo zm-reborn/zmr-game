@@ -18,6 +18,7 @@
 #endif
 
 
+#include "zmr_ammodef.h"
 #include "zmr_player_shared.h"
 
 
@@ -1012,4 +1013,30 @@ void CZMPlayer::DoMuzzleFlash()
     // By default, the player muzzleflash will call into active weapon muzzleflash.
     // We don't want that, because it might not be networked.
     CBaseAnimating::DoMuzzleFlash();
+}
+
+int CZMPlayer::GetTotalAmmoAmount( int iValidAmmoIndex ) const
+{
+    Assert( iValidAmmoIndex >= 0 && iValidAmmoIndex <= MAX_AMMO_TYPES );
+    
+    int total = GetAmmoCount( iValidAmmoIndex );
+
+    for ( int i = 0; i < MAX_WEAPONS; i++ )
+    {
+        auto* pWep = GetWeapon( i );
+        if ( pWep && pWep->m_iPrimaryAmmoType == iValidAmmoIndex )
+        {
+            total += pWep->Clip1();
+        }
+    }
+
+    return total;
+}
+
+int CZMPlayer::GetAmmoRoom( int iValidAmmoIndex ) const
+{
+    Assert( iValidAmmoIndex >= 0 && iValidAmmoIndex <= MAX_AMMO_TYPES );
+
+    auto* pAmmoDef = ZMAmmoDef();
+    return pAmmoDef->MaxCarry( iValidAmmoIndex ) + pAmmoDef->m_Additional[iValidAmmoIndex].nDropAmount;
 }
