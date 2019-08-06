@@ -26,20 +26,9 @@ public:
     ~CZMWeaponRifle();
 
 
-#ifdef CLIENT_DLL
-    virtual CZMBaseCrosshair* GetWeaponCrosshair() const OVERRIDE { return ZMGetCrosshair( "Rifle" ); }
-#endif
-
-
-#ifndef CLIENT_DLL
-    const char* GetDropAmmoName() const OVERRIDE { return "item_ammo_357"; }
-    int GetDropAmmoAmount() const OVERRIDE { return SIZE_AMMO_357; }
-#endif
-
-
-    virtual const Vector& GetBulletSpread() OVERRIDE
+    virtual Vector GetBulletSpread() const OVERRIDE
     {
-        static Vector cone( 0.0f, 0.0f, 0.0f );
+        Vector cone = BaseClass::GetBulletSpread();
 
         CZMPlayer* pOwner = GetPlayerOwner();
         if ( pOwner )
@@ -47,39 +36,14 @@ public:
             float ratio = 1.0f - pOwner->GetAccuracyRatio();
             ratio *= ratio;
 
-            float max = VECTOR_CONE_6DEGREES.x;
-            cone.x = ratio * max;
-            cone.y = ratio * max;
-            cone.z = ratio * max;
+            cone.x = ratio * cone.x;
+            cone.y = ratio * cone.y;
+            cone.z = ratio * cone.z;
         }
 
 
         return cone;
     }
-
-    virtual float GetAccuracyIncreaseRate() const OVERRIDE { return 6.7f; }
-    virtual float GetAccuracyDecreaseRate() const OVERRIDE { return 2.1f; }
-    
-    virtual int GetMaxPenetrations() const OVERRIDE { return 4; }
-
-
-    virtual void AddViewKick() OVERRIDE
-    {
-        CZMPlayer* pPlayer = ToZMPlayer( GetOwner() );
-
-        if ( !pPlayer ) return;
-
-
-        QAngle viewPunch;
-
-        viewPunch.x = SharedRandomFloat( "riflepax", -10.0f, -6.0f );
-        viewPunch.y = SharedRandomFloat( "riflepay", -2.0f, 2.0f );
-        viewPunch.z = 0.0f;
-
-        pPlayer->ViewPunch( viewPunch );
-    }
-    
-    virtual float GetFireRate() OVERRIDE { return 0.9f; }
 
 
     virtual bool Holster( CBaseCombatWeapon* pSwitchTo = nullptr ) OVERRIDE;
@@ -149,13 +113,11 @@ IMPLEMENT_ACTTABLE( CZMWeaponRifle );
 
 CZMWeaponRifle::CZMWeaponRifle()
 {
-    m_fMinRange1 = m_fMinRange2 = 0.0f;
-    m_fMaxRange1 = m_fMaxRange2 = 2000.0f;
-
     m_bFiresUnderwater = false;
 
 
     SetSlotFlag( ZMWEAPONSLOT_LARGE );
+    SetConfigSlot( ZMWeaponConfig::ZMCONFIGSLOT_RIFLE );
 
     m_bInZoom = false;
 }

@@ -1,70 +1,69 @@
-// Sledge
-
 WeaponData
 {
-	// Weapon data is loaded by both the Game and Client DLLs.
-	"printname"	"Sledgehammer"
-	"viewmodel"				"models/weapons/c_sledgehammer_zm.mdl"
-	"usenewhands"			"1"
-	"playermodel"			"models/weapons/sledgehammer3rd_zm.mdl"
+	"printname"				"Sledgehammer"
 
+	"viewmodel"				"models/weapons/c_sledgehammer_zm.mdl"
+	"worldmodel"			"models/weapons/sledgehammer3rd_zm.mdl"
+	
 	"anim_prefix"			"sledge"
+	
+	
+	"PrimaryAttack"
+	{
+		"firerate"			"2.6"
+		"damage"			"50"
+		"range"				"60"
+		
+		"viewpunch_min"		"5 -2 0"
+		"viewpunch_max"		"10 -1 0"
+		
+		// This is the random multiplier applied to damage.
+		"sledge_min_mult"	"0.55"
+		"sledge_max_mult"	"1.1"
+	}
+	
+	"SecondaryAttack"
+	{
+		"firerate"			"3.5"
+		"damage"			"50"
+		"range"				"60"
+		
+		"viewpunch_min"		"5 -2 0"
+		"viewpunch_max"		"10 -1 0"
+		
+		// This is the random multiplier applied to damage.
+		"sledge_min_mult"	"0.99"
+		"sledge_max_mult"	"2.5"
+	}
+	
+	
+	"crosshair"				"Melee"
+	
 	"bucket"				"2"
 	"bucket_position"		"0"
+	"importance"			"2"
 
 	"clip_size"				"-1"
-	"primary_ammo"			"None"
-	"secondary_ammo"		"None"
 
-	"weight"				"0"
-	"item_flags"			"0"
-
-	// Sounds for the weapon. There is a max of 16 sounds per category (i.e. max 16 "single_shot" sounds)
+	
 	SoundData
 	{
 		"single_shot"		"Weapon_Sledge_ZM.Single"
 		"melee_hit"			"Weapon_Sledge_ZM.Primary"
-		"special1"	"Weapon_Sledge_ZM.Secondary"
+		"special1"			"Weapon_Sledge_ZM.Secondary"
 	}
 
-	// Weapon Sprite data is loaded by the Client DLL.
 	TextureData
 	{
 		"weapon"
 		{
-				"font"		"WeaponIcons"
-				"character"	"i"
+			"font"			"WeaponIcons"
+			"character"		"i"
 		}
 		"weapon_s"
 		{	
-				"font"		"WeaponIconsSelected"
-				"character"	"i"
-		}
-		"ammo"
-		{
-				"font"		"WeaponIcons"
-				"character"	"i"
-		}
-		"ammo2"
-		{
-			"file"		"sprites/640hud7"
-			"x"			"48"
-			"y"			"72"
-			"width"		"24"
-			"height"	"24"
-		}
-		"crosshair"
-		{
-				"font"		"Crosshairs"
-				"character"	"Q"
-		}
-		"autoaim"
-		{
-			"file"		"sprites/crosshairs"
-			"x"			"0"
-			"y"			"48"
-			"width"		"24"
-			"height"	"24"
+			"font"			"WeaponIconsSelected"
+			"character"		"i"
 		}
 	}
 }

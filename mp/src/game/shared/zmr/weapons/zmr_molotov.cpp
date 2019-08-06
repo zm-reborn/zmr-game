@@ -307,11 +307,6 @@ public:
     CZMWeaponMolotov();
     ~CZMWeaponMolotov();
 
-
-#ifdef CLIENT_DLL
-    virtual CZMBaseCrosshair* GetWeaponCrosshair() const OVERRIDE { return ZMGetCrosshair( "Throwable" ); }
-#endif
-
     CNetworkVar( int, m_iThrowState );
 
 #ifndef CLIENT_DLL
@@ -404,6 +399,7 @@ CZMWeaponMolotov::CZMWeaponMolotov()
     m_bFiresUnderwater = false;
     
     SetSlotFlag( ZMWEAPONSLOT_EQUIPMENT );
+    SetConfigSlot( ZMWeaponConfig::ZMCONFIGSLOT_MOLOTOV );
 
 
 #ifdef CLIENT_DLL

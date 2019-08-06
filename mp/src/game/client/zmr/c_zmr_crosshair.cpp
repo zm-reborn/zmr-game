@@ -155,6 +155,14 @@ CZMBaseCrosshair* CZMCrosshairSystem::GetCrosshairByName( const char* name ) con
     return ( index != -1 ) ? m_vCrosshairs[index] : nullptr;
 }
 
+CZMBaseCrosshair* CZMCrosshairSystem::GetCrosshairByIndex( int index ) const
+{
+    if ( index < 0 || index >= m_vCrosshairs.Count() )
+        return nullptr;
+
+    return m_vCrosshairs[index];
+}
+
 int CZMCrosshairSystem::FindCrosshairByName( const char* name ) const
 {
     FOR_EACH_VEC( m_vCrosshairs, i )

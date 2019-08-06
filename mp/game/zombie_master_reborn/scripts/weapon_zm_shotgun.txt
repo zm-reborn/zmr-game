@@ -1,28 +1,42 @@
-// Shotgun
-
 WeaponData
 {
-
-	// Weapon data is loaded by both the Game and Client DLLs.
-	"printname"	"Shotgun"
+	"printname"				"Shotgun"
+	
 	"viewmodel"				"models/weapons/c_shotgun_new.mdl"
-	"usenewhands"			"1"
-	"playermodel"			"models/weapons/w_shotgun_zm.mdl"
+	"worldmodel"			"models/weapons/w_shotgun_zm.mdl"
+	
 	"anim_prefix"			"shotgun"
-	"bucket"				"3"
-	"bucket_position"		"0"
-
+	
+	
+	"PrimaryAttack"
+	{
+		"firerate"			"0.55"
+		"damage"			"6"
+		"range"				"500"
+		"bulletspershot"	"7"
+		
+		// 15 degrees | 4.5 degrees
+		"spread"			"15 4.5 0"
+		
+		"viewpunch_min"		"-9 -3.5 0"
+		"viewpunch_max"		"-5 3.5 0"
+	}
+	
+	
+	"crosshair"				"Shotgun"
+	
+	"primary_ammo"			"Buckshot"
+	
+	
 	"clip_size"				"8"
 	"default_clip"			"0"
-	"primary_ammo"			"Buckshot"
-	"secondary_ammo"		"None"
-
-	"weight"				"4"
-	"item_flags"			"0"
-	// Was 6 (8)
-	"damage"			"6" // Previously damage was 9. This was when buckshot damage was scaled by 0.625 .
-
-	// Sounds for the weapon. There is a max of 16 sounds per category (i.e. max 16 "single_shot" sounds)
+	
+	
+	"bucket"				"3"
+	"bucket_position"		"0"
+	"importance"			"4"
+	
+	
 	SoundData
 	{
 
@@ -36,36 +50,22 @@ WeaponData
 		"single_shot_npc"	"Weapon_Shotgun_ZM.NPC_Single"
 	}
 
-	// Weapon Sprite data is loaded by the Client DLL.
 	TextureData
 	{
 		"weapon"
 		{
-				"font"		"WeaponIcons"
-				"character"	"b"
+			"font"			"WeaponIcons"
+			"character"		"b"
 		}
 		"weapon_s"
 		{	
-				"font"		"WeaponIconsSelected"
-				"character"	"b"
+			"font"			"WeaponIconsSelected"
+			"character"		"b"
 		}
 		"ammo"
 		{
-				"font"		"WeaponIcons"
-				"character"	"s"
-		}
-		"crosshair"
-		{
-				"font"		"Crosshairs"
-				"character"	"Q"
-		}
-		"autoaim"
-		{
-				"file"		"sprites/crosshairs"
-				"x"			"0"
-				"y"			"48"
-				"width"		"24"
-				"height"	"24"
+			"font"			"WeaponIcons"
+			"character"		"s"
 		}
 	}
 }

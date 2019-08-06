@@ -428,6 +428,8 @@ $Project "Server (ZMR)"
 				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_sledge.cpp"
 				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_usercmdvalid.cpp"
 				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_usercmdvalid.h"
+				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_weaponconfig.cpp"
+				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_weaponconfig.h"
 			}
 			
 			$File	"zmr\zmr_ammo.cpp"
@@ -468,6 +470,7 @@ $Project "Server (ZMR)"
 			
 			// Shared
 			$File	"$SRCDIR\game\shared\zmr\zmr_ammodef.cpp"
+			$File	"$SRCDIR\game\shared\zmr\zmr_ammodef.h"
 			$File	"$SRCDIR\game\shared\zmr\zmr_animevents.cpp"
 			$File	"$SRCDIR\game\shared\zmr\zmr_gamemovement.cpp"
 			$File	"$SRCDIR\game\shared\zmr\zmr_gamemovement.h"
