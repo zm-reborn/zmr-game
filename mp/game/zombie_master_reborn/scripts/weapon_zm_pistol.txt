@@ -27,7 +27,7 @@ WeaponData
 	"primary_ammo"			"Pistol"
 	
 	
-	"clip_size"				"20"
+	"clip_size"				"16"
 	"default_clip"			"0"
 	
 	
