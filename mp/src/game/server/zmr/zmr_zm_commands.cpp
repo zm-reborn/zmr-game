@@ -342,7 +342,7 @@ void ZM_Cmd_SelectMult( const CCommand &args )
 static ConCommand zm_cmd_selectmult( "zm_cmd_selectmult", ZM_Cmd_SelectMult, "Select multiple zombies.", FCVAR_HIDDEN );
 
 
-static ConVar zm_sv_gibdelete( "zm_sv_gibdelete", "1", FCVAR_NOTIFY, "Does deleting zombies gib them?" );
+ConVar zm_sv_gibdelete( "zm_sv_gibdelete", "1", FCVAR_NOTIFY, "Does deleting zombies gib them?" );
 
 void ZM_Cmd_DeleteZombies( const CCommand &args )
 {
@@ -409,7 +409,7 @@ static ConCommand zm_cmd_trigger( "zm_cmd_trigger", ZM_Cmd_Trigger, "Trigger a t
 /*
     Create trap trigger
 */
-static ConVar zm_sv_maxtraptriggers( "zm_sv_maxtraptriggers", "3", FCVAR_NOTIFY | FCVAR_ARCHIVE, "How many triggers can the ZM create for one trap?" );
+ConVar zm_sv_maxtraptriggers( "zm_sv_maxtraptriggers", "3", FCVAR_NOTIFY | FCVAR_ARCHIVE, "How many triggers can the ZM create for one trap?" );
 
 void ZM_Cmd_CreateTrigger( const CCommand &args )
 {
@@ -552,10 +552,10 @@ static ConCommand zm_cmd_closebuildmenu( "zm_cmd_closebuildmenu", ZM_Cmd_CloseBu
 */
 extern CUtlVector<CZMEntTriggerBlockPhysExp*> g_ZMBlockPhysExp;
 
-static ConVar zm_sv_physexp_cost( "zm_sv_physexp_cost", "400", FCVAR_NOTIFY | FCVAR_ARCHIVE );
-static ConVar zm_sv_physexp_radius( "zm_sv_physexp_radius", "222", FCVAR_NOTIFY | FCVAR_ARCHIVE );
-static ConVar zm_sv_physexp_magnitude( "zm_sv_physexp_magnitude", "17500", FCVAR_NOTIFY | FCVAR_ARCHIVE );
-static ConVar zm_sv_physexp_delay( "zm_sv_physexp_delay", "7.4", FCVAR_NOTIFY | FCVAR_ARCHIVE );
+ConVar zm_sv_physexp_cost( "zm_sv_physexp_cost", "400", FCVAR_NOTIFY | FCVAR_ARCHIVE );
+ConVar zm_sv_physexp_radius( "zm_sv_physexp_radius", "222", FCVAR_NOTIFY | FCVAR_ARCHIVE );
+ConVar zm_sv_physexp_magnitude( "zm_sv_physexp_magnitude", "17500", FCVAR_NOTIFY | FCVAR_ARCHIVE );
+ConVar zm_sv_physexp_delay( "zm_sv_physexp_delay", "7.4", FCVAR_NOTIFY | FCVAR_ARCHIVE );
 
 void ZM_Cmd_PhysExp( const CCommand &args )
 {
