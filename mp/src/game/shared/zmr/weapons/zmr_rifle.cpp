@@ -113,9 +113,6 @@ IMPLEMENT_ACTTABLE( CZMWeaponRifle );
 
 CZMWeaponRifle::CZMWeaponRifle()
 {
-    m_bFiresUnderwater = false;
-
-
     SetSlotFlag( ZMWEAPONSLOT_LARGE );
     SetConfigSlot( ZMWeaponConfig::ZMCONFIGSLOT_RIFLE );
 

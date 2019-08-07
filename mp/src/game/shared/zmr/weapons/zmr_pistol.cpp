@@ -65,8 +65,6 @@ IMPLEMENT_ACTTABLE( CZMWeaponPistol );
 
 CZMWeaponPistol::CZMWeaponPistol()
 {
-    m_bFiresUnderwater = true;
-
     SetSlotFlag( ZMWEAPONSLOT_SIDEARM );
     SetConfigSlot( ZMWeaponConfig::ZMCONFIGSLOT_PISTOL );
 }

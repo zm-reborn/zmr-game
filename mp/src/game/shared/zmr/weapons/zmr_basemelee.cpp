@@ -54,8 +54,6 @@ static const Vector g_bludgeonMaxs(BLUDGEON_HULL_DIM,BLUDGEON_HULL_DIM,BLUDGEON_
 
 CZMBaseMeleeWeapon::CZMBaseMeleeWeapon()
 {
-    m_bFiresUnderwater = true;
-    
 #ifndef CLIENT_DLL
     SetSlotFlag( ZMWEAPONSLOT_MELEE );
 #endif

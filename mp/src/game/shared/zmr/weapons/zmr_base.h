@@ -32,6 +32,19 @@
 
 class ZMWeaponConfig::CZMBaseWeaponConfig;
 
+
+enum ZMWepActionType_t
+{
+    WEPACTION_GENERIC = 0,
+
+    WEPACTION_RELOAD,
+
+    WEPACTION_ATTACK,
+    WEPACTION_ATTACK2,
+    WEPACTION_ATTACK3,
+};
+
+
 class CZMBaseWeapon : public CBaseCombatWeapon, public CZMUserCmdHitWepValidator
 {
 public:
@@ -142,7 +155,8 @@ public:
     virtual bool    CanBeDropped() const { return true; }
     virtual bool    CanPickupAmmo() const { return true; }
     virtual bool    IsInReload() const { return const_cast<CZMBaseWeapon*>( this )->CanReload() && m_bInReload; }
-    virtual bool    CanAct() const; // Can we reload/attack?
+    virtual bool    CanAct( ZMWepActionType_t type = WEPACTION_GENERIC ) const; // Can we reload/attack?
+
 
     virtual void IncrementClip();
     virtual bool ShouldIncrementClip() const;

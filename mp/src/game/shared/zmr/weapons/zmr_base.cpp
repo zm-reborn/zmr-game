@@ -85,6 +85,11 @@ LINK_ENTITY_TO_CLASS( weapon_zm_base, CZMBaseWeapon );
 
 CZMBaseWeapon::CZMBaseWeapon()
 {
+    // Enable base class stuff by default since we'll be checking these ourselves.
+    m_bAltFiresUnderwater = m_bFiresUnderwater = true;
+
+
+
 	SetPredictionEligible( true );
 	AddSolidFlags( FSOLID_TRIGGER ); // Nothing collides with these but it gets touches.
 
@@ -461,7 +466,7 @@ void CZMBaseWeapon::IncrementClip()
 
 bool CZMBaseWeapon::Reload()
 {
-    if ( !CanAct() ) return false;
+    if ( !CanAct( WEPACTION_RELOAD ) ) return false;
 
 
     bool ret = DefaultReload(
@@ -811,7 +816,7 @@ float CZMBaseWeapon::GetFirstInstanceOfAnimEventTime( int iSeq, int iAnimEvent, 
 
 void CZMBaseWeapon::PrimaryAttack()
 {
-    if ( !CanAct() ) return;
+    if ( !CanAct( WEPACTION_ATTACK ) ) return;
 
 
     // If my clip is empty (and I use clips) start reload
@@ -961,7 +966,7 @@ void CZMBaseWeapon::PlayAISound() const
 
 void CZMBaseWeapon::SecondaryAttack()
 {
-    if ( !CanAct() ) return;
+    if ( !CanAct( WEPACTION_ATTACK2 ) ) return;
 
 
     BaseClass::SecondaryAttack();
@@ -1727,16 +1732,49 @@ int CZMBaseWeapon::GetMaxNumPenetrate( ZMUserCmdValidData_t& data ) const
 }
 #endif
 
-bool CZMBaseWeapon::CanAct() const
+bool CZMBaseWeapon::CanAct( ZMWepActionType_t type ) const
 {
-    CBaseCombatCharacter* pOwner = GetOwner();
+    // We're not using this right now, remove this if we do.
+    Assert( type != WEPACTION_GENERIC );
+
+
+    auto* pOwner = GetOwner();
 
     if ( !pOwner )
         return false;
 
-    if ( pOwner->GetMoveType() == MOVETYPE_LADDER )
-        return false;
 
+    int flags = GetWeaponConfig()->fFlags;
+
+
+    // Ladder
+    if ( pOwner->GetMoveType() == MOVETYPE_LADDER )
+    {
+        switch ( type )
+        {
+        case WEPACTION_RELOAD :
+            return (flags & ZMWeaponConfig::WEPFLAG_RELOAD_ONLADDER) ? true : false;
+        case WEPACTION_ATTACK :
+        case WEPACTION_ATTACK2 :
+        case WEPACTION_ATTACK3 :
+            return (flags & ZMWeaponConfig::WEPFLAG_ATTACK_ONLADDER) ? true : false;
+        default :
+            break;
+        }
+    }
+    // Underwater
+    else if ( pOwner->GetWaterLevel() >= WL_Eyes )
+    {
+        switch ( type )
+        {
+        case WEPACTION_ATTACK :
+        case WEPACTION_ATTACK2 :
+        case WEPACTION_ATTACK3 :
+            return (flags & ZMWeaponConfig::WEPFLAG_ATTACK_INWATER) ? true : false;
+        default :
+            break;
+        }
+    }
 
     return true;
 }

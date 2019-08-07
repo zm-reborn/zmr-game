@@ -125,6 +125,9 @@ CZMBaseWeaponConfig::CZMBaseWeaponConfig( const char* wepname, const char* confi
 
     bOverriddenViewmodel = false;
     bOverriddenWorldmodel = false;
+
+
+    fFlags = WEPFLAG_NONE;
 }
 
 CZMBaseWeaponConfig::~CZMBaseWeaponConfig()
@@ -229,6 +232,16 @@ void CZMBaseWeaponConfig::LoadFromConfig( KeyValues* kv )
 
 
     bUseHands = kv->GetBool( "usenewhands", true );
+
+
+
+
+    if ( kv->GetBool( "attackonladder", true ) )
+        fFlags |= WEPFLAG_ATTACK_ONLADDER;
+    if ( kv->GetBool( "attackinwater", true ) )
+        fFlags |= WEPFLAG_ATTACK_INWATER;
+    if ( kv->GetBool( "reloadonladder", true ) )
+        fFlags |= WEPFLAG_RELOAD_ONLADDER;
 }
 
 KeyValues* CZMBaseWeaponConfig::ToKeyValues() const
@@ -323,6 +336,10 @@ KeyValues* CZMBaseWeaponConfig::ToKeyValues() const
 
     kv->SetBool( "usenewhands", bUseHands );
 
+    kv->SetBool( "attackonladder", (fFlags & WEPFLAG_ATTACK_ONLADDER) ? true : false );
+    kv->SetBool( "reloadonladder", (fFlags & WEPFLAG_RELOAD_ONLADDER) ? true : false );
+
+    kv->SetBool( "attackinwater", (fFlags & WEPFLAG_ATTACK_INWATER) ? true : false );
 
     return kv;
 }

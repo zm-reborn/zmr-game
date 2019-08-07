@@ -136,8 +136,6 @@ IMPLEMENT_ACTTABLE( CZMWeaponMac10 );
 
 CZMWeaponMac10::CZMWeaponMac10()
 {
-    m_bFiresUnderwater = false;
-
     SetSlotFlag( ZMWEAPONSLOT_LARGE );
     SetConfigSlot( ZMWeaponConfig::ZMCONFIGSLOT_MAC10 );
 }
