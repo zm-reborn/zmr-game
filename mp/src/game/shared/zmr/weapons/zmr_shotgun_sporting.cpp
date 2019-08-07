@@ -65,8 +65,6 @@ IMPLEMENT_ACTTABLE( CZMWeaponShotgunSporting );
 
 CZMWeaponShotgunSporting::CZMWeaponShotgunSporting()
 {
-    m_bFiresUnderwater = false;
-
     SetSlotFlag( ZMWEAPONSLOT_LARGE );
     SetConfigSlot( ZMWeaponConfig::ZMCONFIGSLOT_SHOTGUNSPORTING );
 }
@@ -83,7 +81,7 @@ void CZMWeaponShotgunSporting::SecondaryAttack()
 
 void CZMWeaponShotgunSporting::ShootBarrels( bool bWantBoth )
 {
-    if ( !CanAct() ) return;
+    if ( !CanAct( bWantBoth ? WEPACTION_ATTACK2 : WEPACTION_ATTACK ) ) return;
 
 
     if ( m_flNextPrimaryAttack > gpGlobals->curtime )

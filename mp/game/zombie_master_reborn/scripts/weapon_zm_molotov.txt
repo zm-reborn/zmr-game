@@ -29,6 +29,11 @@ WeaponData
 	"default_clip"			"1"
 	
 	
+	"reloadonladder"		"0"
+	"attackonladder"		"0"
+	"attackinwater"			"0"
+	
+	
 	TextureData
 	{
 		"weapon"

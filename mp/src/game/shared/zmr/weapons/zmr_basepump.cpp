@@ -58,7 +58,7 @@ bool CZMBasePumpWeapon::Holster( CBaseCombatWeapon* pSwitchTo )
 
 void CZMBasePumpWeapon::PrimaryAttack()
 {
-    if ( !CanAct() ) return;
+    if ( !CanAct( WEPACTION_ATTACK ) ) return;
 
 
     m_bNeedPump = true;
@@ -122,7 +122,7 @@ void CZMBasePumpWeapon::Pump()
 
 void CZMBasePumpWeapon::CheckReload()
 {
-    if ( !CanAct() )
+    if ( !CanAct( WEPACTION_RELOAD ) )
     {
         if ( m_bInReload )
             StopReload();
@@ -145,7 +145,7 @@ void CZMBasePumpWeapon::StartReload()
 
     if ( Clip1() >= GetMaxClip1() ) return;
 
-    if ( !CanAct() ) return;
+    if ( !CanAct( WEPACTION_RELOAD ) ) return;
 
     CZMPlayer* pPlayer = GetPlayerOwner();
     if ( !pPlayer ) return;

@@ -62,6 +62,18 @@ namespace ZMWeaponConfig
         int nBulletsPerShot;
     };
     //
+    
+    //
+    enum WeaponFlags_t
+    {
+        WEPFLAG_NONE                = 0,
+
+        WEPFLAG_ATTACK_ONLADDER     = ( 1 << 0 ),
+        WEPFLAG_ATTACK_INWATER      = ( 1 << 1 ),
+
+        WEPFLAG_RELOAD_ONLADDER     = ( 1 << 2 ),
+    };
+    //
 
     //
     class CZMBaseWeaponConfig
@@ -106,6 +118,11 @@ namespace ZMWeaponConfig
 
         bool bOverriddenViewmodel;
         bool bOverriddenWorldmodel;
+        //
+
+
+        //
+        int fFlags; // WeaponFlags_t
         //
 
     

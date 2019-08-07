@@ -54,6 +54,9 @@ WeaponData
 	"bucket_position"		"0"
 	"importance"			"3"
 	
+	
+	"reloadonladder"		"0"
+	
 
 	SoundData
 	{

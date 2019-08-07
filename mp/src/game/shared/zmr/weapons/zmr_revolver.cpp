@@ -137,7 +137,6 @@ CZMWeaponRevolver::CZMWeaponRevolver()
     m_fMinRange1 = m_fMinRange2 = 0.0f;
     m_fMaxRange1 = m_fMaxRange2 = 1500.0f;
 
-    m_bFiresUnderwater = false;
 
     SetSlotFlag( ZMWEAPONSLOT_SIDEARM );
     SetConfigSlot( ZMWeaponConfig::ZMCONFIGSLOT_REVOLVER );
@@ -157,7 +156,7 @@ bool CZMWeaponRevolver::Deploy()
 
 void CZMWeaponRevolver::PrimaryAttack()
 {
-    if ( !CanAct() )
+    if ( !CanAct( WEPACTION_ATTACK ) )
         return;
 
 	if ( UsesClipsForAmmo1() && !Clip1() ) 
@@ -180,7 +179,7 @@ void CZMWeaponRevolver::PrimaryAttack()
 
 void CZMWeaponRevolver::SecondaryAttack()
 {
-    if ( !CanAct() )
+    if ( !CanAct( WEPACTION_ATTACK2 ) )
         return;
 
 	if ( UsesClipsForAmmo1() && !Clip1() ) 

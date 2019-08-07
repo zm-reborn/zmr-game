@@ -62,6 +62,13 @@ WeaponData
 	"clip_size"				"1337"
 	
 	
+	// These should be self-evident.
+	"attackonladder"		"1"
+	"reloadonladder"		"1"
+	
+	"attackinwater"			"1"
+	
+	
 	
 	// The sound data the gun will use.
 	// Below are all valid entries you can have.

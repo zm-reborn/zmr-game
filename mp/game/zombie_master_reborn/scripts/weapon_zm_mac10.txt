@@ -37,6 +37,9 @@ WeaponData
 	"importance"			"4"
 	
 	
+	"reloadonladder"		"0"
+	
+	
 	SoundData
 	{
 		"reload_npc"		"Weapon_SMG_ZM.NPC_Reload"

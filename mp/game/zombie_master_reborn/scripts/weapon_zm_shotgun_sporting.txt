@@ -51,6 +51,9 @@ WeaponData
 	"importance"			"4"
 	
 	
+	"reloadonladder"		"0"
+	
+	
 	SoundData
 	{
 

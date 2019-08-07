@@ -396,8 +396,6 @@ IMPLEMENT_ACTTABLE( CZMWeaponMolotov );
 
 CZMWeaponMolotov::CZMWeaponMolotov()
 {
-    m_bFiresUnderwater = false;
-    
     SetSlotFlag( ZMWEAPONSLOT_EQUIPMENT );
     SetConfigSlot( ZMWeaponConfig::ZMCONFIGSLOT_MOLOTOV );
 
