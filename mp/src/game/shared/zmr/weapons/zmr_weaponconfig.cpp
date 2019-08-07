@@ -202,6 +202,7 @@ void CZMBaseWeaponConfig::LoadFromConfig( KeyValues* kv )
         CopyAllocString( snddata->GetString( "reload" ), &pszSounds[WeaponSound_t::RELOAD] );
         CopyAllocString( snddata->GetString( "melee_hit" ), &pszSounds[WeaponSound_t::MELEE_HIT] );
         CopyAllocString( snddata->GetString( "deploy" ), &pszSounds[WeaponSound_t::DEPLOY] );
+        CopyAllocString( snddata->GetString( "special1" ), &pszSounds[WeaponSound_t::SPECIAL1] );
     }
 
 
@@ -299,6 +300,7 @@ KeyValues* CZMBaseWeaponConfig::ToKeyValues() const
     snddata->SetString( "reload", pszSounds[WeaponSound_t::RELOAD] );
     snddata->SetString( "melee_hit", pszSounds[WeaponSound_t::MELEE_HIT] );
     snddata->SetString( "deploy", pszSounds[WeaponSound_t::DEPLOY] );
+    snddata->SetString( "special1", pszSounds[WeaponSound_t::SPECIAL1] );
 
 
     //
