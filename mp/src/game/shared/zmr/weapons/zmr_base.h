@@ -136,6 +136,7 @@ public:
     virtual void FallInit();
     // Override this so our guns don't disappear.
     virtual void SetPickupTouch() OVERRIDE;
+    virtual void OnPickedUp( CBaseCombatCharacter* pNewOwner ) OVERRIDE;
     virtual bool CanBeSelected() OVERRIDE;
     // Never let anybody tell you're not beautiful even without any ammo, alright?
     // Let us always select this weapon even when we don't have any ammo for it.
