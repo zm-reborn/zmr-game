@@ -166,6 +166,9 @@ void CZMPlayer::Precache()
 
     PrecacheModel( VMHANDS_FALLBACKMODEL );
 
+    PrecacheScriptSound( "ZMPlayer.PickupWeapon" );
+    PrecacheScriptSound( "ZMPlayer.PickupAmmo" );
+
 
     ZMGetPlayerModels()->LoadModelsFromFile();
 
@@ -662,7 +665,10 @@ int CZMPlayer::GiveAmmo( int nCount, int nAmmoIndex, bool bSuppressSound )
         // Ammo pickup sound
         if ( !bSuppressSound )
         {
-            EmitSound( "BaseCombatCharacter.AmmoPickup" );
+            CRecipientFilter filter;
+            GetMyRecipientFilter( filter );
+
+            CBaseEntity::EmitSound( filter, entindex(), "ZMPlayer.PickupAmmo" );
         }
 
         m_iAmmo.Set( nAmmoIndex, m_iAmmo[nAmmoIndex] + nAdd );
@@ -1786,4 +1792,22 @@ int CZMPlayer::GetZMCommandInterruptFlags() const
         return 0;
 
     return atoi( val );
+}
+
+void CZMPlayer::GetMyRecipientFilter( CRecipientFilter& filter )
+{
+    filter.AddRecipient( this );
+
+    // Get all spectators spectating me.
+    for ( int i = 1; i <= gpGlobals->maxClients; i++ )
+    {
+        CBasePlayer* pPlayer = UTIL_PlayerByIndex( i );
+        if (pPlayer
+            &&  pPlayer->IsObserver()
+            &&  pPlayer->GetObserverMode() == OBS_MODE_IN_EYE
+            &&  pPlayer->GetObserverTarget() == this)
+        {
+            filter.AddRecipient( pPlayer );
+        }
+    }
 }

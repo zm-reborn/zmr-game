@@ -258,6 +258,8 @@ public:
 
     void            UpdatePlayerZMVars();
 
+    void            GetMyRecipientFilter( CRecipientFilter& filter );
+
     void InitZMFog();
 
 

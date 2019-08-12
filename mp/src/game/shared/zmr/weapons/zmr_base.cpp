@@ -2,6 +2,7 @@
 #include "ammodef.h"
 #ifdef CLIENT_DLL
 #include "prediction.h"
+#include "weapon_selection.h"
 #include "view.h"
 #endif
 #include "datacache/imdlcache.h"
@@ -1221,10 +1222,56 @@ ShadowType_t CZMBaseWeapon::ShadowCastType()
 
 void CZMBaseWeapon::OnDataChanged( DataUpdateType_t type )
 {
-    BaseClass::OnDataChanged( type );
+    CBaseAnimating::OnDataChanged( type );
 
     if ( GetPredictable() && !ShouldPredict() )
 	    ShutdownPredictable();
+
+    //
+    // Override BaseCombatWeapon::OnDataChanged
+    //
+    
+
+    // If it's being carried by the *local* player, on the first update,
+    // find the registered weapon for this ID
+    
+    auto* pOwner = GetPlayerOwner();
+
+    if ( pOwner && pOwner->IsLocalPlayer() && !C_ZMPlayer::ShouldDrawLocalPlayer() )
+    {
+        // If I was just picked up, or created & immediately carried, add myself to this client's list of weapons
+        if ( (m_iState != WEAPON_NOT_CARRIED) && (m_iOldState == WEAPON_NOT_CARRIED) )
+        {
+            // Tell the HUD this weapon's been picked up
+            if ( ShouldDrawPickup() )
+            {
+                auto* pHudSelection = GetHudWeaponSelection();
+                if ( pHudSelection )
+                {
+                    pHudSelection->OnWeaponPickup( this );
+                }
+
+                //pPlayer->EmitSound( "Player.PickupWeapon" );
+            }
+        }
+    }
+    else // weapon carried by other player or not at all
+    {
+        int overrideModelIndex = CalcOverrideModelIndex();
+        if( overrideModelIndex != -1 && overrideModelIndex != GetModelIndex() )
+        {
+            SetModelIndex( overrideModelIndex );
+        }
+    }
+
+    if ( type == DATA_UPDATE_CREATED )
+    {
+        UpdateVisibility();
+    }
+
+    m_iOldState = m_iState;
+
+    //m_bJustRestored = false;
 }
 
 bool CZMBaseWeapon::ShouldPredict()
@@ -1449,6 +1496,65 @@ void CZMBaseWeapon::SetPickupTouch()
 {
 #ifndef CLIENT_DLL
     SetTouch( &CBaseCombatWeapon::DefaultTouch );
+#endif
+}
+
+void CZMBaseWeapon::OnPickedUp( CBaseCombatCharacter* pNewOwner )
+{
+#ifndef CLIENT_DLL
+    RemoveEffects( EF_ITEM_BLINK );
+
+
+    auto* pZMPlayer = ToZMPlayer( pNewOwner );
+    if ( pZMPlayer )
+    {
+        // HACK: Don't play sound if we can't be dropped
+        if ( CanBeDropped() )
+        {
+            // Play pickup sound
+            CRecipientFilter filter;
+            pZMPlayer->GetMyRecipientFilter( filter );
+
+            CBaseEntity::EmitSound( filter, pNewOwner->entindex(), "ZMPlayer.PickupWeapon" );
+        }
+
+
+        m_OnPlayerPickup.FireOutput( pNewOwner, this );
+
+        // Robin: We don't want to delete weapons the player has picked up, so
+        // clear the name of the weapon. This prevents wildcards that are meant
+        // to find NPCs finding weapons dropped by the NPCs as well.
+        SetName( NULL_STRING );
+    }
+    else
+    {
+        m_OnNPCPickup.FireOutput( pNewOwner, this );
+    }
+
+#ifdef HL2MP
+    HL2MPRules()->RemoveLevelDesignerPlacedObject( this );
+#endif // HL2MP
+
+    // Someone picked me up, so make it so that I can't be removed.
+    SetRemoveable( false );
+#else
+
+
+    //{
+    //    // Tell the HUD this weapon's been picked up
+    //    if ( ShouldDrawPickup() )
+    //    {
+    //        CBaseHudWeaponSelection* pHudSelection = GetHudWeaponSelection();
+    //        if ( pHudSelection )
+    //        {
+    //            pHudSelection->OnWeaponPickup( this );
+    //        }
+    //    }
+    //}
+
+    //m_iOldState = m_iState;
+
+    //m_bJustRestored = false;
 #endif
 }
 
