@@ -1132,3 +1132,16 @@ void C_ZMPlayer::SetMouseWheelMove( float dir )
     m_flNextUpMove = gpGlobals->curtime + 0.1f;
     m_flUpMove = zm_cl_zmmovemwheelmovespd.GetFloat() * dir;
 }
+
+bool C_ZMPlayer::HasExpensiveFlashlightOn() const
+{
+    return m_pFlashlight && m_pFlashlight->HasExpensiveOn();
+}
+
+void C_ZMPlayer::PreferExpensiveFlashlight( bool state )
+{
+    if ( m_pFlashlight )
+    {
+        m_pFlashlight->PreferExpensive( state );
+    }
+}
