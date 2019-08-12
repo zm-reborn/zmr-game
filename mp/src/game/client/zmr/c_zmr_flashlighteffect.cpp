@@ -10,6 +10,7 @@
 #include "iviewrender_beams.h"
 
 #include "c_zmr_player.h"
+#include "c_zmr_flashlightsystem.h"
 #include "c_zmr_flashlighteffect.h"
 #include "zmr/zmr_player_shared.h"
 
@@ -21,6 +22,7 @@
 ConVar zm_cl_flashlight_useshadows( "zm_cl_flashlight_useshadows", "2", FCVAR_ARCHIVE );
 ConVar zm_cl_flashlight_thirdperson( "zm_cl_flashlight_thirdperson", "1", FCVAR_ARCHIVE, "Do other players have a flashlight beam + dynamic light" );
 ConVar zm_cl_flashlight_spec_uselocal( "zm_cl_flashlight_spec_uselocal", "1", FCVAR_ARCHIVE, "Use better flashlight when spectating in firstperson" );
+ConVar zm_cl_flashlight_expensive_fadetime( "zm_cl_flashlight_expensive_fadetime", "0.4", FCVAR_ARCHIVE );
 
 
 
@@ -60,6 +62,11 @@ CZMFlashlightEffect::CZMFlashlightEffect( CZMPlayer* pPlayer )
     m_iAttachmentRH = m_pPlayer->LookupAttachment( "anim_attachment_RH" );
 
 
+    m_bPreferExpensive = false;
+    m_bDoFade = false;
+    m_flFadeAlpha = 1.0f;
+
+
     if ( g_pMaterialSystemHardwareConfig->SupportsBorderColor() )
     {
         m_FlashlightTexture.Init( "effects/flashlight_border", TEXTURE_GROUP_OTHER, true );
@@ -67,6 +74,16 @@ CZMFlashlightEffect::CZMFlashlightEffect( CZMPlayer* pPlayer )
     else
     {
         m_FlashlightTexture.Init( "effects/flashlight001", TEXTURE_GROUP_OTHER, true );
+    }
+
+
+    if ( !m_pPlayer->IsLocalPlayer() )
+    {
+        bool res = GetZMFlashlightSystem()->AddPlayerToExpensiveList( m_pPlayer );
+        if ( res )
+        {
+            PreferExpensive( true );
+        }
     }
 }
 
@@ -83,6 +100,16 @@ void CZMFlashlightEffect::SetFlashlightHandle( ClientShadowHandle_t handle )
 void CZMFlashlightEffect::SetRightHandAttachment( int index )
 {
     m_iAttachmentRH = index;
+}
+
+void CZMFlashlightEffect::PreferExpensive( bool state )
+{
+    if ( m_bPreferExpensive != state )
+    {
+        m_bPreferExpensive = state;
+
+        m_bDoFade = true;
+    }
 }
 
 void CZMFlashlightEffect::TurnOn()
@@ -356,6 +383,39 @@ void CZMFlashlightEffect::UpdateLightNew( const Vector& vecPos, const Vector& ve
     }
 
 
+    float clr = 1.0f;
+
+
+    //
+    // Perform fade in/out
+    //
+    if ( m_bDoFade )
+    {
+        float delta = gpGlobals->frametime * (1.0f / zm_cl_flashlight_expensive_fadetime.GetFloat());
+
+        if ( m_bPreferExpensive ) // Fade in
+        {
+            m_flFadeAlpha += delta;
+            if ( m_flFadeAlpha >= 1.0f )
+            {
+                m_flFadeAlpha = 1.0f;
+                m_bDoFade = false;
+            }
+        }
+        else // Fade out
+        {
+            m_flFadeAlpha -= delta;
+            if ( m_flFadeAlpha <= 0.0f )
+            {
+                m_flFadeAlpha = 0.0f;
+                m_bDoFade = false;
+            }
+        }
+
+        clr = m_flFadeAlpha;
+    }
+
+
 
     FlashlightState_t state;
     state.m_vecLightOrigin = vOrigin;
@@ -364,9 +424,9 @@ void CZMFlashlightEffect::UpdateLightNew( const Vector& vecPos, const Vector& ve
     state.m_fQuadraticAtten = r_flashlightquadratic.GetFloat();
     state.m_fConstantAtten = r_flashlightconstant.GetFloat();
     state.m_fLinearAtten = flLinearAtten;
-    state.m_Color[0] = 1.0f;
-    state.m_Color[1] = 1.0f;
-    state.m_Color[2] = 1.0f;
+    state.m_Color[0] = clr;
+    state.m_Color[1] = clr;
+    state.m_Color[2] = clr;
     state.m_Color[3] = r_flashlightambient.GetFloat();
     state.m_NearZ = GetFlashlightNearZ();
     state.m_FarZ = GetFlashlightFarZ();
@@ -528,7 +588,7 @@ void CZMFlashlightEffect::UpdateLight()
     // For this reason we don't have the dynamic lights on for the other players.
     //
 
-    const bool bUseFancyLight = LocalPlayerWatchingMe();
+    const bool bUseFancyLight = LocalPlayerWatchingMe() || m_bPreferExpensive || m_bDoFade;
     //const bool bUseLocalEffects = LocalPlayerWatchingMe();
     const bool bInThirdperson = IsInThirdperson();
 

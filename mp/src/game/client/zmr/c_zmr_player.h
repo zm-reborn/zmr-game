@@ -122,6 +122,9 @@ public:
 
     void SetMouseWheelMove( float dir );
 
+    bool HasExpensiveFlashlightOn() const;
+    void PreferExpensiveFlashlight( bool state );
+
 protected:
     void UpdateFlashlight();
 
