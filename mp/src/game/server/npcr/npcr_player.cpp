@@ -22,7 +22,10 @@ CON_COMMAND( bot_sendcmd, "Sends command to all bot players" )
         CBasePlayer* pPlayer = ToBasePlayer( pNPC->GetCharacter() );
         if ( pPlayer )
         {
-            pPlayer->ClientCommand( args );
+            if ( !pPlayer->ClientCommand( args ) )
+            {
+                engine->ClientCommand( pPlayer->edict(), "%s", args.ArgS() );
+            }
         }
 
         return false;
