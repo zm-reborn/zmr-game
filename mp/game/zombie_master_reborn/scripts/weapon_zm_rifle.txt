@@ -49,12 +49,12 @@ WeaponData
 	{
 
 		"empty"				"Weapon_Rifle_ZM.Empty"
-		"reload"			"Weapon_Rifle_ZM.Reload"
+		//"reload"			"Weapon_Rifle_ZM.Reload"
 		"special1"			"Weapon_Rifle_ZM.Special1"
 		"single_shot"		"Weapon_Rifle_ZM.Single"
 		// NPC WEAPON SOUNDS
-		"reload_npc"		"Weapon_Rifle_ZM.NPC_Reload"
-		"single_shot_npc"	"Weapon_Rifle_ZM.NPC_Single"
+		//"reload_npc"		"Weapon_Rifle_ZM.NPC_Reload"
+		//"single_shot_npc"	"Weapon_Rifle_ZM.NPC_Single"
 	}
 
 	TextureData
