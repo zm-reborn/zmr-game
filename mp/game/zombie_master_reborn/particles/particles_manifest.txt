@@ -12,4 +12,5 @@ particles_manifest
 	"file"		"particles/rocket_fx.pcf"
 	
 	"file"		"!particles/molotov_particles.pcf"
+	"file"		"!particles/myrain.pcf"
 }
