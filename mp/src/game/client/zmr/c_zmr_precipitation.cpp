@@ -115,6 +115,16 @@ PrecipitationQuality_t C_ZMPrecipitationSystem::GetQuality() const
     return (PrecipitationQuality_t)zm_cl_precipitationquality.GetInt();
 }
 
+const CNewParticleEffect* C_ZMPrecipitationSystem::GetInner() const
+{
+    return m_pParticlePrecipInner;
+}
+
+const CNewParticleEffect* C_ZMPrecipitationSystem::GetOuter() const
+{
+    return m_pParticlePrecipOuter;
+}
+
 CParticleProperty* C_ZMPrecipitationSystem::ParticleProp()
 {
     if ( m_vPrecipitations.Count() < 1 )
@@ -418,6 +428,7 @@ void C_ZMPrecipitationSystem::DispatchOuterParticlePrecip( C_BasePlayer *pPlayer
     Assert( m_pParticlePrecipOuter );
 
 
+    m_pParticlePrecipOuter->SetControlPointObject( 4, pPlayer );
     m_pParticlePrecipOuter->SetControlPoint( 1, vOffsetPos );
     m_pParticlePrecipOuter->SetControlPointEntity( 2, pPlayer );
     m_pParticlePrecipOuter->SetControlPoint( 3, vOffsetPosNear );

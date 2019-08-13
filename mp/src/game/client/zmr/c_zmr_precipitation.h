@@ -31,6 +31,10 @@ public:
 
     CParticleProperty* ParticleProp();
 
+
+    const CNewParticleEffect* GetInner() const;
+    const CNewParticleEffect* GetOuter() const;
+
 protected:
     void InitializeParticles();
     void BuildRayTracingEnv();
