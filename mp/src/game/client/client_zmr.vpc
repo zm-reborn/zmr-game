@@ -25,6 +25,7 @@ $Project "Client (ZMR)"
 	{
 		$Lib		discord-rpc [$WIN32]
 		//$Lib		libdiscord-rpc [$LINUXALL]
+		$ImpLib		raytrace
 	}
 	
 	$Folder	"Source Files"
@@ -429,6 +430,8 @@ $Project "Client (ZMR)"
 			$File	"zmr\c_zmr_player_resource.h"
 			$File	"zmr\c_zmr_playeranimevent.cpp"
 			$File	"zmr\c_zmr_playeranimevent.h"
+			$File	"zmr\c_zmr_precipitation.cpp"
+			$File	"zmr\c_zmr_precipitation.h"
 			$File	"zmr\c_zmr_teamkeys.cpp"
 			$File	"zmr\c_zmr_teamkeys.h"
 			$File	"zmr\c_zmr_tempmodel.cpp"
