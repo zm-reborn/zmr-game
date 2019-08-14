@@ -96,3 +96,4 @@
 @PointClass base(Weapon) studio("models/weapons/w_crowbar.mdl") = weapon_zm_improvised : "Improvised Weapon" []
 @PointClass base(Weapon) studio("models/weapons/sledgehammer3rd_zm.mdl") = weapon_zm_sledge : "Sledgehammer" []
 @PointClass base(Weapon) studio("models/weapons/molotov3rd_zm.mdl") = weapon_zm_molotov : "Molotov Cocktail" []
+@PointClass base(Weapon) studio("models/weapons/w_sporting.mdl") = weapon_zm_shotgun_sporting : "OverUnder Shotgun" []
