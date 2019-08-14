@@ -3,9 +3,9 @@ WeaponData
 	"printname"				"Over-under"
 	
 	"viewmodel"				"models/weapons/c_sporting.mdl"
-	"worldmodel"			"models/weapons/w_shotgun_zm.mdl"
+	"worldmodel"			"models/weapons/w_sporting.mdl"
 	
-	"anim_prefix"			"shotgun"
+	"anim_prefix"			"rifle"
 	
 	
 	"PrimaryAttack"
