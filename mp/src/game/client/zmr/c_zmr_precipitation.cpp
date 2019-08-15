@@ -27,7 +27,7 @@ CUtlVector<RayTracingEnvironment*> g_RayTraceEnvironments;
 //ConVar r_RainParticleDensity( "r_RainParticleDensity", "1", FCVAR_NONE, "Density of Particle Rain 0-1" );
 //ConVar r_RainAllowInSplitScreen( "r_RainAllowInSplitScreen", "0", FCVAR_NONE, "Allows rain in splitscreen" );
 
-ConVar zm_cl_precipitationquality( "zm_cl_precipitationquality", "2", FCVAR_ARCHIVE );
+ConVar zm_cl_precipitationquality( "zm_cl_precipitationquality", "3", FCVAR_ARCHIVE );
 
 C_ZMPrecipitationSystem* ZMGetPrecipitationSystem()
 {

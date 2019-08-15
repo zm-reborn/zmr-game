@@ -8,7 +8,7 @@
 #include "tier0/memdbgon.h"
 
 
-ConVar zm_cl_flashlight_expensive_max( "zm_cl_flashlight_expensive_max", "2" );
+ConVar zm_cl_flashlight_expensive_max( "zm_cl_flashlight_expensive_max", "0", FCVAR_ARCHIVE );
 ConVar zm_cl_flashlight_expensive_dist( "zm_cl_flashlight_expensive_dist", "300" );
 
 
