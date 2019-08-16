@@ -124,7 +124,7 @@ void CZMBasePumpWeapon::CheckReload()
 {
     if ( !CanAct( WEPACTION_RELOAD ) )
     {
-        if ( m_bInReload )
+        if ( m_bInReload2 )
             StopReload();
 
         return;
@@ -139,7 +139,7 @@ void CZMBasePumpWeapon::StartReload()
 
     if ( m_bNeedPump ) return;
 
-    if ( m_bInReload ) return;
+    if ( m_bInReload2 ) return;
 
     if ( gpGlobals->curtime < m_flNextPrimaryAttack ) return;
 
