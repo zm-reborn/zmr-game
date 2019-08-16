@@ -8,6 +8,7 @@
 #include "datacache/imdlcache.h"
 #include "eventlist.h"
 #include "animation.h"
+#include "in_buttons.h"
 
 #include <vphysics/constraints.h>
 
@@ -49,6 +50,8 @@ BEGIN_NETWORK_TABLE( CZMBaseWeapon, DT_ZM_BaseWeapon )
     RecvPropTime( RECVINFO( m_flNextClipFillTime ) ),
     RecvPropBool( RECVINFO( m_bCanCancelReload ) ),
     RecvPropString( RECVINFO( m_sScriptFileName ) ),
+
+    RecvPropBool( RECVINFO( m_bInReload2 ) ),
 #else
     SendPropInt( SENDINFO( m_nOverrideClip1 ) ),
     SendPropTime( SENDINFO( m_flNextClipFillTime ) ),
@@ -57,6 +60,8 @@ BEGIN_NETWORK_TABLE( CZMBaseWeapon, DT_ZM_BaseWeapon )
 
     SendPropExclude( "DT_LocalWeaponData", "m_iClip2" ),
     SendPropExclude( "DT_LocalWeaponData", "m_iSecondaryAmmoType" ),
+
+    SendPropBool( SENDINFO( m_bInReload2 ) ),
 #endif
 END_NETWORK_TABLE()
 
@@ -66,6 +71,7 @@ IMPLEMENT_NETWORKCLASS_ALIASED( ZMBaseWeapon, DT_ZM_BaseWeapon )
 BEGIN_PREDICTION_DATA( CZMBaseWeapon )
     DEFINE_PRED_FIELD_TOL( m_flNextClipFillTime, FIELD_FLOAT, FTYPEDESC_INSENDTABLE, TD_MSECTOLERANCE ),
     DEFINE_PRED_FIELD( m_bCanCancelReload, FIELD_BOOLEAN, FTYPEDESC_INSENDTABLE ),
+    DEFINE_PRED_FIELD( m_bInReload2, FIELD_BOOLEAN, FTYPEDESC_INSENDTABLE ),
 END_PREDICTION_DATA()
 #endif
 
@@ -106,6 +112,7 @@ CZMBaseWeapon::CZMBaseWeapon()
 
     m_flNextClipFillTime = 0.0f;
     m_bCanCancelReload = true;
+    m_bInReload2 = false;
 
 #ifdef GAME_DLL
     m_sScriptFileName = MAKE_STRING( "" );
@@ -158,7 +165,70 @@ int CZMBaseWeapon::GetDropAmmoAmount() const
 
 void CZMBaseWeapon::ItemPostFrame()
 {
-    BaseClass::ItemPostFrame();
+    //
+    // Override CBaseCombatWeapon::ItemPostFrame
+    //
+    auto* pOwner = GetPlayerOwner();
+    if ( !pOwner )
+        return;
+
+
+    // This sets the m_nButtons on player.
+    UpdateAutoFire();
+
+
+    const int buttons = pOwner->m_nButtons;
+    bool bHoldingAttack = buttons & IN_ATTACK;
+    bool bHoldingAttack2 = buttons & IN_ATTACK2;
+    bool bHoldingReload = buttons & IN_RELOAD;
+
+    
+
+    // Track the duration of the fire
+    m_fFireDuration = bHoldingAttack ? ( m_fFireDuration + gpGlobals->frametime ) : 0.0f;
+
+
+    //
+    // Handle reloading
+    //
+    if ( UsesClipsForAmmo1() )
+    {
+        CheckReload();
+    }
+
+    //
+    // Secondary attack
+    // has priority over primary
+    //
+    if ( bHoldingAttack2 && CanPerformSecondaryAttack() )
+    {
+        SecondaryAttack();
+    }
+
+    //
+    // Primary attack
+    //
+    if ( bHoldingAttack && (m_flNextPrimaryAttack <= gpGlobals->curtime) )
+    {
+        PrimaryAttack();
+    }
+
+    //
+    // Reloading
+    //
+    bool bAutoReload = UsesClipsForAmmo1() && Clip1() == 0 && pOwner->GetAmmoCount( GetPrimaryAmmoType() ) > 0;
+
+    if ( (bHoldingReload || bAutoReload) && m_flNextPrimaryAttack <= gpGlobals->curtime && UsesClipsForAmmo1() && !m_bInReload2 ) 
+    {
+        Reload();
+        m_fFireDuration = 0.0f;
+    }
+
+
+    //
+    // Check weapon idle anims.
+    //
+    WeaponIdle();
 
 
 //#ifdef GAME_DLL
@@ -306,8 +376,22 @@ bool CZMBaseWeapon::DefaultReload( int iClipSize1, int iClipSize2, int iActivity
         return false;
 
     // If I don't have any spare ammo, I can't reload
-    if ( pOwner->GetAmmoCount(m_iPrimaryAmmoType) <= 0 )
+    if ( pOwner->GetAmmoCount( m_iPrimaryAmmoType ) <= 0 )
+    {
+        if ( Clip1() == 0 )
+        {
+            //
+            // Play empty sound
+            //
+            if ( pOwner->m_nButtons & (IN_ATTACK|IN_ATTACK2) && m_flNextEmptySoundTime <= gpGlobals->curtime )
+            {
+                WeaponSound( EMPTY );
+                m_flNextEmptySoundTime = gpGlobals->curtime + 1.0f;
+            }
+        }
+
         return false;
+    }
 
     bool bReload = false;
 
@@ -362,7 +446,7 @@ bool CZMBaseWeapon::DefaultReload( int iClipSize1, int iClipSize2, int iActivity
 
     m_flNextClipFillTime = gpGlobals->curtime + flReloadTime;
 
-    m_bInReload = true;
+    m_bInReload2 = true;
     m_bCanCancelReload = true;
 
     return true;
@@ -370,7 +454,7 @@ bool CZMBaseWeapon::DefaultReload( int iClipSize1, int iClipSize2, int iActivity
 
 void CZMBaseWeapon::CheckReload()
 {
-    if ( m_bInReload )
+    if ( m_bInReload2 )
     {
         //auto* pOwner = GetPlayerOwner();
         if ( ShouldIncrementClip() )
@@ -415,7 +499,7 @@ void CZMBaseWeapon::CancelReload()
 {
     SendWeaponAnim( GetIdleActivity() );
 
-    m_bInReload = false;
+    m_bInReload2 = false;
 
     // Make sure we don't attack instantly when stopping the reload.
     // Add a bit more time.
@@ -425,7 +509,7 @@ void CZMBaseWeapon::CancelReload()
 
 void CZMBaseWeapon::StopReload()
 {
-    m_bInReload = false;
+    m_bInReload2 = false;
 }
 
 bool CZMBaseWeapon::ShouldIncrementClip() const

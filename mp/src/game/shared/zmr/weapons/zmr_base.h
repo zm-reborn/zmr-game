@@ -155,7 +155,7 @@ public:
     CZMPlayer*    GetPlayerOwner() const;
     virtual bool    CanBeDropped() const { return true; }
     virtual bool    CanPickupAmmo() const { return true; }
-    virtual bool    IsInReload() const { return const_cast<CZMBaseWeapon*>( this )->CanReload() && m_bInReload; }
+    virtual bool    IsInReload() const { return const_cast<CZMBaseWeapon*>( this )->CanReload() && m_bInReload2; }
     virtual bool    CanAct( ZMWepActionType_t type = WEPACTION_GENERIC ) const; // Can we reload/attack?
 
 
@@ -239,6 +239,11 @@ protected:
     inline ZMWeaponConfig::WeaponConfigSlot_t GetConfigSlot() const { return m_iConfigSlot; }
     inline void SetConfigSlot( ZMWeaponConfig::WeaponConfigSlot_t slot ) { m_iConfigSlot = slot; }
     void AssignWeaponConfigSlot();
+
+
+    // Override baseclass m_bInReload
+    // Mainly to fix prediction errors, since m_bInReload is not networked.
+    CNetworkVar( bool, m_bInReload2 );
 
 private:
 #ifndef CLIENT_DLL
