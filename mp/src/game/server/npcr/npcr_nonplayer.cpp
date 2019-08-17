@@ -28,7 +28,6 @@ CNPCRNonPlayer::CNPCRNonPlayer() : NPCR::CBaseNPC( this )
     m_bCurActivityLoops = false;
     m_iCurActivity = ACT_INVALID;
     m_iLastActivity = ACT_INVALID;
-    m_iLastLoopActivity = ACT_INVALID;
 
     m_hEnemy.Set( nullptr );
 
@@ -275,12 +274,13 @@ void CNPCRNonPlayer::NPCThink()
     CBaseNPC::Update();
 
     
-    // Make sure we don't send multiple OnAnimActivityFinished() to schedules in one "update".
-    if ( IsSequenceFinished() && (SequenceLoops() || m_iCurActivity != m_iLastLoopActivity) )
+    if ( IsSequenceFinished() )
     {
-        Activity last = m_iCurActivity;
         OnAnimActivityFinished( m_iCurActivity );
-        m_iLastLoopActivity = last;
+
+        // Mark us "not finished".
+        // There's no other way to do this reliably.
+        m_bSequenceFinished = false;
     }
 }
 
