@@ -849,7 +849,7 @@ void CZMBaseWeapon::FireBullets( int numShots, int iAmmoType, float flMaxDist )
     while ( m_flNextPrimaryAttack <= gpGlobals->curtime )
     {
         // MUST call sound before removing a round from the clip of a CMachineGun
-        WeaponSound(SINGLE, m_flNextPrimaryAttack);
+        WeaponSound( SINGLE );
         m_flNextPrimaryAttack = m_flNextPrimaryAttack + fireRate;
         info.m_iShots++;
         if ( !fireRate )
@@ -1012,7 +1012,7 @@ void CZMBaseWeapon::PrimaryAttackEffects()
 
         pPlayer->DoAnimationEvent( PLAYERANIMEVENT_ATTACK_PRIMARY );
 
-        WeaponSound( SINGLE, m_flNextPrimaryAttack );
+        WeaponSound( SINGLE );
     }
 }
 
@@ -1034,7 +1034,7 @@ void CZMBaseWeapon::SecondaryAttackEffects()
 
         pPlayer->DoAnimationEvent( PLAYERANIMEVENT_ATTACK_SECONDARY );
 
-        WeaponSound( SINGLE, m_flNextSecondaryAttack );
+        WeaponSound( SINGLE );
     }
 }
 
