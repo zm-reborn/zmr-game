@@ -156,6 +156,16 @@ vgui::IImage* C_ZMImportanceSystem::GetPlayerImportanceImageIndex( int playerInd
     return ImportanceToImage( m_Importance[playerIndex].importance );
 }
 
+ZMImportance_t C_ZMImportanceSystem::GetPlayerImportance( int playerIndex )
+{
+    if ( !IsCached( playerIndex ) )
+    {
+        ComputePlayerImportance( playerIndex );
+    }
+
+    return m_Importance[playerIndex].importance;
+}
+
 bool C_ZMImportanceSystem::IsCached( int playerIndex )
 {
     return m_Importance[playerIndex].IsValid( playerIndex );
