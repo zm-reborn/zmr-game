@@ -30,6 +30,9 @@
 #include "zmr/npcs/zmr_zombiebase.h"
 #endif
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 #ifdef CLIENT_DLL
 //#define CZMPlayer C_ZMPlayer

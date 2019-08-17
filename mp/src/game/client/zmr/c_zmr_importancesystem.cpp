@@ -15,6 +15,9 @@
 
 #include "c_zmr_importancesystem.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 void C_ZMImportanceSystem::ImportanceData_t::Init( int uid )
 {

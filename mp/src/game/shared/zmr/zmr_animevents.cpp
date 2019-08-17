@@ -2,6 +2,9 @@
 #include "eventlist.h"
 #include "activitylist.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 void RegisterZMAnimEvents()
 {
     // It seems you can't use AE_TYPE_SHARED

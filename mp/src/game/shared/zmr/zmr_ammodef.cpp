@@ -3,6 +3,9 @@
 
 #include "zmr_ammodef.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 /*
     NOTE: Remove GetAmmoDef() from hl2mp/hl2mp_gamerules.cpp
 */

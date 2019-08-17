@@ -9,6 +9,9 @@
 #include "zmr/c_zmr_clientmode.h"
 #include "zmr_buildmenu_base.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 CZMBuildMenuBase::CZMBuildMenuBase( vgui::Panel* pParent, const char* name ) : BaseClass( pParent, name )
 {

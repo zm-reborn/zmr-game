@@ -9,6 +9,9 @@
 #include "zmr/c_zmr_legacy_objpanel.h"
 #include "zmr/c_zmr_player.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 // NOTE: We have to use string tables because of how the info panel parses the file.
 // If you don't use this method, it will assume it's just a file and not parse it as HTML if necessary.

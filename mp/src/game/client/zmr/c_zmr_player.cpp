@@ -26,6 +26,9 @@
 #include "c_zmr_player.h"
 #include "c_zmr_zmvision.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 extern bool g_bRenderPostProcess;
 

@@ -33,6 +33,9 @@
 #include "zmr/zmr_shareddefs.h"
 #include "zmr/zmr_web.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 #ifdef CLIENT_DLL
 ConVar zm_cl_roundrestart_flashtaskbar( "zm_cl_roundrestart_flashtaskbar", "1", 0, "Flash the taskbar icon (Windows) whenever round restarts. 1 = Only when window is not active, 2 = Always" );
