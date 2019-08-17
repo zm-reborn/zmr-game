@@ -69,6 +69,7 @@ public:
 
     virtual bool Deploy() OVERRIDE;
     virtual bool DefaultDeploy();
+    virtual bool Holster( CBaseCombatWeapon* pSwitchingTo = nullptr ) OVERRIDE;
 
     virtual Activity GetPrimaryAttackActivity() OVERRIDE;
     //virtual Activity GetSecondaryAttackActivity() OVERRIDE;

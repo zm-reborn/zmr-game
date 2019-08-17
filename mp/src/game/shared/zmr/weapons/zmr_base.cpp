@@ -333,6 +333,22 @@ bool CZMBaseWeapon::DefaultDeploy()
     return true;
 }
 
+bool CZMBaseWeapon::Holster( CBaseCombatWeapon* pSwitchingTo )
+{
+    // Reset reloading
+    m_bInReload2 = false;
+    m_bFiringWholeClip = false;
+
+
+    SetThink( nullptr );
+
+    SetWeaponVisible( false );
+
+    PoseParameterOverride( true );
+
+    return true;
+}
+
 //Activity CZMBaseWeapon::GetSecondaryAttackActivity()
 //{
 //
