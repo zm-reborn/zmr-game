@@ -71,9 +71,6 @@ bool CNPCRNonPlayer::SetActivity( Activity act )
 
     m_iCurActivity = act;
     m_iLastActivity = last;
-#ifndef CLIENT_DLL
-    m_iLastLoopActivity = ACT_INVALID;
-#endif
 
     return true;
 }
