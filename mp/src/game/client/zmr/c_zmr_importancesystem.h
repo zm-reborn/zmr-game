@@ -45,6 +45,7 @@ public:
     void Reset();
 
     vgui::IImage* GetPlayerImportanceImageIndex( int playerIndex );
+    ZMImportance_t GetPlayerImportance( int playerIndex );
 
     bool IsCached( int playerIndex );
 
