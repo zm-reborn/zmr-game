@@ -2,6 +2,9 @@
 
 #include "c_zmr_tempmodel.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 int UTIL_CreateClientModel( const char* pszModel );
 

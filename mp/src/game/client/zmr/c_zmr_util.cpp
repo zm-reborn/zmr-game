@@ -12,6 +12,9 @@
 #include "c_zmr_tips.h"
 #include "c_zmr_util.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 ConVar zm_hudchat_color( "zm_hudchat_color", "c13c3c", FCVAR_ARCHIVE );
 ConVar zm_hudchat_color_zm( "zm_hudchat_color_zm", "49ff59", FCVAR_ARCHIVE );

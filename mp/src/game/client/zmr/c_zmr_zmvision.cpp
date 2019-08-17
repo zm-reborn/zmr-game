@@ -7,6 +7,9 @@
 #include "c_zmr_util.h"
 #include "c_zmr_zmvision.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 ConVar zm_cl_zmvision_dlight( "zm_cl_zmvision_dlight", "1", FCVAR_ARCHIVE );
 

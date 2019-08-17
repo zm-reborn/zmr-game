@@ -24,6 +24,8 @@
 #include "zmr_gamerules.h"
 #include "zmr/weapons/zmr_base.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
 
 #ifndef CLIENT_DLL
 extern CAmmoDef* GetAmmoDef();

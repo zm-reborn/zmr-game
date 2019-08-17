@@ -29,6 +29,9 @@
 #include "zmr_listpanel.h"
 #include "zmr_scoreboard.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 using namespace vgui;
 

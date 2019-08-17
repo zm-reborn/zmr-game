@@ -5,6 +5,9 @@
 
 #include "zmr_textwindow.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 extern IGameUIFuncs* gameuifuncs;
 

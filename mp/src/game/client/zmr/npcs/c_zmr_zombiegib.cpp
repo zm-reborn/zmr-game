@@ -3,6 +3,9 @@
 #include "c_zmr_zombiebase.h"
 #include "c_zmr_zombiegib.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 #define SKULL_MODEL     "models/gibs/hgibs.mdl"
 
