@@ -19,6 +19,7 @@ ConVar zm_sk_banshee_health( "zm_sk_banshee_health", "25" );
 ConVar zm_sk_banshee_dmg_claw( "zm_sk_banshee_dmg_claw", "5" ); // Wait this can't be right. Was 9
 ConVar zm_sk_banshee_dmg_leap( "zm_sk_banshee_dmg_leap", "7" ); // Increased from 5
 ConVar zm_sk_banshee_dmg_leap_ceilambush( "zm_sk_banshee_dmg_leap_ceilambush", "20" );
+ConVar zm_sk_banshee_melee_continuous_limit( "zm_sk_banshee_melee_continuous_limit", "3" );
 
 ConVar zm_sk_hulk_health( "zm_sk_hulk_health", "110" );
 ConVar zm_sk_hulk_dmg( "zm_sk_hulk_dmg", "50" );

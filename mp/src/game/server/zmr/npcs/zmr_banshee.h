@@ -99,6 +99,7 @@ public:
 
 private:
     float m_flNextLeapAttack;
+    int m_nMeleeAttacks;
 
 
     NPCR::CSchedule<CZMBaseZombie>* m_pLeapSched;
