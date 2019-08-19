@@ -125,14 +125,20 @@ public:
         {
             CBaseEntity* pCurEnemy = pOuter->GetEnemy();
             CBaseEntity* pEnt = pOuter->GetSenses()->GetClosestEntity();
+
+            if ( !pEnt )
+                pEnt = pCurEnemy;
+
             if ( pEnt && pOuter->IsEnemy( pEnt ) )
             {
-                float flCurDist = vecCurPos.DistTo( pSwat->WorldSpaceCenter() );
-                float flNewDist = vecCurPos.DistTo( pEnt->WorldSpaceCenter() );
+                auto mypos = pOuter->WorldSpaceCenter();
+
+                float flCurDist = mypos.DistTo( vecCurPos );
+                float flNewDist = mypos.DistTo( pEnt->WorldSpaceCenter() );
 
                 
                 if (pOuter->HasConditionsForClawAttack( pEnt ) // We can attack the idiot, do it!
-                ||  flNewDist < (flCurDist*0.7f) ) // We have to be reasonably closer to the potential enemy.
+                ||  flNewDist < (flCurDist*0.9f) ) // We have to be reasonably closer to the potential enemy.
                 {
                     if ( !pCurEnemy || pEnt != pCurEnemy )
                         pOuter->AcquireEnemy( pEnt );
