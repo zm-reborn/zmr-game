@@ -40,7 +40,8 @@ $Configuration
 		// warning C26495: uninitialized variable
 		// warning C6031: return value ignored
 		// warning C28251: Inconsistent annotation (???)
-		$DisableSpecificWarnings	"$BASE;4316;4838;4456;4457;4458;4459;26495;6031;28251"
+		// warning C28252: Inconsistent annotation (???)
+		$DisableSpecificWarnings	"$BASE;4316;4838;4456;4457;4458;4459;26495;6031;28251;28252"
 
 		// Having lots of warnings makes it harder to notice new, and possibly
 		// important warnings, both on buildbot and in the output window. Lots
