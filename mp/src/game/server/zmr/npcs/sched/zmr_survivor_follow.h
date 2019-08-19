@@ -124,6 +124,8 @@ public:
 
 
         auto* pLastFollow = m_hFollowTarget.Get();
+        bool bWasValid = pLastFollow ? IsValidFollowTarget( pLastFollow ) : false;
+
         auto* pFollow = FindSurvivorToFollow();
 
         if ( (pLastFollow != pFollow || !m_Path.IsValid()) && pFollow )
@@ -133,6 +135,10 @@ public:
             //float dist = pOuter->GetAbsOrigin().DistTo( pFollow->GetAbsOrigin() );
             
             flNextCheck = 15.0f;
+        }
+        else if ( !bWasValid )
+        {
+            m_hFollowTarget.Set( nullptr );
         }
 
         m_NextFollowTarget.Start( flNextCheck );
