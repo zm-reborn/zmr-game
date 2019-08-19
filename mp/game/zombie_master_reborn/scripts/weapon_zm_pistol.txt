@@ -3,7 +3,7 @@ WeaponData
 	"printname"				"Pistol"
 	
 	"viewmodel"				"models/weapons/c_pistol_new.mdl"
-	"worldmodel"			"models/weapons/pistol3rd_zm.mdl"
+	"worldmodel"			"models/weapons/w_pistol_zm.mdl"
 	
 	"anim_prefix"			"pistol"
 	
