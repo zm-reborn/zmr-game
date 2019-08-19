@@ -71,7 +71,12 @@ public:
         {
             m_pSwatSched->SetBreakObject( DoBreakObject() );
             Intercept( m_pSwatSched, "Close enough to swat!" );
-            return;
+            
+            if ( !IsIntercepted() )
+            {
+                End( "Failed to start swatting schedule!" );
+                return;
+            }
         }
 
 
@@ -171,6 +176,12 @@ public:
         {
             m_pSwatSched->SetBreakObject( DoBreakObject() );
             Intercept( m_pSwatSched, "Close enough to swat!" );
+
+            if ( !IsIntercepted() )
+            {
+                End( "Failed to start swatting schedule!" );
+            }
+
             return;
         }
     }
