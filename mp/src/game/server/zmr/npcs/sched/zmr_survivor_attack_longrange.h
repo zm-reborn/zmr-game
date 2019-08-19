@@ -81,7 +81,7 @@ public:
 
         pOuter->GetMotor()->FaceTowards( vecAimTarget );
 
-        if ( pOuter->GetMotor()->IsFacing( vecAimTarget, 1.0f ) )
+        if ( pOuter->GetMotor()->IsFacing( vecAimTarget, 1.0f ) && pOuter->GetSenses()->CanSee( vecAimTarget ) )
         {
             pOuter->PressFire1( 0.1f );
         }
