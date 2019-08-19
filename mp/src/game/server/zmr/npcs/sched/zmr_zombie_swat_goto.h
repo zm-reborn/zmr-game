@@ -50,6 +50,10 @@ public:
 
     virtual void OnStart() OVERRIDE
     {
+        m_ExpireTimer.Invalidate();
+        m_EnemyScanTimer.Invalidate();
+
+
         CZMBaseZombie* pOuter = GetOuter();
         CBaseEntity* pSwat = pOuter->GetSwatObject();
 
@@ -82,8 +86,6 @@ public:
 
         if ( m_flStartExpireTimer > 0.0f )
             m_ExpireTimer.Start( m_flStartExpireTimer );
-        else
-            m_ExpireTimer.Invalidate();
     }
 
     virtual void OnContinue() OVERRIDE
