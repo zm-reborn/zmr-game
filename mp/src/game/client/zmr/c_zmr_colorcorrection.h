@@ -52,6 +52,7 @@ public:
 
 
     void AddCC( CZMBaseCCEffect* cc );
+    void ClearEffects();
 
 
     CUtlVector<CZMBaseCCEffect*> m_vCCs;
