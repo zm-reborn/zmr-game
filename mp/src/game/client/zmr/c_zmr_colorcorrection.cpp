@@ -66,11 +66,20 @@ C_ZMEntColorCorrection::C_ZMEntColorCorrection()
 
 C_ZMEntColorCorrection::~C_ZMEntColorCorrection()
 {
+    ClearEffects();
+
     ZMGetCCSystem()->m_pCCEnt = nullptr;
 }
 
 void C_ZMEntColorCorrection::ClientThink()
 {
+    if ( !zm_cl_colorcorrection_effects.GetBool() )
+    {
+        ClearEffects();
+        return;
+    }
+
+
     FOR_EACH_VEC( m_vCCs, i )
     {
         auto* eff = m_vCCs[i];
@@ -87,6 +96,25 @@ void C_ZMEntColorCorrection::ClientThink()
     }
 }
 
+void C_ZMEntColorCorrection::ClearEffects()
+{
+    FOR_EACH_VEC( m_vCCs, i )
+    {
+        auto* eff = m_vCCs[i];
+
+        if ( eff->HasHandle() )
+        {
+            g_pColorCorrectionMgr->SetColorCorrectionWeight( eff->GetHandle(), 0.0f );
+            
+            // ZMRTODO: Figure out if this is safe to do.
+            //g_pColorCorrectionMgr->RemoveColorCorrection( eff->GetHandle() );
+            //eff->SetHandle( INVALID_CLIENT_CCHANDLE );
+        }
+    }
+
+    //m_vCCs.RemoveAll();
+}
+
 void C_ZMEntColorCorrection::AddCC( CZMBaseCCEffect* cc )
 {
     if ( m_vCCs.Find( cc ) != m_vCCs.InvalidIndex() )
@@ -98,7 +126,7 @@ void C_ZMEntColorCorrection::AddCC( CZMBaseCCEffect* cc )
 
 
 //
-CZMColorCorrectionSystem::CZMColorCorrectionSystem()
+CZMColorCorrectionSystem::CZMColorCorrectionSystem() : CAutoGameSystem( "ZMColorCorrectionSystem" )
 {
     m_pCCEnt = nullptr;
 }
@@ -139,8 +167,10 @@ bool CZMColorCorrectionSystem::RemoveEffect( CZMBaseCCEffect* eff )
 bool CZMColorCorrectionSystem::CheckCC()
 {
     if ( !zm_cl_colorcorrection_effects.GetBool() )
+    {
+        ReleaseCCEnt();
         return false;
-
+    }
 
     //if ( !IsReady() )
     //    InitCC();
