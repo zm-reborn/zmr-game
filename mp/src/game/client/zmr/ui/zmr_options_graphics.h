@@ -33,4 +33,5 @@ private:
     vgui::TextEntry*    m_pTextEntry_MaxRagdolls;
     vgui::ComboBox*     m_pRainBox;
     vgui::ComboBox*     m_pExpFlashlightAmtBox;
+    vgui::CheckButton*  m_pCheck_CC;
 };

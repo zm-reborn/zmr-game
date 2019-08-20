@@ -12,6 +12,7 @@ extern ConVar zm_cl_silhouette_onlyzmvision;
 extern ConVar g_ragdoll_maxcount;
 extern ConVar zm_cl_precipitationquality;
 extern ConVar zm_cl_flashlight_expensive_max;
+extern ConVar zm_cl_colorcorrection_effects;
 
 
 CZMOptionsSubGraphics::CZMOptionsSubGraphics( Panel* parent ) : BaseClass( parent )
@@ -26,6 +27,7 @@ CZMOptionsSubGraphics::CZMOptionsSubGraphics( Panel* parent ) : BaseClass( paren
     LoadItem( &m_pTextEntry_MaxRagdolls, "MaxRagdollsEntry" );
     LoadItem( &m_pRainBox, "ComboRain" );
     LoadItem( &m_pExpFlashlightAmtBox, "ComboFlashlightAmount" );
+    LoadItem( &m_pCheck_CC, "CheckCC" );
 
 
     if ( FailedLoad() ) return;
@@ -62,6 +64,7 @@ void CZMOptionsSubGraphics::OnApplyChanges()
     zm_cl_zmvision_dlight.SetValue( m_pCheck_VisionDynLight->IsSelected() ? 1 : 0 );
     zm_cl_silhouette_onlyzmvision.SetValue( m_pCheck_SilhouetteVision->IsSelected() ? 1 : 0 );
     g_ragdoll_maxcount.SetValue( m_pSlider_MaxRagdolls->GetValue() );
+    zm_cl_colorcorrection_effects.SetValue( m_pCheck_CC->IsSelected() ? 1 : 0 );
 
 
     zm_cl_flashlight_expensive_max.SetValue( m_pExpFlashlightAmtBox->GetActiveItem() );
@@ -90,6 +93,7 @@ void CZMOptionsSubGraphics::OnResetData()
     m_pCheck_VisionDynLight->SetSelected( zm_cl_zmvision_dlight.GetBool() );
     m_pCheck_SilhouetteVision->SetSelected( zm_cl_silhouette_onlyzmvision.GetBool() );
     m_pSlider_MaxRagdolls->SetValue( g_ragdoll_maxcount.GetInt() );
+    m_pCheck_CC->SetSelected( zm_cl_colorcorrection_effects.GetBool() );
 
 
 
