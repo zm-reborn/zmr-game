@@ -11,7 +11,6 @@
 #include "c_te_effect_dispatch.h"
 #else
 #include "ilagcompensationmanager.h"
-#include "hl2mp/te_hl2mp_shotgun_shot.h"
 #include "iservervehicle.h"
 //#include "vehicle_baseserver.h"
 #include "te_effect_dispatch.h"
@@ -26,6 +25,7 @@
 #include "zmr/c_zmr_player.h"
 #include "zmr/npcs/c_zmr_zombiebase.h"
 #else
+#include "zmr/zmr_te_firebullets.h"
 #include "zmr/zmr_player.h"
 #include "zmr/npcs/zmr_zombiebase.h"
 #endif
@@ -540,7 +540,7 @@ void CZMPlayer::FireBullets( const FireBulletsInfo_t& info )
     }
 
 #ifdef GAME_DLL
-    TE_HL2MPFireBullets( entindex(), info.m_vecSrc, info.m_vecDirShooting, info.m_iAmmoType, iEffectSeed, info.m_iShots, info.m_vecSpread.x, bulletinfo.bDoTracers, bulletinfo.bDoImpacts );
+    TE_ZMFireBullets( entindex(), info.m_vecSrc, info.m_vecDirShooting, info.m_iAmmoType, iEffectSeed, info.m_iShots, info.m_vecSpread.x, bulletinfo.bDoTracers, bulletinfo.bDoImpacts );
 #endif
 
 #ifdef GAME_DLL

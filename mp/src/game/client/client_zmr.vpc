@@ -409,6 +409,10 @@ $Project "Client (ZMR)"
 				$File	"zmr\c_zmr_cc_survivor_lowhp.cpp"
 				$File	"zmr\c_zmr_cc_zm.cpp"
 			}
+			$Folder "Temp Entities"
+			{
+				$File	"zmr\c_zmr_te_firebullets.cpp"
+			}
 			
 			$File	"zmr\c_zmr_ammo.cpp"
 			$File	"zmr\c_zmr_charcircle.cpp"
