@@ -402,6 +402,13 @@ $Project "Client (ZMR)"
 				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_weaponconfig.cpp"
 				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_weaponconfig.h"
 			}
+			$Folder "Color Corrections"
+			{
+				$File	"zmr\c_zmr_cc_death.cpp"
+				$File	"zmr\c_zmr_cc_survivor.cpp"
+				$File	"zmr\c_zmr_cc_survivor_lowhp.cpp"
+				$File	"zmr\c_zmr_cc_zm.cpp"
+			}
 			
 			$File	"zmr\c_zmr_ammo.cpp"
 			$File	"zmr\c_zmr_charcircle.cpp"
