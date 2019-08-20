@@ -21,7 +21,8 @@ public:
 
     virtual bool OnTeamChange( int iTeam ) OVERRIDE
     {
-        if ( iTeam == ZMTEAM_HUMAN )
+        //if ( iTeam != ZMTEAM_SURVIVOR )
+        if ( iTeam != ZMTEAM_ZM ) // Enable for spectators as well for now.
         {
             m_bAlive = true;
 
@@ -36,8 +37,9 @@ public:
 
     virtual bool OnDeath() OVERRIDE
     {
-        m_bAlive = false;
-        return false;
+        //m_bAlive = false;
+        //return false;
+        return true;
     }
 
     virtual float GetWeight() const OVERRIDE
