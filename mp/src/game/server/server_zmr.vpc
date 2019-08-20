@@ -431,6 +431,11 @@ $Project "Server (ZMR)"
 				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_weaponconfig.cpp"
 				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_weaponconfig.h"
 			}
+			$Folder "Temp Entities"
+			{
+				$File	"zmr\zmr_te_firebullets.cpp"
+				$File	"zmr\zmr_te_firebullets.h"
+			}
 			
 			$File	"zmr\zmr_ammo.cpp"
 			$File	"zmr\zmr_ammo.h"
