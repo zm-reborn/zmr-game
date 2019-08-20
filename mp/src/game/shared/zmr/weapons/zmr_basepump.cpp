@@ -59,14 +59,11 @@ bool CZMBasePumpWeapon::Holster( CBaseCombatWeapon* pSwitchTo )
     return res;
 }
 
-void CZMBasePumpWeapon::PrimaryAttack()
+void CZMBasePumpWeapon::Shoot( int iAmmoType, int nBullets, int nAmmo, float flMaxRange, bool bSecondary )
 {
-    if ( !CanAct( WEPACTION_ATTACK ) ) return;
-
-
     m_bNeedPump = true;
 
-    BaseClass::PrimaryAttack();
+    BaseClass::Shoot( iAmmoType, nBullets, nAmmo, flMaxRange, bSecondary );
 }
 
 void CZMBasePumpWeapon::ItemPostFrame()
