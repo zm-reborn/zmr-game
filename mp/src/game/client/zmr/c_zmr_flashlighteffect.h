@@ -62,6 +62,8 @@ protected:
     bool m_bDoFade;
     float m_flFadeAlpha;
 
+    float m_flMoveFwd;
+
 
     CZMPlayer* m_pPlayer;
 };
