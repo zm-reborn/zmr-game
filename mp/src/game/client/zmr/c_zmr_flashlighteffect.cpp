@@ -19,7 +19,7 @@
 
 
 
-ConVar zm_cl_flashlight_useshadows( "zm_cl_flashlight_useshadows", "2", FCVAR_ARCHIVE );
+ConVar zm_cl_flashlight_localuseshadows( "zm_cl_flashlight_localuseshadows", "1", FCVAR_ARCHIVE );
 ConVar zm_cl_flashlight_thirdperson( "zm_cl_flashlight_thirdperson", "1", FCVAR_ARCHIVE, "Do other players have a flashlight beam + dynamic light" );
 ConVar zm_cl_flashlight_spec_uselocal( "zm_cl_flashlight_spec_uselocal", "1", FCVAR_ARCHIVE, "Use better flashlight when spectating in firstperson" );
 ConVar zm_cl_flashlight_expensive_fadetime( "zm_cl_flashlight_expensive_fadetime", "0.4", FCVAR_ARCHIVE );
@@ -65,6 +65,8 @@ CZMFlashlightEffect::CZMFlashlightEffect( CZMPlayer* pPlayer )
     m_bPreferExpensive = false;
     m_bDoFade = false;
     m_flFadeAlpha = 1.0f;
+
+    m_flMoveFwd = 0.0f;
 
 
     if ( g_pMaterialSystemHardwareConfig->SupportsBorderColor() )
@@ -217,9 +219,9 @@ void CZMFlashlightEffect::UpdateLightNew( const Vector& vecPos, const Vector& ve
     // We will lock some of the flashlight params if player is on a ladder, to prevent oscillations due to the trace-rays
     //bool bPlayerOnLadder = m_pPlayer->GetMoveType() == MOVETYPE_LADDER;
 
-    //const float flEpsilon = 0.1f;			// Offset flashlight position along vecUp
-    //const float flDistCutoff = 128.0f;
-    //const float flDistDrag = 0.2f;
+    const float flEpsilon = 0.1f;			// Offset flashlight position along vecUp
+    const float flDistCutoff = 128.0f;
+    const float flDistDrag = 0.2f;
 
     float flFov = GetFlashlightFov();
     float flLinearAtten = r_flashlightlinear.GetFloat();
@@ -231,7 +233,7 @@ void CZMFlashlightEffect::UpdateLightNew( const Vector& vecPos, const Vector& ve
 
 
     // How much we will move forward.
-    float flMoveFwd = bUseFirstpersonEffects ? 0.0f : 16.0f;
+    float flMoveFwd = bUseFirstpersonEffects ? m_flMoveFwd : 16.0f;
 
     if ( r_swingflashlight.GetBool() )
     {
@@ -267,8 +269,6 @@ void CZMFlashlightEffect::UpdateLightNew( const Vector& vecPos, const Vector& ve
     iMask &= ~CONTENTS_HITBOX;
     iMask |= CONTENTS_WINDOW;
 
-    Vector vTarget = vecPos + vecForward * GetFlashlightFarZ();
-
     // Work with these local copies of the basis for the rest of the function
     Vector vDir   = vecForward;
     Vector vRight = vecRight;
@@ -290,40 +290,59 @@ void CZMFlashlightEffect::UpdateLightNew( const Vector& vecPos, const Vector& ve
     AssertFloatEquals( DotProduct( vRight, vUp  ), 0.0f, 1e-3 );
 
 
-    trace_t pmDirectionTrace;
-    UTIL_TraceHull( vOrigin, vTarget, Vector( -4, -4, -4 ), Vector( 4, 4, 4 ), iMask, &traceFilter, &pmDirectionTrace );
 
-    if ( r_flashlightvisualizetrace.GetBool() )
+    if ( bUseFirstpersonEffects )
     {
-        debugoverlay->AddBoxOverlay( pmDirectionTrace.endpos, Vector( -4, -4, -4 ), Vector( 4, 4, 4 ), QAngle( 0, 0, 0 ), 0, 0, 255, 16, 0 );
-        debugoverlay->AddLineOverlay( vOrigin, pmDirectionTrace.endpos, 255, 0, 0, false, 0 );
+        //
+        // Get the surface we're aiming at and move back the flashlight
+        // to make the flashlight seem more dynamic.
+        // If we don't do this, it's going to look really dumb.
+        //
+        trace_t tr;
+
+        const Vector hull( 4, 4, 4 );
+
+
+        Vector vTarget = vOrigin + vecForward * flDistCutoff;
+
+        UTIL_TraceHull( vOrigin, vTarget, -hull, hull, iMask, &traceFilter, &tr );
+
+        if ( r_flashlightvisualizetrace.GetBool() )
+        {
+            debugoverlay->AddBoxOverlay( tr.endpos, -hull, hull, vec3_angle, 0, 0, 255, 16, 0 );
+            debugoverlay->AddLineOverlay( vOrigin, tr.endpos, 255, 0, 0, false, 0 );
+        }
+
+        if ( tr.fraction != 1.0f && !tr.startsolid )
+        {
+            float flDist = (tr.endpos - vOrigin).Length();
+            float flMoveBack = -flMoveFwd;
+
+            // We have an intersection with our cutoff range
+            // Determine how far to pull back, then trace to see if we are clear
+            float flPullBackDist = flDistCutoff - flDist;	// Fixed pull-back distance if on ladder
+            
+            flMoveBack = Lerp( flDistDrag, flMoveBack, flPullBackDist );
+            
+            {
+                UTIL_TraceHull( vOrigin, vOrigin - vDir*(flPullBackDist-flEpsilon), -hull, hull, iMask, &traceFilter, &tr );
+                if ( tr.fraction != 1.0f )
+                {
+                    // We have an intersection behind us as well, so limit our back move.
+                    float flMaxDist = (tr.endpos - vOrigin).Length() - flEpsilon;
+                    if ( flMoveBack > flMaxDist )
+                        flMoveBack = flMaxDist;
+                }
+            }
+
+            flMoveFwd = -flMoveBack;
+        }
+        else
+        {
+            flMoveFwd = Lerp( flDistDrag, flMoveFwd, 0.0f );
+        }
     }
 
-    //float flDist = (pmDirectionTrace.endpos - vOrigin).Length();
-    //if ( flDist < flDistCutoff )
-    //{
-    //    // We have an intersection with our cutoff range
-    //    // Determine how far to pull back, then trace to see if we are clear
-    //    float flPullBackDist = bPlayerOnLadder ? r_flashlightladderdist.GetFloat() : flDistCutoff - flDist;	// Fixed pull-back distance if on ladder
-    //    flMoveFwd = Lerp( flDistDrag, flMoveFwd, flPullBackDist );
-    //    
-    //    if ( !bPlayerOnLadder )
-    //    {
-    //        trace_t pmBackTrace;
-    //        UTIL_TraceHull( vOrigin, vOrigin - vDir*(flPullBackDist-flEpsilon), Vector( -4, -4, -4 ), Vector( 4, 4, 4 ), iMask, &traceFilter, &pmBackTrace );
-    //        if( pmBackTrace.DidHit() )
-    //        {
-    //            // We have an intersection behind us as well, so limit our m_flMoveFwd
-    //            float flMaxDist = (pmBackTrace.endpos - vOrigin).Length() - flEpsilon;
-    //            if( flMoveFwd > flMaxDist )
-    //                flMoveFwd = flMaxDist;
-    //        }
-    //    }
-    //}
-    //else
-    //{
-    //    flMoveFwd = Lerp( flDistDrag, flMoveFwd, 0.0f );
-    //}
 
     vOrigin = vOrigin + vDir * flMoveFwd;
 
@@ -366,21 +385,7 @@ void CZMFlashlightEffect::UpdateLightNew( const Vector& vecPos, const Vector& ve
     // Only draw shadows if we're in thirdperson.
     // Honestly, there's no point in drawing the shadows when in first person.
     // You can barely even see the shadows.
-    bool bDrawShadows = IsInThirdperson();
-
-    switch ( zm_cl_flashlight_useshadows.GetInt() )
-    {
-    case 1 : // Only if local player.
-        //bDrawShadows = bUseFirstpersonEffects;
-        break;
-    case 2 : // Always
-        //bDrawShadows = true;
-        break;
-    default : // 0, Never
-        //bDrawShadows = false;
-        bDrawShadows = false;
-        break;
-    }
+    bool bDrawShadows = bIsThirdperson || zm_cl_flashlight_localuseshadows.GetBool();
 
 
     float clr = 1.0f;
@@ -465,6 +470,9 @@ void CZMFlashlightEffect::UpdateLightNew( const Vector& vecPos, const Vector& ve
         msg->deleteThis();
     }
 #endif
+
+
+    m_flMoveFwd = flMoveFwd;
 }
 
 //
