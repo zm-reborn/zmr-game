@@ -26,7 +26,7 @@ public:
 
 
     virtual bool Holster( CBaseCombatWeapon* pSwitchTo ) OVERRIDE;
-    virtual void PrimaryAttack() OVERRIDE;
+    virtual void Shoot( int iAmmoType = -1, int nBullets = -1, int nAmmo = -1, float flMaxRange = -1.0f, bool bSecondary = false ) OVERRIDE;
     virtual	void CheckReload() OVERRIDE;
     virtual bool Reload() OVERRIDE;
     virtual void ItemPostFrame() OVERRIDE;
