@@ -21,6 +21,7 @@
 #include "zmr/zmr_softcollisions.h"
 #include "c_zmr_player_ragdoll.h"
 #include "c_zmr_teamkeys.h"
+#include "c_zmr_colorcorrection.h"
 
 #include "c_zmr_flashlighteffect.h"
 #include "c_zmr_player.h"
@@ -410,6 +411,9 @@ void C_ZMPlayer::TeamChangeStatic( int iNewTeam )
     {
         engine->ClientCmd_Unrestricted( "exec survivor.cfg" );
     }
+
+
+    ZMGetCCSystem()->OnTeamChange( iNewTeam );
 }
 
 void C_ZMPlayer::UpdateFlashlight()
