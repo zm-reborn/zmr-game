@@ -9,7 +9,7 @@
 #define ZMCC_ZM         "materials/colorcorrection/game_zm.raw"
 
 
-ConVar zm_cl_colorcorrection_zm_weight( "zm_cl_colorcorrection_zm_weight", "1", FCVAR_ARCHIVE );
+ConVar zm_cl_colorcorrection_zm_weight( "zm_cl_colorcorrection_zm_weight", "0.2", FCVAR_ARCHIVE );
 
 
 class CZMZMEffect : public CZMBaseCCEffect
