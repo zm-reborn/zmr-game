@@ -169,12 +169,14 @@ ZMBotWeaponTypeRange_t CZMPlayerBot::GetWeaponType( const char* classname )
     if ( !classname || !(*classname) )
         return BOTWEPRANGE_INVALID;
 
+    // ZMRTODO: Get rid of this hardcoded stuff.
 
-    const char* wep = classname + 10;
+    // Skip 'weapon_zm_'
+    const char* wep = classname + sizeof( "weapon_zm_" ) - 1;
 
     if ( FStrEq( wep, "mac10" ) )
         return BOTWEPRANGE_CLOSERANGE;
-    if ( FStrEq( wep, "shotgun" ) )
+    if ( Q_strncmp( wep, "shotgun", sizeof( "shotgun" ) - 1 ) == 0 )
         return BOTWEPRANGE_CLOSERANGE;
 
     if ( FStrEq( wep, "rifle" ) )
@@ -308,15 +310,20 @@ float CZMPlayerBot::GetOptimalAttackDistance() const
     CZMBaseWeapon* pWep = GetActiveWeapon();
     if ( !pWep ) return FLT_MAX;
 
+    // ZMRTODO: Get rid of this hardcoded stuff.
+
     // HACK: Melee
     if ( !pWep->UsesPrimaryAmmo() )
         return 32.0f;
 
 
-    const char* wep = pWep->GetClassname() + 10;
+    // Skip 'weapon_zm_'
+    const char* wep = pWep->GetClassname() + sizeof( "weapon_zm_" ) - 1;
 
     if ( FStrEq( wep, "rifle" ) || FStrEq( wep, "revolver" ) )
         return 768.0f;
+    if ( FStrEq( wep, "shotgun_sporting" ) )
+        return 150.0f;
     if ( FStrEq( wep, "shotgun" ) )
         return 100.0f;
     if ( FStrEq( wep, "mac10" ) )
@@ -330,15 +337,20 @@ float CZMPlayerBot::GetMaxAttackDistance() const
     CZMBaseWeapon* pWep = GetActiveWeapon();
     if ( !pWep ) return FLT_MAX;
 
+    // ZMRTODO: Get rid of this hardcoded stuff.
+
     // HACK: Melee
     if ( !pWep->UsesPrimaryAmmo() )
         return 50.0f;
 
 
-    const char* wep = pWep->GetClassname() + 10;
+    // Skip 'weapon_zm_'
+    const char* wep = pWep->GetClassname() + sizeof( "weapon_zm_" ) - 1;
 
     if ( FStrEq( wep, "rifle" ) || FStrEq( wep, "revolver" ) )
         return 1024.0f;
+    if ( FStrEq( wep, "shotgun_sporting" ) )
+        return 400.0f;
     if ( FStrEq( wep, "shotgun" ) )
         return 256.0f;
     if ( FStrEq( wep, "mac10" ) )
