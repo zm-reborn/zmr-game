@@ -52,9 +52,9 @@ public:
     virtual void ItemPostFrame() OVERRIDE;
 
 
-    virtual Activity GetReloadStartAct() OVERRIDE { return ACT_VM_RELOAD_START; }
-    virtual Activity GetReloadEndAct() OVERRIDE { return ACT_VM_RELOAD_FINISH; }
-    virtual Activity GetPumpAct() OVERRIDE { return ACT_SHOTGUN_PUMP; }
+    virtual Activity GetReloadStartAct() const OVERRIDE { return ACT_VM_RELOAD_START; }
+    virtual Activity GetReloadEndAct() const OVERRIDE { return ACT_VM_RELOAD_FINISH; }
+    virtual Activity GetPumpAct() const OVERRIDE { return ACT_SHOTGUN_PUMP; }
 
     inline bool IsZoomed() const { return m_bInZoom; }
     void CheckToggleZoom();

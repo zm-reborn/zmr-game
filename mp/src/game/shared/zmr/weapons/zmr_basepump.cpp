@@ -21,7 +21,7 @@ BEGIN_NETWORK_TABLE( CZMBasePumpWeapon, DT_ZM_BasePumpWeapon )
     RecvPropBool( RECVINFO( m_bCancelReload ) ),
 #else
     SendPropInt( SENDINFO( m_iPumpState ), Q_log2( PUMPSTATE_MAX ) + 1, SPROP_UNSIGNED ),
-    SendPropInt( SENDINFO( m_iReloadState ) ),
+    SendPropInt( SENDINFO( m_iReloadState ), Q_log2( RELOADSTATE_MAX ) + 1, SPROP_UNSIGNED ),
     SendPropBool( SENDINFO( m_bCancelReload ) ),
 #endif
 END_NETWORK_TABLE()
