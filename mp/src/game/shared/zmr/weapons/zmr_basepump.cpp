@@ -16,11 +16,11 @@ IMPLEMENT_NETWORKCLASS_ALIASED( ZMBasePumpWeapon, DT_ZM_BasePumpWeapon )
 
 BEGIN_NETWORK_TABLE( CZMBasePumpWeapon, DT_ZM_BasePumpWeapon )
 #ifdef CLIENT_DLL
-    RecvPropBool( RECVINFO( m_bNeedPump ) ),
+    RecvPropInt( RECVINFO( m_iPumpState ) ),
     RecvPropInt( RECVINFO( m_iReloadState ) ),
     RecvPropBool( RECVINFO( m_bCancelReload ) ),
 #else
-    SendPropBool( SENDINFO( m_bNeedPump ) ),
+    SendPropInt( SENDINFO( m_iPumpState ), Q_log2( PUMPSTATE_MAX ) + 1, SPROP_UNSIGNED ),
     SendPropInt( SENDINFO( m_iReloadState ) ),
     SendPropBool( SENDINFO( m_bCancelReload ) ),
 #endif
@@ -28,7 +28,7 @@ END_NETWORK_TABLE()
 
 #ifdef CLIENT_DLL
 BEGIN_PREDICTION_DATA( CZMBasePumpWeapon )
-    DEFINE_PRED_FIELD( m_bNeedPump, FIELD_BOOLEAN, FTYPEDESC_INSENDTABLE ),
+    DEFINE_PRED_FIELD( m_iPumpState, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
     DEFINE_PRED_FIELD( m_iReloadState, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
     DEFINE_PRED_FIELD( m_bCancelReload, FIELD_BOOLEAN, FTYPEDESC_INSENDTABLE ),
 END_PREDICTION_DATA()
@@ -41,7 +41,7 @@ CZMBasePumpWeapon::CZMBasePumpWeapon()
 {
     m_bReloadsSingly = true;
 
-    m_bNeedPump = false;
+    m_iPumpState = PUMPSTATE_NONE;
     m_iReloadState = RELOADSTATE_NONE;
     m_bCancelReload = false;
 }
@@ -61,7 +61,7 @@ bool CZMBasePumpWeapon::Holster( CBaseCombatWeapon* pSwitchTo )
 
 void CZMBasePumpWeapon::Shoot( int iAmmoType, int nBullets, int nAmmo, float flMaxRange, bool bSecondary )
 {
-    m_bNeedPump = true;
+    m_iPumpState = PUMPSTATE_PUMP_EJECT;
 
     BaseClass::Shoot( iAmmoType, nBullets, nAmmo, flMaxRange, bSecondary );
 }
@@ -79,16 +79,15 @@ void CZMBasePumpWeapon::ItemPostFrame()
     }
 
 
-
-    if ( m_bNeedPump && m_flNextPrimaryAttack <= gpGlobals->curtime )
-    {
-        Pump();
-    }
-
-
     if ( m_iReloadState == RELOADSTATE_START && m_flNextPrimaryAttack <= gpGlobals->curtime )
     {
         Reload();
+    }
+
+
+    if ( !IsInReload() && NeedsPump() && m_flNextPrimaryAttack <= gpGlobals->curtime )
+    {
+        Pump();
     }
 
 
@@ -101,12 +100,11 @@ void CZMBasePumpWeapon::Pump()
     if ( !pOwner ) return;
 
     
-    m_bNeedPump = false;
     
     WeaponSound( SPECIAL1 );
 
     // Finish reload animation
-    SendWeaponAnim( GetPumpAct() );
+    SendWeaponAnim( m_iPumpState == PUMPSTATE_PUMP_EJECT ? GetPumpAct() : GetEmptyPumpAct() );
     
 
     float flSeqTime = SequenceDuration();
@@ -118,6 +116,8 @@ void CZMBasePumpWeapon::Pump()
     
     pOwner->m_flNextAttack = gpGlobals->curtime + flReadyTime;
     m_flNextPrimaryAttack = m_flNextSecondaryAttack = gpGlobals->curtime + flReadyTime;
+
+    m_iPumpState = PUMPSTATE_NONE;
 }
 
 void CZMBasePumpWeapon::CheckReload()
@@ -137,7 +137,7 @@ void CZMBasePumpWeapon::StartReload()
 {
     if ( m_iReloadState != RELOADSTATE_NONE ) return;
 
-    if ( m_bNeedPump ) return;
+    if ( NeedsPump() ) return;
 
     if ( m_bInReload2 ) return;
 
@@ -201,7 +201,7 @@ bool CZMBasePumpWeapon::Reload()
 {
     if ( m_iReloadState == RELOADSTATE_NONE )
     {
-        if ( !m_bNeedPump )
+        if ( !NeedsPump() )
         {
             StartReload();
         }
@@ -214,6 +214,10 @@ bool CZMBasePumpWeapon::Reload()
     if ( res )
     {
         m_iReloadState = RELOADSTATE_RELOADING;
+
+        // Keep this commented for now.
+        //if ( Clip1() <= 0 )
+        //    m_iPumpState = PUMPSTATE_PUMP_EMPTY;
     }
     else if ( m_iReloadState != RELOADSTATE_NONE )
     {
