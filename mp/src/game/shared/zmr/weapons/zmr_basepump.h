@@ -9,6 +9,16 @@
 #endif
 
 
+enum PumpState_t
+{
+    PUMPSTATE_NONE = 0,
+
+    PUMPSTATE_PUMP_EJECT, // Shell needs to be ejected
+    PUMPSTATE_PUMP_EMPTY, // Nothing in chamber.
+
+    PUMPSTATE_MAX
+};
+
 #define RELOADSTATE_NONE        0
 #define RELOADSTATE_START       1
 #define RELOADSTATE_RELOADING   2
@@ -35,6 +45,7 @@ public:
     virtual Activity GetReloadStartAct() { return ACT_VM_RELOAD_START; }
     virtual Activity GetReloadEndAct() { return ACT_VM_RELOAD_FINISH; }
     virtual Activity GetPumpAct() { return ACT_SHOTGUN_PUMP; }
+    virtual Activity GetEmptyPumpAct() const { return ACT_VM_RELOAD_SILENCED; }
     virtual void StartReload();
     virtual void Pump();
 
@@ -44,9 +55,10 @@ public:
 
     virtual bool CanPickupAmmo() const OVERRIDE { return !IsInReload(); }
     virtual bool IsInReload() const OVERRIDE;
+    bool NeedsPump() const { return m_iPumpState != PUMPSTATE_NONE; }
     
 protected:
-    CNetworkVar( bool, m_bNeedPump );
+    CNetworkVar( int, m_iPumpState );
     CNetworkVar( int, m_iReloadState );
     CNetworkVar( bool, m_bCancelReload );
 };
