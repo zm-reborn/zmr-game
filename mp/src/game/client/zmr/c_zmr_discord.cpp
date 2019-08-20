@@ -60,7 +60,6 @@ private:
 static CZMDiscordSystem g_ZMDiscordSystem;
 
 
-// These don't seem to work?
 static void Discord_Event_Ready( const DiscordUser* request )
 {
     CZMDiscordSystem::SetConnected();
@@ -138,7 +137,7 @@ void CZMDiscordSystem::Update( float frametime )
         }
 
 
-        m_flNextDiscordUpdateTime = gpGlobals->realtime + 2.0f;
+        m_flNextDiscordUpdateTime = gpGlobals->realtime + 0.2f;
     }
 }
 
