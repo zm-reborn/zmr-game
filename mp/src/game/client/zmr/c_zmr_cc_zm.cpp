@@ -29,6 +29,9 @@ public:
             return true;
         }
 
+
+        m_bAlive = false;
+
         return false;
     }
 
