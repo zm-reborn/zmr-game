@@ -1,0 +1,4 @@
+Color Balance
+	Shadows
+		Red 100
+		Preserve luminosity off
