@@ -19,9 +19,17 @@ enum PumpState_t
     PUMPSTATE_MAX
 };
 
-#define RELOADSTATE_NONE        0
-#define RELOADSTATE_START       1
-#define RELOADSTATE_RELOADING   2
+enum ReloadState_t
+{
+    RELOADSTATE_NONE = 0, // Not in reload.
+
+    RELOADSTATE_START, // We're starting to reload. (transition to looping anim)
+    RELOADSTATE_RELOADING, // Currently in the reload animation.
+
+    // There is no finish state, as we have no use for it.
+
+    RELOADSTATE_MAX
+};
 
 // ZMRTODO: Separate pump and single reload weapon classes.
 class CZMBasePumpWeapon : public CZMBaseWeapon
@@ -42,9 +50,9 @@ public:
     virtual void ItemPostFrame() OVERRIDE;
     virtual void FinishReload() OVERRIDE;
 
-    virtual Activity GetReloadStartAct() { return ACT_VM_RELOAD_START; }
-    virtual Activity GetReloadEndAct() { return ACT_VM_RELOAD_FINISH; }
-    virtual Activity GetPumpAct() { return ACT_SHOTGUN_PUMP; }
+    virtual Activity GetReloadStartAct() const { return ACT_VM_RELOAD_START; }
+    virtual Activity GetReloadEndAct() const { return ACT_VM_RELOAD_FINISH; }
+    virtual Activity GetPumpAct() const { return ACT_SHOTGUN_PUMP; }
     virtual Activity GetEmptyPumpAct() const { return ACT_VM_RELOAD_SILENCED; }
     virtual void StartReload();
     virtual void Pump();
