@@ -17,6 +17,7 @@ $Configuration
 	{
 		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\game\shared\hl2,.\hl2,.\hl2mp,$SRCDIR\game\shared\hl2mp,$SRCDIR\game\shared\zmr,.\npcr"
 		$PreprocessorDefinitions		"$BASE;HL2MP;HL2_DLL;ZMR"
+		$PreprocessorDefinitions		"$BASE;ZMR_STEAM" [$ZMR_STEAM]
 	}
 }
 
