@@ -55,5 +55,5 @@ private:
     bool m_bAlive;
 };
 
-CZMZMEffect g_ZMCCSurvivorEffect;
+CZMZMEffect g_ZMCCZMEffect;
 
