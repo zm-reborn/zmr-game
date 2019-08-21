@@ -31,6 +31,8 @@ WeaponData
 	"clip_size"				"30"
 	"default_clip"			"0"
 	
+	"reloadtime"			"1.33"
+	
 	
 	"bucket"				"3"
 	"bucket_position"		"0"

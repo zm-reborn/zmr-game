@@ -61,6 +61,11 @@ WeaponData
 	// -1 means no clip.
 	"clip_size"				"1337"
 	
+	// The time it takes to reload. Use -1 to use animation length.
+	// If the reload activity has AE_WPN_PRIMARYATTACK animation event and animation length is used,
+	// the animation event will be the reload time.
+	"reloadtime"			"-1"
+	
 	
 	// These should be self-evident.
 	"attackonladder"		"1"

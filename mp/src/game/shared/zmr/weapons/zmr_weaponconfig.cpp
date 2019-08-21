@@ -158,7 +158,7 @@ void CZMBaseWeaponConfig::LoadFromConfig( KeyValues* kv )
     CopyAllocString( kv->GetString( "primary_ammo" ), &pszAmmoName );
 
 
-
+    flReloadTime = kv->GetFloat( "reloadtime", -1.0f );
 
 
     nClipSize = kv->GetInt( "clip_size", WEAPON_NOCLIP );
@@ -259,6 +259,8 @@ KeyValues* CZMBaseWeaponConfig::ToKeyValues() const
 
     kv->SetString( "primary_ammo", pszAmmoName );
 
+
+    kv->SetFloat( "reloadtime", flReloadTime );
 
     kv->SetInt( "clip_size", nClipSize );
     kv->SetInt( "default_clip", nDefaultClip );
