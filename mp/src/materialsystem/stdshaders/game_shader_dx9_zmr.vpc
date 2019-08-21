@@ -5,7 +5,10 @@
 //-----------------------------------------------------------------------------
 
 $Macro SRCDIR		"..\.."
-$Macro GAMENAME "zombie_master_reborn"
+
+$Macro GAMENAME "zmr" [$ZMR_STEAM]
+$Macro GAMENAME "zombie_master_reborn" [!$ZMR_STEAM]
+
 $Include "$SRCDIR\materialsystem\stdshaders\game_shader_dx9_base.vpc"
 
 $Project "Shaders (ZMR)"
