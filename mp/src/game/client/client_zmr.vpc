@@ -26,7 +26,7 @@ $Project "Client (ZMR)"
 	{
 		$Lib		discord-rpc [$WIN32]
 		//$Lib		libdiscord-rpc [$LINUXALL]
-		$ImpLib		raytrace
+		$Lib		raytrace
 	}
 	
 	$Folder	"Source Files"
