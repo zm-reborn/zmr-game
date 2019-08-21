@@ -195,7 +195,7 @@ namespace ZMWeaponConfig
 
 
     //
-#define REGISTER_WEAPON_CONFIG(slot, configclass) static CZMWepConfigReg reg_##classname##( slot, []( const char* wepname, const char* configpath ) { return (CZMBaseWeaponConfig*)(new configclass( wepname, configpath )); } );
+#define REGISTER_WEAPON_CONFIG(slot, configclass) static ZMWeaponConfig::CZMWepConfigReg reg_##classname##( slot, []( const char* wepname, const char* configpath ) { return (ZMWeaponConfig::CZMBaseWeaponConfig*)(new configclass( wepname, configpath )); } );
     //
 
 
