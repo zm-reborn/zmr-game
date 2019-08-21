@@ -197,6 +197,7 @@ public:
     float                   GetMaxPenetrationDist() const;
     virtual Vector          GetBulletSpread() const;
     virtual float           GetFireRate() OVERRIDE;
+    virtual float           GetReloadTime() const;
     // How many bullets we fire per one "bullet", or clip "unit".
     virtual int             GetBulletsPerShot() const;
 

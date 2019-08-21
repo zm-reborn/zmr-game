@@ -123,6 +123,8 @@ namespace ZMWeaponConfig
 
         //
         int fFlags; // WeaponFlags_t
+
+        float flReloadTime;
         //
 
     

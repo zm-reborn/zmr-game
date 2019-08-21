@@ -446,17 +446,17 @@ bool CZMBaseWeapon::DefaultReload( int iClipSize1, int iClipSize2, int iActivity
 
     MDLCACHE_CRITICAL_SECTION();
 
-    float flSeqTime = SequenceDuration();
+    float flConfigReloadTime = GetReloadTime();
     //pOwner->SetNextAttack( flSequenceEndTime );
 
     float flReloadTime = GetFirstInstanceOfAnimEventTime( GetSequence(), (int)AE_WPN_INCREMENTAMMO );
     if ( flReloadTime == -1.0f )
-        flReloadTime = flSeqTime;
+        flReloadTime = flConfigReloadTime;
 
 
     float flReadyTime = GetFirstInstanceOfAnimEventTime( GetSequence(), (int)AE_WPN_PRIMARYATTACK );
     if ( flReadyTime == -1.0f )
-        flReadyTime = flSeqTime;
+        flReadyTime = flConfigReloadTime;
     
 
     m_flNextPrimaryAttack = m_flNextSecondaryAttack = gpGlobals->curtime + flReadyTime;
@@ -791,6 +791,19 @@ float CZMBaseWeapon::GetFireRate()
     }
 
     return flConfigFireRate;
+}
+
+float CZMBaseWeapon::GetReloadTime() const
+{
+    float flReloadTime = GetWeaponConfig()->flReloadTime;
+
+    // If the fire rate is not set, use sequence duration
+    if ( !CZMBaseWeaponConfig::IsValidFirerate( flReloadTime ) )
+    {
+        return const_cast<CZMBaseWeapon*>( this )->SequenceDuration();
+    }
+
+    return flReloadTime;
 }
 
 int CZMBaseWeapon::GetBulletsPerShot() const
