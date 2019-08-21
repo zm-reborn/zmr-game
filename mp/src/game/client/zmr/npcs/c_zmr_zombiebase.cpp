@@ -13,6 +13,7 @@
 #include "zmr/c_zmr_zmvision.h"
 #include "zmr/npcs/zmr_zombieanimstate.h"
 #include "zmr/npcs/zmr_zombiebase_shared.h"
+#include "c_zmr_zombiegib.h"
 #include "zmr/zmr_usercmd.h"
 
 
@@ -35,6 +36,8 @@ IMPLEMENT_CLIENTCLASS_DT( C_ZMBaseZombie, DT_ZM_BaseZombie, CZMBaseZombie )
     RecvPropInt( RECVINFO( m_iAnimationRandomSeed ) ),
     RecvPropInt( RECVINFO( m_lifeState ) ),
     RecvPropInt( RECVINFO( m_iPlayerControllerIndex ) ),
+
+    RecvPropInt( RECVINFO( m_iGibType ) ),
 END_RECV_TABLE()
 
 BEGIN_PREDICTION_DATA( C_ZMBaseZombie )
@@ -91,6 +94,9 @@ C_ZMBaseZombie::C_ZMBaseZombie()
     m_pHat = nullptr;
 
     m_iAdditionalAnimRandomSeed = 0;
+
+
+    m_bDidDeathEffect = false;
     
 
     // Always create FX.
@@ -601,11 +607,31 @@ CStudioHdr* C_ZMBaseZombie::OnNewModel()
 
 C_BaseAnimating* C_ZMBaseZombie::BecomeRagdollOnClient()
 {
-    C_BaseAnimating* pRagdoll = BaseClass::BecomeRagdollOnClient();
+    if ( m_bDidDeathEffect )
+        return nullptr;
+
+
+    m_bDidDeathEffect = true;
+
+
 
     ReleaseHat();
 
-    return pRagdoll;
+
+    if ( m_iGibType != ZMGIBTYPE_NONE )
+    {
+        AddEffects( EF_NODRAW );
+
+
+        C_ZMZombieGib::Create( this, ZMGIBTYPE_HEAD );
+    }
+    else
+    {
+        return BaseClass::BecomeRagdollOnClient();
+    }
+
+    
+    return nullptr;
 }
 
 void C_ZMBaseZombie::UpdateVisibility()

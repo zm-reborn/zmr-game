@@ -1,0 +1,5 @@
+LightmappedGeneric
+{
+	$basetexture	tools\toolsblock_los
+	$translucent	1
+}

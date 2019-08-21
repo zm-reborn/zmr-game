@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cbase.h"
+#include "precipitation_shared.h"
 
 #include "zmr/zmr_shareddefs.h"
 
@@ -89,4 +90,23 @@ protected:
 private:
     CNetworkVar( int, m_nCost );
     CNetworkVar( int, m_nTrapCost );
+};
+
+class C_ZMEntPrecipitation : public C_BaseEntity
+{
+public:
+    DECLARE_CLASS( C_ZMEntPrecipitation, C_BaseEntity );
+    DECLARE_CLIENTCLASS();
+
+    C_ZMEntPrecipitation();
+    ~C_ZMEntPrecipitation();
+
+    virtual void PostDataUpdate( DataUpdateType_t updateType ) OVERRIDE;
+
+    float GetDensity() const { return m_flDensity; }
+    PrecipitationType_t GetPrecipitationType() const { return m_nPrecipType; }
+
+protected:
+    PrecipitationType_t m_nPrecipType;
+    float m_flDensity;
 };

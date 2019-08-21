@@ -14,6 +14,7 @@ public:
 
     virtual void        Spawn() OVERRIDE;
     virtual void        Precache() OVERRIDE;
+    virtual void        OnEntityEvent( EntityEvent_t event, void* pEventData ) OVERRIDE;
 
     virtual bool        MyTouch( CBasePlayer* pPlayer ) OVERRIDE;
 
@@ -34,4 +35,6 @@ protected:
     CNetworkVar( int, m_iAmmoType );
     CNetworkVar( int, m_nAmmo );
     CNetworkVar( int, m_nMaxAmmo );
+
+    bool m_bInThrow;
 };

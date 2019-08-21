@@ -1,66 +1,88 @@
-// Pistol
-
 WeaponData
 {
+	"printname"				"Revolver"
+	
+	"viewmodel"				"models/weapons/c_revolver_zm.mdl"
+	"worldmodel"			"models/weapons/w_357.mdl"
+	
+	"anim_prefix"			"pistol"
+	
+	
+	"PrimaryAttack"
+	{
+		"firerate"			"1.1"
+		"damage"			"45"
+		"range"				"1500"
+		
+		// 10 degrees
+		"spread"			"10 10 0"
+		
+		"viewpunch_min"		"-8 -1 0"
+		"viewpunch_max"		"-8 1 0"
+	}
+	
+	"SecondaryAttack"
+	{
+		"firerate"			"0.3"
+		"damage"			"45"
+		"range"				"1500"
+		
+		// 20 degrees
+		"spread"			"20 20 20"
+		
+		"viewpunch_min"		"-8 -2 0"
+		"viewpunch_max"		"2 2 0"
+	}
+	
+	
+	"crosshair"				"Revolver"
+	
+	"accuracy_increase"		"2.9"
+	"accuracy_decrease"		"5.1"
+	
+	"penetration_max"		"1"
+	
+	
+	"primary_ammo"			"Revolver"
+	
+	
+	"clip_size"				"6"
+	"default_clip"			"0"
+	
+	
+	"bucket"				"1"
+	"bucket_position"		"0"
+	"importance"			"3"
+	
+	
+	"reloadonladder"		"0"
+	
 
-	// Weapon data is loaded by both the Game and Client DLLs.
-	"printname"	"Revolver"
-	"viewmodel"			"models/weapons/c_revolver_zm.mdl"
-	"usenewhands"		"1"
-	"playermodel"		"models/weapons/w_357.mdl" //FIXME: No world model yet!
-	"anim_prefix"		"pistol"
-	"bucket"			"1"
-	"bucket_position"	"0"
-
-	"clip_size"			"6"
-	"default_clip"		"0"
-	"primary_ammo"		"Revolver"
-	"secondary_ammo"	"None"
-
-	"weight"			"2"
-	"item_flags"			"0"
-	"damage"			"55"
-
-	// Sounds for the weapon. There is a max of 16 sounds per category (i.e. max 16 "single_shot" sounds)
 	SoundData
 	{
-		//"reload"		"Weapon_pistol_zm.Reload"
-		"reload_npc"	"Weapon_Revolver_ZM.Reload" // TODO: Fix these.
-		"empty"			"Weapon_pistol_zm.Empty"
-		"single_shot"	"Weapon_Revolver_ZM.Single"
+		//"reload"			"Weapon_pistol_zm.Reload"
+		"reload_npc"		"Weapon_Revolver_ZM.Reload" // TODO: Fix these.
+		"empty"				"Weapon_pistol_zm.Empty"
+		"single_shot"		"Weapon_Revolver_ZM.Single"
 		"single_shot_npc"	"Weapon_Revolver_ZM.Single"
 	}
 
-	// Weapon Sprite data is loaded by the Client DLL.
 	TextureData
 	{
 		"weapon"
 		{
-				"font"		"WeaponIcons"
-				"character"	"e"
+			"font"			"WeaponIcons"
+			"character"		"e"
 		}
 		"weapon_s"
 		{	
-				"font"		"WeaponIconsSelected"
-				"character"	"e"
+			"font"			"WeaponIconsSelected"
+			"character"		"e"
 		}
 		"ammo"
 		{
-				"font"		"WeaponIcons"
-				"character"	"q"
-		}
-		"crosshair"
-		{
-				"font"		"Crosshairs"
-				"character"	"Q"
-		}
-		"autoaim"
-		{
-				"file"		"sprites/crosshairs"
-				"x"			"0"
-				"y"			"48"
-				"width"		"24"
-				"height"	"24"
+			"font"			"WeaponIcons"
+			"character"		"q"
 		}
 	}
 }

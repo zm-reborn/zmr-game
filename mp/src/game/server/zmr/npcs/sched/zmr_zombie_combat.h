@@ -8,6 +8,9 @@
 #include "zmr_zombie_chase.h"
 
 
+ConVar zm_sv_zombie_threat_investigation_dist( "zm_sv_zombie_threat_investigation_maxdist", "700" );
+
+
 class CombatSchedule : public NPCR::CSchedule<CZMBaseZombie>
 {
 private:
@@ -15,6 +18,9 @@ private:
 
     Vector m_vecFaceTowards;
     CountdownTimer m_FaceTimer;
+    CountdownTimer m_NextThreat;
+
+
     CountdownTimer m_NextEnemyScan;
 
     // For checking a potential threat
@@ -51,6 +57,8 @@ public:
     virtual void OnContinue() OVERRIDE
     {
         m_FaceTimer.Invalidate();
+        m_NextThreat.Invalidate();
+
         m_NextEnemyScan.Invalidate();
 
         m_Path.Invalidate();
@@ -119,7 +127,7 @@ public:
 
             CBaseEntity* pEnemy = pClosest && pOuter->IsEnemy( pClosest ) ? pClosest : pOldEnemy;
 
-            if ( bCanMove && pEnemy && pOuter->ShouldChase( pEnemy ) != NPCR::RES_NO )
+            if ( pEnemy && pOuter->ShouldChase( pEnemy ) != NPCR::RES_NO )
             {
                 pOuter->AcquireEnemy( pEnemy );
 
@@ -176,7 +184,7 @@ public:
         auto* pOuter = GetOuter();
 
         // Try to look for any enemies we can hear.
-        if ( !pOuter->GetEnemy() && !m_FaceTimer.HasStarted() && pSound->IsSoundType( SOUND_COMBAT | SOUND_PLAYER ) )
+        if ( !pOuter->GetEnemy() && ShouldCareAboutThreat() && pSound->IsSoundType( SOUND_COMBAT | SOUND_PLAYER ) )
         {
             const Vector sndOrigin = pSound->GetSoundReactOrigin();
             
@@ -192,11 +200,37 @@ public:
             {
                 m_vecFaceTowards = sndOrigin;
                 m_FaceTimer.Start( 2.0f );
+                m_NextThreat.Start( 5.0f );
 
                 if ( IsDebugging() )
                     Msg( "Facing zombie %i towards sound.\n", pOuter->entindex() );
             }
         }
+    }
+
+    virtual void OnCommanded( ZombieCommandType_t com ) OVERRIDE
+    {
+        OnContinue();
+
+        // We were command to do something else,
+        // don't care about threats for a while.
+        m_NextThreat.Start( 3.0f );
+        // Definitely don't move for a while!
+        m_NextMove.Start( 6.0f );
+    }
+
+    virtual void OnQueuedCommand( CBasePlayer* pPlayer, ZombieCommandType_t com ) OVERRIDE
+    {
+        OnContinue();
+    }
+
+    bool ShouldCareAboutThreat() const
+    {
+        // We're currently trying to face towards something, not now!
+        if ( m_FaceTimer.HasStarted() && !m_FaceTimer.IsElapsed() )
+            return false;
+
+        return !m_NextThreat.HasStarted() || m_NextThreat.IsElapsed();
     }
 
     bool GotoThreatPosition( const Vector& vecEnd )
@@ -208,7 +242,25 @@ public:
         CZMBaseZombie* pOuter = GetOuter();
 
 
+        // Don't bother investigating if we're moving right now.
+        if ( pOuter->IsMoving() )
+            return false;
+
+
         const Vector vecStart = pOuter->GetAbsOrigin();
+
+
+        float flInvestigationDist = zm_sv_zombie_threat_investigation_dist.GetFloat();
+
+        if ( vecStart.DistTo( vecEnd ) > flInvestigationDist )
+        {
+            if ( IsDebugging() )
+                Msg( "Investigation sound origin for %i is too far away!\n", pOuter->entindex() );
+
+            return false;
+        }
+
+
 
         CNavArea* start = TheNavMesh->GetNearestNavArea( vecStart, true, 10000.0f, true );
         CNavArea* goal = TheNavMesh->GetNearestNavArea( vecEnd, true, 10000.0f, true );
@@ -230,6 +282,22 @@ public:
         }
 
 
+        float flPathLength = m_Path.ComputeLength();
+
+        if ( flPathLength > flInvestigationDist )
+        {
+            if ( IsDebugging() )
+                Msg( "Investigation path for %i is too long! (%.1f)\n", pOuter->entindex(), flPathLength );
+            
+            m_Path.Invalidate();
+
+            // Don't attempt this path again for a while, it sounds expensive.
+            m_NextMove.Start( 2.0f );
+
+            return false;
+        }
+
+
         pOuter->SetCurrentPath( &m_Path );
 
         // We don't need to get too close
@@ -245,6 +313,7 @@ public:
 
         // Don't recompute this path again for a while.
         m_NextMove.Start( 2.0f );
+        m_NextThreat.Start( 8.0f );
 
 
         return true;

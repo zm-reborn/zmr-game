@@ -907,12 +907,18 @@ void CHudWeaponSelection::DrawLargeWeaponBox( C_BaseCombatWeapon *pWeapon, bool 
 
 	// draw text
 	col = m_TextColor;
+#ifndef ZMR
 	const FileWeaponInfo_t &weaponInfo = pWeapon->GetWpnData();
+#endif
 
 	if ( bSelected )
 	{
 		wchar_t text[128];
+#ifdef ZMR
+        wchar_t *tempString = g_pVGuiLocalize->Find(pWeapon->GetPrintName());
+#else
 		wchar_t *tempString = g_pVGuiLocalize->Find(weaponInfo.szPrintName);
+#endif
 
 		// setup our localized string
 		if ( tempString )
@@ -927,7 +933,11 @@ void CHudWeaponSelection::DrawLargeWeaponBox( C_BaseCombatWeapon *pWeapon, bool 
 		else
 		{
 			// string wasn't found by g_pVGuiLocalize->Find()
+#ifdef ZMR
+            g_pVGuiLocalize->ConvertANSIToUnicode(pWeapon->GetPrintName(), text, sizeof(text));
+#else
 			g_pVGuiLocalize->ConvertANSIToUnicode(weaponInfo.szPrintName, text, sizeof(text));
+#endif
 		}
 
 		surface()->DrawSetTextColor( col );

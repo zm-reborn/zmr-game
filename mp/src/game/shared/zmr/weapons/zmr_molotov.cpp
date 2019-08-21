@@ -305,11 +305,7 @@ public:
 	DECLARE_ACTTABLE();
 
     CZMWeaponMolotov();
-
-
-#ifdef CLIENT_DLL
-    virtual CZMBaseCrosshair* GetWeaponCrosshair() const OVERRIDE { return ZMGetCrosshair( "Throwable" ); }
-#endif
+    ~CZMWeaponMolotov();
 
     CNetworkVar( int, m_iThrowState );
 
@@ -333,6 +329,7 @@ public:
     void PrimaryAttack() OVERRIDE;
     void Equip( CBaseCombatCharacter* pCharacter ) OVERRIDE;
     bool Deploy() OVERRIDE;
+    bool Holster( CBaseCombatWeapon* pSwitchTo = nullptr ) OVERRIDE;
     bool CanHolster() const OVERRIDE { return m_iThrowState < MOLOTOVSTATE_DRAWBACK && m_iThrowState >= MOLOTOVSTATE_IDLE; }
     bool CanBeDropped() const OVERRIDE { return CanHolster(); }
     
@@ -348,6 +345,12 @@ public:
 
     void Throw( CZMPlayer* pPlayer );
     void GetThrowPos( CZMPlayer* pPlayer, Vector& outpos );
+
+#ifdef CLIENT_DLL
+    HPARTICLEFFECT m_hClothFlameParticle;
+
+    void DestroyClothFlameParticle();
+#endif
 };
 
 IMPLEMENT_NETWORKCLASS_ALIASED( ZMWeaponMolotov, DT_ZM_WeaponMolotov )
@@ -393,13 +396,20 @@ IMPLEMENT_ACTTABLE( CZMWeaponMolotov );
 
 CZMWeaponMolotov::CZMWeaponMolotov()
 {
-    m_bFiresUnderwater = false;
-    
     SetSlotFlag( ZMWEAPONSLOT_EQUIPMENT );
+    SetConfigSlot( ZMWeaponConfig::ZMCONFIGSLOT_MOLOTOV );
 
 
 #ifdef CLIENT_DLL
     //m_bClothFlame = false;
+    m_hClothFlameParticle = nullptr;
+#endif
+}
+
+CZMWeaponMolotov::~CZMWeaponMolotov()
+{
+#ifdef CLIENT_DLL
+    DestroyClothFlameParticle();
 #endif
 }
 
@@ -412,6 +422,7 @@ void CZMWeaponMolotov::Precache()
 #endif
 
     PrecacheMaterial( MOLOTOV_FIRE_SPRITE );
+    PrecacheParticleSystem( "molotov_clothflame" );
 }
 
 bool CZMWeaponMolotov::Deploy()
@@ -433,6 +444,31 @@ bool CZMWeaponMolotov::Deploy()
 
     return ret;
 }
+
+bool CZMWeaponMolotov::Holster( CBaseCombatWeapon* pSwitchTo )
+{
+    bool ret = BaseClass::Holster( pSwitchTo );
+
+    if ( ret )
+    {
+#ifdef CLIENT_DLL
+        DestroyClothFlameParticle();
+#endif
+    }
+
+    return ret;
+}
+
+#ifdef CLIENT_DLL
+void CZMWeaponMolotov::DestroyClothFlameParticle()
+{
+    if ( m_hClothFlameParticle )
+    {
+        m_hClothFlameParticle->StopEmission();
+        m_hClothFlameParticle = nullptr;
+    }
+}
+#endif
 
 void CZMWeaponMolotov::Equip( CBaseCombatCharacter* pCharacter )
 {
@@ -639,7 +675,9 @@ void CZMWeaponMolotov::HandleAnimEvent( animevent_t* pEvent )
 
             if ( pVM )
             {
-                pVM->SetBodygroup( 1, 1 );
+                // Toggle lighter flame on/off.
+                int prevvalue = pVM->GetBodygroup( 1 );
+                pVM->SetBodygroup( 1, prevvalue != 1 ? 1 : 0 );
             }
         }
     }
@@ -666,6 +704,24 @@ bool CZMWeaponMolotov::OnFireEvent( C_BaseViewModel* pViewModel, const Vector& o
         HandleAnimEventThrow();
         return true;
     case AE_ZM_LIGHTERFLAME :
+        return true;
+    case AE_ZM_CLOTHFLAME :
+        // Toggle cloth flame.
+        if ( m_hClothFlameParticle )
+        {
+            DestroyClothFlameParticle();
+        }
+        else
+        {
+            auto* pPlayer = GetPlayerOwner();
+            CBaseViewModel* pVM = pPlayer ? pPlayer->GetViewModel() : nullptr;
+            if ( pVM )
+            {
+                 m_hClothFlameParticle = pVM->ParticleProp()->Create( "molotov_clothflame", ParticleAttachment_t::PATTACH_POINT_FOLLOW, "clothflame" );
+            }
+        }
+
+
         return true;
 	}
 

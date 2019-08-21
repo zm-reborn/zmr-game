@@ -49,13 +49,24 @@ public:
         pOuter->SetNextAttack( gpGlobals->curtime + wait );
         //pOuter->SetNextMove( gpGlobals->curtime + wait );
 
-        m_FinishTimer.Start( wait );
+        if ( !pOuter->SequenceLoops() )
+        {
+            // Make sure we finish.
+            m_FinishTimer.Start( wait );
+        }
+        else
+        {
+            // We loop, assume our class takes care of this one.
+            // But add a sanity check.
+            m_FinishTimer.Start( wait + 10.0f );
+        }
+
         m_vecLastFacing = pEnemy->WorldSpaceCenter();
     }
 
     virtual void OnUpdate() OVERRIDE
     {
-        if ( m_FinishTimer.IsElapsed() )
+        if ( m_FinishTimer.HasStarted() && m_FinishTimer.IsElapsed() )
         {
             End( "Successfully finished attacking!" );
             return;
@@ -74,6 +85,14 @@ public:
         m_vecLastFacing = face;
     }
 
+    //virtual void OnAnimActivityFinished( Activity completedActivity ) OVERRIDE
+    //{
+    //    auto* pOuter = GetOuter();
+    //    if ( completedActivity == ACT_MELEE_ATTACK1 && !pOuter->SequenceLoops() )
+    //    {
+    //    }
+    //}
+
     virtual void OnAnimActivityInterrupted( Activity newActivity ) OVERRIDE
     {
         if ( GetOuter()->GetActivity() != ACT_MELEE_ATTACK1 )
@@ -87,6 +106,11 @@ public:
     virtual NPCR::QueryResult_t IsBusy() const OVERRIDE
     {
         return NPCR::RES_YES;
+    }
+
+    virtual NPCR::QueryResult_t ShouldChase( CBaseEntity* pEnemy ) const OVERRIDE
+    {
+        return NPCR::RES_NO;
     }
 
     virtual void OnAttacked() OVERRIDE

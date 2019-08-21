@@ -2,6 +2,7 @@
 
 
 #include <vgui_controls/CheckButton.h>
+#include <vgui_controls/ComboBox.h>
 #include <vgui_controls/Slider.h>
 #include <vgui_controls/TextEntry.h>
 
@@ -30,4 +31,7 @@ private:
     vgui::CheckButton*  m_pCheck_SilhouetteVision;
     vgui::Slider*       m_pSlider_MaxRagdolls;
     vgui::TextEntry*    m_pTextEntry_MaxRagdolls;
+    vgui::ComboBox*     m_pRainBox;
+    vgui::ComboBox*     m_pExpFlashlightAmtBox;
+    vgui::CheckButton*  m_pCheck_CC;
 };

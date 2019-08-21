@@ -10,6 +10,9 @@
 #include "c_zmr_player.h"
 #include "c_zmr_crosshair.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 
 #define CROSSHAIRFILE_DEFAULT       "resource/zmcrosshairs_default.txt"
@@ -153,6 +156,14 @@ CZMBaseCrosshair* CZMCrosshairSystem::GetCrosshairByName( const char* name ) con
     int index = FindCrosshairByName( name );
 
     return ( index != -1 ) ? m_vCrosshairs[index] : nullptr;
+}
+
+CZMBaseCrosshair* CZMCrosshairSystem::GetCrosshairByIndex( int index ) const
+{
+    if ( index < 0 || index >= m_vCrosshairs.Count() )
+        return nullptr;
+
+    return m_vCrosshairs[index];
 }
 
 int CZMCrosshairSystem::FindCrosshairByName( const char* name ) const

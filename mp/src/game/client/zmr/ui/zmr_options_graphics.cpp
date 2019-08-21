@@ -10,6 +10,9 @@ extern ConVar zm_cl_glow_ammo_enabled;
 extern ConVar zm_cl_zmvision_dlight;
 extern ConVar zm_cl_silhouette_onlyzmvision;
 extern ConVar g_ragdoll_maxcount;
+extern ConVar zm_cl_precipitationquality;
+extern ConVar zm_cl_flashlight_expensive_max;
+extern ConVar zm_cl_colorcorrection_effects;
 
 
 CZMOptionsSubGraphics::CZMOptionsSubGraphics( Panel* parent ) : BaseClass( parent )
@@ -22,10 +25,27 @@ CZMOptionsSubGraphics::CZMOptionsSubGraphics( Panel* parent ) : BaseClass( paren
     LoadItem( &m_pCheck_SilhouetteVision, "CheckSilhouetteVision" );
     LoadItem( &m_pSlider_MaxRagdolls, "MaxRagdollsSlider" );
     LoadItem( &m_pTextEntry_MaxRagdolls, "MaxRagdollsEntry" );
+    LoadItem( &m_pRainBox, "ComboRain" );
+    LoadItem( &m_pExpFlashlightAmtBox, "ComboFlashlightAmount" );
+    LoadItem( &m_pCheck_CC, "CheckCC" );
 
 
     if ( FailedLoad() ) return;
 
+
+    auto* tempkv = new KeyValues( "temp" );
+
+    m_pRainBox->AddItem( L"None", tempkv ); // 0
+    m_pRainBox->AddItem( L"Low", tempkv ); // 1
+    //m_pRainBox->AddItem( L"Medium", tempkv ); // Skip medium for now
+    m_pRainBox->AddItem( L"High", tempkv ); // 3
+
+    m_pExpFlashlightAmtBox->AddItem( L"0", tempkv );
+    m_pExpFlashlightAmtBox->AddItem( L"1", tempkv );
+    m_pExpFlashlightAmtBox->AddItem( L"2", tempkv );
+    m_pExpFlashlightAmtBox->AddItem( L"3", tempkv );
+
+    tempkv->deleteThis();
 
     m_pSlider_MaxRagdolls->SetRange( 0, 100 );
     m_pSlider_MaxRagdolls->AddActionSignalTarget( this );
@@ -44,6 +64,23 @@ void CZMOptionsSubGraphics::OnApplyChanges()
     zm_cl_zmvision_dlight.SetValue( m_pCheck_VisionDynLight->IsSelected() ? 1 : 0 );
     zm_cl_silhouette_onlyzmvision.SetValue( m_pCheck_SilhouetteVision->IsSelected() ? 1 : 0 );
     g_ragdoll_maxcount.SetValue( m_pSlider_MaxRagdolls->GetValue() );
+    zm_cl_colorcorrection_effects.SetValue( m_pCheck_CC->IsSelected() ? 1 : 0 );
+
+
+    zm_cl_flashlight_expensive_max.SetValue( m_pExpFlashlightAmtBox->GetActiveItem() );
+
+    int rainval = m_pRainBox->GetActiveItem();
+    switch ( rainval )
+    {
+    case 0 :
+    case 1 : // None/Low
+        zm_cl_precipitationquality.SetValue( rainval );
+        break;
+    case 2 : // High
+    default :
+        zm_cl_precipitationquality.SetValue( 3 );
+        break;
+    }
 }
 
 void CZMOptionsSubGraphics::OnResetData()
@@ -56,6 +93,24 @@ void CZMOptionsSubGraphics::OnResetData()
     m_pCheck_VisionDynLight->SetSelected( zm_cl_zmvision_dlight.GetBool() );
     m_pCheck_SilhouetteVision->SetSelected( zm_cl_silhouette_onlyzmvision.GetBool() );
     m_pSlider_MaxRagdolls->SetValue( g_ragdoll_maxcount.GetInt() );
+    m_pCheck_CC->SetSelected( zm_cl_colorcorrection_effects.GetBool() );
+
+
+
+    m_pExpFlashlightAmtBox->ActivateItem( zm_cl_flashlight_expensive_max.GetInt() );
+    
+    int rainval = zm_cl_precipitationquality.GetInt();
+    switch ( rainval )
+    {
+    case 0 :
+    case 1 : // None/Low
+        m_pRainBox->ActivateItem( rainval );
+        break;
+    case 3 : // High
+    default :
+        m_pRainBox->ActivateItem( 2 );
+        break;
+    }
 
 
     char buffer[32];

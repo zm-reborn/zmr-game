@@ -101,8 +101,6 @@ private:
 
     bool        m_bHandledAnimEvent;
 
-    Activity    m_iLastLoopActivity; // For making sure we don't call OnActivityFinished multiple times.
-
 
 public:
     // Outputs

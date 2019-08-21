@@ -267,6 +267,9 @@ private:
     CNetworkVar( int, m_iAnimationRandomSeed );
     CNetworkVar( int, m_iPlayerControllerIndex );
 
+    // When we die these change.
+    CNetworkVar( int, m_iGibType );
+
 
 
     CHandle<CZMEntAmbushTrigger> m_hAmbushEnt;

@@ -5,6 +5,9 @@
 
 #include "zmr_framepanel.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 CZMFramePanel::CZMFramePanel( vgui::Panel* pParent, const char* szName ) : vgui::EditablePanel( pParent, szName )
 {

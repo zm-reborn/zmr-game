@@ -541,6 +541,18 @@ bool NPCR::CBaseNavPath::BuildGraphPath( const Vector& vecStart, const Vector& v
     return true;
 }
 
+float NPCR::CBaseNavPath::ComputeLength()
+{
+    float length = 0.0f;
+
+    for ( int i = 0; i < m_nLinkCount-1; i++ )
+    {
+        length += m_Links[i].length;
+    }
+
+    return length;
+}
+
 bool NPCR::CBaseNavPath::CheckSimpleLOS( const Vector& vecStart, const Vector& vecEnd, trace_t& tr ) const
 {
     CTraceFilterWorldOnly filter;

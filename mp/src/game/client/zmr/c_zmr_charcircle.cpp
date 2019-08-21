@@ -4,6 +4,9 @@
 
 #include "c_zmr_charcircle.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 void CZMCharCircle::Draw()
 {

@@ -1,0 +1,24 @@
+"ZMPlayer.PickupWeapon"
+{
+	"channel"		"CHAN_ITEM"
+	"volume"		"0.8"
+	"soundlevel"		"SNDLVL_75dB"
+	"pitch"		"95,105"
+	
+	"wave"		"items/weapon_pickup-1.wav"
+	"wave"		"items/weapon_pickup-2.wav"
+}
+
+"ZMPlayer.PickupAmmo"
+{
+	"channel"		"CHAN_ITEM"
+	"volume"		"0.8"
+	"soundlevel"		"SNDLVL_75dB"
+	"pitch"		"95,105"
+	
+	"rndwave"
+	{
+		"wave"		"items/ammo_pickup-1.wav"
+		"wave"		"items/ammo_pickup-2.wav"
+	}
+}

@@ -162,15 +162,16 @@ void CZMEntItemCrate::Spawn()
     AddEFlags( EFL_NO_ROTORWASH_PUSH );
 
 
-    //if ( GetModelPtr() )
-    //{
-        //int nItemSkin = TranslateItemClassToSkin();
+    // Set skin based on item we house.
+    if ( GetModelPtr() )
+    {
+        int iItemSkin = TranslateItemClassToSkin();
 
-        //if ( nItemSkin > 0 && nItemSkin < GetModelPtr()->numskinfamilies() )
-        //{
-        //    m_nSkin = nItemSkin;
-        //}
-    //}
+        if ( iItemSkin >= 0 && iItemSkin < GetModelPtr()->numskinfamilies() )
+        {
+            m_nSkin = iItemSkin;
+        }
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -258,62 +259,89 @@ void CZMEntItemCrate::OnPhysGunPickup( CBasePlayer* pPhysGunUser, PhysGunPickup_
 }
 
 // strncmp for ammo since some of them use *_large classnames.
-#define AMMO_EQU(str,classname)             ( Q_strncmp( str, classname, sizeof classname ) == 0 )
+#define AMMO_EQU(str,classname)             ( Q_strncmp( str, classname, sizeof( classname ) - 1 ) == 0 )
 
 // Strict compare for weapon classnames.
 #define WEAPON_EQU(str,classname)           ( Q_strcmp( str, classname ) == 0 )
 
+
+// Return -1 for invalid
 int CZMEntItemCrate::TranslateItemClassToSkin()
 {
-    // ZMRTODO: Implement me.
+    // ZMRTODO: Also check template ones.
     const char* c = STRING( m_iszItemClass );
 
-
-    if ( AMMO_EQU( c, "item_ammo_pistol" ) )
-    {
-        
-    }
-    if ( AMMO_EQU( c, "item_ammo_revolver" ) )
-    {
-        
-    }
-    if ( AMMO_EQU( c, "item_ammo_smg1" ) )
-    {
-        
-    }
-    if ( AMMO_EQU( c, "item_box_buckshot" ) )
-    {
-        
-    }
-    if ( AMMO_EQU( c, "item_ammo_357" ) )
-    {
-        
-    }
+    bool bIsWeapon = c[0] == 'w';
 
 
-    if ( WEAPON_EQU( c, "weapon_zm_pistol" ) )
+    if ( bIsWeapon )
     {
-        
+        // Skip weapon_zm_
+        int skip = sizeof( "weapon_zm_" ) - 1;
+
+        int len = Q_strlen( c );
+        if ( len <= skip )
+            return -1;
+
+        c += skip;
+
+
+        if ( WEAPON_EQU( c, "molotov" ) )
+        {
+            return 1;
+        }
+        if ( WEAPON_EQU( c, "sledge" ) )
+        {
+            return 2;
+        }
+        if ( WEAPON_EQU( c, "improvised" ) )
+        {
+            return 3;
+        }
+
+        if ( WEAPON_EQU( c, "pistol" ) )
+        {
+            return 9;
+        }
+        if ( WEAPON_EQU( c, "revolver" ) )
+        {
+            return 10;
+        }
+        if ( AMMO_EQU( c, "shotgun" ) ) // shotgun && shotgun_sporting
+        {
+            return 11;
+        }
+        if ( WEAPON_EQU( c, "rifle" ) )
+        {
+            return 12;
+        }
+        if ( WEAPON_EQU( c, "mac10" ) )
+        {
+            return 13;
+        }
     }
-    if ( WEAPON_EQU( c, "weapon_zm_revolver" ) )
+    else
     {
-        
-    }
-    if ( WEAPON_EQU( c, "weapon_zm_mac10" ) )
-    {
-        
-    }
-    if ( WEAPON_EQU( c, "weapon_zm_shotgun" ) )
-    {
-        
-    }
-    if ( WEAPON_EQU( c, "weapon_zm_rifle" ) )
-    {
-        
-    }
-    if ( WEAPON_EQU( c, "weapon_zm_molotov" ) )
-    {
-        
+        if ( AMMO_EQU( c, "item_ammo_pistol" ) )
+        {
+            return 4;
+        }
+        if ( AMMO_EQU( c, "item_ammo_revolver" ) )
+        {
+            return 5;
+        }
+        if ( AMMO_EQU( c, "item_box_buckshot" ) )
+        {
+            return 6;
+        }
+        if ( AMMO_EQU( c, "item_ammo_357" ) )
+        {
+            return 7;
+        }
+        if ( AMMO_EQU( c, "item_ammo_smg1" ) )
+        {
+            return 8;
+        }
     }
 
 

@@ -1,16 +1,6 @@
 "UnlitGeneric"
  {
-	"$baseTexture" "sprites/fire"
+	$basetexture models\weapons\molotov_zm\fire
 	$additive 1
-	"$model" 1
-
-	"Proxies" 
-	{ 
-		"AnimatedTexture" 
-		{ 
-			"animatedTextureVar" "$basetexture" 
-			"animatedTextureFrameNumVar" "$frame" 
-			"animatedTextureFrameRate" "12" 
-		}
-	} 
+	$model 1
 }

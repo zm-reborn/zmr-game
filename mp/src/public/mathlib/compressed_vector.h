@@ -134,7 +134,7 @@ inline Normal32::operator Vector ()
 
 	tmp.x = ((int)x - 16384) * (1 / 16384.0);
 	tmp.y = ((int)y - 16384) * (1 / 16384.0);
-	tmp.z = sqrt( 1 - tmp.x * tmp.x - tmp.y * tmp.y );
+	tmp.z = sqrtf( 1 - tmp.x * tmp.x - tmp.y * tmp.y );
 	if (zneg)
 		tmp.z = -tmp.z;
 	return tmp; 
@@ -219,7 +219,7 @@ inline Quaternion48::operator Quaternion ()
 	tmp.x = ((int)x - 32768) * (1 / 32768.0);
 	tmp.y = ((int)y - 32768) * (1 / 32768.0);
 	tmp.z = ((int)z - 16384) * (1 / 16384.0);
-	tmp.w = sqrt( 1 - tmp.x * tmp.x - tmp.y * tmp.y - tmp.z * tmp.z );
+	tmp.w = sqrtf( 1 - tmp.x * tmp.x - tmp.y * tmp.y - tmp.z * tmp.z );
 	if (wneg)
 		tmp.w = -tmp.w;
 	return tmp; 
@@ -266,7 +266,7 @@ inline Quaternion32::operator Quaternion ()
 	tmp.x = ((int)x - 1024) * (1 / 1024.0);
 	tmp.y = ((int)y - 512) * (1 / 512.0);
 	tmp.z = ((int)z - 512) * (1 / 512.0);
-	tmp.w = sqrt( 1 - tmp.x * tmp.x - tmp.y * tmp.y - tmp.z * tmp.z );
+	tmp.w = sqrtf( 1 - tmp.x * tmp.x - tmp.y * tmp.y - tmp.z * tmp.z );
 	if (wneg)
 		tmp.w = -tmp.w;
 	return tmp; 

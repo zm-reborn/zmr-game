@@ -29,7 +29,7 @@ CNPCRNonPlayer* NPCR::CNonPlayerMotor::GetOuter() const
 
 bool NPCR::CNonPlayerMotor::ShouldApplyGroundMove() const
 {
-    return GetGroundNormal().z > GetSlopeLimit();
+    return CanStandOnNormal( GetGroundNormal() );
 }
 
 void NPCR::CNonPlayerMotor::Approach( const Vector& vecDesiredGoal )
@@ -91,8 +91,8 @@ void NPCR::CNonPlayerMotor::Move()
         {
             // Woah, vector projection.
             Vector left( -veldir.y, veldir.x, 0.0f );
-            left.NormalizeInPlace();
             Vector movedir = CrossProduct( left, GetGroundNormal() );
+            movedir.NormalizeInPlace();
 
             m_vecVelocity = movedir * m_vecVelocity.Dot( movedir );
         }

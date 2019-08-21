@@ -81,9 +81,19 @@ public:
 
         pOuter->GetMotor()->FaceTowards( vecAimTarget );
 
-        if ( pOuter->GetMotor()->IsFacing( vecAimTarget, 1.0f ) )
+        if ( pOuter->GetMotor()->IsFacing( vecAimTarget, 1.0f ) && pOuter->GetSenses()->CanSee( vecAimTarget ) )
         {
             pOuter->PressFire1( 0.1f );
         }
+    }
+
+    virtual NPCR::QueryResult_t IsBusy() const OVERRIDE
+    {
+        return m_Path.IsValid() ? NPCR::RES_YES : NPCR::RES_NONE;
+    }
+
+    virtual NPCR::QueryResult_t ShouldChase( CBaseEntity* pEnemy ) const OVERRIDE
+    {
+        return IsDone() ? NPCR::RES_NONE : NPCR::RES_NO;
     }
 };

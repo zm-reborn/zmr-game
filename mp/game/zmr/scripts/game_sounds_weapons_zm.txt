@@ -446,3 +446,54 @@
 
 	"wave"			")weapons/revolver_zm/revolver_reload.wav"
 }
+
+"Weapon_OverUnder_ZM.Reload1"
+{
+	"channel"		"CHAN_ITEM"
+	"volume"		"0.7"
+	"soundlevel"	"SNDLVL_NORM"
+
+	"wave"			"weapons/pistol_zm/pistol_zm_reload1.wav"
+}
+
+"Weapon_OverUnder_ZM.Reload2"
+{
+	"channel"		"CHAN_ITEM"
+	"volume"		"0.7"
+	"soundlevel"	"SNDLVL_NORM"
+
+	"wave"			"weapons/pistol_zm/pistol_zm_reload3.wav"
+}
+
+"Weapon_OverUnder_ZM.Reload3"
+{
+	"channel"		"CHAN_ITEM"
+	"volume"		"0.7"
+	"soundlevel"	"SNDLVL_NORM"
+
+	"rndwave"
+	{
+		"wave"			"weapons/shotgun_zm/shotgun_reload1_zm.wav"
+		"wave"			"weapons/shotgun_zm/shotgun_reload2_zm.wav"
+		"wave"			"weapons/shotgun_zm/shotgun_reload3_zm.wav"
+	}
+}
+
+"Weapon_OverUnder_ZM.Single"
+{
+	"channel"		"CHAN_WEAPON"
+	"volume"		"1.0"
+	"soundlevel"	"SNDLVL_GUNFIRE"
+
+	"wave"			"^weapons/shotgun_zm/shotgun_fire7_zm_dist2.wav"
+}
+
+"Weapon_OverUnder_ZM.Double"
+{
+	"channel"		"CHAN_WEAPON"
+	"volume"		"1.0"
+	"soundlevel"	"SNDLVL_GUNFIRE" 
+	"pitch"			"90,95"
+
+	"wave"			"^weapons/shotgun_zm/shotgun_dbl_fire7_zm_dist.wav"
+}

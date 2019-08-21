@@ -11,6 +11,7 @@
 extern ConVar zm_sv_defense_chase_dist;
 extern ConVar zm_sv_defense_goal_tolerance;
 
+ConVar zm_sv_zombie_move_start_areafinddist( "zm_sv_zombie_move_start_areafinddist", "256" );
 
 
 class MoveSchedule : public NPCR::CSchedule<CZMBaseZombie>
@@ -59,6 +60,10 @@ public:
         CZMBaseZombie* pOuter = GetOuter();
 
             
+        //
+        // Update move path.
+        // Commanded move / etc.
+        //
         if ( m_pPath->IsValid() )
         {
             // See if we have anything blocking us.
@@ -89,6 +94,9 @@ public:
                 m_pPath->Update( pOuter );
             }
         }
+        //
+        // Update defensive mode
+        //
         else if ( pOuter->GetZombieMode() == ZOMBIEMODE_DEFEND )
         {
             const Vector defpos = GetGoalPos();
@@ -111,6 +119,10 @@ public:
         }
 
 
+        //
+        // Update our queued commands
+        // and pick the ones we will handle.
+        //
         CZMCommandBase* pQueued = pOuter->GetCommandQueue()->NextCommand();
         if ( pQueued )
         {
@@ -143,6 +155,11 @@ public:
         GetOuter()->LostEnemy();
     }
 
+    virtual void OnQueuedCommand( CBasePlayer* pPlayer, ZombieCommandType_t com ) OVERRIDE
+    {
+        m_pPath->Invalidate();
+    }
+
     virtual void OnChase( CBaseEntity* pEnt ) OVERRIDE
     {
         m_pPath->Invalidate();
@@ -163,6 +180,15 @@ public:
         return NPCR::RES_NONE;
     }
 
+    // Wait for us to finish before doing something else.
+    virtual NPCR::QueryResult_t IsBusy() const OVERRIDE
+    {
+        return m_pPath->IsValid() ? NPCR::RES_YES : NPCR::RES_NONE;
+    }
+
+    //
+    // Commanded to move somewhere.
+    //
     bool Command( const Vector& vecPos )
     {
         UpdateGoal( vecPos );
@@ -178,7 +204,10 @@ public:
         CNavArea* pStart = pOuter->GetLastKnownArea();
         if ( !pStart ) // We might not have a position yet if we just spawned.
         {
-            pStart = TheNavMesh->GetNearestNavArea( pOuter->GetPosition(), true, 128.0f, true );
+            float flStartFindDist = zm_sv_zombie_move_start_areafinddist.GetFloat();
+            flStartFindDist = fabs( flStartFindDist );
+
+            pStart = TheNavMesh->GetNearestNavArea( pOuter->GetPosition(), true, flStartFindDist, true );
         }
 
         CNavArea* pGoal = TheNavMesh->GetNearestNavArea( vecPos, true, 128.0f, true );
@@ -212,6 +241,9 @@ public:
         return true;
     }
 
+    //
+    // Commanded to swat some object.
+    //
     bool CommandSwat( CBaseEntity* pEnt, bool bBreak = true )
     {
         if ( !pEnt )

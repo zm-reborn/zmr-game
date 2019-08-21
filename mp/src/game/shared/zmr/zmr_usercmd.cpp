@@ -15,6 +15,9 @@
 #include "zmr/zmr_player.h"
 #endif
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 static ConVar zm_sv_clientsidehitdetection( "zm_sv_clientsidehitdetection", "1", FCVAR_NOTIFY | FCVAR_ARCHIVE | FCVAR_REPLICATED );
 

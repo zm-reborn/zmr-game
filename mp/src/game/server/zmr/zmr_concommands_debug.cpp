@@ -269,3 +269,24 @@ void ZM_PrintPriority( const CCommand &args )
 }
 
 static ConCommand zm_printpriority( "zm_printpriority", ZM_PrintPriority );
+
+/*
+    Gib all alive zombies.
+*/
+void ZM_GibZombies( const CCommand &args )
+{
+    if ( !UTIL_IsCommandIssuedByServerAdmin() )
+    {
+        return;
+    }
+    
+
+    g_ZombieManager.ForEachAliveZombie( []( CZMBaseZombie* pZombie )
+    {
+        CTakeDamageInfo info( pZombie, pZombie, 1337.0f, DMG_ALWAYSGIB );
+        pZombie->TakeDamage( info );
+    } );
+}
+
+static ConCommand zm_gibzombies( "zm_gibzombies", ZM_GibZombies );
+

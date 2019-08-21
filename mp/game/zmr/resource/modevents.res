@@ -58,6 +58,12 @@
 		"pos_z"	"float"
 	}
 	
+	// Tell clients to reload their weapon configs.
+	// Makes editing configs very easy.
+	"reload_weapon_config"
+	{
+	}
+	
 	
 
 	"player_death"				// a game event, name may be 32 charaters long

@@ -57,6 +57,10 @@ namespace NPCR
         virtual int GetSoundMask() const;
         virtual bool CanHearSound( CSound* pSound ) const;
 
+
+        virtual unsigned int GetVisionMask() const;
+        virtual bool CanSeeThrough( CBaseEntity* pEnt ) const;
+
         virtual float GetVisionDistance() const { return 4096.0f; }
         virtual float GetFieldOfView() const { return 180.0f; }
 

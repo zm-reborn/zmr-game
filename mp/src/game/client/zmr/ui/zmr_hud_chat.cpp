@@ -10,6 +10,8 @@
 #include "ihudlcd.h"
 
 #include "zmr_shareddefs.h"
+#include "zmr/c_zmr_importancesystem.h"
+
 #include "zmr_hud_chat.h"
 
 
@@ -100,6 +102,13 @@ Color CHudChat::GetClientColor( int clientIndex )
     }
     else if ( g_PR )
     {
+        // Not my fault.
+        if ( g_ZMImportanceSystem.GetPlayerImportance( clientIndex ) == ZMIMPORTANCE_DEV )
+        {
+            return Color( 0, 110, 252, 255 );
+        }
+
+
         switch ( g_PR->GetTeam( clientIndex ) )
         {
         case ZMTEAM_HUMAN :     return g_ColorRed;

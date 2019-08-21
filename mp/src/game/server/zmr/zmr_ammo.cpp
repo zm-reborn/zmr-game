@@ -26,6 +26,8 @@ CZMAmmo::CZMAmmo()
 {
     m_iAmmoType = -1;
     m_nAmmo = 0;
+
+    m_bInThrow = false;
 }
 
 void CZMAmmo::Spawn()
@@ -42,12 +44,16 @@ void CZMAmmo::SetNextPickupTouch( float delay )
 
     SetThink( &CZMAmmo::NoPickupThink );
     SetNextThink( gpGlobals->curtime + delay );
+
+    m_bInThrow = true;
 }
 
 void CZMAmmo::NoPickupThink()
 {
     SetThink( nullptr );
     SetTouch( &CItem::ItemTouch );
+
+    m_bInThrow = false;
 }
 
 void CZMAmmo::EmptyTouch( CBaseEntity* pOther )
@@ -60,6 +66,19 @@ void CZMAmmo::Precache()
 
 
     m_iAmmoType = GetAmmoDef()->Index( GetAmmoName() );
+}
+
+void CZMAmmo::OnEntityEvent( EntityEvent_t event, void* pEventData )
+{
+    // Ignore this event for CItem, as it fucks up our stuff, making ammo unpickable.
+    if ( m_bInThrow && event == ENTITY_EVENT_WATER_TOUCH )
+    {
+        CBaseAnimating::OnEntityEvent( event, pEventData );
+    }
+    else
+    {
+        BaseClass::OnEntityEvent( event, pEventData );
+    }
 }
 
 bool CZMAmmo::MyTouch( CBasePlayer* pPlayer )

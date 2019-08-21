@@ -1,69 +1,78 @@
-// Shotgun
-
 WeaponData
 {
-
-	// Weapon data is loaded by both the Game and Client DLLs.
-	"printname"	"Rifle"
+	"printname"				"Rifle"
+	
 	"viewmodel"				"models/weapons/c_rifle_zm.mdl"
-	"usenewhands"			"1"
-	"playermodel"			"models/weapons/rifle_zm_3rd.mdl"
+	"worldmodel"			"models/weapons/rifle_zm_3rd.mdl"
+	
 	"anim_prefix"			"rifle"
-	"bucket"				"3"
-	"bucket_position"		"0"
-
+	
+	
+	"PrimaryAttack"
+	{
+		"firerate"			"0.9"
+		"damage"			"50"
+		"range"				"2000"
+		
+		// 6 degrees
+		"spread"			"6 6 0"
+		
+		"viewpunch_min"		"-10 -2 0"
+		"viewpunch_max"		"-6 2 0"
+	}
+	
+	
+	"crosshair"				"Rifle"
+	
+	"accuracy_increase"		"6.7"
+	"accuracy_decrease"		"2.1"
+	
+	"penetration_max"		"4"	
+	
+	
+	"primary_ammo"			"357"
+	
+	
 	"clip_size"				"11"
 	"default_clip"			"0"
-	"primary_ammo"			"357"
-	"secondary_ammo"		"None"
+	
+	
+	"bucket"				"3"
+	"bucket_position"		"0"
+	"importance"			"4"
+	
+	
+	"reloadonladder"		"0"
+	
 
-	"weight"				"5"
-	"item_flags"			"0"
-	"damage"			"50"
-
-	// Sounds for the weapon. There is a max of 16 sounds per category (i.e. max 16 "single_shot" sounds)
 	SoundData
 	{
 
 		"empty"				"Weapon_Rifle_ZM.Empty"
-		"reload"			"Weapon_Rifle_ZM.Reload"
+		//"reload"			"Weapon_Rifle_ZM.Reload"
 		"special1"			"Weapon_Rifle_ZM.Special1"
 		"single_shot"		"Weapon_Rifle_ZM.Single"
 		// NPC WEAPON SOUNDS
-		"reload_npc"		"Weapon_Rifle_ZM.NPC_Reload"
-		"single_shot_npc"	"Weapon_Rifle_ZM.NPC_Single"
+		//"reload_npc"		"Weapon_Rifle_ZM.NPC_Reload"
+		//"single_shot_npc"	"Weapon_Rifle_ZM.NPC_Single"
 	}
 
-	// Weapon Sprite data is loaded by the Client DLL.
 	TextureData
 	{
 		"weapon"
 		{
-				"font"		"WeaponIcons"
-				"character"	"f"
+			"font"			"WeaponIcons"
+			"character"		"f"
 		}
 		"weapon_s"
 		{	
-				"font"		"WeaponIconsSelected"
-				"character"	"f"
+			"font"			"WeaponIconsSelected"
+			"character"		"f"
 		}
 		"ammo"
 		{
-				"font"		"WeaponIcons"
-				"character"	"q"
-		}
-		"crosshair"
-		{
-				"font"		"Crosshairs"
-				"character"	"Q"
-		}
-		"autoaim"
-		{
-				"file"		"sprites/crosshairs"
-				"x"			"0"
-				"y"			"48"
-				"width"		"24"
-				"height"	"24"
+			"font"			"WeaponIcons"
+			"character"		"q"
 		}
 	}
 }

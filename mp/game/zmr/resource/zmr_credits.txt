@@ -5,15 +5,17 @@ brendaym			- Viewmodel animations
 BurntCornFlakes	- MAC-10 model and textures, various model edits
 Mehis			- Code, various maps/textures/models
 Reborn			- Various sounds
-Sage J. Fox		- Various model edits
-The Renegadist		- Various textures
+Sage J. Fox		- Various models and model edits
+The Renegadist		- Various models/textures
 Yeckoh			- Various models, model edits
 ____________
 Contributors:
 
 Asg_alligator		- Model edits
+Biohazard			- Flashlight shader fix code
 Forrest Mark X		- Viewmodel c-arm edits
 Game Zombie		- Model edits
+Joshua Ashton		- VS2019 support edits
 KnechtRuprecht		- Winchester M1912 model and textures
 Marphy Black		- Zombie textures, model edits
 MaxOfS2D			- Viewmodel arms (c-arms, model and textures)
@@ -22,6 +24,7 @@ PazerOP			- Glow outline performance + feature fixes
 -Rusty-			- Zombie textures
 ryandmaclean		- VRAD optimization
 SAM61			- P220 model
+Sandern			- Material replacement system code
 Tony Sergi		- Multiplayer friendly animations code
 tgnottingham		- VBSP smoothing group fix
 wouterpleizier		- VBSP/VVIS/VRAD edits

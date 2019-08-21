@@ -33,6 +33,7 @@ CZMZombieAnimState::CZMZombieAnimState( CZMBaseZombie* pZombie )
     m_flLastSpdSqr = 0.0f;
     m_bReady = false;
     m_iMoveSeq = -1;
+    m_iMoveRandomSeed = 0;
 }
 
 CZMZombieAnimState::~CZMZombieAnimState()
@@ -44,7 +45,6 @@ int CZMZombieAnimState::AnimEventToActivity( ZMZombieAnimEvent_t iEvent, int nDa
 {
     switch ( iEvent )
     {
-    case ZOMBIEANIMEVENT_IDLE : return ACT_IDLE;
     case ZOMBIEANIMEVENT_ATTACK : return ACT_MELEE_ATTACK1;
     case ZOMBIEANIMEVENT_SWAT : return nData;
     case ZOMBIEANIMEVENT_BANSHEEANIM : return nData;
@@ -107,6 +107,10 @@ bool CZMZombieAnimState::HandleAnimEvent( ZMZombieAnimEvent_t iEvent, int nData 
 {
     switch ( iEvent )
     {
+    case ZOMBIEANIMEVENT_IDLE :
+        SetOuterActivity( ACT_IDLE );
+        m_iMoveRandomSeed = nData; // Use the data as seed in the future.
+        return true;
     // We're burning, change idle & moving activities.
     case ZOMBIEANIMEVENT_ON_BURN :
         if ( GetOuter()->HasActivity( ACT_IDLE_ON_FIRE ) )
@@ -285,6 +289,11 @@ Activity CZMZombieAnimState::GetOuterActivity() const
 bool CZMZombieAnimState::SetOuterActivity( Activity act ) const
 {
     return GetOuter()->SetActivity( act );
+}
+
+void CZMZombieAnimState::SetOuterCycle( float cycle ) const
+{
+    GetOuter()->SetCycle( cycle );
 }
 
 Vector CZMZombieAnimState::GetOuterVelocity() const
@@ -475,7 +484,7 @@ void CZMZombieAnimState::UpdateMovement()
     Activity iCurAct = GetOuterActivity();
 
     // If some other activity is currently playing, ignore us.
-    if ( iCurAct != m_actMove && iCurAct != m_actIdle )
+    if ( iCurAct != m_actMove && iCurAct != m_actIdle && iCurAct != ACT_INVALID )
     {
         // The activity was finished, idle.
         if ( pOuter->IsSequenceFinished() && !pOuter->SequenceLoops() )
@@ -571,6 +580,15 @@ void CZMZombieAnimState::UpdateMoveActivity()
 
     if ( !SetOuterActivity( m_actMove ) )
         return;
+
+
+    // Set a random cycle, so we don't look too synchronized
+    // with other zombies.
+    RandomSeed( m_iMoveRandomSeed );
+    float randomcycle = RandomFloat();
+
+    SetOuterCycle( randomcycle );
+
 
 
     m_iMoveSeq = pOuter->GetSequence();

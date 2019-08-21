@@ -1,29 +1,47 @@
-// Small Machine Gun 1
-
 WeaponData
 {
-	// Weapon data is loaded by both the Game and Client DLLs.
-	"printname"	"MAC 10"
+	"printname"				"MAC 10"
+	
 	"viewmodel"				"models/weapons/c_mac10_new.mdl"
-	"usenewhands"			"1"
-	"playermodel"			"models/weapons/smg_zm_3rd.mdl"
+	"worldmodel"			"models/weapons/smg_zm_3rd.mdl"
+	
 	"anim_prefix"			"smg2"
-	"bucket"				"3"
-	"bucket_position"		"0"
-
+	
+	
+	"PrimaryAttack"
+	{
+		"firerate"			"0.06"
+		"damage"			"17"
+		"range"				"1400"
+		
+		// 4 degrees
+		"spread"			"4 4 0"
+		
+		// Viewpunch stuff specific to Mac-10
+		"easy_dampen"		"0.5"
+		"max_vertical_kick"	"2.0"
+		"slide_limit"		"1.0"
+	}
+	
+	
+	"crosshair"				"Mac10"
+	
+	"primary_ammo"			"SMG1"
+	
 	"clip_size"				"30"
 	"default_clip"			"0"
-
-	"primary_ammo"			"SMG1"
-	"secondary_ammo"		"None"
-
-	"weight"				"3"
-	"item_flags"			"0"
-	// Was 17
-	// 28 to 2 hit headshot shamblers
-	"damage"			"17"
-
-	// Sounds for the weapon. There is a max of 16 sounds per category (i.e. max 16 "single_shot" sounds)
+	
+	"reloadtime"			"1.33"
+	
+	
+	"bucket"				"3"
+	"bucket_position"		"0"
+	"importance"			"4"
+	
+	
+	"reloadonladder"		"0"
+	
+	
 	SoundData
 	{
 		"reload_npc"		"Weapon_SMG_ZM.NPC_Reload"
@@ -34,7 +52,6 @@ WeaponData
 		"burst"				"Weapon_SMG_ZM.Burst"
 	}
 
-	// Weapon Sprite data is loaded by the Client DLL.
 	TextureData
 	{
 		"weapon"
@@ -51,24 +68,6 @@ WeaponData
 		{
 				"font"		"WeaponIcons"
 				"character"	"r"
-		}
-		"ammo2"
-		{
-				"font"		"WeaponIcons"
-				"character"	"t"
-		}
-		"crosshair"
-		{
-				"font"		"Crosshairs"
-				"character"	"Q"
-		}
-		"autoaim"
-		{
-				"file"		"sprites/crosshairs"
-				"x"			"0"
-				"y"			"48"
-				"width"		"24"
-				"height"	"24"
 		}
 	}
 }

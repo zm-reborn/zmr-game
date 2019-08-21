@@ -7,6 +7,69 @@
 @include "zmr_base_game.fgd"
 
 
+
+
+@BaseClass base(Targetname, Origin, Global, prop_static_base) = BaseVehicle
+[
+	vehiclescript(string) : "Vehicle Script File" : "scripts/vehicles/jeep_test.txt"
+	actionScale(float) : "Scale of action input / framerate" : "1"
+
+	// Inputs
+	input Action(float) : "Set the speed of the action animation"
+
+	input TurnOn(void) : "Turn on: Start engine & enable throttle"
+	input TurnOff(void) : "Turn off: Stop engine, disable throttle, engage brakes."
+
+	input Lock(void) : "Prevent the player from entering or exiting the vehicle."
+	input Unlock(void) : "Re-allow the player to enter or exit the vehicle."
+]
+
+
+@BaseClass base(BaseVehicle) = BaseDriveableVehicle
+[
+	VehicleLocked(choices) : "Start locked" : 0 =
+	[
+		0 : "No"
+		1 : "Yes"
+	]	
+
+	// Outputs
+	output PlayerOn(void) : "Player entered the vehicle"
+	output PlayerOff(void) : "Player exited the vehicle"
+	
+	output PressedAttack(void) : "Player Pressed attack key"
+	output PressedAttack2(void) : "Player Pressed attack2 key"
+
+	output AttackAxis(string) : "State of attack button [0,1]"
+	output Attack2Axis(string) : "State of attack2 button [0,1]"
+	
+	// Inputs
+	input HandBrakeOn(void) : "Turns the handbrake on"
+	input HandBrakeOff(void): "Releases the handbrake"
+]
+
+
+
+@PointClass base(BaseDriveableVehicle, Parentname) studioprop() = prop_vehicle_prisoner_pod :
+	"Combine prisoner pod that the player can ride in."
+[
+	model(studio) : "World model" : "models/vehicles/prisoner_pod.mdl"
+	vehiclescript(string) : "Vehicle Script File" : "scripts/vehicles/prisoner_pod.txt"
+	
+	input Open(void) : "Plays the pod's open animation and unlocks the pod for entry or exit."
+	input Close(void) : "Plays the pod's close animation and locks the pod for entry or exit."
+	input EnterVehicle(void) : "Forces the activator (or player) into the pod."
+	input EnterVehicleImmediate(void) : "Forces the activator (or player) into the pod without enter/exit animations."
+	input ExitVehicle(void) : "Boots the prisoner out of the pod."
+	
+	output OnOpen(void) : "Fired when the pod is open enough to enter."
+	output OnClose(void) : "Fired when the pod too closed to enter."
+]
+
+
+
+
+
 @SolidClass base(Trigger, Angles) = trigger_physics_trap :
 	"A volumetric trigger that disintegrates enemies"
 [

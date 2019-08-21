@@ -7,6 +7,9 @@
 
 #include "zmr_listpanel.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 using namespace vgui;
 
@@ -119,7 +122,10 @@ void CZMListRow::OnMousePressed( vgui::MouseCode code )
         kv = new KeyValues( "OnRowItemPressed" );
     }
 
+
+    kv->SetString( "pressed_name", GetSection()->GetColumnName( m_iLastHovered ) );
     kv->SetInt( "pressed_index", m_iLastHovered );
+
 
     Panel* pParent = GetSection()->GetParent()->GetParent();
     PostMessage( pParent, kv );

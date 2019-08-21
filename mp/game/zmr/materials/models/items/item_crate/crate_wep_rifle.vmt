@@ -1,0 +1,9 @@
+VertexLitGeneric
+{
+	$basetexture models\items\item_crate\crate_wep_rifle
+	
+	//$envmap			env_cubemap
+	//$envmapmask		models\items\item_crate\crate_specular
+	
+	$model 1
+}

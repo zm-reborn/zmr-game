@@ -20,6 +20,9 @@
 #include "zmr/c_zmr_player.h"
 #include "zmr_voicelines.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 // Similar to AngleNormalize
 float AngleNormalizeRadians( float angle )

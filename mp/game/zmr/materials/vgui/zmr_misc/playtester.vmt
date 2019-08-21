@@ -1,0 +1,6 @@
+UnlitGeneric
+{
+	$basetexture	vgui\zmr_misc\playtester
+	$ignorez	1
+	$translucent	1
+}

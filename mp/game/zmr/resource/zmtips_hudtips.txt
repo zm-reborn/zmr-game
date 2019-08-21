@@ -42,6 +42,177 @@
 		
 		"param1"		"key@zm_vision"
 	}
+	"tutorial1"
+	{
+		"msg"			"#ZMTutorial1"
+		"icon"			"zmr_effects/tt_icon_light"
+		"time"			"9"
+		"priority"		"1003"
+		"pulse"			"1"
+		"sound"			"1"
+	}
+	"tutorial1b"
+	{
+		"msg"			"#ZMTutorial1b"
+		"icon"			"zmr_effects/tt_icon_light"
+		"time"			"15"
+		"priority"		"1002"
+		"pulse"			"0"
+		"sound"			"1"
+	}
+	"tutorial2"
+	{
+		"msg"			"#ZMTutorial2"
+		"icon"			"zmr_effects/tt_icon_light"
+		"time"			"13"
+		"priority"		"1001"
+		"canbequeued"	"1"
+		"pulse"			"0"
+		"sound"			"1"
+		
+		"param1"		"key@+forward"
+		"param2"		"key@+moveleft"
+		"param3"		"key@+back"
+		"param4"		"key@+moveright"
+	}
+	"tutorial3"
+	{
+		"msg"			"#ZMTutorial3"
+		"icon"			"zmr_effects/tt_icon_light"
+		"time"			"9"
+		"priority"		"1000"
+		"canbequeued"	"1"
+		"pulse"			"0"
+		"sound"			"1"
+	}
+	"tutorial3b"
+	{
+		"msg"			"#ZMTutorial3b"
+		"icon"			"zmr_effects/tt_icon_light"
+		"time"			"8"
+		"priority"		"999"
+		"canbequeued"	"1"
+		"pulse"			"0"
+		"sound"			"1"
+	}
+	"tutorial4"
+	{
+		"msg"			"#ZMTutorial4"
+		"icon"			"zmr_effects/tt_icon_light"
+		"time"			"9999"
+		"priority"		"998"
+		"canbequeued"	"1"
+		"pulse"			"1"
+		"sound"			"1"
+	}
+	"tutorial4b"
+	{
+		"msg"			"#ZMTutorial4b"
+		"icon"			"zmr_effects/tt_icon_light"
+		"time"			"10"
+		"priority"		"1001"
+		"pulse"			"0"
+		"sound"			"1"
+	}
+	"tutorial5"
+	{
+		"msg"			"#ZMTutorial5"
+		"icon"			"zmr_effects/tt_icon_light"
+		"time"			"9999"
+		"priority"		"1000"
+		"canbequeued"	"1"
+		"pulse"			"1"
+		"sound"			"1"
+	}
+	"tutorial5b"
+	{
+		"msg"			"#ZMTutorial5b"
+		"icon"			"zmr_effects/tt_icon_light"
+		"time"			"10"
+		"priority"		"1001"
+		"pulse"			"0"
+		"sound"			"1"
+	}
+	"tutorial6"
+	{
+		"msg"			"#ZMTutorial6"
+		"icon"			"zmr_effects/tt_icon_light"
+		"time"			"9999"
+		"priority"		"1000"
+		"canbequeued"	"1"
+		"pulse"			"1"
+		"sound"			"1"
+	}
+	"tutorial7"
+	{
+		"msg"			"#ZMTutorial7"
+		"icon"			"zmr_effects/tt_icon_light"
+		"time"			"10"
+		"priority"		"1012"
+		"pulse"			"0"
+		"sound"			"1"
+	}
+	"tutorial8"
+	{
+		"msg"			"#ZMTutorial8"
+		"icon"			"zmr_effects/tt_icon_light"
+		"time"			"9999"
+		"priority"		"1011"
+		"canbequeued"	"1"
+		"pulse"			"1"
+		"sound"			"1"
+		
+		"param1"		"key@zm_cmd_delete"
+	}
+	"tutorial9"
+	{
+		"msg"			"#ZMTutorial9"
+		"icon"			"zmr_effects/tt_icon_light"
+		"time"			"8"
+		"priority"		"1013"
+		"pulse"			"0"
+		"sound"			"1"
+	}
+	"tutorial10"
+	{
+		"msg"			"#ZMTutorial10"
+		"icon"			"zmr_effects/tt_icon_light"
+		"time"			"4"
+		"priority"		"1014"
+		"pulse"			"1"
+		"sound"			"1"
+	}
+	"tutorial11"
+	{
+		"msg"			"#ZMTutorial11"
+		"icon"			"zmr_effects/tt_icon_light"
+		"time"			"7"
+		"priority"		"1013"
+		"canbequeued"	"1"
+		"pulse"			"0"
+		"sound"			"1"
+	}
+	"tutorial12"
+	{
+		"msg"			"#ZMTutorial12"
+		"icon"			"zmr_effects/tt_icon_light"
+		"time"			"9999"
+		"priority"		"1012"
+		"canbequeued"	"1"
+		"pulse"			"1"
+		"sound"			"1"
+		
+		"param1"		"key@+use"
+	}
+	"tutorial13"
+	{
+		"msg"			"#ZMTutorial13"
+		"icon"			"zmr_effects/tt_icon_light"
+		"time"			"6"
+		"priority"		"1013"
+		"pulse"			"0"
+		"sound"			"1"
+	}
 	"zmmenu_exp"
 	{
 		"msg"			"#ZMMenuZMExp"

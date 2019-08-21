@@ -1,0 +1,24 @@
+//-----------------------------------------------------------------------------
+//	game_shader_dx9.vpc
+//
+//	Project Script for mods to use an an example of how to override shaders
+//-----------------------------------------------------------------------------
+
+$Macro SRCDIR		"..\.."
+$Macro GAMENAME "zombie_master_reborn"
+$Include "$SRCDIR\materialsystem\stdshaders\game_shader_dx9_base.vpc"
+
+$Project "Shaders (ZMR)"
+{
+	$Folder	"Source Files"
+	{
+		$Folder	"ZMR"
+		{
+			$File	"zmr/zmr_test.cpp"
+		}
+		
+		$File	"lightmappedgeneric_dx9.cpp"
+		$File	"lightmappedgeneric_dx9_helper.cpp"
+		$File	"lightmappedgeneric_dx9_helper.h"
+	}
+}

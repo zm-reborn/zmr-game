@@ -9,6 +9,9 @@
 #include "zmr/c_zmr_clientmode.h"
 #include "zmr_buildmenu_base.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 CZMBuildMenuBase::CZMBuildMenuBase( vgui::Panel* pParent, const char* name ) : BaseClass( pParent, name )
 {
@@ -125,7 +128,7 @@ void __MsgFunc_ZMBuildMenuUpdate( bf_read &msg )
 
 
 
-	bool force_open = msg.ReadOneBit() == 1;
+	bool active = msg.ReadOneBit() == 1;
 
 
     int count = msg.ReadByte();
@@ -145,10 +148,11 @@ void __MsgFunc_ZMBuildMenuUpdate( bf_read &msg )
 		pQueue[i].nCount = msg.ReadByte();
 	}
 
-	if ( force_open )
+
+    // No longer active, so close us.
+	if ( !active )
 	{
-		// If we weren't visible, this is also an opening message
-		gViewPortInterface->ShowPanel( pMenu, true );
+        pMenu->Close();
 	}
 
 

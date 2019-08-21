@@ -244,6 +244,11 @@ public:
         return m_bInLeap ? NPCR::RES_YES : NPCR::RES_NONE;
     }
 
+    virtual NPCR::QueryResult_t ShouldChase( CBaseEntity* pEnemy ) const OVERRIDE
+    {
+        return NPCR::RES_NO;
+    }
+
     bool IsCeilingFlat( const Vector& plane )
     {
         const Vector flat = Vector( 0.0f, 0.0f, -1.0f );

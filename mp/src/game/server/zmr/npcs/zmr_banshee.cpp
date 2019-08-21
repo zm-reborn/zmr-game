@@ -23,6 +23,8 @@ ConVar zm_sv_banshee_leapdist_max( "zm_sv_banshee_leapdist_max", "300", FCVAR_NO
 ConVar zm_sv_banshee_ceilambush_detectrange( "zm_sv_banshee_ceilambush_detectrange", "256", FCVAR_NOTIFY, "", true, 0.0f, false, 0.0f );
 ConVar zm_sv_banshee_ceilambush_maxheight( "zm_sv_banshee_ceilambush_maxheight", "375", FCVAR_NOTIFY, "", true, 0.0f, false, 0.0f );
 
+extern ConVar zm_sk_banshee_melee_continuous_limit;
+
 
 LINK_ENTITY_TO_CLASS( npc_fastzombie, CZMBanshee );
 PRECACHE_REGISTER( npc_fastzombie );
@@ -79,6 +81,7 @@ CZMBanshee::CZMBanshee()
 
 
     m_flNextLeapAttack = 0.0f;
+    m_nMeleeAttacks = 0;
 
 
     m_pLeapSched = new BansheeLeapSched;
@@ -131,6 +134,11 @@ void CZMBanshee::Spawn()
     BaseClass::Spawn();
 }
 
+CZMBansheeMotor* CZMBanshee::GetBansheeMotor() const
+{
+    return static_cast<CZMBansheeMotor*>( GetMotor() );
+}
+
 NPCR::CPathCostGroundOnly* CZMBanshee::GetPathCost() const
 {
     static NPCR::CPathCostGroundOnly* cost = nullptr;
@@ -157,6 +165,14 @@ void CZMBanshee::OnNavJump()
     //SetActivity( ACT_JUMP );
 
     BaseClass::OnNavJump();
+}
+
+NPCR::QueryResult_t CZMBanshee::ShouldChase( CBaseEntity* pEnemy ) const
+{
+    if ( GetBansheeMotor()->IsInNavJump() )
+        return NPCR::RES_NO;
+
+    return BaseClass::ShouldChase( pEnemy );
 }
 
 bool CZMBanshee::IsAttacking() const
@@ -336,7 +352,15 @@ void CZMBanshee::OnAnimActivityFinished( Activity completedActivity )
     if ( completedActivity == ACT_MELEE_ATTACK1 )
     {
         bool bCanAttack = GetEnemy() && HasConditionsForClawAttack( GetEnemy() );
-        if ( !bCanAttack )
+        
+        int attacklimit = zm_sk_banshee_melee_continuous_limit.GetInt();
+        //
+        // If we loop, we're the "fast" attack
+        // for this attack, limit how many times we can attack.
+        //
+        // Otherwise, just let us through.
+        //
+        if ( !SequenceLoops() || !bCanAttack || ++m_nMeleeAttacks >= attacklimit )
         {
             DoAnimationEvent( ZOMBIEANIMEVENT_BANSHEEANIM, ACT_FASTZOMBIE_FRENZY );
 
@@ -346,8 +370,9 @@ void CZMBanshee::OnAnimActivityFinished( Activity completedActivity )
 
 
             EmitSound( "NPC_FastZombie.Frenzy" );
-        }
 
+            m_nMeleeAttacks = 0;
+        }
     }
     else if ( completedActivity == ACT_FASTZOMBIE_FRENZY )
     {
