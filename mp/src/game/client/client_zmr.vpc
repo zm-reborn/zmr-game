@@ -180,6 +180,10 @@ $Project "Client (ZMR)"
 		}
 		$Folder "ZMR"
 		{
+			$Folder "Game Shader"
+			{
+				$File	"replmats.cpp"
+			}
 			$Folder "GlowStencil"
 			{
 				$File	"glowstencil\c_glowbase.cpp"
