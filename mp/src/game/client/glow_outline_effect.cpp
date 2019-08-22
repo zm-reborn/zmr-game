@@ -29,7 +29,8 @@
 // If you've fixed IMatRenderContext::CopyTextureToRenderTargetEx
 // (see CGlowObjectManager::RenderGlowModels below), then you can enable this and have
 // code that's a bit cleaner. Also, then you won't have to ship debug/debugfbtexture1.
-#define FIXED_COPY_TEXTURE_TO_RENDER_TARGET 0
+// ZMRCHANGE: I'm changing this because it was causing the world to suddenly become lighter due to the shader replacements.
+#define FIXED_COPY_TEXTURE_TO_RENDER_TARGET 1
 
 ConVar glow_outline_effect_enable( "glow_outline_effect_enable", "1", FCVAR_ARCHIVE, "Enable entity outline glow effects." );
 
