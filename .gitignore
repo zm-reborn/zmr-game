@@ -74,6 +74,7 @@ server_blacklist.txt
 *.prt
 *.vmx
 *.mdmp
+mp/game/zombie_master_reborn/
 mp/game/zmr/custom/*
 !mp/game/zmr/custom/readme.txt
 mp/game/zmr/download/*
