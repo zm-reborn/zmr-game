@@ -572,6 +572,8 @@ void CZMClientScoreBoardDialog::GetPlayerScoreInfo( int playerIndex, KeyValues* 
     }
 
     kv->SetInt( "importance", iImage );
+
+    kv->SetString( "importance_tooltip", g_ZMImportanceSystem.GetPlayerImportanceName( playerIndex ) );
 }
 
 void CZMClientScoreBoardDialog::UpdatePlayerAvatar( int playerIndex, KeyValues* kv )

@@ -4,6 +4,7 @@
 #include <vgui_controls/Label.h>
 #include <vgui_controls/SectionedListPanel.h>
 #include <vgui_controls/ImageList.h>
+#include <vgui_controls/Tooltip.h>
 
 #include "zmr_listpanel.h"
 
@@ -222,10 +223,14 @@ void CZMListRow::ColumnDataLabel( int column, Label* pLabel )
     pLabel->SetFgColor( clr );
 
 
+    char temp[64];
+
     TextImage* pTextImage = nullptr;
     IImage* pImage = pLabel->GetImageAtIndex( 0 );
 
     const bool bIsImg = ( GetSection()->GetColumnFlags( column ) & COLUMN_IMG ) != 0;
+
+    const bool bHasTooltip = ( GetSection()->GetColumnFlags( column ) & COLUMN_TOOLTIP ) != 0;
         
     const char* colName = GetSection()->GetColumnName( column );
 
@@ -266,6 +271,23 @@ void CZMListRow::ColumnDataLabel( int column, Label* pLabel )
         pImage = pTextImage;
     }
 
+    if ( bHasTooltip )
+    {
+        Q_snprintf( temp, sizeof( temp ), "%s_tooltip", colName );
+
+        const char* tip = m_pKvData->GetString( temp, nullptr );
+
+        if ( tip && *tip )
+        {
+            pLabel->GetTooltip()->SetText( tip );
+            pLabel->SetMouseInputEnabled( true );
+        }
+        else
+        {
+            pLabel->SetMouseInputEnabled( false );
+            //pLabel->SetTooltip( nullptr, nullptr );
+        }
+    }
 
     pLabel->SetImageAtIndex( 0, pImage, 0 );
 }
@@ -706,6 +728,7 @@ void CZMListPanel::ApplySettings( KeyValues* inKv )
             flags |= ( col->GetInt( "is_image" ) ? COLUMN_IMG : 0 );
             flags |=  ( col->GetInt( "stretch_right" ) ? COLUMN_STRETCH_RIGHT : 0 );
             flags |= ( col->GetInt( "clickable" ) ? COLUMN_CLICKABLE : 0 );
+            flags |= ( col->GetInt( "is_tooltip" ) ? COLUMN_TOOLTIP : 0 );
 
             AddColumn(
                 iSection,

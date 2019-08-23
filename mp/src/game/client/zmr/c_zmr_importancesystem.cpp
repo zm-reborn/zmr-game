@@ -159,6 +159,16 @@ vgui::IImage* C_ZMImportanceSystem::GetPlayerImportanceImageIndex( int playerInd
     return ImportanceToImage( m_Importance[playerIndex].importance );
 }
 
+const char* C_ZMImportanceSystem::GetPlayerImportanceName( int playerIndex )
+{
+    if ( !IsCached( playerIndex ) )
+    {
+        ComputePlayerImportance( playerIndex );
+    }
+
+    return ImportanceToName( m_Importance[playerIndex].importance );
+}
+
 ZMImportance_t C_ZMImportanceSystem::GetPlayerImportance( int playerIndex )
 {
     if ( !IsCached( playerIndex ) )
@@ -190,6 +200,17 @@ vgui::IImage* C_ZMImportanceSystem::ImportanceToImage( ZMImportance_t index )
     case ZMIMPORTANCE_TRUSTED : return m_pImageTrusted;
     case ZMIMPORTANCE_PLAYTESTER : return m_pImagePlaytester;
     default : return nullptr;
+    }
+}
+
+const char* C_ZMImportanceSystem::ImportanceToName( ZMImportance_t index )
+{
+    switch ( index )
+    {
+    case ZMIMPORTANCE_DEV : return "Developer";
+    case ZMIMPORTANCE_TRUSTED : return "Trusted";
+    case ZMIMPORTANCE_PLAYTESTER : return "Playtester";
+    default : return "";
     }
 }
 

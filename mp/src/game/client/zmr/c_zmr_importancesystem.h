@@ -45,6 +45,7 @@ public:
     void Reset();
 
     vgui::IImage* GetPlayerImportanceImageIndex( int playerIndex );
+    const char* GetPlayerImportanceName( int playerIndex );
     ZMImportance_t GetPlayerImportance( int playerIndex );
 
     bool IsCached( int playerIndex );
@@ -56,6 +57,7 @@ protected:
 
     bool ComputePlayerImportance( int playerIndex );
     vgui::IImage* ImportanceToImage( ZMImportance_t index );
+    static const char* ImportanceToName( ZMImportance_t index );
     ZMImportance_t ImportanceNameToIndex( const char* name );
 
 private:
