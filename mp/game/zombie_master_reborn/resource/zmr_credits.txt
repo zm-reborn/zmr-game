@@ -6,8 +6,9 @@ BurntCornFlakes	- MAC-10 model and textures, various model edits
 Mehis			- Code, various maps/textures/models
 Reborn			- Various sounds
 Sage J. Fox		- Various models and model edits
-The Renegadist		- Various models/textures
-Yeckoh			- Various models, model edits
+That 1 Guy		- Various weapon sounds
+The Renegadist		- Various models/textures/sounds
+Yeckoh			- Various viewmodels/worldmodels and model edits
 ____________
 Contributors:
 
@@ -16,6 +17,7 @@ Biohazard			- Flashlight shader fix code
 Forrest Mark X		- Viewmodel c-arm edits
 Game Zombie		- Model edits
 Joshua Ashton		- VS2019 support edits
+Keyb0ard			- Footstep sounds
 KnechtRuprecht		- Winchester M1912 model and textures
 Marphy Black		- Zombie textures, model edits
 MaxOfS2D			- Viewmodel arms (c-arms, model and textures)
