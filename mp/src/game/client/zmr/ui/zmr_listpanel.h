@@ -20,7 +20,10 @@ enum
     // Stretch this column to the first column aligned to the right.
     COLUMN_STRETCH_RIGHT = ( 1 << 4 ),
 
-    COLUMN_CLICKABLE = ( 1 << 5 )
+    COLUMN_CLICKABLE = ( 1 << 5 ),
+
+    // Has a tooltip.
+    COLUMN_TOOLTIP = ( 1 << 6 ),
 };
 
 // Fixes a small stupid leak.
