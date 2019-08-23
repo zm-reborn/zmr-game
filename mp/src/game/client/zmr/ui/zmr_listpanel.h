@@ -48,33 +48,33 @@ public:
     virtual void PerformLayout() OVERRIDE;
 
 
-    int         GetItemId() { return m_iItemId; };
+    int         GetItemId() const { return m_iItemId; };
 
-    int         GetItemHeight() { return m_nItemHeight; };
+    int         GetItemHeight() const { return m_nItemHeight; };
     void        SetItemHeight( int h );
 
-    int         GetItemBottomMargin() { return m_nItemBottomMargin; };
+    int         GetItemBottomMargin() const { return m_nItemBottomMargin; };
     void        SetItemBottomMargin( int margin );
 
-    vgui::HFont GetItemFont() { return m_hItemFont; };
+    vgui::HFont GetItemFont() const { return m_hItemFont; };
     // Set to 0 to ignore this. Use section's default font by default.
     void        SetItemFont( vgui::HFont font );
 
-    int         GetItemWidth() { return m_nItemWidth; };
+    int         GetItemWidth() const { return m_nItemWidth; };
     // Set to -1 to ignore this. Uses column width by default.
     void        SetItemWidth( int w );
 
-    Color       GetItemColor() { return m_ItemColor; };
+    Color       GetItemColor() const { return m_ItemColor; };
     void        SetItemColor( Color clr );
 
     //void        SetItemBgColor( Color clr );
 
-    int         GetItemColumnCount();
+    int         GetItemColumnCount() const;
 
-    KeyValues*  GetData() { return m_pKvData; };
+    KeyValues*  GetData() const { return m_pKvData; };
     void        SetData( KeyValues* kv );
 
-    CZMListSection* GetSection() { return m_pParentSection; };
+    CZMListSection* GetSection() const { return m_pParentSection; };
     void            SetSection( CZMListSection* pSection ) { m_pParentSection = pSection; };
 
 protected:
@@ -125,36 +125,36 @@ public:
     // Frees row.
     void        RemoveItem( int index );
 
-    int         GetNumItems() { return m_vItems.Count(); };
-    CZMListRow* GetItem( int index ) { return m_vItems[index]; };
+    int         GetNumItems() const { return m_vItems.Count(); };
+    CZMListRow* GetItem( int index ) const { return m_vItems[index]; };
 
-    const char* GetColumnName( int col );
-    int         GetColumnWidth( int col );
-    int         GetColumnFlags( int col );
-    int         GetColumnOffset( int col );
-    int         GetNumColumns() { return m_vColumns.Count(); };
+    const char* GetColumnName( int col ) const;
+    int         GetColumnWidth( int col ) const;
+    int         GetColumnFlags( int col ) const;
+    int         GetColumnOffset( int col ) const;
+    int         GetNumColumns() const { return m_vColumns.Count(); };
 
     int             AddItem( int itemId, KeyValues* kv );
     int             AddItem( CZMListRow* pRow );
 
 
-    int     GetDefaultItemHeight() { return m_nDefaultItemHeight; };
+    int     GetDefaultItemHeight() const { return m_nDefaultItemHeight; };
     void    SetDefaultItemHeight( int h );
 
     void    SetSortingFunc( ZMSectionSortFunc_t func ) { m_pSortFunc = func; };
 
-    int     GetBottomMargin() { return m_nBottomMargin; };
+    int     GetBottomMargin() const { return m_nBottomMargin; };
     void    SetBottomMargin( int margin );
-    int     GetTopMargin() { return m_nTopMargin; };
+    int     GetTopMargin() const { return m_nTopMargin; };
     void    SetTopMargin( int margin );
 
-    vgui::HFont GetDefaultFont() { return m_hDefaultFont; };
+    vgui::HFont GetDefaultFont() const { return m_hDefaultFont; };
     void        SetDefaultFont( vgui::HFont font );
 
-    CZMListPanel*   GetListPanel() { return m_pListPanel; };
+    CZMListPanel*   GetListPanel() const { return m_pListPanel; };
 
-    int     FindItemByKey( int iSymbolIndex, int iKeyData );
-    int     FindItemById( int itemId );
+    int     FindItemByKey( int iSymbolIndex, int iKeyData ) const;
+    int     FindItemById( int itemId ) const;
 
     class CZMListColumn
     {
@@ -203,7 +203,7 @@ public:
 
     int     AddSection( const char* name, vgui::HFont defaultfont = NULL, int nDefItemHeight = 0 );
 
-    int     GetSectionByName( const char* name );
+    int     GetSectionByName( const char* name ) const;
     void    ClearRows( int section );
 
     void    SetSectionSortingFunc( int section, ZMSectionSortFunc_t func );
@@ -225,9 +225,9 @@ public:
     void    RemoveItemById( int itemId );
 
     int                 AddImage( vgui::IImage* pImage );
-    CZMImageList*       GetImageList() { return m_pImageList; };
+    CZMImageList*       GetImageList() const { return m_pImageList; };
 
-    int     FindItemByKey( int iSymbolIndex, int iKeyData );
+    int     FindItemByKey( int iSymbolIndex, int iKeyData ) const;
 
 protected:
     CUtlVector<CZMListSection*>     m_vSections;

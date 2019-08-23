@@ -192,7 +192,7 @@ void C_ZMImportanceSystem::Reset()
     }
 }
 
-vgui::IImage* C_ZMImportanceSystem::ImportanceToImage( ZMImportance_t index )
+vgui::IImage* C_ZMImportanceSystem::ImportanceToImage( ZMImportance_t index ) const
 {
     switch ( index )
     {
