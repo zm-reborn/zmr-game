@@ -199,6 +199,7 @@ void CZMBaseWeaponConfig::LoadFromConfig( KeyValues* kv )
     {
         CopyAllocString( snddata->GetString( "empty" ), &pszSounds[WeaponSound_t::EMPTY] );
         CopyAllocString( snddata->GetString( "single_shot" ), &pszSounds[WeaponSound_t::SINGLE] );
+        CopyAllocString( snddata->GetString( "double_shot" ), &pszSounds[WeaponSound_t::WPN_DOUBLE] );
         CopyAllocString( snddata->GetString( "reload" ), &pszSounds[WeaponSound_t::RELOAD] );
         CopyAllocString( snddata->GetString( "melee_hit" ), &pszSounds[WeaponSound_t::MELEE_HIT] );
         CopyAllocString( snddata->GetString( "deploy" ), &pszSounds[WeaponSound_t::DEPLOY] );
