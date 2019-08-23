@@ -320,7 +320,7 @@
 		{
 			"discord"
 			{
-				"url"		"https://discord.gg/zS8qHN9"
+				"url"		"https://discord.gg/tZTUex3"
 				"icon"		"zmr_mainmenu/icon_discord"
 			}
 			"steam"
