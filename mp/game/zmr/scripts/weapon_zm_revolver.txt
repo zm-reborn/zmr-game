@@ -60,11 +60,8 @@ WeaponData
 
 	SoundData
 	{
-		//"reload"			"Weapon_pistol_zm.Reload"
-		"reload_npc"		"Weapon_Revolver_ZM.Reload" // TODO: Fix these.
 		"empty"				"Weapon_pistol_zm.Empty"
 		"single_shot"		"Weapon_Revolver_ZM.Single"
-		"single_shot_npc"	"Weapon_Revolver_ZM.Single"
 	}
 
 	TextureData

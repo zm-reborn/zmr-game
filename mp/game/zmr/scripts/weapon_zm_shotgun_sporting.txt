@@ -27,7 +27,7 @@ WeaponData
 		"firerate"			"0.45"
 		"damage"			"6"
 		"range"				"500"
-		"bulletspershot"	"14"
+		"bulletspershot"	"7"
 		
 		// 15 degrees
 		"spread"			"15 15 15"
@@ -56,7 +56,6 @@ WeaponData
 	
 	SoundData
 	{
-
 		"empty"				"Weapon_Shotgun_ZM.Empty"
 		"single_shot"		"Weapon_OverUnder_ZM.Single"
 		"double_shot"		"Weapon_OverUnder_ZM.Double"

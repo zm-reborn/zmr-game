@@ -69,7 +69,7 @@ public:
     virtual void AddViewKick() OVERRIDE;
 
     virtual void PrimaryAttack() OVERRIDE;
-    virtual void PrimaryAttackEffects() OVERRIDE;
+    virtual void PrimaryAttackEffects( WeaponSound_t wpnsound ) OVERRIDE;
     virtual void SecondaryAttack() OVERRIDE;
 
     void ItemPostFrame() OVERRIDE;
@@ -212,7 +212,7 @@ void CZMWeaponRevolver::ItemPostFrame()
     }
 }
 
-void CZMWeaponRevolver::PrimaryAttackEffects()
+void CZMWeaponRevolver::PrimaryAttackEffects( WeaponSound_t wpnsound )
 {
     CZMPlayer* pPlayer = GetPlayerOwner();
     if ( !pPlayer )
@@ -230,7 +230,7 @@ void CZMWeaponRevolver::PrimaryAttackEffects()
         pPlayer->DoAnimationEvent( PLAYERANIMEVENT_ATTACK_PRIMARY );
 
         // ZMRTODO: Right now fires twice. Remove fire sound from model(?)
-        WeaponSound( SINGLE, m_flNextPrimaryAttack );
+        WeaponSound( wpnsound );
     }
 }
 

@@ -957,9 +957,9 @@ void CZMBaseWeapon::Shoot( int iAmmoType, int nBullets, int nAmmo, float flMaxRa
     // Certain methods will check for secondary fire by
     // comparing the weapon activity.
     if ( !bSecondary )
-        PrimaryAttackEffects();
+        PrimaryAttackEffects( SINGLE );
     else
-        SecondaryAttackEffects();
+        SecondaryAttackEffects( SINGLE );
 
 
     if ( iAmmoType == -1 )
@@ -1023,7 +1023,7 @@ void CZMBaseWeapon::Shoot( int iAmmoType, int nBullets, int nAmmo, float flMaxRa
 #endif
 }
 
-void CZMBaseWeapon::PrimaryAttackEffects()
+void CZMBaseWeapon::PrimaryAttackEffects( WeaponSound_t wpnsound )
 {
     CZMPlayer* pPlayer = GetPlayerOwner();
     if ( !pPlayer )
@@ -1041,11 +1041,11 @@ void CZMBaseWeapon::PrimaryAttackEffects()
 
         pPlayer->DoAnimationEvent( PLAYERANIMEVENT_ATTACK_PRIMARY );
 
-        WeaponSound( SINGLE );
+        WeaponSound( wpnsound );
     }
 }
 
-void CZMBaseWeapon::SecondaryAttackEffects()
+void CZMBaseWeapon::SecondaryAttackEffects( WeaponSound_t wpnsound )
 {
     CZMPlayer* pPlayer = GetPlayerOwner();
     if ( !pPlayer )
@@ -1063,7 +1063,7 @@ void CZMBaseWeapon::SecondaryAttackEffects()
 
         pPlayer->DoAnimationEvent( PLAYERANIMEVENT_ATTACK_SECONDARY );
 
-        WeaponSound( SINGLE );
+        WeaponSound( wpnsound );
     }
 }
 

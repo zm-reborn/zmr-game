@@ -44,12 +44,8 @@ WeaponData
 	
 	SoundData
 	{
-		"reload_npc"		"Weapon_SMG_ZM.NPC_Reload"
 		"empty"				"Weapon_SMG_ZM.Empty"
 		"single_shot"		"Weapon_SMG_ZM.Single"
-		"single_shot_npc"	"Weapon_SMG_ZM.NPC_Single"
-		"double_shot"		"Weapon_SMG_ZM.Double"
-		"burst"				"Weapon_SMG_ZM.Burst"
 	}
 
 	TextureData

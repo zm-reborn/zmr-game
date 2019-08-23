@@ -30,9 +30,15 @@ public:
     virtual void PrimaryAttack() OVERRIDE;
     virtual void SecondaryAttack() OVERRIDE;
     virtual bool Reload() OVERRIDE;
+    virtual void SecondaryAttackEffects( WeaponSound_t wpnsound ) OVERRIDE;
 
 
     void ShootBarrels( bool bWantBoth );
+
+
+#ifdef GAME_DLL
+    virtual int GetMaxUserCmdBullets( ZMUserCmdValidData_t& data ) const OVERRIDE;
+#endif
 };
 
 IMPLEMENT_NETWORKCLASS_ALIASED( ZMWeaponShotgunSporting, DT_ZM_WeaponShotgunSporting )
@@ -121,3 +127,17 @@ bool CZMWeaponShotgunSporting::Reload()
 
     return DefaultReload( GetMaxClip1(), GetMaxClip2(), bReloadSingle ? ACT_VM_RELOAD_START : ACT_VM_RELOAD );
 }
+
+void CZMWeaponShotgunSporting::SecondaryAttackEffects( WeaponSound_t wpnsound )
+{
+    // Play double shot for secondary.
+    BaseClass::SecondaryAttackEffects( WeaponSound_t::WPN_DOUBLE );
+}
+
+#ifdef GAME_DLL
+int CZMWeaponShotgunSporting::GetMaxUserCmdBullets( ZMUserCmdValidData_t& data ) const
+{
+    int bullets = GetBulletsPerShot();
+    return IsInSecondaryAttack() ? (bullets * 2) : bullets;
+}
+#endif
