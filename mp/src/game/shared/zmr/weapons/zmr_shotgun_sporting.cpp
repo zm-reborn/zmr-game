@@ -34,6 +34,11 @@ public:
 
 
     void ShootBarrels( bool bWantBoth );
+
+
+#ifdef GAME_DLL
+    virtual int GetMaxUserCmdBullets( ZMUserCmdValidData_t& data ) const OVERRIDE;
+#endif
 };
 
 IMPLEMENT_NETWORKCLASS_ALIASED( ZMWeaponShotgunSporting, DT_ZM_WeaponShotgunSporting )
@@ -128,3 +133,11 @@ void CZMWeaponShotgunSporting::SecondaryAttackEffects( WeaponSound_t wpnsound )
     // Play double shot for secondary.
     BaseClass::SecondaryAttackEffects( WeaponSound_t::WPN_DOUBLE );
 }
+
+#ifdef GAME_DLL
+int CZMWeaponShotgunSporting::GetMaxUserCmdBullets( ZMUserCmdValidData_t& data ) const
+{
+    int bullets = GetBulletsPerShot();
+    return IsInSecondaryAttack() ? (bullets * 2) : bullets;
+}
+#endif
