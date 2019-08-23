@@ -42,15 +42,10 @@ WeaponData
 	
 	SoundData
 	{
-
 		"empty"				"Weapon_Shotgun_ZM.Empty"
 		"reload"			"Weapon_Shotgun_ZM.Reload"
 		"special1"			"Weapon_Shotgun_ZM.Special1"
 		"single_shot"		"Weapon_Shotgun_ZM.Single"
-		"double_shot"		"Weapon_Shotgun_ZM.Double"
-		// NPC WEAPON SOUNDS
-		"reload_npc"		"Weapon_Shotgun_ZM.NPC_Reload"
-		"single_shot_npc"	"Weapon_Shotgun_ZM.NPC_Single"
 	}
 
 	TextureData
