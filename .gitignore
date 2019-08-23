@@ -32,12 +32,16 @@ obj*/
 client.pdb
 client.dll
 client.lib
+game_shader_dx9.dll
+game_shader_dx9.pdb
 server.pdb
 server.dll
 server.lib
 
 client.so
 client.so.dbg
+game_shader_dx9.so
+game_shader_dx9.so.dbg
 server.so
 server.so.dbg
 server_srv.so
