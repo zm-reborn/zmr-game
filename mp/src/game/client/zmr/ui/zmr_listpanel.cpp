@@ -113,9 +113,9 @@ void CZMListRow::OnMousePressed( vgui::MouseCode code )
 
 
     KeyValues* kv = nullptr;
-    if ( m_pKvData )
+    if ( GetData() )
     {
-        kv = m_pKvData->MakeCopy();
+        kv = GetData()->MakeCopy();
         kv->SetName( "OnRowItemPressed" );
     }
     else
@@ -158,7 +158,7 @@ void CZMListRow::OnCursorMoved( int x, int y )
 
 void CZMListRow::PerformLayout()
 {
-    if ( !m_pKvData )
+    if ( !GetData() )
     {
         Assert( 0 );
 
@@ -252,7 +252,7 @@ void CZMListRow::ColumnDataLabel( int column, Label* pLabel )
 
 
         // Find the image and set it.
-        int index = m_pKvData->GetInt( colName, -1 );
+        int index = GetData()->GetInt( colName, -1 );
 
         ImageList* list = GetSection()->GetListPanel()->GetImageList();
         if ( list && list->IsValidIndex( index ) )
@@ -264,7 +264,7 @@ void CZMListRow::ColumnDataLabel( int column, Label* pLabel )
 
     if ( pTextImage )
     {
-        pTextImage->SetText( m_pKvData->GetString( colName, "" ) );
+        pTextImage->SetText( GetData()->GetString( colName, "" ) );
         pTextImage->SetColor( clr );
         pTextImage->SetFont( usefont );
 
@@ -275,7 +275,7 @@ void CZMListRow::ColumnDataLabel( int column, Label* pLabel )
     {
         Q_snprintf( temp, sizeof( temp ), "%s_tooltip", colName );
 
-        const char* tip = m_pKvData->GetString( temp, nullptr );
+        const char* tip = GetData()->GetString( temp, nullptr );
 
         if ( tip && *tip )
         {
@@ -515,6 +515,8 @@ void CZMListSection::ClearRows()
 
 CZMListRow* CZMListSection::EraseItem( int index )
 {
+    Assert( m_vItems.IsValidIndex( index ) );
+
     CZMListRow* pRow = m_vItems[index];
 
     m_vItems.Remove( index );
@@ -856,26 +858,36 @@ int CZMListPanel::GetSectionByName( const char* name ) const
 
 void CZMListPanel::ClearRows( int section )
 {
+    Assert( m_vSections.IsValidIndex( section ) );
+
     m_vSections[section]->ClearRows();
 }
 
 void CZMListPanel::SetSectionSortingFunc( int section, ZMSectionSortFunc_t func )
 {
+    Assert( m_vSections.IsValidIndex( section ) );
+
     m_vSections[section]->SetSortingFunc( func );
 }
 
 void CZMListPanel::SetSectionTopMargin( int section, int margin )
 {
+    Assert( m_vSections.IsValidIndex( section ) );
+
     m_vSections[section]->SetTopMargin( margin );
 }
 
 void CZMListPanel::SetSectionBottomMargin( int section, int margin )
 {
+    Assert( m_vSections.IsValidIndex( section ) );
+
     m_vSections[section]->SetBottomMargin( margin );
 }
 
 void CZMListPanel::SetSectionMouseInputEnabled( int section, bool state )
 {
+    Assert( m_vSections.IsValidIndex( section ) );
+
     auto* pSection = m_vSections[section];
     pSection->SetMouseInputEnabled( state );
     /*
@@ -889,11 +901,15 @@ void CZMListPanel::SetSectionMouseInputEnabled( int section, bool state )
 
 int CZMListPanel::AddColumn( int section, const char* name, int width, int flags, int xoffset )
 {
+    Assert( m_vSections.IsValidIndex( section ) );
+
     return m_vSections[section]->AddColumn( name, width, flags, xoffset );
 }
 
 int CZMListPanel::AddItem( int section, KeyValues* kv )
 {
+    Assert( m_vSections.IsValidIndex( section ) );
+
     int item = m_vSections[section]->AddItem( m_nItemIds++, kv );
     
     InvalidateLayout();
@@ -903,27 +919,52 @@ int CZMListPanel::AddItem( int section, KeyValues* kv )
 
 void CZMListPanel::SetItemWidth( int section, int itemIndex, int w )
 {
-    m_vSections[section]->GetItem( itemIndex )->SetItemWidth( w );
+    Assert( m_vSections.IsValidIndex( section ) );
+
+    auto* pItem = m_vSections[section]->GetItem( itemIndex );
+    Assert( pItem );
+
+    pItem->SetItemWidth( w );
 }
 
 void CZMListPanel::SetItemHeight( int section, int itemIndex, int h )
 {
-    m_vSections[section]->GetItem( itemIndex )->SetItemHeight( h );
+    Assert( m_vSections.IsValidIndex( section ) );
+
+    auto* pItem = m_vSections[section]->GetItem( itemIndex );
+    Assert( pItem );
+
+    pItem->SetItemHeight( h );
 }
 
 void CZMListPanel::SetItemFont( int section, int itemIndex, HFont font )
 {
-    m_vSections[section]->GetItem( itemIndex )->SetItemFont( font );
+    Assert( m_vSections.IsValidIndex( section ) );
+
+    auto* pItem = m_vSections[section]->GetItem( itemIndex );
+    Assert( pItem );
+
+    pItem->SetItemFont( font );
 }
 
 void CZMListPanel::SetItemColor( int section, int itemIndex, Color clr )
 {
-    m_vSections[section]->GetItem( itemIndex )->SetItemColor( clr );
+    Assert( m_vSections.IsValidIndex( section ) );
+
+    auto* pItem = m_vSections[section]->GetItem( itemIndex );
+    Assert( pItem );
+
+    pItem->SetItemColor( clr );
 }
 
 void CZMListPanel::SetItemBgColor( int section, int itemIndex, Color clr )
 {
-    m_vSections[section]->GetItem( itemIndex )->SetBgColor( clr );
+    Assert( m_vSections.IsValidIndex( section ) );
+
+    auto* pItem = m_vSections[section]->GetItem( itemIndex );
+    Assert( pItem );
+
+    pItem->SetBgColor( clr );
 }
 
 int CZMListPanel::ModifyItem( int itemId, int newSection, KeyValues* kv )
@@ -964,6 +1005,8 @@ int CZMListPanel::ModifyItem( int itemId, int newSection, KeyValues* kv )
 
 void CZMListPanel::RemoveItem( int section, int itemIndex )
 {
+    Assert( m_vSections.IsValidIndex( section ) );
+
     m_vSections[section]->RemoveItem( itemIndex );
 
     InvalidateLayout();
