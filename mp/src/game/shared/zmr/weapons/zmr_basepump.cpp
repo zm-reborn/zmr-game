@@ -150,7 +150,22 @@ void CZMBasePumpWeapon::StartReload()
     CZMPlayer* pPlayer = GetPlayerOwner();
     if ( !pPlayer ) return;
 
-    if ( pPlayer->GetAmmoCount( GetPrimaryAmmoType() ) < 1 ) return;
+    if ( pPlayer->GetAmmoCount( GetPrimaryAmmoType() ) < 1 )
+    {
+        if ( Clip1() == 0 )
+        {
+            //
+            // Play empty sound
+            //
+            if ( pPlayer->m_nButtons & (IN_ATTACK|IN_ATTACK2) && m_flNextEmptySoundTime <= gpGlobals->curtime )
+            {
+                WeaponSound( EMPTY );
+                m_flNextEmptySoundTime = gpGlobals->curtime + 1.0f;
+            }
+        }
+
+        return;
+    }
 
 
     SendWeaponAnim( GetReloadStartAct() );
