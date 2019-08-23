@@ -94,6 +94,9 @@ int CHudChat::GetChatInputOffset( void )
         return 0;
 }
 
+ConVar zm_cl_chat_color_dev( "zm_cl_chat_color_dev", "255 255 64" );
+
+
 Color CHudChat::GetClientColor( int clientIndex )
 {
     if ( clientIndex == 0 ) // console msg
@@ -105,7 +108,18 @@ Color CHudChat::GetClientColor( int clientIndex )
         // Not my fault.
         if ( g_ZMImportanceSystem.GetPlayerImportance( clientIndex ) == ZMIMPORTANCE_DEV )
         {
-            return Color( 0, 110, 252, 255 );
+            CSplitString split( zm_cl_chat_color_dev.GetString(), " " );
+
+            int clr[3] = { 255, 255, 255 };
+            for ( int i = 0; i < ARRAYSIZE( clr ); i++ )
+            {
+                if ( split.Count() > i )
+                    clr[i] = Q_atoi( split[i] );
+                else
+                    break;
+            }
+
+            return Color( clr[0], clr[1], clr[2], 255 );
         }
 
 
