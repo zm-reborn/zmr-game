@@ -30,6 +30,7 @@ public:
     virtual void PrimaryAttack() OVERRIDE;
     virtual void SecondaryAttack() OVERRIDE;
     virtual bool Reload() OVERRIDE;
+    virtual void SecondaryAttackEffects( WeaponSound_t wpnsound ) OVERRIDE;
 
 
     void ShootBarrels( bool bWantBoth );
@@ -120,4 +121,10 @@ bool CZMWeaponShotgunSporting::Reload()
     bool bReloadSingle = m_iClip1 >= 1;
 
     return DefaultReload( GetMaxClip1(), GetMaxClip2(), bReloadSingle ? ACT_VM_RELOAD_START : ACT_VM_RELOAD );
+}
+
+void CZMWeaponShotgunSporting::SecondaryAttackEffects( WeaponSound_t wpnsound )
+{
+    // Play double shot for secondary.
+    BaseClass::SecondaryAttackEffects( WeaponSound_t::WPN_DOUBLE );
 }

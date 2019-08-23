@@ -86,8 +86,8 @@ public:
     virtual void FireBullets( int numShots, int iAmmoType, float flMaxDist );
     virtual void PrimaryAttack() OVERRIDE;
     virtual void Shoot( int iAmmoType = -1, int nBullets = -1, int nAmmo = -1, float flMaxRange = -1.0f, bool bSecondary = false );
-    virtual void PrimaryAttackEffects();
-    virtual void SecondaryAttackEffects();
+    virtual void PrimaryAttackEffects( WeaponSound_t wpnsound );
+    virtual void SecondaryAttackEffects( WeaponSound_t wpnsound );
     virtual void SecondaryAttack() OVERRIDE;
 
 
