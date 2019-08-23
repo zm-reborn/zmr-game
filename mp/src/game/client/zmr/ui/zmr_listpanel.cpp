@@ -97,7 +97,7 @@ void CZMListRow::SetItemColor( Color clr )
 //    SetBgColor( clr );
 //}
 
-int CZMListRow::GetItemColumnCount()
+int CZMListRow::GetItemColumnCount() const
 {
     return ( GetSection()->GetNumColumns() > 0 ) ? GetSection()->GetNumColumns() : 1;
 }
@@ -569,7 +569,7 @@ void CZMListSection::SetDefaultFont( HFont font )
     m_hDefaultFont = font;
 }
 
-const char* CZMListSection::GetColumnName( int col )
+const char* CZMListSection::GetColumnName( int col ) const
 {
     if ( !m_vColumns.IsValidIndex( col ) )
         return "";
@@ -577,15 +577,15 @@ const char* CZMListSection::GetColumnName( int col )
     return m_vColumns[col]->m_szName;
 }
 
-int CZMListSection::GetColumnWidth( int col )
+int CZMListSection::GetColumnWidth( int col ) const
 {
     if ( !m_vColumns.IsValidIndex( col ) )
-        return GetWide();
+        return const_cast<CZMListSection*>( this )->GetWide();
 
     return m_vColumns[col]->m_nWidth;
 }
 
-int CZMListSection::GetColumnFlags( int col )
+int CZMListSection::GetColumnFlags( int col ) const
 {
     if ( !m_vColumns.IsValidIndex( col ) )
         return 0;
@@ -593,7 +593,7 @@ int CZMListSection::GetColumnFlags( int col )
     return m_vColumns[col]->m_Flags;
 }
 
-int CZMListSection::GetColumnOffset( int col )
+int CZMListSection::GetColumnOffset( int col ) const
 {
     if ( !m_vColumns.IsValidIndex( col ) )
         return 0;
@@ -613,7 +613,7 @@ void CZMListSection::SetBottomMargin( int margin )
     GetListPanel()->InvalidateLayout();
 }
 
-int CZMListSection::FindItemByKey( int iSymbolIndex, int iKeyData )
+int CZMListSection::FindItemByKey( int iSymbolIndex, int iKeyData ) const
 {
     int len = GetNumItems();
     for ( int i = 0; i < len; i++ )
@@ -630,7 +630,7 @@ int CZMListSection::FindItemByKey( int iSymbolIndex, int iKeyData )
     return -1;
 }
 
-int CZMListSection::FindItemById( int itemId )
+int CZMListSection::FindItemById( int itemId ) const
 {
     int len = GetNumItems();
     for ( int i = 0; i < len; i++ )
@@ -843,11 +843,11 @@ int CZMListPanel::AddSection( const char* name, vgui::HFont defaultfont, int nDe
     return m_vSections.AddToTail( section );
 }
 
-int CZMListPanel::GetSectionByName( const char* name )
+int CZMListPanel::GetSectionByName( const char* name ) const
 {
     for ( int i = 0; i < m_vSections.Count(); i++ )
     {
-        if ( Q_strcmp( name, m_vSections[i]->GetName() ) == 0 )
+        if ( Q_strcmp( name, const_cast<CZMListSection*>( m_vSections[i] )->GetName() ) == 0 )
             return i;
     }
 
@@ -1003,7 +1003,7 @@ int CZMListPanel::AddImage( IImage* pImage )
     return m_pImageList->AddImage( pImage );
 }
 
-int CZMListPanel::FindItemByKey( int iSymbolIndex, int iKeyData )
+int CZMListPanel::FindItemByKey( int iSymbolIndex, int iKeyData ) const
 {
     for ( int i = 0; i < m_vSections.Count(); i++ )
     {

@@ -56,9 +56,11 @@ protected:
 
 
     bool ComputePlayerImportance( int playerIndex );
-    vgui::IImage* ImportanceToImage( ZMImportance_t index );
+
+    vgui::IImage* ImportanceToImage( ZMImportance_t index ) const;
+
     static const char* ImportanceToName( ZMImportance_t index );
-    ZMImportance_t ImportanceNameToIndex( const char* name );
+    static ZMImportance_t ImportanceNameToIndex( const char* name );
 
 private:
     vgui::IImage* m_pImageDev;
