@@ -148,14 +148,12 @@ BEGIN_NETWORK_TABLE( CZMWeaponHands, DT_ZM_WeaponHands )
     RecvPropFloat( RECVINFO( m_attachedAnglesPlayerSpace[0] ) ),
     RecvPropFloat( RECVINFO( m_attachedAnglesPlayerSpace[1] ) ),
     RecvPropFloat( RECVINFO( m_attachedAnglesPlayerSpace[2] ) ),
-    RecvPropTime( RECVINFO( m_flAttackHitTime ) ),
 #else
     SendPropEHandle( SENDINFO( m_hAttachedObject ) ),
     SendPropVector(SENDINFO( m_attachedPositionObjectSpace ), -1, SPROP_COORD),
     SendPropAngle( SENDINFO_VECTORELEM( m_attachedAnglesPlayerSpace, 0 ), 11 ),
     SendPropAngle( SENDINFO_VECTORELEM( m_attachedAnglesPlayerSpace, 1 ), 11 ),
     SendPropAngle( SENDINFO_VECTORELEM( m_attachedAnglesPlayerSpace, 2 ), 11 ),
-    SendPropTime( SENDINFO( m_flAttackHitTime ) ),
 #endif
 END_NETWORK_TABLE()
 
@@ -163,7 +161,6 @@ IMPLEMENT_NETWORKCLASS_ALIASED( ZMWeaponHands, DT_ZM_WeaponHands )
 
 #ifdef CLIENT_DLL
 BEGIN_PREDICTION_DATA( CZMWeaponHands )
-    DEFINE_PRED_FIELD_TOL( m_flAttackHitTime, FIELD_FLOAT, FTYPEDESC_INSENDTABLE, TD_MSECTOLERANCE ),
 END_PREDICTION_DATA()
 #endif
 
@@ -241,6 +238,9 @@ void CZMWeaponHands::ItemPostFrame()
 
     CheckForTarget();
     WeaponIdle();
+
+    // Pass to base to call anim event attacks.
+    BaseClass::ItemPostFrame();
 }
 
 //

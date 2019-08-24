@@ -33,10 +33,17 @@ void DispatchEffect( const char *pName, const CEffectData &data );
 IMPLEMENT_NETWORKCLASS_ALIASED( ZMBaseMeleeWeapon, DT_ZM_BaseMeleeWeapon )
 
 BEGIN_NETWORK_TABLE( CZMBaseMeleeWeapon, DT_ZM_BaseMeleeWeapon )
+#ifdef CLIENT_DLL
+    RecvPropTime( RECVINFO( m_flAttackHitTime ) ),
+#else
+    // We may use animation events, so we need to network the attack time.
+    SendPropTime( SENDINFO( m_flAttackHitTime ) ),
+#endif
 END_NETWORK_TABLE()
 
 #ifdef CLIENT_DLL
 BEGIN_PREDICTION_DATA( CZMBaseMeleeWeapon )
+    DEFINE_PRED_FIELD_TOL( m_flAttackHitTime, FIELD_FLOAT, FTYPEDESC_INSENDTABLE, TD_MSECTOLERANCE ),
 END_PREDICTION_DATA()
 #endif
 
@@ -135,7 +142,7 @@ void CZMBaseMeleeWeapon::SecondaryAttack()
     m_flNextSecondaryAttack = m_flNextPrimaryAttack = gpGlobals->curtime + GetFireRate();
 }
 
-void CZMBaseMeleeWeapon::StartHit( trace_t* traceRes, Activity iActivityDamage )
+void CZMBaseMeleeWeapon::StartHit( trace_t* traceRes, Activity iActivityDamage, bool bJustTrace )
 {
     CZMPlayer* pPlayer = GetPlayerOwner();
     if ( !pPlayer ) return;
@@ -148,7 +155,10 @@ void CZMBaseMeleeWeapon::StartHit( trace_t* traceRes, Activity iActivityDamage )
     trace_t traceHit;
     TraceMeleeAttack( traceHit );
 
-    Hit( traceHit, iActivityDamage );
+    if ( !bJustTrace )
+    {
+        Hit( traceHit, iActivityDamage );
+    }
 
 #ifndef CLIENT_DLL
     lagcompensation->FinishLagCompensation( pPlayer );
@@ -278,32 +288,46 @@ void CZMBaseMeleeWeapon::Swing( bool bSecondary )
     if ( !pOwner ) return;
 
 
+    const Activity iHitAct = bSecondary ? GetSecondaryAttackActivity() : GetPrimaryAttackActivity();
+    const Activity iMissAct = bSecondary ? ACT_VM_MISSCENTER2 : ACT_VM_MISSCENTER;
+    
+    
+    Activity iFallbackActivity = iMissAct;
+    Activity iActivity = iHitAct;
 
-    const bool bUseAnimEvent = UsesAnimEvent( bSecondary );
+    //
+    // Trace which animation we should play.
+    //
+    trace_t traceHit;
+    traceHit.fraction = 1.0f;
+    StartHit( &traceHit, iHitAct, true );
 
-
-
-    Activity nHitActivity = bSecondary ? GetSecondaryAttackActivity() : GetPrimaryAttackActivity();
-
-    if ( !bUseAnimEvent )
+    // We didn't hit anything, use miss anim if possible.
+    if ( traceHit.fraction == 1.0f )
     {
-        trace_t traceHit;
-        traceHit.fraction = 1.0f;
-        StartHit( &traceHit, nHitActivity );
-
-        if ( traceHit.fraction == 1.0f ) nHitActivity = bSecondary ? ACT_VM_MISSCENTER2 : ACT_VM_MISSCENTER;
+        iFallbackActivity = iHitAct;
+        iActivity = iMissAct;
     }
     
+
     // Send the anim
-    SendWeaponAnim( nHitActivity );
-
-
-    if ( bUseAnimEvent )
+    if ( !SendWeaponAnim( iActivity ) )
     {
-        // Currently, only supports firstperson
-        float waittime = GetFirstInstanceOfAnimEventTime( GetSequence(), AE_ZM_MELEEHIT );
-        if ( waittime >= 0.0f )
-            m_flAttackHitTime = gpGlobals->curtime + waittime;
+        iActivity = iFallbackActivity;
+        if ( !SendWeaponAnim( iFallbackActivity ) )
+            Assert( 0 );
+    }
+
+
+
+    bool bUseAnimEvent = false;
+
+
+    float attackdelay = GetFirstInstanceOfAnimEventTime( GetSequence(), AE_ZM_MELEEHIT );
+    if ( attackdelay > 0.0f )
+    {
+        m_flAttackHitTime = gpGlobals->curtime + attackdelay;
+        bUseAnimEvent = true;
     }
 
 
@@ -313,6 +337,9 @@ void CZMBaseMeleeWeapon::Swing( bool bSecondary )
 
     if ( !bUseAnimEvent )
     {
+        Hit( traceHit, iActivity );
+
+
         AddViewKick();
 
 #ifndef CLIENT_DLL
