@@ -462,7 +462,7 @@
 	"volume"		"0.7"
 	"soundlevel"	"SNDLVL_NORM"
 
-	"wave"			"weapons/overunder/reload3.wav"
+	"wave"			"weapons/overunder/reload2.wav"
 }
 
 "Weapon_OverUnder_ZM.Reload3"
@@ -473,9 +473,8 @@
 
 	"rndwave"
 	{
-		"wave"			"weapons/shotgun_zm/shotgun_reload1_zm.wav"
-		"wave"			"weapons/shotgun_zm/shotgun_reload2_zm.wav"
-		"wave"			"weapons/shotgun_zm/shotgun_reload3_zm.wav"
+		"wave"			"weapons/overunder/ou_load1_zm.wav"
+		"wave"			"weapons/overunder/ou_load2_zm.wav"
 	}
 }
 
