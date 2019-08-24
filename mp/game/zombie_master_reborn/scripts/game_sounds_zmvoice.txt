@@ -4,10 +4,23 @@
 
 	"rndwave"
 	{
-		"wave"	"vo/npc/male01/ok01.wav"
-		"wave"	"vo/npc/male01/yeah02.wav"
-		"wave"	"vo/npc/male01/yougotit02.wav"
-		"wave"	"vo/npc/male01/squad_affirm03.wav"
+		"wave"	"player/voice/male/yes/yes1.wav"
+		"wave"	"player/voice/male/yes/yes2.wav"
+		"wave"	"player/voice/male/yes/yes3.wav"
+		"wave"	"player/voice/male/yes/yes4.wav"
+		"wave"	"player/voice/male/yes/yes5.wav"
+		"wave"	"player/voice/male/yes/yes6.wav"
+		"wave"	"player/voice/male/yes/yes7.wav"
+		"wave"	"player/voice/male/yes/yes8.wav"
+		"wave"	"player/voice/male/yes/yes9.wav"
+		"wave"	"player/voice/male/yes/yes10.wav"
+		"wave"	"player/voice/male/yes/yes11.wav"
+		"wave"	"player/voice/male/yes/yes12.wav"
+		"wave"	"player/voice/male/yes/yes13.wav"
+		"wave"	"player/voice/male/yes/yes14.wav"
+		"wave"	"player/voice/male/yes/yes15.wav"
+		"wave"	"player/voice/male/yes/yes16.wav"
+		"wave"	"player/voice/male/yes/yes17.wav"
 	}
 }
 "ZMVoiceline.Yes.Female"
@@ -16,10 +29,18 @@
 
 	"rndwave"
 	{
-		"wave"	"vo/npc/female01/ok01.wav"
-		"wave"	"vo/npc/female01/ok02.wav"
-		"wave"	"vo/npc/female01/yougotit02.wav"
-		"wave"	"vo/npc/female01/squad_affirm03.wav"
+		"wave"	"player/voice/female/yes/yes1.wav"
+		"wave"	"player/voice/female/yes/yes2.wav"
+		"wave"	"player/voice/female/yes/yes3.wav"
+		"wave"	"player/voice/female/yes/yes4.wav"
+		"wave"	"player/voice/female/yes/yes5.wav"
+		"wave"	"player/voice/female/yes/yes6.wav"
+		"wave"	"player/voice/female/yes/yes7.wav"
+		"wave"	"player/voice/female/yes/yes8.wav"
+		"wave"	"player/voice/female/yes/yes9.wav"
+		"wave"	"player/voice/female/yes/yes10.wav"
+		"wave"	"player/voice/female/yes/yes11.wav"
+		"wave"	"player/voice/female/yes/yes12.wav"
 	}
 }
 "ZMVoiceline.No.Male"
@@ -28,9 +49,13 @@
 
 	"rndwave"
 	{
-		//"wave"	"vo/npc/male01/vanswer01.wav"
-		"wave"	"vo/npc/male01/ohno.wav"
-		"wave"	"vo/trainyard/male01/cit_hit05.wav"
+		"wave"	"player/voice/male/no/no1.wav"
+		"wave"	"player/voice/male/no/no2.wav"
+		"wave"	"player/voice/male/no/no3.wav"
+		"wave"	"player/voice/male/no/no4.wav"
+		"wave"	"player/voice/male/no/no5.wav"
+		"wave"	"player/voice/male/no/no6.wav"
+		"wave"	"player/voice/male/no/no7.wav"
 	}
 }
 "ZMVoiceline.No.Female"
@@ -39,9 +64,12 @@
 
 	"rndwave"
 	{
-		"wave"	"vo/npc/female01/no01.wav"
-		"wave"	"vo/npc/female01/no02.wav"
-		"wave"	"vo/trainyard/female01/cit_hit05.wav"
+		"wave"	"player/voice/female/no/no1.wav"
+		"wave"	"player/voice/female/no/no2.wav"
+		"wave"	"player/voice/female/no/no3.wav"
+		"wave"	"player/voice/female/no/no4.wav"
+		"wave"	"player/voice/female/no/no5.wav"
+		"wave"	"player/voice/female/no/no6.wav"
 	}
 }
 "ZMVoiceline.Help.Male"
@@ -50,10 +78,13 @@
 
 	"rndwave"
 	{
-		"wave"	"vo/npc/male01/help01.wav"
-		"wave"	"vo/streetwar/sniper/male01/c17_09_help01.wav"
-		"wave"	"vo/streetwar/sniper/male01/c17_09_help02.wav"
-		"wave"	"vo/streetwar/sniper/male01/c17_09_help03.wav"
+		"wave"	"player/voice/male/help/help1.wav"
+		"wave"	"player/voice/male/help/help2.wav"
+		"wave"	"player/voice/male/help/help3.wav"
+		"wave"	"player/voice/male/help/help4.wav"
+		"wave"	"player/voice/male/help/help5.wav"
+		"wave"	"player/voice/male/help/help6.wav"
+		"wave"	"player/voice/male/help/help7.wav"
 	}
 }
 "ZMVoiceline.Help.Female"
@@ -62,8 +93,10 @@
 
 	"rndwave"
 	{
-		"wave"	"vo/npc/female01/help01.wav"
-		"wave"	"vo/canals/arrest_helpme.wav"
+		"wave"	"player/voice/female/help/help1.wav"
+		"wave"	"player/voice/female/help/help2.wav"
+		"wave"	"player/voice/female/help/help3.wav"
+		"wave"	"player/voice/female/help/help4.wav"
 	}
 }
 "ZMVoiceline.Go.Male"
@@ -72,9 +105,14 @@
 
 	"rndwave"
 	{
-		"wave"	"vo/npc/male01/letsgo01.wav"
-		"wave"	"vo/npc/male01/letsgo02.wav"
-		"wave"	"vo/npc/male01/squad_follow03.wav"
+		"wave"	"player/voice/male/go/go1.wav"
+		"wave"	"player/voice/male/go/go2.wav"
+		"wave"	"player/voice/male/go/go3.wav"
+		"wave"	"player/voice/male/go/go4.wav"
+		"wave"	"player/voice/male/go/go5.wav"
+		"wave"	"player/voice/male/go/go6.wav"
+		"wave"	"player/voice/male/go/go7.wav"
+		"wave"	"player/voice/male/go/go8.wav"
 	}
 }
 "ZMVoiceline.Go.Female"
@@ -83,10 +121,14 @@
 
 	"rndwave"
 	{
-		"wave"	"vo/npc/female01/letsgo01.wav"
-		"wave"	"vo/npc/female01/letsgo02.wav"
-		"wave"	"vo/npc/female01/squad_follow02.wav"
-		"wave"	"vo/npc/female01/squad_follow03.wav"
+		"wave"	"player/voice/female/go/go1.wav"
+		"wave"	"player/voice/female/go/go2.wav"
+		"wave"	"player/voice/female/go/go3.wav"
+		"wave"	"player/voice/female/go/go4.wav"
+		"wave"	"player/voice/female/go/go5.wav"
+		"wave"	"player/voice/female/go/go6.wav"
+		"wave"	"player/voice/female/go/go7.wav"
+		"wave"	"player/voice/female/go/go8.wav"
 	}
 }
 "ZMVoiceline.Follow.Male"
@@ -95,10 +137,15 @@
 
 	"rndwave"
 	{
-		"wave"	"vo/coast/cardock/le_followme.wav"
-		"wave"	"vo/coast/odessa/male01/stairman_follow01.wav"
-		"wave"	"vo/npc/male01/squad_away02.wav"
-		"wave"	"vo/npc/male01/squad_away03.wav"
+		"wave"	"player/voice/male/follow/follow1.wav"
+		"wave"	"player/voice/male/follow/follow2.wav"
+		"wave"	"player/voice/male/follow/follow3.wav"
+		"wave"	"player/voice/male/follow/follow4.wav"
+		"wave"	"player/voice/male/follow/follow5.wav"
+		"wave"	"player/voice/male/follow/follow6.wav"
+		"wave"	"player/voice/male/follow/follow7.wav"
+		"wave"	"player/voice/male/follow/follow8.wav"
+		"wave"	"player/voice/male/follow/follow9.wav"
 	}
 }
 "ZMVoiceline.Follow.Female"
@@ -107,10 +154,13 @@
 
 	"rndwave"
 	{
-		"wave"	"vo/coast/odessa/female01/stairman_follow01.wav"
-		"wave"	"vo/npc/female01/squad_away01.wav"
-		"wave"	"vo/npc/female01/squad_away02.wav"
-		"wave"	"vo/npc/female01/squad_away03.wav"
+		"wave"	"player/voice/female/follow/follow1.wav"
+		"wave"	"player/voice/female/follow/follow2.wav"
+		"wave"	"player/voice/female/follow/follow3.wav"
+		"wave"	"player/voice/female/follow/follow4.wav"
+		"wave"	"player/voice/female/follow/follow5.wav"
+		"wave"	"player/voice/female/follow/follow6.wav"
+		"wave"	"player/voice/female/follow/follow7.wav"
 	}
 }
 "ZMVoiceline.Taunt.Male"
@@ -119,8 +169,34 @@
 
 	"rndwave"
 	{
-		"wave"	"vo/npc/male01/likethat.wav"
-		"wave"	"vo/npc/male01/evenodds.wav"
+		"wave"	"player/voice/male/taunt/taunt1.wav"
+		"wave"	"player/voice/male/taunt/taunt2.wav"
+		"wave"	"player/voice/male/taunt/taunt3.wav"
+		"wave"	"player/voice/male/taunt/taunt4.wav"
+		"wave"	"player/voice/male/taunt/taunt5.wav"
+		"wave"	"player/voice/male/taunt/taunt6.wav"
+		"wave"	"player/voice/male/taunt/taunt7.wav"
+		"wave"	"player/voice/male/taunt/taunt8.wav"
+		"wave"	"player/voice/male/taunt/taunt9.wav"
+		"wave"	"player/voice/male/taunt/taunt10.wav"
+		"wave"	"player/voice/male/taunt/taunt11.wav"
+		"wave"	"player/voice/male/taunt/taunt12.wav"
+		"wave"	"player/voice/male/taunt/taunt13.wav"
+		"wave"	"player/voice/male/taunt/taunt14.wav"
+		"wave"	"player/voice/male/taunt/taunt15.wav"
+		"wave"	"player/voice/male/taunt/taunt16.wav"
+		"wave"	"player/voice/male/taunt/taunt17.wav"
+		"wave"	"player/voice/male/taunt/taunt18.wav"
+		"wave"	"player/voice/male/taunt/taunt19.wav"
+		"wave"	"player/voice/male/taunt/taunt20.wav"
+		"wave"	"player/voice/male/taunt/taunt21.wav"
+		"wave"	"player/voice/male/taunt/taunt22.wav"
+		"wave"	"player/voice/male/taunt/taunt23.wav"
+		"wave"	"player/voice/male/taunt/taunt24.wav"
+		"wave"	"player/voice/male/taunt/taunt25.wav"
+		"wave"	"player/voice/male/taunt/taunt26.wav"
+		"wave"	"player/voice/male/taunt/taunt27.wav"
+		"wave"	"player/voice/male/taunt/taunt28.wav"
 	}
 }
 "ZMVoiceline.Taunt.Female"
@@ -129,8 +205,25 @@
 
 	"rndwave"
 	{
-		"wave"	"vo/npc/female01/likethat.wav"
-		"wave"	"vo/npc/female01/waitingsomebody.wav"
+		"wave"	"player/voice/female/taunt/taunt1.wav"
+		"wave"	"player/voice/female/taunt/taunt2.wav"
+		"wave"	"player/voice/female/taunt/taunt3.wav"
+		"wave"	"player/voice/female/taunt/taunt4.wav"
+		"wave"	"player/voice/female/taunt/taunt5.wav"
+		"wave"	"player/voice/female/taunt/taunt6.wav"
+		"wave"	"player/voice/female/taunt/taunt7.wav"
+		"wave"	"player/voice/female/taunt/taunt8.wav"
+		"wave"	"player/voice/female/taunt/taunt9.wav"
+		"wave"	"player/voice/female/taunt/taunt10.wav"
+		"wave"	"player/voice/female/taunt/taunt11.wav"
+		"wave"	"player/voice/female/taunt/taunt12.wav"
+		"wave"	"player/voice/female/taunt/taunt13.wav"
+		"wave"	"player/voice/female/taunt/taunt14.wav"
+		"wave"	"player/voice/female/taunt/taunt15.wav"
+		"wave"	"player/voice/female/taunt/taunt16.wav"
+		"wave"	"player/voice/female/taunt/taunt17.wav"
+		"wave"	"player/voice/female/taunt/taunt18.wav"
+		"wave"	"player/voice/female/taunt/taunt19.wav"
 	}
 }
 "ZMVoiceline.Laugh.Male"
@@ -139,11 +232,17 @@
 
 	"rndwave"
 	{
-		"wave"	"vo/npc/male01/fantastic01.wav"
-		"wave"	"vo/coast/odessa/male01/nlo_cheer01.wav"
-		"wave"	"vo/coast/odessa/male01/nlo_cheer02.wav"
-		"wave"	"vo/coast/odessa/male01/nlo_cheer03.wav"
-		"wave"	"vo/coast/odessa/male01/nlo_cheer04.wav"
+		"wave"	"player/voice/male/cheer/cheer1.wav"
+		"wave"	"player/voice/male/cheer/cheer2.wav"
+		"wave"	"player/voice/male/cheer/cheer3.wav"
+		"wave"	"player/voice/male/cheer/cheer4.wav"
+		"wave"	"player/voice/male/cheer/cheer5.wav"
+		"wave"	"player/voice/male/cheer/cheer6.wav"
+		"wave"	"player/voice/male/cheer/cheer7.wav"
+		"wave"	"player/voice/male/cheer/cheer8.wav"
+		"wave"	"player/voice/male/cheer/cheer9.wav"
+		"wave"	"player/voice/male/cheer/cheer10.wav"
+		"wave"	"player/voice/male/cheer/cheer11.wav"
 	}
 }
 "ZMVoiceline.Laugh.Female"
@@ -152,10 +251,15 @@
 
 	"rndwave"
 	{
-		"wave"	"vo/npc/female01/fantastic01.wav"
-		"wave"	"vo/coast/odessa/female01/nlo_cheer01.wav"
-		"wave"	"vo/coast/odessa/female01/nlo_cheer02.wav"
-		"wave"	"vo/coast/odessa/female01/nlo_cheer03.wav"
+		"wave"	"player/voice/female/cheer/cheer1.wav"
+		"wave"	"player/voice/female/cheer/cheer2.wav"
+		"wave"	"player/voice/female/cheer/cheer3.wav"
+		"wave"	"player/voice/female/cheer/cheer4.wav"
+		"wave"	"player/voice/female/cheer/cheer5.wav"
+		"wave"	"player/voice/female/cheer/cheer6.wav"
+		"wave"	"player/voice/female/cheer/cheer7.wav"
+		"wave"	"player/voice/female/cheer/cheer8.wav"
+		"wave"	"player/voice/female/cheer/cheer9.wav"
 	}
 }
 "ZMVoiceline.Alert.Male"
@@ -164,8 +268,29 @@
 
 	"rndwave"
 	{
-		"wave"	"vo/npc/male01/headsup01.wav"
-		"wave"	"vo/npc/male01/headsup02.wav"
+		"wave"	"player/voice/male/alert/alert1.wav"
+		"wave"	"player/voice/male/alert/alert2.wav"
+		"wave"	"player/voice/male/alert/alert3.wav"
+		"wave"	"player/voice/male/alert/alert4.wav"
+		"wave"	"player/voice/male/alert/alert5.wav"
+		"wave"	"player/voice/male/alert/alert6.wav"
+		"wave"	"player/voice/male/alert/alert7.wav"
+		"wave"	"player/voice/male/alert/alert8.wav"
+		"wave"	"player/voice/male/alert/alert9.wav"
+		"wave"	"player/voice/male/alert/alert10.wav"
+		"wave"	"player/voice/male/alert/alert11.wav"
+		"wave"	"player/voice/male/alert/alert12.wav"
+		"wave"	"player/voice/male/alert/alert13.wav"
+		"wave"	"player/voice/male/alert/alert14.wav"
+		"wave"	"player/voice/male/alert/alert15.wav"
+		"wave"	"player/voice/male/alert/alert16.wav"
+		"wave"	"player/voice/male/alert/alert17.wav"
+		"wave"	"player/voice/male/alert/alert18.wav"
+		"wave"	"player/voice/male/alert/alert19.wav"
+		"wave"	"player/voice/male/alert/alert20.wav"
+		"wave"	"player/voice/male/alert/alert21.wav"
+		"wave"	"player/voice/male/alert/alert22.wav"
+		"wave"	"player/voice/male/alert/alert23.wav"
 	}
 }
 "ZMVoiceline.Alert.Female"
@@ -174,7 +299,29 @@
 
 	"rndwave"
 	{
-		"wave"	"vo/npc/female01/headsup01.wav"
-		"wave"	"vo/npc/female01/headsup02.wav"
+		"wave"	"player/voice/female/alert/alert1.wav"
+		"wave"	"player/voice/female/alert/alert2.wav"
+		"wave"	"player/voice/female/alert/alert3.wav"
+		"wave"	"player/voice/female/alert/alert4.wav"
+		"wave"	"player/voice/female/alert/alert5.wav"
+		"wave"	"player/voice/female/alert/alert6.wav"
+		"wave"	"player/voice/female/alert/alert7.wav"
+		"wave"	"player/voice/female/alert/alert8.wav"
+		"wave"	"player/voice/female/alert/alert9.wav"
+		"wave"	"player/voice/female/alert/alert10.wav"
+		"wave"	"player/voice/female/alert/alert11.wav"
+		"wave"	"player/voice/female/alert/alert12.wav"
+		"wave"	"player/voice/female/alert/alert13.wav"
+		"wave"	"player/voice/female/alert/alert14.wav"
+		"wave"	"player/voice/female/alert/alert15.wav"
+		"wave"	"player/voice/female/alert/alert16.wav"
+		"wave"	"player/voice/female/alert/alert17.wav"
+		"wave"	"player/voice/female/alert/alert18.wav"
+		"wave"	"player/voice/female/alert/alert19.wav"
+		"wave"	"player/voice/female/alert/alert20.wav"
+		"wave"	"player/voice/female/alert/alert21.wav"
+		"wave"	"player/voice/female/alert/alert22.wav"
+		"wave"	"player/voice/female/alert/alert23.wav"
+		"wave"	"player/voice/female/alert/alert24.wav"
 	}
 }
