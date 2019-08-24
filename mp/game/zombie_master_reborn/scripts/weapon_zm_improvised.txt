@@ -31,8 +31,6 @@ WeaponData
 	SoundData
 	{
 		"single_shot"		"Weapon_Crowbar.Single"
-		"melee_hit"			"Weapon_Crowbar.Melee_Hit"
-		"melee_hit_world"	"Weapon_Crowbar.Melee_HitWorld"
 	}
 	
 	TextureData

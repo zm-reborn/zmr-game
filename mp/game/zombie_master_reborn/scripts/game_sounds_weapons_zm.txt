@@ -250,7 +250,7 @@
 //
 // Fists
 //
-"Weapon_Fists_ZM.Melee_Hit"
+"Weapon_Fists_ZM.Swing"
 {
 	"channel"		"CHAN_WEAPON"
 	"volume"		"0.6"
@@ -258,24 +258,12 @@
 	"pitch"			"95,100"
 
 	"wave"			"weapons/fists_zm/swing1.wav"
-
 }
 
 
 //
 // Sledge
 //
-"Weapon_Sledge_ZM.Single"
-{
-	"channel"		"CHAN_WEAPON"
-	"volume"		"0.65"
-	"soundlevel"	"SNDLVL_105dB"
-	"pitch"			"95,100"
-
-	"wave"			"weapons/sledge_zm/sledge_swing.wav"
-
-}
-
 "Weapon_Sledge_ZM.Primary"
 {
 	"channel"		"CHAN_WEAPON"
