@@ -43,8 +43,8 @@ WeaponData
 	
 	SoundData
 	{
-		"empty"				"Weapon_pistol_zm.Empty"
-		"single_shot"		"Weapon_pistol_zm.Single"
+		"empty"				"Weapon_Pistol_ZM.Empty"
+		"single_shot"		"Weapon_Pistol_ZM.Single"
 	}
 
 	

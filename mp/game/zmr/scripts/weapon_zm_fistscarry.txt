@@ -30,7 +30,7 @@ WeaponData
 	
 	SoundData
 	{
-		"melee_hit"			"Weapon_Fists_ZM.Melee_Hit"
+		"single_shot"			"Weapon_Fists_ZM.Swing"
 	}
 	
 	TextureData

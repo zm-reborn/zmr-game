@@ -137,18 +137,11 @@ public:
 IMPLEMENT_NETWORKCLASS_ALIASED( ZMWeaponSledge, DT_ZM_WeaponSledge )
 
 
-// We use animation events, so we need to network the attack time.
 BEGIN_NETWORK_TABLE( CZMWeaponSledge, DT_ZM_WeaponSledge )
-#ifdef CLIENT_DLL
-    RecvPropTime( RECVINFO( m_flAttackHitTime ) ),
-#else
-    SendPropTime( SENDINFO( m_flAttackHitTime ) ),
-#endif
 END_NETWORK_TABLE()
 
 #ifdef CLIENT_DLL
 BEGIN_PREDICTION_DATA( CZMWeaponSledge )
-    DEFINE_PRED_FIELD_TOL( m_flAttackHitTime, FIELD_FLOAT, FTYPEDESC_INSENDTABLE, TD_MSECTOLERANCE ),
 END_PREDICTION_DATA()
 #endif
 

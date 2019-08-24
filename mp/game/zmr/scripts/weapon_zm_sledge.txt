@@ -48,8 +48,7 @@ WeaponData
 	
 	SoundData
 	{
-		"single_shot"		"Weapon_Sledge_ZM.Single"
-		"melee_hit"			"Weapon_Sledge_ZM.Primary"
+		"single_shot"		"Weapon_Sledge_ZM.Primary"
 		"special1"			"Weapon_Sledge_ZM.Secondary"
 	}
 
