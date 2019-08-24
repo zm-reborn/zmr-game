@@ -1,4 +1,9 @@
 // ZMR Sounds
+
+
+//
+// Molotov
+//
 "Grenade_Molotov.Detonate"
 {
 	"channel"	"CHAN_VOICE"
@@ -23,7 +28,10 @@
 	}
 }
 
-// weapon_shotgun_zm.txt
+
+//
+// Shotgun
+//
 "Weapon_Shotgun_ZM.Empty"
 {
 	"channel"		"CHAN_WEAPON"
@@ -73,41 +81,10 @@
 	//}
 }
 
-"Weapon_Shotgun_ZM.Double"
-{
-	"channel"		"CHAN_WEAPON"
-	"volume"		"1.0"
-	"soundlevel"	"SNDLVL_GUNFIRE" 
-	"pitch"			"90,95"
 
-	"wave"			"^weapons/shotgun_zm/shotgun_dbl_fire7_zm_dist.wav"
-}
-
-"Weapon_Shotgun_ZM.NPC_Reload"
-{
-	"channel"		"CHAN_ITEM"
-	"volume"		"0.7"
-	"soundlevel"	"SNDLVL_NORM"
-
-	"rndwave"
-	{
-		"wave"			"weapons/shotgun_zm/shotgun_reload1_zm.wav"
-		"wave"			"weapons/shotgun_zm/shotgun_reload2_zm.wav"
-		"wave"			"weapons/shotgun_zm/shotgun_reload3_zm.wav"
-	}
-}
-//TGB: NPC_Single is NOT USED
-"Weapon_Shotgun_ZM.NPC_Single"
-{
-	"channel"		"CHAN_WEAPON"
-	"volume"		"1.0"
-	"soundlevel"	"SNDLVL_NORM" //was SNDLVL_GUNFIRE
-	"pitch"			"98,101"
-
-	"wave"			"weapons/shotgun_zm/shotgun_fire6_zm.wav"
-}
-
-// weapon_rifle_zm.txt
+//
+// Rifle
+//
 "Weapon_Rifle_ZM.Empty"
 {
 	"channel"		"CHAN_WEAPON"
@@ -155,31 +132,10 @@
 	}
 }
 
-"Weapon_Rifle_ZM.NPC_Reload"
-{
-	"channel"		"CHAN_ITEM"
-	"volume"		"0.7"
-	"soundlevel"	"SNDLVL_NORM"
 
-	"rndwave"
-	{
-		"wave"			")weapons/rifle_zm/zm_rifle_reload1.wav"
-		"wave"			")weapons/rifle_zm/zm_rifle_reload2.wav"
-	}
-}
-//TGB: NPC_Single is NOT USED
-"Weapon_Rifle_ZM.NPC_Single"
-{
-	"channel"		"CHAN_WEAPON"
-	"volume"		"0.50"
-	"soundlevel"	"SNDLVL_GUNFIRE"
-	"pitch"			"98,101"
-
-	"wave"			"^weapons/rifle_zm/zm_rifle_fire2_dist.wav"
-}
-
-
-// weapon_zm_smg.txt
+//
+// Mac-10
+//
 "Weapon_SMG_ZM.Draw"
 {
 	"channel"		"CHAN_ITEM"
@@ -236,79 +192,10 @@
 	"wave"			"^weapons/smg_zm/smg_fire_distancefade.wav"
 }
 
-"Weapon_SMG_ZM.Double"
-{
-	"channel"		"CHAN_WEAPON"
-	"volume"		"0.61"
-	"soundlevel"	"SNDLVL_GUNFIRE"
 
-	"wave"		"^weapons/smg_zm/smg_fire_distancefade.wav"
-}
-
-//TGB: NPC_Single is NOT USED
-"Weapon_SMG_ZM.NPC_Single"
-{
-	"channel"		"CHAN_WEAPON"
-	"volume"		"0.8"
-	"soundlevel"	"SNDLVL_GUNFIRE"
-
-	"wave"			"^weapons/smg_zm/smg_fire_distancefade.wav"
-}
-
-"Weapon_SMG_ZM.Burst"
-{
-	"channel"		"CHAN_WEAPON"
-	"volume"		"0.7"
-	"soundlevel"	"SNDLVL_GUNFIRE"
-	"pitch"			"98,105"
-
-	"wave"		"^weapons/smg_zm/smg_fire_distancefade.wav"
-
-
-}
-
-"Weapon_SMG_ZM.NPC_Reload"
-{
-	"channel"		"CHAN_ITEM"
-	"volume"		"0.7"
-	"soundlevel"	"SNDLVL_NORM"
-
-	"wave"		"weapons/smg1/smg1_reload.wav"
-}
-
-// weapon_flashlight_zm.txt
-"Weapon_Flashlight_ZM.Single"
-{
-	"channel"		"CHAN_WEAPON"
-	"volume"		"0.55"
-	"soundlevel"	"SNDLVL_105dB"
-	"pitch"			"95,100"
-
-	"wave"			"weapons/flashlight_zm/flashlight_swing.wav"
-}
-
-"Weapon_Flashlight_ZM.Melee_Hit"
-{
-	"channel"		"CHAN_WEAPON"
-	"volume"		"0.55"
-	"soundlevel"	"SNDLVL_105dB"
-	"pitch"			"95,100"
-
-	"wave"			"weapons/flashlight_zm/flashlight_swinghit.wav"
-
-}
-
-"Weapon_Flashlight_ZM.Melee_HitWorld"
-{
-	"channel"		"CHAN_WEAPON"
-	"volume"		"0.55"
-	"soundlevel"	"SNDLVL_105dB"
-	"pitch"			"95,100"
-
-	"wave"			"weapons/flashlight_zm/flashlight_swinghit.wav"
-}
-
-// weapon_pistol.txt
+//
+// Pistol
+//
 "Weapon_Pistol_ZM.Reload1"
 {
 	"channel"		"CHAN_ITEM"
@@ -336,16 +223,7 @@
 	"wave"		")weapons/pistol_zm/pistol_zm_reload3.wav"
 }
 
-"Weapon_pistol_zm.NPC_Reload"
-{
-	"channel"		"CHAN_ITEM"
-	"volume"		"0.7"
-	"soundlevel"	"SNDLVL_NORM"
-
-	"wave"		"weapons/smg1/smg1_reload.wav"
-}
-
-"Weapon_pistol_zm.Empty"
+"Weapon_Pistol_ZM.Empty"
 {
 	"channel"		"CHAN_WEAPON"
 	"volume"		"0.7"
@@ -354,7 +232,7 @@
 	"wave"		"weapons/pistol_zm/pistol_zm_empty.wav"
 }
 
-"Weapon_pistol_zm.Single"
+"Weapon_Pistol_ZM.Single"
 {
 	"channel"		"CHAN_WEAPON"
 	"volume"		"0.8"
@@ -369,22 +247,9 @@
 
 }
 
-//TGB: NPC_Single is NOT USED
-"Weapon_pistol_zm.NPC_Single"
-{
-	"channel"		"CHAN_WEAPON"
-	"volume"		"0.9"
-	"soundlevel"	"SNDLVL_GUNFIRE"
-	"pitch"			"98,120"
-
-	"rndwave"
-	{
-		"wave"		")weapons/pistol_zm/pistol_zm_fire1.wav"
-		"wave"		")weapons/pistol_zm/pistol_zm_fire2.wav"
-
-	}
-}
-
+//
+// Fists
+//
 "Weapon_Fists_ZM.Melee_Hit"
 {
 	"channel"		"CHAN_WEAPON"
@@ -396,6 +261,10 @@
 
 }
 
+
+//
+// Sledge
+//
 "Weapon_Sledge_ZM.Single"
 {
 	"channel"		"CHAN_WEAPON"
@@ -428,6 +297,10 @@
 	"wave"			"weapons/sledge_zm/sledge_swingalt.wav"
 }
 
+
+//
+// Revolver
+//
 "Weapon_Revolver_ZM.Single"
 {
 	"channel"		"CHAN_WEAPON"
@@ -447,6 +320,10 @@
 	"wave"			")weapons/revolver_zm/revolver_reload.wav"
 }
 
+
+//
+// OverUnder
+//
 "Weapon_OverUnder_ZM.Reload1"
 {
 	"channel"		"CHAN_ITEM"
