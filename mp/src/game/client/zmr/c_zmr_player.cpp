@@ -642,6 +642,19 @@ float C_ZMPlayer::GetFOV()
     return MAX( GetMinFOV(), fov );
 }
 
+extern ConVar default_fov;
+
+float C_ZMPlayer::GetLocalDefaultFOV()
+{
+    const float flLocalDefFOV = default_fov.GetFloat();
+
+    auto* pLocal = C_ZMPlayer::GetLocalPlayer();
+    if ( !pLocal )
+        return flLocalDefFOV;
+
+    return pLocal->GetDefaultFOV();
+}
+
 int C_ZMPlayer::GetIDTarget() const
 {
     return m_iIDEntIndex;
