@@ -13,6 +13,7 @@ extern ConVar g_ragdoll_maxcount;
 extern ConVar zm_cl_precipitationquality;
 extern ConVar zm_cl_flashlight_expensive_max;
 extern ConVar zm_cl_colorcorrection_effects;
+extern ConVar zm_cl_muzzleflash_light;
 
 
 CZMOptionsSubGraphics::CZMOptionsSubGraphics( Panel* parent ) : BaseClass( parent )
@@ -28,6 +29,7 @@ CZMOptionsSubGraphics::CZMOptionsSubGraphics( Panel* parent ) : BaseClass( paren
     LoadItem( &m_pRainBox, "ComboRain" );
     LoadItem( &m_pExpFlashlightAmtBox, "ComboFlashlightAmount" );
     LoadItem( &m_pCheck_CC, "CheckCC" );
+    LoadItem( &m_pMuzzleflashBox, "ComboMuzzleflash" );
 
 
     if ( FailedLoad() ) return;
@@ -44,6 +46,10 @@ CZMOptionsSubGraphics::CZMOptionsSubGraphics( Panel* parent ) : BaseClass( paren
     m_pExpFlashlightAmtBox->AddItem( L"1", tempkv );
     m_pExpFlashlightAmtBox->AddItem( L"2", tempkv );
     m_pExpFlashlightAmtBox->AddItem( L"3", tempkv );
+
+    m_pMuzzleflashBox->AddItem( L"None", tempkv );
+    m_pMuzzleflashBox->AddItem( L"Local Only", tempkv );
+    m_pMuzzleflashBox->AddItem( L"All Players", tempkv );
 
     tempkv->deleteThis();
 
@@ -68,6 +74,7 @@ void CZMOptionsSubGraphics::OnApplyChanges()
 
 
     zm_cl_flashlight_expensive_max.SetValue( m_pExpFlashlightAmtBox->GetActiveItem() );
+    zm_cl_muzzleflash_light.SetValue( m_pMuzzleflashBox->GetActiveItem() );
 
     int rainval = m_pRainBox->GetActiveItem();
     switch ( rainval )
@@ -98,6 +105,7 @@ void CZMOptionsSubGraphics::OnResetData()
 
 
     m_pExpFlashlightAmtBox->ActivateItem( zm_cl_flashlight_expensive_max.GetInt() );
+    m_pMuzzleflashBox->ActivateItem( zm_cl_muzzleflash_light.GetInt() );
     
     int rainval = zm_cl_precipitationquality.GetInt();
     switch ( rainval )
