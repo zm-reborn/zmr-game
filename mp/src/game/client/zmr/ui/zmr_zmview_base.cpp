@@ -12,6 +12,7 @@
 #include "zmr/c_zmr_util.h"
 #include "zmr/c_zmr_clientmode.h"
 #include "zmr/zmr_hiddenspawn.h"
+#include "zmr/c_zmr_in_main.h"
 #include "zmr/c_zmr_tempmodel.h"
 #include "zmr_zmview_base.h"
 
@@ -32,6 +33,7 @@ ConVar zm_cl_zmview_switchmousebuttons( "zm_cl_zmview_switchmousebuttons", "0", 
 ConVar zm_cl_poweruser_boxselect( "zm_cl_poweruser_boxselect", "0", FCVAR_ARCHIVE, "Select zombies through walls with box select." );
 ConVar zm_cl_poweruser( "zm_cl_poweruser", "0", FCVAR_ARCHIVE, "Select spawns/traps/zombies through walls." );
 ConVar zm_cl_hidemouseinscore( "zm_cl_hidemouseinscore", "1", FCVAR_ARCHIVE, "Is mouse input disabled while having scoreboard open?" );
+ConVar zm_cl_border_scroll( "zm_cl_border_scroll", "10", FCVAR_ARCHIVE, "Border scrolling in pixels." );
 
 
 
@@ -182,6 +184,11 @@ void CZMViewBase::SetClickMode( ZMClickMode_t mode, bool print )
 
 
     m_iClickMode = mode;
+}
+
+float CZMViewBase::GetBorderScroll()
+{
+    return zm_cl_border_scroll.GetInt();
 }
 
 float CZMViewBase::GetDoubleClickDelta() const
@@ -415,45 +422,11 @@ void CZMViewBase::OnThink()
     }
 
 
+    
 
     if ( IsMouseInputEnabled() )
     {
-#define SCRL_BORDER     10
-
-	    int mx, my;
-	    ::input->GetFullscreenMousePos( &mx, &my );
-
-        if ( mx < SCRL_BORDER )
-        {
-            engine->ClientCmd( "+left" );
-            engine->ClientCmd( "-right" );
-        }
-        else if ( mx > (ScreenWidth() - SCRL_BORDER) )
-        {
-            engine->ClientCmd( "-left" );
-            engine->ClientCmd( "+right" );
-        }
-        else
-        {
-            engine->ClientCmd( "-left" );
-            engine->ClientCmd( "-right" );
-        }
-
-        if ( my < SCRL_BORDER )
-        {
-            engine->ClientCmd( "+lookup" );
-            engine->ClientCmd( "-lookdown" );
-        }
-        else if ( my > (ScreenHeight() - SCRL_BORDER) )
-        {
-            engine->ClientCmd( "-lookup" );
-            engine->ClientCmd( "+lookdown" );
-        }
-        else
-        {
-            engine->ClientCmd( "-lookup" );
-            engine->ClientCmd( "-lookdown" );
-        }
+        CheckBorderScrolling();
     }
 
 
@@ -477,6 +450,46 @@ void CZMViewBase::OnThink()
     else
     {
         FreeTempHiddenZombie();
+    }
+}
+
+void CZMViewBase::CheckBorderScrolling()
+{
+    int nBorderScroll = GetBorderScroll();
+
+    if ( nBorderScroll <= 0 )
+        return;
+
+
+
+	int mx, my;
+	::input->GetFullscreenMousePos( &mx, &my );
+
+    if ( mx < nBorderScroll )
+    {
+        ZMInput()->SetScreenScrollStateYaw( CZMInput::SCROLL_POSITIVE );
+    }
+    else if ( mx > (ScreenWidth() - nBorderScroll) )
+    {
+        ZMInput()->SetScreenScrollStateYaw( CZMInput::SCROLL_NEGATIVE );
+    }
+    else
+    {
+        ZMInput()->SetScreenScrollStateYaw( CZMInput::SCROLL_NONE );
+    }
+
+
+    if ( my < nBorderScroll )
+    {
+        ZMInput()->SetScreenScrollStatePitch( CZMInput::SCROLL_NEGATIVE );
+    }
+    else if ( my > (ScreenHeight() - nBorderScroll) )
+    {
+        ZMInput()->SetScreenScrollStatePitch( CZMInput::SCROLL_POSITIVE );
+    }
+    else
+    {
+        ZMInput()->SetScreenScrollStatePitch( CZMInput::SCROLL_NONE );
     }
 }
 
