@@ -79,6 +79,7 @@ namespace NPCR
         virtual void OnUpdate() {}
         virtual void OnEnd() {}
         virtual void OnContinue() {} // When the child schedule has finished.
+        virtual void OnIntercept() {}
         
 
         CSchedule<NPCRChar>* GetActiveSchedule() const
@@ -148,6 +149,7 @@ namespace NPCR
             }
             
 
+            OnIntercept();
             GetParentInterface()->RemoveComponent( this );
 
 

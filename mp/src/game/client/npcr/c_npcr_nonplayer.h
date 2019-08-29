@@ -7,8 +7,13 @@
 class C_NPCRNonPlayer : public C_BaseCombatCharacter
 {
 public:
+    DECLARE_CLASS( C_NPCRNonPlayer, C_BaseCombatCharacter );
+
+
     C_NPCRNonPlayer();
 
+
+    virtual void PostDataUpdate( DataUpdateType_t updateType ) OVERRIDE;
 
     virtual bool IsNPCR() const OVERRIDE { return true; }
 

@@ -16,6 +16,7 @@ $Configuration
 	{
 		$AdditionalIncludeDirectories		"$BASE;hl2mp\ui,.\hl2mp,$SRCDIR\game\shared\hl2mp,.\hl2,.\hl2\elements,$SRCDIR\game\shared\hl2,$SRCDIR\game\shared\zmr"
 		$PreprocessorDefinitions			"$BASE;HL2MP;HL2_CLIENT_DLL;ZMR"
+		$PreprocessorDefinitions			"$BASE;ZMR_STEAM" [$ZMR_STEAM]
 	}
 }
 
@@ -25,6 +26,7 @@ $Project "Client (ZMR)"
 	{
 		$Lib		discord-rpc [$WIN32]
 		//$Lib		libdiscord-rpc [$LINUXALL]
+		$Lib		raytrace
 	}
 	
 	$Folder	"Source Files"
@@ -100,7 +102,7 @@ $Project "Client (ZMR)"
 			$File	"$SRCDIR\game\shared\hl2\hl2_usermessages.cpp"
 			$File	"$SRCDIR\game\shared\hl2\hl_gamemovement.cpp"
 			$File	"$SRCDIR\game\shared\hl2\hl_gamemovement.h"
-			$File	"hl2\hl_in_main.cpp"
+			//$File	"hl2\hl_in_main.cpp"
 			$File	"hl2\hl_prediction.cpp"
 			//$File	"hl2\hud_ammo.cpp"
 			$File	"hl2\hud_battery.cpp"
@@ -178,6 +180,10 @@ $Project "Client (ZMR)"
 		}
 		$Folder "ZMR"
 		{
+			$Folder "Game Shader"
+			{
+				$File	"replmats.cpp"
+			}
 			$Folder "GlowStencil"
 			{
 				$File	"glowstencil\c_glowbase.cpp"
@@ -215,6 +221,8 @@ $Project "Client (ZMR)"
 				$File	"zmr\npcs\c_zmr_zombieanimevent.h"
 				$File	"zmr\npcs\c_zmr_zombiebase.cpp"
 				$File	"zmr\npcs\c_zmr_zombiebase.h"
+				$File	"zmr\npcs\c_zmr_zombiegib.cpp"
+				$File	"zmr\npcs\c_zmr_zombiegib.h"
 				
 				// Shared
 				$File	"$SRCDIR\game\shared\zmr\npcs\zmr_zombieanimstate.cpp"
@@ -396,21 +404,43 @@ $Project "Client (ZMR)"
 				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_sledge.cpp"
 				//$File	"$SRCDIR\game\shared\zmr\weapons\zmr_usercmdvalid.cpp"
 				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_usercmdvalid.h"
+				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_weaponconfig.cpp"
+				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_weaponconfig.h"
+			}
+			$Folder "Color Corrections"
+			{
+				$File	"zmr\c_zmr_cc_death.cpp"
+				$File	"zmr\c_zmr_cc_survivor.cpp"
+				$File	"zmr\c_zmr_cc_survivor_lowhp.cpp"
+				$File	"zmr\c_zmr_cc_zm.cpp"
+			}
+			$Folder "Temp Entities"
+			{
+				$File	"zmr\c_zmr_te_firebullets.cpp"
 			}
 			
 			$File	"zmr\c_zmr_ammo.cpp"
 			$File	"zmr\c_zmr_charcircle.cpp"
 			$File	"zmr\c_zmr_charcircle.h"
+			$File	"zmr\c_zmr_clearsndcache.cpp"
 			$File	"zmr\c_zmr_clientmode.cpp"
 			$File	"zmr\c_zmr_clientmode.h"
+			$File	"zmr\c_zmr_colorcorrection.cpp"
+			$File	"zmr\c_zmr_colorcorrection.h"
 			$File	"zmr\c_zmr_concommands.cpp"
 			$File	"zmr\c_zmr_crosshair.cpp"
 			$File	"zmr\c_zmr_crosshair.h"
 			$File	"zmr\c_zmr_discord.cpp" [$WIN32]
 			$File	"zmr\c_zmr_entities.cpp"
 			$File	"zmr\c_zmr_entities.h"
+			$File	"zmr\c_zmr_flashlighteffect.cpp"
+			$File	"zmr\c_zmr_flashlighteffect.h"
+			$File	"zmr\c_zmr_flashlightsystem.cpp"
+			$File	"zmr\c_zmr_flashlightsystem.h"
 			$File	"zmr\c_zmr_importancesystem.cpp"
 			$File	"zmr\c_zmr_importancesystem.h"
+			$File	"zmr\c_zmr_in_main.cpp"
+			$File	"zmr\c_zmr_in_main.h"
 			$File	"zmr\c_zmr_legacy_objpanel.cpp"
 			$File	"zmr\c_zmr_legacy_objpanel.h"
 			$File	"zmr\c_zmr_player.cpp"
@@ -421,6 +451,8 @@ $Project "Client (ZMR)"
 			$File	"zmr\c_zmr_player_resource.h"
 			$File	"zmr\c_zmr_playeranimevent.cpp"
 			$File	"zmr\c_zmr_playeranimevent.h"
+			$File	"zmr\c_zmr_precipitation.cpp"
+			$File	"zmr\c_zmr_precipitation.h"
 			$File	"zmr\c_zmr_teamkeys.cpp"
 			$File	"zmr\c_zmr_teamkeys.h"
 			$File	"zmr\c_zmr_tempmodel.cpp"
@@ -434,6 +466,7 @@ $Project "Client (ZMR)"
 			
 			// Shared
 			$File	"$SRCDIR\game\shared\zmr\zmr_ammodef.cpp"
+			$File	"$SRCDIR\game\shared\zmr\zmr_ammodef.h"
 			$File	"$SRCDIR\game\shared\zmr\zmr_animevents.cpp"
 			$File	"$SRCDIR\game\shared\zmr\zmr_gamemovement.cpp"
 			$File	"$SRCDIR\game\shared\zmr\zmr_gamemovement.h"

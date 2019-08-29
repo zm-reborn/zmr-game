@@ -1,0 +1,8 @@
+// Shit to compile for flashlight fix:
+//sdk_lightmappedgeneric_ps2x.fxc
+//sdk_vertexlit_and_unlit_generic_bump_ps2x.fxc
+//sdk_vertexlit_and_unlit_generic_ps2x.fxc
+//sdk_worldtwotextureblend_ps2x.fxc
+
+// The actual thing that fixes the "back" flashlight
+//sdk_flashlight_ps2x.fxc

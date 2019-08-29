@@ -31,6 +31,7 @@ static const char* g_szSurvivorCommands[] = {
     "+reload",
     "+speed",
     "+use",
+    "+attack3",
     "+zm_voicemenu",
     "impulse 100",
     "impulse 201",
@@ -42,6 +43,7 @@ static const char* g_szSurvivorCommands[] = {
     "lastinv",
 };
 
+// Unique just for spectators.
 static const char* g_szSpectatorCommands[] = {
     "zm_observezombie",
 };

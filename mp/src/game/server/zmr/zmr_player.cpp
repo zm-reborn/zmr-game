@@ -16,6 +16,7 @@
 #include "zmr/zmr_gamerules.h"
 #include "zmr/zmr_playermodels.h"
 #include "weapons/zmr_fistscarry.h"
+#include "zmr_ammodef.h"
 #include "zmr_player.h"
 
 
@@ -60,6 +61,8 @@ BEGIN_SEND_TABLE_NOBASE( CZMPlayer, DT_ZMNonLocalPlayerExclusive )
 
     SendPropFloat( SENDINFO_VECTORELEM( m_angEyeAngles, 0 ), 8, SPROP_CHANGES_OFTEN, -90.0f, 90.0f ),
     SendPropAngle( SENDINFO_VECTORELEM( m_angEyeAngles, 1 ), 10, SPROP_CHANGES_OFTEN ),
+
+    SendPropInt( SENDINFO( m_nMuzzleFlashParity ), EF_MUZZLEFLASH_BITS, SPROP_UNSIGNED ),
 END_SEND_TABLE()
 
 IMPLEMENT_SERVERCLASS_ST( CZMPlayer, DT_ZM_Player )
@@ -77,6 +80,9 @@ IMPLEMENT_SERVERCLASS_ST( CZMPlayer, DT_ZM_Player )
     // Other players' water level is networked for animations.
     SendPropInt( SENDINFO( m_nWaterLevel ), 2, SPROP_UNSIGNED ),
     SendPropExclude( "DT_LocalPlayerExclusive", "m_nWaterLevel" ),
+    
+    // We only want to send it to other players.
+    SendPropExclude( "DT_BaseAnimating", "m_nMuzzleFlashParity" ),
 
     
     SendPropExclude( "DT_BaseAnimating", "m_flPoseParameter" ),
@@ -159,6 +165,9 @@ void CZMPlayer::Precache()
     PrecacheModel ( "sprites/glow01.vmt" );
 
     PrecacheModel( VMHANDS_FALLBACKMODEL );
+
+    PrecacheScriptSound( "ZMPlayer.PickupWeapon" );
+    PrecacheScriptSound( "ZMPlayer.PickupAmmo" );
 
 
     ZMGetPlayerModels()->LoadModelsFromFile();
@@ -628,8 +637,9 @@ void CZMPlayer::PickDefaultSpawnTeam()
 int CZMPlayer::GiveAmmo( int nCount, int nAmmoIndex, bool bSuppressSound )
 {
     // Don't try to give the player invalid ammo indices.
-    if ( nAmmoIndex < 0 )
+    if ( nAmmoIndex < 0 || nAmmoIndex >= MAX_AMMO_SLOTS )
         return 0;
+
 
     bool bCheckAutoSwitch = false;
     if ( !HasAnyAmmoOfType( nAmmoIndex ) )
@@ -637,7 +647,35 @@ int CZMPlayer::GiveAmmo( int nCount, int nAmmoIndex, bool bSuppressSound )
         bCheckAutoSwitch = true;
     }
 
-    int nAdd = CBasePlayer::GiveAmmo( nCount, nAmmoIndex, bSuppressSound );
+
+    // Game rules say I can't have any more of this ammo type.
+    if ( !g_pGameRules->CanHaveAmmo( this, nAmmoIndex ) )
+    {
+        return 0;
+    }
+
+
+    int nRoom = GetAmmoRoom( nAmmoIndex ) - GetTotalAmmoAmount( nAmmoIndex );
+    int nAdd = MIN( nCount, nRoom );
+    nAdd = MAX( 0, nAdd );
+
+
+    if ( nAdd )
+    {
+        // Ammo pickup sound
+        if ( !bSuppressSound )
+        {
+            CRecipientFilter filter;
+            GetMyRecipientFilter( filter );
+
+            CBaseEntity::EmitSound( filter, entindex(), "ZMPlayer.PickupAmmo" );
+        }
+
+        m_iAmmo.Set( nAmmoIndex, m_iAmmo[nAmmoIndex] + nAdd );
+    }
+    
+
+
 
     // We've been denied the pickup, display a hud icon to show that.
     // Make sure we don't send this usermessage multiple times a frame.
@@ -1754,4 +1792,22 @@ int CZMPlayer::GetZMCommandInterruptFlags() const
         return 0;
 
     return atoi( val );
+}
+
+void CZMPlayer::GetMyRecipientFilter( CRecipientFilter& filter )
+{
+    filter.AddRecipient( this );
+
+    // Get all spectators spectating me.
+    for ( int i = 1; i <= gpGlobals->maxClients; i++ )
+    {
+        CBasePlayer* pPlayer = UTIL_PlayerByIndex( i );
+        if (pPlayer
+            &&  pPlayer->IsObserver()
+            &&  pPlayer->GetObserverMode() == OBS_MODE_IN_EYE
+            &&  pPlayer->GetObserverTarget() == this)
+        {
+            filter.AddRecipient( pPlayer );
+        }
+    }
 }

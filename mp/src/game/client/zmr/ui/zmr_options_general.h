@@ -32,6 +32,7 @@ private:
     vgui::CheckButton*  m_pCheck_BoxPowerUser;
     vgui::Slider*       m_pSlider_Pitch;
     vgui::Slider*       m_pSlider_Yaw;
+    vgui::Slider*       m_pSlider_Border;
     
     const char* GetCurrentPlayerModel();
     void AppendCustomModels();

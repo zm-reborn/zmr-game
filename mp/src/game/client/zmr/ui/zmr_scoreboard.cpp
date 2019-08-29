@@ -29,6 +29,9 @@
 #include "zmr_listpanel.h"
 #include "zmr_scoreboard.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 using namespace vgui;
 
@@ -569,6 +572,8 @@ void CZMClientScoreBoardDialog::GetPlayerScoreInfo( int playerIndex, KeyValues* 
     }
 
     kv->SetInt( "importance", iImage );
+
+    kv->SetString( "importance_tooltip", g_ZMImportanceSystem.GetPlayerImportanceName( playerIndex ) );
 }
 
 void CZMClientScoreBoardDialog::UpdatePlayerAvatar( int playerIndex, KeyValues* kv )

@@ -229,11 +229,19 @@ CHudTexture *WeaponsResource::GetAmmoIconFromWeapon( int iAmmoId )
 
 		if ( weapon->GetPrimaryAmmoType() == iAmmoId )
 		{
+#ifdef ZMR
+            return (CHudTexture*)weapon->GetSpriteAmmo();
+#else
 			return weapon->GetWpnData().iconAmmo;
+#endif
 		}
 		else if ( weapon->GetSecondaryAmmoType() == iAmmoId )
 		{
+#ifdef ZMR
+            return (CHudTexture*)weapon->GetSpriteAmmo();
+#else
 			return weapon->GetWpnData().iconAmmo2;
+#endif
 		}
 	}
 

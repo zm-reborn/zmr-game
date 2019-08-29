@@ -46,11 +46,23 @@ public:
 
         m_pGotoSwatSched->SetBreakObject( DoBreakObject() );
         Intercept( m_pGotoSwatSched, "Found a swattable object! Go to it!" );
+
+        if ( !IsIntercepted() )
+        {
+            End( "Failed to start go to swat schedule!" );
+        }
     }
 
     virtual void OnContinue() OVERRIDE
     {
         End( "Swatting finished!" );
+    }
+
+    // We should never reach here.
+    virtual void OnUpdate() OVERRIDE
+    {
+        Assert( 0 );
+        End( "Schedule error occured in swatting scan!" );
     }
 
     CBaseEntity* GetSwatObject()

@@ -161,6 +161,12 @@ bool CEnvProjectedTexture::KeyValue( const char *szKeyName, const char *szValue 
 		UTIL_ColorStringToLinearFloatColor( tmp, szValue );
 		m_LinearFloatLightColor = tmp;
 	}
+#ifdef ZMR // ZMRCHANGE: https://developer.valvesoftware.com/wiki/Env_projectedtexture/fixes
+    else if ( FStrEq( szKeyName, "texturename" ) )
+    {
+        Q_strcpy( m_SpotlightTextureName.GetForModify(), szValue );
+    }
+#endif
 	else
 	{
 		return BaseClass::KeyValue( szKeyName, szValue );
@@ -226,10 +232,14 @@ void CEnvProjectedTexture::InputSetSpotlightTexture( inputdata_t &inputdata )
 
 void CEnvProjectedTexture::Activate( void )
 {
+#ifdef ZMR
+    m_bState = ( GetSpawnFlags() & ENV_PROJECTEDTEXTURE_STARTON ) ? true : false;
+#else
 	if ( GetSpawnFlags() & ENV_PROJECTEDTEXTURE_STARTON )
 	{
 		m_bState = true;
 	}
+#endif
 
 	SetThink( &CEnvProjectedTexture::InitialThink );
 	SetNextThink( gpGlobals->curtime + 0.1f );

@@ -413,26 +413,42 @@ private:
 /*
     Phys explosion
 */
-class CZMPhysExplosion : public CPhysExplosion
+class CZMPhysExplosion : public CServerOnlyPointEntity
 {
 public:
-    DECLARE_CLASS( CZMPhysExplosion, CPhysExplosion );
+    DECLARE_CLASS( CZMPhysExplosion, CServerOnlyPointEntity );
     DECLARE_DATADESC();
 
 
     CZMPhysExplosion();
     ~CZMPhysExplosion();
 
+
+    static CZMPhysExplosion* CreatePhysExplosion( const Vector& pos, float delay, float magnitude, float radius );
+
     void Spawn() OVERRIDE;
     void Precache() OVERRIDE;
-    
-    void DelayedExplode( float delay );
+
+
+    float GetMagnitude() const { return m_flMagnitude; }
+    float GetRadius() const { return m_flRadius; }
+
+    void SetMagnitude( float val ) { m_flMagnitude = val; }
+    void SetRadius( float val ) { m_flRadius = val; }
 
 private:
     void DelayThink();
     void CreateEffects( float delay );
+    void Push();
+
+
+    void DelayedExplode( float delay );
 
     EHANDLE m_hSpark;
+
+
+    float m_flMagnitude;
+    float m_flRadius;
 };
 
 /*
@@ -485,3 +501,33 @@ private:
     bool m_bNeedsInit;
 };
 
+/*
+    Brush spawn volume
+*/
+class CZMEntTriggerSpawnVolume : public CBaseTrigger
+{
+public:
+    DECLARE_CLASS( CZMEntTriggerSpawnVolume, CBaseTrigger );
+    DECLARE_DATADESC();
+
+
+    CZMEntTriggerSpawnVolume();
+    ~CZMEntTriggerSpawnVolume();
+
+    void Spawn() OVERRIDE;
+
+
+    static void GetPositionWithin( const CBaseEntity* pEnt, Vector& pos );
+    void GetPositionWithin( Vector& pos ) const;
+
+
+    inline bool IsActive() const { return m_bActive; }
+
+
+    void InputToggle( inputdata_t &inputdata );
+    void InputEnable( inputdata_t &inputdata );
+    void InputDisable( inputdata_t &inputdata );
+
+private:
+    bool m_bActive;
+};

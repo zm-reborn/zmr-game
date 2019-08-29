@@ -381,7 +381,13 @@ public:
 	QAngle	GetStepAngles( void ) const;
 
 private:
+#ifdef ZMR // ZMRCHANGE: Allow m_bSequenceFinished to be accessed.
+protected:
+#endif
 	bool				m_bSequenceFinished;// flag set when StudioAdvanceFrame moves across a frame boundry
+#ifdef ZMR
+private:
+#endif
 	bool				m_bSequenceLoops;	// true if the sequence loops
 	bool				m_bResetSequenceInfoOnLoad; // true if a ResetSequenceInfo was queued up during dynamic load
 	float				m_flDissolveStartTime;

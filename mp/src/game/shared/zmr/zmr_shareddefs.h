@@ -191,3 +191,13 @@ enum ZombieCommandInterrupt_t
     ZCO_SWAT = ( 1 << 0 ),
     ZCO_ATTACK = ( 1 << 1 )
 };
+
+enum ZMZombieGibType_t
+{
+    ZMGIBTYPE_NONE = 0,
+    
+    ZMGIBTYPE_HEAD,
+
+
+    ZMGIBTYPE_MAX
+};

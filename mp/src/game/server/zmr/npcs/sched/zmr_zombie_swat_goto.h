@@ -50,6 +50,10 @@ public:
 
     virtual void OnStart() OVERRIDE
     {
+        m_ExpireTimer.Invalidate();
+        m_EnemyScanTimer.Invalidate();
+
+
         CZMBaseZombie* pOuter = GetOuter();
         CBaseEntity* pSwat = pOuter->GetSwatObject();
 
@@ -67,7 +71,12 @@ public:
         {
             m_pSwatSched->SetBreakObject( DoBreakObject() );
             Intercept( m_pSwatSched, "Close enough to swat!" );
-            return;
+            
+            if ( !IsIntercepted() )
+            {
+                End( "Failed to start swatting schedule!" );
+                return;
+            }
         }
 
 
@@ -82,8 +91,6 @@ public:
 
         if ( m_flStartExpireTimer > 0.0f )
             m_ExpireTimer.Start( m_flStartExpireTimer );
-        else
-            m_ExpireTimer.Invalidate();
     }
 
     virtual void OnContinue() OVERRIDE
@@ -118,14 +125,20 @@ public:
         {
             CBaseEntity* pCurEnemy = pOuter->GetEnemy();
             CBaseEntity* pEnt = pOuter->GetSenses()->GetClosestEntity();
+
+            if ( !pEnt )
+                pEnt = pCurEnemy;
+
             if ( pEnt && pOuter->IsEnemy( pEnt ) )
             {
-                float flCurDist = vecCurPos.DistTo( pSwat->WorldSpaceCenter() );
-                float flNewDist = vecCurPos.DistTo( pEnt->WorldSpaceCenter() );
+                auto mypos = pOuter->WorldSpaceCenter();
+
+                float flCurDist = mypos.DistTo( vecCurPos );
+                float flNewDist = mypos.DistTo( pEnt->WorldSpaceCenter() );
 
                 
                 if (pOuter->HasConditionsForClawAttack( pEnt ) // We can attack the idiot, do it!
-                ||  flNewDist < (flCurDist*0.7f) ) // We have to be reasonably closer to the potential enemy.
+                ||  flNewDist < (flCurDist*0.9f) ) // We have to be reasonably closer to the potential enemy.
                 {
                     if ( !pCurEnemy || pEnt != pCurEnemy )
                         pOuter->AcquireEnemy( pEnt );
@@ -169,6 +182,12 @@ public:
         {
             m_pSwatSched->SetBreakObject( DoBreakObject() );
             Intercept( m_pSwatSched, "Close enough to swat!" );
+
+            if ( !IsIntercepted() )
+            {
+                End( "Failed to start swatting schedule!" );
+            }
+
             return;
         }
     }

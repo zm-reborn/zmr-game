@@ -106,11 +106,16 @@ protected:
     CZMCharCircle* m_fxHealth;
     CZMCharCircle* m_fxInner;
 
+
+    bool m_bDidDeathEffect;
+
 private:
     CNetworkVar( int, m_iSelectorIndex );
     CNetworkVar( float, m_flHealthRatio );
     CNetworkVar( bool, m_bIsOnGround );
     CNetworkVar( int, m_iAnimationRandomSeed );
+
+    CNetworkVar( int, m_iGibType );
 
     int m_iGroup;
     ZombieClass_t m_iZombieClass;

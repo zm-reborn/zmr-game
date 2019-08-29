@@ -33,6 +33,9 @@
 #include "zmr/zmr_shareddefs.h"
 #include "zmr/zmr_web.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 #ifdef CLIENT_DLL
 ConVar zm_cl_roundrestart_flashtaskbar( "zm_cl_roundrestart_flashtaskbar", "1", 0, "Flash the taskbar icon (Windows) whenever round restarts. 1 = Only when window is not active, 2 = Always" );
@@ -69,6 +72,13 @@ public:
 void CZMSystem::PostInit()
 {
 #ifdef CLIENT_DLL
+    //
+    // https://developer.valvesoftware.com/wiki/Env_projectedtexture/fixes
+    //
+    ConVarRef r_flashlightscissor( "r_flashlightscissor" );
+    r_flashlightscissor.SetValue( "0" );
+
+
     ListenForGameEvent( "round_end_post" );
     ListenForGameEvent( "round_restart_post" );
     ListenForGameEvent( "player_spawn" );
