@@ -145,7 +145,11 @@ int C_ZMViewModel::DrawModel( int flags )
 
 bool C_ZMViewModel::ShouldReceiveProjectedTextures( int flags )
 {
-    return true;
+    //
+    // IMPORTANT: There's a common crash is caused by things that return true in ShouldReceiveProjectedTextures
+    // I've not been able to debug it, so fuck it.
+    //
+    return false;
 }
 
 C_BaseAnimating* C_ZMViewModel::FindFollowedEntity()
