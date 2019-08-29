@@ -99,7 +99,6 @@ ConVar r_flashlightdepthres( "r_flashlightdepthres", "512" );
 ConVar r_flashlightdepthres( "r_flashlightdepthres", "1024" );
 #endif
 
-ConVar r_threaded_client_shadow_manager( "r_threaded_client_shadow_manager", "0" );
 
 #ifdef _WIN32
 #pragma warning( disable: 4701 )
@@ -959,8 +958,10 @@ private:
 	bool m_RenderToTextureActive;
 	bool m_bRenderTargetNeedsClear;
 	bool m_bUpdatingDirtyShadows;
+public:
 	bool m_bThreaded;
-	float m_flShadowCastDist;
+private:
+    float m_flShadowCastDist;
 	float m_flMinShadowArea;
 	CUtlRBTree< ClientShadowHandle_t, unsigned short >	m_DirtyShadows;
 	CUtlVector< ClientShadowHandle_t > m_TransparentShadows;
@@ -983,6 +984,11 @@ private:
 //-----------------------------------------------------------------------------
 static CClientShadowMgr s_ClientShadowMgr;
 IClientShadowMgr* g_pClientShadowMgr = &s_ClientShadowMgr;
+
+ConVar r_threaded_client_shadow_manager( "r_threaded_client_shadow_manager", "0", FCVAR_ARCHIVE, "", []( IConVar* var, const char* pOldValue, float flOldValue ) {
+    ConVarRef ref( var );
+    s_ClientShadowMgr.m_bThreaded = ref.GetBool();
+});
 
 
 //-----------------------------------------------------------------------------
@@ -1173,7 +1179,7 @@ CClientShadowMgr::CClientShadowMgr() :
 	m_bDepthTextureActive( false )
 {
 	m_nDepthTextureResolution = r_flashlightdepthres.GetInt();
-	m_bThreaded = true;
+	m_bThreaded = false;
 }
 
 
