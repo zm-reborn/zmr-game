@@ -56,7 +56,6 @@ ConVar zm_cl_zmmoveaccelerate( "zm_cl_zmmoveaccelerate", "5", FCVAR_USERINFO | F
 ConVar zm_cl_zmmovedecelerate( "zm_cl_zmmovedecelerate", "4", FCVAR_USERINFO | FCVAR_ARCHIVE, "How fast you'll decelerate." );
 // Mouse wheel
 ConVar zm_cl_zmmovemwheelmove( "zm_cl_zmmovemwheelmove", "1", FCVAR_ARCHIVE, "As the ZM, can you move up/down with mousewheel?" );
-ConVar zm_cl_zmmovemwheelmovereverse( "zm_cl_zmmovemwheelmovereverse", "1", FCVAR_ARCHIVE, "Is mousewheel scrolling reversed?" );
 ConVar zm_cl_zmmovemwheelmovespd( "zm_cl_zmmovemwheelmovespd", "1600", FCVAR_ARCHIVE, "", true, 400.0f, true, 2000.0f );
 // Button ones
 ConVar zm_cl_zmmovejumpspd( "zm_cl_zmmovejumpspd", "1600", FCVAR_ARCHIVE );
@@ -1092,7 +1091,7 @@ bool C_ZMPlayer::CreateMove( float delta, CUserCmd* cmd )
     bool bResult = BaseClass::CreateMove( delta, cmd );
     
 
-    if ( m_flNextUpMove > gpGlobals->curtime )
+    if ( m_flNextUpMove > gpGlobals->curtime && zm_cl_zmmovemwheelmove.GetBool() )
     {
         cmd->upmove += m_flUpMove;
     }
@@ -1139,15 +1138,9 @@ bool C_ZMPlayer::CreateMove( float delta, CUserCmd* cmd )
 
 void C_ZMPlayer::SetMouseWheelMove( float dir )
 {
-    if ( !zm_cl_zmmovemwheelmove.GetBool() ) return;
-
-    if ( dir == 0.0f ) return;
-
     if ( m_flNextUpMove > gpGlobals->curtime )
         return;
 
-    if ( zm_cl_zmmovemwheelmovereverse.GetBool() )
-        dir *= -1.0f;
 
     m_flNextUpMove = gpGlobals->curtime + 0.1f;
     m_flUpMove = zm_cl_zmmovemwheelmovespd.GetFloat() * dir;

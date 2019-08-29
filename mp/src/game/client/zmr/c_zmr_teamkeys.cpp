@@ -22,6 +22,8 @@ static const char* g_szZMCommands[] = {
     "zm_cmd_delete",
     "zm_hiddenspawn",
     "roundrestart",
+    "zm_cmd_moveup",
+    "zm_cmd_movedown",
 };
 
 // All commands we consider survivor/spectator commands
