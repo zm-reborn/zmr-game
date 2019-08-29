@@ -3,7 +3,6 @@
 #include "npcevent.h"
 #include "activitylist.h"
 #include "eventlist.h"
-#include "gib.h"
 #include "collisionutils.h"
 
 #include "npcr_manager.h"
@@ -182,6 +181,8 @@ IMPLEMENT_SERVERCLASS_ST( CZMBaseZombie, DT_ZM_BaseZombie )
     SendPropInt( SENDINFO( m_iAnimationRandomSeed ) ),
     SendPropInt( SENDINFO( m_lifeState ), 3, SPROP_UNSIGNED ),
 
+    SendPropInt( SENDINFO( m_iGibType ), Q_log2( ZMGIBTYPE_MAX ) + 1, SPROP_UNSIGNED ),
+
 
     // Animation excludes
     SendPropExclude( "DT_BaseAnimating", "m_flPoseParameter" ),
@@ -234,6 +235,8 @@ CZMBaseZombie::CZMBaseZombie()
     m_iAnimationRandomSeed = (int)gpGlobals->curtime + randomseed;
     
     m_iAdditionalAnimRandomSeed = 0;
+
+    m_iGibType = ZMGIBTYPE_NONE;
 
 
     m_hAmbushEnt.Set( nullptr );
@@ -348,7 +351,6 @@ void CZMBaseZombie::Spawn()
 
     BaseClass::Spawn();
 
-    DoAnimationEvent( ZOMBIEANIMEVENT_IDLE );
 
     SetThink( &CZMBaseZombie::ZombieThink );
     SetNextThink( gpGlobals->curtime );
@@ -464,32 +466,29 @@ void CZMBaseZombie::HandleAnimEvent( animevent_t* pEvent )
 
 bool CZMBaseZombie::Event_Gibbed( const CTakeDamageInfo &info )
 {
-    bool gibbed = CorpseGib( info );
+    CorpseGib( info );
 
-    if ( gibbed )
-    {
-        UTIL_Remove( this );
-        SetThink( nullptr ); // We're going away, so don't think anymore.
-    }
-    else
-    {
-        CorpseFade();
-    }
-
-    return gibbed;
+    return true;
 }
 
 bool CZMBaseZombie::CorpseGib( const CTakeDamageInfo &info )
 {
+    // ZMRTODO: Combine these into one single sound.
     EmitSound( "BaseCombatCharacter.CorpseGib" );
     EmitSound( "NPC_Antlion.RunOverByVehicle" );
 
 
-    // ZMRTODO: Better gibbing.
-    CGib::SpawnHeadGib( this );
+    // ZMRTODO: Make sure CanBecomeRagdoll always return true!!!
+    if ( !BecomeRagdollOnClient( vec3_origin ) )
+    {
+        UTIL_Remove( this );
+    }
+    else
+    {
+        m_iGibType = ZMGIBTYPE_HEAD;
+    }
 
-
-    return true;
+    return false;
 }
 
 bool CZMBaseZombie::ShouldGib( const CTakeDamageInfo& info )

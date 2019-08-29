@@ -1,0 +1,24 @@
+#include "common_ps_fxc.h"
+
+
+sampler2D FBSampler : register( s0 );
+sampler2D VigSampler : register( s1 );
+
+const float vigStrength : register( c0 );
+
+struct PS_INPUT
+{
+	float2 texCoord	: TEXCOORD0;
+};
+
+float4 main( PS_INPUT i ) : COLOR
+{
+    float4 fbSample = tex2D( FBSampler, i.texCoord );
+    float4 vigSample = tex2D( VigSampler, i.texCoord );
+
+    float4 vigClamp = clamp(vigSample * vigStrength, 0.0, 1.0);
+
+    float4 vig = vigClamp * fbSample;
+
+	return vig;
+}

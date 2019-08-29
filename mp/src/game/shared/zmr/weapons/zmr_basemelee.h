@@ -19,10 +19,7 @@ public:
     CZMBaseMeleeWeapon();
 
 
-#ifdef CLIENT_DLL
-    virtual CZMBaseCrosshair* GetWeaponCrosshair() const OVERRIDE { return ZMGetCrosshair( "Melee" ); }
-#endif
-
+    virtual void ItemBusyFrame() OVERRIDE;
     virtual void ItemPostFrame() OVERRIDE;
 
     virtual bool Deploy() OVERRIDE;
@@ -34,8 +31,8 @@ public:
 
     virtual bool UsesAnimEvent( bool bSecondary ) const { return false; }
     
-    virtual float GetRange() const { return 10.0f; }
-    virtual	float GetDamageForActivity( Activity hitActivity ) const { return 1.0f; }
+    virtual float GetRange() const;
+    virtual	float GetDamageForActivity( Activity hitActivity ) const;
 
     virtual bool CanPrimaryAttack() const { return true; }
     virtual bool CanSecondaryAttack() const { return false; }
@@ -56,7 +53,7 @@ public:
 
 protected:
     virtual void Swing( bool bSecondary );
-    virtual void StartHit( trace_t* traceRes = nullptr, Activity iActivityDamage = ACT_VM_HITCENTER );
+    virtual void StartHit( trace_t* traceRes = nullptr, Activity iActivityDamage = ACT_VM_HITCENTER, bool bJustTrace = false );
     virtual void Hit( trace_t& tr, Activity act );
 
     void ChooseIntersectionPoint( trace_t& tr, const Vector& mins, const Vector& maxs );

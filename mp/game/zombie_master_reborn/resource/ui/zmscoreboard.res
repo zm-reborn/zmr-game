@@ -175,6 +175,7 @@
 						"width"		"24"
 						"colalign_right"		"1"
 						"is_image"		"1"
+						"is_tooltip"		"1"
 					}
 				}
 			}
@@ -300,6 +301,7 @@
 						"width"		"24"
 						"colalign_right"		"1"
 						"is_image"		"1"
+						"is_tooltip"		"1"
 					}
 				}
 			}

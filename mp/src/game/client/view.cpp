@@ -59,6 +59,9 @@
 #include "c_prop_portal.h" //portal surface rendering functions
 #endif
 
+#ifdef ZMR
+#include "zmr/c_zmr_player.h"
+#endif
 	
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -642,6 +645,12 @@ void CViewRender::SetUpViews()
 	// Initialize view structure with default values
 	float farZ = GetZFar();
 
+#ifdef ZMR
+	float fDefaultFov = C_ZMPlayer::GetLocalDefaultFOV();
+#else
+	float fDefaultFov = default_fov.GetFloat();
+#endif
+
     // Set up the mono/middle view.
     CViewSetup &view = m_View;
 
@@ -651,7 +660,7 @@ void CViewRender::SetUpViews()
 	//  closest point of approach seems to be view center to top of crouched box
 	view.zNear			    = GetZNear();
 	view.zNearViewmodel	    = 1;
-	view.fov				= default_fov.GetFloat();
+	view.fov				= fDefaultFov;
 
 	view.m_bOrtho			= false;
     view.m_bViewToProjectionOverride = false;
@@ -732,7 +741,6 @@ void CViewRender::SetUpViews()
 	}
 
 	//Find the offset our current FOV is from the default value
-	float fDefaultFov = default_fov.GetFloat();
 	float flFOVOffset = fDefaultFov - view.fov;
 
 	//Adjust the viewmodel's FOV to move with any FOV offsets on the viewer's end

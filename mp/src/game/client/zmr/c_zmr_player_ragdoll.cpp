@@ -4,6 +4,9 @@
 
 #include "c_zmr_player.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 IMPLEMENT_CLIENTCLASS_DT_NOBASE( C_ZMRagdoll, DT_ZM_Ragdoll, CZMRagdoll )
     RecvPropVector( RECVINFO( m_vecRagdollOrigin ) ),

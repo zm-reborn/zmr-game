@@ -148,14 +148,12 @@ BEGIN_NETWORK_TABLE( CZMWeaponHands, DT_ZM_WeaponHands )
     RecvPropFloat( RECVINFO( m_attachedAnglesPlayerSpace[0] ) ),
     RecvPropFloat( RECVINFO( m_attachedAnglesPlayerSpace[1] ) ),
     RecvPropFloat( RECVINFO( m_attachedAnglesPlayerSpace[2] ) ),
-    RecvPropTime( RECVINFO( m_flAttackHitTime ) ),
 #else
     SendPropEHandle( SENDINFO( m_hAttachedObject ) ),
     SendPropVector(SENDINFO( m_attachedPositionObjectSpace ), -1, SPROP_COORD),
     SendPropAngle( SENDINFO_VECTORELEM( m_attachedAnglesPlayerSpace, 0 ), 11 ),
     SendPropAngle( SENDINFO_VECTORELEM( m_attachedAnglesPlayerSpace, 1 ), 11 ),
     SendPropAngle( SENDINFO_VECTORELEM( m_attachedAnglesPlayerSpace, 2 ), 11 ),
-    SendPropTime( SENDINFO( m_flAttackHitTime ) ),
 #endif
 END_NETWORK_TABLE()
 
@@ -163,7 +161,6 @@ IMPLEMENT_NETWORKCLASS_ALIASED( ZMWeaponHands, DT_ZM_WeaponHands )
 
 #ifdef CLIENT_DLL
 BEGIN_PREDICTION_DATA( CZMWeaponHands )
-    DEFINE_PRED_FIELD_TOL( m_flAttackHitTime, FIELD_FLOAT, FTYPEDESC_INSENDTABLE, TD_MSECTOLERANCE ),
 END_PREDICTION_DATA()
 #endif
 
@@ -197,6 +194,7 @@ CZMWeaponHands::CZMWeaponHands()
 #endif
 
     SetSlotFlag( ZMWEAPONSLOT_NONE );
+    SetConfigSlot( ZMWeaponConfig::ZMCONFIGSLOT_FISTSCARRY );
 }
 
 void CZMWeaponHands::ItemPreFrame()
@@ -240,6 +238,9 @@ void CZMWeaponHands::ItemPostFrame()
 
     CheckForTarget();
     WeaponIdle();
+
+    // Pass to base to call anim event attacks.
+    BaseClass::ItemPostFrame();
 }
 
 //
@@ -262,7 +263,7 @@ void CZMWeaponHands::PrimaryAttack()
     Swing( false );
 
 
-    float delay = GetFireRate();
+    float delay = GetPrimaryFireRate();
 
     m_flNextPrimaryAttack = gpGlobals->curtime + delay;
     m_flNextSecondaryAttack = gpGlobals->curtime + delay;
@@ -321,7 +322,8 @@ void CZMWeaponHands::SecondaryAttack()
             }
 
             // If all else fails, pull
-            if ( !bDone )
+            // Puller must be on ground.
+            if ( !bDone && pOwner->GetFlags() & FL_ONGROUND )
             {
                PullObject( pEnt );
 
@@ -372,8 +374,11 @@ void CZMWeaponHands::TertiaryAttack()
     if ( !pEntity )
         return;
 
-
-    PushObject( pEntity, hitPos );
+    // Allow pushing in the air in case they get stuck or something.
+    //if ( pOwner->GetFlags() & FL_ONGROUND )
+    {
+        PushObject( pEntity, hitPos );
+    }
 
 
     if ( GetActivity() != HOLD_ACTIVITY )
@@ -435,21 +440,6 @@ bool CZMWeaponHands::Deploy()
     }
 
     return bReturn;
-}
-
-void CZMWeaponHands::AddViewKick()
-{
-    // This is the punch view kick.
-    CZMPlayer* pPlayer = GetPlayerOwner();
-    if ( !pPlayer ) return;
-
-
-    QAngle ang;
-    ang.x = SharedRandomFloat( "fistsx", -1.0f, 1.0f );
-    ang.y = SharedRandomFloat( "fistsy", -1.0f, 1.0f );
-    ang.z = 0.0f;
-
-    pPlayer->ViewPunch( ang );
 }
 
 void CZMWeaponHands::ForceDrop( CBaseEntity* pEnt )

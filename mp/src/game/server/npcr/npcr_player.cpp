@@ -22,13 +22,70 @@ CON_COMMAND( bot_sendcmd, "Sends command to all bot players" )
         CBasePlayer* pPlayer = ToBasePlayer( pNPC->GetCharacter() );
         if ( pPlayer )
         {
-            pPlayer->ClientCommand( args );
+            if ( !pPlayer->ClientCommand( args ) )
+            {
+                engine->ClientCommand( pPlayer->edict(), "%s", args.ArgS() );
+            }
         }
 
         return false;
     } );
 }
 #endif
+
+CON_COMMAND( bot_teleport, "Teleport given bots to your crosshair." )
+{
+    if ( !UTIL_IsCommandIssuedByServerAdmin() )
+        return;
+
+    auto* pPlayer = UTIL_GetCommandClient();
+    if( !pPlayer )
+        return;
+
+
+    CTraceFilterSimple filter( pPlayer, COLLISION_GROUP_NONE );
+    Vector fwd;
+    trace_t tr;
+
+    pPlayer->EyeVectors( &fwd );
+
+    UTIL_TraceLine( pPlayer->EyePosition(), pPlayer->EyePosition() + fwd * MAX_TRACE_LENGTH, MASK_SOLID, &filter, &tr );
+    
+
+
+    const char* comp = args.Arg( 2 );
+
+    NPCR::g_NPCManager.ForEachNPC( [ &args, comp, &tr ]( NPCR::CBaseNPC* pNPC )
+    {
+        bool passes = false;
+
+        auto* pChar = pNPC->GetCharacter();
+
+        if ( comp && *comp )
+        {
+            auto* pPlayerBot = ToBasePlayer( pChar );
+            if ( pPlayerBot )
+            {
+			    passes = Q_stricmp( pPlayerBot->GetPlayerName(), comp ) != -1;
+            }
+            else
+            {
+                passes = Q_stricmp( STRING( pChar->GetEntityName() ), comp ) != -1;
+            }
+        }
+        else
+        {
+            passes = true;
+        }
+
+        if ( passes )
+        {
+            pChar->Teleport( &tr.endpos, nullptr, nullptr );
+        }
+
+        return false;
+    } );
+}
 
 ConVar bot_mimic_pitch_offset( "bot_mimic_pitch_offset", "0" );
 // A specific target?

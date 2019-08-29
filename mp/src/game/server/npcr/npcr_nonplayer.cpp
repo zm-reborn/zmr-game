@@ -28,7 +28,6 @@ CNPCRNonPlayer::CNPCRNonPlayer() : NPCR::CBaseNPC( this )
     m_bCurActivityLoops = false;
     m_iCurActivity = ACT_INVALID;
     m_iLastActivity = ACT_INVALID;
-    m_iLastLoopActivity = ACT_INVALID;
 
     m_hEnemy.Set( nullptr );
 
@@ -69,6 +68,7 @@ void CNPCRNonPlayer::Spawn()
     AddSolidFlags( FSOLID_NOT_STANDABLE );
     SetMoveType( MOVETYPE_CUSTOM );
     SetCollisionGroup( COLLISION_GROUP_NPC );
+    SetBlocksLOS( false );
 
     // This flag makes sure we can touch NPC triggers.
     AddFlag( FL_NPC );
@@ -76,6 +76,11 @@ void CNPCRNonPlayer::Spawn()
 
     
     InitBoneControllers(); 
+
+    // Default to idle. Remember to set in client as well.
+    // Animation events may not get through to client, and it's better to have
+    // some animation, rather than model's default animation which can be anything.
+    SetActivity( ACT_IDLE );
 
 
     SetThink( &CNPCRNonPlayer::NPCThink );
@@ -269,12 +274,13 @@ void CNPCRNonPlayer::NPCThink()
     CBaseNPC::Update();
 
     
-    // Make sure we don't send multiple OnAnimActivityFinished() to schedules in one "update".
-    if ( IsSequenceFinished() && (SequenceLoops() || m_iCurActivity != m_iLastLoopActivity) )
+    if ( IsSequenceFinished() )
     {
-        Activity last = m_iCurActivity;
         OnAnimActivityFinished( m_iCurActivity );
-        m_iLastLoopActivity = last;
+
+        // Mark us "not finished".
+        // There's no other way to do this reliably.
+        m_bSequenceFinished = false;
     }
 }
 

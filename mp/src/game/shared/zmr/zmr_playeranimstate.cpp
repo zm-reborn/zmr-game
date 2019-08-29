@@ -13,6 +13,9 @@
 #include "zmr_player_shared.h"
 #include "zmr/zmr_shareddefs.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 // Don't let the head spass out.
 #define ZM_LOOKAT_UPDATE_TIME       0.1f

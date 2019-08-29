@@ -33,10 +33,17 @@ void DispatchEffect( const char *pName, const CEffectData &data );
 IMPLEMENT_NETWORKCLASS_ALIASED( ZMBaseMeleeWeapon, DT_ZM_BaseMeleeWeapon )
 
 BEGIN_NETWORK_TABLE( CZMBaseMeleeWeapon, DT_ZM_BaseMeleeWeapon )
+#ifdef CLIENT_DLL
+    RecvPropTime( RECVINFO( m_flAttackHitTime ) ),
+#else
+    // We may use animation events, so we need to network the attack time.
+    SendPropTime( SENDINFO( m_flAttackHitTime ) ),
+#endif
 END_NETWORK_TABLE()
 
 #ifdef CLIENT_DLL
 BEGIN_PREDICTION_DATA( CZMBaseMeleeWeapon )
+    DEFINE_PRED_FIELD_TOL( m_flAttackHitTime, FIELD_FLOAT, FTYPEDESC_INSENDTABLE, TD_MSECTOLERANCE ),
 END_PREDICTION_DATA()
 #endif
 
@@ -54,12 +61,6 @@ static const Vector g_bludgeonMaxs(BLUDGEON_HULL_DIM,BLUDGEON_HULL_DIM,BLUDGEON_
 
 CZMBaseMeleeWeapon::CZMBaseMeleeWeapon()
 {
-    m_fMinRange1 = m_fMinRange2 = 0.0f;
-    m_fMaxRange1 = m_fMaxRange2 = 128.0f;
-
-
-    m_bFiresUnderwater = true;
-    
 #ifndef CLIENT_DLL
     SetSlotFlag( ZMWEAPONSLOT_MELEE );
 #endif
@@ -68,17 +69,25 @@ CZMBaseMeleeWeapon::CZMBaseMeleeWeapon()
     m_flAttackHitTime = 0.0f;
 }
 
+void CZMBaseMeleeWeapon::ItemBusyFrame()
+{
+    ItemPostFrame();
+}
+
 void CZMBaseMeleeWeapon::ItemPostFrame()
 {
     CZMPlayer* pPlayer = GetPlayerOwner();
     if ( !pPlayer ) return;
 
+
+    bool bCanAttack = pPlayer->m_flNextAttack <= gpGlobals->curtime;
+
     // We have to go around the ammo requirement.
-    if ( pPlayer->m_nButtons & IN_ATTACK && m_flNextPrimaryAttack <= gpGlobals->curtime )
+    if ( bCanAttack && pPlayer->m_nButtons & IN_ATTACK && m_flNextPrimaryAttack <= gpGlobals->curtime )
     {
         PrimaryAttack();
     }
-    else if ( pPlayer->m_nButtons & IN_ATTACK2 && m_flNextSecondaryAttack <= gpGlobals->curtime )
+    else if ( bCanAttack && pPlayer->m_nButtons & IN_ATTACK2 && m_flNextSecondaryAttack <= gpGlobals->curtime )
     {
         SecondaryAttack();
     }
@@ -117,8 +126,7 @@ void CZMBaseMeleeWeapon::PrimaryAttack()
 
 
     // Setup our next attack times
-    m_flNextPrimaryAttack = gpGlobals->curtime + GetFireRate();
-    m_flNextSecondaryAttack = gpGlobals->curtime + SequenceDuration();
+    m_flNextSecondaryAttack = m_flNextPrimaryAttack = gpGlobals->curtime + GetFireRate();
 }
 
 void CZMBaseMeleeWeapon::SecondaryAttack()
@@ -131,11 +139,10 @@ void CZMBaseMeleeWeapon::SecondaryAttack()
 
 
     // Setup our next attack times
-    m_flNextPrimaryAttack = gpGlobals->curtime + GetFireRate();
-    m_flNextSecondaryAttack = gpGlobals->curtime + SequenceDuration();
+    m_flNextSecondaryAttack = m_flNextPrimaryAttack = gpGlobals->curtime + GetFireRate();
 }
 
-void CZMBaseMeleeWeapon::StartHit( trace_t* traceRes, Activity iActivityDamage )
+void CZMBaseMeleeWeapon::StartHit( trace_t* traceRes, Activity iActivityDamage, bool bJustTrace )
 {
     CZMPlayer* pPlayer = GetPlayerOwner();
     if ( !pPlayer ) return;
@@ -148,7 +155,10 @@ void CZMBaseMeleeWeapon::StartHit( trace_t* traceRes, Activity iActivityDamage )
     trace_t traceHit;
     TraceMeleeAttack( traceHit );
 
-    Hit( traceHit, iActivityDamage );
+    if ( !bJustTrace )
+    {
+        Hit( traceHit, iActivityDamage );
+    }
 
 #ifndef CLIENT_DLL
     lagcompensation->FinishLagCompensation( pPlayer );
@@ -235,9 +245,9 @@ void CZMBaseMeleeWeapon::Hit( trace_t& traceHit, Activity nHitActivity )
         VectorNormalize( hitDirection );
 
 #ifdef CLIENT_DLL
-        int dmg = GetDamageForActivity( nHitActivity );
+        float dmg = GetDamageForActivity( nHitActivity );
 #else
-        int dmg = GetOverrideDamage() > -1 ? GetOverrideDamage() : GetDamageForActivity( nHitActivity );
+        float dmg = (GetOverrideDamage() > -1) ? GetOverrideDamage() : GetDamageForActivity( nHitActivity );
 #endif
         CTakeDamageInfo info( GetOwner(), GetOwner(), this, dmg, DMG_CLUB, 0 );
 
@@ -278,32 +288,46 @@ void CZMBaseMeleeWeapon::Swing( bool bSecondary )
     if ( !pOwner ) return;
 
 
+    const Activity iHitAct = bSecondary ? GetSecondaryAttackActivity() : GetPrimaryAttackActivity();
+    const Activity iMissAct = bSecondary ? ACT_VM_MISSCENTER2 : ACT_VM_MISSCENTER;
+    
+    
+    Activity iFallbackActivity = iMissAct;
+    Activity iActivity = iHitAct;
 
-    const bool bUseAnimEvent = UsesAnimEvent( bSecondary );
+    //
+    // Trace which animation we should play.
+    //
+    trace_t traceHit;
+    traceHit.fraction = 1.0f;
+    StartHit( &traceHit, iHitAct, true );
 
-
-
-    Activity nHitActivity = bSecondary ? GetSecondaryAttackActivity() : GetPrimaryAttackActivity();
-
-    if ( !bUseAnimEvent )
+    // We didn't hit anything, use miss anim if possible.
+    if ( traceHit.fraction == 1.0f )
     {
-        trace_t traceHit;
-        traceHit.fraction = 1.0f;
-        StartHit( &traceHit, nHitActivity );
-
-        if ( traceHit.fraction == 1.0f ) nHitActivity = bSecondary ? ACT_VM_MISSCENTER2 : ACT_VM_MISSCENTER;
+        iFallbackActivity = iHitAct;
+        iActivity = iMissAct;
     }
     
+
     // Send the anim
-    SendWeaponAnim( nHitActivity );
-
-
-    if ( bUseAnimEvent )
+    if ( !SendWeaponAnim( iActivity ) )
     {
-        // Currently, only supports firstperson
-        float waittime = GetFirstInstanceOfAnimEventTime( GetSequence(), AE_ZM_MELEEHIT );
-        if ( waittime >= 0.0f )
-            m_flAttackHitTime = gpGlobals->curtime + waittime;
+        iActivity = iFallbackActivity;
+        if ( !SendWeaponAnim( iFallbackActivity ) )
+            Assert( 0 );
+    }
+
+
+
+    bool bUseAnimEvent = false;
+
+
+    float attackdelay = GetFirstInstanceOfAnimEventTime( GetSequence(), AE_ZM_MELEEHIT );
+    if ( attackdelay > 0.0f )
+    {
+        m_flAttackHitTime = gpGlobals->curtime + attackdelay;
+        bUseAnimEvent = true;
     }
 
 
@@ -313,6 +337,9 @@ void CZMBaseMeleeWeapon::Swing( bool bSecondary )
 
     if ( !bUseAnimEvent )
     {
+        Hit( traceHit, iActivity );
+
+
         AddViewKick();
 
 #ifndef CLIENT_DLL
@@ -416,6 +443,21 @@ void CZMBaseMeleeWeapon::ImpactEffect( trace_t& traceHit )
     if ( traceHit.m_pEnt )
         UTIL_ImpactTrace( &traceHit, DMG_CLUB );
 }
+
+float CZMBaseMeleeWeapon::GetDamageForActivity( Activity hitActivity ) const
+{
+    return (!IsInSecondaryAttack())
+            ? GetWeaponConfig()->primary.flDamage
+            : GetWeaponConfig()->secondary.flDamage;
+}
+
+float CZMBaseMeleeWeapon::GetRange() const
+{
+    return (!IsInSecondaryAttack())
+            ? GetWeaponConfig()->primary.flRange
+            : GetWeaponConfig()->secondary.flRange;
+}
+
 
 #ifdef GAME_DLL
 float CZMBaseMeleeWeapon::GetMaxDamageDist( ZMUserCmdValidData_t& data ) const

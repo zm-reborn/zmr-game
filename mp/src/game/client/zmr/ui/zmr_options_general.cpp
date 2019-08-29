@@ -12,8 +12,9 @@ extern ConVar zm_cl_zmview_switchmousebuttons;
 extern ConVar zm_cl_poweruser;
 extern ConVar zm_cl_poweruser_boxselect;
 
-extern ConVar cl_yawspeed;
-extern ConVar cl_pitchspeed;
+extern ConVar zm_cl_border_yawspeed;
+extern ConVar zm_cl_border_pitchspeed;
+extern ConVar zm_cl_border_scroll;
 
 
 CZMOptionsSubGeneral::CZMOptionsSubGeneral( Panel* parent ) : BaseClass( parent )
@@ -29,12 +30,14 @@ CZMOptionsSubGeneral::CZMOptionsSubGeneral( Panel* parent ) : BaseClass( parent 
     LoadItem( &m_pSlider_Pitch, "SliderScrollVer" );
     LoadItem( &m_pModelPanel, "CZMModelPanel1" );
     LoadItem( &m_pModelCombo, "ModelComboBox" );
+    LoadItem( &m_pSlider_Border, "SliderBorder" );
 
     if ( FailedLoad() ) return;
 
 
     m_pSlider_Yaw->SetRange( 10, 500 );
     m_pSlider_Pitch->SetRange( 10, 500 );
+    m_pSlider_Border->SetRange( 0, 100 );
 
 
     KeyValues* kv;
@@ -96,8 +99,9 @@ void CZMOptionsSubGeneral::OnApplyChanges()
     zm_cl_poweruser_boxselect.SetValue( m_pCheck_BoxPowerUser->IsSelected() ? 1 : 0 );
 
 
-    cl_yawspeed.SetValue( m_pSlider_Yaw->GetValue() );
-    cl_pitchspeed.SetValue( m_pSlider_Pitch->GetValue() );
+    zm_cl_border_yawspeed.SetValue( m_pSlider_Yaw->GetValue() );
+    zm_cl_border_pitchspeed.SetValue( m_pSlider_Pitch->GetValue() );
+    zm_cl_border_scroll.SetValue( m_pSlider_Border->GetValue() );
 
     ConVar* cl_playermodel = cvar->FindVar( "cl_playermodel" );
     cl_playermodel->SetValue( GetCurrentPlayerModel() );
@@ -119,8 +123,9 @@ void CZMOptionsSubGeneral::OnResetData()
     m_pCheck_BoxPowerUser->SetSelected( zm_cl_poweruser_boxselect.GetBool() );
 
 
-    m_pSlider_Yaw->SetValue( (int)cl_yawspeed.GetFloat() );
-    m_pSlider_Pitch->SetValue( (int)cl_pitchspeed.GetFloat() );
+    m_pSlider_Yaw->SetValue( (int)zm_cl_border_yawspeed.GetFloat() );
+    m_pSlider_Pitch->SetValue( (int)zm_cl_border_pitchspeed.GetFloat() );
+    m_pSlider_Border->SetValue( (int)zm_cl_border_scroll.GetInt() );
 
 
 

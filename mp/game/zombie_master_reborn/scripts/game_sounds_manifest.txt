@@ -4,6 +4,7 @@ game_sounds_manifest
 	"precache_file"		"scripts/game_sounds.txt"
 	"precache_file"		"scripts/game_sounds_ui.txt"
 	"precache_file"		"scripts/game_sounds_player.txt"
+	"precache_file"		"scripts/game_sounds_player_zm.txt" // ZMR
 
 	// Weapon sounds
 	"precache_file"		"scripts/game_sounds_weapons.txt"

@@ -27,6 +27,26 @@ public:
     CZMTip( KeyValues* kv, int index );
     ~CZMTip();
     
+    
+    struct zmtip_param_t
+    {
+    public:
+        zmtip_param_t()
+        {
+            pszParam = nullptr;
+            iParamType = TIPPARAMTYPE_NONE;
+        }
+
+        ~zmtip_param_t()
+        {
+            delete[] pszParam;
+            pszParam = nullptr;
+        }
+
+        char* pszParam;
+        TipParamType_t iParamType;
+    };
+    
 
     void LoadUsed( KeyValues* kv );
     void WriteUsed( KeyValues* kv );
@@ -64,7 +84,7 @@ public:
     static TipParamType_t TipNameToType( const char* type );
     
 private:
-    void SetParam( const char* param );
+    void AddParam( const char* param );
 
 
     char* m_pszName;
@@ -88,8 +108,7 @@ private:
     int m_nShownPerGame;
 
 
-    char* m_pszParam;
-    TipParamType_t m_iParamType;
+    CUtlVector<zmtip_param_t*> m_vParams;
 };
 //
 

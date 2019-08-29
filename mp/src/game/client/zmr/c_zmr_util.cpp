@@ -12,6 +12,9 @@
 #include "c_zmr_tips.h"
 #include "c_zmr_util.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 ConVar zm_hudchat_color( "zm_hudchat_color", "c13c3c", FCVAR_ARCHIVE );
 ConVar zm_hudchat_color_zm( "zm_hudchat_color_zm", "49ff59", FCVAR_ARCHIVE );
@@ -279,18 +282,24 @@ void ZMClientUtil::SelectZombies( const CUtlVector<C_ZMBaseZombie*>& vZombies, b
     {
         cmdbuffer[0] = NULL;
 
+
         for ( ; i < count; i++ )
         {
             pZombie = vZombies.Element( i );
 
             pZombie->SetSelector( index );
+            
+            char add[16]; // "XXXXX "
+            int len = Q_snprintf( add, sizeof( add ), "%i ", pZombie->entindex() );
 
-            Q_snprintf( cmdbuffer, sizeof( cmdbuffer ), "%s%i ", cmdbuffer, pZombie->entindex() );
+            Q_strncat( cmdbuffer, add, sizeof( cmdbuffer ), len );
         }
 
         if ( cmdbuffer[0] )
         {
-            engine->ClientCmd( VarArgs( "zm_cmd_selectmult %s %s",  bSticky ? "1": "0", cmdbuffer ) );
+            const char* cmd = VarArgs( "zm_cmd_selectmult %s %s",  bSticky ? "1": "0", cmdbuffer );
+            //DevMsg( "Sending select multiple command: \"%s\"\n", cmd );
+            engine->ClientCmd( cmd );
         }
 
 

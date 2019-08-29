@@ -10,6 +10,12 @@
 #include "entityparticletrail_shared.h"
 #include "collisionutils.h"
 
+#if defined( ZMR ) && defined( CLIENT_DLL )
+#include "raytrace.h"
+
+#include "zmr/c_zmr_precipitation.h"
+#endif
+
 #if defined( CLIENT_DLL )
 #include "c_pixel_visibility.h"
 #endif
@@ -161,6 +167,42 @@ bool CParticleSystemQuery::MovePointInsideControllingObject(
 #ifdef GAME_DLL
 	return true;
 #else
+#ifdef ZMR
+    //
+    // Make sure the rain spawns inside func_precipitation.
+    // SUPER HACK
+    //
+    extern CUtlVector<RayTracingEnvironment*> g_RayTraceEnvironments;
+
+    if ( g_RayTraceEnvironments.IsValidIndex( 0 ) )
+    {
+        auto* inner = ZMGetPrecipitationSystem()->GetInner();
+        auto* outer = ZMGetPrecipitationSystem()->GetOuter();
+
+        if ( pParticles == inner || pParticles == outer )
+        {
+            // Trace to check if the particle position is within the environment.
+            // We have to use this 4 ray shit.
+            RayTracingResult Result;
+            FourRays frRays;
+
+            fltx4 TMax = ReplicateX4( 500.0f );
+
+            frRays.direction.DuplicateVector( Vector( 0, 0, -1 ) );
+            frRays.origin.DuplicateVector( *pPnt );
+
+            g_RayTraceEnvironments[0]->Trace4Rays( frRays, Four_Zeros, TMax, &Result );
+
+            // Didn't hit? Just set the position somewhere impossibly far.
+            if ( Result.HitIds[0] == -1 )
+            {
+                *pPnt = Vector( FLT_MAX, FLT_MAX, FLT_MAX );
+            }
+        }
+    }
+
+    return true;
+#else // ZMR
 	if (! pObject )
 		return true;										// accept the input point unmodified
 
@@ -170,6 +212,7 @@ bool CParticleSystemQuery::MovePointInsideControllingObject(
 	enginetrace->ClipRayToEntity( ray, MASK_ALL, (CBaseEntity *) pObject, &tr );
 	
 	return ( tr.startsolid );
+#endif // ZMR
 #endif
 }
 

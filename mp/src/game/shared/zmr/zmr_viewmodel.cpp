@@ -50,6 +50,9 @@ CZMViewModel::CZMViewModel()
 {
 #ifdef CLIENT_DLL
     m_bDrawVM = true;
+    m_iOverrideModelIndex = -1;
+    m_pOverrideModelWeapon = nullptr;
+    m_pLastWeapon = nullptr;
 #else
     SetModelColor2( 1.0f, 1.0f, 1.0f );
 #endif
@@ -90,7 +93,46 @@ CBaseCombatWeapon* CZMViewModel::GetOwningWeapon()
     return nullptr;
 }
 
+void CZMViewModel::SetWeaponModelEx( const char* pszModel, CBaseCombatWeapon* pWep, bool bOverriden )
+{
 #ifdef CLIENT_DLL
+    // Set override model
+    auto* pCurWeapon = GetWeapon();
+
+    int newIndex = modelinfo->GetModelIndex( pszModel );
+
+    if ( pWep != pCurWeapon )
+    {
+        m_iOverrideModelIndex = bOverriden ? newIndex : -1;
+        m_pOverrideModelWeapon = pWep;
+
+        m_pLastWeapon = pCurWeapon;
+    }
+
+#endif
+
+    SetWeaponModel( pszModel, pWep );
+}
+
+#ifdef CLIENT_DLL
+int C_ZMViewModel::CalcOverrideModelIndex()
+{
+    if ( m_iOverrideModelIndex != -1 )
+    {
+        // HACK: Check if we changed weapons.
+        auto* pCurWeapon = GetWeapon();
+        if ( pCurWeapon != m_pOverrideModelWeapon && pCurWeapon != m_pLastWeapon )
+        {
+            // Stop overriding.
+            m_iOverrideModelIndex = -1;
+            m_pOverrideModelWeapon = nullptr;
+        }
+    }
+
+
+    return m_iOverrideModelIndex;
+}
+
 int C_ZMViewModel::DrawModel( int flags )
 {
     if ( m_bDrawVM )
@@ -99,6 +141,11 @@ int C_ZMViewModel::DrawModel( int flags )
     }
 
     return 0;
+}
+
+bool C_ZMViewModel::ShouldReceiveProjectedTextures( int flags )
+{
+    return true;
 }
 
 C_BaseAnimating* C_ZMViewModel::FindFollowedEntity()

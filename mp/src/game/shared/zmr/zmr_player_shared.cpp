@@ -11,13 +11,13 @@
 #include "c_te_effect_dispatch.h"
 #else
 #include "ilagcompensationmanager.h"
-#include "hl2mp/te_hl2mp_shotgun_shot.h"
 #include "iservervehicle.h"
 //#include "vehicle_baseserver.h"
 #include "te_effect_dispatch.h"
 #endif
 
 
+#include "zmr_ammodef.h"
 #include "zmr_player_shared.h"
 
 
@@ -25,9 +25,13 @@
 #include "zmr/c_zmr_player.h"
 #include "zmr/npcs/c_zmr_zombiebase.h"
 #else
+#include "zmr/zmr_te_firebullets.h"
 #include "zmr/zmr_player.h"
 #include "zmr/npcs/zmr_zombiebase.h"
 #endif
+
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
 
 
 #ifdef CLIENT_DLL
@@ -536,7 +540,7 @@ void CZMPlayer::FireBullets( const FireBulletsInfo_t& info )
     }
 
 #ifdef GAME_DLL
-    TE_HL2MPFireBullets( entindex(), info.m_vecSrc, info.m_vecDirShooting, info.m_iAmmoType, iEffectSeed, info.m_iShots, info.m_vecSpread.x, bulletinfo.bDoTracers, bulletinfo.bDoImpacts );
+    TE_ZMFireBullets( entindex(), info.m_vecSrc, info.m_vecDirShooting, info.m_iAmmoType, iEffectSeed, info.m_iShots, info.m_vecSpread.x, bulletinfo.bDoTracers, bulletinfo.bDoImpacts );
 #endif
 
 #ifdef GAME_DLL
@@ -1005,4 +1009,37 @@ bool CZMPlayer::HandleShotImpactingWater( const FireBulletsInfo_t& info, const V
     DispatchEffect( "gunshotsplash", data );
 
     return true;
+}
+
+void CZMPlayer::DoMuzzleFlash()
+{
+    // By default, the player muzzleflash will call into active weapon muzzleflash.
+    // We don't want that, because it might not be networked.
+    CBaseAnimating::DoMuzzleFlash();
+}
+
+int CZMPlayer::GetTotalAmmoAmount( int iValidAmmoIndex ) const
+{
+    Assert( iValidAmmoIndex >= 0 && iValidAmmoIndex <= MAX_AMMO_TYPES );
+    
+    int total = GetAmmoCount( iValidAmmoIndex );
+
+    for ( int i = 0; i < MAX_WEAPONS; i++ )
+    {
+        auto* pWep = GetWeapon( i );
+        if ( pWep && pWep->m_iPrimaryAmmoType == iValidAmmoIndex )
+        {
+            total += pWep->Clip1();
+        }
+    }
+
+    return total;
+}
+
+int CZMPlayer::GetAmmoRoom( int iValidAmmoIndex ) const
+{
+    Assert( iValidAmmoIndex >= 0 && iValidAmmoIndex <= MAX_AMMO_TYPES );
+
+    auto* pAmmoDef = ZMAmmoDef();
+    return pAmmoDef->MaxCarry( iValidAmmoIndex ) + pAmmoDef->m_Additional[iValidAmmoIndex].nDropAmount;
 }

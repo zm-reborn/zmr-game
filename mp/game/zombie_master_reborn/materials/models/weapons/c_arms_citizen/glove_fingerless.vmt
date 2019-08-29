@@ -1,0 +1,50 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/weapons/c_arms_citizen/glove_fingerless"
+	"$bumpmap"     "models/weapons/c_arms_citizen/glove_fingerless_normal"
+	
+	"$envmap" "env_cubemap"
+	"$envmaptint" "[.6 .6 .6]"
+	"$normalmapalphaenvmapmask" "1"
+	
+	
+	"$phong" "1"
+	"$phongboost" "1.0"
+	"$phongexponent" "8"
+	"$phongfresnelranges"	"[.1 .5 1]"
+	
+	//"$detail"             "models/weapons/c_arms_citizen/skin_detail"
+	//"$detailscale"        "7"
+	//"$detailblendfactor"  "0.4"
+	//"$detailblendmode"    "0"
+	
+	"$phongtint" "[0.8 0.6 0.4]"
+	
+	"$rimlight" "1"
+	"$rimlightboost" "0.2"
+	"$rimlightexponent" "4"
+	
+	
+	Proxies
+	{
+		ViewModelColor // NOTE: Only use on arms!!
+		{
+			resultVar	$color2
+			default		1 1 1
+		}
+		Clamp
+		{
+			min 0.2
+			max 0.5
+			srcVar1 "$color2"
+			resultVar "$phongtint"
+		}
+		Clamp
+		{
+			min 0.01
+			max 1.50
+			srcVar1 "$color2"
+			resultVar "$color2"
+		}
+	}
+}

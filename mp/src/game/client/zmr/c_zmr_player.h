@@ -18,6 +18,7 @@ class CZMPlayerAttackTraceFilter;
 
 class C_ZMRagdoll;
 class C_ZMBaseWeapon;
+class CZMFlashlightEffect;
 
 
 class C_ZMPlayer : public C_BaseHLPlayer
@@ -55,6 +56,8 @@ public:
     void                    SetLocalAngles( const QAngle& angles );
     virtual float           GetFOV() OVERRIDE;
     virtual float           GetMinFOV() const OVERRIDE { return 5.0f; };
+    static float            GetLocalDefaultFOV();
+    virtual void            ProcessMuzzleFlashEvent() OVERRIDE;
 
     int GetIDTarget() const;
 
@@ -114,13 +117,17 @@ public:
     void                    SimulateBullet( ZMFireBulletsInfo_t& bulletinfo );
     bool                    HandleBulletPenetration( trace_t& tr, const ZMFireBulletsInfo_t& bulletinfo, Vector& vecNextSrc, float& flDistance );
     bool                    HandleShotImpactingWater( const FireBulletsInfo_t& info, const Vector& vecEnd, CTraceFilter* pFilter );
+    virtual void            DoMuzzleFlash() OVERRIDE;
+    int                     GetTotalAmmoAmount( int iValidAmmoIndex ) const;
+    int                     GetAmmoRoom( int iValidAmmoIndex ) const;
 
     void SetMouseWheelMove( float dir );
 
+    bool HasExpensiveFlashlightOn() const;
+    void PreferExpensiveFlashlight( bool state );
+
 protected:
-    bool ShouldUseLocalFlashlight() const;
-    void UpdateLocalFlashlight();
-    void UpdateOtherFlashlight();
+    void UpdateFlashlight();
 
 
     CZMCharCircle* m_fxInner;
@@ -143,11 +150,8 @@ private:
 
     int m_iIDEntIndex;
 
-    void ReleaseOtherFlashlight();
-    Beam_t* m_pFlashlightBeam;
-
-    void ReleaseLocalFlashlight();
-    CFlashlightEffect* m_pLocalFlashlight;
+    void ReleaseFlashlight();
+    CZMFlashlightEffect* m_pFlashlight;
 
 
     // Only used locally.

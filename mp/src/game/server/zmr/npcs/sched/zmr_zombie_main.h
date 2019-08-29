@@ -60,6 +60,10 @@ public:
         CZMBaseZombie* pOuter = GetOuter();
 
             
+        //
+        // Update move path.
+        // Commanded move / etc.
+        //
         if ( m_pPath->IsValid() )
         {
             // See if we have anything blocking us.
@@ -90,6 +94,9 @@ public:
                 m_pPath->Update( pOuter );
             }
         }
+        //
+        // Update defensive mode
+        //
         else if ( pOuter->GetZombieMode() == ZOMBIEMODE_DEFEND )
         {
             const Vector defpos = GetGoalPos();
@@ -112,6 +119,10 @@ public:
         }
 
 
+        //
+        // Update our queued commands
+        // and pick the ones we will handle.
+        //
         CZMCommandBase* pQueued = pOuter->GetCommandQueue()->NextCommand();
         if ( pQueued )
         {
@@ -175,6 +186,9 @@ public:
         return m_pPath->IsValid() ? NPCR::RES_YES : NPCR::RES_NONE;
     }
 
+    //
+    // Commanded to move somewhere.
+    //
     bool Command( const Vector& vecPos )
     {
         UpdateGoal( vecPos );
@@ -227,6 +241,9 @@ public:
         return true;
     }
 
+    //
+    // Commanded to swat some object.
+    //
     bool CommandSwat( CBaseEntity* pEnt, bool bBreak = true )
     {
         if ( !pEnt )

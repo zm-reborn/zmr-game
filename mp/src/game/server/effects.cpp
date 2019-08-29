@@ -1485,7 +1485,9 @@ public:
 	CNetworkVar( PrecipitationType_t, m_nPrecipType );
 };
 
+#ifndef ZMR // ZMRCHANGE: We have our own func_precipitation now.
 LINK_ENTITY_TO_CLASS( func_precipitation, CPrecipitation );
+#endif
 
 BEGIN_DATADESC( CPrecipitation )
 	DEFINE_KEYFIELD( m_nPrecipType, FIELD_INTEGER, "preciptype" ),

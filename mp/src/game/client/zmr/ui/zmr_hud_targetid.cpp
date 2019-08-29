@@ -243,8 +243,21 @@ void CZMHudTargetID::PaintTargetId( C_BasePlayer* pPlayer )
     surface()->GetTextSize( m_hFont, m_wszTargetIdStr, tw, th );
 
 
+    // Center
     xpos -= tw / 2;
-            
+
+
+    // Clamp to screen
+    if ( ypos < 0 )
+    {
+        ypos = 0;
+    }
+    else if ( (ypos + th) > ScreenHeight() )
+    {
+        ypos = ScreenHeight() - th;
+    }
+    
+
     surface()->DrawSetTextFont( m_hFont );
     surface()->DrawSetTextPos( xpos, ypos );
     surface()->DrawSetTextColor( COLOR_WHITE );

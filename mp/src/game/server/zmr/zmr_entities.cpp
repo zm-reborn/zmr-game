@@ -5,6 +5,7 @@
 #include "props.h"
 #include "IEffects.h"
 #include "envspark.h"
+#include "precipitation_shared.h"
 
 
 #include "zmr/zmr_gamerules.h"
@@ -262,7 +263,11 @@ void CZMEntZombieSpawn::InputToggle( inputdata_t &inputdata )
     BaseClass::InputToggle( inputdata );
 
     if ( IsActive() ) StartSpawning();
-    else StopSpawning();
+    else
+    {
+        StopSpawning();
+        SendMenuUpdate(); // Make sure we close the menu.
+    }
 }
 
 void CZMEntZombieSpawn::InputHide( inputdata_t &inputdata )
@@ -270,6 +275,7 @@ void CZMEntZombieSpawn::InputHide( inputdata_t &inputdata )
     BaseClass::InputHide( inputdata );
 
     StopSpawning();
+    SendMenuUpdate(); // Make sure we close the menu.
 }
 
 void CZMEntZombieSpawn::InputUnhide( inputdata_t &inputdata )
@@ -408,7 +414,7 @@ void CZMEntZombieSpawn::SendMenuUpdate()
     {
 		WRITE_SHORT( entindex() );
 
-		WRITE_BOOL( false ); // Force open
+		WRITE_BOOL( IsActive() );
 
         int count = m_vSpawnQueue.Count();
         WRITE_BYTE( count );
@@ -632,6 +638,17 @@ bool CZMEntZombieSpawn::FindSpawnPoint( CZMBaseZombie* pZombie, Vector& outpos, 
 
                     m_vSpawnNodes.AddToTail( next );
                 }
+            }
+        }
+        else
+        {
+            CBaseEntity* pEnt = gEntList.FindEntityByName( nullptr, m_sFirstNodeName );
+
+            auto* pBrush = dynamic_cast<CZMEntTriggerSpawnVolume*>( pEnt );
+            if ( pBrush )
+            {
+                pBrush->GetPositionWithin( outpos );
+                return true;
             }
         }
     }
@@ -1102,7 +1119,7 @@ BEGIN_DATADESC( CZMEntTriggerPlayerCount )
 
     DEFINE_INPUTFUNC( FIELD_VOID, "Toggle", InputToggle ),
     DEFINE_INPUTFUNC( FIELD_VOID, "Disable", InputDisable ),
-    DEFINE_INPUTFUNC( FIELD_VOID, "Enabled", InputEnable ),
+    DEFINE_INPUTFUNC( FIELD_VOID, "Enable", InputEnable ),
 
     DEFINE_OUTPUT( m_OnCount, "OnCount" ),
 END_DATADESC()
@@ -1248,7 +1265,7 @@ BEGIN_DATADESC( CZMEntTriggerEntityCount )
 
     DEFINE_INPUTFUNC( FIELD_VOID, "Toggle", InputToggle ),
     DEFINE_INPUTFUNC( FIELD_VOID, "Disable", InputDisable ),
-    DEFINE_INPUTFUNC( FIELD_VOID, "Enabled", InputEnable ),
+    DEFINE_INPUTFUNC( FIELD_VOID, "Enable", InputEnable ),
 
     DEFINE_INPUTFUNC( FIELD_VOID, "Count", InputCount ),
 
@@ -1604,7 +1621,7 @@ BEGIN_DATADESC( CZMEntTriggerBlockHidden )
 
     DEFINE_INPUTFUNC( FIELD_VOID, "Toggle", InputToggle ),
     DEFINE_INPUTFUNC( FIELD_VOID, "Disable", InputDisable ),
-    DEFINE_INPUTFUNC( FIELD_VOID, "Enabled", InputEnable ),
+    DEFINE_INPUTFUNC( FIELD_VOID, "Enable", InputEnable ),
 END_DATADESC()
 
 LINK_ENTITY_TO_CLASS( trigger_blockspotcreate, CZMEntTriggerBlockHidden );
@@ -1653,7 +1670,7 @@ BEGIN_DATADESC( CZMEntTriggerBlockPhysExp )
 
     DEFINE_INPUTFUNC( FIELD_VOID, "Toggle", InputToggle ),
     DEFINE_INPUTFUNC( FIELD_VOID, "Disable", InputDisable ),
-    DEFINE_INPUTFUNC( FIELD_VOID, "Enabled", InputEnable ),
+    DEFINE_INPUTFUNC( FIELD_VOID, "Enable", InputEnable ),
 END_DATADESC()
 
 LINK_ENTITY_TO_CLASS( trigger_blockphysexplosion, CZMEntTriggerBlockPhysExp );
@@ -1796,6 +1813,11 @@ LINK_ENTITY_TO_CLASS( env_delayed_physexplosion, CZMPhysExplosion );
 PRECACHE_REGISTER( env_delayed_physexplosion );
 
 
+ConVar zm_sv_physexp_debug( "zm_sv_physexp_debug", "0" );
+ConVar zm_sv_physexp_disorientateplayer( "zm_sv_physexp_disorientateplayer", "10", FCVAR_NOTIFY | FCVAR_ARCHIVE );
+ConVar zm_sv_physexp_player_mult( "zm_sv_physexp_player_mult", "0.05", FCVAR_NOTIFY | FCVAR_ARCHIVE );
+
+
 CZMPhysExplosion::CZMPhysExplosion()
 {
     m_hSpark = nullptr;
@@ -1807,6 +1829,35 @@ CZMPhysExplosion::~CZMPhysExplosion()
     {
         UTIL_Remove( m_hSpark );
     }
+}
+
+CZMPhysExplosion* CZMPhysExplosion::CreatePhysExplosion( const Vector& pos, float delay, float magnitude, float radius )
+{
+    auto* pExp = dynamic_cast<CZMPhysExplosion*>( CreateEntityByName( "env_delayed_physexplosion" ) );
+
+    if ( !pExp )
+    {
+        return nullptr;
+    }
+
+
+
+    pExp->SetMagnitude( magnitude );
+    pExp->SetRadius( radius );
+
+
+    if ( DispatchSpawn( pExp ) != 0 )
+    {
+        UTIL_RemoveImmediate( pExp );
+        return nullptr;
+    }
+
+
+    pExp->Teleport( &pos, nullptr, nullptr );
+    pExp->Activate();
+    pExp->DelayedExplode( delay );
+
+    return pExp;
 }
 
 void CZMPhysExplosion::Spawn()
@@ -1833,10 +1884,131 @@ void CZMPhysExplosion::DelayThink()
     g_pEffects->Sparks( GetAbsOrigin(), 15, 3 );
 
 
-    
-    Explode( nullptr, this );
+    Push();
 
     UTIL_Remove( this );
+}
+
+void CZMPhysExplosion::Push()
+{
+    CBaseEntity* pEnt = nullptr;
+    Vector src = GetAbsOrigin();
+    Vector end;
+
+    float flRadius = MAX( GetRadius(), 1.0f );
+
+
+    while ( (pEnt = gEntList.FindEntityInSphere( pEnt, src, flRadius )) != nullptr )
+    {
+        // Physics objects
+        bool bValid = pEnt->GetMoveType() == MOVETYPE_VPHYSICS;
+
+        if ( !bValid )
+        {
+            // Alive players
+            bValid = pEnt->IsPlayer() && pEnt->GetTeamNumber() == ZMTEAM_HUMAN && pEnt->IsAlive();
+
+            if ( !bValid )
+                continue;
+        }
+
+
+        end = pEnt->BodyTarget( src );
+
+
+
+        Vector dir = (end - src);
+        float dist = dir.NormalizeInPlace();
+
+
+        float ratio = 1.0f - dist / flRadius;
+        if ( ratio < 0.0f )
+            ratio = 0.0f;
+
+
+
+        IPhysicsObject* pPhys = pEnt->VPhysicsGetObject();
+
+
+        //
+        // Player
+        //
+        if ( pEnt->IsPlayer() )
+        {
+            auto* pPlayer = ToZMPlayer( pEnt );
+
+            //
+            // Disorient the player
+            //
+            if ( zm_sv_physexp_disorientateplayer.GetFloat() > 0.0f )
+            {
+                float f = zm_sv_physexp_disorientateplayer.GetFloat();
+
+                QAngle ang;
+                ang.x = random->RandomInt( -f, f );
+                ang.y = random->RandomInt( -f, f );
+                ang.z = 0.0f;
+
+                pPlayer->SnapEyeAngles( pPlayer->EyeAngles() + ang );
+                pPlayer->ViewPunch( ang );
+            }
+
+
+            //
+            // Push em.
+            //
+            if ( zm_sv_physexp_player_mult.GetFloat() > 0.0f )
+            {
+                float force = ratio * GetMagnitude() * zm_sv_physexp_player_mult.GetFloat();
+                force *= phys_pushscale.GetFloat();
+
+
+                Vector push = dir * force;
+
+                if ( pEnt->GetFlags() & FL_BASEVELOCITY )
+                {
+                    push += pEnt->GetBaseVelocity();
+                }
+
+                pEnt->SetGroundEntity( nullptr );
+                pEnt->SetBaseVelocity( push );
+                pEnt->AddFlag( FL_BASEVELOCITY );
+            }
+
+
+            pPlayer->ForceDropOfCarriedPhysObjects( nullptr );
+        }
+        //
+        // Physics object
+        //
+        else if ( pPhys )
+        {
+            float force = GetMagnitude() * ratio;
+            if ( force < 1.0f )
+                force = 1.0f;
+
+
+            CTakeDamageInfo info( this, this, force, DMG_BLAST );
+            CalculateExplosiveDamageForce( &info, dir, src );
+
+            //force *= phys_pushscale.GetFloat();
+            //info.SetDamagePosition( src );
+            //info.SetDamageForce( dir * force );
+
+            if ( pPhys->GetGameFlags() & FVPHYSICS_PLAYER_HELD )
+            {
+                auto* pOwner = pEnt->GetOwnerEntity();
+                if ( pOwner && pOwner->IsPlayer() )
+                {
+                    auto* pPlayer = ToZMPlayer( pOwner );
+
+                    pPlayer->ForceDropOfCarriedPhysObjects( pEnt );
+                }
+            }
+
+            pEnt->VPhysicsTakeDamage( info );
+        }
+    }
 }
 
 void CZMPhysExplosion::CreateEffects( float delay )
@@ -1887,6 +2059,12 @@ void CZMPhysExplosion::DelayedExplode( float delay )
 
     SetThink( &CZMPhysExplosion::DelayThink );
     SetNextThink( gpGlobals->curtime + delay );
+
+
+    if ( zm_sv_physexp_debug.GetBool() )
+    {
+        NDebugOverlay::Sphere( GetAbsOrigin(), GetRadius(), 255, 0, 0, false, delay );
+    }
 }
 
 /*
@@ -2098,4 +2276,194 @@ void CZMEntFogController::InitFog()
     m_fog.lerptime = -1.0f;
 
     m_flSkyboxFarZ = zm_sv_zmfog_farz_skybox.GetFloat();
+}
+
+/*
+    Brush spawn volume
+*/
+BEGIN_DATADESC( CZMEntTriggerSpawnVolume )
+    DEFINE_KEYFIELD( m_bActive, FIELD_BOOLEAN, "Active" ),
+
+    DEFINE_INPUTFUNC( FIELD_VOID, "Toggle", InputToggle ),
+    DEFINE_INPUTFUNC( FIELD_VOID, "Disable", InputDisable ),
+    DEFINE_INPUTFUNC( FIELD_VOID, "Enable", InputEnable ),
+END_DATADESC()
+
+LINK_ENTITY_TO_CLASS( trigger_zombiespawnvolume, CZMEntTriggerSpawnVolume );
+
+
+CZMEntTriggerSpawnVolume::CZMEntTriggerSpawnVolume()
+{
+
+}
+
+CZMEntTriggerSpawnVolume::~CZMEntTriggerSpawnVolume()
+{
+
+}
+
+void CZMEntTriggerSpawnVolume::Spawn()
+{
+    BaseClass::Spawn();
+
+    InitTrigger();
+}
+
+void CZMEntTriggerSpawnVolume::InputToggle( inputdata_t &inputData )
+{
+    m_bActive = !m_bActive;
+}
+
+void CZMEntTriggerSpawnVolume::InputEnable( inputdata_t &inputData )
+{
+    m_bActive = true;
+}
+
+void CZMEntTriggerSpawnVolume::InputDisable( inputdata_t &inputData )
+{
+    m_bActive = false;
+}
+
+void CZMEntTriggerSpawnVolume::GetPositionWithin( const CBaseEntity* pEnt, Vector& pos )
+{
+    auto* pNonConst = const_cast<CBaseEntity*>( pEnt );
+
+    auto* pModel = pNonConst->GetModel();
+    if ( !pModel )
+    {
+        Assert( 0 );
+        return;
+    }
+
+
+    float size = modelinfo->GetModelRadius( pModel ) + 10.0f;
+
+
+    Vector start, dir;
+    QAngle ang;
+    Ray_t ray;
+    trace_t tr;
+
+    
+    Vector origin = pEnt->GetAbsOrigin();
+    
+    // Try a few times.
+    for ( int i = 0; i < 3; i++ )
+    {
+        ang.x = random->RandomFloat( -20.0f, 20.0f );
+        ang.y = random->RandomFloat( -180.0f, 180.0f );
+        ang.z = 0.0f;
+
+        AngleVectors( ang, &dir );
+
+
+
+        start = origin + dir * size;
+
+        // Trace inwards to find a position on the surface.
+        ray.Init( start, origin );
+
+        enginetrace->ClipRayToEntity( ray, MASK_SOLID, pNonConst, &tr );
+        if ( tr.fraction == 1.0f )
+            continue;
+
+        Assert( tr.m_pEnt == pEnt );
+
+
+        // Get a random position between the surface and the origin.
+        // This assumes we're convex.
+        float dist = (tr.endpos - origin).Length();
+
+        float mult = random->RandomFloat( 0.1f, 0.95f );
+
+        pos = origin + dir * dist * mult;
+
+        break;
+    }
+}
+
+void CZMEntTriggerSpawnVolume::GetPositionWithin( Vector& pos ) const
+{
+    GetPositionWithin( this, pos );
+}
+
+/*
+    Precipitation
+*/
+class CZMEntPrecipitation : public CBaseEntity
+{
+public:
+    DECLARE_CLASS( CZMEntPrecipitation, CBaseEntity );
+    DECLARE_DATADESC();
+    DECLARE_SERVERCLASS();
+
+    CZMEntPrecipitation();
+    ~CZMEntPrecipitation();
+
+
+    virtual void Spawn() OVERRIDE;
+    virtual int UpdateTransmitState() OVERRIDE;
+
+private:
+    CNetworkVar( PrecipitationType_t, m_nPrecipType );
+};
+
+LINK_ENTITY_TO_CLASS( func_precipitation, CZMEntPrecipitation );
+
+BEGIN_DATADESC( CZMEntPrecipitation )
+    DEFINE_KEYFIELD( m_nPrecipType, FIELD_INTEGER, "preciptype" ),
+END_DATADESC()
+
+// Just send the normal entity crap
+IMPLEMENT_SERVERCLASS_ST( CZMEntPrecipitation, DT_ZM_EntPrecipitation)
+    SendPropInt( SENDINFO( m_nPrecipType ), Q_log2( NUM_PRECIPITATION_TYPES ) + 1, SPROP_UNSIGNED ),
+END_SEND_TABLE()
+
+
+CZMEntPrecipitation::CZMEntPrecipitation()
+{
+    m_nPrecipType = PRECIPITATION_TYPE_RAIN;
+}
+
+CZMEntPrecipitation::~CZMEntPrecipitation()
+{
+}
+
+void CZMEntPrecipitation::Spawn()
+{
+    //SetTransmitState( FL_EDICT_ALWAYS );
+    SetTransmitState( FL_EDICT_PVSCHECK );
+
+    PrecacheMaterial( "effects/fleck_ash1" );
+    PrecacheMaterial( "effects/fleck_ash2" );
+    PrecacheMaterial( "effects/fleck_ash3" );
+    PrecacheMaterial( "effects/ember_swirling001" );
+    Precache();
+
+
+    // Default to rain.
+    if ( m_nPrecipType < 0 || m_nPrecipType > NUM_PRECIPITATION_TYPES )
+        m_nPrecipType = PRECIPITATION_TYPE_RAIN;
+
+
+    SetMoveType( MOVETYPE_NONE );
+    SetModel( STRING( GetModelName() ) );		// Set size
+    //if ( m_nPrecipType == PRECIPITATION_TYPE_PARTICLERAIN )
+    {
+        SetSolid( SOLID_VPHYSICS );
+        AddSolidFlags( FSOLID_NOT_SOLID );
+        AddSolidFlags( FSOLID_FORCE_WORLD_ALIGNED );
+        VPhysicsInitStatic();
+    }
+    //else
+    //{
+    //    SetSolid( SOLID_NONE );							// Remove model & collisions
+    //}
+
+    m_nRenderMode = kRenderEnvironmental;
+}
+
+int CZMEntPrecipitation::UpdateTransmitState()
+{
+    return SetTransmitState( FL_EDICT_ALWAYS );
 }

@@ -1,7 +1,11 @@
 #include "cbase.h"
 
+#include "c_zmr_precipitation.h"
 #include "c_zmr_entities.h"
 #include "zmr/zmr_player_shared.h"
+
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
 
 
 /*
@@ -155,4 +159,34 @@ void C_ZMEntManipulate::InitSpriteMat()
     {
         m_SpriteMat.Init( MAT_MANISPRITE, TEXTURE_GROUP_CLIENT_EFFECTS );
     }
+}
+
+
+/*
+    Precipitation
+*/
+IMPLEMENT_CLIENTCLASS_DT( C_ZMEntPrecipitation, DT_ZM_EntPrecipitation, CZMEntPrecipitation )
+	RecvPropInt( RECVINFO( m_nPrecipType ) ),
+END_RECV_TABLE()
+
+
+C_ZMEntPrecipitation::C_ZMEntPrecipitation()
+{
+}
+
+C_ZMEntPrecipitation::~C_ZMEntPrecipitation()
+{
+    ZMGetPrecipitationSystem()->RemovePrecipitation( this );
+}
+
+void C_ZMEntPrecipitation::PostDataUpdate( DataUpdateType_t updateType )
+{
+    BaseClass::PostDataUpdate( updateType );
+
+    if ( updateType == DATA_UPDATE_CREATED )
+    {
+        ZMGetPrecipitationSystem()->AddPrecipitation( this );
+    }
+
+    m_flDensity = RemapVal( (float)(GetRenderColor().a), 0, 100, 0, 1 );
 }

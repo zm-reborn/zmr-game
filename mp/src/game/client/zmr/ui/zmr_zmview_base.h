@@ -69,6 +69,9 @@ public:
     virtual void CloseChildMenus();
     virtual void HideMouseTools();
 
+    static float GetBorderScroll();
+    virtual void CheckBorderScrolling();
+
     void UpdateHiddenSpawnSpot( int mx, int my );
     const char* GetTempHiddenSpawnModel( ZombieClass_t zclass ) const;
 private:

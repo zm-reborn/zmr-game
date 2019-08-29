@@ -234,4 +234,30 @@ void ZM_VoiceMenu( const CCommand &args )
 static ConCommand zm_cmd_voicemenu( "zm_cmd_voicemenu", ZM_VoiceMenu );
 
 
+/*
+    Mirror legacy cvars to the new ones.
+    Only set because some maps can break without these.
+*/
+#define LEGACY_CVAR( oldcvar, newcvar ) \
+    CON_COMMAND( oldcvar, "DON'T EDIT THIS CVAR, USE "#newcvar" INSTEAD!" ) \
+    { \
+        extern ConVar newcvar; \
+        if ( UTIL_IsCommandIssuedByServerAdmin() ) \
+        { \
+            Msg( "LEGACY CVAR %s | %s -> %s\n", #oldcvar, #newcvar, args.ArgS() ); \
+            newcvar.SetValue( args.ArgS() ); \
+        } \
+    }
 
+
+// taters_made_this
+LEGACY_CVAR( zm_resource_limit, zm_sv_resource_max )
+LEGACY_CVAR( zm_resource_refill_rate, zm_sv_resource_rate )
+LEGACY_CVAR( zm_initial_resources, zm_sv_resource_init )
+
+// bman
+LEGACY_CVAR( zm_physexp_cost, zm_sv_physexp_cost )
+LEGACY_CVAR( zm_spotcreate_cost, zm_hidden_cost_shambler )
+
+// kink
+LEGACY_CVAR( zm_flashlight_drainrate, zm_sv_flashlightdrainrate )

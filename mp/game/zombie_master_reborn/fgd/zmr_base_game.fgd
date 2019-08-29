@@ -6472,13 +6472,14 @@
 [
 	spawnflags(flags) =
 	[
-		1  : "Enabled"				: 1
+		1  : "Start on"				: 1
 	]
 
-	target(target_destination)	: "target" : : "target"	
+	target(target_destination)	: "Entity to point at" : : "target"	
 	lightfov(float)				: "FOV" : "90.0" : "FOV"
 	nearz(float)				: "NearZ" : "4.0" : "Near Z for projected texture"
 	farz(float)					: "FarZ" : "750.0" : "Far Z for projected texture"	
+	texturename(string)					: "Texture name" : "effects/flashlight001" : "Name of the texture."	
 	
 	enableshadows(Choices) : "Enable Shadows" : 0 : "Enables/disables shadows from this projected texture." =
 	[
@@ -6501,7 +6502,11 @@
 		1 : "Yes"
 	]
 	lightcolor(color255)		: "Light Color" : "255 255 255 200" : "Light Color RGB-Intensity"
-	cameraspace(integer)		: "Camera Space" : 0 : "Angles are interpreted as being relative to camera."
+	cameraspace(Choices)		: "Camera Space" : 0 : "Angles are interpreted as being relative to camera." =
+	[
+		0 : "No"
+		1 : "Yes"
+	]
 
 	// Inputs
 	input TurnOn(void)		: "Turn on the texture"

@@ -15,6 +15,9 @@
 
 #include "c_zmr_importancesystem.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 void C_ZMImportanceSystem::ImportanceData_t::Init( int uid )
 {
@@ -156,6 +159,26 @@ vgui::IImage* C_ZMImportanceSystem::GetPlayerImportanceImageIndex( int playerInd
     return ImportanceToImage( m_Importance[playerIndex].importance );
 }
 
+const char* C_ZMImportanceSystem::GetPlayerImportanceName( int playerIndex )
+{
+    if ( !IsCached( playerIndex ) )
+    {
+        ComputePlayerImportance( playerIndex );
+    }
+
+    return ImportanceToName( m_Importance[playerIndex].importance );
+}
+
+ZMImportance_t C_ZMImportanceSystem::GetPlayerImportance( int playerIndex )
+{
+    if ( !IsCached( playerIndex ) )
+    {
+        ComputePlayerImportance( playerIndex );
+    }
+
+    return m_Importance[playerIndex].importance;
+}
+
 bool C_ZMImportanceSystem::IsCached( int playerIndex )
 {
     return m_Importance[playerIndex].IsValid( playerIndex );
@@ -169,7 +192,7 @@ void C_ZMImportanceSystem::Reset()
     }
 }
 
-vgui::IImage* C_ZMImportanceSystem::ImportanceToImage( ZMImportance_t index )
+vgui::IImage* C_ZMImportanceSystem::ImportanceToImage( ZMImportance_t index ) const
 {
     switch ( index )
     {
@@ -177,6 +200,17 @@ vgui::IImage* C_ZMImportanceSystem::ImportanceToImage( ZMImportance_t index )
     case ZMIMPORTANCE_TRUSTED : return m_pImageTrusted;
     case ZMIMPORTANCE_PLAYTESTER : return m_pImagePlaytester;
     default : return nullptr;
+    }
+}
+
+const char* C_ZMImportanceSystem::ImportanceToName( ZMImportance_t index )
+{
+    switch ( index )
+    {
+    case ZMIMPORTANCE_DEV : return "Developer";
+    case ZMIMPORTANCE_TRUSTED : return "Trusted";
+    case ZMIMPORTANCE_PLAYTESTER : return "Playtester";
+    default : return "";
     }
 }
 

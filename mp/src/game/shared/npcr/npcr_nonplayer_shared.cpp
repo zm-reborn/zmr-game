@@ -59,7 +59,10 @@ bool CNPCRNonPlayer::SetActivity( Activity act )
     Activity last = m_iCurActivity;
 
 #ifdef GAME_DLL
-    if ( !IsSequenceFinished() )
+    // Interruptions should always be called
+    // because it's possible for the activity to be interrupted
+    // but then never finished
+    //if ( !IsSequenceFinished() )
         OnAnimActivityInterrupted( act );
 #endif
 
@@ -71,9 +74,6 @@ bool CNPCRNonPlayer::SetActivity( Activity act )
 
     m_iCurActivity = act;
     m_iLastActivity = last;
-#ifndef CLIENT_DLL
-    m_iLastLoopActivity = ACT_INVALID;
-#endif
 
     return true;
 }

@@ -8,7 +8,7 @@
 
 
 // This is the absolute maximum bullets the player can shoot.
-#define ZM_USERCMD_MAX_BULLETS_PER_SHOT     8
+#define ZM_USERCMD_MAX_BULLETS_PER_SHOT     14
 #define ZM_USERCMD_MAX_HITS                  12
 #define ZM_USERCMD_MAX_HITS_BITS             ( Q_log2( ZM_USERCMD_MAX_HITS ) + 1 )
 #define ZM_NUMHITS_BITS                     ( Q_log2( ZM_USERCMD_MAX_BULLETS_PER_SHOT ) + 1 )

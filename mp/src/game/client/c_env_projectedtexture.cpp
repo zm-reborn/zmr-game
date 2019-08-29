@@ -154,11 +154,17 @@ void C_EnvProjectedTexture::UpdateLight( bool bForceUpdate )
 		else
 		{
 			vForward = m_hTargetEntity->GetAbsOrigin() - GetAbsOrigin();
+#ifdef ZMR // ZMRCHANGE: https://developer.valvesoftware.com/wiki/Env_projectedtexture/fixes
+            QAngle ang;
+            VectorAngles( vForward, ang );
+
+            AngleVectors( ang, &vForward, &vRight, &vUp );
+#else
 			VectorNormalize( vForward );
 
 			// JasonM - unimplemented
 			Assert (0);
-
+#endif
 			//Quaternion q = DirectionToOrientation( dir );
 
 
@@ -221,7 +227,9 @@ void C_EnvProjectedTexture::UpdateLight( bool bForceUpdate )
 
 	g_pClientShadowMgr->SetFlashlightLightWorld( m_LightHandle, m_bLightWorld );
 
+#ifndef ZMR // ZMRCHANGE: https://developer.valvesoftware.com/wiki/Env_projectedtexture/fixes
 	if ( bForceUpdate == false )
+#endif
 	{
 		g_pClientShadowMgr->UpdateProjectedTexture( m_LightHandle, true );
 	}
@@ -229,7 +237,11 @@ void C_EnvProjectedTexture::UpdateLight( bool bForceUpdate )
 
 void C_EnvProjectedTexture::Simulate( void )
 {
+#ifdef ZMR
+    UpdateLight( GetMoveParent() != nullptr );
+#else
 	UpdateLight( false );
+#endif
 
 	BaseClass::Simulate();
 }
