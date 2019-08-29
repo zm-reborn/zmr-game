@@ -65,6 +65,28 @@ ConCommand zm_cmd_ctrl_up( "+zm_cmd_ctrl", IN_ZM_Cmd_Control );
 ConCommand zm_cmd_ctrl_down( "-zm_cmd_ctrl", IN_ZM_Cmd_Control );
 
 
+//
+// Move up/down
+//
+static void IN_ZM_Cmd_MoveUp( const CCommand& args )
+{
+    C_ZMPlayer* pPlayer = C_ZMPlayer::GetLocalPlayer();
+    
+    if ( pPlayer )
+        pPlayer->SetMouseWheelMove( 1 );
+}
+ConCommand zm_cmd_moveup( "zm_cmd_moveup", IN_ZM_Cmd_MoveUp );
+
+static void IN_ZM_Cmd_MoveDown( const CCommand& args )
+{
+    C_ZMPlayer* pPlayer = C_ZMPlayer::GetLocalPlayer();
+    
+    if ( pPlayer )
+        pPlayer->SetMouseWheelMove( -1 );
+}
+ConCommand zm_cmd_movedown( "zm_cmd_movedown", IN_ZM_Cmd_MoveDown );
+
+
 
 
 //

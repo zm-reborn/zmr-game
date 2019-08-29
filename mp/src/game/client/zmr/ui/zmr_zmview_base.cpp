@@ -353,11 +353,14 @@ void CZMViewBase::OnMouseWheeled( int delta )
 {
     BaseClass::OnMouseWheeled( delta );
 
+    // Pass mouse wheel stuff to engine.
+    MouseCode code = delta >= 0 ? MOUSE_WHEEL_UP : MOUSE_WHEEL_DOWN;
 
-    C_ZMPlayer* pPlayer = C_ZMPlayer::GetLocalPlayer();
-    
-    if ( pPlayer )
-        pPlayer->SetMouseWheelMove( (float)delta );
+    const char* binding = gameuifuncs->GetBindingForButtonCode( code );
+    if ( binding && *binding )
+    {
+        engine->ClientCmd_Unrestricted( binding );
+    }
 }
 
 void CZMViewBase::Paint()
