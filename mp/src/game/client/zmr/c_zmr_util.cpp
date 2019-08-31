@@ -4,6 +4,8 @@
 #include "text_message.h"
 #include <engine/IEngineSound.h>
 #include "c_user_message_register.h"
+#include "cdll_client_int.h"
+#include "IGameUIFuncs.h"
 
 #include "zmr/npcs/zmr_zombiebase_shared.h"
 #include "zmr/ui/zmr_hud_chat.h"
@@ -33,6 +35,35 @@ int UTIL_CreateClientModel( const char* pszModel )
     }
     
     return index;
+}
+
+bool UTIL_PassKeyToEngine( ButtonCode_t code, bool bDoRelease = true, bool bOnlyRelease = false )
+{
+    Assert( bDoRelease || !bOnlyRelease );
+
+
+    const char* binding = gameuifuncs->GetBindingForButtonCode( code );
+    if ( binding && *binding )
+    {
+        if ( !bOnlyRelease )
+        {
+            engine->ClientCmd_Unrestricted( binding );
+        }
+
+        // HACK: Call '-' version of the command to unpress said key.
+        if ( bDoRelease && binding[0] == '+' )
+        {
+            char temp[128];
+            Q_strncpy( temp, binding, sizeof( temp ) );
+            temp[0] = '-';
+
+            engine->ClientCmd_Unrestricted( temp );
+        }
+
+        return true;
+    }
+
+    return false;
 }
 
 

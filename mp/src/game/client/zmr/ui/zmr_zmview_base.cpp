@@ -48,6 +48,7 @@ CLIENTEFFECT_MATERIAL( MAT_TARGETBREAK )
 CLIENTEFFECT_REGISTER_END()
 
 
+bool UTIL_PassKeyToEngine( ButtonCode_t code, bool bDoRelease = true, bool bOnlyRelease = false );
 
 
 class CTraceFilterNoNPCs : public CTraceFilterSimple
@@ -282,6 +283,14 @@ void CZMViewBase::OnCursorMoved( int x, int y )
 
 void CZMViewBase::OnMouseReleased( MouseCode code )
 {
+    // HACK: We don't use these buttons, so pass them through to engine.
+    if ( code != MOUSE_LEFT && code != MOUSE_RIGHT )
+    {
+        UTIL_PassKeyToEngine( code, true, true );
+        return;
+    }
+
+
     if ( UseSwitchedButtons() )
     {
         code = SwitchMouseButtons( code );
@@ -309,12 +318,7 @@ void CZMViewBase::OnMousePressed( MouseCode code )
     // HACK: We don't use these buttons, so pass them through to engine.
     if ( code != MOUSE_LEFT && code != MOUSE_RIGHT )
     {
-        const char* binding = gameuifuncs->GetBindingForButtonCode( code );
-        if ( binding && *binding )
-        {
-            engine->ClientCmd_Unrestricted( binding );
-        }
-
+        UTIL_PassKeyToEngine( code, false );
         return;
     }
 
@@ -353,14 +357,12 @@ void CZMViewBase::OnMouseWheeled( int delta )
 {
     BaseClass::OnMouseWheeled( delta );
 
+    Assert( delta ); // Is it actually possible for delta to be 0?
+
     // Pass mouse wheel stuff to engine.
     MouseCode code = delta >= 0 ? MOUSE_WHEEL_UP : MOUSE_WHEEL_DOWN;
 
-    const char* binding = gameuifuncs->GetBindingForButtonCode( code );
-    if ( binding && *binding )
-    {
-        engine->ClientCmd_Unrestricted( binding );
-    }
+    UTIL_PassKeyToEngine( code );
 }
 
 void CZMViewBase::Paint()
