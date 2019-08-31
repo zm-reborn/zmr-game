@@ -70,21 +70,27 @@ ConCommand zm_cmd_ctrl_down( "-zm_cmd_ctrl", IN_ZM_Cmd_Control );
 //
 static void IN_ZM_Cmd_MoveUp( const CCommand& args )
 {
+    bool state = ( args.Arg( 0 )[0] == '+' ) ? true : false;
+
     C_ZMPlayer* pPlayer = C_ZMPlayer::GetLocalPlayer();
     
     if ( pPlayer )
-        pPlayer->SetMouseWheelMove( 1 );
+        pPlayer->SetMouseWheelMove( state ? 1 : 0 );
 }
-ConCommand zm_cmd_moveup( "zm_cmd_moveup", IN_ZM_Cmd_MoveUp );
+ConCommand zm_cmd_moveup_down( "+zm_cmd_moveup", IN_ZM_Cmd_MoveUp );
+ConCommand zm_cmd_moveup_up( "-zm_cmd_moveup", IN_ZM_Cmd_MoveUp );
 
 static void IN_ZM_Cmd_MoveDown( const CCommand& args )
 {
+    bool state = ( args.Arg( 0 )[0] == '+' ) ? true : false;
+
     C_ZMPlayer* pPlayer = C_ZMPlayer::GetLocalPlayer();
     
     if ( pPlayer )
-        pPlayer->SetMouseWheelMove( -1 );
+        pPlayer->SetMouseWheelMove( state ? -1 : 0 );
 }
-ConCommand zm_cmd_movedown( "zm_cmd_movedown", IN_ZM_Cmd_MoveDown );
+ConCommand zm_cmd_movedown_down( "+zm_cmd_movedown", IN_ZM_Cmd_MoveDown );
+ConCommand zm_cmd_movedown_up( "-zm_cmd_movedown", IN_ZM_Cmd_MoveDown );
 
 
 

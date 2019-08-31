@@ -1138,12 +1138,20 @@ bool C_ZMPlayer::CreateMove( float delta, CUserCmd* cmd )
 
 void C_ZMPlayer::SetMouseWheelMove( float dir )
 {
-    if ( m_flNextUpMove > gpGlobals->curtime )
-        return;
-
-
-    m_flNextUpMove = gpGlobals->curtime + 0.1f;
-    m_flUpMove = zm_cl_zmmovemwheelmovespd.GetFloat() * dir;
+    if ( dir != 0.0f )
+    {
+        // Keep going up until we are called again with 0.
+        m_flNextUpMove = FLT_MAX;
+        m_flUpMove = zm_cl_zmmovemwheelmovespd.GetFloat() * dir;
+    }
+    else
+    {
+        // We want to be stopped.
+        if ( m_flNextUpMove > gpGlobals->curtime )
+        {
+            m_flNextUpMove = (gpGlobals->curtime + 0.1f);
+        }
+    }
 }
 
 bool C_ZMPlayer::HasExpensiveFlashlightOn() const
