@@ -357,12 +357,15 @@ void CZMViewBase::OnMouseWheeled( int delta )
 {
     BaseClass::OnMouseWheeled( delta );
 
-    Assert( delta ); // Is it actually possible for delta to be 0?
 
-    // Pass mouse wheel stuff to engine.
-    MouseCode code = delta >= 0 ? MOUSE_WHEEL_UP : MOUSE_WHEEL_DOWN;
+    // Apparently, it is possible for the delta to be 0.
+    if ( delta )
+    {
+        // Pass mouse wheel stuff to engine.
+        MouseCode code = delta >= 0 ? MOUSE_WHEEL_UP : MOUSE_WHEEL_DOWN;
 
-    UTIL_PassKeyToEngine( code );
+        UTIL_PassKeyToEngine( code );
+    }
 }
 
 void CZMViewBase::Paint()
