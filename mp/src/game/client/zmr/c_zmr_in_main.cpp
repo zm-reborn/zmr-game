@@ -51,7 +51,7 @@ void CZMInput::AdjustYaw( float speed, QAngle& viewangles )
     {
 	    viewangles[YAW] += speed * zm_cl_border_yawspeed.GetFloat() * (m_StateYaw.iState == SCROLL_POSITIVE ? 1 : -1);
 
-        if ( (gpGlobals->curtime - m_StateYaw.flLastStateChange) < SCROLL_GRACETIME )
+        if ( (gpGlobals->curtime - m_StateYaw.flLastStateChange) > SCROLL_GRACETIME )
         {
             m_StateYaw.iState = SCROLL_NONE;
         }
@@ -61,7 +61,7 @@ void CZMInput::AdjustYaw( float speed, QAngle& viewangles )
     {
 	    viewangles[PITCH] += speed * zm_cl_border_pitchspeed.GetFloat() * (m_StatePitch.iState == SCROLL_POSITIVE ? 1 : -1);
 
-        if ( (gpGlobals->curtime - m_StatePitch.flLastStateChange) < SCROLL_GRACETIME )
+        if ( (gpGlobals->curtime - m_StatePitch.flLastStateChange) > SCROLL_GRACETIME )
         {
             m_StatePitch.iState = SCROLL_NONE;
         }
