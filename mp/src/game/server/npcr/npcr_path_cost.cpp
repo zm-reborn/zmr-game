@@ -5,6 +5,27 @@
 
 ConVar npcr_path_simplepathvischeck( "npcr_path_simplepathvischeck", "0" );
 
+bool NPCR::CBasePathCost::ComputePortalPoints( const CNavArea* from, const CNavArea* to, Vector& fromPos, Vector& toPos )
+{
+	// Find which side it is connected on
+	int dir = 0;
+	for( ; dir < NUM_DIRECTIONS; ++dir )
+	{
+		if ( from->IsConnected( to, (NavDirType)dir ) )
+			break;
+	}
+
+	if ( dir == NUM_DIRECTIONS )
+        return false;
+
+
+	float halfWidth;
+	from->ComputePortal( to, (NavDirType)dir, &fromPos, &halfWidth );
+
+	to->ComputePortal( from, OppositeDirection( (NavDirType)dir ), &toPos, &halfWidth );
+
+    return true;
+}
 
 bool NPCR::CBasePathCost::CanBuildSimpleRoute( const Vector& vecStart, const Vector& vecGoal ) const
 {
@@ -55,9 +76,26 @@ float NPCR::CPathCostGroundOnly::operator()( CNavArea* area, CNavArea* fromArea,
         return PATHCOST_INVALID;
     }
             
+    
+    // Get the points that are closest to each other.
+    Vector fromClosest, toClosest;
+    bool bPortalOk = ComputePortalPoints( fromArea, area, fromClosest, toClosest );
+    Assert( bPortalOk );
+
     // The step up is too high.
-    float height = fromArea->ComputeAdjacentConnectionHeightChange( area );
+    float height = toClosest.z - fromClosest.z;
     if ( height > GetMaxHeightChange() )
+    {
+        return PATHCOST_INVALID;
+    }
+
+
+    // We don't want the z-axis anymore.
+    toClosest.z = fromClosest.z = 0.0f;
+
+    // Check the gap between these areas.
+    float distsqr = fromClosest.DistToSqr( toClosest );
+    if ( distsqr > (GetAbsMaxGap()*GetAbsMaxGap()) )
     {
         return PATHCOST_INVALID;
     }

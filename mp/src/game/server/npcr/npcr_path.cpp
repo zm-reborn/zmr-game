@@ -346,15 +346,20 @@ bool NPCR::CBaseNavPath::ComputeNavPathDetails( int count, const Vector& vecStar
         if ( from->area == to->area )
             continue;
 
-        // Compute the height difference.
-        float height = from->area->ComputeAdjacentConnectionHeightChange( to->area );
-        if ( height == FLT_MAX )
-            continue;
 
+        Vector fromPos, toPos;
+        if ( !CBasePathCost::ComputePortalPoints( from->area, to->area, fromPos, toPos ) )
+        {
+            Assert( 0 ); // We should be connected...
+            continue;
+        }
+
+        float height = toPos.z - fromPos.z;
+        fromPos.z = toPos.z = 0.0f;
 
         const float flStepHeight = cost.GetStepHeight();
 
-        if ( height > flStepHeight )
+        if ( height > flStepHeight || fromPos.DistToSqr( toPos ) > (cost.GetMaxWalkGap()*cost.GetMaxWalkGap()) )
         {
             NavLink_t* jumpstart = from;
             
