@@ -15,6 +15,7 @@
 
 
 ConVar zm_sv_debug_nav_transient( "zm_sv_debug_nav_transient", "0" );
+ConVar zm_sv_debug_nav_block( "zm_sv_debug_nav_block", "0" );
 
 
 
@@ -23,6 +24,7 @@ CZMRNavMesh::CZMRNavMesh()
     ListenForGameEvent( "round_restart_pre" );
     ListenForGameEvent( "round_restart_post" );
     ListenForGameEvent( "nav_generate" );
+    ListenForGameEvent( "nav_blocked" );
 }
 
 CZMRNavMesh::~CZMRNavMesh()
@@ -221,6 +223,16 @@ void CZMRNavMesh::FireGameEvent( IGameEvent* pEvent )
     if ( FStrEq( pEvent->GetName(), "nav_generate" ) )
     {
         engine->ServerCommand( "npcr_remove_all\n" );
+        return;
+    }
+
+    if ( FStrEq( pEvent->GetName(), "nav_blocked" ) )
+    {
+        if ( zm_sv_debug_nav_block.GetBool() )
+        {
+            Msg( "Nav area %i block state: %i\n", pEvent->GetInt( "area" ), pEvent->GetInt( "blocked" ) );
+        }
+
         return;
     }
 

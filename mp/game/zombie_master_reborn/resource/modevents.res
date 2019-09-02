@@ -65,7 +65,13 @@
 	}
 	
 	
-
+	
+	"nav_blocked"
+	{
+		"area"	"long"
+		"blocked"	"short"
+	}
+	
 	"player_death"				// a game event, name may be 32 charaters long
 	{
 		"userid"	"short"   	// user ID who died				
