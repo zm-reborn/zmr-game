@@ -1300,13 +1300,16 @@ void CZMBaseWeapon::UpdateGlow()
     }
 }
 
+void UTIL_ParseFloatColorFromString( const char* str, float clr[], int nColors );
+
 void CZMBaseWeapon::GetGlowEffectColor( float& r, float& g, float& b )
 {
-    CSplitString split( zm_cl_glow_weapon.GetString(), " " );
+    float clr[3];
+    UTIL_ParseFloatColorFromString( zm_cl_glow_weapon.GetString(), clr, ARRAYSIZE( clr ) );
 
-    if ( split.Count() > 0 ) r = atof( split[0] );
-    if ( split.Count() > 1 ) g = atof( split[1] );
-    if ( split.Count() > 2 ) b = atof( split[2] );
+    r = clr[0];
+    g = clr[1];
+    b = clr[2];
 }
 
 ShadowType_t CZMBaseWeapon::ShadowCastType()

@@ -201,17 +201,20 @@ CViewModelColorMaterialProxy::~CViewModelColorMaterialProxy()
 {
 }
 
+void UTIL_ParseFloatColorFromString( const char* str, float clr[], int nColors );
+
 bool CViewModelColorMaterialProxy::Init( IMaterial* pMaterial, KeyValues* pKeyValues )
 {
     bool foundVar;
     m_defaultVar = pMaterial->FindVar( pKeyValues->GetString( "resultVar", "" ), &foundVar, false );
 
 
-    CSplitString split( pKeyValues->GetString( "default" ), " " );
+    float clr[3];
+    UTIL_ParseFloatColorFromString( pKeyValues->GetString( "default", "" ), clr, ARRAYSIZE( clr ) );
 
-    if ( split.Count() > 0 ) m_defR = atof( split[0] );
-    if ( split.Count() > 1 ) m_defG = atof( split[1] );
-    if ( split.Count() > 2 ) m_defB = atof( split[2] );
+    m_defR = clr[0];
+    m_defG = clr[1];
+    m_defB = clr[2];
 
     return foundVar;
 }

@@ -66,6 +66,40 @@ bool UTIL_PassKeyToEngine( ButtonCode_t code, bool bDoRelease = true, bool bOnly
     return false;
 }
 
+void UTIL_ParseColorFromString( const char* str, int clr[], int nColors )
+{
+    Assert( str );
+
+    CSplitString split( str, " " );
+
+    Q_memset( clr, 0, nColors * sizeof( int ) );
+
+    for ( int i = 0; i < nColors; i++ )
+    {
+        if ( split.Count() > i )
+            clr[i] = Q_atoi( split[i] );
+        else
+            break;
+    }
+}
+
+void UTIL_ParseFloatColorFromString( const char* str, float clr[], int nColors )
+{
+    Assert( str );
+
+    CSplitString split( str, " " );
+
+    Q_memset( clr, 0, nColors * sizeof( float ) );
+
+    for ( int i = 0; i < nColors; i++ )
+    {
+        if ( split.Count() > i )
+            clr[i] = Q_atof( split[i] );
+        else
+            break;
+    }
+}
+
 
 
 void ZMClientUtil::PrintNotify( const char* msg, ZMChatNotifyType_t type )
