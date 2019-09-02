@@ -38,6 +38,18 @@ void CZMBansheeFollowPath::Invalidate()
     BaseClass::Invalidate();
 }
 
+NPCR::PathRes_t CZMBansheeFollowPath::CheckGoal( NPCR::CBaseNPC* pNPC ) const
+{
+    // If we're about to jump, don't do any goal checks yet.
+    if ( m_JumpStatus == NPCR::JUMP_BEGIN && GetCurLink() && GetCurLink()->navTravel == NPCR::TRAVEL_NAVJUMP )
+    {
+        return NPCR::PATH_OK;
+    }
+
+
+    return BaseClass::CheckGoal( pNPC );
+}
+
 void CZMBansheeFollowPath::OnNewGoal( NPCR::CBaseNPC* pNPC )
 {
     m_JumpStatus = NPCR::JUMP_BEGIN;
