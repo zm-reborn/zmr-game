@@ -28,7 +28,7 @@ public:
     virtual void FireGameEvent( IGameEvent* pEvent ) OVERRIDE;
 
 
-    static float GetTransientCheckStartHeight() { return 0.5f; }
+    static float GetTransientCheckStartHeight() { return 17.0f; }
 
     void UpdateTransientAreas();
     void UpdateFloorCheckAreas();
