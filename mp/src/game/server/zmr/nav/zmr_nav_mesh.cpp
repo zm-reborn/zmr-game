@@ -240,7 +240,7 @@ void CZMRNavMesh::FireGameEvent( IGameEvent* pEvent )
     BaseClass::FireGameEvent( pEvent );
 }
 
-void CZMRNavMesh::GetAreaBounds( CNavArea* pArea, Vector& mins, Vector& maxs )
+void CZMRNavMesh::GetAreaBounds( const CNavArea* pArea, Vector& mins, Vector& maxs )
 {
     Vector temp;
 
