@@ -14,6 +14,7 @@ namespace NPCR
         {
             m_flStepHeight = 16.0f;
             m_flMaxPathLength = 0.0f;
+            m_flMaxWalkGap = 32.0f; // Just assume our hull diameter.
         }
 
         float           GetStepHeight() const { return m_flStepHeight; }
@@ -21,6 +22,10 @@ namespace NPCR
 
         float           GetMaxPathLength() const { return m_flMaxPathLength; }
         void            SetMaxPathLength( float l ) { m_flMaxPathLength = l; }
+
+        // This is the maximum gap we can walk over. Different from absolute max gap.
+        float           GetMaxWalkGap() const { return m_flMaxWalkGap; }
+        virtual void    SetMaxWalkGap( float g ) { m_flMaxWalkGap = g; }
 
 
         virtual float   GetJumpCostMultiplier() const { return 2.0f; }
@@ -35,10 +40,14 @@ namespace NPCR
 
         // Can we build a straight path.
         virtual bool CanBuildSimpleRoute( const Vector& vecStart, const Vector& vecGoal ) const;
+
+
+        static bool ComputePortalPoints( const CNavArea* from, const CNavArea* to, Vector& fromPos, Vector& toPos );
     
     private:
         float m_flStepHeight;
         float m_flMaxPathLength;
+        float m_flMaxWalkGap;
     };
 
     class CPathCostGroundOnly : public CBasePathCost
@@ -47,6 +56,7 @@ namespace NPCR
         CPathCostGroundOnly()
         {
             m_flMaxHeightChange = GetStepHeight(); // Just use default step height.
+            m_flAbsMaxGap = GetMaxWalkGap(); // Use the walk gap by default.
 
             //m_flHullHeight = 72.0f;
 
@@ -70,6 +80,19 @@ namespace NPCR
         int     GetMaxHeightChange() const { return m_flMaxHeightChange; }
         void    SetMaxHeightChange( float h ) { m_flMaxHeightChange = h; }
 
+
+        // How big of a gap we are allowed to cross. This should be the max jump length.
+        float   GetAbsMaxGap() const { return m_flAbsMaxGap; }
+        void    SetAbsMaxGap( float g ) { m_flAbsMaxGap = g; }
+
+        virtual void SetMaxWalkGap( float g ) OVERRIDE
+        {
+            if ( GetAbsMaxGap() < g )
+                SetAbsMaxGap( g );
+
+            CBasePathCost::SetMaxWalkGap( g );
+        }
+
         CNavArea* GetStartArea() const { return m_pStartArea; }
         void SetStartPos( const Vector& vecPos, CNavArea* area )
         {
@@ -92,6 +115,7 @@ namespace NPCR
 
     protected:
         float m_flMaxHeightChange;
+        float m_flAbsMaxGap;
         //float m_flHullHeight;
 
 
