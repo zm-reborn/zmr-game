@@ -170,6 +170,10 @@ void CZMRNavMesh::OnServerActivate()
     {
         Warning( "!!\n!! Map does not have a NAV mesh loaded!\n!!\n" );
     }
+
+
+    m_UpdateTransientTimer.Invalidate();
+    m_UpdateCheckFloorTimer.Invalidate();
 }
 
 class NavRoundRestart
