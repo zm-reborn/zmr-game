@@ -947,6 +947,8 @@ void C_ZMPlayer::ReleaseFlashlight()
 #define FLASH_LOCAL_ONLY        1
 #define FLASH_ALL_PLAYERS       2
 
+void UTIL_ParseColorFromString( const char* str, int clr[], int nColors );
+
 extern ConVar muzzleflash_light;
 
 ConVar zm_cl_muzzleflash_light( "zm_cl_muzzleflash_light", "2", FCVAR_ARCHIVE, "0 = No light, 1 = Only local player, 2 = All players" );
@@ -1060,18 +1062,8 @@ void C_ZMPlayer::ProcessMuzzleFlashEvent()
     }
 
 
-    int r = 255;
-    int g = 255;
-    int b = 255;
-        
-    CSplitString split( zm_cl_muzzleflash_light_color.GetString(), " " );
-        
-    if ( split.Count() > 0 )
-        r = Q_atoi( split[0] );
-    if ( split.Count() > 1 )
-        g = Q_atoi( split[1] );
-    if ( split.Count() > 2 )
-        b = Q_atoi( split[2] );
+    int clr[3];
+    UTIL_ParseColorFromString( zm_cl_muzzleflash_light_color.GetString(), clr, ARRAYSIZE( clr ) );
 
 
     // Dynamic light
@@ -1080,9 +1072,9 @@ void C_ZMPlayer::ProcessMuzzleFlashEvent()
     el->radius = radius; 
     el->decay = el->radius / lifetime;
     el->die = gpGlobals->curtime + lifetime;
-    el->color.r = (byte)r;
-    el->color.g = (byte)g;
-    el->color.b = (byte)b;
+    el->color.r = (byte)clr[0];
+    el->color.g = (byte)clr[1];
+    el->color.b = (byte)clr[2];
     el->color.exponent = (signed char)zm_cl_muzzleflash_light_exponent.GetInt();
 }
 
