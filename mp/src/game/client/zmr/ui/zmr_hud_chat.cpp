@@ -15,6 +15,8 @@
 #include "zmr_hud_chat.h"
 
 
+void UTIL_ParseColorFromString( const char* str, int clr[], int nColors );
+
 
 DECLARE_HUDELEMENT( CHudChat );
 
@@ -108,16 +110,8 @@ Color CHudChat::GetClientColor( int clientIndex )
         // Not my fault.
         if ( g_ZMImportanceSystem.GetPlayerImportance( clientIndex ) == ZMIMPORTANCE_DEV )
         {
-            CSplitString split( zm_cl_chat_color_dev.GetString(), " " );
-
-            int clr[3] = { 255, 255, 255 };
-            for ( int i = 0; i < ARRAYSIZE( clr ); i++ )
-            {
-                if ( split.Count() > i )
-                    clr[i] = Q_atoi( split[i] );
-                else
-                    break;
-            }
+            int clr[3];
+            UTIL_ParseColorFromString( zm_cl_chat_color_dev.GetString(), clr, ARRAYSIZE( clr ) );
 
             return Color( clr[0], clr[1], clr[2], 255 );
         }

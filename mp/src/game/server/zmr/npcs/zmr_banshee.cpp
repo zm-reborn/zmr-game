@@ -150,6 +150,8 @@ NPCR::CPathCostGroundOnly* CZMBanshee::GetPathCost() const
 
         cost = new NPCR::CPathCostGroundOnly;
         cost->SetMaxHeightChange( GetMaxNavJumpHeight() );
+        cost->SetAbsMaxGap( GetMaxNavJumpDist() );
+        //cost->SetMaxWalkGap( 32.0f ); // Our hull diameter.
     }
 
     return cost;

@@ -61,7 +61,6 @@ public:
     virtual void CancelReload() OVERRIDE;
     virtual bool ShouldCancelReload() const OVERRIDE;
 
-    virtual bool CanPickupAmmo() const OVERRIDE { return !IsInReload(); }
     virtual bool IsInReload() const OVERRIDE;
     bool NeedsPump() const { return m_iPumpState != PUMPSTATE_NONE; }
     

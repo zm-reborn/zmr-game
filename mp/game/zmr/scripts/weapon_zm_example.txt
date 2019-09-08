@@ -7,6 +7,8 @@ WeaponData
 	"viewmodel"				"models/weapons/c_fists_zm.mdl"
 	"worldmodel"			"models/weapons/w_null.mdl"
 	
+	// Not used?
+	"anim_prefix"			"357"
 	
 	
 	// Primary attack
@@ -38,6 +40,22 @@ WeaponData
 		"viewpunch_max"		"2 -1 0"
 	}
 	
+	// Crosshair of the weapon. See resource/zmcrosshairs_default.txt for all crosshairs.
+	"crosshair"				"Pistol"
+	
+	// If the weapon uses the accuracy model (rifle and revolver):
+	// Increase = How fast the gun gets accurate when stopping.
+	// Decrease = How fast the gun gets inaccurate when moving.
+	"accuracy_increase"		"1"
+	"accuracy_decrease"		"1"
+	
+	// How many times a bullet can penetrate.
+	"penetration_max"		"0"
+	// Currently not used.
+	"penetration_dmgmult"	"1"
+	// How far in solid can the bullet move.
+	// Some material types will decrease this.
+	"penetration_maxdist"	"16"
 	
 	// The slot of the weapon.
 	// 0 = slot1
@@ -60,6 +78,10 @@ WeaponData
 	// Size of the "clip" / magazine.
 	// -1 means no clip.
 	"clip_size"				"1337"
+	// When picking up the weapon for the first time,
+	// how many bullets does the clip have.
+	// Never used, probably bugged.
+	"default_clip"			"0"
 	
 	// The time it takes to reload. Use -1 to use animation length.
 	// If the reload activity has AE_WPN_PRIMARYATTACK animation event and animation length is used,
@@ -85,6 +107,7 @@ WeaponData
 		"reload"			"Weapon_Shotgun_ZM.Reload"
 		"special1"			"Weapon_Shotgun_ZM.Special1"
 		"single_shot"		"vo/citadel/eli_dontstruggle.wav"
+		"double_shot"		"vo/citadel/eli_dontstruggle.wav"
 		"deploy"			""
 	}
 	

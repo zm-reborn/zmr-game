@@ -1225,6 +1225,9 @@ void CZMPlayer::Event_Killed( const CTakeDamageInfo &info )
 
     RemoveEffects( EF_NODRAW );	// still draw player body
     StopZooming();
+
+    // ZMRTODO: Figure out how to call EndTouch for all entities on death.
+    StopWaterDeathSounds();
 }
 
 int CZMPlayer::OnTakeDamage( const CTakeDamageInfo& inputInfo )

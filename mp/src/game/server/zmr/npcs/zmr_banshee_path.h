@@ -17,6 +17,7 @@ public:
     // Returns minimum jump height in order to jump over obstacles.
     float FindJumpHeight( const Vector& vecStart, const Vector& vecGoal ) const;
 
+    virtual NPCR::PathRes_t CheckGoal( NPCR::CBaseNPC* pNPC ) const OVERRIDE;
     virtual void UpdateMove( NPCR::CBaseNPC* pNPC ) OVERRIDE;
     virtual void OnNewGoal( NPCR::CBaseNPC* pNPC ) OVERRIDE;
 

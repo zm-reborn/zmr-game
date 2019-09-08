@@ -56,6 +56,7 @@ public:
     void                    SetLocalAngles( const QAngle& angles );
     virtual float           GetFOV() OVERRIDE;
     virtual float           GetMinFOV() const OVERRIDE { return 5.0f; };
+    static float            GetLocalDefaultFOV();
     virtual void            ProcessMuzzleFlashEvent() OVERRIDE;
 
     int GetIDTarget() const;

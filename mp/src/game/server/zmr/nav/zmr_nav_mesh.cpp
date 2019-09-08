@@ -8,16 +8,23 @@
 #include "zmr_nav_mesh.h"
 
 
-#define MASK_TRANSIENT          (CONTENTS_SOLID|CONTENTS_MOVEABLE)
+#define MASK_TRANSIENT          (CONTENTS_SOLID|CONTENTS_GRATE|CONTENTS_WINDOW|CONTENTS_MOVEABLE)
 
 
 #define ZMR_NAV_TRANSIENT_HEIGHT    17.0f
+
+
+ConVar zm_sv_debug_nav_transient( "zm_sv_debug_nav_transient", "0" );
+ConVar zm_sv_debug_nav_block( "zm_sv_debug_nav_block", "0" );
+
+
 
 CZMRNavMesh::CZMRNavMesh()
 {
     ListenForGameEvent( "round_restart_pre" );
     ListenForGameEvent( "round_restart_post" );
     ListenForGameEvent( "nav_generate" );
+    ListenForGameEvent( "nav_blocked" );
 }
 
 CZMRNavMesh::~CZMRNavMesh()
@@ -50,6 +57,9 @@ void CZMRNavMesh::UpdateTransientAreas()
 
     Vector mins, maxs, center;
 
+    const bool bDebugging = zm_sv_debug_nav_transient.GetBool();
+
+
     FOR_EACH_VEC( areas, i )
     {
         auto* area = areas[i];
@@ -80,7 +90,17 @@ void CZMRNavMesh::UpdateTransientAreas()
         
         UTIL_TraceHull( center, center, mins, maxs, MASK_TRANSIENT, &filter, &tr );
 
-        if ( tr.fraction != 1.0f || tr.startsolid || tr.m_pEnt )
+        bool bBlock = tr.fraction != 1.0f || tr.startsolid || tr.m_pEnt;
+
+
+
+        if ( bDebugging )
+        {
+            NDebugOverlay::SweptBox( center, center, mins, maxs, vec3_angle, bBlock ? 255 : 0, (!bBlock) ? 255 : 0, 0, 255, zm_sv_debug_nav_transient.GetFloat() );
+        }
+
+
+        if ( bBlock )
         {
             area->MarkAsBlocked( TEAM_ANY, nullptr );
         }
@@ -93,6 +113,9 @@ void CZMRNavMesh::UpdateFloorCheckAreas()
     auto* pWorld = GetContainingEntity( INDEXENT( 0 ) );
 
     Vector mins, maxs, center;
+
+    const bool bDebugging = zm_sv_debug_nav_transient.GetBool();
+
 
     FOR_EACH_VEC( areas, i )
     {
@@ -122,7 +145,16 @@ void CZMRNavMesh::UpdateFloorCheckAreas()
         UTIL_TraceHull( center, center, mins, maxs, MASK_TRANSIENT, &filter, &tr );
 
 
-        area->SetNoFloor( !tr.m_pEnt );
+        bool bBlock = !tr.m_pEnt;
+
+
+        if ( bDebugging )
+        {
+            NDebugOverlay::SweptBox( center, center, mins, maxs, vec3_angle, bBlock ? 255 : 0, (!bBlock) ? 255 : 0, 0, 255, zm_sv_debug_nav_transient.GetFloat() );
+        }
+
+
+        area->SetNoFloor( bBlock );
     }
 }
 
@@ -140,6 +172,10 @@ void CZMRNavMesh::OnServerActivate()
     {
         Warning( "!!\n!! Map does not have a NAV mesh loaded!\n!!\n" );
     }
+
+
+    m_UpdateTransientTimer.Invalidate();
+    m_UpdateCheckFloorTimer.Invalidate();
 }
 
 class NavRoundRestart
@@ -190,11 +226,21 @@ void CZMRNavMesh::FireGameEvent( IGameEvent* pEvent )
         return;
     }
 
+    if ( FStrEq( pEvent->GetName(), "nav_blocked" ) )
+    {
+        if ( zm_sv_debug_nav_block.GetBool() )
+        {
+            Msg( "Nav area %i block state: %i\n", pEvent->GetInt( "area" ), pEvent->GetInt( "blocked" ) );
+        }
+
+        return;
+    }
+
 
     BaseClass::FireGameEvent( pEvent );
 }
 
-void CZMRNavMesh::GetAreaBounds( CNavArea* pArea, Vector& mins, Vector& maxs )
+void CZMRNavMesh::GetAreaBounds( const CNavArea* pArea, Vector& mins, Vector& maxs )
 {
     Vector temp;
 

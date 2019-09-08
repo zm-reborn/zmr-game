@@ -56,7 +56,6 @@ ConVar zm_cl_zmmoveaccelerate( "zm_cl_zmmoveaccelerate", "5", FCVAR_USERINFO | F
 ConVar zm_cl_zmmovedecelerate( "zm_cl_zmmovedecelerate", "4", FCVAR_USERINFO | FCVAR_ARCHIVE, "How fast you'll decelerate." );
 // Mouse wheel
 ConVar zm_cl_zmmovemwheelmove( "zm_cl_zmmovemwheelmove", "1", FCVAR_ARCHIVE, "As the ZM, can you move up/down with mousewheel?" );
-ConVar zm_cl_zmmovemwheelmovereverse( "zm_cl_zmmovemwheelmovereverse", "1", FCVAR_ARCHIVE, "Is mousewheel scrolling reversed?" );
 ConVar zm_cl_zmmovemwheelmovespd( "zm_cl_zmmovemwheelmovespd", "1600", FCVAR_ARCHIVE, "", true, 400.0f, true, 2000.0f );
 // Button ones
 ConVar zm_cl_zmmovejumpspd( "zm_cl_zmmovejumpspd", "1600", FCVAR_ARCHIVE );
@@ -642,6 +641,19 @@ float C_ZMPlayer::GetFOV()
     return MAX( GetMinFOV(), fov );
 }
 
+extern ConVar default_fov;
+
+float C_ZMPlayer::GetLocalDefaultFOV()
+{
+    const float flLocalDefFOV = default_fov.GetFloat();
+
+    auto* pLocal = C_ZMPlayer::GetLocalPlayer();
+    if ( !pLocal )
+        return flLocalDefFOV;
+
+    return pLocal->GetDefaultFOV();
+}
+
 int C_ZMPlayer::GetIDTarget() const
 {
     return m_iIDEntIndex;
@@ -935,6 +947,8 @@ void C_ZMPlayer::ReleaseFlashlight()
 #define FLASH_LOCAL_ONLY        1
 #define FLASH_ALL_PLAYERS       2
 
+void UTIL_ParseColorFromString( const char* str, int clr[], int nColors );
+
 extern ConVar muzzleflash_light;
 
 ConVar zm_cl_muzzleflash_light( "zm_cl_muzzleflash_light", "2", FCVAR_ARCHIVE, "0 = No light, 1 = Only local player, 2 = All players" );
@@ -1048,18 +1062,8 @@ void C_ZMPlayer::ProcessMuzzleFlashEvent()
     }
 
 
-    int r = 255;
-    int g = 255;
-    int b = 255;
-        
-    CSplitString split( zm_cl_muzzleflash_light_color.GetString(), " " );
-        
-    if ( split.Count() > 0 )
-        r = Q_atoi( split[0] );
-    if ( split.Count() > 1 )
-        g = Q_atoi( split[1] );
-    if ( split.Count() > 2 )
-        b = Q_atoi( split[2] );
+    int clr[3];
+    UTIL_ParseColorFromString( zm_cl_muzzleflash_light_color.GetString(), clr, ARRAYSIZE( clr ) );
 
 
     // Dynamic light
@@ -1068,9 +1072,9 @@ void C_ZMPlayer::ProcessMuzzleFlashEvent()
     el->radius = radius; 
     el->decay = el->radius / lifetime;
     el->die = gpGlobals->curtime + lifetime;
-    el->color.r = (byte)r;
-    el->color.g = (byte)g;
-    el->color.b = (byte)b;
+    el->color.r = (byte)clr[0];
+    el->color.g = (byte)clr[1];
+    el->color.b = (byte)clr[2];
     el->color.exponent = (signed char)zm_cl_muzzleflash_light_exponent.GetInt();
 }
 
@@ -1079,7 +1083,7 @@ bool C_ZMPlayer::CreateMove( float delta, CUserCmd* cmd )
     bool bResult = BaseClass::CreateMove( delta, cmd );
     
 
-    if ( m_flNextUpMove > gpGlobals->curtime )
+    if ( m_flNextUpMove > gpGlobals->curtime && zm_cl_zmmovemwheelmove.GetBool() )
     {
         cmd->upmove += m_flUpMove;
     }
@@ -1126,18 +1130,20 @@ bool C_ZMPlayer::CreateMove( float delta, CUserCmd* cmd )
 
 void C_ZMPlayer::SetMouseWheelMove( float dir )
 {
-    if ( !zm_cl_zmmovemwheelmove.GetBool() ) return;
-
-    if ( dir == 0.0f ) return;
-
-    if ( m_flNextUpMove > gpGlobals->curtime )
-        return;
-
-    if ( zm_cl_zmmovemwheelmovereverse.GetBool() )
-        dir *= -1.0f;
-
-    m_flNextUpMove = gpGlobals->curtime + 0.1f;
-    m_flUpMove = zm_cl_zmmovemwheelmovespd.GetFloat() * dir;
+    if ( dir != 0.0f )
+    {
+        // Keep going up until we are called again with 0.
+        m_flNextUpMove = FLT_MAX;
+        m_flUpMove = zm_cl_zmmovemwheelmovespd.GetFloat() * dir;
+    }
+    else
+    {
+        // We want to be stopped.
+        if ( m_flNextUpMove > gpGlobals->curtime )
+        {
+            m_flNextUpMove = (gpGlobals->curtime + 0.1f);
+        }
+    }
 }
 
 bool C_ZMPlayer::HasExpensiveFlashlightOn() const

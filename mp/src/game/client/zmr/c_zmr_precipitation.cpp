@@ -127,10 +127,16 @@ const CNewParticleEffect* C_ZMPrecipitationSystem::GetOuter() const
 
 CParticleProperty* C_ZMPrecipitationSystem::ParticleProp()
 {
-    if ( m_vPrecipitations.Count() < 1 )
-        return nullptr;
+    // Get the world's particle property.
+    auto* pEnt = cl_entitylist->GetBaseEntity( 0 );
 
-    return m_vPrecipitations[0]->ParticleProp();
+    // How can the world not exist? :thinking:
+    Assert( pEnt );
+
+    if ( !pEnt )
+        return nullptr;
+    
+    return pEnt->ParticleProp();
 }
 
 void C_ZMPrecipitationSystem::BuildRayTracingEnv()
@@ -272,20 +278,16 @@ void C_ZMPrecipitationSystem::InitializeParticles()
 void C_ZMPrecipitationSystem::UpdateParticles()
 {
     auto* pPlayer = C_ZMPlayer::GetLocalPlayer();
-    if ( !pPlayer )
+
+    if (!pPlayer
+    ||  m_iLastQuality == PRECIPQ_NONE // We don't want rain
+    ||  g_RayTraceEnvironments.Count() < 1
+    ||  !ParticleProp() )
+    {
+        DestroyInnerParticlePrecip();
+        DestroyOuterParticlePrecip();
         return;
-
-
-    if ( g_RayTraceEnvironments.Count() < 1 )
-        return;
-
-
-    if ( !ParticleProp() )
-        return;
-
-
-    if ( m_iLastQuality == PRECIPQ_NONE )
-        return;
+    }
 
 
     float flCurTime = gpGlobals->frametime;

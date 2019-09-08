@@ -757,7 +757,9 @@ void CTriggerWateryDeath::StartTouch(CBaseEntity *pOther)
 #ifdef HL2_DLL
 	if ( pOther->IsPlayer() )
 	{
+#ifndef ZMR // ZMRCHANGE: This only works for one player anyway. Begone.
 		SpawnLeeches( pOther );
+#endif
 
 		CHL2_Player *pHL2Player = dynamic_cast<CHL2_Player*>( pOther );
 

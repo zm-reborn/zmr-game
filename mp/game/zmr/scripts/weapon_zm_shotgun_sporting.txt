@@ -11,12 +11,12 @@ WeaponData
 	"PrimaryAttack"
 	{
 		"firerate"			"0.45"
-		"damage"			"6"
-		"range"				"800"
+		"damage"			"12"
+		"range"				"500"
 		"bulletspershot"	"7"
 		
 		// 6 degrees
-		"spread"			"6 6 0"
+		"spread"			"8 8 0"
 		
 		"viewpunch_min"		"-8 -4 0"
 		"viewpunch_max"		"-6 4 0"
@@ -25,12 +25,12 @@ WeaponData
 	"SecondaryAttack"
 	{
 		"firerate"			"0.45"
-		"damage"			"6"
-		"range"				"500"
+		"damage"			"12"
+		"range"				"300"
 		"bulletspershot"	"7"
 		
 		// 15 degrees
-		"spread"			"15 15 15"
+		"spread"			"20 20 0"
 		
 		"viewpunch_min"		"-16 -4 0"
 		"viewpunch_max"		"-8 4 0"
@@ -38,6 +38,8 @@ WeaponData
 	
 	
 	"crosshair"				"ShotgunSporting"
+	
+	"penetration_max"		"1"
 	
 	"primary_ammo"			"Buckshot"
 	

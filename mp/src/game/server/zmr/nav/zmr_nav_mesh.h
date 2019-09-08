@@ -33,7 +33,7 @@ public:
     void UpdateTransientAreas();
     void UpdateFloorCheckAreas();
 
-    void GetAreaBounds( CNavArea* pArea, Vector& mins, Vector& maxs );
+    static void GetAreaBounds( const CNavArea* pArea, Vector& mins, Vector& maxs );
 
 private:
     CountdownTimer m_UpdateTransientTimer;
