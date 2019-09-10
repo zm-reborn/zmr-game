@@ -275,7 +275,8 @@ static ReplacementSystem s_ReplacementSystem;
 
 void ReplacementSystem::Enable()
 {
-	replMatPossible = true; //CommandLine()->CheckParm("-experimental");
+    // ZMRCHANGE: Change when we actually need to replace materials.
+	replMatPossible = CommandLine()->CheckParm( "-replacematerials" );
 
 	if( m_pOldMaterialSystem || !replMatPossible )
 		return;
