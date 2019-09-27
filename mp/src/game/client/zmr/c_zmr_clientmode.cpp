@@ -241,9 +241,6 @@ int ClientModeZMNormal::KeyInput( int down, ButtonCode_t keynum, const char* psz
 // Return -1 to call baseclass.
 int ClientModeZMNormal::ZMKeyInput( int down, ButtonCode_t keynum, const char* pszCurrentBinding )
 {
-    C_ZMPlayer* pPlayer = C_ZMPlayer::GetLocalPlayer();
-
-
     int ret = g_pZMView->ZMKeyInput( keynum, down );
     if ( ret != -1 )
         return ret;
@@ -262,14 +259,6 @@ int ClientModeZMNormal::ZMKeyInput( int down, ButtonCode_t keynum, const char* p
         {
             ZMClientUtil::SelectGroup( num );
         }
-    }
-
-
-    // Mousewheel move
-    // We have to put this here or otherwise we can't move while in free-cam.
-    if ( down && (keynum == MOUSE_WHEEL_DOWN || keynum == MOUSE_WHEEL_UP) )
-    {
-        pPlayer->SetMouseWheelMove( ( keynum == MOUSE_WHEEL_DOWN ) ? -1.0f : 1.0f );
     }
 
     return -1;
