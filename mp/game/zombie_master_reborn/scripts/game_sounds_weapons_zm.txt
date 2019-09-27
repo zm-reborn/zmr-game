@@ -62,7 +62,13 @@
 	"volume"		"0.7"
 	"soundlevel"	"SNDLVL_NORM"
 
-	"wave"		"weapons/shotgun_zm/shotgun_cock_zm.wav"
+	"rndwave"
+	{
+		"wave"			"^weapons/shotgun_zm/cock_zm_0.wav"
+		"wave"			"^weapons/shotgun_zm/cock_zm_1.wav"
+		"wave"			"^weapons/shotgun_zm/cock_zm_2.wav"
+		"wave"			"^weapons/shotgun_zm/cock_zm_3.wav"
+	}
 }
 
 "Weapon_Shotgun_ZM.Single"
