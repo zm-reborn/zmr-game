@@ -121,7 +121,7 @@
 	"volume"		"1.0"
 	"soundlevel"	"SNDLVL_NORM"
 
-	"wave"		"weapons/rifle_zm/zm_rifle_lever.wav"
+	"wave"		"^weapons/rifle_zm/zm_rifle_lever.wav"
 }
 
 "Weapon_Rifle_ZM.Single"
