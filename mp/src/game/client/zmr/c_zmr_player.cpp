@@ -383,6 +383,9 @@ void C_ZMPlayer::TeamChange( int iNewTeam )
 
 
     TeamChangeStatic( iNewTeam );
+
+
+    m_flNextUpMove = 0.0f;
 }
 
 void C_ZMPlayer::TeamChangeStatic( int iNewTeam )
@@ -1083,7 +1086,7 @@ bool C_ZMPlayer::CreateMove( float delta, CUserCmd* cmd )
     bool bResult = BaseClass::CreateMove( delta, cmd );
     
 
-    if ( m_flNextUpMove > gpGlobals->curtime && zm_cl_zmmovemwheelmove.GetBool() )
+    if ( IsZM() && m_flNextUpMove > gpGlobals->curtime && zm_cl_zmmovemwheelmove.GetBool() )
     {
         cmd->upmove += m_flUpMove;
     }
