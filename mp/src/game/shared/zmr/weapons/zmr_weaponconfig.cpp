@@ -798,7 +798,7 @@ WeaponConfigSlot_t CZMWeaponConfigSystem::RegisterCustomWeapon( WeaponConfigSlot
     }
 
 
-    auto* pConfig = LoadCustomConfigFromFile( baseslot, filename );
+    auto* pConfig = LoadCustomConfigFromFile( baseslot, file );
 
     m_pConfigs[slot] = pConfig;
 
