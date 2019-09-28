@@ -300,6 +300,7 @@ KeyValues* CZMBaseWeaponConfig::ToKeyValues() const
 
     snddata->SetString( "empty", pszSounds[WeaponSound_t::EMPTY] );
     snddata->SetString( "single_shot", pszSounds[WeaponSound_t::SINGLE] );
+    snddata->SetString( "double_shot", pszSounds[WeaponSound_t::WPN_DOUBLE] );
     snddata->SetString( "reload", pszSounds[WeaponSound_t::RELOAD] );
     snddata->SetString( "melee_hit", pszSounds[WeaponSound_t::MELEE_HIT] );
     snddata->SetString( "deploy", pszSounds[WeaponSound_t::DEPLOY] );
