@@ -86,6 +86,8 @@ namespace ZMWeaponConfig
         virtual void LoadFromConfig( KeyValues* kv );
         virtual KeyValues* ToKeyValues() const;
 
+        virtual void OnCustomConfigLoaded();
+
 
         static bool IsValidFirerate( float rate ) { return rate >= 0.0f; }
 
