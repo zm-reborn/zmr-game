@@ -338,6 +338,9 @@ void CZMMainMenu::ApplySchemeSettings( IScheme* pScheme )
 {
     m_BgColor = GetSchemeColor( "ZMMainMenuBg", COLOR_BLACK, pScheme );
 
+    // By default all elements assume we're not in game.
+    s_bWasInGame = false;
+
 
     LoadControlSettings( "resource/ui/zmmainmenu.res" );
 
