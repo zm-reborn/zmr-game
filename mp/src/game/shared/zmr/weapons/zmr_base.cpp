@@ -1208,9 +1208,16 @@ void CZMBaseWeapon::Precache()
 
 
 
+    //
+    // Only set m_iViewModelIndex/m_iWorldModelIndex
+    // as the server unless we're overriding the model.
+    //
+#ifdef GAME_DLL
 	// Precache models (preload to avoid hitch)
 	m_iViewModelIndex = 0;
 	m_iWorldModelIndex = 0;
+#endif
+
 
     // Make sure we precache all models.
     // It's possible to only precache the override model and the default one is left out.
@@ -1221,20 +1228,19 @@ void CZMBaseWeapon::Precache()
         {
             m_iViewModelIndex = UTIL_CreateClientModel( GetWeaponConfig()->pszModel_View );
         }
-        else
 #endif
-        {
-            m_iViewModelIndex = PrecacheModel( GetWeaponConfig()->pszModel_View );
-        }
+#ifdef GAME_DLL
+        m_iViewModelIndex = PrecacheModel( GetWeaponConfig()->pszModel_View );
+#endif
     }
 
+#ifdef GAME_DLL
     if ( GetWeaponConfig()->pszModel_World[0] != NULL )
     {
         m_iWorldModelIndex = PrecacheModel( GetWeaponConfig()->pszModel_World );
     }
 
 
-#ifdef GAME_DLL
     if ( m_OverrideViewModel != NULL_STRING )
     {
         m_iViewModelIndex = PrecacheModel( STRING( m_OverrideViewModel ) );
