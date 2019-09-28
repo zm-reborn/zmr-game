@@ -593,6 +593,12 @@ void CZMBaseWeaponConfig::OverrideAttack( KeyValues* kv, ZMAttackConfig_t& attac
         attack.vecViewPunch_Max = vecTemp;
 }
 
+void CZMBaseWeaponConfig::OnCustomConfigLoaded()
+{
+    // Custom weapons aren't "overridden" as they are shared.
+    bOverriddenViewmodel = false;
+    bOverriddenWorldmodel = false;
+}
 
 //
 //
@@ -962,6 +968,8 @@ CZMBaseWeaponConfig* CZMWeaponConfigSystem::LoadCustomConfigFromFile( WeaponConf
     pConfig->LoadFromConfig( basekv );
 
     pConfig->OverrideFromConfig( kv );
+
+    pConfig->OnCustomConfigLoaded();
 
 
     basekv->deleteThis();
