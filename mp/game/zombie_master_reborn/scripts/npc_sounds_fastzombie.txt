@@ -10,6 +10,9 @@
 		"wave"			"npc/banshee/leap1.wav"
 		"wave"			"npc/banshee/leap2.wav"
 		"wave"			"npc/banshee/leap3_long.wav"
+		"wave"			"npc/banshee/fz_scream1.wav"
+		"wave"			"npc/banshee/fz_scream2.wav"
+		"wave"			"npc/banshee/fz_scream3.wav"
 	}
 }
 
