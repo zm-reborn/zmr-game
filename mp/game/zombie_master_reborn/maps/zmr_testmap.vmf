@@ -2,7 +2,7 @@ versioninfo
 {
 	"editorversion" "400"
 	"editorbuild" "7538"
-	"mapversion" "182"
+	"mapversion" "188"
 	"formatversion" "100"
 	"prefab" "0"
 }
@@ -20,7 +20,7 @@ viewsettings
 world
 {
 	"id" "1"
-	"mapversion" "182"
+	"mapversion" "188"
 	"classname" "worldspawn"
 	"detailmaterial" "detail/detailsprites"
 	"detailvbsp" "detail.vbsp"
@@ -12560,8 +12560,6 @@ entity
 	"id" "840"
 	"classname" "weapon_zm_rifle"
 	"angles" "0 0 0"
-	"clip1override" "-1"
-	"dmgoverride" "-1"
 	"spawnflags" "0"
 	"origin" "-944 -320 16"
 	editor
@@ -13094,8 +13092,6 @@ entity
 	"id" "1638"
 	"classname" "weapon_zm_mac10"
 	"angles" "0 0 0"
-	"clip1override" "-1"
-	"dmgoverride" "-1"
 	"spawnflags" "0"
 	"origin" "-944 -288 16"
 	editor
@@ -13139,8 +13135,6 @@ entity
 	"id" "1653"
 	"classname" "weapon_zm_shotgun"
 	"angles" "0 0 0"
-	"clip1override" "-1"
-	"dmgoverride" "-1"
 	"spawnflags" "0"
 	"origin" "-944 -352 16"
 	editor
@@ -13184,8 +13178,6 @@ entity
 	"id" "1761"
 	"classname" "weapon_zm_improvised"
 	"angles" "0 0 0"
-	"clip1override" "-1"
-	"dmgoverride" "-1"
 	"origin" "-944 -256 16"
 	editor
 	{
@@ -13200,8 +13192,6 @@ entity
 	"id" "1763"
 	"classname" "weapon_zm_pistol"
 	"angles" "0 0 0"
-	"clip1override" "-1"
-	"dmgoverride" "-1"
 	"spawnflags" "0"
 	"origin" "-944 -384 16"
 	editor
@@ -13217,8 +13207,6 @@ entity
 	"id" "1767"
 	"classname" "weapon_zm_sledge"
 	"angles" "0 0 0"
-	"clip1override" "-1"
-	"dmgoverride" "-1"
 	"origin" "-944 -224 16"
 	editor
 	{
@@ -13233,8 +13221,6 @@ entity
 	"id" "1782"
 	"classname" "weapon_zm_revolver"
 	"angles" "0 0 0"
-	"clip1override" "-1"
-	"dmgoverride" "-1"
 	"spawnflags" "0"
 	"origin" "-944 -416 16"
 	editor
@@ -20186,10 +20172,24 @@ entity
 	"id" "12351"
 	"classname" "weapon_zm_shotgun_sporting"
 	"angles" "0 0 0"
-	"clip1override" "-1"
-	"dmgoverride" "-1"
 	"spawnflags" "0"
 	"origin" "-944 -448 16"
+	editor
+	{
+		"color" "0 0 200"
+		"visgroupshown" "1"
+		"visgroupautoshown" "1"
+		"logicalpos" "[0 0]"
+	}
+}
+entity
+{
+	"id" "12592"
+	"classname" "weapon_zm_mac10"
+	"angles" "0 0 0"
+	"customscriptfile" "weapon_zm_custommac10_zmr_testmap"
+	"spawnflags" "0"
+	"origin" "-928 -528 30"
 	editor
 	{
 		"color" "0 0 200"
