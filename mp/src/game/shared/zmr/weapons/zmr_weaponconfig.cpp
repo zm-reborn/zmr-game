@@ -482,7 +482,7 @@ bool CZMBaseWeaponConfig::OverrideFromConfig( KeyValues* kv )
     {
         OverrideAttack( secattack, secondary );
     }
-
+#endif // GAME_DLL
 
 
     //
@@ -499,6 +499,10 @@ bool CZMBaseWeaponConfig::OverrideFromConfig( KeyValues* kv )
         if ( pszTmp )
             CopyAllocString( pszTmp, &pszSounds[WeaponSound_t::SINGLE] );
 
+        pszTmp = snddata->GetString( "double_shot", nullptr );
+        if ( pszTmp )
+            CopyAllocString( pszTmp, &pszSounds[WeaponSound_t::WPN_DOUBLE] );
+
         pszTmp = snddata->GetString( "reload", nullptr );
         if ( pszTmp )
             CopyAllocString( pszTmp, &pszSounds[WeaponSound_t::RELOAD] );
@@ -510,6 +514,10 @@ bool CZMBaseWeaponConfig::OverrideFromConfig( KeyValues* kv )
         pszTmp = snddata->GetString( "deploy", nullptr );
         if ( pszTmp )
             CopyAllocString( pszTmp, &pszSounds[WeaponSound_t::DEPLOY] );
+
+        pszTmp = snddata->GetString( "special1", nullptr );
+        if ( pszTmp )
+            CopyAllocString( pszTmp, &pszSounds[WeaponSound_t::SPECIAL1] );
     }
 
 
@@ -520,7 +528,6 @@ bool CZMBaseWeaponConfig::OverrideFromConfig( KeyValues* kv )
     pszTmp = kv->GetString( "primary_ammo", nullptr );
     if ( pszTmp )
         CopyAllocString( pszTmp, &pszAmmoName );
-#endif // GAME_DLL
 
 
     
