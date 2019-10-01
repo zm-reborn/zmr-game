@@ -755,6 +755,8 @@ bool CZMRules::ReplaceZM( CZMPlayer* pZM )
 
         if ( pPlayer->IsZM() ) continue;
 
+        if ( pPlayer->IsHLTV() ) continue;
+
 
         switch( pPlayer->GetParticipation() )
         {
@@ -996,6 +998,8 @@ CZMPlayer* CZMRules::ChooseZM()
 
         if ( !pPlayer ) continue;
 
+        if ( pPlayer->IsHLTV() ) continue;
+
 
         switch ( pPlayer->GetParticipation() )
         {
@@ -1071,6 +1075,9 @@ void CZMRules::BeginRound( CZMPlayer* pZM )
         pPlayer = ToZMPlayer( UTIL_PlayerByIndex( i ) );
 
         if ( !pPlayer ) continue;
+
+        if ( pPlayer->IsHLTV() ) continue;
+
 
         // Always increase the priority.
         pPlayer->SetPickPriority( pPlayer->GetPickPriority() + 1 );
@@ -1337,6 +1344,9 @@ int CZMRules::GetNumAliveHumans()
 bool CZMRules::ShouldLateSpawn( CZMPlayer* pPlayer )
 {
     if ( pPlayer->GetTeamNumber() > ZMTEAM_SPECTATOR && pPlayer->IsAlive() )
+        return false;
+
+    if ( pPlayer->IsHLTV() )
         return false;
 
 
