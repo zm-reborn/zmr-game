@@ -79,8 +79,7 @@ float NPCR::CPathCostGroundOnly::operator()( CNavArea* area, CNavArea* fromArea,
     
     // Get the points that are closest to each other.
     Vector fromClosest, toClosest;
-    bool bPortalOk = ComputePortalPoints( fromArea, area, fromClosest, toClosest );
-    Assert( bPortalOk );
+    ComputePortalPoints( fromArea, area, fromClosest, toClosest );
 
     // The step up is too high.
     float height = toClosest.z - fromClosest.z;
