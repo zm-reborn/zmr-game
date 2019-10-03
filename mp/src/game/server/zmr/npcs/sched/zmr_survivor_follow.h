@@ -97,21 +97,40 @@ public:
     //        
     //}
 
-    bool IsValidFollowTarget( CBasePlayer* pPlayer ) const
+    bool IsValidFollowTarget( CBasePlayer* pPlayer, bool bCheckLoop = false ) const
     {
         if ( pPlayer->GetTeamNumber() != ZMTEAM_HUMAN || !pPlayer->IsAlive() )
         {
             return false;
         }
 
-        if ( pPlayer->IsBot() )
+        auto* pOuter = GetOuter();
+
+        // Make sure our following chain isn't circular.
+
+        auto* pLoop = pPlayer;
+        do
         {
-            auto* pBot = static_cast<CZMPlayerBot*>( pPlayer );
-            if ( pBot->GetFollowTarget() == GetOuter() ) // Don't follow a bot that is following us, lul.
+            if ( pLoop->IsBot() )
             {
-                return false;
+                auto* pBot = static_cast<CZMPlayerBot*>( pLoop );
+                auto* pTheirTarget = pBot->GetFollowTarget();
+                if ( pTheirTarget == pOuter ) // Don't follow a bot that is following us, lul.
+                {
+                    return false;
+                }
+
+                if ( bCheckLoop )
+                    pLoop = pTheirTarget;
+                else
+                    break;
+            }
+            else
+            {
+                break;
             }
         }
+        while ( pLoop != nullptr );
 
         return true;
     }
@@ -124,7 +143,7 @@ public:
 
 
         auto* pLastFollow = m_hFollowTarget.Get();
-        bool bWasValid = pLastFollow ? IsValidFollowTarget( pLastFollow ) : false;
+        bool bWasValid = pLastFollow ? IsValidFollowTarget( pLastFollow, true ) : false;
 
         auto* pFollow = FindSurvivorToFollow();
 
@@ -187,7 +206,7 @@ public:
 
             if ( !bAllowBot && pPlayer->IsBot() ) continue;
 
-            if ( !IsValidFollowTarget( pPlayer ) ) continue;
+            if ( !IsValidFollowTarget( pPlayer, true ) ) continue;
 
 
             float dist = pPlayer->GetAbsOrigin().DistToSqr( mypos );
