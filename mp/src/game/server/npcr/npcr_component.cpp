@@ -4,6 +4,10 @@
 #include "npcr_component.h"
 
 
+NPCR::EventComponent::EventComponent()
+{
+    m_bSelfCall = false;
+}
 
 NPCR::CComponent::CComponent( CEventDispatcher* pOwner, CBaseNPC* pNPC )
 {

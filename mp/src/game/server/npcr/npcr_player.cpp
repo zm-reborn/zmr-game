@@ -1,5 +1,6 @@
 #include "cbase.h"
 #include "in_buttons.h"
+#include "nav_mesh.h"
 
 #include "npcr_motor_player.h"
 #include "npcr_manager.h"
@@ -7,6 +8,43 @@
 
 
 #ifdef NPCR_BOT_CMDS
+template<typename ForEachFunc>
+void ForTargetedBots( const char* comp, ForEachFunc f )
+{
+    NPCR::g_NPCManager.ForEachNPC( [ comp, f ]( NPCR::CBaseNPC* pNPC )
+    {
+        bool passes = false;
+
+        auto* pChar = pNPC->GetCharacter();
+
+        if ( comp && *comp )
+        {
+            auto* pPlayerBot = ToBasePlayer( pChar );
+            if ( pPlayerBot )
+            {
+			    passes = Q_stricmp( pPlayerBot->GetPlayerName(), comp ) != -1;
+            }
+            else
+            {
+                passes = Q_stricmp( STRING( pChar->GetEntityName() ), comp ) != -1;
+            }
+        }
+        else
+        {
+            passes = true;
+        }
+
+        if ( passes )
+        {
+            f( pNPC );
+        }
+
+        return false;
+    } );
+}
+
+
+
 ConVar bot_attack( "bot_attack", "0" );
 ConVar bot_mimic( "bot_mimic", "0" );
 ConVar bot_mimic_yaw_offset( "bot_mimic_yaw_offset", "0" );
@@ -55,35 +93,50 @@ CON_COMMAND( bot_teleport, "Teleport given bots to your crosshair." )
 
     const char* comp = args.Arg( 2 );
 
-    NPCR::g_NPCManager.ForEachNPC( [ &args, comp, &tr ]( NPCR::CBaseNPC* pNPC )
+    ForTargetedBots( comp, [ &tr ]( NPCR::CBaseNPC* pNPC )
     {
-        bool passes = false;
+        pNPC->GetCharacter()->Teleport( &tr.endpos, nullptr, nullptr );
+    } );
+}
 
-        auto* pChar = pNPC->GetCharacter();
+CON_COMMAND( bot_goto_selected, "Tells given bots to move to specific nav area." )
+{
+    if ( !UTIL_IsCommandIssuedByServerAdmin() )
+        return;
 
-        if ( comp && *comp )
-        {
-            auto* pPlayerBot = ToBasePlayer( pChar );
-            if ( pPlayerBot )
-            {
-			    passes = Q_stricmp( pPlayerBot->GetPlayerName(), comp ) != -1;
-            }
-            else
-            {
-                passes = Q_stricmp( STRING( pChar->GetEntityName() ), comp ) != -1;
-            }
-        }
-        else
-        {
-            passes = true;
-        }
+    auto* pPlayer = UTIL_GetCommandClient();
+    if( !pPlayer )
+        return;
 
-        if ( passes )
-        {
-            pChar->Teleport( &tr.endpos, nullptr, nullptr );
-        }
 
-        return false;
+    auto* pArea = TheNavMesh->GetSelectedArea();
+
+    if ( !pArea )
+    {
+        CTraceFilterSimple filter( pPlayer, COLLISION_GROUP_NONE );
+        Vector fwd;
+        trace_t tr;
+
+        pPlayer->EyeVectors( &fwd );
+
+        UTIL_TraceLine( pPlayer->EyePosition(), pPlayer->EyePosition() + fwd * MAX_TRACE_LENGTH, MASK_SOLID, &filter, &tr );
+    
+        pArea = TheNavMesh->GetNavArea( tr.endpos );
+    }
+
+
+    if ( !pArea )
+    {
+        Warning( "Couldn't find a nav mesh area!" );
+        return;
+    }
+
+
+    const char* comp = args.Arg( 2 );
+
+    ForTargetedBots( comp, [ pArea ]( NPCR::CBaseNPC* pNPC )
+    {
+        pNPC->OnForcedMove( pArea );
     } );
 }
 

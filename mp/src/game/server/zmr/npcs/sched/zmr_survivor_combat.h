@@ -126,7 +126,9 @@ public:
         }
 
 
+        SetSelfCall( true ); // Ignore our own IsBusy listener.
         bool bBusy = pOuter->IsBusy() == NPCR::RES_YES;
+        SetSelfCall( false );
 
         if ( !bBusy && (!m_NextRangeCheck.HasStarted() || m_NextRangeCheck.IsElapsed()) )
         {
@@ -205,9 +207,26 @@ public:
         }
     }
 
+    virtual void OnForcedMove( CNavArea* pArea ) OVERRIDE
+    {
+        m_Path.Invalidate();
+
+        auto vecMyPos = GetOuter()->GetAbsOrigin();
+        auto vecTarget = pArea->GetRandomPoint();
+
+        auto* pStart = GetOuter()->GetLastKnownArea();
+
+        m_PathCost.SetStartPos( vecMyPos, pStart );
+        m_PathCost.SetGoalPos( vecTarget, pArea );
+
+        m_Path.Compute( vecMyPos, vecTarget, pStart, pArea, m_PathCost );
+    }
+
     virtual NPCR::QueryResult_t IsBusy() const OVERRIDE
     {
-        return m_Path.IsValid() ? NPCR::RES_YES : NPCR::RES_NONE;
+        return (m_Path.IsValid() &&
+                !IsSelfCall()) // Ignore if we're the one asking.
+            ? NPCR::RES_YES : NPCR::RES_NONE;
     }
 
     bool ShouldMoveBack( CBaseEntity* pEnemy ) const
