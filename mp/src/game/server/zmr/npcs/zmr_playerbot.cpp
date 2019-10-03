@@ -49,6 +49,7 @@ PRECACHE_REGISTER( npcr_player_zm );
 
 CZMPlayerBot::CZMPlayerBot()
 {
+    m_hFollowTarget.Set( nullptr );
 }
 
 CZMPlayerBot::~CZMPlayerBot()
