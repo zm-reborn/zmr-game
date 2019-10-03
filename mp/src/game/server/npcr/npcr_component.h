@@ -24,6 +24,9 @@ namespace NPCR
     abstract_class EventComponent
     {
     public:
+        EventComponent();
+
+
         // Events
         virtual void OnSpawn() {}
         virtual void OnAnimEvent( animevent_t* pEvent ) {}
@@ -40,6 +43,7 @@ namespace NPCR
         virtual void OnMoveSuccess( CBaseNavPath* pPath ) {}
         virtual void OnMoveFailed( CBaseNavPath* pPath ) {}
         virtual void OnNavJump() {}
+        virtual void OnForcedMove( CNavArea* pArea ) {} // Used for debugging.
         // Zombie events
         virtual void OnCommanded( ZombieCommandType_t com ) {}
         virtual void OnQueuedCommand( CBasePlayer* pPlayer, ZombieCommandType_t com ) {}
@@ -51,6 +55,13 @@ namespace NPCR
         virtual QueryResult_t ShouldTouch( CBaseEntity* pEnt ) const { return RES_NONE; }
         // Zombie queries
         virtual QueryResult_t ShouldChase( CBaseEntity* pEnemy ) const { return RES_NONE; }
+
+    protected:
+        bool IsSelfCall() const { return m_bSelfCall; }
+        void SetSelfCall( bool state ) { m_bSelfCall = state; }
+
+    private:
+        bool m_bSelfCall;
     };
 
     abstract_class CComponent : public EventComponent
@@ -168,6 +179,7 @@ namespace NPCR
         COMP_DISPATCH_1ARG( OnLandedGround, CBaseEntity*, pGround )
         COMP_DISPATCH_1ARG( OnLeftGround, CBaseEntity*, pOldGround )
         COMP_DISPATCH_2ARG( OnTouch, CBaseEntity*, pEnt, trace_t*, pTrace )
+        COMP_DISPATCH_1ARG( OnForcedMove, CNavArea*, pArea )
         // Zombie events
         COMP_DISPATCH_1ARG( OnCommanded, ZombieCommandType_t, com )
         COMP_DISPATCH_2ARG( OnQueuedCommand, CBasePlayer*, pPlayer, ZombieCommandType_t, com )
