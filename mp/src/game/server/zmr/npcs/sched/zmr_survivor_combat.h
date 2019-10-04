@@ -203,7 +203,23 @@ public:
         {
             m_NextHeardLook.Start( 5.0f );
             m_NextLookAround.Start( 3.0f );
-            m_vecLookAt = pSound->GetSoundOrigin();
+
+
+            auto* pOwner = pSound->m_hOwner.Get();
+
+            if ( pOwner && pOwner->IsPlayer() )
+            {
+                // Face shooter's direction.
+                Vector fwd;
+                AngleVectors( pOwner->EyeAngles(), &fwd );
+                
+                m_vecLookAt = pOwner->EyePosition() + fwd * 1024.0f;
+            }
+            else
+            {
+                m_vecLookAt = pSound->GetSoundOrigin();
+            }
+            
         }
     }
 
