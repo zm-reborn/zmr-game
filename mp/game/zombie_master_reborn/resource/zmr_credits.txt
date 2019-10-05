@@ -5,6 +5,7 @@ brendaym			- Viewmodel animations
 BurntCornFlakes	- MAC-10 model and textures, various model edits
 Mehis			- Code, various maps/textures/models
 Reborn			- Various sounds
+Rhett Dahl			- Music
 Sage J. Fox		- Various models and model edits
 That 1 Guy		- Various weapon sounds
 The Renegadist		- Various models/textures/sounds
