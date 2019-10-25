@@ -5,6 +5,8 @@
 #include <vgui/ISurface.h>
 #include <vgui/IInput.h>
 
+#include <engine/IEngineSound.h>
+
 #include "zmr_mainmenu_contactbuttons.h"
 #include "zmr_mainmenu_btn.h"
 #include "zmr_mainmenu.h"
@@ -154,6 +156,11 @@ void CZMMainMenu::OnInGameStatusChanged( bool bInGame )
     if ( !bInGame )
     {
         PlayMainMenuMusic();
+    }
+    else
+    {
+        // HACK: Force the main menu music to stop when in-game.
+        enginesound->StopAllSounds( false );
     }
 }
 
