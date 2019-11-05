@@ -1,0 +1,27 @@
+// Valve Material Setup 2014. Brought you by Studio Apocalyptic.
+// Written by Yogensia and Rafael De Jongh
+// More information: http://source.gamebanana.com/tuts/11498
+// Parameter Cheat Sheet: http://bit.ly/1ibGMCe (Google Drive Spreadsheet)
+
+Vertexlitgeneric
+{
+
+	// MAIN SETTINGS
+	$basetexture                "models/weapons/sporting/diffuse"
+	$bumpmap                    "models/weapons/sporting/normal"
+
+	// PHONG SHADING
+	$phong                      1
+	$phongboost                 1
+	$phongfresnelranges         "[1 4 6]"
+	$phongtint                  "[.8 .8 1]"
+	$phongexponenttexture       "models/weapons/sporting/gloss"
+	$normalmapalphaphongmask    1
+
+	// ENVIRONMENT REFLECTION
+	$envmap                     env_cubemap
+	$envmaptint                 "[.003 .003 .005]"
+	$envmapfresnel              0.5
+	$normalmapalphaenvmapmask   1
+
+}
