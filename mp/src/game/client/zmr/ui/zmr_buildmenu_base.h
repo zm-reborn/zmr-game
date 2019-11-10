@@ -53,10 +53,14 @@ public:
     inline int GetZombieFlags() { return m_fSpawnZombieFlags; };
     inline void SetZombieFlags( int flags ) { m_fSpawnZombieFlags = flags; };
 
+    inline int* GetZombieCosts() { return (int*)m_iZombieCosts; };
+    inline void SetZombieCosts( const int *costs ) { memcpy(m_iZombieCosts, costs, sizeof(int) * ZMCLASS_MAX); };
+
     int GetAltSpawnAmount() const;
 
 private:
     int m_iLastSpawnIndex;
     int m_iSpawnIndex;
     int m_fSpawnZombieFlags;
+    int m_iZombieCosts[ZMCLASS_MAX];
 };

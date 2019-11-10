@@ -281,7 +281,7 @@ void CZMBuildMenu::ShowZombieInfo( int type )
     ZombieClass_t zclass = static_cast<ZombieClass_t>( type );
 
     char buffer[50];
-    Q_snprintf(buffer, sizeof(buffer), "%d", C_ZMBaseZombie::GetCost(zclass) );
+    Q_snprintf(buffer, sizeof(buffer), "%d", GetZombieCosts()[type] );
     info_rescost->SetText(buffer);
 
     Q_snprintf(buffer, sizeof(buffer), "%d", C_ZMBaseZombie::GetPopCost(zclass));
@@ -323,6 +323,7 @@ void CZMBuildMenu::UpdateQueue( const ZMQueueSlotData_t q[], int size )
             queueimages[i]->SetText( buf );
 
             queueimages[i]->UpdateData( q[i].nCount, q[i].zclass );
+            queueimages[i]->SetCost( GetZombieCosts()[type] );
 
 
             zombies_present = true;

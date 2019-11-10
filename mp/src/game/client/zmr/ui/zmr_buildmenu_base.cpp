@@ -92,6 +92,16 @@ void CZMBuildMenuBase::ShowMenu( C_ZMEntZombieSpawn* pSpawn )
 {
     SetSpawnIndex( pSpawn->entindex() );
     SetZombieFlags( pSpawn->GetZombieFlags() );
+
+    SetZombieCosts( pSpawn->GetZombieCosts() );
+    for ( int i = 0; i < ZMCLASS_MAX; i++ )
+    {
+        // Zombie costs can be overridden by spawn points.
+        // "-1" means to use the default cost.
+        if ( m_iZombieCosts[i] == -1 )
+            m_iZombieCosts[i] = C_ZMBaseZombie::GetCost( (ZombieClass_t)i );
+    }
+
     ShowPanel( true );
 }
 
