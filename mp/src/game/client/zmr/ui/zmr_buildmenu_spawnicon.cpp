@@ -29,6 +29,7 @@ void CZMImageRowItemSpawn::ResetMe()
 {
     m_flStartTime = 0.0f;
     m_nCount = 0;
+    m_iCost = -1;
     m_iZombieClass = ZMCLASS_INVALID;
     m_bIsPrimary = false;
     m_flDelay = 0.1f;
@@ -143,7 +144,7 @@ bool CZMImageRowItemSpawn::CanSpawn() const
     if ( !pPlayer || !pPlayer->IsZM() )
         return false;
 
-    if ( !pPlayer->HasEnoughResToSpawn( m_iZombieClass ) )
+    if ( !pPlayer->HasEnoughRes( m_iCost ) )
         return false;
     
     if ( !C_ZMBaseZombie::HasEnoughPopToSpawn( m_iZombieClass ) )

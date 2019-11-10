@@ -57,12 +57,14 @@ public:
     void Precache() OVERRIDE;
 
     int GetZombieFlags() { return m_fZombieFlags; };
+    const int* GetZombieCosts() { return m_iZombieCosts.Base(); };
 
 protected:
     virtual void InitSpriteMat() OVERRIDE;
 
 private:
     CNetworkVar( int, m_fZombieFlags );
+    CNetworkArray( int, m_iZombieCosts, ZMCLASS_MAX );
 };
 
 class C_ZMEntManipulate : public C_ZMEntBaseUsable

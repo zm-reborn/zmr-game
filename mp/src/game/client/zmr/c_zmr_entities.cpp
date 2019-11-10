@@ -99,6 +99,7 @@ int C_ZMEntBaseUsable::DrawModel( int flags )
 */
 IMPLEMENT_CLIENTCLASS_DT( C_ZMEntZombieSpawn, DT_ZM_EntZombieSpawn, CZMEntZombieSpawn )
     RecvPropInt( RECVINFO( m_fZombieFlags ) ),
+    RecvPropArray3( RECVINFO_ARRAY(m_iZombieCosts), RecvPropInt( RECVINFO(m_iZombieCosts[0]) ) ),
 END_RECV_TABLE()
 
 BEGIN_DATADESC( C_ZMEntZombieSpawn )
@@ -108,6 +109,11 @@ END_DATADESC()
 C_ZMEntZombieSpawn::C_ZMEntZombieSpawn()
 {
     m_fZombieFlags = 0;
+
+    for (int i = 0; i < ZMCLASS_MAX; i++)
+    {
+        m_iZombieCosts.Set(i, -1);
+    }
 }
 
 void C_ZMEntZombieSpawn::Precache()

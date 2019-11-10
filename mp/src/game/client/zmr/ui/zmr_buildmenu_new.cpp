@@ -201,7 +201,7 @@ void CZMBuildMenuNew::OnRadialOver( KeyValues* kv )
                 if ( format )
                 {
                     char buffer[128];
-                    Q_snprintf( buffer, sizeof( buffer ), format, C_ZMBaseZombie::GetPopCost( zclass ), C_ZMBaseZombie::GetCost( zclass ) );
+                    Q_snprintf( buffer, sizeof( buffer ), format, C_ZMBaseZombie::GetPopCost( zclass ), GetZombieCosts()[zclass] );
                     pButton->GetLabel()->SetText( buffer );
                 }
             }
