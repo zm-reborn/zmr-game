@@ -300,16 +300,22 @@ void CZMEntZombieSpawn::Spawn()
     }
 }
 
+bool CZMEntZombieSpawn::AcceptInput( const char *szInputName, CBaseEntity *pActivator, CBaseEntity *pCaller, variant_t Value, int outputID )
+{
+    bool base = BaseClass::AcceptInput( szInputName, pActivator, pCaller, Value, outputID );
+
+    // Update the menu in response to any valid input
+    if ( base ) SendMenuUpdate();
+
+    return base;
+}
+
 void CZMEntZombieSpawn::InputToggle( inputdata_t &inputdata )
 {
     BaseClass::InputToggle( inputdata );
 
     if ( IsActive() ) StartSpawning();
-    else
-    {
-        StopSpawning();
-        SendMenuUpdate(); // Make sure we close the menu.
-    }
+    else StopSpawning();
 }
 
 void CZMEntZombieSpawn::InputHide( inputdata_t &inputdata )
@@ -317,7 +323,6 @@ void CZMEntZombieSpawn::InputHide( inputdata_t &inputdata )
     BaseClass::InputHide( inputdata );
 
     StopSpawning();
-    SendMenuUpdate(); // Make sure we close the menu.
 }
 
 void CZMEntZombieSpawn::InputUnhide( inputdata_t &inputdata )
@@ -325,21 +330,6 @@ void CZMEntZombieSpawn::InputUnhide( inputdata_t &inputdata )
     BaseClass::InputUnhide( inputdata );
 
     StartSpawning();
-}
-
-void CZMEntZombieSpawn::InputSetZombieFlags( inputdata_t &inputdata )
-{
-    m_fZombieFlags = inputdata.value.Int();
-}
-
-void CZMEntZombieSpawn::InputAddZombieFlags( inputdata_t &inputdata )
-{
-    m_fZombieFlags |= inputdata.value.Int();
-}
-
-void CZMEntZombieSpawn::InputRemoveZombieFlags( inputdata_t &inputdata )
-{
-    m_fZombieFlags &= ~inputdata.value.Int();
 }
 
 bool CZMEntZombieSpawn::CanSpawn( ZombieClass_t zclass )
@@ -472,6 +462,12 @@ void CZMEntZombieSpawn::SendMenuUpdate()
 		WRITE_SHORT( entindex() );
 
 		WRITE_BOOL( IsActive() );
+
+        WRITE_BYTE( m_fZombieFlags );
+        for ( int i = 0; i < ZMCLASS_MAX; i++ )
+        {
+            WRITE_SHORT( m_iZombieCosts[i] );
+        }
 
         int count = m_vSpawnQueue.Count();
         WRITE_BYTE( count );

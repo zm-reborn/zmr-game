@@ -106,12 +106,14 @@ public:
     void Spawn() OVERRIDE;
     void Precache() OVERRIDE;
 
+    bool AcceptInput( const char *szInputName, CBaseEntity *pActivator, CBaseEntity *pCaller, variant_t Value, int outputID ) OVERRIDE;
+
     void InputToggle( inputdata_t &inputdata );
     void InputHide( inputdata_t &inputdata );
     void InputUnhide( inputdata_t &inputdata );
-    void InputSetZombieFlags( inputdata_t &inputdata );
-    void InputAddZombieFlags( inputdata_t &inputdata );
-    void InputRemoveZombieFlags( inputdata_t &inputdata );
+    void InputSetZombieFlags( inputdata_t &inputdata ) { m_fZombieFlags = inputdata.value.Int(); }
+    void InputAddZombieFlags( inputdata_t &inputdata ) { m_fZombieFlags |= inputdata.value.Int(); }
+    void InputRemoveZombieFlags( inputdata_t &inputdata ) { m_fZombieFlags &= ~inputdata.value.Int(); }
     void InputEnableZombie0( inputdata_t& inputdata ) { m_fZombieFlags |= 1 << 0; }
     void InputEnableZombie1( inputdata_t& inputdata ) { m_fZombieFlags |= 1 << 1; }
     void InputEnableZombie2( inputdata_t& inputdata ) { m_fZombieFlags |= 1 << 2; }
