@@ -44,6 +44,7 @@ public:
     virtual int ZMKeyInput( ButtonCode_t keynum, int down );
 
     virtual void ShowMenu( C_ZMEntZombieSpawn* pSpawn );
+    virtual void UpdateMenuData() {};
     virtual void UpdateQueue( const ZMQueueSlotData_t q[], int size ) {};
 
     inline int GetLastSpawnIndex() { return m_iLastSpawnIndex; };
@@ -54,7 +55,7 @@ public:
     inline void SetZombieFlags( int flags ) { m_fSpawnZombieFlags = flags; };
 
     inline int* GetZombieCosts() { return (int*)m_iZombieCosts; };
-    inline void SetZombieCosts( const int *costs ) { memcpy(m_iZombieCosts, costs, sizeof(int) * ZMCLASS_MAX); };
+    void SetZombieCosts( const int *costs );
 
     int GetAltSpawnAmount() const;
 
