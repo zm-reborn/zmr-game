@@ -532,6 +532,11 @@ bool CZMWeaponHands::PushObject( CBaseEntity* pEnt, const Vector& vecHitPos )
         //reflect, but flatten the trajectory out a bit so it's easier to hit standing targets
         forward.z *= -0.65f;
         forward.NormalizeInPlace();
+
+        // We're literally going the other direction. That's not a good idea.
+        // Fixes prop climbing.
+        if ( forward.z > 0.8f )
+            return false;
     }
                 
     // NOTE: Do this first to enable motion (if disabled) - so forces will work
