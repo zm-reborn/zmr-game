@@ -187,6 +187,7 @@ int CZMEntBaseSimple::UpdateTransmitState()
 */
 IMPLEMENT_SERVERCLASS_ST( CZMEntZombieSpawn, DT_ZM_EntZombieSpawn )
     SendPropInt( SENDINFO( m_fZombieFlags ) ),
+    SendPropArray3( SENDINFO_ARRAY3(m_iZombieCosts), SendPropInt( SENDINFO_ARRAY(m_iZombieCosts), 16 ) ), // Resource cost is not likely to surpass 16 bits
 END_SEND_TABLE()
 
 BEGIN_DATADESC( CZMEntZombieSpawn )
@@ -196,6 +197,28 @@ BEGIN_DATADESC( CZMEntZombieSpawn )
     DEFINE_INPUTFUNC( FIELD_VOID, "Hide", InputHide ),
     DEFINE_INPUTFUNC( FIELD_VOID, "Unhide", InputUnhide ),
 
+    DEFINE_INPUTFUNC( FIELD_INTEGER, "SetZombieFlags", InputSetZombieFlags ),
+    DEFINE_INPUTFUNC( FIELD_INTEGER, "AddZombieFlags", InputAddZombieFlags ),
+    DEFINE_INPUTFUNC( FIELD_INTEGER, "RemoveZombieFlags", InputRemoveZombieFlags ),
+
+    DEFINE_INPUTFUNC( FIELD_VOID, "EnableShamblerSpawn", InputEnableZombie0 ),
+    DEFINE_INPUTFUNC( FIELD_VOID, "EnableBansheeSpawn", InputEnableZombie1 ),
+    DEFINE_INPUTFUNC( FIELD_VOID, "EnableHulkSpawn", InputEnableZombie2 ),
+    DEFINE_INPUTFUNC( FIELD_VOID, "EnableDrifterSpawn", InputEnableZombie3 ),
+    DEFINE_INPUTFUNC( FIELD_VOID, "EnableImmolatorSpawn", InputEnableZombie4 ),
+
+    DEFINE_INPUTFUNC( FIELD_VOID, "DisableShamblerSpawn", InputDisableZombie0 ),
+    DEFINE_INPUTFUNC( FIELD_VOID, "DisableBansheeSpawn", InputDisableZombie1 ),
+    DEFINE_INPUTFUNC( FIELD_VOID, "DisableHulkSpawn", InputDisableZombie2 ),
+    DEFINE_INPUTFUNC( FIELD_VOID, "DisableDrifterSpawn", InputDisableZombie3 ),
+    DEFINE_INPUTFUNC( FIELD_VOID, "DisableImmolatorSpawn", InputDisableZombie4 ),
+
+    DEFINE_INPUTFUNC( FIELD_INTEGER, "SetShamblerCost", InputSetZombieCost0 ),
+    DEFINE_INPUTFUNC( FIELD_INTEGER, "SetBansheeCost", InputSetZombieCost1 ),
+    DEFINE_INPUTFUNC( FIELD_INTEGER, "SetHulkCost", InputSetZombieCost2 ),
+    DEFINE_INPUTFUNC( FIELD_INTEGER, "SetDrifterCost", InputSetZombieCost3 ),
+    DEFINE_INPUTFUNC( FIELD_INTEGER, "SetImmolatorCost", InputSetZombieCost4 ),
+
 
     DEFINE_KEYFIELD( m_fZombieFlags, FIELD_INTEGER, "zombieflags" ),
     //DEFINE_KEYFIELD( m_nSpawnQueueCapacity, FIELD_INTEGER, "spawnqueuecapacity" ),
@@ -203,6 +226,20 @@ BEGIN_DATADESC( CZMEntZombieSpawn )
     DEFINE_KEYFIELD( m_sFirstNodeName, FIELD_STRING, "nodename" ),
 
     DEFINE_KEYFIELD( m_sZombieModelGroup, FIELD_STRING, "modelgroup" ),
+
+    DEFINE_KEYFIELD( m_iZombieCosts[0], FIELD_INTEGER, "shamblercost" ),
+    DEFINE_KEYFIELD( m_iZombieCosts[1], FIELD_INTEGER, "bansheecost" ),
+    DEFINE_KEYFIELD( m_iZombieCosts[2], FIELD_INTEGER, "hulkcost" ),
+    DEFINE_KEYFIELD( m_iZombieCosts[3], FIELD_INTEGER, "driftercost" ),
+    DEFINE_KEYFIELD( m_iZombieCosts[4], FIELD_INTEGER, "immolatorcost" ),
+
+    DEFINE_OUTPUT( m_OnSpawnZMClass[0], "OnSpawnShambler" ),
+    DEFINE_OUTPUT( m_OnSpawnZMClass[1], "OnSpawnBanshee" ),
+    DEFINE_OUTPUT( m_OnSpawnZMClass[2], "OnSpawnHulk" ),
+    DEFINE_OUTPUT( m_OnSpawnZMClass[3], "OnSpawnDrifter" ),
+    DEFINE_OUTPUT( m_OnSpawnZMClass[4], "OnSpawnImmolator" ),
+
+    DEFINE_OUTPUT( m_OnSpawnNPC, "OnSpawnNPC" ),
 
     DEFINE_THINKFUNC( SpawnThink ),
 END_DATADESC()
@@ -215,6 +252,11 @@ CZMEntZombieSpawn::CZMEntZombieSpawn()
 {
     m_vSpawnNodes.Purge();
     m_vSpawnQueue.Purge();
+
+    for (int i = 0; i < ZMCLASS_MAX; i++)
+    {
+        m_iZombieCosts.Set(i, -1);
+    }
 }
 
 void CZMEntZombieSpawn::Precache()
@@ -258,16 +300,22 @@ void CZMEntZombieSpawn::Spawn()
     }
 }
 
+bool CZMEntZombieSpawn::AcceptInput( const char *szInputName, CBaseEntity *pActivator, CBaseEntity *pCaller, variant_t Value, int outputID )
+{
+    bool base = BaseClass::AcceptInput( szInputName, pActivator, pCaller, Value, outputID );
+
+    // Update the menu in response to any valid input
+    if ( base ) SendMenuUpdate();
+
+    return base;
+}
+
 void CZMEntZombieSpawn::InputToggle( inputdata_t &inputdata )
 {
     BaseClass::InputToggle( inputdata );
 
     if ( IsActive() ) StartSpawning();
-    else
-    {
-        StopSpawning();
-        SendMenuUpdate(); // Make sure we close the menu.
-    }
+    else StopSpawning();
 }
 
 void CZMEntZombieSpawn::InputHide( inputdata_t &inputdata )
@@ -275,7 +323,6 @@ void CZMEntZombieSpawn::InputHide( inputdata_t &inputdata )
     BaseClass::InputHide( inputdata );
 
     StopSpawning();
-    SendMenuUpdate(); // Make sure we close the menu.
 }
 
 void CZMEntZombieSpawn::InputUnhide( inputdata_t &inputdata )
@@ -416,6 +463,12 @@ void CZMEntZombieSpawn::SendMenuUpdate()
 
 		WRITE_BOOL( IsActive() );
 
+        WRITE_BYTE( m_fZombieFlags );
+        for ( int i = 0; i < ZMCLASS_MAX; i++ )
+        {
+            WRITE_SHORT( m_iZombieCosts[i] );
+        }
+
         int count = m_vSpawnQueue.Count();
         WRITE_BYTE( count );
 
@@ -461,7 +514,7 @@ void CZMEntZombieSpawn::SpawnThink()
     ZombieClass_t zclass = queue.m_zclass;
 
 
-    int cost = CZMBaseZombie::GetCost( zclass );
+    int cost = m_iZombieCosts[zclass] == -1 ? CZMBaseZombie::GetCost( zclass ) : m_iZombieCosts[zclass];
     bool bCreate = true;
     CZMPlayer* pPlayer = nullptr;
 
@@ -540,7 +593,8 @@ CZMBaseZombie* CZMEntZombieSpawn::CreateZombie( ZombieClass_t zclass )
     Vector spawnpos;
     QAngle ang = vec3_angle;
 
-    if ( !FindSpawnPoint( pZombie, spawnpos, ang ) )
+    CBaseEntity* pSpawnPoint = FindSpawnPoint( pZombie, spawnpos, ang );
+    if ( !pSpawnPoint )
     {
         UTIL_RemoveImmediate( pZombie );
         return nullptr;
@@ -567,6 +621,20 @@ CZMBaseZombie* CZMEntZombieSpawn::CreateZombie( ZombieClass_t zclass )
     pZombie->Activate();
 
 
+    // Fire outputs in case the mapper wants to do something with the zombies spawned here
+    m_OnSpawnNPC.Set( pZombie, pZombie, this );
+	m_OnSpawnZMClass[pZombie->GetZombieClass()].Set( pZombie, pZombie, this );
+
+    if ( pSpawnPoint != this )
+    {
+        // Also fire an output on what could be either a spawn node or a spawn volume.
+        // We could do classname check + dynamic_casting instead, but doing it this way is more flexible.
+        variant_t variant;
+        variant.SetEntity( pZombie );
+        pSpawnPoint->FireNamedOutput( "OnSpawnNPC", variant, pZombie, pSpawnPoint );
+    }
+
+
     if ( m_pRallyPoint )
     {
         DevMsg( "Commanding zombie to rallypoint...\n" );
@@ -584,9 +652,9 @@ CZMBaseZombie* CZMEntZombieSpawn::CreateZombie( ZombieClass_t zclass )
     return pZombie;
 }
 
-bool CZMEntZombieSpawn::FindSpawnPoint( CZMBaseZombie* pZombie, Vector& outpos, QAngle& outang )
+CBaseEntity* CZMEntZombieSpawn::FindSpawnPoint( CZMBaseZombie* pZombie, Vector& outpos, QAngle& outang )
 {
-    if ( !pZombie ) return false;
+    if ( !pZombie ) return nullptr;
 
 
     // We have no spawn nodes, so find em.
@@ -648,7 +716,7 @@ bool CZMEntZombieSpawn::FindSpawnPoint( CZMBaseZombie* pZombie, Vector& outpos, 
             if ( pBrush )
             {
                 pBrush->GetPositionWithin( outpos );
-                return true;
+                return pBrush;
             }
         }
     }
@@ -665,7 +733,7 @@ bool CZMEntZombieSpawn::FindSpawnPoint( CZMBaseZombie* pZombie, Vector& outpos, 
         {
             outpos = pNode->GetAbsOrigin();
             outang = pNode->GetAbsAngles();
-            return true;
+            return pNode;
         }
 
         // Try any node.
@@ -677,7 +745,7 @@ bool CZMEntZombieSpawn::FindSpawnPoint( CZMBaseZombie* pZombie, Vector& outpos, 
             {
                 outpos = pNode->GetAbsOrigin();
                 outang = pNode->GetAbsAngles();
-                return true;
+                return pNode;
             }
         }
     }
@@ -700,11 +768,11 @@ bool CZMEntZombieSpawn::FindSpawnPoint( CZMBaseZombie* pZombie, Vector& outpos, 
             Vector dir = pos - GetAbsOrigin(); // Face away from the zombie spawn.
             outang.y = RAD2DEG( atan2f( dir.y, dir.x ) );
 
-            return true;
+            return this;
         }
     }
 
-    return false;
+    return nullptr;
 }
 
 
@@ -713,6 +781,7 @@ bool CZMEntZombieSpawn::FindSpawnPoint( CZMBaseZombie* pZombie, Vector& outpos, 
 */
 BEGIN_DATADESC( CZMEntSpawnNode )
     DEFINE_KEYFIELD( m_sNextNodeName, FIELD_STRING, "nodename" ),
+    DEFINE_OUTPUT( m_OnSpawnNPC, "OnSpawnNPC" ),
 END_DATADESC()
 
 LINK_ENTITY_TO_CLASS( info_spawnnode, CZMEntSpawnNode );
@@ -2287,6 +2356,8 @@ BEGIN_DATADESC( CZMEntTriggerSpawnVolume )
     DEFINE_INPUTFUNC( FIELD_VOID, "Toggle", InputToggle ),
     DEFINE_INPUTFUNC( FIELD_VOID, "Disable", InputDisable ),
     DEFINE_INPUTFUNC( FIELD_VOID, "Enable", InputEnable ),
+
+    DEFINE_OUTPUT( m_OnSpawnNPC, "OnSpawnNPC" ),
 END_DATADESC()
 
 LINK_ENTITY_TO_CLASS( trigger_zombiespawnvolume, CZMEntTriggerSpawnVolume );

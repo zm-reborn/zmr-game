@@ -79,6 +79,7 @@ public:
     void                            AddButton( KeyValues* kv );
     void                            LoadFromFile( const char* file );
     CUtlVector<CZMRadialButton*>*   GetButtons() { return &m_Buttons; };
+    CZMRadialButton*				GetLastButton() { return m_pLastButton; }
 
     void SetBackgroundImage( const char* image );
 

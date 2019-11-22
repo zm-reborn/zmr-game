@@ -92,6 +92,8 @@ void CZMBuildMenuBase::ShowMenu( C_ZMEntZombieSpawn* pSpawn )
 {
     SetSpawnIndex( pSpawn->entindex() );
     SetZombieFlags( pSpawn->GetZombieFlags() );
+    SetZombieCosts( pSpawn->GetZombieCosts() );
+
     ShowPanel( true );
 }
 
@@ -112,6 +114,21 @@ void CZMBuildMenuBase::OnClose()
 	BaseClass::OnClose();
 }
 
+void CZMBuildMenuBase::SetZombieCosts( const int *costs )
+{
+    //memcpy( m_iZombieCosts, costs, sizeof(int) * ZMCLASS_MAX );
+
+	// Zombie costs can be overridden by spawn points.
+    // "-1" means to use the default cost.
+    for ( int i = 0; i < ZMCLASS_MAX; i++ )
+    {
+        if ( costs[i] == -1 )
+            m_iZombieCosts[i] = C_ZMBaseZombie::GetCost( (ZombieClass_t)i );
+        else
+            m_iZombieCosts[i] = costs[i];
+    }
+}
+
 void __MsgFunc_ZMBuildMenuUpdate( bf_read &msg )
 {
     if ( !g_pZMView || !g_pZMView->GetBuildMenu() ) return;
@@ -129,6 +146,16 @@ void __MsgFunc_ZMBuildMenuUpdate( bf_read &msg )
 
 
 	bool active = msg.ReadOneBit() == 1;
+
+
+    pMenu->SetZombieFlags( msg.ReadByte() );
+
+    int iCosts[ZMCLASS_MAX];
+    for ( int i = 0; i < ZMCLASS_MAX; i++ )
+    {
+        iCosts[i] = msg.ReadShort();
+    }
+    pMenu->SetZombieCosts( iCosts );
 
 
     int count = msg.ReadByte();
@@ -155,6 +182,8 @@ void __MsgFunc_ZMBuildMenuUpdate( bf_read &msg )
         pMenu->Close();
 	}
 
+
+    pMenu->UpdateMenuData();
 
 	pMenu->UpdateQueue( pQueue, count );
 

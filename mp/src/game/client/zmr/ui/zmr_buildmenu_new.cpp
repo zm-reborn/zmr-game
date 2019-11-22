@@ -170,6 +170,24 @@ void CZMBuildMenuNew::UpdateButtons()
     }
 }
 
+void CZMBuildMenuNew::UpdateButtonData( CZMRadialButton* pButton )
+{
+    // Update pop and cost values.
+    const char* szClass = pButton->GetLabelData() ? pButton->GetLabelData()->GetString( "zombieclass" ) : "";
+
+    if ( *szClass )
+    {
+        ZombieClass_t zclass = C_ZMBaseZombie::NameToClass( szClass );
+        const char* format = g_pVGuiLocalize->FindAsUTF8( "#ZMRadialMouseOver" );
+        if ( format )
+        {
+            char buffer[128];
+            Q_snprintf( buffer, sizeof( buffer ), format, C_ZMBaseZombie::GetPopCost( zclass ), GetZombieCosts()[zclass] );
+            pButton->GetLabel()->SetText( buffer );
+        }
+    }
+}
+
 void CZMBuildMenuNew::OnImageRowPressed( KeyValues* kv )
 {
     // Clear the specific pos on the queue.
@@ -191,20 +209,7 @@ void CZMBuildMenuNew::OnRadialOver( KeyValues* kv )
     {
         if ( pButton->GetLabel() )
         {
-            // Update pop and cost values.
-            const char* szClass = pButton->GetLabelData() ? pButton->GetLabelData()->GetString( "zombieclass" ) : "";
-
-            if ( *szClass )
-            {
-                ZombieClass_t zclass = C_ZMBaseZombie::NameToClass( szClass );
-                const char* format = g_pVGuiLocalize->FindAsUTF8( "#ZMRadialMouseOver" );
-                if ( format )
-                {
-                    char buffer[128];
-                    Q_snprintf( buffer, sizeof( buffer ), format, C_ZMBaseZombie::GetPopCost( zclass ), C_ZMBaseZombie::GetCost( zclass ) );
-                    pButton->GetLabel()->SetText( buffer );
-                }
-            }
+            UpdateButtonData( pButton );
 
             pButton->GetLabel()->SetVisible( true );
         }
@@ -253,6 +258,14 @@ void CZMBuildMenuNew::ShowMenu( C_ZMEntZombieSpawn* pSpawn )
 
 
     BaseClass::ShowMenu( pSpawn );
+}
+
+void CZMBuildMenuNew::UpdateMenuData()
+{
+    if ( m_pRadial && m_pRadial->GetLastButton() && m_pRadial->GetLastButton()->GetLabel() )
+    {
+        UpdateButtonData( m_pRadial->GetLastButton() );
+    }
 }
 
 void CZMBuildMenuNew::UpdateQueue( const ZMQueueSlotData_t queue[], int size )
