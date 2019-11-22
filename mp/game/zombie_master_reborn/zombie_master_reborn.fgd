@@ -100,6 +100,41 @@
 	nodename(target_destination) : "Spawn Node/Volume" : "" : "Targetname of the first spawn node, if any, in the chain of spawn nodes. This may also be a spawn volume trigger."
 	
 	modelgroup(string) : "Model Group" : "" : "Leave empty to use default model group (DefaultModels if not overriden). See scripts/zombiemodelgroups.txt"
+	
+	shamblercost(float) : "Shambler Cost" : "-1" : "Overrides the resource cost needed to spawn a shambler at this point. Leave at -1 to use the default value, which is normally 10."
+	bansheecost(float) : "Banshee Cost" : "-1" : "Overrides the resource cost needed to spawn a banshee at this point. Leave at -1 to use the default value, which is normally 60."
+	hulkcost(float) : "Hulk Cost" : "-1" : "Overrides the resource cost needed to spawn a hulk at this point. Leave at -1 to use the default value, which is normally 70."
+	driftercost(float) : "Drifter Cost" : "-1" : "Overrides the resource cost needed to spawn a drifter at this point. Leave at -1 to use the default value, which is normally 35."
+	immolatorcost(float) : "Immolator Cost" : "-1" : "Overrides the resource cost needed to spawn an immolator at this point. Leave at -1 to use the default value, which is normally 100."
+	
+	input SetZombieFlags(integer) : "Manually sets the zombies that can be spawned here."
+	input AddZombieFlags(integer) : "Manually adds to the zombies that can be spawned here."
+	input RemoveZombieFlags(integer) : "Manually removes from the zombies that can be spawned here."
+	
+	input EnableShamblerSpawn(void) : "Allows shamblers to spawn here if they were not allowed to before."
+	input EnableBansheeSpawn(void) : "Allows banshees to spawn here if they were not allowed to before."
+	input EnableHulkSpawn(void) : "Allows hulks to spawn here if they were not allowed to before."
+	input EnableDrifterSpawn(void) : "Allows drifters to spawn here if they were not allowed to before."
+	input EnableImmolatorSpawn(void) : "Allows immolators to spawn here if they were not allowed to before."
+	
+	input DisableShamblerSpawn(void) : "Stops shamblers from spawning here if they were allowed to before."
+	input DisableBansheeSpawn(void) : "Stops banshees from spawning here if they were allowed to before."
+	input DisableHulkSpawn(void) : "Stops hulks from spawning here if they were allowed to before."
+	input DisableDrifterSpawn(void) : "Stops drifters from spawning here if they were allowed to before."
+	input DisableImmolatorSpawn(void) : "Stops immolators from spawning here if they were allowed to before."
+	
+	input SetShamblerCost(integer) : "Overrides the cost of this zombie type. -1 reverts to default."
+	input SetBansheeCost(integer) : "Overrides the cost of this zombie type. -1 reverts to default."
+	input SetHulkCost(integer) : "Overrides the cost of this zombie type. -1 reverts to default."
+	input SetDrifterCost(integer) : "Overrides the cost of this zombie type. -1 reverts to default."
+	input SetImmolatorCost(integer) : "Overrides the cost of this zombie type. -1 reverts to default."
+	
+	output OnSpawnNPC(ehandle) : "Fired when a zombie is spawned here. The activator is the zombie, and the parameter is a pointer to the zombie."
+	output OnSpawnShambler(ehandle) : "Fired when a shambler is spawned here. The activator is the shambler, and the parameter is a pointer to the shambler."
+	output OnSpawnBanshee(ehandle) : "Fired when a banshee is spawned here. The activator is the banshee, and the parameter is a pointer to the banshee."
+	output OnSpawnHulk(ehandle) : "Fired when a hulk is spawned here. The activator is the hulk, and the parameter is a pointer to the hulk."
+	output OnSpawnDrifter(ehandle) : "Fired when a drifter is spawned here. The activator is the drifter, and the parameter is a pointer to the drifter."
+	output OnSpawnImmolator(ehandle) : "Fired when a immolator is spawned here. The activator is the immolator, and the parameter is a pointer to the immolator."
 ]
 
 
@@ -107,6 +142,8 @@
 	"Specific spawn point for Zombie Spawn"
 [
 	nodename(target_destination) : "Next Node" : "" : "Next node in the chain, if any."
+	
+	output OnSpawnNPC(ehandle) : "Fired when a zombie is spawned at this node. The activator is the zombie, and the parameter is a pointer to the zombie."
 ]
 
 @PointClass base(Targetname, Parentname, Origin, Angles) = info_rallypoint :
@@ -231,6 +268,7 @@
 @SolidClass base(Targetname, Origin, Activeable, InputActiveable) = trigger_zombiespawnvolume :
 	"A trigger volume that zombies spawn in."
 [
+	output OnSpawnNPC(ehandle) : "Fired when a zombie is spawned in this volume. The activator is the zombie, and the parameter is a pointer to the zombie."
 ]
 
 @SolidClass base(Targetname, Origin, Activeable, InputActiveable) = trigger_blockphysexplosion :

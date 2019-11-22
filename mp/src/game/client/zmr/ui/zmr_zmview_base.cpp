@@ -677,6 +677,7 @@ void CZMViewBase::OnRightRelease()
     {
         bool bPlayer = false;
         bool bObj = false;
+        bool bIsOnZombieTeam = pTarget->GetTeamNumber() == ZMTEAM_ZM; // Don't attack objects associated with the ZM.
 
         if ( pTarget->IsPlayer() )
         {
@@ -689,7 +690,7 @@ void CZMViewBase::OnRightRelease()
             bObj = (phys && phys->IsMoveable()) || !pTarget->IsBaseTrain();
         }
 
-        if ( bObj )
+        if ( bObj && !bIsOnZombieTeam )
         {
             bool bForceBreak = IsDoubleClickRight();
 

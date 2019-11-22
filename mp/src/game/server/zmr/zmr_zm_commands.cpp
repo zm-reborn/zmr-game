@@ -69,6 +69,7 @@ void ZM_Cmd_Target( const CCommand &args )
     bool bSwat = false; // Just swat the object away/towards an enemy.
     bool bIsBreakable = false;
     bool bCanBeDamaged = pTarget->GetHealth() > 0 && pTarget->m_takedamage == DAMAGE_YES;
+    bool bIsOnZombieTeam = pTarget->GetTeamNumber() == ZMTEAM_ZM; // Don't attack objects associated with the ZM.
     
     if ( pTarget->IsPlayer() )
     {
@@ -93,7 +94,7 @@ void ZM_Cmd_Target( const CCommand &args )
 
 
     // Can't really do anything here, just move.
-    if ( !bTarget && !bCanBeDamaged && !bSwat )
+    if ( (!bTarget && !bCanBeDamaged && !bSwat) || bIsOnZombieTeam )
     {
         ZMUtil::MoveSelectedZombies( pPlayer->entindex(), pos );
         return;

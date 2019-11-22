@@ -28,11 +28,14 @@ public:
     bool CanSpawn() const;
     void SetPrimary() { m_bIsPrimary = true; }
 
+    void SetCost( int pCost ) { m_iCost = pCost; }
+
     void ResetMe();
 
 private:
     float m_flStartTime;
     int m_nCount;
+    int m_iCost;
     ZombieClass_t m_iZombieClass;
     bool m_bIsPrimary;
     float m_flDelay;

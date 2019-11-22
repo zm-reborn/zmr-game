@@ -22,6 +22,10 @@
 #include "npc_playercompanion.h"
 #endif // HL2_DLL
 
+#ifdef ZMR
+#include "zmr_shareddefs.h"
+#endif
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -541,6 +545,20 @@ CBaseEntity *CGlobalEntityList::FindEntityProcedural( const char *szName, CBaseE
 			}
 
 		}
+#ifdef ZMR
+		else if ( FStrEq( pName, "zm" ) )
+		{
+			// Return the first player found on the ZM team
+			for (int i = 1; i <= gpGlobals->maxClients; i++)
+			{
+				CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+				if (pPlayer && pPlayer->GetTeamNumber() == ZMTEAM_ZM)
+				{
+					return pPlayer;
+				}
+			}
+		}
+#endif
 		else if ( FStrEq( pName, "activator" ) )
 		{
 			return pActivator;

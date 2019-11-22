@@ -106,9 +106,29 @@ public:
     void Spawn() OVERRIDE;
     void Precache() OVERRIDE;
 
+    bool AcceptInput( const char *szInputName, CBaseEntity *pActivator, CBaseEntity *pCaller, variant_t Value, int outputID ) OVERRIDE;
+
     void InputToggle( inputdata_t &inputdata );
     void InputHide( inputdata_t &inputdata );
     void InputUnhide( inputdata_t &inputdata );
+    void InputSetZombieFlags( inputdata_t &inputdata ) { m_fZombieFlags = inputdata.value.Int(); }
+    void InputAddZombieFlags( inputdata_t &inputdata ) { m_fZombieFlags |= inputdata.value.Int(); }
+    void InputRemoveZombieFlags( inputdata_t &inputdata ) { m_fZombieFlags &= ~inputdata.value.Int(); }
+    void InputEnableZombie0( inputdata_t& inputdata ) { m_fZombieFlags |= 1 << 0; }
+    void InputEnableZombie1( inputdata_t& inputdata ) { m_fZombieFlags |= 1 << 1; }
+    void InputEnableZombie2( inputdata_t& inputdata ) { m_fZombieFlags |= 1 << 2; }
+    void InputEnableZombie3( inputdata_t& inputdata ) { m_fZombieFlags |= 1 << 3; }
+    void InputEnableZombie4( inputdata_t& inputdata ) { m_fZombieFlags |= 1 << 4; }
+    void InputDisableZombie0( inputdata_t& inputdata ) { m_fZombieFlags &= ~(1 << 0); }
+    void InputDisableZombie1( inputdata_t& inputdata ) { m_fZombieFlags &= ~(1 << 1); }
+    void InputDisableZombie2( inputdata_t& inputdata ) { m_fZombieFlags &= ~(1 << 2); }
+    void InputDisableZombie3( inputdata_t& inputdata ) { m_fZombieFlags &= ~(1 << 3); }
+    void InputDisableZombie4( inputdata_t& inputdata ) { m_fZombieFlags &= ~(1 << 4); }
+    void InputSetZombieCost0( inputdata_t &inputdata ) { m_iZombieCosts.Set( 0, inputdata.value.Int() ); }
+    void InputSetZombieCost1( inputdata_t &inputdata ) { m_iZombieCosts.Set( 1, inputdata.value.Int() ); }
+    void InputSetZombieCost2( inputdata_t &inputdata ) { m_iZombieCosts.Set( 2, inputdata.value.Int() ); }
+    void InputSetZombieCost3( inputdata_t &inputdata ) { m_iZombieCosts.Set( 3, inputdata.value.Int() ); }
+    void InputSetZombieCost4( inputdata_t &inputdata ) { m_iZombieCosts.Set( 4, inputdata.value.Int() ); }
 
 
     void SpawnThink();
@@ -132,7 +152,7 @@ private:
     void StartSpawning();
     void StopSpawning();
 
-    bool FindSpawnPoint( CZMBaseZombie* pZombie, Vector& output, QAngle& outang );
+    CBaseEntity* FindSpawnPoint( CZMBaseZombie* pZombie, Vector& output, QAngle& outang );
 
     void SetNextSpawnThink();
     float GetSpawnDelay() const;
@@ -147,6 +167,11 @@ private:
     string_t m_sZombieModelGroup;
     string_t m_sRallyName;
     string_t m_sFirstNodeName;
+
+    CNetworkArray( int, m_iZombieCosts, ZMCLASS_MAX );
+    COutputEHANDLE m_OnSpawnZMClass[ZMCLASS_MAX];
+
+    COutputEHANDLE m_OnSpawnNPC;
 
     //int m_fZombieFlags;
     CNetworkVar( int, m_fZombieFlags );
@@ -166,6 +191,9 @@ public:
     void Precache() OVERRIDE;
 
     string_t m_sNextNodeName;
+
+    // This is fired (with its parameter) from info_zombiespawn right now
+    COutputEvent m_OnSpawnNPC;
 };
 
 
@@ -530,4 +558,7 @@ public:
 
 private:
     bool m_bActive;
+
+    // This is fired (with its parameter) from info_zombiespawn right now
+    COutputEvent m_OnSpawnNPC;
 };
