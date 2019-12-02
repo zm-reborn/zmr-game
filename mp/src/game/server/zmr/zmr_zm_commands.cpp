@@ -504,7 +504,7 @@ static ConCommand zm_cmd_setrally( "zm_cmd_setrally", ZM_Cmd_SetRally, "Set rall
 /*
     Open build menu
 */
-void ZM_Cmd_OpenBuildMenu( const CCommand &args )
+void ZM_Cmd_OpenMenu( const CCommand &args )
 {
     CZMPlayer* pPlayer = ToZMPlayer( UTIL_GetCommandClient() );
 
@@ -521,19 +521,19 @@ void ZM_Cmd_OpenBuildMenu( const CCommand &args )
 
 
 
-    CZMEntZombieSpawn* pSpawn = dynamic_cast<CZMEntZombieSpawn*>( UTIL_EntityByIndex( entindex ) );
+    CZMEntBaseUsable* pEntity = dynamic_cast<CZMEntBaseUsable*>( UTIL_EntityByIndex( entindex ) );
 
-    if ( pSpawn )
+    if ( pEntity )
     {
-        pPlayer->SetBuildSpawn( pSpawn );
-        pSpawn->SendMenuUpdate();
+        pPlayer->SetMenuEnt( pEntity );
+        pEntity->SendMenuUpdate();
     }
 }
 
-static ConCommand zm_cmd_openbuildmenu( "zm_cmd_openbuildmenu", ZM_Cmd_OpenBuildMenu, "", FCVAR_HIDDEN );
+static ConCommand zm_cmd_openmenu( "zm_cmd_openmenu", ZM_Cmd_OpenMenu, "", FCVAR_HIDDEN );
 
 
-void ZM_Cmd_CloseBuildMenu( const CCommand &args )
+void ZM_Cmd_CloseMenu( const CCommand &args )
 {
     CZMPlayer* pPlayer = ToZMPlayer( UTIL_GetCommandClient() );
 
@@ -542,10 +542,10 @@ void ZM_Cmd_CloseBuildMenu( const CCommand &args )
     if ( !pPlayer->IsZM() ) return;
 
 
-    pPlayer->SetBuildSpawn( 0 );
+    pPlayer->SetMenuEnt( 0 );
 }
 
-static ConCommand zm_cmd_closebuildmenu( "zm_cmd_closebuildmenu", ZM_Cmd_CloseBuildMenu, "", FCVAR_HIDDEN );
+static ConCommand zm_cmd_closemenu( "zm_cmd_closemenu", ZM_Cmd_CloseMenu, "", FCVAR_HIDDEN );
 
 
 /*

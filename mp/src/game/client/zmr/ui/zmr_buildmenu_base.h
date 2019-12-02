@@ -44,7 +44,7 @@ public:
     virtual int ZMKeyInput( ButtonCode_t keynum, int down );
 
     virtual void ShowMenu( C_ZMEntZombieSpawn* pSpawn );
-    virtual void UpdateMenuData() {};
+	virtual void UpdateMenu( C_ZMEntZombieSpawn* pSpawn );
     virtual void UpdateQueue( const ZMQueueSlotData_t q[], int size ) {};
 
     inline int GetLastSpawnIndex() { return m_iLastSpawnIndex; };
