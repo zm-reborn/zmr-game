@@ -178,7 +178,7 @@ void CZMBuildMenu::ShowPanel( bool state )
     if ( state )
     {
         // Notify the server we've opened this menu.
-        engine->ClientCmd( VarArgs( "zm_cmd_openbuildmenu %i", GetSpawnIndex() ) );
+        engine->ClientCmd( VarArgs( "zm_cmd_openmenu %i", GetSpawnIndex() ) );
     }
 
 

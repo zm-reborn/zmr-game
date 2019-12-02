@@ -180,23 +180,25 @@ public:
     float m_flNextResourceInc;
 
 
-    void SetBuildSpawn( CZMEntZombieSpawn* pSpawn )
+    void SetMenuEnt( CZMEntBaseUsable* pEnt )
     {
         int index = 0;
-        if ( pSpawn )
-            index = pSpawn->entindex();
+        if ( pEnt )
+            index = pEnt->entindex();
 
 
-        m_iBuildSpawnIndex = index;
+        m_iMenuEntIndex = index;
     }
 
-    void SetBuildSpawn( int index )
+    void SetMenuEnt( int index )
     {
-        m_iBuildSpawnIndex = index;
+        m_iMenuEntIndex = index;
     }
 
-    inline CZMEntZombieSpawn* GetBuildSpawn() { return dynamic_cast<CZMEntZombieSpawn*>( UTIL_EntityByIndex( m_iBuildSpawnIndex ) ); };
-    inline int GetBuildSpawnIndex() { return m_iBuildSpawnIndex; };
+    inline CZMEntZombieSpawn* GetBuildSpawn() { return dynamic_cast<CZMEntZombieSpawn*>( UTIL_EntityByIndex( m_iMenuEntIndex ) ); };
+    inline CZMEntManipulate* GetManipulate() { return dynamic_cast<CZMEntManipulate*>( UTIL_EntityByIndex( m_iMenuEntIndex ) ); };
+    inline CZMEntBaseUsable* GetMenuEnt() { return assert_cast<CZMEntBaseUsable*>( UTIL_EntityByIndex( m_iMenuEntIndex ) ); };
+    inline int GetMenuEntIndex() { return m_iMenuEntIndex; };
 
     void DeselectAllZombies();
 
@@ -287,7 +289,7 @@ private:
 
     CZMPlayerAnimState* m_pPlayerAnimState;
 
-    int m_iBuildSpawnIndex; // To update build menu.
+    int m_iMenuEntIndex; // To update build and manipulate menus.
     //Participation_t m_iParticipation;
     int m_nPickPriority;
     float m_flLastActivity;
