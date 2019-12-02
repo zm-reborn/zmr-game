@@ -254,6 +254,8 @@ CZMBaseZombie::CZMBaseZombie()
 
     m_strModelGroup = NULL_STRING;
 
+    ChangeTeam( ZMTEAM_ZM );
+
 
     g_ZombieManager.AddZombie( this );
 }
@@ -732,6 +734,10 @@ bool CZMBaseZombie::CanSwatObject( CBaseEntity* pEnt )
 bool CZMBaseZombie::CanBreakObject( CBaseEntity* pEnt, bool bSwat ) const
 {
     if ( pEnt->GetHealth() <= 0 || pEnt->m_takedamage != DAMAGE_YES )
+        return false;
+
+    // Avoid breaking our own stuff.
+    if ( pEnt->GetTeamNumber() == ZMTEAM_ZM )
         return false;
 
     CBreakable* pBreak = dynamic_cast<CBreakable*>( pEnt );
