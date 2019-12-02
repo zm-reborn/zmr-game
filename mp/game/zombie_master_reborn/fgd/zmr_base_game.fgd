@@ -265,7 +265,7 @@
 	ResponseContext(string) : "Response Contexts" : "" : "Response system context(s) for this entity. Format should be: 'key:value,key2:value2,etc'. When this entity speaks, the list of keys & values will be passed to the response rules system."
 ]
 
-@BaseClass base(Targetname, DamageFilter, Shadow) = Breakable
+@BaseClass base(Targetname, DamageFilter, Shadow, ZMTeam) = Breakable
 [
 	ExplodeDamage(float) : "Explosion Damage" : 0 : "If non-zero, when this entity breaks it will create an explosion that causes the specified amount of damage. See also 'Explosion Radius'."
 	ExplodeRadius(float) : "Explosion Radius" : 0 : "If non-zero, when this entity breaks it will create an explosion with a radius of the specified amount. See also 'Explosion Damage'."

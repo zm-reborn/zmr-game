@@ -28,3 +28,16 @@
 	
 	input SetGlowColor(color255) : "Change glow color. Format: <Red 0-255> <Green 0-255> <Blue 0-255>"
 ]
+
+@BaseClass = ZMTeam
+[
+	TeamNum(choices) : "Team Assignment" : 0 : "Assigns this entity to a specific team, which can cause the game to treat it differently. For example, a func_breakable on the ZM team cannot be attacked by zombies." =
+	[
+		0 : "None"
+		1 : "Spectator"
+		2 : "Human"
+		3 : "Zombie Master"
+	]
+	
+	input SetTeam(integer) : "Sets this entity's team."
+]
