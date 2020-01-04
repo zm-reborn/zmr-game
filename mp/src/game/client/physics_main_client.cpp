@@ -6,9 +6,7 @@
 //=============================================================================//
 #include "cbase.h"
 #include "c_baseentity.h"
-#ifdef WIN32
-#include <typeinfo.h>
-#endif
+#include <typeinfo>
 #include "tier0/vprof.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -333,11 +331,14 @@ void C_BaseEntity::PhysicsDispatchThink( BASEPTR thinkFunc )
 			else
 #endif
 			{
+				Msg( "CLIENT:  %s(%s) thinking for %.02f ms!!!\n",
+					GetClassname(),
 #ifdef WIN32
-				Msg( "CLIENT:  %s(%s) thinking for %.02f ms!!!\n", GetClassname(), typeid(this).raw_name(), time );
+					typeid(this).raw_name(),
 #else
-				Msg( "CLIENT:  %s(%s) thinking for %.02f ms!!!\n", GetClassname(), typeid(this).name(), time );				
+					typeid(this).name(),
 #endif
+					time );
 			}
 		}
 	}
