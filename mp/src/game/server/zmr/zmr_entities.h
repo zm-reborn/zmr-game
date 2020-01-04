@@ -78,6 +78,8 @@ public:
 
     bool IsActive() const { return m_bActive; }
 
+    virtual void SendMenuUpdate() = 0;
+
 private:
     bool m_bActive;
 };
@@ -140,7 +142,7 @@ public:
     void QueueClear( int inamount = -1, int inpos = -1 );
     bool CanSpawn( ZombieClass_t zclass );
 
-    void SendMenuUpdate();
+    void SendMenuUpdate() OVERRIDE;
 
     void SetRallyPoint( const Vector& pos );
 
@@ -282,10 +284,15 @@ public:
     void Spawn() OVERRIDE;
     void Precache() OVERRIDE;
 
+    bool AcceptInput( const char *szInputName, CBaseEntity *pActivator, CBaseEntity *pCaller, variant_t Value, int outputID ) OVERRIDE;
+
     void InputToggle( inputdata_t &inputdata );
     void InputHide( inputdata_t &inputdata );
     void InputUnhide( inputdata_t &inputdata );
     void InputPress( inputdata_t &inputdata );
+	void InputSetDescription( inputdata_t &inputdata ) { m_sDescription = inputdata.value.StringID(); }
+	void InputSetTrapCost( inputdata_t &inputdata );
+	void InputSetCost( inputdata_t &inputdata );
 
 
     void Trigger( CBaseEntity* pActivator );
@@ -296,6 +303,8 @@ public:
     inline int GetTriggerCount() const { return m_vTriggers.Count(); }
 
     COutputEvent m_OnPressed;
+
+	void SendMenuUpdate() OVERRIDE;
 
 
     inline const char* GetDescription() const { return m_sDescription.Get().ToCStr(); }

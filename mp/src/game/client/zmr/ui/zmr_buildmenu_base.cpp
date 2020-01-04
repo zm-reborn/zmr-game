@@ -93,8 +93,15 @@ void CZMBuildMenuBase::ShowMenu( C_ZMEntZombieSpawn* pSpawn )
     SetSpawnIndex( pSpawn->entindex() );
     SetZombieFlags( pSpawn->GetZombieFlags() );
     SetZombieCosts( pSpawn->GetZombieCosts() );
+	pSpawn->SetMenu( this );
 
     ShowPanel( true );
+}
+
+void CZMBuildMenuBase::UpdateMenu( C_ZMEntZombieSpawn* pSpawn )
+{
+    SetZombieFlags( pSpawn->GetZombieFlags() );
+    SetZombieCosts( pSpawn->GetZombieCosts() );
 }
 
 int CZMBuildMenuBase::GetAltSpawnAmount() const
@@ -106,7 +113,7 @@ int CZMBuildMenuBase::GetAltSpawnAmount() const
 void CZMBuildMenuBase::OnClose()
 {
     // Notify server we've closed this menu.
-    engine->ClientCmd( VarArgs( "zm_cmd_closebuildmenu %i", GetSpawnIndex() ) );
+    engine->ClientCmd( VarArgs( "zm_cmd_closemenu %i", GetSpawnIndex() ) );
 
     m_iLastSpawnIndex = GetSpawnIndex();
 
@@ -148,16 +155,6 @@ void __MsgFunc_ZMBuildMenuUpdate( bf_read &msg )
 	bool active = msg.ReadOneBit() == 1;
 
 
-    pMenu->SetZombieFlags( msg.ReadByte() );
-
-    int iCosts[ZMCLASS_MAX];
-    for ( int i = 0; i < ZMCLASS_MAX; i++ )
-    {
-        iCosts[i] = msg.ReadShort();
-    }
-    pMenu->SetZombieCosts( iCosts );
-
-
     int count = msg.ReadByte();
 
 
@@ -182,8 +179,6 @@ void __MsgFunc_ZMBuildMenuUpdate( bf_read &msg )
         pMenu->Close();
 	}
 
-
-    pMenu->UpdateMenuData();
 
 	pMenu->UpdateQueue( pQueue, count );
 

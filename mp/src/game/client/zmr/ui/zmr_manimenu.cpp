@@ -57,6 +57,11 @@ void CZMManiMenu::ShowPanel( bool state )
 {
     if ( IsVisible() == state ) return;
 
+    if ( state )
+    {
+        // Notify the server we've opened this menu.
+        engine->ClientCmd( VarArgs( "zm_cmd_openmenu %i", GetTrapIndex() ) );
+    }
 
     SetVisible( state );
 }

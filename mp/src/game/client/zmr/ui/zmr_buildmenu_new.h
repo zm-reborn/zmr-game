@@ -41,7 +41,7 @@ public:
     virtual const char* GetName() OVERRIDE { return "ZMBuildMenuNew"; };
 
     virtual void ShowMenu( C_ZMEntZombieSpawn* pSpawn ) OVERRIDE;
-    virtual void UpdateMenuData() OVERRIDE;
+    virtual void UpdateMenu( C_ZMEntZombieSpawn* pSpawn ) OVERRIDE;
     virtual void UpdateQueue( const ZMQueueSlotData_t queue[], int size ) OVERRIDE;
 
 private:

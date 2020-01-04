@@ -448,7 +448,7 @@ void CZMEntZombieSpawn::SendMenuUpdate()
     {
         pZM = ToZMPlayer( UTIL_PlayerByIndex( i ) );
 
-        if ( pZM && pZM->IsZM() && pZM->GetBuildSpawn() == this )
+        if ( pZM && pZM->IsZM() && pZM->GetMenuEnt() == this )
         {
             filter.AddRecipient( pZM );
         }
@@ -462,12 +462,6 @@ void CZMEntZombieSpawn::SendMenuUpdate()
 		WRITE_SHORT( entindex() );
 
 		WRITE_BOOL( IsActive() );
-
-        WRITE_BYTE( m_fZombieFlags );
-        for ( int i = 0; i < ZMCLASS_MAX; i++ )
-        {
-            WRITE_SHORT( m_iZombieCosts[i] );
-        }
 
         int count = m_vSpawnQueue.Count();
         WRITE_BYTE( count );
@@ -1012,6 +1006,9 @@ BEGIN_DATADESC( CZMEntManipulate )
     DEFINE_OUTPUT( m_OnPressed, "OnPressed" ),
 
     DEFINE_INPUTFUNC( FIELD_VOID, "Press", InputPress ),
+    DEFINE_INPUTFUNC( FIELD_STRING, "SetDescription", InputSetDescription ),
+    DEFINE_INPUTFUNC( FIELD_INTEGER, "SetTrapCost", InputSetTrapCost ),
+    DEFINE_INPUTFUNC( FIELD_INTEGER, "SetCost", InputSetCost ),
 END_DATADESC()
 
 LINK_ENTITY_TO_CLASS( info_manipulate, CZMEntManipulate );
@@ -1045,6 +1042,16 @@ void CZMEntManipulate::Spawn()
     SetModel( MODEL_MANIPULATE );
 }
 
+bool CZMEntManipulate::AcceptInput( const char *szInputName, CBaseEntity *pActivator, CBaseEntity *pCaller, variant_t Value, int outputID )
+{
+    bool base = BaseClass::AcceptInput( szInputName, pActivator, pCaller, Value, outputID );
+
+    // Update the menu in response to any valid input
+    if ( base ) SendMenuUpdate();
+
+    return base;
+}
+
 void CZMEntManipulate::InputToggle( inputdata_t &inputdata )
 {
     BaseClass::InputToggle( inputdata );
@@ -1070,6 +1077,22 @@ void CZMEntManipulate::InputUnhide( inputdata_t &inputdata )
 void CZMEntManipulate::InputPress( inputdata_t &inputdata )
 {
     Trigger( nullptr );
+}
+
+void CZMEntManipulate::InputSetTrapCost( inputdata_t &inputdata )
+{
+    if ( inputdata.value.Int() <= 0 )
+        m_nTrapCost = m_nCost * 1.5;
+    else
+        m_nTrapCost = inputdata.value.Int();
+}
+
+void CZMEntManipulate::InputSetCost( inputdata_t &inputdata )
+{
+    if ( inputdata.value.Int() <= 0 )
+        m_nCost = 10;
+    else
+        m_nCost = inputdata.value.Int();
 }
 
 void CZMEntManipulate::Trigger( CBaseEntity* pActivator )
@@ -1146,6 +1169,34 @@ void CZMEntManipulate::RemoveTriggers()
     }
 
     m_vTriggers.Purge();
+}
+
+void CZMEntManipulate::SendMenuUpdate()
+{
+	CRecipientFilter filter;
+	filter.MakeReliable();
+
+    CZMPlayer* pZM;
+    for ( int i = 1; i <= gpGlobals->maxClients; i++ )
+    {
+        pZM = ToZMPlayer( UTIL_PlayerByIndex( i ) );
+
+        if ( pZM && pZM->IsZM() && pZM->GetMenuEnt() == this )
+        {
+            filter.AddRecipient( pZM );
+        }
+    }
+
+    if ( !filter.GetRecipientCount() ) return;
+
+
+	UserMessageBegin( filter, "ZMManiMenuUpdate" );
+    {
+		WRITE_SHORT( entindex() );
+
+		WRITE_BOOL( IsActive() );
+    }
+	MessageEnd();
 }
 
 

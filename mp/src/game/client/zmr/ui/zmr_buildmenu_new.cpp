@@ -113,7 +113,7 @@ void CZMBuildMenuNew::ShowPanel( bool state )
     if ( state )
     {
         // Notify the server we've opened this menu.
-        engine->ClientCmd( VarArgs( "zm_cmd_openbuildmenu %i", GetSpawnIndex() ) );
+        engine->ClientCmd( VarArgs( "zm_cmd_openmenu %i", GetSpawnIndex() ) );
     }
 
 
@@ -260,8 +260,10 @@ void CZMBuildMenuNew::ShowMenu( C_ZMEntZombieSpawn* pSpawn )
     BaseClass::ShowMenu( pSpawn );
 }
 
-void CZMBuildMenuNew::UpdateMenuData()
+void CZMBuildMenuNew::UpdateMenu( C_ZMEntZombieSpawn* pSpawn )
 {
+	BaseClass::UpdateMenu( pSpawn );
+
     if ( m_pRadial && m_pRadial->GetLastButton() && m_pRadial->GetLastButton()->GetLabel() )
     {
         UpdateButtonData( m_pRadial->GetLastButton() );
