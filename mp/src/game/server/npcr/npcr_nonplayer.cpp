@@ -252,9 +252,9 @@ void CNPCRNonPlayer::PostUpdate()
             else if ( bCanSee && !m_bDidSeeEnemyLastTime )
             {
                 if ( pCurEnemy->IsPlayer() )
-                    m_OnFoundPlayer.Set( m_hEnemy, this, this );
+                    m_OnFoundPlayer.Set( m_hEnemy, m_hEnemy.Get(), this );
 
-                m_OnFoundEnemy.Set( m_hEnemy, this, this );
+                m_OnFoundEnemy.Set( m_hEnemy, m_hEnemy.Get(), this );
             }
 
             m_flNextLOSOutputs = gpGlobals->curtime + 0.1f;

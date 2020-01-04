@@ -5,6 +5,9 @@
 
 #include "zmr/zmr_shareddefs.h"
 
+class CZMBuildMenuBase;
+class CZMManiMenuBase;
+
 
 abstract_class C_ZMEntBaseSimple : public C_BaseAnimating
 {
@@ -56,8 +59,13 @@ public:
 
     void Precache() OVERRIDE;
 
+	void OnDataChanged( DataUpdateType_t type ) OVERRIDE;
+
     int GetZombieFlags() { return m_fZombieFlags; };
     const int* GetZombieCosts() { return m_iZombieCosts.Base(); };
+
+	void SetMenu( CZMBuildMenuBase* pMenu ) { m_pBuildMenu = pMenu; };
+	CZMBuildMenuBase* GetMenu() { return m_pBuildMenu; };
 
 protected:
     virtual void InitSpriteMat() OVERRIDE;
@@ -65,6 +73,8 @@ protected:
 private:
     CNetworkVar( int, m_fZombieFlags );
     CNetworkArray( int, m_iZombieCosts, ZMCLASS_MAX );
+
+	CZMBuildMenuBase* m_pBuildMenu;
 };
 
 class C_ZMEntManipulate : public C_ZMEntBaseUsable
@@ -84,6 +94,11 @@ public:
 
     inline const char* GetDescription() { return m_sDescription; };
 
+	void OnDataChanged( DataUpdateType_t type ) OVERRIDE;
+
+	void SetMenu( CZMManiMenuBase* pMenu ) { m_pManiMenu = pMenu; };
+	CZMManiMenuBase* GetMenu() { return m_pManiMenu; };
+
 protected:
     virtual void InitSpriteMat() OVERRIDE;
 
@@ -92,6 +107,8 @@ protected:
 private:
     CNetworkVar( int, m_nCost );
     CNetworkVar( int, m_nTrapCost );
+
+	CZMManiMenuBase* m_pManiMenu;
 };
 
 class C_ZMEntPrecipitation : public C_BaseEntity

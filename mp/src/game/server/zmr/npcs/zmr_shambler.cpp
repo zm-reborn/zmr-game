@@ -117,6 +117,10 @@ bool CZMShambler::CanBreakObject( CBaseEntity* pEnt, bool bSwat ) const
     if ( pEnt->MyCombatCharacterPointer() != nullptr )
         return false;
 
+    // Avoid breaking our own stuff.
+    if ( pEnt->GetTeamNumber() == ZMTEAM_ZM )
+        return false;
+
     // As long as we can break it it's all good.
     return ( pEnt->GetHealth() > 0 && pEnt->m_takedamage == DAMAGE_YES );
 }

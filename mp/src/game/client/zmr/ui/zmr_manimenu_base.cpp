@@ -31,5 +31,49 @@ void CZMManiMenuBase::ShowMenu( C_ZMEntManipulate* pMani )
     SetDescription( *pMani->GetDescription() ? pMani->GetDescription() : "Activate trap." );
     SetCost( pMani->GetCost() );
     SetTrapCost( pMani->GetTrapCost() );
+	pMani->SetMenu( this );
+
     ShowPanel( true );
 }
+
+void CZMManiMenuBase::UpdateMenu( C_ZMEntManipulate* pMani )
+{
+    SetDescription( *pMani->GetDescription() ? pMani->GetDescription() : "Activate trap." );
+    SetCost( pMani->GetCost() );
+    SetTrapCost( pMani->GetTrapCost() );
+}
+
+void CZMManiMenuBase::OnClose()
+{
+    // Notify server we've closed this menu.
+    engine->ClientCmd( VarArgs( "zm_cmd_closemenu %i", GetTrapIndex() ) );
+
+	BaseClass::OnClose();
+}
+
+void __MsgFunc_ZMManiMenuUpdate( bf_read &msg )
+{
+    if ( !g_pZMView || !g_pZMView->GetManiMenu() ) return;
+
+
+    CZMManiMenuBase* pMenu = g_pZMView->GetManiMenu();
+
+
+
+	int spawnidx = msg.ReadShort();
+
+    // We don't care about this trap since we don't have it open...
+    if ( spawnidx != pMenu->GetTrapIndex() ) return;
+
+
+	bool active = msg.ReadOneBit() == 1;
+
+
+    // No longer active, so close us.
+	if ( !active )
+	{
+        pMenu->Close();
+	}
+}
+
+USER_MESSAGE_REGISTER( ZMManiMenuUpdate );

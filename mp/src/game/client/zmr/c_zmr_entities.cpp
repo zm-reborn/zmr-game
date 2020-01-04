@@ -3,6 +3,8 @@
 #include "c_zmr_precipitation.h"
 #include "c_zmr_entities.h"
 #include "zmr/zmr_player_shared.h"
+#include "zmr/ui/zmr_buildmenu_base.h"
+#include "zmr/ui/zmr_manimenu_base.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -123,6 +125,16 @@ void C_ZMEntZombieSpawn::Precache()
     PrecacheModel( MAT_SPAWNSPRITE );
 }
 
+void C_ZMEntZombieSpawn::OnDataChanged( DataUpdateType_t type )
+{
+	if ( GetMenu() )
+	{
+		GetMenu()->UpdateMenu( this );
+	}
+
+    BaseClass::OnDataChanged( type );
+}
+
 void C_ZMEntZombieSpawn::InitSpriteMat()
 {
     if ( m_SpriteMat == nullptr )
@@ -157,6 +169,16 @@ void C_ZMEntManipulate::Precache()
     BaseClass::Precache();
 
     PrecacheModel( MAT_MANISPRITE );
+}
+
+void C_ZMEntManipulate::OnDataChanged( DataUpdateType_t type )
+{
+	if ( GetMenu() )
+	{
+		GetMenu()->UpdateMenu( this );
+	}
+
+    BaseClass::OnDataChanged( type );
 }
 
 void C_ZMEntManipulate::InitSpriteMat()

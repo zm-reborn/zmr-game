@@ -74,11 +74,14 @@
 	"Manipulatable object by the Zombie Master"
 [
 	Cost(integer) : "Cost" : 10 : "The amount of resources deducted upon activation"
-	output OnPressed(void) : "Fired when the button is pressed."
-
 	Description(string) : "Description" : "" : "Description of this Manipulate's functions."
 	TrapCost(integer) : "TrapCost" : 0 : "Override the trap cost."
 
+	input SetDescription(string) : "Sets the description."
+	input SetTrapCost(integer) : "Sets the trap cost override."
+	input SetCost(integer) : "Sets the cost."
+	
+	output OnPressed(void) : "Fired when the button is pressed."
 ]
 
 @PointClass base(Targetname, Parentname, Origin, Angles, Activeable, InputActiveable)  = info_zombiespawn :

@@ -38,10 +38,12 @@ public:
 
 
     virtual void OnCommand( const char *command ) OVERRIDE;
+    virtual void OnClose() OVERRIDE;
 
 
 
     virtual void ShowMenu( C_ZMEntManipulate* pMani );
+	virtual void UpdateMenu( C_ZMEntManipulate* pSpawn );
     virtual void SetDescription( const char* ) = 0;
 
     inline int GetTrapIndex() { return m_iTrapIndex; };
