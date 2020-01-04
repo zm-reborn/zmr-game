@@ -339,6 +339,9 @@ bool CZMBaseWeapon::Holster( CBaseCombatWeapon* pSwitchingTo )
     m_bInReload2 = false;
     m_bFiringWholeClip = false;
 
+    m_flNextClipFillTime = 0.0f;
+    m_bCanCancelReload = false;
+
 
     SetThink( nullptr );
 
@@ -1756,6 +1759,14 @@ void CZMBaseWeapon::Drop( const Vector& vecVelocity )
         UTIL_Remove( this );
     }
 #endif
+
+
+    // Reset reloading
+    m_bInReload2 = false;
+    m_bFiringWholeClip = false;
+
+    m_flNextClipFillTime = 0.0f;
+    m_bCanCancelReload = false;
 }
 
 void CZMBaseWeapon::Equip( CBaseCombatCharacter* pCharacter )
