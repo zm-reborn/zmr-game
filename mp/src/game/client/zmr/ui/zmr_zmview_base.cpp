@@ -251,10 +251,8 @@ void CZMViewBase::SetVisible( bool state )
 {
     BaseClass::SetVisible( state );
 
-    engine->ClientCmd( "-left" );
-    engine->ClientCmd( "-right" );
-    engine->ClientCmd( "-lookup" );
-    engine->ClientCmd( "-lookdown" );
+    ZMInput()->SetScreenScrollStatePitch( CZMInput::SCROLL_NONE );
+    ZMInput()->SetScreenScrollStateYaw( CZMInput::SCROLL_NONE );
 
 
     HideMouseTools();
