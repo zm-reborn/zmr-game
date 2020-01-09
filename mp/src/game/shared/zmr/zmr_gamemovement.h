@@ -46,6 +46,7 @@ public:
 
     void FullZMMove();
     virtual void Duck() OVERRIDE;
+    virtual void FinishDuck() OVERRIDE;
 
     virtual bool CheckJumpButton() OVERRIDE;
 

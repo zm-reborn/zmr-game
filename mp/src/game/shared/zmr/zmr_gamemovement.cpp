@@ -638,6 +638,56 @@ void CZMGameMovement::Duck()
     CGameMovement::Duck();
 }
 
+void CZMGameMovement::FinishDuck()
+{
+    // This was causing problems.
+	//if ( player->GetFlags() & FL_DUCKING )
+	//	return;
+
+    player->AddFlag( FL_DUCKING );
+    player->m_Local.m_bDucked = true;
+    player->m_Local.m_bDucking = false;
+
+    player->SetViewOffset( GetPlayerViewOffset( true ) );
+
+    // HACKHACK - Fudge for collision bug - no time to fix this properly
+    if ( player->GetGroundEntity() )
+    {
+        for ( int i = 0; i < 3; i++ )
+        {
+            Vector org = mv->GetAbsOrigin();
+            org[ i ]-= ( VEC_DUCK_HULL_MIN_SCALED( player )[i] - VEC_HULL_MIN_SCALED( player )[i] );
+            mv->SetAbsOrigin( org );
+        }
+    }
+    else
+    {
+        Vector hullSizeNormal = VEC_HULL_MAX_SCALED( player ) - VEC_HULL_MIN_SCALED( player );
+        Vector hullSizeCrouch = VEC_DUCK_HULL_MAX_SCALED( player ) - VEC_DUCK_HULL_MIN_SCALED( player );
+        Vector viewDelta = ( hullSizeNormal - hullSizeCrouch );
+        Vector out;
+        VectorAdd( mv->GetAbsOrigin(), viewDelta, out );
+        mv->SetAbsOrigin( out );
+
+#ifdef CLIENT_DLL
+#ifdef STAGING_ONLY
+        if ( debug_latch_reset_onduck.GetBool() )
+        {
+            player->ResetLatched();
+        }
+#else
+        player->ResetLatched();
+#endif
+#endif // CLIENT_DLL
+    }
+
+    // See if we are stuck?
+    FixPlayerCrouchStuck( true );
+
+    // Recategorize position since ducking can change origin
+    CategorizePosition();
+}
+
 bool CZMGameMovement::CheckJumpButton( void )
 {
     if (player->pl.deadflag)
