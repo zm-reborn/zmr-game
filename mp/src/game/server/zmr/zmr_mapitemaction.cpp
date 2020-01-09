@@ -47,6 +47,10 @@ ItemBaseData_t const CZMMapItemSystem::m_vItemData[] =
     ITEMDATA( weapon_zm_improvised, CLASS_WEAPON|CLASS_MELEE ),
     ITEMDATA( weapon_zm_sledge, CLASS_WEAPON|CLASS_MELEE ),
 
+    // Legacy weapons
+    ITEMDATA( weapon_crowbar, CLASS_DONTUSE ),
+    ITEMDATA( weapon_shotgun, CLASS_DONTUSE ),
+
     // Ammo
     ITEMDATA( item_box_buckshot, CLASS_AMMO|CLASS_AMMO_SHOTGUN ),
     ITEMDATA( item_ammo_357, CLASS_AMMO|CLASS_AMMO_RIFLE ),
@@ -653,9 +657,12 @@ bool CZMMapItemActionReplace::Replace( ItemEntData_t& itemEntData )
 
 CZMMapItemActionReplace* CZMMapItemActionReplace::Create( KeyValues* kv )
 {
+    const char* name = kv->GetName();
+
+
     if ( zm_sv_mapitem_debug.GetBool() )
     {
-        Msg( "Loading replace '%s'\n", kv->GetName() );
+        Msg( "Loading replace '%s'\n", name );
     }
 
 

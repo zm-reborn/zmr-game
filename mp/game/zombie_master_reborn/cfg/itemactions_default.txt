@@ -3,6 +3,29 @@
 {
 	"Replace"
 	{
+		//
+		// Fix certain maps using "weapon_crowbar" instead of "weapon_zm_improvised"
+		//
+		"Stock_FixCrowbar"
+		{
+			"filter_class"		"weapon_crowbar"
+			
+			"replace"		"weapon_zm_improvised"
+		}
+		
+		//
+		// Fix certain maps using "weapon_shotgun" instead of "weapon_zm_shotgun"
+		//
+		"Stock_FixShotgun"
+		{
+			"filter_class"		"weapon_shotgun"
+			
+			"replace"		"weapon_zm_shotgun"
+		}
+		
+		//
+		// Spawn other shotgun types in old maps.
+		//
 		"Stock_SpawnOtherShotgunTypes"
 		{
 			"onlyoldmaps"		"1"
