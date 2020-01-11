@@ -21,3 +21,7 @@ Yes.
 **Project refuses to compile, says something about wrong/missing toolset.**
 Open project settings and make sure `Platform Toolset` is `v142` and `Windows SDK Version` is `10.0` (other 10.X versions should also work).
 If it says one of them is missing, you need to download them from Visual Studio Installer (Tools -> Get Tools and Features)
+
+## Contributing
+
+**Please base all pull requests on the 'dev' branch.** If you're planning on something bigger or you want to work on one of the Issues, do contact us so your efforts don't go to waste.
