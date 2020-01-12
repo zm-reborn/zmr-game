@@ -257,7 +257,7 @@ LEGACY_CVAR( zm_initial_resources, zm_sv_resource_init )
 
 // bman
 LEGACY_CVAR( zm_physexp_cost, zm_sv_physexp_cost )
-LEGACY_CVAR( zm_spotcreate_cost, zm_hidden_cost_shambler )
+LEGACY_CVAR( zm_spotcreate_cost, zm_sv_hidden_cost_shambler )
 
 // kink
 LEGACY_CVAR( zm_flashlight_drainrate, zm_sv_flashlightdrainrate )

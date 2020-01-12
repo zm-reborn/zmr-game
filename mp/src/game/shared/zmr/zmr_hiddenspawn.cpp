@@ -22,10 +22,10 @@ CUtlVector<CZMEntTriggerBlockHidden*> g_ZMBlockHidden;
 #endif
 
 
-ConVar zm_hidden_cost_shambler( "zm_hidden_cost_shambler", "100", FCVAR_NOTIFY | FCVAR_REPLICATED );
-ConVar zm_hidden_mindistance( "zm_hidden_mindistance", "144", FCVAR_NOTIFY | FCVAR_REPLICATED, "The closest distance (in units) to survivors that the ZM can spawn zombies in." );
-ConVar zm_hidden_zombiedistmult( "zm_hidden_zombiedistmult", "256", FCVAR_NOTIFY | FCVAR_REPLICATED, "Zombie further away than this will have minimum cost." );
-ConVar zm_hidden_mincost( "zm_hidden_mincost", "10", FCVAR_NOTIFY | FCVAR_REPLICATED, "The minimum amount a hidden spawn will cost." );
+ConVar zm_sv_hidden_cost_shambler( "zm_sv_hidden_cost_shambler", "100", FCVAR_NOTIFY | FCVAR_REPLICATED );
+ConVar zm_sv_hidden_mindistance( "zm_sv_hidden_mindistance", "144", FCVAR_NOTIFY | FCVAR_REPLICATED, "The closest distance (in units) to survivors that the ZM can spawn zombies in." );
+ConVar zm_sv_hidden_zombiedistmult( "zm_sv_hidden_zombiedistmult", "256", FCVAR_NOTIFY | FCVAR_REPLICATED, "Zombie further away than this will have minimum cost." );
+ConVar zm_sv_hidden_mincost( "zm_sv_hidden_mincost", "10", FCVAR_NOTIFY | FCVAR_REPLICATED, "The minimum amount a hidden spawn will cost." );
 
 
 
@@ -44,24 +44,24 @@ CZMHiddenSpawnSystem::~CZMHiddenSpawnSystem()
 
 float CZMHiddenSpawnSystem::GetMinimumDistance() const
 {
-    return zm_hidden_mindistance.GetFloat();
+    return zm_sv_hidden_mindistance.GetFloat();
 }
 
 int CZMHiddenSpawnSystem::GetResourcesMax( ZombieClass_t zclass ) const
 {
-    return zm_hidden_cost_shambler.GetInt();
+    return zm_sv_hidden_cost_shambler.GetInt();
 }
 
 int CZMHiddenSpawnSystem::ComputeResourceCost( ZombieClass_t zclass, float closestZombieDist ) const
 {
-    const float flMaxDist = zm_hidden_zombiedistmult.GetFloat();
+    const float flMaxDist = zm_sv_hidden_zombiedistmult.GetFloat();
     Assert( flMaxDist > 0.0f );
 
 
     float frac = 1.0f - RemapValClamped( closestZombieDist, 24.0f, flMaxDist, 0.0f, 1.0f );
 
 
-    return zm_hidden_mincost.GetInt() + frac * GetResourcesMax( zclass );
+    return zm_sv_hidden_mincost.GetInt() + frac * GetResourcesMax( zclass );
 }
 
 void CZMHiddenSpawnSystem::Trace( CZMPlayer* pSurvivor, const Vector& endpos, trace_t& tr ) const
