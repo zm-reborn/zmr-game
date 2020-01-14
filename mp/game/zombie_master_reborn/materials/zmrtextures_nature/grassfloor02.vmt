@@ -1,0 +1,7 @@
+"LightmappedGeneric"
+{
+	"$baseTexture" "zmrtextures_nature/grassfloor02"
+	"$surfaceprop" "dirt"
+
+	"%keywords" "zmr"
+}

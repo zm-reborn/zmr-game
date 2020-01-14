@@ -1,0 +1,13 @@
+"LightmappedGeneric"
+{
+	"$baseTexture" "zmrtextures_brick/brick05"
+	"$surfaceprop" "concrete"
+
+	"$bumpmap" "zmrtextures_brick/brick05_normal"
+	"$normalmapalphaenvmapmask" "1"
+	"$envmap" "env_cubemap"
+	"$envmaptint" "[ .3 .3 .3 ]"
+	"$envmapsaturation" "0.8"
+
+	"%keywords" "zmr"
+}

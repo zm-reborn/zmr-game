@@ -1,0 +1,13 @@
+"LightmappedGeneric"
+{
+	"$baseTexture" "zmrtextures_nature/mudfloor01"
+	"$surfaceprop" "mud"
+
+	"$bumpmap" "zmrtextures_nature/mudfloor01_normal"
+	"$normalmapalphaenvmapmask" "1"
+	"$envmap" "env_cubemap"
+	"$envmaptint" "[ .6 .6 .6 ]"
+	"$envmapsaturation" "0.8"
+
+	"%keywords" "zmr"
+}

@@ -1,0 +1,13 @@
+"LightmappedGeneric"
+{
+	"$baseTexture" "zmrtextures_nature/rockwall01"
+	"$surfaceprop" "rock"
+
+	"$bumpmap" "zmrtextures_nature/rockwall01_normal"
+	"$normalmapalphaenvmapmask" "1"
+	"$envmap" "env_cubemap"
+	"$envmaptint" "[ .4 .4 .4 ]"
+	"$envmapsaturation" "0.5"
+
+	"%keywords" "zmr"
+}

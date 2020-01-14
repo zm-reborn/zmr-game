@@ -1,0 +1,13 @@
+"LightmappedGeneric"
+{
+	"$baseTexture" "zmrtextures_roof/tileroof01"
+	"$surfaceprop" "tile"
+
+	"$bumpmap" "zmrtextures_roof/tileroof01_normal"
+	"$normalmapalphaenvmapmask" "1"
+	"$envmap" "env_cubemap"
+	"$envmaptint" "[ .15 .15 .15 ]"
+	"$envmapsaturation" "0.1"
+
+	"%keywords" "zmr"
+}
