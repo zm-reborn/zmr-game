@@ -1,0 +1,7 @@
+VertexLitGeneric
+{
+	"$basetexture"	"models\props\de_tides\tides_flag_a"
+	"$nocull" "1"
+	"$surfaceprop" "default"
+
+}

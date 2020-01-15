@@ -1,0 +1,6 @@
+VertexLitGeneric
+{
+	"$basetexture"	"models\props\cs_militia\roofbeams01"
+	"$surfaceprop" "wood_plank"
+
+}

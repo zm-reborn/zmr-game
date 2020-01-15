@@ -1,0 +1,7 @@
+VertexLitGeneric
+{
+	"$basetexture"	"models\props\cs_office\screenb"
+	"$envmap" "env_cubemap"
+	"$envmapmask" "fx\white50_ref"
+
+}

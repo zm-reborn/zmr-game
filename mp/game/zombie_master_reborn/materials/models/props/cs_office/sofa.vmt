@@ -1,0 +1,12 @@
+VertexLitGeneric
+{
+	"$basetexture"	"models\props\cs_office\sofa"
+ 	"$envmap" "env_cubemap"
+	"$envmapmask" "models\props\cs_office\sofa_spec"
+        "$envmaptint" "[1 1 1]" 
+        "vertexlitgeneric_HDR_dx9" 
+        { 
+                "$envmaptint" "[.25 .25 .25]" 
+
+        } 
+}

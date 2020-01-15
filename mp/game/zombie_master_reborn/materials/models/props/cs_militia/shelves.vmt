@@ -1,0 +1,6 @@
+"VertexLitGeneric"
+{
+	"$baseTexture" "models\props\cs_militia/shelves"
+	"$envmap" "env_cubemap"
+	"$envmapmask" "models\props\cs_militia\shelves_ref"
+}

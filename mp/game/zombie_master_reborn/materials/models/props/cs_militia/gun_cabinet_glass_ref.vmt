@@ -1,0 +1,8 @@
+VertexLitGeneric
+{
+	"$basetexture"	"models\props\cs_militia\gun_cabinet_glass_ref"
+	"$translucent" "1"
+	"$envmap" "env_cubemap"
+	"$envmapmask" "models\props\cs_militia\gun_cabinet_glass_ref_ref"
+
+}

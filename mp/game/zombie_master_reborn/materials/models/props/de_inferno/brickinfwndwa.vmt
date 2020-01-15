@@ -1,0 +1,6 @@
+VertexLitGeneric
+{
+	"$basetexture"	"brick\infwndwa"
+	"$selfillum" "1"
+
+}

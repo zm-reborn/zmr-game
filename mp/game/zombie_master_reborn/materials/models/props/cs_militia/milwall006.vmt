@@ -1,0 +1,8 @@
+"VertexLitGeneric"
+{
+	"$basetexture"	"plaster\milwall006"
+	"$surfaceprop" 	"plaster"
+	"$envmap"	"env_cubemap"
+	"$envmapmask" 	"plaster\milwall006_ref"
+
+}

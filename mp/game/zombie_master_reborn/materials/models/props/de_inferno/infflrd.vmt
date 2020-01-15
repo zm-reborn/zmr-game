@@ -1,0 +1,6 @@
+VertexLitGeneric
+{
+	"$basetexture"	"stone\infflrd"
+	"$surfaceprop" "rock"
+
+}

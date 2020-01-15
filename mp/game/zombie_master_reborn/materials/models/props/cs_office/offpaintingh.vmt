@@ -1,0 +1,7 @@
+VertexLitGeneric
+{
+	"$basetexture"	"models\props\cs_office\offpaintingh"
+	"$envmap" "env_cubemap"
+	"$envmapmask" "models\props\cs_office\offpaintingh_ref"
+
+}

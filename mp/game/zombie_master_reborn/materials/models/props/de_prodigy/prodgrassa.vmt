@@ -1,0 +1,9 @@
+UnlitGeneric
+{
+	"$basetexture"	"models\props\de_prodigy\prodgrassa"
+	"$translucent" "1"
+//	"$alphatest" "1"
+	"$nocull" "1"
+	"$model" "1"
+
+}

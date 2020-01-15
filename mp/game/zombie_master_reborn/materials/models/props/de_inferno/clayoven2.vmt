@@ -1,0 +1,6 @@
+VertexLitGeneric
+{
+	"$basetexture"	"models\props\de_inferno\clayoven2"
+	"$alphatest" "1"
+
+}

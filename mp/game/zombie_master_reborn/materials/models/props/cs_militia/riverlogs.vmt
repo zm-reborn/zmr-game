@@ -1,0 +1,6 @@
+"VertexLitGeneric"
+{
+	"$baseTexture" "models\props\CS_Militia/riverlogs"
+	"$alphatest" "1"
+	"$surfaceprop" "Wood"
+}

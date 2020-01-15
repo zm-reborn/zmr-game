@@ -1,0 +1,7 @@
+UnlitGeneric
+{
+	"$basetexture"	"models\props\de_train\lightwindowsa"
+	"$additive" "1"
+	"$nocull" "1"
+	"$model" "1"
+}

@@ -1,0 +1,6 @@
+VertexLitGeneric
+{
+	"$basetexture"	"models\props\de_train\mike_facemap"
+	"$surfaceprop" "flesh"
+
+}

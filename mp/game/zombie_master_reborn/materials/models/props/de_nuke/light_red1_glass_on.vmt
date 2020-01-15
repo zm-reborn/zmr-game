@@ -1,0 +1,10 @@
+UnlitGeneric
+{
+	"$basetexture"	"models\props\de_nuke\light_red1_glass"
+	"$translucent" "1"
+	"$model" "1" 
+	"$envmap" "env_cubemap"
+	"$envmapmask" "models\props\de_nuke\light_red1_glass_ref"
+	"$envmaptint" "[1 .05 .05]"
+	"$nocull" "1"
+}

@@ -1,0 +1,11 @@
+VertexLitGeneric
+{
+	"$basetexture"	"models\props\de_train\processor"
+	"$envmap" "env_cubemap"
+	"$envmapmask" "models\props\de_train\processor_ref"
+	//"$envmapcontrast" "1"
+	"$envmapmode" "1"
+	//"$envmapsaturation" "1"
+	//"$envmaptint" "[ .50 .50 .50 ]"
+
+}

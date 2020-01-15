@@ -1,0 +1,7 @@
+VertexLitGeneric
+{
+	"$basetexture"	"models\props\cs_office\microwave"
+	"$envmap" "env_cubemap"
+	"$envmapmask" "models\props\cs_office\microwave_ref"
+
+}

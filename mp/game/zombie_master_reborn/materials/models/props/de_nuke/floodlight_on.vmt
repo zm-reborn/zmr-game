@@ -1,0 +1,6 @@
+VertexLitGeneric
+{
+	"$basetexture"	"models\props\de_nuke\floodlight_on"
+	"$selfillum" "1"
+
+}

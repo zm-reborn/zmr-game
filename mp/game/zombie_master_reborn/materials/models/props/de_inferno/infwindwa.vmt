@@ -1,0 +1,8 @@
+VertexLitGeneric
+{
+	"$basetexture"	"stone\infwindwa"
+	"$envmap" "env_cubemap"
+	"$envmapmask" "stone\infwindwa_ref"
+	"$surfaceprop" "stone"
+
+}

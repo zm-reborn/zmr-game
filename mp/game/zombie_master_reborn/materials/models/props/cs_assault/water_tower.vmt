@@ -1,0 +1,7 @@
+VertexLitGeneric
+{
+	"$basetexture"	"models\props\cs_assault\water_tower"
+	"$envmap" "env_cubemap"
+	"$envmapmask" "models\props\cs_assault\water_tower_ref"
+
+}

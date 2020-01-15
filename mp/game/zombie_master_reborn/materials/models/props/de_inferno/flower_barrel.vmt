@@ -1,0 +1,7 @@
+VertexLitGeneric
+{
+	"$basetexture"	"models\props\de_inferno\flower_barrel"
+	"$alphatest" "1"
+	"$nocull" "1"
+
+}

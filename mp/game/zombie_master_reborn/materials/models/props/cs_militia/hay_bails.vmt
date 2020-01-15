@@ -1,0 +1,7 @@
+VertexLitGeneric
+{
+	"$basetexture"	"models\props\de_inferno\hay_bails"
+	"$alphatest" "1"
+	"$nocull" "1"
+
+}

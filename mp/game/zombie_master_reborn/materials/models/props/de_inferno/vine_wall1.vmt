@@ -1,0 +1,7 @@
+VertexLitGeneric
+{
+	"$basetexture"	"models\props\de_inferno\vine_wall1"
+	"$alphatest" "1"
+	"$nocull" "1"
+
+}

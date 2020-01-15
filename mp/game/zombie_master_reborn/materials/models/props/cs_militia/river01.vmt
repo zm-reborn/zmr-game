@@ -1,0 +1,28 @@
+UnLitGeneric
+{
+	"$basetexture"	"models\props\cs_militia\river01"
+	"$translucent"	"1"
+	"$nocull"	"1"
+	"$model"	"1"
+	//"$surfaceprop" "water"
+
+
+
+
+
+	"Proxies"
+
+	{
+
+		"TextureScroll"
+		{
+			"texturescrollvar" "$baseTextureTransform"
+		
+			"texturescrollrate" .15
+			
+			"texturescrollangle" 270.00
+		}
+
+	}
+	
+}

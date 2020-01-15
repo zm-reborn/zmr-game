@@ -1,0 +1,10 @@
+VertexLitGeneric
+{
+	"$basetexture"	"models\props\cs_militia\wndw01"
+	"$translucent" "1"
+	"$nocull" "1"
+	"$surfaceprop" "glass"
+	"$envmap" 	"env_cubemap"
+	"$envmapmask"	"models\props\cs_militia\wndw01_ref"
+
+}

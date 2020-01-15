@@ -1,0 +1,7 @@
+VertexLitGeneric
+{
+	"$basetexture"	"models\props\de_nuke\skylight01_bottom"
+	"$envmap" "env_cubemap"
+	"$envmapmask" "models\props\de_nuke\skylight01_bottom_ref"
+
+}

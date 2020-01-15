@@ -1,0 +1,7 @@
+VertexLitGeneric
+{
+	"$basetexture"	"models\props\de_nuke\crane_walkway"
+	"$translucent" "1"
+	"$alphatest" "1"
+
+}

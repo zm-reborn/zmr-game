@@ -1,0 +1,6 @@
+VertexLitGeneric
+{
+	"$basetexture"	"de_nuke\nukibeama"
+	"$surfaceprop" "metal"
+
+}

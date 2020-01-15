@@ -1,0 +1,9 @@
+UnlitGeneric
+{
+	"$basetexture"	"models\props\de_nuke\warehouselightingeffects"
+	"$translucent" "1"
+	"$nocull" "1"
+	"$model" "1"
+//	"$color" "[ 1 .7 .5]"
+    "srgb?$color2" "[.4 .4 .4]"
+}

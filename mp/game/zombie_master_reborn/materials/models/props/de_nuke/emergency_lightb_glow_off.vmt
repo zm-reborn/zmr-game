@@ -1,0 +1,7 @@
+VertexLitGeneric
+{
+	"$basetexture"	"models\props\de_nuke\emergency_lightb_glow_off"
+	"$additive" "1"
+	"$nocull" "1"
+
+}

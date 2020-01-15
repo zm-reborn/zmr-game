@@ -1,0 +1,7 @@
+VertexLitGeneric
+{
+	"$basetexture"	"models\props\cs_militia\showers"
+	"$envmap" "env_cubemap"
+	"$envmapmask" "models\props\cs_militia\showers_ref"
+
+}

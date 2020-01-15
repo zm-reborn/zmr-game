@@ -1,0 +1,7 @@
+VertexLitGeneric
+{
+	"$basetexture"	"models\props\de_nuke\coolingtank"
+	"$envmap" "env_cubemap"
+	"$envmapmask" "models\props\de_nuke\coolingtank_ref"
+
+}

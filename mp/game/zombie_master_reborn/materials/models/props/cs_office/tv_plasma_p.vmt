@@ -1,0 +1,7 @@
+VertexLitGeneric
+{
+	"$basetexture"	"models\props\cs_office\tv_plasma_p"
+	"$envmap" "env_cubemap"
+	"$envmapmask" "models\props\cs_office\tv_plasma_p_ref"
+
+}

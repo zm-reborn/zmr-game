@@ -1,0 +1,7 @@
+VertexLitGeneric
+{
+	"$basetexture"	"models\props\de_inferno\light_streetlight"
+	"$envmap" "env_cubemap"
+	"$envmapmask" "models\props\de_inferno\light_streetlight_ref"
+
+}

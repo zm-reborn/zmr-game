@@ -1,0 +1,6 @@
+"VertexLitGeneric"
+{
+	"$baseTexture" "models\props\cs_militia/trees3"
+	"$alphatest" "1"
+	"$nocull" "1"
+}

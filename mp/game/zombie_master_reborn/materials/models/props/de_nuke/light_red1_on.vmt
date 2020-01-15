@@ -1,0 +1,5 @@
+VertexLitGeneric
+{
+	"$basetexture"	"models\props\de_nuke\light_red1"
+	"$selfillum" "1"
+}

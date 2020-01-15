@@ -1,0 +1,7 @@
+VertexLitGeneric
+{
+	"$basetexture"	"models\props\cs_militia\fencebarbedwire_wire2"
+	"$translucent" "1"
+	"$nocull" "1"
+
+}

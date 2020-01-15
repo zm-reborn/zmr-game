@@ -1,0 +1,6 @@
+"VertexLitGeneric"
+{
+	"$baseTexture" "models\props\CS_Militia/ReloadingPress"
+	"$envmap" "env_cubemap"
+	"$envmapmask" "models\props\CS_Militia\ReloadingPress_ref"
+}

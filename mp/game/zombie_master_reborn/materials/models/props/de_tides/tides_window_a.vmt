@@ -1,0 +1,6 @@
+VertexLitGeneric
+{
+	"$basetexture"	"models\props\de_tides\tides_window_a"
+	"$selfillum" "1"
+
+}

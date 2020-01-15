@@ -1,0 +1,7 @@
+"VertexLitGeneric"
+{
+	"$baseTexture" "models\props\CS_Militia/CircularSawBlade01"
+	"$translucent" "1"
+	"$envmap" "env_cubemap"
+	"$envmapmask" "models\props\CS_Militia\CircularSawBlade01_ref"
+}

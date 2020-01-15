@@ -1,0 +1,6 @@
+VertexLitGeneric
+{
+	"$basetexture"	"models\props\cs_militia\fireplacegrate"
+	"$translucent" "1"
+
+}

@@ -1,0 +1,8 @@
+UnlitGeneric
+{
+	"$basetexture"	"models\props\de_inferno\largebushi"
+	"$alphatest" "1"
+	"$nocull" "1"
+	"$model" "1"
+
+}

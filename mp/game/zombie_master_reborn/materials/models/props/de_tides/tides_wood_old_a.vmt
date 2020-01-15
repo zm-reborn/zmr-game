@@ -1,0 +1,6 @@
+VertexLitGeneric
+{
+	"$basetexture"	"models\props\de_tides\tides_wood_old_a"
+	"$surfaceprop" "wood"
+
+}

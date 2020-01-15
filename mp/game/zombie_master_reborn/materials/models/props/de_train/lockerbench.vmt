@@ -1,0 +1,8 @@
+VertexLitGeneric
+{
+	"$basetexture"	"models\props\de_train\lockerbench"
+	"$envmap" "env_cubemap"
+	"$envmapmode" "1"
+	"$envmapmask" "models\props\de_train\lockerbench_ref"
+
+}

@@ -1,0 +1,18 @@
+VertexLitGeneric
+{
+	"$basetexture"	"models\props\cs_office\screen"
+	"$selfillum"	"1"
+	"$envmap" "env_cubemap"
+	"$envmapmask" "fx\white50_ref"
+
+"Proxies"
+ {
+  "AnimatedTexture"
+  {
+    "animatedTextureVar" "$basetexture"
+    "animatedTextureFrameNumVar" "$frame"
+    "animatedTextureFrameRate" "2"
+  }
+ }
+
+}

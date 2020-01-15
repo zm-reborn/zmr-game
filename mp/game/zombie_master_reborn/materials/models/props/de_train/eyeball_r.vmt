@@ -1,0 +1,6 @@
+VertexLitGeneric
+{
+	"$basetexture"	"models\props\de_train\eyeball_r"
+	"$surfaceprop" "flesh"
+
+}

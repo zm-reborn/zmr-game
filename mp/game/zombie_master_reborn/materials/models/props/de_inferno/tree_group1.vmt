@@ -1,0 +1,7 @@
+UnlitGeneric
+{
+	"$basetexture"	"models\props\de_inferno\tree_group1"
+	"$translucent" "1"
+	"$model" "1"
+	"$nocull" "1"
+}

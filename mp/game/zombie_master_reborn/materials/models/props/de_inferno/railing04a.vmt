@@ -1,0 +1,7 @@
+VertexLitGeneric
+{
+	"$basetexture"	"models\props\de_inferno\railing04a"
+	"$envmap" "env_cubemap"
+	"$envmapmask" "models\props\de_inferno\railing04a_ref"
+
+}

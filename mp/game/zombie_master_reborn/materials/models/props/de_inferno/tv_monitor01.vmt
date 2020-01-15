@@ -1,0 +1,11 @@
+
+"VertexLitGeneric"
+{
+	// Original shader: VertexLitTexture
+	"$basetexture" "Models/props_c17/tv_monitor01"
+	"$surfaceprop" "plastic"
+	"$envmap" "env_cubemap"
+	"$envmaptint" "[ .4 .4 .4]"
+	"$envmapmask" "Models/props_c17/tv_monitor01_mask"
+	"$basealphaenvmapmask" 1 
+}

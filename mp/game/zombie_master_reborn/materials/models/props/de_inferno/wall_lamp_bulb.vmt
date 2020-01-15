@@ -1,0 +1,6 @@
+VertexLitGeneric
+{
+	"$basetexture"	"models\props\de_inferno\wall_lamp_bulb"
+	"$selfillum" "1"
+
+}

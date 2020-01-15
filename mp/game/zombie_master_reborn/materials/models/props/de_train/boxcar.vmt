@@ -1,0 +1,7 @@
+VertexLitGeneric
+{
+	"$basetexture"	"models\props\de_train\boxcar"
+	"$envmap" "env_cubemap"
+	"$envmapmask" "models\props\de_train\boxcar_ref"
+
+}

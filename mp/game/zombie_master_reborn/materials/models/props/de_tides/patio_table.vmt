@@ -1,0 +1,7 @@
+VertexLitGeneric
+{
+	"$basetexture"	"models\props\de_tides\patio_table"
+	"$envmap" "env_cubemap"
+	"$envmapmask" "models\props\de_tides\patio_table_ref"
+
+}

@@ -1,0 +1,8 @@
+VertexLitGeneric
+{
+	"$basetexture"	"models\props\de_train\railroadtrack"
+	//"$envmapmask" "models\props\de_train\railroadtrack_ref"
+	//"$envmap" "env_cubemap"
+	//"$envmapmode" "1"
+
+}

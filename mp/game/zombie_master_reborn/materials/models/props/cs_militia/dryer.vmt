@@ -1,0 +1,7 @@
+"VertexLitGeneric"
+{
+	"$baseTexture" "models\props\CS_Militia/dryer"
+	"$envmap" "env_cubemap"
+	"$envmapmask" "models\props\CS_Militia\dryer_ref"
+	"$surfaceprop" "metalpanel"
+}

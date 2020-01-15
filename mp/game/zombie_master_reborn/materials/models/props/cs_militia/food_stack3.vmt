@@ -1,0 +1,6 @@
+"VertexLitGeneric"
+{
+	"$baseTexture" "models\props\cs_militia/food_stack3"
+	"$envmap" "env_cubemap"
+	"$envmapmask" "models\props\cs_militia\food_stack3_ref"
+}

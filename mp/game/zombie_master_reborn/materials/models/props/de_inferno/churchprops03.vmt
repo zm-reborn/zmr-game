@@ -1,0 +1,6 @@
+VertexLitGeneric
+{
+	"$basetexture"	"models\props\de_inferno\churchprops03"
+	"$surfaceprop" "plaster"
+
+}

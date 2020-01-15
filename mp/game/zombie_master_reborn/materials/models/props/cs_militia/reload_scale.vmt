@@ -1,0 +1,6 @@
+"VertexLitGeneric"
+{
+	"$baseTexture" "models\props\cs_militia/reload_scale"
+	"$envmap" "env_cubemap"
+	"$envmapmask" "models\props\cs_militia\reload_scale_ref"
+}

@@ -1,0 +1,8 @@
+VertexLitGeneric
+{
+	"$basetexture"	"models\props\de_train\de_train_signalbox"
+	"$bumpmap" "models\props\de_train\de_train_signalbox_normal"
+	"$normalmapalphaenvmapmask" "1"
+	"$surfaceprop" "metal"
+
+}

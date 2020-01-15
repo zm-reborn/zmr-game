@@ -1,0 +1,8 @@
+VertexLitGeneric
+{
+	"$basetexture"	"models\props\de_tides\tides_window_glass"
+	"$envmap" "env_cubemap"
+	"$envmapmask" "models\props\de_tides\tides_window_glass_ref"
+	"$surfaceprop" "glass"
+
+}
