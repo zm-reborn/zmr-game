@@ -1,0 +1,8 @@
+"VertexLitGeneric"
+{
+	"$basetexture"		"models/zmrprops_street/street_lamp01"
+	"$surfaceprop"		"metal"
+	"$envmap"		"env_cubemap"
+	"$envmapmask"		"models/zmrprops_street/street_lamp01_mask"
+
+}

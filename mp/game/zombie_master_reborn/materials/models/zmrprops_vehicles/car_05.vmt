@@ -1,0 +1,12 @@
+"VertexLitGeneric"
+{
+	"$basetexture"	"models/zmrprops_vehicles/car_05"
+	"$envmap" "env_cubemap"
+	"$envmaptint" "[ .5 .5 .5 ]"
+	"$normalmapalphaenvmapmask"	1
+	"$bumpmap"	"models/zmrprops_vehicles/car_01_normal"
+	"$surfaceprop"	"metal"
+	"$selfIllum"			0
+	"$alphatest"			1
+	"$nocull"			1
+}

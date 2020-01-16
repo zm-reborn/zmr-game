@@ -1,0 +1,10 @@
+"VertexLitGeneric"
+{
+	"$basetexture"	"models/zmrprops_vehicles/car_01_windows"
+	"$envmap" "env_cubemap"
+	"$envmaptint" "[ .40 .40 .55 ]"
+	"$surfaceprop"	"glass"
+	"$selfIllum"			0
+	"$translucent"			1
+
+}

@@ -1,0 +1,6 @@
+"VertexLitGeneric"
+{
+	"$basetexture"	"models/zmrprops_foliage/tree_urban_trunk"
+	"$surfaceprop"	"wood"
+
+}

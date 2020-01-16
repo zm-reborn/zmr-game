@@ -1,0 +1,7 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/zmrprops_misc/fire_extinguisher"
+	"$surfaceprop" "canister"
+	"$envmap"			env_cubemap
+	"$envmapmask"		"models/zmrprops_misc/fire_extinguisher_mask"
+}

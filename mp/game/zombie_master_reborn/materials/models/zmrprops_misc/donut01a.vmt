@@ -1,0 +1,5 @@
+"VertexLitGeneric"
+{
+	"$basetexture"	"models/zmrprops_misc/donut01a"
+	"$surfaceprop"	"flesh"
+}

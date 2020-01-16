@@ -1,0 +1,6 @@
+"VertexLitGeneric"
+{
+	"$basetexture"	"models/zmrprops_vehicles/wheel_01"
+	"$surfaceprop"	"rubber"
+	"$selfIllum"			0
+}

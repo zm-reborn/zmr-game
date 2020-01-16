@@ -1,0 +1,7 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/zmrprops_misc/tape_recorder"
+	"$surfaceprop" "computer"
+	"$envmap"			env_cubemap
+	"$envmapmask"		"models/zmrprops_misc/tape_recorder_mask"
+}

@@ -1,0 +1,7 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/zmrprops_misc/fuse"
+	"$surfaceprop" "computer"
+	"$envmap"			env_cubemap
+	"$envmapmask"		"models/zmrprops_misc/fuse_mask"
+}

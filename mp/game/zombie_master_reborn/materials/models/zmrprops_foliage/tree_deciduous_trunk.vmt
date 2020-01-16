@@ -1,0 +1,6 @@
+"VertexLitGeneric"
+{
+	"$basetexture"	"models/zmrprops_foliage/tree_deciduous_trunk"
+	"$surfaceprop"	"wood"
+
+}

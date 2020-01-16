@@ -1,0 +1,7 @@
+"VertexLitGeneric"
+{
+	"$basetexture"	"models/zmrprops_appliances/coffeepot01"
+	"$surfaceprop"	"metal"
+	"$envmap" "env_cubemap"
+	"$envmapmask"	"models/zmrprops_appliances/coffeepot01_mask"
+}
