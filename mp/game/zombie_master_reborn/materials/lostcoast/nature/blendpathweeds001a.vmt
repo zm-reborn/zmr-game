@@ -1,0 +1,8 @@
+"WorldVertexTransition"
+{
+	"$basetexture" "lostcoast/nature/dirtfloor002a"
+	"$basetexture2" "lostcoast/nature/grassweeds001a"
+	"%tooltexture" "lostcoast/nature/blendpathweeds001a_tooltexture"
+	"%keywords" "wasteland"
+	"%detailtype" "lostcoast_grass"
+}

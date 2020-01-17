@@ -1,0 +1,6 @@
+"LightmappedGeneric"
+{
+	"$basetexture" "lostcoast/nature/rockwall022a"
+	"$surfaceprop" "concrete"
+	"$bumpmap" "lostcoast/nature/rockwall022a_normal"
+}

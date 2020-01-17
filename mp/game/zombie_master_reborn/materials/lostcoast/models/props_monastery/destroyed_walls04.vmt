@@ -1,0 +1,6 @@
+"VertexLitGeneric"
+{
+	"$baseTexture" "lostcoast\models\props_monastery\destroyed_walls04"
+//	"$bumpmap"	"lostcoast\models\props_monastery\destroyed_walls04_normal"
+
+}

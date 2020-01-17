@@ -1,0 +1,7 @@
+"LightmappedGeneric"
+{
+	// Original shader: DecalBaseTimesLightmapAlphaBlend
+	"$basetexture" "lostcoast/monastery/sign_warning01"
+	"$decal" 1
+	"$decalscale" 0.125
+}

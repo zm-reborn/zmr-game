@@ -1,0 +1,9 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "lostcoast\models\props_monastery\monastery_chimmney01"
+	"$surfaceprop" "stone"
+	"$envmap" "env_cubemap"
+	"$basealphaenvmapmask" 1
+	"$envmaptint" "[.35 .35 .35]"
+}
+

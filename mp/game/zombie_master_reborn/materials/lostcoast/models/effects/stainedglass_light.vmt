@@ -1,0 +1,11 @@
+"UnlitGeneric"
+{
+	"$baseTexture" "lostcoast/Models/Effects/stainedglass_light"
+	"$nocull" "1"	
+	"$additive" "1"
+//	"$translucent" "1"
+	"$model" "1"
+	"$no_fullbright" 1
+
+}
+

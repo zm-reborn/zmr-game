@@ -1,0 +1,10 @@
+"LightmappedGeneric"
+{
+	"$basetexture" "lostcoast/Monastery/Monastery_Wall003d"
+	"$surfaceprop" "concrete"
+	"$envmap" "env_cubemap"
+	"$basealphaenvmapmask" 1
+	"$envmapcontrast" 1
+	"$envmapsaturation" 1
+	"$envmaptint" "[ .75 .75 .75]"
+}

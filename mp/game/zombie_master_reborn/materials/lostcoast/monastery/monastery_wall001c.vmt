@@ -1,0 +1,6 @@
+"LightmappedGeneric"
+{
+	"$basetexture" "lostcoast/Monastery/Monastery_Wall001c"
+	"$surfaceprop" "brick"
+	"$bumpmap" "lostcoast/Monastery/Monastery_Wall001c_normal"
+}

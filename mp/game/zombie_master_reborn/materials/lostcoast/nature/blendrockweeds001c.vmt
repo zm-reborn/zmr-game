@@ -1,0 +1,13 @@
+"WorldVertexTransition"
+{
+	"$basetexture" "lostcoast/nature/rockwall021d"
+	"$basetexture2" "lostcoast/nature/grassweeds001a"
+	"%tooltexture" "lostcoast/nature/blendrockweeds001c_tooltexture"
+	"%keywords" "wasteland"
+	"$bumpmap" "lostcoast/nature/rockwall021d_normal"
+	"$normalmapalphaenvmapmask" 1
+	"$envmapcontrast" 1
+	"$envmapsaturation" 1
+	"$envmaptint" "[ .625 .625 .625]"
+	"$envmap" "env_cubemap"
+}

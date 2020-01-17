@@ -1,0 +1,5 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "lostcoast\models\props_monastery\scaffolding01a"
+	"$surfaceprop" "metal"
+}

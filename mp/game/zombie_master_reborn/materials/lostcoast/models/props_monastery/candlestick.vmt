@@ -1,0 +1,12 @@
+"VertexLitGeneric"
+{
+	"$baseTexture" "lostcoast\models\props_monastery\candlestick"
+	"$bumpmap"	"lostcoast\models\props_monastery\candlestick_normal"
+	"$normalmapalphaenvmapmask" 1
+	//"$envmap" "lostcoast\models\props_monastery\candlestick_cube"
+	"$envmap" "env_cubemap"
+//	"$envmapcontrast" 0.5
+	"$envmapsaturation" 1.2
+	"$envmaptint" "{ 220 170 110}"
+
+}

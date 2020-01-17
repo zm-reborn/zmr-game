@@ -1,0 +1,18 @@
+"WorldVertexTransition"
+{
+	"$basetexture" 	"lostcoast/nature/sandfloor007c"
+	"$basetexture2" "lostcoast/nature/sandfloor007d"
+	"%tooltexture" "lostcoast/nature/blendsandsand007d_tooltexture"
+	"$surfaceprop" "sand"
+	"%keywords" "coastline"
+	"$bumpmap" "lostcoast/nature/sandfloor007c_normal"
+	"$bumpmap2" "lostcoast/nature/sandfloor007d_normal"
+	"$normalmapalphaenvmapmask" 1
+	"$envmapcontrast" 1
+	"$envmapsaturation" 1
+	"$envmaptint" "[ .6 .6 .6]"
+	"$envmap" "env_cubemap"
+	"$parallaxmap" "lostcoast/nature/sandfloor007c_height"
+	"$parallaxmap2" "lostcoast/nature/sandfloor007d_height"
+	"$parallaxmapscale" ".05"
+}

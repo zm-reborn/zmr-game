@@ -1,0 +1,6 @@
+"VertexLitGeneric"
+{
+
+	"$basetexture" "lostcoast\models\props_monastery\Monastery_window001a"
+	"$surfaceprop" "wood"
+}

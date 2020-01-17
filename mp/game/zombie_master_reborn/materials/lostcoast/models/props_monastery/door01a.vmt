@@ -1,0 +1,7 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "lostcoast\models\props_monastery\door01a"
+	"$surfaceprop" "wood"
+//	"$basealphaenvmapmask" 1
+//	"$envmap" "env_cubemap"
+}

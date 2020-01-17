@@ -1,0 +1,7 @@
+"LightmappedGeneric"
+{
+	"$basetexture" "lostcoast/nature/sandfloor007d"
+	"$bumpmap" "lostcoast/nature/sandfloor007d_normal"
+	"$surfaceprop" "sand"
+	"%keywords" "wasteland"
+}

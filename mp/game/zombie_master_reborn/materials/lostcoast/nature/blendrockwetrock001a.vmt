@@ -1,0 +1,20 @@
+"WorldVertexTransition"
+{
+	"$basetexture" 	"lostcoast/nature/rockwall021e"
+	"$basetexture2" "lostcoast/nature/rockwall020a"
+	"%tooltexture" "lostcoast/nature/blendrockwetrock001a_tooltexture"
+	"$surfaceprop" "sand"
+	"%keywords" "coastline"
+	"$bumpmap" "lostcoast/nature/rockwall021e_normal"
+	"$bumpmap2" "lostcoast/nature/rockwall020a_normal"
+	"$normalmapalphaenvmapmask" 1
+	"$envmapcontrast" 1
+	"$envmapsaturation" 1
+	"$envmaptint" "[ .5 .5 .5]"
+	"$envmap" "env_cubemap"
+	"$basetexturenoenvmap" 1
+	//"$fresnelreflection" 0.0
+	//"$basetexturetransform" "center .5 .5 scale .25 .25 rotate 0 translate 0 0"
+	//"$basetexturetransform2" "center .5 .5 scale .5 .5 rotate 0 translate 0 0"
+}
+

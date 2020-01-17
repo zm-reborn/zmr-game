@@ -1,0 +1,9 @@
+"WorldVertexTransition"
+{
+	"$basetexture" "lostcoast/Monastery/Monastery_Ground001a"
+	"$basetexture2" "lostcoast/nature/grassweeds001a"
+	"%tooltexture" "lostcoast/nature/blendstonepathweeds001a_tooltexture"
+	"%keywords" "wasteland"
+	"%detailtype" "lostcoast_grass"
+	"$bumpmap" "lostcoast/Monastery/Monastery_Ground001a_normal"
+}

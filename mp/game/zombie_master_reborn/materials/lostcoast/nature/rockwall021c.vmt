@@ -1,0 +1,10 @@
+"LightmappedGeneric"
+{
+	"$basetexture" "lostcoast/nature/rockwall021c"
+	"$surfaceprop" "concrete"
+	"$bumpmap" "lostcoast/nature/rockwall021c_normal"
+	//"$parallaxmap" "lostcoast/nature/rockwall021c_height"
+	//"$parallaxmapscale" ".025"
+	"$detail" "lostcoast/nature/rockwall021_detail"
+	"$detailscale" 5
+}

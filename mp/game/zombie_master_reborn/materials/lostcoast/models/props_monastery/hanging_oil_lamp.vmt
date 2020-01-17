@@ -1,0 +1,12 @@
+"VertexLitGeneric"
+{
+	"$baseTexture" "lostcoast\models\props_monastery\hanging_oil_lamp"
+	"$bumpmap"	"lostcoast\models\props_monastery\hanging_oil_lamp_normal"
+	"$normalmapalphaenvmapmask" 1
+	//"$envmap" "lostcoast\models\props_monastery\hanging_oil_lampcube"
+	"$envmap" "env_cubemap"
+//	"$envmapcontrast" 0.5
+	"$envmapsaturation" 1.2
+	"$envmaptint" "{ 220 200 110}"
+
+}

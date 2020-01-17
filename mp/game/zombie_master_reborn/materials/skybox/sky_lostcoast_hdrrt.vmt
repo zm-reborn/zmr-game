@@ -1,0 +1,11 @@
+"Sky"
+{
+	// HDR basetexture
+	"$hdrbasetexture" "skybox/sky_lostcoast_hdrrt"
+
+	// non-HDR basetexture
+	"$basetexture" "skybox/sky_lostcoastrt"
+
+        "$nofog" 1
+        "$ignorez" 1
+}

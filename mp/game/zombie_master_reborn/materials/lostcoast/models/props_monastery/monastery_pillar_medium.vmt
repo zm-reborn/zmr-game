@@ -1,0 +1,9 @@
+"VertexLitGeneric"
+{
+	"$baseTexture" "lostcoast\models\props_monastery\monastery_pillar_medium"
+	"$bumpMap" "lostcoast\models\props_monastery\monastery_pillar_medium_normal"
+	"$envmap" "env_cubemap"
+	"$normalmapalphaenvmapmask" 1
+	"$envmaptint" "[ .32 .32 .32 ]"
+
+}
