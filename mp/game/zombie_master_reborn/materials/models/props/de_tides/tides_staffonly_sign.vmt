@@ -1,7 +1,0 @@
-VertexLitGeneric
-{
-	"$basetexture"	"models\props\de_tides\tides_staffonly_sign"
-	"$selfillum" "1"
-	"$surfaceprop" "wood"
-
-}

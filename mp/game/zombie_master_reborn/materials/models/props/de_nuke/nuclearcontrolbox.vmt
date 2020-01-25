@@ -1,7 +1,0 @@
-VertexLitGeneric
-{
-	"$basetexture"	"models\props\de_nuke\nuclearcontrolbox"
-	"$envmap" "env_cubemap"
-	"$envmapmask" "models\props\de_nuke\nuclearcontrolbox_ref"
-
-}

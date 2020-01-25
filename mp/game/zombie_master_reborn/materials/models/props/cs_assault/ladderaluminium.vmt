@@ -1,8 +1,0 @@
-VertexLitGeneric
-{
-	"$basetexture"	"models\props\de_train\ladderaluminium"
-	"$envmapmask" "models\props\de_train\ladderaluminium_ref"
-	"$envmap" "env_cubemap"
-	"$envmapmode" "1"
-
-}

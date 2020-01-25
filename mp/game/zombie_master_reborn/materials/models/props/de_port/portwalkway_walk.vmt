@@ -1,7 +1,0 @@
-VertexLitGeneric
-{
-	"$basetexture"	"models\props\de_port\portwalkway_walk"
-	"$envmap" "env_cubemap"
-	"$envmapmask" "models\props\de_port\portwalkway_walk_ref"
-
-}

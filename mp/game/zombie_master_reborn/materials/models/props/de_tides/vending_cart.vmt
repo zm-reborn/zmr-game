@@ -1,7 +1,0 @@
-VertexLitGeneric
-{
-	"$basetexture"	"models\props\de_tides\vending_cart"
-	"$alphatest" "1"
-	"$nocull" "1"
-
-}

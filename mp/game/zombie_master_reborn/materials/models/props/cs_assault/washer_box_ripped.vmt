@@ -1,7 +1,0 @@
-VertexLitGeneric
-{
-	"$basetexture"	"models\props\cs_assault\washer_box_ripped"
-	"$translucent" "1"
-	"$alphatest" "1"
-
-}

@@ -1,7 +1,0 @@
-VertexLitGeneric
-{
-	"$basetexture"	"models\props\de_inferno\cart_wheel"
-	"$envmap" "env_cubemap"
-	"$envmapmask" "models\props\de_inferno\cart_wheel_ref"
-
-}

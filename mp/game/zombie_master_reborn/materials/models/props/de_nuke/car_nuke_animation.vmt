@@ -1,7 +1,0 @@
-VertexLitGeneric
-{
-	"$basetexture"	"models\props\de_nuke\car_nuke_animation"
-	"$envmap" "env_cubemap"
-	"$envmapmask" "models\props\de_nuke\car_nuke_ref"
-
-}

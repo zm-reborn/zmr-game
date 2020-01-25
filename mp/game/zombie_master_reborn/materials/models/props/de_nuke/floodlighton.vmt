@@ -1,6 +1,0 @@
-VertexLitGeneric
-{
-	"$basetexture"	"models\props\de_nuke\floodlighton"
-	"$selfillum" "1"
-
-}

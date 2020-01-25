@@ -1,7 +1,0 @@
-VertexLitGeneric
-{
-	"$basetexture"	"models\props\cs_office\offinspg"
-	"$envmap" "env_cubemap"
-	"$envmapmask" "models\props\cs_office\offinspg_ref"
-
-}

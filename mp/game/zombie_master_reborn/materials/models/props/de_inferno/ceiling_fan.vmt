@@ -1,7 +1,0 @@
-VertexLitGeneric
-{
-	"$basetexture"	"models\props\de_inferno\ceiling_fan"
-	"$envmap" "env_cubemap"
-	"$envmapmask" "models\props\de_inferno\ceiling_fan_ref"
-
-}
