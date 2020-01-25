@@ -1,8 +1,0 @@
-"VertexLitGeneric"
-{
-	"$baseTexture" "lostcoast\models\props_wasteland\boat_wooden01a"
-	"$envmap" "env_cubemap"
-	"$basealphaenvmapmask" 1
-	"$surfaceprop" "wood"
-
-}
