@@ -75,6 +75,10 @@
 			game				|all_source_engine_paths|hl2/hl2_sound_misc.vpk
 			game				|all_source_engine_paths|hl2/hl2_misc.vpk
 			platform			|all_source_engine_paths|platform/platform_misc.vpk
+			
+			// Our VPK files
+			game				|gameinfo_path|assets_css.vpk
+			game				|gameinfo_path|assets_lostcoast.vpk
 
 			// Add the HL2 directory as a game search path.  This is also where where writes
 			// to the "game" path go.
