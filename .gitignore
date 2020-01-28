@@ -95,6 +95,7 @@ keys_zm.cfg
 mp/game/zombie_master_reborn/cfg/pet.txt
 mp/game/zombie_master_reborn/cfg/commedit.txt
 mp/game/zombie_master_reborn/sound/soundcacheversion.txt
+*.vpk
 # Tool (vbsp/vvis/vrad) compilation output
 *.dll
 *.exe
