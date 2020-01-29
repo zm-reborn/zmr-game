@@ -51,7 +51,18 @@ public:
     virtual float GetMaxDamageDist( ZMUserCmdValidData_t& data ) const OVERRIDE;
 #endif
 
+
+    void ArcAttack();
+    void ArcTrace( const Vector& vecPos, const QAngle& ang, float dist, float inDegrees, float fraction, float offset = 0.0f );
+private:
+    float m_flArcAttackDegrees;
+    float m_flEndArcAttack;
+    float m_flArcTime;
+    float m_flLastArcFraction;
+public:
+
 protected:
+
     virtual void Swing( bool bSecondary );
     virtual void StartHit( trace_t* traceRes = nullptr, Activity iActivityDamage = ACT_VM_HITCENTER, bool bJustTrace = false );
     virtual void Hit( trace_t& tr, Activity act );

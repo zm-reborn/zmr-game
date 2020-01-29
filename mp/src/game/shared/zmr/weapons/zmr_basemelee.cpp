@@ -67,6 +67,10 @@ CZMBaseMeleeWeapon::CZMBaseMeleeWeapon()
 
 
     m_flAttackHitTime = 0.0f;
+
+    m_flEndArcAttack = 0.0f;
+    m_flArcTime = 0.1f;
+    m_flLastArcFraction = 0.0f;
 }
 
 void CZMBaseMeleeWeapon::ItemBusyFrame()
@@ -102,6 +106,9 @@ void CZMBaseMeleeWeapon::ItemPostFrame()
         StartHit( nullptr, GetActivity() );
         m_flAttackHitTime = 0.0f;
     }
+
+
+    ArcAttack();
 }
 
 bool CZMBaseMeleeWeapon::Deploy()
@@ -172,6 +179,10 @@ void CZMBaseMeleeWeapon::StartHit( trace_t* traceRes, Activity iActivityDamage, 
 
 void CZMBaseMeleeWeapon::TraceMeleeAttack( trace_t& traceHit )
 {
+    m_flEndArcAttack = gpGlobals->curtime + m_flArcTime;
+    m_flLastArcFraction = 0.0f;
+
+
     traceHit.fraction = 0.0f;
     traceHit.m_pEnt = nullptr;
 
@@ -491,4 +502,95 @@ bool CZMBaseMeleeWeapon::OnFireEvent( C_BaseViewModel* pViewModel, const Vector&
     return false;
 }
 #endif
+
+
+ConVar zm_sv_debug_melee_arc( "zm_sv_debug_melee_arc", "0" );
+
+void CZMBaseMeleeWeapon::ArcAttack()
+{
+    if ( m_flEndArcAttack == 0.0f )
+        return;
+
+
+    auto* pPlayer = GetPlayerOwner();
+
+
+    m_flArcAttackDegrees = 90.0f;
+
+
+    float dif = m_flEndArcAttack - gpGlobals->curtime;
+    dif = m_flArcTime - MAX( dif, 0.0f );
+
+
+    const float epsilon = 0.001f;
+
+    float fraction = 0.0f;
+    if ( dif > epsilon )
+        fraction = dif / m_flArcTime;
+
+    ArcTrace( pPlayer->EyePosition(), pPlayer->EyeAngles(), 48.0f, m_flArcAttackDegrees, fraction );
+
+
+    m_flLastArcFraction = fraction;
+
+
+    if ( m_flEndArcAttack <= gpGlobals->curtime )
+    {
+        m_flEndArcAttack = 0.0f;
+    }
+}
+
+void CZMBaseMeleeWeapon::ArcTrace( const Vector& vecPos, const QAngle& ang, float dist, float inDegrees, float fraction, float offset )
+{
+    Vector fwd, right, up;
+    Vector startPos, endPos;
+    CTraceFilterSimple filter( GetOwner(), COLLISION_GROUP_NONE );
+    trace_t tr;
+
+
+    const bool bDebugging = zm_sv_debug_melee_arc.GetBool();
+    const Vector hull( 1, 1, 1 );
+
+
+
+    AngleVectors( ang, &fwd, &right, &up );
+
+    float curstep = -90.0f + ang.y - inDegrees * 0.5f - offset + inDegrees * fraction;
+    curstep = AngleNormalize( curstep );
+
+
+    
+
+    float rad = DEG2RAD( curstep );
+
+    Vector dir( cosf( rad ), sinf( rad ), 0.0f );
+
+    dir = CrossProduct( up, dir );
+
+
+    startPos = vecPos + dir * 14.0f;
+    endPos = vecPos + dir * dist;
+
+
+    UTIL_TraceHull( startPos, endPos, -hull, hull, CONTENTS_MONSTER, &filter, &tr );
+
+
+    if ( bDebugging )
+    {
+#ifdef GAME_DLL
+        bool bHit = tr.fraction != 1.0f;
+
+        NDebugOverlay::SweptBox(
+            startPos,
+            endPos,
+            -hull, hull,
+            vec3_angle,
+            bHit ? 255 : 0,
+            (!bHit) ? 255 : 0,
+            0,
+            255,
+            fabsf( zm_sv_debug_melee_arc.GetFloat() ) );
+#endif
+    }
+}
 
