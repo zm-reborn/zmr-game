@@ -915,9 +915,12 @@ void CZMViewBase::SelectZombiesOfType( ZombieClass_t zclass, bool bSticky )
     int myindex = GetLocalPlayerIndex();
 
 
-    g_ZombieManager.ForEachAliveZombie( [ &vZombies, &tr, &filter, &screen, &myindex ]( C_ZMBaseZombie* pZombie )
+    g_ZombieManager.ForEachAliveZombie( [ zclass, &vZombies, &tr, &filter, &screen, &myindex ]( C_ZMBaseZombie* pZombie )
     {
         if ( pZombie->GetSelectorIndex() == myindex )
+            return;
+
+        if ( pZombie->GetZombieClass() != zclass )
             return;
 
 
