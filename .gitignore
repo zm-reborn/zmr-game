@@ -110,3 +110,4 @@ mp/src/materialsystem/stdshaders/filelist.txt
 mp/src/materialsystem/stdshaders/inclist.txt
 *.VC.*
 *.FileListAbsolute.txt
+.vs
