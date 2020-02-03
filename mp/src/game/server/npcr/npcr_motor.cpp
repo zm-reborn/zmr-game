@@ -398,34 +398,7 @@ Vector NPCR::CBaseMotor::HandleCollisions( const Vector& vecGoal )
                 NDebugOverlay::Box( startPos, mins, maxs, 255, 0, 0, 0, 1.0f );
             }
 
-            // HACK: We are constantly getting stuck on physics objects.
-            CBaseEntity* pEnt = tr.m_pEnt;
-            if ( pEnt && pEnt->VPhysicsGetObject() )
-            {
-                IPhysicsObject* pPhys = pEnt->VPhysicsGetObject();
-
-                Vector vel;
-                pPhys->GetVelocity( &vel, nullptr );
-                if ( pPhys->IsMotionEnabled() && vel.LengthSqr() < (10.0f*10.0f) )
-                {
-                    Vector dir = pEnt->WorldSpaceCenter() - startPos;
-                    dir.NormalizeInPlace();
-                    dir *= 100.0f;
-
-                    pPhys->AddVelocity( &dir, nullptr );
-
-                    if ( npcr_debug_navigator.GetBool() )
-                    {
-                        NDebugOverlay::HorzArrow( startPos, pEnt->WorldSpaceCenter(), 12.0f, 255, 0, 0, 255, true, 1.0f );
-                    }
-                }
-            }
-
-            if ( m_bHasValidPos )
-            {
-                Assert( validPos != m_vecLastValidPos );
-                validPos = m_vecLastValidPos;
-            }
+            FixStuck( tr, validPos );
 
             m_bAdjustVel = false;
             break;
@@ -468,6 +441,74 @@ Vector NPCR::CBaseMotor::HandleCollisions( const Vector& vecGoal )
     }
     
     return validPos;
+}
+
+bool NPCR::CBaseMotor::FixStuck( const trace_t& tr, Vector& vecValidPos ) const
+{
+    // HACK: We are constantly getting stuck on physics objects.
+    CBaseEntity* pEnt = tr.m_pEnt;
+    if ( pEnt )
+    {
+        // We're stuck in world, this probably means we were spawned here.
+        // Push us up.
+        if ( pEnt->IsWorld() && tr.startsolid )
+        {
+            float halfhull = GetHullWidth() / 2.0f;
+
+            Vector mins( -halfhull, -halfhull, 0.0f );
+            Vector maxs( halfhull, halfhull, 1.0f );
+
+            // Should never happen.
+            Assert( mins.z < maxs.z );
+
+            trace_t hulltr;
+            UTIL_TraceHull(
+                GetNPC()->GetPosition() + Vector( 0.0f, 0.0f, GetHullHeight() - 1.0f ),
+                GetNPC()->GetPosition(),
+                mins,
+                maxs,
+                MASK_NPCSOLID,
+                GetOuter(),
+                COLLISION_GROUP_NONE,
+                &hulltr );
+            
+            if ( !hulltr.startsolid )
+            {
+                vecValidPos = hulltr.endpos;
+                return true;
+            }
+        }
+        // A physics object! Push them a bit.
+        else if ( pEnt->VPhysicsGetObject() )
+        {
+            IPhysicsObject* pPhys = pEnt->VPhysicsGetObject();
+
+            Vector vel;
+            pPhys->GetVelocity( &vel, nullptr );
+            if ( pPhys->IsMotionEnabled() && vel.LengthSqr() < (10.0f*10.0f) )
+            {
+                Vector dir = pEnt->WorldSpaceCenter() - vecValidPos;
+                dir.NormalizeInPlace();
+                dir *= 100.0f;
+
+                pPhys->AddVelocity( &dir, nullptr );
+
+                if ( npcr_debug_navigator.GetBool() )
+                {
+                    NDebugOverlay::HorzArrow( vecValidPos, pEnt->WorldSpaceCenter(), 12.0f, 255, 0, 0, 255, true, 1.0f );
+                }
+            }
+        }
+    }
+
+    if ( m_bHasValidPos )
+    {
+        Assert( vecValidPos != m_vecLastValidPos );
+        vecValidPos = m_vecLastValidPos;
+        return true;
+    }
+
+    return false;
 }
 
 void NPCR::CBaseMotor::Approach( const Vector& vecDesiredGoal )
