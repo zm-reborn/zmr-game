@@ -70,6 +70,7 @@ namespace NPCR
         CBaseEntity*    UpdateGround();
         Vector          HandleCollisions( const Vector& vecGoal );
         void            MoveTowards( const Vector& vecNewPos );
+        bool            FixStuck( const trace_t& tr, Vector& vecValidPos ) const;
 
 
         Vector m_vecMoveDir;
