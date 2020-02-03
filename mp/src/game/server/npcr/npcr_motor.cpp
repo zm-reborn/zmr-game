@@ -53,6 +53,7 @@ NPCR::CBaseMotor::CBaseMotor( CBaseNPC* pNPC ) : NPCR::CEventListener( pNPC, pNP
     m_vecDesiredMoveDir = vec3_origin;
     m_vecGroundNormal = Vector( 0, 0, 1 );
     m_vecLastValidPos = vec3_origin;
+    m_bHasValidPos = false;
     m_bForceGravity = false;
     m_flGroundZOffset = 0.0f;
 
@@ -420,8 +421,12 @@ Vector NPCR::CBaseMotor::HandleCollisions( const Vector& vecGoal )
                 }
             }
 
-            Assert( validPos != m_vecLastValidPos );
-            validPos = m_vecLastValidPos;
+            if ( m_bHasValidPos )
+            {
+                Assert( validPos != m_vecLastValidPos );
+                validPos = m_vecLastValidPos;
+            }
+
             m_bAdjustVel = false;
             break;
         }
@@ -459,6 +464,7 @@ Vector NPCR::CBaseMotor::HandleCollisions( const Vector& vecGoal )
     if ( !tr.startsolid )
     {
         m_vecLastValidPos = validPos;
+        m_bHasValidPos = true;
     }
     
     return validPos;

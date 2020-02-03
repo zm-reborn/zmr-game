@@ -84,6 +84,7 @@ namespace NPCR
         bool m_bAdjustVel;
         bool m_bDoMove;
         Vector m_vecLastValidPos;
+        bool m_bHasValidPos;
 
         bool m_bOnGround;
         CHandle<CBaseEntity> m_hGroundEnt;
