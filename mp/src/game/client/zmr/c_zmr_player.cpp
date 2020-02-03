@@ -228,17 +228,6 @@ void C_ZMPlayer::PreThink()
     //}
 }
 
-void C_ZMPlayer::PostThink()
-{
-    if ( IsLocalPlayer() )
-    {
-        // Perform soft collisions here, so we can get at least some prediction going on.
-        GetZMSoftCollisions()->Update( 0.0f );
-    }
-
-    BaseClass::PostThink();
-}
-
 void C_ZMPlayer::UpdateClientSideAnimation()
 {
     m_pPlayerAnimState->Update( EyeAngles()[YAW], EyeAngles()[PITCH] );
@@ -1126,6 +1115,10 @@ bool C_ZMPlayer::CreateMove( float delta, CUserCmd* cmd )
         {
             cmd->buttons |= IN_ZM_OBSERVERMODE;
         }
+    }
+    else if ( IsHuman() && IsAlive() )
+    {
+        GetZMSoftCollisions()->PerformPlayerSoftCollisions( cmd );
     }
 
     return bResult;

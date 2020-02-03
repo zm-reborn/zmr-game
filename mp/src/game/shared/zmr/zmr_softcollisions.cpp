@@ -25,7 +25,7 @@ ConVar zm_sv_softcollisions_zombie_debug( "zm_sv_softcollisions_zombie_debug", "
 extern ConVar zm_sv_playercollision;
 
 ConVar zm_sv_softcollisions_player_size( "zm_sv_softcollisions_player_size", "32", FCVAR_NOTIFY | FCVAR_ARCHIVE | FCVAR_REPLICATED );
-ConVar zm_sv_softcollisions_player_force( "zm_sv_softcollisions_player_force", "950", FCVAR_NOTIFY | FCVAR_ARCHIVE | FCVAR_REPLICATED );
+ConVar zm_sv_softcollisions_player_force( "zm_sv_softcollisions_player_force", "60", FCVAR_NOTIFY | FCVAR_ARCHIVE | FCVAR_REPLICATED );
 ConVar zm_sv_softcollisions_player_air_multiplier( "zm_sv_softcollisions_player_air_multiplier", "0.1", FCVAR_NOTIFY | FCVAR_ARCHIVE | FCVAR_REPLICATED );
 ConVar zm_sv_softcollisions_player_debug( "zm_sv_softcollisions_player_debug", "0", FCVAR_REPLICATED );
 
@@ -101,10 +101,138 @@ CZMBaseSoftCol::SoftColRes_t CZMZombieSoftCol::PerformCollision()
 
     return CZMBaseSoftCol::COLRES_NONE;
 }
+
+//
+void CZMSoftCollisions::FrameUpdatePostEntityThink()
+{
+    if ( zm_sv_zombiesoftcollisions.GetBool() )
+    {
+        PerformZombieSoftCollisions();
+    }
+    else
+    {
+        ClearZombieCollisions();
+    }
+}
+
+void CZMSoftCollisions::PerformZombieSoftCollisions()
+{
+    VPROF_BUDGET( "CZMSoftCollisions::PerformZombieSoftCollisions", "NPCR" );
+
+
+
+    int counter = 0;
+
+    FOR_EACH_VEC( m_vZombieCollisions, i )
+    {
+        CZMBaseSoftCol::SoftColRes_t ret = m_vZombieCollisions[i].PerformCollision();
+
+        switch ( ret )
+        {
+        case CZMBaseSoftCol::COLRES_APPLIED :
+            ++counter;
+        case CZMBaseSoftCol::COLRES_INVALID :
+            m_vZombieCollisions.Remove( i );
+            --i;
+        }
+    }
+
+
+    if ( zm_sv_softcollisions_zombie_debug.GetBool() && counter > 0 )
+    {
+        DevMsg( "Performed soft collisions %i times!\n", counter );
+    }
+}
+
+void CZMSoftCollisions::OnZombieCollide( CBaseEntity* pOrigin, CBaseEntity* pOther )
+{
+    // Do we already have this collision?
+    FOR_EACH_VEC( m_vZombieCollisions, i )
+    {
+        if ( m_vZombieCollisions[i].Equals( pOrigin, pOther ) )
+            return;
+    }
+
+
+    CZMZombieSoftCol col( pOrigin, pOther );
+
+    m_vZombieCollisions.AddToTail( col );
+}
+
+void CZMSoftCollisions::ClearZombieCollisions()
+{
+    m_vZombieCollisions.RemoveAll();
+}
+#endif
+
+#ifdef CLIENT_DLL
+void CZMSoftCollisions::OnPlayerCollide( CBaseEntity* pOrigin, CBaseEntity* pOther )
+{
+    // Do we already have this collision?
+    FOR_EACH_VEC( m_vPlayerCollisions, i )
+    {
+        if ( m_vPlayerCollisions[i].Equals( pOrigin, pOther ) )
+            return;
+    }
+
+
+    CZMPlayerSoftCol col( pOrigin, pOther );
+
+    m_vPlayerCollisions.AddToTail( col );
+}
+
+void CZMSoftCollisions::PerformPlayerSoftCollisions( CUserCmd* pCmd )
+{
+    if ( zm_sv_playercollision.GetInt() != 1 )
+    {
+        ClearPlayerCollisions();
+        return;
+    }
+
+    VPROF_BUDGET( "CZMSoftCollisions::PerformPlayerSoftCollisions", VPROF_BUDGETGROUP_CLIENT_SIM );
+
+
+
+    int counter = 0;
+
+
+    FOR_EACH_VEC( m_vPlayerCollisions, i )
+    {
+        CZMBaseSoftCol::SoftColRes_t ret = m_vPlayerCollisions[i].PerformCollision( pCmd );
+
+        switch ( ret )
+        {
+        case CZMBaseSoftCol::COLRES_APPLIED :
+            ++counter;
+            break;
+        case CZMBaseSoftCol::COLRES_INVALID :
+        default :
+            m_vPlayerCollisions.Remove( i );
+            --i;
+        }
+    }
+
+
+    if ( zm_sv_softcollisions_player_debug.GetBool() && counter > 0 )
+    {
+        const bool bIsServer =
+#ifdef CLIENT_DLL
+            false;
+#else
+            true;
+#endif
+        DevMsg( "Performed soft collisions %i times! (%s)\n", counter, bIsServer ? "server" : "client" );
+    }
+}
+
+void CZMSoftCollisions::ClearPlayerCollisions()
+{
+    m_vPlayerCollisions.RemoveAll();
+}
 #endif
 
 // Perform player collisions
-CZMBaseSoftCol::SoftColRes_t CZMPlayerSoftCol::PerformCollision()
+CZMBaseSoftCol::SoftColRes_t CZMPlayerSoftCol::PerformCollision( CUserCmd* pCmd )
 {
     const float flMaxDist = zm_sv_softcollisions_player_size.GetFloat();
 
@@ -162,7 +290,7 @@ CZMBaseSoftCol::SoftColRes_t CZMPlayerSoftCol::PerformCollision()
             return CZMBaseSoftCol::COLRES_NONE;
     }
 
-    float force = RemapValClamped( dist, 0.0f, flMaxDist, 1.0f, 5.0f );
+    float force = RemapValClamped( dist, 0.0f, flMaxDist, 0.1f, 5.0f );
     force *= zm_sv_softcollisions_player_force.GetFloat();
         
 
@@ -176,11 +304,18 @@ CZMBaseSoftCol::SoftColRes_t CZMPlayerSoftCol::PerformCollision()
 
     if ( vel.Dot( dir ) < 0.0f || vel.Length2D() < flMinPush )
     {
-        vel += dir * force * gpGlobals->frametime;
-        pOrigin->SetLocalVelocity( vel );
+        vel = dir * force;
+
+        Vector fwd, right;
+        AngleVectors( pCmd->viewangles, &fwd, &right, nullptr );
+
+        pCmd->forwardmove += fwd.Dot( vel );
+        pCmd->sidemove += right.Dot( vel );
+
 
         vecLastDir = dir.AsVector2D();
         m_bOriginMovedLast = bMovingOrigin;
+
 
         return CZMBaseSoftCol::COLRES_APPLIED;
     }
@@ -188,149 +323,6 @@ CZMBaseSoftCol::SoftColRes_t CZMPlayerSoftCol::PerformCollision()
 
     return CZMBaseSoftCol::COLRES_NONE;
 }
-//
-
-
-//
-#ifdef GAME_DLL
-void CZMSoftCollisions::FrameUpdatePostEntityThink()
-#else
-void CZMSoftCollisions::Update( float frametime )
-#endif
-{
-    if ( zm_sv_playercollision.GetInt() == 1 )
-    {
-        PerformPlayerSoftCollisions();
-    }
-    else
-    {
-        ClearPlayerCollisions();
-    }
-
-
-#ifdef GAME_DLL
-    if ( zm_sv_zombiesoftcollisions.GetBool() )
-    {
-        PerformZombieSoftCollisions();
-    }
-    else
-    {
-        ClearZombieCollisions();
-    }
-#endif
-}
-
-#ifdef GAME_DLL
-void CZMSoftCollisions::PerformZombieSoftCollisions()
-{
-    VPROF_BUDGET( "CZMSoftCollisions::PerformZombieSoftCollisions", "NPCR" );
-
-
-
-    int counter = 0;
-
-    FOR_EACH_VEC( m_vZombieCollisions, i )
-    {
-        CZMBaseSoftCol::SoftColRes_t ret = m_vZombieCollisions[i].PerformCollision();
-
-        switch ( ret )
-        {
-        case CZMBaseSoftCol::COLRES_APPLIED :
-            ++counter;
-        case CZMBaseSoftCol::COLRES_INVALID :
-            m_vZombieCollisions.Remove( i );
-            --i;
-        }
-    }
-
-
-    if ( zm_sv_softcollisions_zombie_debug.GetBool() && counter > 0 )
-    {
-        DevMsg( "Performed soft collisions %i times!\n", counter );
-    }
-}
-#endif
-
-void CZMSoftCollisions::PerformPlayerSoftCollisions()
-{
-    VPROF_BUDGET( "CZMSoftCollisions::PerformPlayerSoftCollisions", VPROF_BUDGETGROUP_CLIENT_SIM );
-
-
-
-    int counter = 0;
-
-
-    FOR_EACH_VEC( m_vPlayerCollisions, i )
-    {
-        CZMBaseSoftCol::SoftColRes_t ret = m_vPlayerCollisions[i].PerformCollision();
-
-        switch ( ret )
-        {
-        case CZMBaseSoftCol::COLRES_APPLIED :
-            ++counter;
-        case CZMBaseSoftCol::COLRES_INVALID :
-            m_vPlayerCollisions.Remove( i );
-            --i;
-        }
-    }
-
-
-    if ( zm_sv_softcollisions_player_debug.GetBool() && counter > 0 )
-    {
-        const bool bIsServer =
-#ifdef CLIENT_DLL
-            false;
-#else
-            true;
-#endif
-        DevMsg( "Performed soft collisions %i times! (%s)\n", counter, bIsServer ? "server" : "client" );
-    }
-}
-
-#ifdef GAME_DLL
-void CZMSoftCollisions::OnZombieCollide( CBaseEntity* pOrigin, CBaseEntity* pOther )
-{
-    // Do we already have this collision?
-    FOR_EACH_VEC( m_vZombieCollisions, i )
-    {
-        if ( m_vZombieCollisions[i].Equals( pOrigin, pOther ) )
-            return;
-    }
-
-
-    CZMZombieSoftCol col( pOrigin, pOther );
-
-    m_vZombieCollisions.AddToTail( col );
-}
-#endif
-
-void CZMSoftCollisions::OnPlayerCollide( CBaseEntity* pOrigin, CBaseEntity* pOther )
-{
-    // Do we already have this collision?
-    FOR_EACH_VEC( m_vPlayerCollisions, i )
-    {
-        if ( m_vPlayerCollisions[i].Equals( pOrigin, pOther ) )
-            return;
-    }
-
-
-    CZMPlayerSoftCol col( pOrigin, pOther );
-
-    m_vPlayerCollisions.AddToTail( col );
-}
-
-
-void CZMSoftCollisions::ClearPlayerCollisions()
-{
-    m_vPlayerCollisions.RemoveAll();
-}
-
-#ifdef GAME_DLL
-void CZMSoftCollisions::ClearZombieCollisions()
-{
-    m_vZombieCollisions.RemoveAll();
-}
-#endif
 //
 
 

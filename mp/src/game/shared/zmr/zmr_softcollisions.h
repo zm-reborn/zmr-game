@@ -53,7 +53,7 @@ class CZMPlayerSoftCol : public CZMBaseSoftCol
 public:
     CZMPlayerSoftCol( CBaseEntity* pOrigin, CBaseEntity* pOther ) : CZMBaseSoftCol( pOrigin, pOther ) { m_bOriginMovedLast = false; }
 
-    SoftColRes_t PerformCollision();
+    SoftColRes_t PerformCollision( CUserCmd* pCmd );
 
 protected:
     bool m_bOriginMovedLast;
@@ -73,27 +73,24 @@ class CZMSoftCollisions :
 public:
 #ifdef GAME_DLL
     virtual void FrameUpdatePostEntityThink() OVERRIDE;
-#else
-    virtual void Update( float frametime ) OVERRIDE;
 #endif
 
-    void OnPlayerCollide( CBaseEntity* pOrigin, CBaseEntity* pOther );
+    
 #ifdef GAME_DLL
     void OnZombieCollide( CBaseEntity* pOrigin, CBaseEntity* pOther );
+#else
+    void OnPlayerCollide( CBaseEntity* pOrigin, CBaseEntity* pOther );
+    void PerformPlayerSoftCollisions( CUserCmd* pCmd );
 #endif
 
 protected:
-    void PerformPlayerSoftCollisions();
-    void ClearPlayerCollisions();
-    
 #ifdef GAME_DLL
     void PerformZombieSoftCollisions();
     void ClearZombieCollisions();
-#endif
-
-    CUtlVector<CZMPlayerSoftCol> m_vPlayerCollisions;
-#ifdef GAME_DLL
     CUtlVector<CZMZombieSoftCol> m_vZombieCollisions;
+#else
+    void ClearPlayerCollisions();
+    CUtlVector<CZMPlayerSoftCol> m_vPlayerCollisions;
 #endif
 };
 //

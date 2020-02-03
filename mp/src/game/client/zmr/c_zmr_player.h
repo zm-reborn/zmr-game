@@ -36,7 +36,6 @@ public:
     virtual void Spawn() OVERRIDE;
     virtual void ClientThink() OVERRIDE;
     virtual void PreThink() OVERRIDE;
-    virtual void PostThink() OVERRIDE;
     virtual bool CreateMove( float delta, CUserCmd* cmd ) OVERRIDE;
 
     void            OnSpawn();
