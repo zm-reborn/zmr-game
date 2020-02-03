@@ -159,6 +159,12 @@ void NPCR::CNonPlayerMotor::Move()
     {
         m_vecVelocity += vecBaseVel;
         m_vecLastBaseVelocity = vecBaseVel;
+
+        // If we're getting pushed up enough to float, stop doing step down tracing.
+        if ( vecBaseVel.z >= GetGravity() )
+        {
+            m_bDoStepDownTrace = false;
+        }
     }
     else
     {
