@@ -72,8 +72,10 @@ public:
 #endif
                 )
             {
+#ifdef CLIENT_DLL
                 // Pass our hit player to soft collisions.
                 GetZMSoftCollisions()->OnPlayerCollide( m_pMe, pEnt );
+#endif
             }
             // If we have collisions on and they're inside one another, ignore collision.
             else if ( zm_sv_playercollision.GetInt() >= 2 )
