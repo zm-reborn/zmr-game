@@ -77,11 +77,11 @@ namespace NPCR
         Vector m_vecDesiredMoveDir;
         bool m_bForceGravity;
         float m_flGroundZOffset;
+        bool m_bDoStepDownTrace;
         
     private:
         Vector m_vecGroundNormal;
         CountdownTimer m_MoveTimer;
-        bool m_bDoStepDownTrace;
         bool m_bAdjustVel;
         bool m_bDoMove;
         Vector m_vecLastValidPos;
