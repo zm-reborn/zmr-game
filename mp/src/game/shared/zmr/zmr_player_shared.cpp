@@ -472,8 +472,9 @@ void CZMPlayer::FireBullets( const FireBulletsInfo_t& info )
 
 
     // Make sure we don't have a dangling damage target from a recursive call
-    if ( g_MultiDamage.GetTarget() != NULL )
+    if ( g_MultiDamage.GetTarget() )
     {
+        Warning( "Clearing dangling damage target %i!\n", g_MultiDamage.GetTarget()->entindex() );
         ApplyMultiDamage();
     }
       
