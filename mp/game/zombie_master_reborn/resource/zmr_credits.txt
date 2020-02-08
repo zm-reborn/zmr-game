@@ -3,23 +3,25 @@ Zombie Master: Reborn  Credits:
 
 brendaym			- Viewmodel animations
 BurntCornFlakes	- MAC-10 model and textures, various model edits
-Mehis			- Code, various maps/textures/models
+Mehis			- Lead dev, code, various maps/textures/models
 Reborn			- Various sounds
 Rhett Dahl			- Music
 Sage J. Fox		- Various models and model edits
 That 1 Guy		- Various weapon sounds
-The Renegadist		- Various models/textures/sounds
+The Renegadist		- Lead dev, various models/textures/sounds
 Yeckoh			- Various viewmodels/worldmodels and model edits
 ____________
 Contributors:
 
 Asg_alligator		- Model edits
 Biohazard			- Flashlight shader fix code
+Blixibon			- Code
 Forrest Mark X		- Viewmodel c-arm edits
 Game Zombie		- Model edits
 Joshua Ashton		- VS2019 support edits
 Keyb0ard			- Footstep sounds
 KnechtRuprecht		- Winchester M1912 model and textures
+Kud				- Simplified chinese translation
 Marphy Black		- Zombie textures, model edits
 MaxOfS2D			- Viewmodel arms (c-arms, model and textures)
 Noodum			- P220 model textures
@@ -35,9 +37,10 @@ Yogensia			- Shotgun shell model
 __________
 Thanks to:
 
-Tannerbondy		- Ideas & inspiration
-ZMR Discord		- Keeping the game alive
-YOU				- For playing ;)
+Tannerbondy			- Ideas & inspiration
+Muob's Clubhouse peeps	- Motivating me to start the mod
+ZMR Discord			- Keeping the game alive
+YOU					- For playing ;)
 __________
 Licenses:
 
@@ -69,4 +72,4 @@ Suicide42		- Concept art, writing
 Tannerbondy	- Weapon selection icons
 
 
-If you feel left out or you're not happy that we're using your work, please contact one of the developers.
+If you feel left out or you're not happy that we're using your work, please contact one of the lead developers.
