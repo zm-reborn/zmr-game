@@ -5,6 +5,7 @@
 #include "rumble_shared.h"
 #include "shot_manipulator.h"
 #include "takedamageinfo.h"
+#include "debugoverlay_shared.h"
 
 #ifdef CLIENT_DLL
 #include "prediction.h"
@@ -135,6 +136,9 @@ struct ZMFireBulletsInfo_t
         bDoTracers = false;
         flCumulativeDamage = 0.0f;
         this->vecDir = vecDir;
+
+        nTraceHullFreq = 0;
+        bDoTraceHull = false;
     }
 
     void ClearPerBulletData()
@@ -143,6 +147,7 @@ struct ZMFireBulletsInfo_t
         pFilter->ClearPenetrations();
 
         bDoTracers = false;
+        bDoTraceHull = false;
     }
 
 
@@ -158,6 +163,9 @@ struct ZMFireBulletsInfo_t
     CShotManipulator Manipulator;
     CZMPlayerAttackTraceFilter* pFilter;
     Vector vecDir;
+
+    int nTraceHullFreq;
+    bool bDoTraceHull;
 };
 //
 
@@ -511,6 +519,11 @@ void CZMPlayer::FireBullets( const FireBulletsInfo_t& info )
     int iEffectSeed = iSeed;
 #endif
 
+    // If we have more than a few shots, do hull traces.
+    // You know, it's a shotgun, that shoots pellets, right.
+    // Don't allow hull tracing when using penetrations.
+    bulletinfo.nTraceHullFreq = (bulletinfo.pWeapon->GetMaxPenetrations() == 0 && info.m_iShots > 1) ? 2 : 0;
+
 
     for ( int iShot = 0; iShot < info.m_iShots; iShot++ )
     {
@@ -532,6 +545,11 @@ void CZMPlayer::FireBullets( const FireBulletsInfo_t& info )
         if ( info.m_iTracerFreq && ( tracerCount++ % info.m_iTracerFreq ) == 0 /*&& !bHitGlass*/ )
         {
             bulletinfo.bDoTracers = true;
+        }
+
+        if ( bulletinfo.nTraceHullFreq && (iShot % bulletinfo.nTraceHullFreq) == 0 )
+        {
+            bulletinfo.bDoTraceHull = true;
         }
 
         // Do the actual shooting
@@ -581,6 +599,7 @@ void CZMPlayer::SimulateBullet( ZMFireBulletsInfo_t& bulletinfo )
     Vector          vecFirstStart = vec3_origin;
     Vector          vecFirstEnd = vecSrc + vecDir * flDistanceLeft;
     int             nPenetrations = 0;
+    const Vector    vecShotHull = Vector( 3, 3, 3 );
 
 
     CAmmoDef*       pAmmoDef = GetAmmoDef();
@@ -620,8 +639,20 @@ void CZMPlayer::SimulateBullet( ZMFireBulletsInfo_t& bulletinfo )
         //
         // Do the trace
         //
-        UTIL_TraceLine( vecSrc, vecEnd, MASK_SHOT, pFilter, &tr );
-
+        if ( bulletinfo.bDoTraceHull )
+        {
+            UTIL_TraceHull( vecSrc,
+                            vecEnd,
+                            -vecShotHull,
+                            vecShotHull,
+                            MASK_SHOT,
+                            pFilter,
+                            &tr );
+        }
+        else
+        {
+            UTIL_TraceLine( vecSrc, vecEnd, MASK_SHOT, pFilter, &tr );
+        }
 
         if ( !tr.startsolid )
         {
@@ -785,12 +816,29 @@ void CZMPlayer::SimulateBullet( ZMFireBulletsInfo_t& bulletinfo )
         if ( zm_sv_debugbullets.GetBool() )
         {
 #ifdef CLIENT_DLL
-            const int dbgclr[3] = { 255, 0, 0 };
+            const int dbgclr[4] = { 255, 0, 0, 255 };
 #else
-            const int dbgclr[3] = { 0, 0, 255 };
+            const int dbgclr[4] = { 0, 0, 255, 255 };
 #endif // CLIENT_DLL
+            float t = abs( zm_sv_debugbullets_time.GetFloat() );
 
-            DebugDrawLine( tr.startpos, tr.endpos, dbgclr[0], dbgclr[1], dbgclr[2], false, abs( zm_sv_debugbullets_time.GetFloat() ) );
+            if ( bulletinfo.bDoTraceHull )
+            {
+                NDebugOverlay::SweptBox(
+                    tr.startpos, tr.endpos,
+                    -vecShotHull, vecShotHull,
+                    vec3_angle,
+                    dbgclr[0], dbgclr[1], dbgclr[2], dbgclr[3],
+                    t );
+            }
+            else
+            {
+                DebugDrawLine(
+                    tr.startpos, tr.endpos,
+                    dbgclr[0], dbgclr[1], dbgclr[2],
+                    false, t );
+            }
+            
         }
 #endif // ZMR - DEBUG
     }
