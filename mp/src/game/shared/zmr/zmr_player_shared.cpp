@@ -141,6 +141,8 @@ struct ZMFireBulletsInfo_t
     {
         pFilter->ClearIgnoreList();
         pFilter->ClearPenetrations();
+
+        bDoTracers = false;
     }
 
 
