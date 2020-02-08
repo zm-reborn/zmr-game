@@ -224,6 +224,39 @@ void CZMRejoinDataSystem::SaveData( CZMPlayer* pPlayer, CZMRejoinData* pData )
     }
 }
 
+const CZMRejoinData* CZMRejoinDataSystem::FindPlayerData( CZMPlayer* pPlayer, const char* pszDataName ) const
+{
+    int i = FindPlayer( pPlayer );
+    if ( i == -1 )
+        return nullptr;
+
+
+    CZMRejoinData* pOut = nullptr;
+    m_vPlayerData[i]->ForEachData( [ &pOut, pszDataName ]( CZMRejoinData* pData ) {
+        if ( Q_strcmp( pszDataName, pData->GetDataName() ) == 0 )
+        {
+            pOut = pData;
+            return;
+        }
+    } );
+
+    return pOut;
+}
+
+int CZMRejoinDataSystem::FindPlayer( CZMPlayer* pPlayer ) const
+{
+    Assert( pPlayer );
+
+    CSteamID id;
+    if ( !pPlayer->GetSteamID( &id ) )
+    {
+        DevMsg( "Rejoin - Player %i has no Steam Id! Can't find player!\n", pPlayer->entindex() );
+        return -1;
+    }
+
+    return FindPlayer( id );
+}
+
 int CZMRejoinDataSystem::FindPlayer( const CSteamID& id ) const
 {
     for ( int i = 0; i < m_vPlayerData.Count(); i++ )
