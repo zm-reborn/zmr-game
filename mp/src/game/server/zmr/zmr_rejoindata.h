@@ -19,10 +19,10 @@ public:
     virtual int     GetExpirationTime() const { return 0; }
 
 
-
     virtual bool ShouldKeepData( bool bMapChange, time_t leavetime );
 
-    virtual void RestoreData( CZMPlayer* pPlayer ) = 0;
+    virtual bool Validate() const { return true; }
+    virtual void RestoreData( CZMPlayer* pPlayer ) {}
 };
 //
 
@@ -48,7 +48,6 @@ public:
             func( m_vRejoinData[i] );
         }
     }
-
 
 
     bool IsSamePlayer( const CSteamID& id );
@@ -97,6 +96,7 @@ public:
     void AddListener( CZMRejoinListener* pListener );
     bool RemoveListener( CZMRejoinListener* pListener );
     void SaveData( CZMPlayer* pPlayer, CZMRejoinData* pData );
+    const CZMRejoinData* FindPlayerData( CZMPlayer* pPlayer, const char* pszDataName ) const;
 
 
     void PrintRejoinData();
@@ -104,6 +104,7 @@ public:
 protected:
     void CheckDataExpiration( bool bMapChange );
 
+    int FindPlayer( CZMPlayer* pPlayer ) const;
     int FindPlayer( const CSteamID& id ) const;
 
 private:
