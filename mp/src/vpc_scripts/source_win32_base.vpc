@@ -41,7 +41,8 @@ $Configuration
 		// warning C6031: return value ignored
 		// warning C28251: Inconsistent annotation (???)
 		// warning C28252: Inconsistent annotation (???)
-		$DisableSpecificWarnings	"$BASE;4316;4838;4456;4457;4458;4459;26495;6031;28251;28252"
+		// warning C5205: delete of an abstract class 'x' that has a non-virtual destructor results in undefined behavior
+		$DisableSpecificWarnings	"$BASE;4316;4838;4456;4457;4458;4459;26495;6031;28251;28252;5205"
 
 		// Having lots of warnings makes it harder to notice new, and possibly
 		// important warnings, both on buildbot and in the output window. Lots
