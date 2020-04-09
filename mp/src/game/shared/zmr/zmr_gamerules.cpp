@@ -83,9 +83,11 @@ BEGIN_NETWORK_TABLE_NOBASE( CZMRules, DT_ZM_Rules )
     #ifdef CLIENT_DLL
         RecvPropInt( RECVINFO( m_nZombiePop ) ),
         RecvPropInt( RECVINFO( m_nRounds ), SPROP_UNSIGNED ),
+        RecvPropInt( RECVINFO( m_nRealRounds ), SPROP_UNSIGNED ),
     #else
         SendPropInt( SENDINFO( m_nZombiePop ) ),
         SendPropInt( SENDINFO( m_nRounds ), -1, SPROP_UNSIGNED ),
+        SendPropInt( SENDINFO( m_nRealRounds ), -1, SPROP_UNSIGNED ),
     #endif
 
 END_NETWORK_TABLE()
@@ -142,6 +144,7 @@ CZMRules::CZMRules()
     m_flRoundStartTime = 0.0f;
     m_bInRoundEnd = false;
     m_nRounds = 0;
+    m_nRealRounds = 0;
     m_nRoundMaxHumansAlive = 0;
 
 
@@ -886,6 +889,7 @@ void CZMRules::EndRound( ZMRoundEndReason_t reason )
     CZMEntObjectivesManager::ResetObjectives();
 
 
+    ++m_nRealRounds;
     if ( (gpGlobals->curtime - m_flRoundStartTime) > zm_sv_roundmintime.GetFloat() && reason != ZMROUND_GAMEBEGIN )
     {
         ++m_nRounds;
@@ -1361,7 +1365,17 @@ bool CZMRules::ShouldLateSpawn( CZMPlayer* pPlayer )
             return false;
     }
 
-    return gpGlobals->curtime < (ZMRules()->GetRoundStartTime() + zm_sv_joingrace.GetFloat());
+    // Outside late spawning grace period?
+    if ( gpGlobals->curtime < (ZMRules()->GetRoundStartTime() + zm_sv_joingrace.GetFloat()) )
+    {
+        return false;
+    }
+
+    
+    // Check if we were spawned this round already.
+    auto* pData = GetZMRejoinSystem()->FindPlayerData( pPlayer, "Late spawn" );
+
+    return pData ? pData->Validate() : true;
 }
 #endif
 
