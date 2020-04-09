@@ -23,7 +23,7 @@ abstract_class CZMBaseCrosshair : public CZMCrosshairPartMat
 {
 public:
     CZMBaseCrosshair();
-    ~CZMBaseCrosshair();
+    virtual ~CZMBaseCrosshair();
 
     virtual void LoadValues( KeyValues* kv );
     virtual void WriteValues( KeyValues* kv ) const;
