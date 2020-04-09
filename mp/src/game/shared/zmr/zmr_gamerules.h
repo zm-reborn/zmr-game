@@ -182,8 +182,8 @@ public:
     CZMEntFogController* GetZMFogController() const { return m_pZMFog; }
 #endif
 
-    inline int GetZombiePop() { return m_nZombiePop; };
-    inline int GetRoundsPlayed() { return m_nRounds; };
+    inline int GetZombiePop() const { return m_nZombiePop.Get(); }
+    inline int GetRoundsPlayed( bool bReal = false ) const { return bReal ? m_nRealRounds.Get() : m_nRounds.Get(); }
 
     static int GetServerParticipationFlags();
 
@@ -194,7 +194,8 @@ public:
 
 private:
     CNetworkVar( int, m_nZombiePop );
-    CNetworkVar( int, m_nRounds );
+    CNetworkVar( int, m_nRounds ); // Number of "valid" rounds played. If the round is short, it will be skipped.
+    CNetworkVar( int, m_nRealRounds ); // The real number of rounds played. Each round start is counted.
 
     
 
