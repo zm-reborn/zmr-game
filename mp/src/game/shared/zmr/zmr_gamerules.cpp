@@ -878,6 +878,18 @@ void CZMRules::EndRound( ZMRoundEndReason_t reason )
     if ( IsInRoundEnd() ) return;
 
 
+    IGameEvent* pEvent = nullptr;
+
+    // Fire round end event for plugins
+    pEvent = gameeventmanager->CreateEvent( "round_end", true );
+    if ( pEvent )
+    {
+        pEvent->SetInt( "reason", reason );
+
+        gameeventmanager->FireEvent( pEvent, true );
+    }
+
+
     RewardPoints( reason );
 
 
@@ -903,7 +915,7 @@ void CZMRules::EndRound( ZMRoundEndReason_t reason )
 
 
     // Will be used by clients in the future.
-    IGameEvent* pEvent = gameeventmanager->CreateEvent( "round_end_post", true );
+    pEvent = gameeventmanager->CreateEvent( "round_end_post", true );
     if ( pEvent )
     {
         pEvent->SetInt( "reason", reason );

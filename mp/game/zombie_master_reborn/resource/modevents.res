@@ -29,6 +29,13 @@
 {
 	// ZMR
 	
+	// Before round end occurs.
+	"round_end"
+	{
+		// Reason id. See ZMRoundEndReason_t, github.com/zm-reborn/zmr-game/blob/master/mp/src/game/shared/zmr/zmr_shareddefs.h
+		"reason"	"short"
+	}
+	
 	// When round has ended and we are waiting for the round intermission to end to restart the round. See below.
 	"round_end_post"
 	{
