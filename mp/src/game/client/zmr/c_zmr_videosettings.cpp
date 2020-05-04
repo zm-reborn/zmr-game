@@ -10,6 +10,9 @@
 
 #include <tier0/icommandline.h>
 
+//
+// Unused for now.
+//
 
 #ifdef WIN32
 static bool ZMSetBorderlessFullscreen( HWND window )
