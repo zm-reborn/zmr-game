@@ -170,6 +170,10 @@ extern vgui::IInputInternal *g_InputInternal;
 #include "sixense/in_sixense.h"
 #endif
 
+#ifdef ZMR
+#include "zmr/c_zmr_videosettings.h"
+#endif
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -980,6 +984,10 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 
 	if( !g_pMaterialSystemHardwareConfig )
 		return false;
+
+#ifdef ZMR
+	ZMInitBorderless();
+#endif
 
 	// Hook up the gaussian random number generator
 	s_GaussianRandomStream.AttachToStream( random );

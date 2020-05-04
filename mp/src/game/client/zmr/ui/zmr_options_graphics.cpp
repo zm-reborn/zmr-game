@@ -1,7 +1,9 @@
 #include "cbase.h"
 #include "filesystem.h"
+#include <tier0/icommandline.h>
 
 
+#include "zmr/c_zmr_videosettings.h"
 #include "zmr_options_graphics.h"
 
 
@@ -30,6 +32,7 @@ CZMOptionsSubGraphics::CZMOptionsSubGraphics( Panel* parent ) : BaseClass( paren
     LoadItem( &m_pExpFlashlightAmtBox, "ComboFlashlightAmount" );
     LoadItem( &m_pCheck_CC, "CheckCC" );
     LoadItem( &m_pMuzzleflashBox, "ComboMuzzleflash" );
+    LoadItem( &m_pCheck_Borderless, "CheckBorderless" );
 
 
     if ( FailedLoad() ) return;
@@ -88,6 +91,8 @@ void CZMOptionsSubGraphics::OnApplyChanges()
         zm_cl_precipitationquality.SetValue( 3 );
         break;
     }
+
+    ZMSetBorderless( m_pCheck_Borderless->IsSelected() );
 }
 
 void CZMOptionsSubGraphics::OnResetData()
@@ -125,6 +130,8 @@ void CZMOptionsSubGraphics::OnResetData()
     Q_snprintf( buffer, sizeof( buffer ), "%i", g_ragdoll_maxcount.GetInt() );
 
     m_pTextEntry_MaxRagdolls->SetText( buffer );
+
+    m_pCheck_Borderless->SetSelected( ZMIsBorderless() );
 }
 
 void CZMOptionsSubGraphics::OnSliderMoved( Panel* panel )

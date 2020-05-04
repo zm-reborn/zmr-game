@@ -35,4 +35,5 @@ private:
     vgui::ComboBox*     m_pExpFlashlightAmtBox;
     vgui::CheckButton*  m_pCheck_CC;
     vgui::ComboBox*     m_pMuzzleflashBox;
+    vgui::CheckButton*  m_pCheck_Borderless;
 };
