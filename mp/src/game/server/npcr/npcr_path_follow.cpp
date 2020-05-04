@@ -39,24 +39,20 @@ public:
             if ( m_pNPC->IsTargetedEnemy( pEnt ) )
                 return false;
 
-
-            NPCR::QueryResult_t res = m_pNPC->ShouldTouch( pEnt );
-            if ( res == NPCR::RES_YES )
-                return true;
-            if ( res == NPCR::RES_NO )
-                return false;
-            
+            //
+            // Always check other characters before ShouldTouch()
+            //
             if ( pEnt->MyCombatCharacterPointer() )
             {
                 Vector vel = pEnt->GetLocalVelocity();
                 float spd = vel.NormalizeInPlace();
 
                 // They're not moving anywhere, go around.
-                if ( spd < 10.0f )
-                    return true;
+                //if ( spd < 10.0f )
+                //    return true;
 
                 // Slowpokes
-                if ( spd < (m_pNPC->GetMotor()->GetMovementSpeed() * 0.7f) )
+                if ( spd > 10.0f && spd < (m_pNPC->GetMotor()->GetMovementSpeed() * 0.9f) )
                     return true;
 
                 // If we're going opposite directions, we need to go around them.
@@ -66,6 +62,12 @@ public:
                 // We're probably moving WITH them, so just trust them to move out of our way.
                 return false;
             }
+
+            NPCR::QueryResult_t res = m_pNPC->ShouldTouch( pEnt );
+            if ( res == NPCR::RES_YES )
+                return true;
+            if ( res == NPCR::RES_NO )
+                return false;
 
             return true;
         }
