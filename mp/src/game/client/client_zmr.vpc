@@ -461,6 +461,8 @@ $Project "Client (ZMR)"
 			$File	"zmr\c_zmr_tips.h"
 			$File	"zmr\c_zmr_util.cpp"
 			$File	"zmr\c_zmr_util.h"
+			$File	"zmr\c_zmr_videosettings.cpp"
+			$File	"zmr\c_zmr_videosettings.h"
 			$File	"zmr\c_zmr_zmvision.cpp"
 			$File	"zmr\c_zmr_zmvision.h"
 			
