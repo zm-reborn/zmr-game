@@ -1,0 +1,9 @@
+"vertexlitgeneric"
+{
+	"$basetexture" "models/weapons/rifle_zmr/sights"
+	//"$bumpmap" "models/weapons/new_pistol/pistol_normal"
+	
+	"$surfaceprop" "metal"
+	$model 1
+
+}

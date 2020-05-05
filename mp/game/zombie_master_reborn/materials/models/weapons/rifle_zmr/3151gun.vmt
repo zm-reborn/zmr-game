@@ -1,0 +1,15 @@
+VertexLitGeneric
+{
+	"$basetexture" "models\weapons\rifle_zmr\gun_diff"
+	"$bumpmap" "models\weapons\rifle_zmr\gun_normspec"
+	"$surfaceprop" "metal"
+	
+	"$halflambert" "1"
+	"$model" 1
+
+
+	$phong 1
+	$phongexponenttexture models\weapons\rifle_zmr\gun_gloss
+	$phongboost	0.4
+	$phongfresnelranges	4
+}
