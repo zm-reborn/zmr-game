@@ -49,7 +49,7 @@ WeaponData
 	{
 
 		"empty"				"Weapon_Rifle_ZM.Empty"
-		"special1"			"Weapon_Rifle_ZM.Special1"
+		//"special1"			"Weapon_Rifle_ZM.Special1"
 		"single_shot"		"Weapon_Rifle_ZM.Single"
 	}
 
