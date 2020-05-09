@@ -1959,7 +1959,7 @@ void CZMBaseWeapon::TransferReserveAmmo( CBaseCombatCharacter* pOwner )
 
 float CZMBaseWeapon::GetMaxDamageDist( ZMUserCmdValidData_t& data ) const
 {
-    return GetWeaponConfig()->primary.flRange;
+    return 8192.0f;
 }
 
 int CZMBaseWeapon::GetMaxUserCmdBullets( ZMUserCmdValidData_t& data ) const

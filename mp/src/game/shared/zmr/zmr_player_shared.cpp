@@ -593,7 +593,8 @@ void CZMPlayer::SimulateBullet( ZMFireBulletsInfo_t& bulletinfo )
 
 
     CBaseEntity*    pAttacker = info.m_pAttacker ? info.m_pAttacker : this;
-    float           flDistanceLeft = info.m_flDistance;
+    float           flDistanceLeft = 8192.0f;
+    float           flDamageFallOffStart = MAX( 1.0f, info.m_flDistance );
     Vector          vecSrc = info.m_vecSrc;
     Vector          vecDir = bulletinfo.vecDir;
     Vector          vecFirstStart = vec3_origin;
@@ -690,6 +691,31 @@ void CZMPlayer::SimulateBullet( ZMFireBulletsInfo_t& bulletinfo )
 
 
         CTakeDamageInfo dmgInfo( this, pAttacker, flActualDamage, nActualDamageType );
+
+        // Scale damage based on the distance
+        // ZMRTODO: Add a param to config to change fall-off behavior.
+        float flDistFromSrc = vecSrc.DistTo( tr.endpos );
+        if ( flDistFromSrc > flDamageFallOffStart )
+        {
+            // The distance we'll consider
+            float falloffDist = flDamageFallOffStart * 2.0f;
+            
+            float dist = (flDistFromSrc - flDamageFallOffStart);
+            dist = MIN( dist, falloffDist );
+
+            float mult = 1.0f - (dist / falloffDist);
+            mult = clamp( mult, 0.0f, 1.0f );
+            mult *= mult;
+
+            DevMsg( "Bullet wen't over weapon range of %.1f! Scaling damage by %.1f!\n",
+                flDamageFallOffStart,
+                mult );
+
+            dmgInfo.ScaleDamage( mult );
+            if ( dmgInfo.GetDamage() < 1.0f )
+                dmgInfo.SetDamage( 1.0f );
+        }
+
         ModifyFireBulletsDamage( &dmgInfo );
         CalculateBulletDamageForce( &dmgInfo, info.m_iAmmoType, vecDir, tr.endpos );
         dmgInfo.ScaleDamageForce( info.m_flDamageForceScale );
