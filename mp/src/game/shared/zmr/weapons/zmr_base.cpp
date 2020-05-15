@@ -233,36 +233,54 @@ void CZMBaseWeapon::ItemPostFrame()
     WeaponIdle();
 
 
-//#ifdef GAME_DLL
-//    auto* pOwner = GetPlayerOwner();
-//    if ( !pOwner )
-//        return;
-//
-//
-//    // ZMRTODO: Put this somewhere else.
-//    auto* pVM = pOwner->GetViewModel( m_nViewModelIndex );
-//
-//    int iPoseParamIndex = pVM->LookupPoseParameter( "move_x" );
-//    if ( iPoseParamIndex != -1 )
-//    {
-//        float spd = pOwner->GetLocalVelocity().Length2D();
-//        float target = spd > 0.1f ? MIN( 1.0f, spd / 190.0f ) : 0.0f;
-//
-//        float cur = pVM->GetPoseParameter( iPoseParamIndex );
-//        float add = gpGlobals->frametime * 2.0f;
-//        if ( target < cur )
-//        {
-//            add *= -1.0f;
-//        }
-//        else if ( cur == target )
-//            return;
-//
-//        float newratio = cur + add;
-//
-//        pVM->SetPoseParameter( iPoseParamIndex, clamp( newratio, 0.0f, 1.0f ) );
-//    }
-//#endif
+#ifdef CLIENT_DLL
+    // ZMRTODO: Put this somewhere else.
+    auto* pVM = pOwner->GetViewModel( m_nViewModelIndex );
+    static ConVar testbob("testbob", "1");
+    int iPoseParamIndex = pVM->LookupPoseParameter( "move_x" );
+    if ( iPoseParamIndex != -1 && testbob.GetBool() )
+    {
+        float spd = pOwner->GetLocalVelocity().Length2D();
+        float target = spd > 0.1f ? spd / 190.0f : 0.0f;
+        target = clamp( target, 0.0f, 1.0f );
+
+        float cur = pVM->GetPoseParameter( iPoseParamIndex );
+        cur = clamp( cur, 0.5f, 1.0f );
+        cur /= 0.5f;
+        cur -= 1.0f;
+
+        float add = gpGlobals->frametime * clamp( cur, 0.25f, 1.0f );
+        if ( target < cur )
+        {
+            add *= -1.0f * 1.2f;
+        }
+        else if ( cur == target )
+            return;
+
+        float newratio = target;//cur + add;
+
+        pVM->SetPoseParameter( iPoseParamIndex, clamp( newratio, 0.001f, 1.0f ) );
+        pVM->SetPlaybackRate( 1.0f );
+    }
+#endif
 }
+
+#ifdef CLIENT_DLL
+CON_COMMAND(testbobbingvalue, "")
+{
+    float value = atof( args.Arg( 1 ) );
+
+    auto* pOwner = C_ZMPlayer::GetLocalPlayer();
+    // ZMRTODO: Put this somewhere else.
+    auto* pVM = pOwner->GetViewModel( VMINDEX_WEP );
+
+    int iPoseParamIndex = pVM->LookupPoseParameter( "move_x" );
+    if ( iPoseParamIndex != -1 )
+    {
+        pVM->SetPoseParameter( iPoseParamIndex, value );
+    }
+}
+#endif
 
 Activity CZMBaseWeapon::GetPrimaryAttackActivity()
 {

@@ -28,7 +28,9 @@ BEGIN_NETWORK_TABLE( CZMViewModel, DT_ZM_ViewModel )
     SendPropFloat( SENDINFO_ARRAYELEM( m_flClr, 2 ), -1, 0, 0.0f, 1.0f ),
 
 
-    //SendPropExclude( "DT_BaseAnimating", "m_flPoseParameter" ),
+    SendPropExclude( "DT_BaseAnimating", "m_flPoseParameter" ),
+    SendPropExclude( "DT_BaseAnimating", "m_flEncodedController" ),
+    SendPropExclude( "DT_BaseViewModel", "m_flPoseParameter" ),
     //SendPropExclude( "DT_BaseAnimating", "m_flPlaybackRate" ),
     //SendPropExclude( "DT_BaseAnimating", "m_nSequence" ),
     //SendPropExclude( "DT_BaseAnimatingOverlay", "overlay_vars" ),
@@ -38,12 +40,14 @@ BEGIN_NETWORK_TABLE( CZMViewModel, DT_ZM_ViewModel )
 #endif
 END_NETWORK_TABLE()
 
-
-BEGIN_PREDICTION_DATA( C_ZMViewModel )
 #ifdef CLIENT_DLL
-    //DEFINE_PRED_ARRAY( m_flPoseParameter, FIELD_FLOAT, MAXSTUDIOPOSEPARAM, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
-#endif
+BEGIN_PREDICTION_DATA( C_ZMViewModel )
+
+    //DEFINE_PRED_ARRAY( m_flPoseParameter, FIELD_FLOAT, MAXSTUDIOPOSEPARAM, FTYPEDESC_OVERRIDE | FTYPEDESC_NOERRORCHECK ),
+    //DEFINE_PRED_ARRAY_TOL( m_flEncodedController, FIELD_FLOAT, MAXSTUDIOBONECTRLS, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE, 0.02f ),
+
 END_PREDICTION_DATA()
+#endif
 
 
 CZMViewModel::CZMViewModel()
