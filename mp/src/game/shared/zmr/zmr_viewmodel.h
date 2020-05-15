@@ -11,7 +11,9 @@ class CZMViewModel : public CPredictedViewModel
 public:
     DECLARE_CLASS( CZMViewModel, CPredictedViewModel );
     DECLARE_NETWORKCLASS();
+#ifdef CLIENT_DLL
     DECLARE_PREDICTABLE();
+#endif
 
     CZMViewModel();
     ~CZMViewModel();
