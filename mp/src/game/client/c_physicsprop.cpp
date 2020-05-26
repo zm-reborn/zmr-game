@@ -24,7 +24,11 @@ IMPLEMENT_CLIENTCLASS_DT(C_PhysicsProp, DT_PhysicsProp, CPhysicsProp)
 	RecvPropBool( RECVINFO( m_bAwake ) ),
 END_RECV_TABLE()
 
+#ifdef ZMR // ZMRCHANGE: PBR change
+ConVar r_PhysPropStaticLighting( "r_PhysPropStaticLighting", "0" );
+#else
 ConVar r_PhysPropStaticLighting( "r_PhysPropStaticLighting", "1" );
+#endif
 
 
 //-----------------------------------------------------------------------------
