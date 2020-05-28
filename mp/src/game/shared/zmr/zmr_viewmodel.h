@@ -23,6 +23,8 @@ public:
     virtual int                 DrawModel( int flags ) OVERRIDE;
     virtual bool                ShouldReceiveProjectedTextures( int flags ) OVERRIDE;
     virtual C_BaseAnimating*    FindFollowedEntity() OVERRIDE;
+
+    virtual void                UpdateClientSideAnimation() OVERRIDE;
 #endif
 
     void SetWeaponModelEx( const char* pszModel, CBaseCombatWeapon* pWep, bool bOverriden );

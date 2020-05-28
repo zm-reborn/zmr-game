@@ -29,22 +29,31 @@ BEGIN_NETWORK_TABLE( CZMViewModel, DT_ZM_ViewModel )
 
 
     SendPropExclude( "DT_BaseAnimating", "m_flPoseParameter" ),
-    SendPropExclude( "DT_BaseAnimating", "m_flEncodedController" ),
     SendPropExclude( "DT_BaseViewModel", "m_flPoseParameter" ),
-    //SendPropExclude( "DT_BaseAnimating", "m_flPlaybackRate" ),
-    //SendPropExclude( "DT_BaseAnimating", "m_nSequence" ),
-    //SendPropExclude( "DT_BaseAnimatingOverlay", "overlay_vars" ),
 
-    //SendPropExclude( "DT_ServerAnimationData" , "m_flCycle" ),	
-    //SendPropExclude( "DT_AnimTimeMustBeFirst" , "m_flAnimTime" ),
+    SendPropExclude( "DT_BaseAnimating", "m_flEncodedController" ),
+
+    SendPropExclude( "DT_BaseAnimating", "m_flPlaybackRate" ),
+    SendPropExclude( "DT_BaseViewModel", "m_flPlaybackRate" ),
+
+    //SendPropExclude( "DT_BaseAnimating", "m_nSequence" ),
+    SendPropExclude( "DT_BaseAnimatingOverlay", "overlay_vars" ),
+
+    SendPropExclude( "DT_ServerAnimationData" , "m_flCycle" ),	
+    SendPropExclude( "DT_AnimTimeMustBeFirst" , "m_flAnimTime" ),
 #endif
 END_NETWORK_TABLE()
 
 #ifdef CLIENT_DLL
 BEGIN_PREDICTION_DATA( C_ZMViewModel )
 
-    //DEFINE_PRED_ARRAY( m_flPoseParameter, FIELD_FLOAT, MAXSTUDIOPOSEPARAM, FTYPEDESC_OVERRIDE | FTYPEDESC_NOERRORCHECK ),
-    //DEFINE_PRED_ARRAY_TOL( m_flEncodedController, FIELD_FLOAT, MAXSTUDIOBONECTRLS, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE, 0.02f ),
+    DEFINE_PRED_FIELD( m_flCycle, FIELD_FLOAT, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
+
+    DEFINE_PRED_FIELD( m_flPlaybackRate, FIELD_FLOAT, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
+    //DEFINE_PRED_ARRAY( m_flPoseParameter, FIELD_FLOAT, MAXSTUDIOPOSEPARAM, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
+    DEFINE_PRED_ARRAY_TOL( m_flPoseParameter, FIELD_FLOAT, MAXSTUDIOPOSEPARAM, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK, 0.0f ),
+
+    DEFINE_PRED_ARRAY_TOL( m_flEncodedController, FIELD_FLOAT, MAXSTUDIOBONECTRLS, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK, 0.02f ),
 
 END_PREDICTION_DATA()
 #endif
@@ -61,7 +70,7 @@ CZMViewModel::CZMViewModel()
     SetModelColor2( 1.0f, 1.0f, 1.0f );
 #endif
 
-    //UseClientSideAnimation();
+    UseClientSideAnimation();
 
     //m_flPlaybackRate = 1.0f;
 }
@@ -119,6 +128,102 @@ void CZMViewModel::SetWeaponModelEx( const char* pszModel, CBaseCombatWeapon* pW
 }
 
 #ifdef CLIENT_DLL
+static ConVar testbob("testbob", "1");
+
+void C_ZMViewModel::UpdateClientSideAnimation()
+{
+    // ZMRTODO: Put this somewhere else.
+    auto* pOwner = ToZMPlayer( GetOwner() );
+    if ( !pOwner ) return;
+
+    auto* pVM = this;//pOwner->GetViewModel( m_nViewModelIndex );
+
+    int iPoseParamIndex = pVM->LookupPoseParameter( "move_x" );
+    int iVerticalPoseParamIndex = pVM->LookupPoseParameter( "ver_aims" );
+
+
+    //pVM->SetPlaybackRate( 0.2f );
+
+    if ( iVerticalPoseParamIndex != -1 )
+    {
+        float vert = pOwner->EyeAngles().x;
+        vert = clamp( vert, -90.0f, 90.0f );
+        vert /= 90.0f;
+
+        pVM->SetPoseParameter( iVerticalPoseParamIndex, vert );
+    }
+
+    if ( iPoseParamIndex != -1 && testbob.GetBool() )
+    {
+        float spd = pOwner->GetLocalVelocity().Length2D();
+        float target = spd > 0.1f ? spd / 190.0f : 0.0f;
+        target = clamp( target, 0.0f, 1.0f );
+
+        //
+        // The pose parameter goes from:
+        // Backwards, no movement, forwards
+        // In numbers:
+        // -1.0 .. 0.0 .. 1
+        //
+        // But when we retrieve the actual pose parameter it will be:
+        //  0.0 .. 0.5 .. 1
+        //
+        // When setting the pose parameter, we need to use former scale.
+        // 
+
+        float cur = pVM->GetPoseParameter( iPoseParamIndex );
+        cur = clamp( cur, 0.5f, 1.0f );
+
+        // Translate from
+        // 0.5 .. 1 to 0 .. 1
+        cur /= 0.5f;
+        cur -= 1.0f;
+
+        float add = gpGlobals->frametime * 1.0f;
+        if ( target < cur )
+        {
+            add *= -1.0f * 1.2f;
+        }
+        //else if ( cur == target )
+        //    return;
+
+        float newratio = cur + add;
+
+        pVM->SetPoseParameter( iPoseParamIndex, clamp( newratio, 0.001f, 1.0f ) );
+        //pVM->SetPlaybackRate( clamp( newratio, 0.001f, 1.0f ) );
+    }
+    else
+    {
+        //pVM->SetPlaybackRate( 1.0f );
+    }
+
+    BaseClass::UpdateClientSideAnimation();
+}
+
+#ifdef CLIENT_DLL
+CON_COMMAND(testbobbingvalue, "")
+{
+#ifdef CLIENT_DLL
+    auto* pOwner = C_ZMPlayer::GetLocalPlayer();
+#else
+    auto* pOwner = ToZMPlayer( UTIL_GetCommandClient() );
+#endif
+
+    if ( !pOwner ) return;
+
+
+    float value = atof( args.Arg( 1 ) );
+    // ZMRTODO: Put this somewhere else.
+    auto* pVM = pOwner->GetViewModel( VMINDEX_WEP );
+
+    int iPoseParamIndex = pVM->LookupPoseParameter( "move_x" );
+    if ( iPoseParamIndex != -1 )
+    {
+        pVM->SetPoseParameter( iPoseParamIndex, value );
+    }
+}
+#endif // CLIENT_DLL
+
 int C_ZMViewModel::CalcOverrideModelIndex()
 {
     if ( m_iOverrideModelIndex != -1 )
