@@ -48,6 +48,7 @@ END_NETWORK_TABLE()
 BEGIN_PREDICTION_DATA( C_ZMViewModel )
 
     DEFINE_PRED_FIELD( m_flCycle, FIELD_FLOAT, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
+    DEFINE_PRED_FIELD( m_flAnimTime, FIELD_FLOAT, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
 
     DEFINE_PRED_FIELD( m_flPlaybackRate, FIELD_FLOAT, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
     //DEFINE_PRED_ARRAY( m_flPoseParameter, FIELD_FLOAT, MAXSTUDIOPOSEPARAM, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
@@ -198,6 +199,12 @@ void C_ZMViewModel::UpdateClientSideAnimation()
     }
 
     BaseClass::UpdateClientSideAnimation();
+}
+
+bool C_ZMViewModel::Interpolate( float currentTime )
+{
+    // We need to skip the C_BaseViewModel interpolation as it fucks up our client-side cycle.
+    return C_BaseAnimating::Interpolate( currentTime );
 }
 
 #ifdef CLIENT_DLL

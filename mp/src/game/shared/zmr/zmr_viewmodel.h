@@ -25,6 +25,7 @@ public:
     virtual C_BaseAnimating*    FindFollowedEntity() OVERRIDE;
 
     virtual void                UpdateClientSideAnimation() OVERRIDE;
+    virtual bool                Interpolate( float currentTime ) OVERRIDE;
 #endif
 
     void SetWeaponModelEx( const char* pszModel, CBaseCombatWeapon* pWep, bool bOverriden );
