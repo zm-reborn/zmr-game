@@ -123,11 +123,10 @@ void CZMDiscordSystem::LevelShutdownPostEntity()
 
 void CZMDiscordSystem::Update( float frametime )
 {
+    Discord_RunCallbacks();
+
     if ( m_flNextDiscordUpdateTime <= gpGlobals->realtime )
     {
-        Discord_RunCallbacks();
-
-
         if ( IsConnected() )
         {
             if ( IsInGame() )
