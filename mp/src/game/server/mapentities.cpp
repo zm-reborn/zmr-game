@@ -107,8 +107,8 @@ static int __cdecl CompareSpawnOrder(HierarchicalSpawn_t *pEnt1, HierarchicalSpa
 	{
 		if ( g_pClassnameSpawnPriority )
 		{
-			int o1 = pEnt1->m_pEntity ? g_pClassnameSpawnPriority->GetStringID( pEnt1->m_pEntity->GetClassname() ) : -1;
-			int o2 = pEnt2->m_pEntity ? g_pClassnameSpawnPriority->GetStringID( pEnt2->m_pEntity->GetClassname() ) : -1;
+			int o1 = pEnt1->m_hEntity.Get() ? g_pClassnameSpawnPriority->GetStringID( pEnt1->m_hEntity->GetClassname() ) : -1;
+			int o2 = pEnt2->m_hEntity.Get() ? g_pClassnameSpawnPriority->GetStringID( pEnt2->m_hEntity->GetClassname() ) : -1;
 			if ( o1 < o2 )
 				return 1;
 			if ( o2 < o1 )
@@ -156,7 +156,7 @@ static void ComputeSpawnHierarchyDepth( int nEntities, HierarchicalSpawn_t *pSpa
 	int nEntity;
 	for (nEntity = 0; nEntity < nEntities; nEntity++)
 	{
-		CBaseEntity *pEntity = pSpawnList[nEntity].m_pEntity;
+		CBaseEntity *pEntity = pSpawnList[nEntity].m_hEntity;
 		if (pEntity && !pEntity->IsDormant())
 		{
 			pSpawnList[nEntity].m_nDepth = ComputeSpawnHierarchyDepth_r( pEntity );
@@ -206,7 +206,7 @@ void SetupParentsForSpawnList( int nEntities, HierarchicalSpawn_t *pSpawnList )
 	int nEntity;
 	for (nEntity = nEntities - 1; nEntity >= 0; nEntity--)
 	{
-		CBaseEntity *pEntity = pSpawnList[nEntity].m_pEntity;
+		CBaseEntity *pEntity = pSpawnList[nEntity].m_hEntity;
 		if ( pEntity )
 		{
 			if ( strchr(STRING(pEntity->m_iParent), ',') )
@@ -238,7 +238,7 @@ void RememberInitialEntityPositions( int nEntities, HierarchicalSpawn_t *pSpawnL
 {
 	for (int nEntity = 0; nEntity < nEntities; nEntity++)
 	{
-		CBaseEntity *pEntity = pSpawnList[nEntity].m_pEntity;
+		CBaseEntity *pEntity = pSpawnList[nEntity].m_hEntity;
 
 		if ( pEntity )
 		{
@@ -254,7 +254,7 @@ void SpawnAllEntities( int nEntities, HierarchicalSpawn_t *pSpawnList, bool bAct
 	for (nEntity = 0; nEntity < nEntities; nEntity++)
 	{
 		VPROF( "MapEntity_ParseAllEntities_Spawn");
-		CBaseEntity *pEntity = pSpawnList[nEntity].m_pEntity;
+		CBaseEntity *pEntity = pSpawnList[nEntity].m_hEntity;
 
 		if ( pSpawnList[nEntity].m_pDeferredParent )
 		{
@@ -276,15 +276,15 @@ void SpawnAllEntities( int nEntities, HierarchicalSpawn_t *pSpawnList, bool bAct
 				for ( int i = nEntity+1; i < nEntities; i++ )
 				{
 					// this is a child object that will be deleted now
-					if ( pSpawnList[i].m_pEntity && pSpawnList[i].m_pEntity->IsMarkedForDeletion() )
+					if ( pSpawnList[i].m_hEntity && pSpawnList[i].m_hEntity->IsMarkedForDeletion() )
 					{
-						pSpawnList[i].m_pEntity = NULL;
+						pSpawnList[i].m_hEntity.Set( nullptr );
 					}
 				}
 				// Spawn failed.
 				gEntList.CleanupDeleteList();
 				// Remove the entity from the spawn list
-				pSpawnList[nEntity].m_pEntity = NULL;
+				pSpawnList[nEntity].m_hEntity.Set( nullptr );
 			}
 		}
 	}
@@ -295,7 +295,7 @@ void SpawnAllEntities( int nEntities, HierarchicalSpawn_t *pSpawnList, bool bAct
 		bool bAsyncAnims = mdlcache->SetAsyncLoad( MDLCACHE_ANIMBLOCK, false );
 		for (nEntity = 0; nEntity < nEntities; nEntity++)
 		{
-			CBaseEntity *pEntity = pSpawnList[nEntity].m_pEntity;
+			CBaseEntity *pEntity = pSpawnList[nEntity].m_hEntity;
 
 			if ( pEntity )
 			{
@@ -427,7 +427,7 @@ void MapEntity_ParseAllEntities(const char *pMapData, IMapEntityFilter *pFilter,
 		else
 		{
 			// Queue up this entity for spawning
-			pSpawnList[nEntities].m_pEntity = pEntity;
+			pSpawnList[nEntities].m_hEntity = pEntity;
 			pSpawnList[nEntities].m_nDepth = 0;
 			pSpawnList[nEntities].m_pDeferredParentAttachment = NULL;
 			pSpawnList[nEntities].m_pDeferredParent = NULL;
@@ -463,7 +463,7 @@ void MapEntity_ParseAllEntities(const char *pMapData, IMapEntityFilter *pFilter,
 			CBaseEntity *pEntity = pPointTemplate->GetTemplateEntity( iTemplateNum );
 			for ( int iEntNum = 0; iEntNum < nEntities; iEntNum++ )
 			{
-				if ( pSpawnList[iEntNum].m_pEntity == pEntity )
+				if ( pSpawnList[iEntNum].m_hEntity == pEntity )
 				{
 					// Give the point_template the mapdata
 					pPointTemplate->AddTemplate( pEntity, pSpawnMapData[iEntNum].m_pMapData, pSpawnMapData[iEntNum].m_iMapDataLength );
@@ -475,7 +475,7 @@ void MapEntity_ParseAllEntities(const char *pMapData, IMapEntityFilter *pFilter,
 						gEntList.CleanupDeleteList();
 
 						// Remove the entity from the spawn list
-						pSpawnList[iEntNum].m_pEntity = NULL;
+						pSpawnList[iEntNum].m_hEntity.Set( nullptr );
 					}
 					break;
 				}
