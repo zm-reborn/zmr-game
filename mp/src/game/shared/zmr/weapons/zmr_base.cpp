@@ -355,7 +355,14 @@ void CZMBaseWeapon::WeaponIdle()
 {
     if ( HasWeaponIdleTimeElapsed() )
     {
-        SendWeaponAnim( GetIdleActivity() );
+        // Don't keep updating our activity as the idle should always loop.
+        // Resetting the idle animation manually can look bad when
+        // taking into account pose parameter anims.
+        auto curAct = GetActivity();
+        auto wantedAct = GetIdleActivity();
+
+        if ( curAct != wantedAct )
+            SendWeaponAnim( wantedAct );
     }
 }
 
