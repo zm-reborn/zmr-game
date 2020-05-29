@@ -2595,7 +2595,9 @@ BEGIN_PREDICTION_DATA( CBaseCombatWeapon )
 
 	// Not networked
 
+#ifndef ZMR // ZMRCHANGE: What's the point of this? It's already here above.
 	DEFINE_PRED_FIELD( m_flTimeWeaponIdle, FIELD_FLOAT, FTYPEDESC_INSENDTABLE ),
+#endif
 	DEFINE_FIELD( m_bInReload, FIELD_BOOLEAN ),
 	DEFINE_FIELD( m_bFireOnEmpty, FIELD_BOOLEAN ),
 	DEFINE_FIELD( m_bFiringWholeClip, FIELD_BOOLEAN ),
