@@ -243,7 +243,11 @@ void CPhysicsHook::LevelInitPreEntity()
 
 	physenv->SetObjectEventHandler( &g_Collisions );
 	
+#ifdef ZMR // ZMRCHANGE: Speculative tickrate physics bug fix
+	physenv->SetSimulationTimestep( gpGlobals->interval_per_tick );
+#else
 	physenv->SetSimulationTimestep( DEFAULT_TICK_INTERVAL ); // 15 ms per tick
+#endif
 	// HL Game gravity, not real-world gravity
 	physenv->SetGravity( Vector( 0, 0, -GetCurrentGravity() ) );
 	g_PhysAverageSimTime = 0;
@@ -1616,7 +1620,11 @@ CON_COMMAND( physics_budget, "Times the cost of each active object" )
 		float totalTime = 0.f;
 		g_Collisions.BufferTouchEvents( true );
 		float full = engine->Time();
+#ifdef ZMR // ZMRCHANGE: Speculative tickrate physics bug fix
+		physenv->Simulate( gpGlobals->interval_per_tick );
+#else
 		physenv->Simulate( DEFAULT_TICK_INTERVAL );
+#endif
 		full = engine->Time() - full;
 		float lastTime = full;
 
@@ -1633,7 +1641,11 @@ CON_COMMAND( physics_budget, "Times the cost of each active object" )
 				PhysForceEntityToSleep( ents[j], ents[j]->VPhysicsGetObject() );
 			}
 			float start = engine->Time();
+#ifdef ZMR // ZMRCHANGE: Speculative tickrate physics bug fix
+			physenv->Simulate( gpGlobals->interval_per_tick );
+#else
 			physenv->Simulate( DEFAULT_TICK_INTERVAL );
+#endif
 			float end = engine->Time();
 
 			float elapsed = end - start;
