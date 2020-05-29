@@ -72,6 +72,7 @@ static void Discord_Event_Disconnected( int errorCode, const char* message )
 
 static void Discord_Event_Error( int errorCode, const char* message )
 {
+    Assert( 0 );
     DevWarning( "Discord error (%i): %s", errorCode, message );
 }
 
