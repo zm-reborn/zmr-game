@@ -159,6 +159,7 @@ public:
     virtual bool    IsInReload() const { return const_cast<CZMBaseWeapon*>( this )->CanReload() && m_bInReload2; }
     virtual bool    CanAct( ZMWepActionType_t type = WEPACTION_GENERIC ) const; // Can we reload/attack?
 
+    virtual bool    IsZoomed() const { return false; }
 
     virtual void IncrementClip();
     virtual bool ShouldIncrementClip() const;
