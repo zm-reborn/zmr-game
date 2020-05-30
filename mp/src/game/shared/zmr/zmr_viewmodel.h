@@ -2,6 +2,8 @@
 
 #include "predicted_viewmodel.h"
 
+#include "weapons/zmr_base.h"
+
 #ifdef CLIENT_DLL
 #define CZMViewModel C_ZMViewModel
 #endif
@@ -25,8 +27,19 @@ public:
     virtual C_BaseAnimating*    FindFollowedEntity() OVERRIDE;
 
     virtual void                UpdateClientSideAnimation() OVERRIDE;
+
     virtual bool                Interpolate( float currentTime ) OVERRIDE;
+
+    CZMBaseWeapon* GetWeapon() const { return static_cast<CZMBaseWeapon*>( CBaseViewModel::GetWeapon() ); }
+
+
+    void PerformAnimBobbing();
+    bool PerformIronSight( Vector& vecPos, QAngle& ang );
+    bool PerformLag( Vector& vecPos, QAngle& ang, const QAngle& origAng );
 #endif
+
+    virtual void CalcViewModelView( CBasePlayer* pOwner, const Vector& eyePosition, const QAngle& eyeAngles ) OVERRIDE;
+
 
     void SetWeaponModelEx( const char* pszModel, CBaseCombatWeapon* pWep, bool bOverriden );
 
@@ -49,6 +62,9 @@ private:
     int m_iOverrideModelIndex;
     CBaseCombatWeapon* m_pOverrideModelWeapon;
     CBaseCombatWeapon* m_pLastWeapon;
+
+    bool m_bInIronSight;
+    float m_flIronSightFrac;
 #endif
 };
 
