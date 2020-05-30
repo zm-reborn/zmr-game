@@ -6,4 +6,10 @@
 	"$surfaceprop" "metal"
 	$model 1
 
+	
+	$detail "models\weapons\rifle_zmr\sights315_emiss"
+	$detailblendmode 5
+	$detailscale 1
+	
+	
 }
