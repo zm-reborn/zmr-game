@@ -166,7 +166,7 @@ void CZMWeaponRifle::Zoom( CZMPlayer* pPlayer )
 
 void CZMWeaponRifle::UnZoom( CZMPlayer* pPlayer )
 {
-    pPlayer->SetFOV( this, 0, 0.2f );
+    pPlayer->SetFOV( this, 0, 0.1f );
 
     m_bInZoom = false;
 }
