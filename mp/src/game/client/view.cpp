@@ -647,6 +647,8 @@ void CViewRender::SetUpViews()
 
 #ifdef ZMR
 	float fDefaultFov = C_ZMPlayer::GetLocalDefaultFOV();
+
+	fDefaultFov = MAX( fDefaultFov, 0.01f );
 #else
 	float fDefaultFov = default_fov.GetFloat();
 #endif
@@ -744,7 +746,12 @@ void CViewRender::SetUpViews()
 	float flFOVOffset = fDefaultFov - view.fov;
 
 	//Adjust the viewmodel's FOV to move with any FOV offsets on the viewer's end
+#ifdef ZMR // ZMRCHANGE: Changing vm fov is proportional. Also fixes <= 0 vm fov.
+	float vmFOV = g_pClientMode->GetViewModelFOV();
+	view.fovViewmodel = vmFOV - ((flFOVOffset / fDefaultFov) * vmFOV);
+#else
 	view.fovViewmodel = g_pClientMode->GetViewModelFOV() - flFOVOffset;
+#endif
 
 	if ( UseVR() )
 	{
