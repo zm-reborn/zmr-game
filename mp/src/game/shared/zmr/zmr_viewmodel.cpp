@@ -7,6 +7,8 @@
 #ifdef CLIENT_DLL
 #include <materialsystem/imaterialvar.h>
 #include "proxyentity.h"
+#include "ivieweffects.h"
+#include "prediction.h"
 #endif
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -67,6 +69,9 @@ CZMViewModel::CZMViewModel()
     m_iOverrideModelIndex = -1;
     m_pOverrideModelWeapon = nullptr;
     m_pLastWeapon = nullptr;
+
+    m_bInIronSight = false;
+    m_flIronSightFrac = 0.0f;
 #else
     SetModelColor2( 1.0f, 1.0f, 1.0f );
 #endif
@@ -128,10 +133,120 @@ void CZMViewModel::SetWeaponModelEx( const char* pszModel, CBaseCombatWeapon* pW
     SetWeaponModel( pszModel, pWep );
 }
 
+void CZMViewModel::CalcViewModelView( CBasePlayer* pOwner, const Vector& eyePosition, const QAngle& eyeAngles )
+{
+    Vector originalPos = eyePosition;
+    QAngle originalAng = eyeAngles;
+
+    Vector newPos = originalPos;
+    QAngle newAng = originalAng;
+
+#ifdef CLIENT_DLL
+    // Let the viewmodel shake at about 10% of the amplitude of the player's view
+    vieweffects->ApplyShake( newPos, newAng, 0.1f );
+
+    PerformIronSight( newPos, newAng );
+
+    PerformLag( newPos, newAng, originalAng );
+#endif
+
+    SetLocalOrigin( newPos );
+    SetLocalAngles( newAng );
+}
+
 #ifdef CLIENT_DLL
 static ConVar testbob("testbob", "1");
 
 void C_ZMViewModel::UpdateClientSideAnimation()
+{
+    PerformAnimBobbing();
+
+    BaseClass::UpdateClientSideAnimation();
+}
+
+bool C_ZMViewModel::Interpolate( float currentTime )
+{
+    // We need to skip the C_BaseViewModel interpolation as it fucks up our client-side cycle.
+    return C_BaseAnimating::Interpolate( currentTime );
+}
+
+bool C_ZMViewModel::PerformIronSight( Vector& vecOut, QAngle& angOut )
+{
+    if ( ViewModelIndex() != VMINDEX_WEP ) return false;
+
+
+    auto iAttachment = LookupAttachment( "ironsight" );
+    if ( iAttachment <= 0 ) return false;
+
+
+    auto* pWeapon = C_ZMViewModel::GetWeapon();
+
+    bool bPrevState = m_bInIronSight;
+    bool bChanged = false;
+    if ( prediction->IsFirstTimePredicted() )
+    {
+        bChanged = pWeapon->IsZoomed() != bPrevState;
+    }
+
+    if ( bChanged )
+    {
+        m_bInIronSight = !m_bInIronSight;
+    }
+    
+    if ( m_bInIronSight )
+    {
+        if ( m_flIronSightFrac != 1.0f )
+        {
+            m_flIronSightFrac += gpGlobals->frametime * 1.2f;
+            m_flIronSightFrac = MIN( m_flIronSightFrac, 1.0f );
+        }
+    }
+    else
+    {
+        if ( m_flIronSightFrac != 0.0f )
+        {
+            m_flIronSightFrac -= gpGlobals->frametime * 1.2f;
+            m_flIronSightFrac = MAX( m_flIronSightFrac, 0.0f );
+        }
+    }
+
+
+    Vector vecLocal;
+    Vector vecIronsightPos;
+    Vector vecEyePos = vec3_origin;
+
+
+    // Get the iron sight position relative to the camera position.
+    auto* pHdr = GetModelPtr();
+    auto& attachment = pHdr->pAttachment( iAttachment-1 );
+
+    // The attachment position is local to the bone.
+    // Here we are assuming that the bone is at origin.
+    MatrixPosition( attachment.local, vecLocal );
+
+    
+    VectorRotate( vecLocal, angOut, vecIronsightPos );
+
+
+    auto smootherstep = []( float x ) { return x * x * x * (x * (x * 6 - 15) + 10); };
+
+    Vector vecCur = Lerp( smootherstep( m_flIronSightFrac ), vecEyePos, vecIronsightPos );
+    
+
+    vecOut -= vecCur;
+
+    return true;
+}
+
+bool C_ZMViewModel::PerformLag( Vector& vecPos, QAngle& ang, const QAngle& origAng )
+{
+    QAngle origAngles = origAng;
+    CalcViewModelLag( vecPos, ang, origAngles );
+
+    return true;
+}
+
+void C_ZMViewModel::PerformAnimBobbing()
 {
     // ZMRTODO: Put this somewhere else.
     auto* pOwner = ToZMPlayer( GetOwner() );
@@ -197,14 +312,6 @@ void C_ZMViewModel::UpdateClientSideAnimation()
     {
         //pVM->SetPlaybackRate( 1.0f );
     }
-
-    BaseClass::UpdateClientSideAnimation();
-}
-
-bool C_ZMViewModel::Interpolate( float currentTime )
-{
-    // We need to skip the C_BaseViewModel interpolation as it fucks up our client-side cycle.
-    return C_BaseAnimating::Interpolate( currentTime );
 }
 
 #ifdef CLIENT_DLL
