@@ -62,7 +62,7 @@ END_PREDICTION_DATA()
 #endif
 
 #ifdef CLIENT_DLL
-CZMViewModel::CZMViewModel() : m_LagAnglesHistory( "CZMViewModel::m_LagAnglesHistory" )
+CZMViewModel::CZMViewModel() : m_LagAnglesHistory( "CZMViewModel::m_LagAnglesHistory" ), m_flLagEyePosZHistory( "CZMViewModel::m_flLagEyePosZHistory")
 #else
 CZMViewModel::CZMViewModel()
 #endif
@@ -76,6 +76,16 @@ CZMViewModel::CZMViewModel()
     m_bInIronSight = false;
     m_flIronSightFrac = 0.0f;
 
+
+    m_vLagAngles.Init();
+    m_LagAnglesHistory.Setup( &m_vLagAngles, 0 );
+
+    m_flLagEyePosZ = 0.0f;
+    m_flLagEyePosZHistory.Setup( &m_flLagEyePosZ, 0 );
+
+    m_flLastImpactDelta = 0.0f;
+    m_flImpactTargetDelta = 0.0f;
+    m_flImpactVel = 0.0f;
 
     m_iPoseParamMoveX = -1;
     m_iPoseParamVertAim = -1;
@@ -159,7 +169,7 @@ void CZMViewModel::CalcViewModelView( CBasePlayer* pOwner, const Vector& eyePosi
 
         PerformOldBobbing( newPos, newAng );
 
-        PerformLag( newPos, newAng, originalAng );
+        PerformLag( newPos, newAng, originalPos, originalAng );
 #endif
     }
 
@@ -259,10 +269,184 @@ bool C_ZMViewModel::PerformIronSight( Vector& vecOut, QAngle& angOut )
     return true;
 }
 
-bool C_ZMViewModel::PerformLag( Vector& vecPos, QAngle& ang, const QAngle& origAng )
+
+ConVar zm_cl_bob_lag_interp( "zm_cl_bob_lag_interp", "0.1" );
+ConVar zm_cl_bob_lag_angle_mult( "zm_cl_bob_lag_angle_mult", "0.1" );
+//ConVar zm_cl_bob_lag_movement_fwd_pitch_mult( "zm_cl_bob_lag_movement_fwd_pitch_mult", "0.1" );
+ConVar zm_cl_bob_lag_movement_side_roll_mult( "zm_cl_bob_lag_movement_side_roll_mult", "3" );
+ConVar zm_cl_bob_lag_movement_side_yaw_mult( "zm_cl_bob_lag_movement_side_yaw_mult", "2" );
+
+bool C_ZMViewModel::PerformLag( Vector& vecPos, QAngle& ang, const Vector& origPos, const QAngle& origAng )
 {
-    QAngle origAngles = origAng;
-    CalcViewModelLag( vecPos, ang, origAngles );
+    Vector fwd, right;
+    AngleVectors( origAng, &fwd, &right, nullptr );
+
+
+    PerformAngleLag( vecPos, ang, origAng );
+    
+    PerformMovementLag( vecPos, ang, fwd, right );
+
+    PerformImpactLag( vecPos, ang, origPos );
+
+
+    NormalizeAngles( ang );
+
+
+    return true;
+}
+
+bool C_ZMViewModel::PerformAngleLag( Vector& vecPos, QAngle& ang, const QAngle& origAng )
+{
+    const float flInterp = zm_cl_bob_lag_interp.GetFloat();
+
+
+    // Add an entry to the history.
+    m_vLagAngles = origAng;
+    m_LagAnglesHistory.NoteChanged( gpGlobals->curtime, flInterp, false );
+	
+    // Interpolate back 100ms.
+    m_LagAnglesHistory.Interpolate( gpGlobals->curtime, flInterp );
+
+
+    //VectorAngles( m_vLagAngles, angLag );
+
+    QAngle angleDiff = origAng - m_vLagAngles;
+
+    NormalizeAngles( angleDiff );
+
+    ang += angleDiff * zm_cl_bob_lag_angle_mult.GetFloat();
+
+    return true;
+}
+
+bool C_ZMViewModel::PerformMovementLag( Vector& vecPos, QAngle& ang, const Vector& fwd, const Vector& right )
+{
+    auto* pOwner = GetOwner();
+    if ( !pOwner )
+        return false;
+
+
+    const float flMaxGroundSpeed = pOwner->GetPlayerMaxSpeed();
+
+
+    Vector vel = pOwner->GetLocalVelocity();
+
+    Vector vecVelDir = vel;
+    vecVelDir.x = vecVelDir.x / flMaxGroundSpeed;
+    vecVelDir.y = vecVelDir.y / flMaxGroundSpeed;
+
+    // Clamp to 1
+    vecVelDir.x = MIN( vecVelDir.x, 1.0f );
+    vecVelDir.y = MIN( vecVelDir.y, 1.0f );
+
+    //float dotFwd = fwd.Dot( vecVelDir );
+    float dotRight = right.Dot( vecVelDir );
+
+
+    //ang.x += dotFwd * zm_cl_bob_lag_movement_fwd_pitch_mult.GetFloat();
+    ang.y -= dotRight * zm_cl_bob_lag_movement_side_yaw_mult.GetFloat();
+    ang.z -= dotRight * zm_cl_bob_lag_movement_side_roll_mult.GetFloat();
+
+    return true;
+}
+
+ConVar zm_cl_bob_lag_impact_interp( "zm_cl_bob_lag_impact_interp", "0.1" );
+
+ConVar zm_cl_bob_lag_impact_air( "zm_cl_bob_lag_impact_air", "4" );
+ConVar zm_cl_bob_lag_impact_air_rate( "zm_cl_bob_lag_impact_air_rate", "0.2" );
+
+ConVar zm_cl_bob_lag_impact_ground( "zm_cl_bob_lag_impact_ground", "5" );
+ConVar zm_cl_bob_lag_impact_ground_rate( "zm_cl_bob_lag_impact_ground_rate", "0.15" );
+
+ConVar zm_cl_bob_lag_impact_land( "zm_cl_bob_lag_impact_land", "250" );
+ConVar zm_cl_bob_lag_impact_land_rate( "zm_cl_bob_lag_impact_land_rate", "30" );
+
+bool C_ZMViewModel::PerformImpactLag( Vector& vecPos, QAngle& ang, const Vector& origPos )
+{
+    auto* pOwner = GetOwner();
+    if ( !pOwner )
+        return false;
+
+
+    const float flInterp = zm_cl_bob_lag_impact_interp.GetFloat();
+
+
+    bool bOnGround = (pOwner->GetFlags() & FL_ONGROUND) != 0;
+
+
+    m_flLagEyePosZ = origPos.z;
+    m_flLagEyePosZHistory.NoteChanged( gpGlobals->curtime, flInterp, false );
+
+    m_flLagEyePosZHistory.Interpolate( gpGlobals->curtime, flInterp );
+
+
+    float delta = origPos.z - m_flLagEyePosZ;
+
+    
+    
+    if ( bOnGround )
+    {
+        delta *= zm_cl_bob_lag_impact_ground_rate.GetFloat();
+        delta = clamp( delta, -zm_cl_bob_lag_impact_ground.GetFloat(), zm_cl_bob_lag_impact_ground.GetFloat() );
+    }
+    else
+    {
+        delta *= zm_cl_bob_lag_impact_air_rate.GetFloat();
+        delta = clamp( delta, -zm_cl_bob_lag_impact_air.GetFloat(), zm_cl_bob_lag_impact_air.GetFloat() );
+    }
+
+    float flOriginalDelta = delta;
+
+
+    float flNextDelta = flOriginalDelta;
+    
+    
+    if ( bOnGround != m_bOnGround )
+    {
+        m_bOnGround = bOnGround;
+        m_flGroundTime = gpGlobals->curtime;
+
+        if ( bOnGround )
+        {
+            float impactSpd = fabsf( delta ) / flInterp;
+            impactSpd = MAX( impactSpd, 0.0f );
+
+            float mult = impactSpd / 400.0f;
+            mult = MIN( mult, 1.0f );
+
+            m_flImpactTargetDelta = m_flLastImpactDelta;
+            m_flImpactVel = zm_cl_bob_lag_impact_land.GetFloat() * mult;
+            m_flImpactVelOrig = m_flImpactVel;
+        }
+    }
+
+    
+    if ( bOnGround )
+    {
+        if ( m_flImpactVel <= 0.0f && m_flImpactTargetDelta <= flOriginalDelta )
+        {
+            flNextDelta = flOriginalDelta;
+        }
+        else
+        {
+            m_flImpactVel -= zm_cl_bob_lag_impact_land_rate.GetFloat() * gpGlobals->frametime;
+
+            if ( m_flImpactTargetDelta < flOriginalDelta )
+            {
+                m_flImpactVel = MAX( m_flImpactVel, m_flImpactVelOrig );
+            }
+
+            m_flImpactTargetDelta += m_flImpactVel * gpGlobals->frametime;
+            flNextDelta = m_flImpactTargetDelta;
+        }
+    }
+
+    ang.x += flNextDelta;
+
+    if ( !bOnGround )
+    {
+        m_flLastImpactDelta = flNextDelta;
+    }
 
     return true;
 }
