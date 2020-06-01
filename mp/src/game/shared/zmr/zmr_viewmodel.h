@@ -38,8 +38,13 @@ public:
     bool CanAnimBob() const;
     bool PerformOldBobbing( Vector& vecPos, QAngle& ang );
     void PerformAnimBobbing();
+
     bool PerformIronSight( Vector& vecPos, QAngle& ang );
-    bool PerformLag( Vector& vecPos, QAngle& ang, const QAngle& origAng );
+
+    bool PerformLag( Vector& vecPos, QAngle& ang, const Vector& origPos, const QAngle& origAng );
+    bool PerformAngleLag( Vector& vecPos, QAngle& ang, const QAngle& origAng );
+    bool PerformMovementLag( Vector& vecPos, QAngle& ang, const Vector& fwd, const Vector& right );
+    bool PerformImpactLag( Vector& vecPos, QAngle& ang, const Vector& origPos );
 #endif
 
     CZMPlayer* GetOwner() const { return static_cast<CZMPlayer*>( CBaseViewModel::GetOwner() ); };
@@ -63,6 +68,14 @@ private:
     CNetworkArray( float, m_flClr, 3 );
 
 #ifdef CLIENT_DLL
+    // This is used to lag the viewmodel.
+    CInterpolatedVar<QAngle> m_LagAnglesHistory;
+    QAngle m_vLagAngles;
+
+    CInterpolatedVar<float> m_flLagEyePosZHistory;
+    float m_flLagEyePosZ;
+
+
     bool m_bDrawVM; // We have to override this so the client can decide whether to draw it.
 
     int m_iOverrideModelIndex;
@@ -75,6 +88,14 @@ private:
     int m_iPoseParamMoveX;
     int m_iPoseParamVertAim;
     int m_iAttachmentIronsight;
+
+    bool m_bOnGround;
+    float m_flGroundTime; // When we left or arrived.
+
+    float m_flImpactTargetDelta;
+    float m_flLastImpactDelta;
+    float m_flImpactVel;
+    float m_flImpactVelOrig;
 #endif
 };
 
