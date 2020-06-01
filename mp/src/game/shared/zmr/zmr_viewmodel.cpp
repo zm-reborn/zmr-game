@@ -72,6 +72,10 @@ CZMViewModel::CZMViewModel()
 
     m_bInIronSight = false;
     m_flIronSightFrac = 0.0f;
+
+
+    m_iPoseParamMoveX = -1;
+    m_iPoseParamVertAim = -1;
 #else
     SetModelColor2( 1.0f, 1.0f, 1.0f );
 #endif
@@ -141,14 +145,20 @@ void CZMViewModel::CalcViewModelView( CBasePlayer* pOwner, const Vector& eyePosi
     Vector newPos = originalPos;
     QAngle newAng = originalAng;
 
+    // Arms are bonemerged. They don't need this fancy stuff.
+    if ( ViewModelIndex() == VMINDEX_WEP )
+    {
 #ifdef CLIENT_DLL
-    // Let the viewmodel shake at about 10% of the amplitude of the player's view
-    vieweffects->ApplyShake( newPos, newAng, 0.1f );
+        // Let the viewmodel shake at about 10% of the amplitude of the player's view
+        vieweffects->ApplyShake( newPos, newAng, 0.1f );
 
-    PerformIronSight( newPos, newAng );
+        PerformIronSight( newPos, newAng );
 
-    PerformLag( newPos, newAng, originalAng );
+        PerformOldBobbing( newPos, newAng );
+
+        PerformLag( newPos, newAng, originalAng );
 #endif
+    }
 
     SetLocalOrigin( newPos );
     SetLocalAngles( newAng );
@@ -175,8 +185,7 @@ bool C_ZMViewModel::PerformIronSight( Vector& vecOut, QAngle& angOut )
     if ( ViewModelIndex() != VMINDEX_WEP ) return false;
 
 
-    auto iAttachment = LookupAttachment( "ironsight" );
-    if ( iAttachment <= 0 ) return false;
+    if ( m_iAttachmentIronsight <= 0 ) return false;
 
 
     auto* pWeapon = C_ZMViewModel::GetWeapon();
@@ -218,7 +227,7 @@ bool C_ZMViewModel::PerformIronSight( Vector& vecOut, QAngle& angOut )
 
     // Get the iron sight position relative to the camera position.
     auto* pHdr = GetModelPtr();
-    auto& attachment = pHdr->pAttachment( iAttachment-1 );
+    auto& attachment = pHdr->pAttachment( m_iAttachmentIronsight-1 );
 
     // The attachment position is local to the bone.
     // Here we are assuming that the bone is at origin.
@@ -246,33 +255,138 @@ bool C_ZMViewModel::PerformLag( Vector& vecPos, QAngle& ang, const QAngle& origA
     return true;
 }
 
-void C_ZMViewModel::PerformAnimBobbing()
+bool C_ZMViewModel::CanAnimBob() const
 {
-    // ZMRTODO: Put this somewhere else.
-    auto* pOwner = ToZMPlayer( GetOwner() );
-    if ( !pOwner ) return;
+    return m_iPoseParamMoveX != -1;
+}
 
-    auto* pVM = this;//pOwner->GetViewModel( m_nViewModelIndex );
+// Version of cl_bob* cvars that are actually useful...
+ConVar cl_bobcycle( "cl_bobcycle", "0.6", 0 , "How fast the bob cycles", true, 0.01f, false, 0.0f );
+ConVar cl_bobup( "cl_bobup", "0.5", 0 , "Don't change...", true, 0.01f, true, 0.99f );
+ConVar cl_bobvertscale( "cl_bobvertscale", "0.6", 0, "Vertical scale" ); // Def. is 0.1
+ConVar cl_boblatscale( "cl_boblatscale", "0.8", 0, "Lateral scale" );
+ConVar cl_bobenable( "cl_bobenable", "1" );
 
-    int iPoseParamIndex = pVM->LookupPoseParameter( "move_x" );
-    int iVerticalPoseParamIndex = pVM->LookupPoseParameter( "ver_aims" );
 
-
-    //pVM->SetPlaybackRate( 0.2f );
-
-    if ( iVerticalPoseParamIndex != -1 )
+bool C_ZMViewModel::PerformOldBobbing( Vector& vecPos, QAngle& ang )
+{
+    // We're going to be doing the animation bobbing.
+    // Skip us.
+    if ( CanAnimBob() )
     {
-        float vert = pOwner->EyeAngles().x;
-        vert = clamp( vert, -90.0f, 90.0f );
-        vert /= 90.0f;
-
-        pVM->SetPoseParameter( iVerticalPoseParamIndex, vert );
+        return false;
     }
 
-    if ( iPoseParamIndex != -1 && testbob.GetBool() )
+
+    if ( !cl_bobenable.GetBool() )
+        return false;
+
+
+    float bobup = cl_bobup.GetFloat();
+    float bobcycle = cl_bobcycle.GetFloat();
+    
+
+    auto* pOwner = GetOwner();
+
+
+    if ( !pOwner || bobcycle <= 0.0f || bobup <= 0.0f || bobup >= 1.0f )
     {
+        return false;
+    }
+
+
+    static float bobtime = 0.0f;
+    static float lastbobtime = 0.0f;
+    float cycle;
+
+    float verticalBob;
+    float lateralBob;
+
+
+    const float flMaxGroundSpeed = pOwner->GetPlayerMaxSpeed();
+
+
+    float speed = pOwner->GetLocalVelocity().Length2D();
+    float bob_offset = RemapValClamped( speed, 0, flMaxGroundSpeed, 0.0f, 1.0f );
+    
+    bobtime += ( gpGlobals->curtime - lastbobtime ) * bob_offset;
+    lastbobtime = gpGlobals->curtime;
+
+    // Calculate the vertical bob
+    cycle = bobtime - (int)(gpGlobals->curtime/bobcycle)*bobcycle;
+    cycle /= bobcycle;
+
+    if ( cycle < bobup )
+    {
+        cycle = M_PI_F * cycle / bobup;
+    }
+    else
+    {
+        cycle = M_PI_F + M_PI_F*(cycle-bobup)/(1.0f - bobup);
+    }
+    
+    verticalBob = speed*0.005f;
+    verticalBob = verticalBob*0.3f + verticalBob*0.7f*sinf(cycle);
+
+    verticalBob = clamp( verticalBob, -7.0f, 4.0f );
+
+    // Calculate the lateral bob
+    cycle = bobtime - (int)(bobtime/bobcycle*2)*bobcycle*2;
+    cycle /= bobcycle*2;
+
+    if ( cycle < bobup )
+    {
+        cycle = M_PI_F * cycle / bobup;
+    }
+    else
+    {
+        cycle = M_PI_F + M_PI_F*(cycle-bobup)/(1.0f - bobup);
+    }
+
+    
+    lateralBob = speed*0.005f;
+    lateralBob = lateralBob*0.3f + lateralBob*0.7f*sinf(cycle);
+    lateralBob = clamp( lateralBob, -7.0f, 4.0f );
+
+
+
+    Vector	fwd, right;
+    AngleVectors( ang, &fwd, &right, nullptr );
+
+    // Apply bob, but scaled down to 40%
+    VectorMA( vecPos, verticalBob * cl_bobvertscale.GetFloat(), fwd, vecPos );
+    
+    // Z bob a bit more
+    vecPos.z += verticalBob * 0.1f;
+    
+    // bob the angles
+    ang.z += verticalBob * 0.5f; // Roll
+    ang.x -= verticalBob * 0.4f; // Pitch
+
+    ang.y -= lateralBob * 0.3f; // Yaw
+
+
+    VectorMA( vecPos, lateralBob * cl_boblatscale.GetFloat(), right, vecPos );
+
+    return true;
+}
+
+void C_ZMViewModel::PerformAnimBobbing()
+{
+    auto* pOwner = GetOwner();
+    if ( !pOwner ) return;
+
+
+
+    //
+    // Bobbing
+    //
+    if ( m_iPoseParamMoveX != -1 )
+    {
+        const float flMaxGroundSpeed = pOwner->GetPlayerMaxSpeed();
+
         float spd = pOwner->GetLocalVelocity().Length2D();
-        float target = spd > 0.1f ? spd / 190.0f : 0.0f;
+        float target = spd > 0.1f ? spd / flMaxGroundSpeed : 0.0f;
         target = clamp( target, 0.0f, 1.0f );
 
         //
@@ -287,7 +401,7 @@ void C_ZMViewModel::PerformAnimBobbing()
         // When setting the pose parameter, we need to use former scale.
         // 
 
-        float cur = pVM->GetPoseParameter( iPoseParamIndex );
+        float cur = GetPoseParameter( m_iPoseParamMoveX );
         cur = clamp( cur, 0.5f, 1.0f );
 
         // Translate from
@@ -305,38 +419,21 @@ void C_ZMViewModel::PerformAnimBobbing()
 
         float newratio = cur + add;
 
-        pVM->SetPoseParameter( iPoseParamIndex, clamp( newratio, 0.001f, 1.0f ) );
-        //pVM->SetPlaybackRate( clamp( newratio, 0.001f, 1.0f ) );
+        SetPoseParameter( m_iPoseParamMoveX, clamp( newratio, 0.0f, 1.0f ) );
     }
-    else
+
+    //
+    // Vertical aiming stuff (unused)
+    //
+    if ( m_iPoseParamVertAim != -1 )
     {
-        //pVM->SetPlaybackRate( 1.0f );
+        float vert = pOwner->EyeAngles().x;
+        vert = clamp( vert, -90.0f, 90.0f );
+        vert /= 90.0f;
+
+        SetPoseParameter( m_iPoseParamVertAim, vert );
     }
 }
-
-#ifdef CLIENT_DLL
-CON_COMMAND(testbobbingvalue, "")
-{
-#ifdef CLIENT_DLL
-    auto* pOwner = C_ZMPlayer::GetLocalPlayer();
-#else
-    auto* pOwner = ToZMPlayer( UTIL_GetCommandClient() );
-#endif
-
-    if ( !pOwner ) return;
-
-
-    float value = atof( args.Arg( 1 ) );
-    // ZMRTODO: Put this somewhere else.
-    auto* pVM = pOwner->GetViewModel( VMINDEX_WEP );
-
-    int iPoseParamIndex = pVM->LookupPoseParameter( "move_x" );
-    if ( iPoseParamIndex != -1 )
-    {
-        pVM->SetPoseParameter( iPoseParamIndex, value );
-    }
-}
-#endif // CLIENT_DLL
 
 int C_ZMViewModel::CalcOverrideModelIndex()
 {
@@ -354,6 +451,18 @@ int C_ZMViewModel::CalcOverrideModelIndex()
 
 
     return m_iOverrideModelIndex;
+}
+
+CStudioHdr* C_ZMViewModel::OnNewModel()
+{
+    auto* pHdr = BaseClass::OnNewModel();
+
+    m_iPoseParamMoveX = LookupPoseParameter( "move_x" );
+    m_iPoseParamVertAim = LookupPoseParameter( "ver_aims" );
+
+    m_iAttachmentIronsight = LookupAttachment( "ironsight" );
+
+    return pHdr;
 }
 
 int C_ZMViewModel::DrawModel( int flags )
