@@ -22,6 +22,7 @@ public:
 
 #ifdef CLIENT_DLL
     virtual int                 CalcOverrideModelIndex() OVERRIDE;
+    virtual CStudioHdr*         OnNewModel() OVERRIDE;
     virtual int                 DrawModel( int flags ) OVERRIDE;
     virtual bool                ShouldReceiveProjectedTextures( int flags ) OVERRIDE;
     virtual C_BaseAnimating*    FindFollowedEntity() OVERRIDE;
@@ -33,6 +34,8 @@ public:
     CZMBaseWeapon* GetWeapon() const { return static_cast<CZMBaseWeapon*>( CBaseViewModel::GetWeapon() ); }
 
 
+    bool CanAnimBob() const;
+    bool PerformOldBobbing( Vector& vecPos, QAngle& ang );
     void PerformAnimBobbing();
     bool PerformIronSight( Vector& vecPos, QAngle& ang );
     bool PerformLag( Vector& vecPos, QAngle& ang, const QAngle& origAng );
@@ -65,6 +68,10 @@ private:
 
     bool m_bInIronSight;
     float m_flIronSightFrac;
+
+    int m_iPoseParamMoveX;
+    int m_iPoseParamVertAim;
+    int m_iAttachmentIronsight;
 #endif
 };
 
