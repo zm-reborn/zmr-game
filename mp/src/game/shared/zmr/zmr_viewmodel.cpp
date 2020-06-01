@@ -61,8 +61,11 @@ BEGIN_PREDICTION_DATA( C_ZMViewModel )
 END_PREDICTION_DATA()
 #endif
 
-
+#ifdef CLIENT_DLL
+CZMViewModel::CZMViewModel() : m_LagAnglesHistory( "CZMViewModel::m_LagAnglesHistory" )
+#else
 CZMViewModel::CZMViewModel()
+#endif
 {
 #ifdef CLIENT_DLL
     m_bDrawVM = true;
@@ -91,7 +94,7 @@ CZMViewModel::~CZMViewModel()
 
 CBaseCombatWeapon* CZMViewModel::GetOwningWeapon()
 {
-    auto* pOwner = BaseClass::GetOwningWeapon();
+    auto* pOwner = CBaseViewModel::GetOwningWeapon();
     if ( pOwner )
         return pOwner;
 
@@ -172,6 +175,15 @@ void C_ZMViewModel::UpdateClientSideAnimation()
     PerformAnimBobbing();
 
     BaseClass::UpdateClientSideAnimation();
+}
+
+bool C_ZMViewModel::ShouldPredict()
+{
+    auto* pOwner = GetOwner();
+    if ( pOwner && pOwner == C_ZMPlayer::GetLocalPlayer() )
+        return true;
+
+    return BaseClass::ShouldPredict();
 }
 
 bool C_ZMViewModel::Interpolate( float currentTime )

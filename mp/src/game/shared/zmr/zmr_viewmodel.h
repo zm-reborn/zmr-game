@@ -1,6 +1,6 @@
 #pragma once
 
-#include "predicted_viewmodel.h"
+#include "baseviewmodel_shared.h"
 
 #include "weapons/zmr_base.h"
 
@@ -8,10 +8,10 @@
 #define CZMViewModel C_ZMViewModel
 #endif
 
-class CZMViewModel : public CPredictedViewModel
+class CZMViewModel : public CBaseViewModel
 {
 public:
-    DECLARE_CLASS( CZMViewModel, CPredictedViewModel );
+    DECLARE_CLASS( CZMViewModel, CBaseViewModel );
     DECLARE_NETWORKCLASS();
 #ifdef CLIENT_DLL
     DECLARE_PREDICTABLE();
@@ -29,6 +29,7 @@ public:
 
     virtual void                UpdateClientSideAnimation() OVERRIDE;
 
+    virtual bool                ShouldPredict() OVERRIDE;
     virtual bool                Interpolate( float currentTime ) OVERRIDE;
 
     CZMBaseWeapon* GetWeapon() const { return static_cast<CZMBaseWeapon*>( CBaseViewModel::GetWeapon() ); }
@@ -40,6 +41,8 @@ public:
     bool PerformIronSight( Vector& vecPos, QAngle& ang );
     bool PerformLag( Vector& vecPos, QAngle& ang, const QAngle& origAng );
 #endif
+
+    CZMPlayer* GetOwner() const { return static_cast<CZMPlayer*>( CBaseViewModel::GetOwner() ); };
 
     virtual void CalcViewModelView( CBasePlayer* pOwner, const Vector& eyePosition, const QAngle& eyeAngles ) OVERRIDE;
 
