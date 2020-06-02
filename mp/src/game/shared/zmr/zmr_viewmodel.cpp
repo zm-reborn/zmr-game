@@ -94,8 +94,6 @@ CZMViewModel::CZMViewModel()
 #endif
 
     UseClientSideAnimation();
-
-    //m_flPlaybackRate = 1.0f;
 }
 
 CZMViewModel::~CZMViewModel()
@@ -109,6 +107,7 @@ CBaseCombatWeapon* CZMViewModel::GetOwningWeapon()
         return pOwner;
 
 
+    // Arm viewmodel does not have an owning. Ask our brother.
     if ( ViewModelIndex() == VMINDEX_HANDS )
     {
         auto* pPlayer = static_cast<C_ZMPlayer*>( GetOwner() );
@@ -165,7 +164,7 @@ void CZMViewModel::CalcViewModelView( CBasePlayer* pOwner, const Vector& eyePosi
         // Let the viewmodel shake at about 10% of the amplitude of the player's view
         vieweffects->ApplyShake( newPos, newAng, 0.1f );
 
-        PerformIronSight( newPos, newAng );
+        PerformIronSight( newPos, newAng, originalAng );
 
         PerformOldBobbing( newPos, newAng );
 
@@ -178,8 +177,6 @@ void CZMViewModel::CalcViewModelView( CBasePlayer* pOwner, const Vector& eyePosi
 }
 
 #ifdef CLIENT_DLL
-static ConVar testbob("testbob", "1");
-
 void C_ZMViewModel::UpdateClientSideAnimation()
 {
     PerformAnimBobbing();
@@ -202,7 +199,15 @@ bool C_ZMViewModel::Interpolate( float currentTime )
     return C_BaseAnimating::Interpolate( currentTime );
 }
 
-bool C_ZMViewModel::PerformIronSight( Vector& vecOut, QAngle& angOut )
+bool C_ZMViewModel::IsInIronsights() const
+{
+    return m_bInIronSight;
+}
+
+ConVar zm_cl_ironsight_zoom_rate( "zm_cl_ironsight_zoom_rate", "1.2" );
+ConVar zm_cl_ironsight_unzoom_rate( "zm_cl_ironsight_unzoom_rate", "1.2" );
+
+bool C_ZMViewModel::PerformIronSight( Vector& vecOut, QAngle& angOut, const QAngle& origAng )
 {
     if ( ViewModelIndex() != VMINDEX_WEP ) return false;
 
@@ -228,7 +233,7 @@ bool C_ZMViewModel::PerformIronSight( Vector& vecOut, QAngle& angOut )
     {
         if ( m_flIronSightFrac != 1.0f )
         {
-            m_flIronSightFrac += gpGlobals->frametime * 1.2f;
+            m_flIronSightFrac += gpGlobals->frametime * zm_cl_ironsight_zoom_rate.GetFloat();
             m_flIronSightFrac = MIN( m_flIronSightFrac, 1.0f );
         }
     }
@@ -236,7 +241,7 @@ bool C_ZMViewModel::PerformIronSight( Vector& vecOut, QAngle& angOut )
     {
         if ( m_flIronSightFrac != 0.0f )
         {
-            m_flIronSightFrac -= gpGlobals->frametime * 1.2f;
+            m_flIronSightFrac -= gpGlobals->frametime * zm_cl_ironsight_unzoom_rate.GetFloat();
             m_flIronSightFrac = MAX( m_flIronSightFrac, 0.0f );
         }
     }
@@ -256,12 +261,22 @@ bool C_ZMViewModel::PerformIronSight( Vector& vecOut, QAngle& angOut )
     MatrixPosition( attachment.local, vecLocal );
 
     
-    VectorRotate( vecLocal, angOut, vecIronsightPos );
+    VectorRotate( vecLocal, origAng, vecIronsightPos );
 
 
-    auto smootherstep = []( float x ) { return x * x * x * (x * (x * 6 - 15) + 10); };
+    //auto smootherstep = []( float x ) { return x * x * x * (x * (x * 6 - 15) + 10); };
+    auto inversesquare = [ this ]( float x )
+    {
+        if ( m_bInIronSight )
+        {
+            float inv = 1.0f - x;
+            return 1.0f - inv * inv;
+        }
+        else
+            return x * x;
+    };
 
-    Vector vecCur = Lerp( smootherstep( m_flIronSightFrac ), vecEyePos, vecIronsightPos );
+    Vector vecCur = Lerp( inversesquare( m_flIronSightFrac ), vecEyePos, vecIronsightPos );
     
 
     vecOut -= vecCur;
@@ -281,11 +296,13 @@ bool C_ZMViewModel::PerformLag( Vector& vecPos, QAngle& ang, const Vector& origP
     Vector fwd, right;
     AngleVectors( origAng, &fwd, &right, nullptr );
 
-
+    // Looking around moves the vm
     PerformAngleLag( vecPos, ang, origAng );
     
+    // Moving around moves the vm
     PerformMovementLag( vecPos, ang, fwd, right );
 
+    // Jumping/crouching/landing moves the vm
     PerformImpactLag( vecPos, ang, origPos );
 
 
@@ -303,12 +320,10 @@ bool C_ZMViewModel::PerformAngleLag( Vector& vecPos, QAngle& ang, const QAngle& 
     // Add an entry to the history.
     m_vLagAngles = origAng;
     m_LagAnglesHistory.NoteChanged( gpGlobals->curtime, flInterp, false );
-	
+    
     // Interpolate back 100ms.
     m_LagAnglesHistory.Interpolate( gpGlobals->curtime, flInterp );
 
-
-    //VectorAngles( m_vLagAngles, angLag );
 
     QAngle angleDiff = origAng - m_vLagAngles;
 
@@ -326,7 +341,11 @@ bool C_ZMViewModel::PerformMovementLag( Vector& vecPos, QAngle& ang, const Vecto
         return false;
 
 
-    const float flMaxGroundSpeed = pOwner->GetPlayerMaxSpeed();
+    if ( IsInIronsights() )
+        return false;
+
+    float flMaxGroundSpeed = pOwner->GetPlayerMaxSpeed();
+    flMaxGroundSpeed = MAX( flMaxGroundSpeed, 1.0f ); // Please don't divide by 0
 
 
     Vector vel = pOwner->GetLocalVelocity();
@@ -334,10 +353,11 @@ bool C_ZMViewModel::PerformMovementLag( Vector& vecPos, QAngle& ang, const Vecto
     Vector vecVelDir = vel;
     vecVelDir.x = vecVelDir.x / flMaxGroundSpeed;
     vecVelDir.y = vecVelDir.y / flMaxGroundSpeed;
+    vecVelDir.z = 0.0f;
 
     // Clamp to 1
-    vecVelDir.x = MIN( vecVelDir.x, 1.0f );
-    vecVelDir.y = MIN( vecVelDir.y, 1.0f );
+    vecVelDir.x = clamp( vecVelDir.x, -1.0f, 1.0f );
+    vecVelDir.y = clamp( vecVelDir.y, -1.0f, 1.0f );
 
     //float dotFwd = fwd.Dot( vecVelDir );
     float dotRight = right.Dot( vecVelDir );
@@ -374,9 +394,11 @@ bool C_ZMViewModel::PerformImpactLag( Vector& vecPos, QAngle& ang, const Vector&
     bool bOnGround = (pOwner->GetFlags() & FL_ONGROUND) != 0;
 
 
+    // Add an entry to history.
     m_flLagEyePosZ = origPos.z;
     m_flLagEyePosZHistory.NoteChanged( gpGlobals->curtime, flInterp, false );
 
+    // Interpolate back 100ms.
     m_flLagEyePosZHistory.Interpolate( gpGlobals->curtime, flInterp );
 
 
@@ -386,13 +408,15 @@ bool C_ZMViewModel::PerformImpactLag( Vector& vecPos, QAngle& ang, const Vector&
     
     if ( bOnGround )
     {
+        float maxvalue = fabsf( zm_cl_bob_lag_impact_ground.GetFloat() );
         delta *= zm_cl_bob_lag_impact_ground_rate.GetFloat();
-        delta = clamp( delta, -zm_cl_bob_lag_impact_ground.GetFloat(), zm_cl_bob_lag_impact_ground.GetFloat() );
+        delta = clamp( delta, -maxvalue, maxvalue );
     }
     else
     {
+        float maxvalue = fabsf( zm_cl_bob_lag_impact_air.GetFloat() );
         delta *= zm_cl_bob_lag_impact_air_rate.GetFloat();
-        delta = clamp( delta, -zm_cl_bob_lag_impact_air.GetFloat(), zm_cl_bob_lag_impact_air.GetFloat() );
+        delta = clamp( delta, -maxvalue, maxvalue );
     }
 
     float flOriginalDelta = delta;
@@ -401,6 +425,7 @@ bool C_ZMViewModel::PerformImpactLag( Vector& vecPos, QAngle& ang, const Vector&
     float flNextDelta = flOriginalDelta;
     
     
+    // Jumping/landing
     if ( bOnGround != m_bOnGround )
     {
         m_bOnGround = bOnGround;
@@ -408,10 +433,14 @@ bool C_ZMViewModel::PerformImpactLag( Vector& vecPos, QAngle& ang, const Vector&
 
         if ( bOnGround )
         {
+            // We landed, init the impact logic.
+            const float flMaxLandingSpeed = 400.0f;
+
+
             float impactSpd = fabsf( delta ) / flInterp;
             impactSpd = MAX( impactSpd, 0.0f );
 
-            float mult = impactSpd / 400.0f;
+            float mult = impactSpd / flMaxLandingSpeed;
             mult = MIN( mult, 1.0f );
 
             m_flImpactTargetDelta = m_flLastImpactDelta;
@@ -423,14 +452,12 @@ bool C_ZMViewModel::PerformImpactLag( Vector& vecPos, QAngle& ang, const Vector&
     
     if ( bOnGround )
     {
-        if ( m_flImpactVel <= 0.0f && m_flImpactTargetDelta <= flOriginalDelta )
-        {
-            flNextDelta = flOriginalDelta;
-        }
-        else
+        // We're doing the impact effect.
+        if ( m_flImpactVel > 0.0f || m_flImpactTargetDelta > flOriginalDelta )
         {
             m_flImpactVel -= zm_cl_bob_lag_impact_land_rate.GetFloat() * gpGlobals->frametime;
 
+            // Still above our intended spot, maintain velocity.
             if ( m_flImpactTargetDelta < flOriginalDelta )
             {
                 m_flImpactVel = MAX( m_flImpactVel, m_flImpactVelOrig );
@@ -443,7 +470,7 @@ bool C_ZMViewModel::PerformImpactLag( Vector& vecPos, QAngle& ang, const Vector&
 
     ang.x += flNextDelta;
 
-    if ( !bOnGround )
+    if ( !bOnGround ) // Save our last delta for the impact effect.
     {
         m_flLastImpactDelta = flNextDelta;
     }
@@ -474,6 +501,9 @@ bool C_ZMViewModel::PerformOldBobbing( Vector& vecPos, QAngle& ang )
     }
 
 
+    if ( IsInIronsights() )
+        return false;
+
     if ( !cl_bobenable.GetBool() )
         return false;
 
@@ -503,7 +533,8 @@ bool C_ZMViewModel::PerformOldBobbing( Vector& vecPos, QAngle& ang )
 
 
     float speed = pOwner->GetLocalVelocity().Length2D();
-    float bob_offset = RemapValClamped( speed, 0, flMaxGroundSpeed, 0.0f, 1.0f );
+    speed = clamp( speed, 0.0f, flMaxGroundSpeed*2.0f ); // Clamp the speed a bit so it doesn't look terrible.
+    float bob_offset = RemapValClamped( speed, 0.0f, flMaxGroundSpeed, 0.0f, 1.0f );
     
     bobtime += ( gpGlobals->curtime - lastbobtime ) * bob_offset;
     lastbobtime = gpGlobals->curtime;
@@ -567,6 +598,9 @@ bool C_ZMViewModel::PerformOldBobbing( Vector& vecPos, QAngle& ang )
     return true;
 }
 
+ConVar zm_cl_bob_anim_accel( "zm_cl_bob_anim_accel", "1" );
+ConVar zm_cl_bob_anim_decel( "zm_cl_bob_anim_decel", "1.2" );
+
 void C_ZMViewModel::PerformAnimBobbing()
 {
     auto* pOwner = GetOwner();
@@ -579,7 +613,9 @@ void C_ZMViewModel::PerformAnimBobbing()
     //
     if ( m_iPoseParamMoveX != -1 )
     {
-        const float flMaxGroundSpeed = pOwner->GetPlayerMaxSpeed();
+        float flMaxGroundSpeed = pOwner->GetPlayerMaxSpeed();
+        flMaxGroundSpeed = MAX( flMaxGroundSpeed, 1.0f ); // Please don't divide by 0
+
 
         float spd = pOwner->GetLocalVelocity().Length2D();
         float target = spd > 0.1f ? spd / flMaxGroundSpeed : 0.0f;
@@ -605,17 +641,23 @@ void C_ZMViewModel::PerformAnimBobbing()
         cur /= 0.5f;
         cur -= 1.0f;
 
-        float add = gpGlobals->frametime * 1.0f;
-        if ( target < cur )
+
+        float add = 0.0f;
+        if ( target > cur )
         {
-            add *= -1.0f * 1.2f;
+            add = zm_cl_bob_anim_accel.GetFloat();
         }
-        //else if ( cur == target )
-        //    return;
+        else if ( target < cur )
+        {
+            add = -zm_cl_bob_anim_decel.GetFloat();
+        }
 
-        float newratio = cur + add;
+        if ( add != 0.0f )
+        {
+            float newratio = cur + gpGlobals->frametime * add;
 
-        SetPoseParameter( m_iPoseParamMoveX, clamp( newratio, 0.0f, 1.0f ) );
+            SetPoseParameter( m_iPoseParamMoveX, clamp( newratio, 0.0f, 1.0f ) );
+        }
     }
 
     //

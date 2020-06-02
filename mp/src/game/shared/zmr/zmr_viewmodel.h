@@ -39,7 +39,8 @@ public:
     bool PerformOldBobbing( Vector& vecPos, QAngle& ang );
     void PerformAnimBobbing();
 
-    bool PerformIronSight( Vector& vecPos, QAngle& ang );
+    bool IsInIronsights() const;
+    bool PerformIronSight( Vector& vecPos, QAngle& ang, const QAngle& origAng );
 
     bool PerformLag( Vector& vecPos, QAngle& ang, const Vector& origPos, const QAngle& origAng );
     bool PerformAngleLag( Vector& vecPos, QAngle& ang, const QAngle& origAng );
