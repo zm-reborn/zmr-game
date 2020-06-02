@@ -196,6 +196,11 @@ bool C_ZMViewModel::ShouldPredict()
 bool C_ZMViewModel::Interpolate( float currentTime )
 {
     // We need to skip the C_BaseViewModel interpolation as it fucks up our client-side cycle.
+    
+    // Animation parity makes sure our animation cycle is up-to-date
+    // in case unpredicted thing happens.
+    UpdateAnimationParity();
+
     return C_BaseAnimating::Interpolate( currentTime );
 }
 

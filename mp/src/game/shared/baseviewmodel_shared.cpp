@@ -365,8 +365,10 @@ void CBaseViewModel::SendViewModelMatchingSequence( int sequence )
 #if defined( CLIENT_DLL )
 	m_nOldAnimationParity = m_nAnimationParity;
 
+#ifndef ZMR // ZMRCHANGE: This makes animations freeze for a few frames. (client-side vm anims)
 	// Force frame interpolation to start at exactly frame zero
 	m_flAnimTime			= gpGlobals->curtime;
+#endif // ZMR
 #else
 	CBaseCombatWeapon *weapon = m_hWeapon.Get();
 	bool showControlPanels = weapon && weapon->ShouldShowControlPanels();
