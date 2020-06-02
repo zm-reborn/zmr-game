@@ -221,6 +221,8 @@ bool C_ZMViewModel::PerformIronSight( Vector& vecOut, QAngle& angOut, const QAng
 
 
     auto* pWeapon = C_ZMViewModel::GetWeapon();
+    if ( !pWeapon ) return false;
+
 
     bool bPrevState = m_bInIronSight;
     bool bChanged = false;
