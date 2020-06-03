@@ -659,12 +659,9 @@ void C_ZMViewModel::PerformAnimBobbing()
             add = -zm_cl_bob_anim_decel.GetFloat();
         }
 
-        if ( add != 0.0f )
-        {
-            float newratio = cur + gpGlobals->frametime * add;
 
-            SetPoseParameter( m_iPoseParamMoveX, clamp( newratio, 0.0f, 1.0f ) );
-        }
+        float newratio = cur + gpGlobals->frametime * add;
+        SetPoseParameter( m_iPoseParamMoveX, clamp( newratio, 0.0f, 1.0f ) );
     }
 
     //
@@ -706,6 +703,11 @@ CStudioHdr* C_ZMViewModel::OnNewModel()
     m_iPoseParamVertAim = LookupPoseParameter( "ver_aims" );
 
     m_iAttachmentIronsight = LookupAttachment( "ironsight" );
+
+
+    m_LagAnglesHistory.ClearHistory();
+    m_flLagEyePosZHistory.ClearHistory();
+
 
     return pHdr;
 }
