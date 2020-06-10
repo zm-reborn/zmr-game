@@ -140,7 +140,7 @@ public:
 
     bool QueueUnit( CZMPlayer* pPlayer, ZombieClass_t zclass, int amount );
     void QueueClear( int inamount = -1, int inpos = -1 );
-    bool CanSpawn( ZombieClass_t zclass );
+    bool CanSpawn( ZombieClass_t zclass ) const;
 
     void SendMenuUpdate() OVERRIDE;
 
@@ -376,7 +376,7 @@ public:
 
 
     void Reset();
-    void DistributeToPlayer( CZMPlayer* );
+    void DistributeToPlayer( CZMPlayer* pPlayer );
     
 
     inline LoadOutMethod_t GetMethod();

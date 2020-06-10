@@ -156,7 +156,7 @@ public:
 
 
 
-    CZMEntAmbushTrigger*    GetAmbushTrigger() { return m_hAmbushEnt.Get(); };
+    CZMEntAmbushTrigger*    GetAmbushTrigger() const { return m_hAmbushEnt.Get(); };
     void                    SetAmbush( CZMEntAmbushTrigger* trigger );
     void                    RemoveFromAmbush( bool bRemoveFromAmbushEnt = true );
 
@@ -215,7 +215,7 @@ public:
 
 
     float   GetNextMove() const { return m_flNextMove; }
-    void    SetNextMove( float time ){ m_flNextMove = time; }
+    void    SetNextMove( float nextmove ) { m_flNextMove = nextmove; }
 
 
     // Hull trace that starts from our origin.
