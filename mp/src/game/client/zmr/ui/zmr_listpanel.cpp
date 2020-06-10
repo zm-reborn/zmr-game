@@ -798,9 +798,9 @@ void CZMListPanel::PerformLayout()
         int sh = 0;
         int systart = absy;
 
-        for ( int i = 0; i < nItems; i++ )
+        for ( int j = 0; j < nItems; j++ )
         {
-            auto* item = section->GetItem( i );
+            auto* item = section->GetItem( j );
 
             int height = item->GetItemHeight();
 

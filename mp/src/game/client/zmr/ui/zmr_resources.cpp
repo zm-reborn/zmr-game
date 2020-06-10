@@ -221,8 +221,8 @@ void CZMResourceHud::Paint()
         if ( m_pIcons[i] )
         {
             //when we get better/larger icons than the current 32x32 ones, replace Width/Height calls with hardcoded 32 size
-            const int w = (int)m_pIcons[i]->Width();
-            const int h = (int)m_pIcons[i]->Height();
+            w = (int)m_pIcons[i]->Width();
+            h = (int)m_pIcons[i]->Height();
 
             //can't avoid some icon-specific positioning
             int indent = 2;
