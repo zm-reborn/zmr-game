@@ -12,7 +12,7 @@
 #pragma once
 #endif
 
-#define ST_EPS 0.001
+#define ST_EPS 0.001f
 
 #define DEFINE_SIMTIMER( type, name ) 	DEFINE_EMBEDDED( type, name )
 
@@ -86,7 +86,7 @@ public:
 	void Set( float interval, bool startExpired = true )
 	{ 
 		m_interval = interval;
-		m_next = (startExpired) ? -1.0 : gpGlobals->curtime + m_interval;
+		m_next = (startExpired) ? -1.0f : gpGlobals->curtime + m_interval;
 	}
 
 	void Reset( float interval = -1.0 )
