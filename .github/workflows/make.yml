@@ -1,0 +1,42 @@
+name: make_game_linux
+
+on:
+  push:
+    branches:
+    - master
+    - dev
+    - hotfix*
+    paths:
+    - mp/src/*
+    - forcebuild.txt
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    # NOTE: Each step sets cwd back to git folder.
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Install Dependencies
+      run: |
+        sudo apt update
+        sudo apt install build-essential gcc-multilib g++-multilib
+    - name: Download Steam Runtime
+      run: |
+        sudo mkdir /valve
+        sudo wget http://media.steampowered.com/client/runtime/steam-runtime-sdk_latest.tar.xz
+        sudo tar xvf steam-runtime-sdk_latest.tar.xz
+        sudo mv steam-runtime-sdk_2013-09-05 /valve/steam-runtime
+    - name: Install Runtime
+      run: cat build/steam-runtime-install.txt | sudo /valve/steam-runtime/setup.sh
+    - name: Create make file
+      run: |
+        cd mp/src
+        ./creategameprojects
+    - name: Make
+      run: cat build/make-game-script.txt | sudo /valve/steam-runtime/shell-i386.sh
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        path: mp/game/zombie_master_reborn/bin/?(*.so|*.dbg)
