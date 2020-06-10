@@ -1551,7 +1551,7 @@ void CZMPlayer::PlayerUse( void )
     BaseClass::PlayerUse();
 }
 
-CZMBaseWeapon* CZMPlayer::GetWeaponOfHighestSlot()
+CZMBaseWeapon* CZMPlayer::GetWeaponOfHighestSlot() const
 {
     CZMBaseWeapon* pWep = nullptr;
 
@@ -1571,7 +1571,7 @@ CZMBaseWeapon* CZMPlayer::GetWeaponOfHighestSlot()
     return ToZMBaseWeapon( Weapon_OwnsThisType( "weapon_zm_fistscarry" ) );
 }
 
-CZMBaseWeapon* CZMPlayer::GetWeaponOfSlot( int slot )
+CZMBaseWeapon* CZMPlayer::GetWeaponOfSlot( int slot ) const
 {
     // You can search for multiple slots.
     if ( !(GetWeaponSlotFlags() & slot) )
@@ -1593,7 +1593,7 @@ CZMBaseWeapon* CZMPlayer::GetWeaponOfSlot( int slot )
     return nullptr;
 }
 
-CZMBaseWeapon* CZMPlayer::GetWeaponOfSlot( const char* szSlotName )
+CZMBaseWeapon* CZMPlayer::GetWeaponOfSlot( const char* szSlotName ) const
 {
     if ( Q_stricmp( szSlotName, "sidearm" ) == 0 )
     {
@@ -1797,7 +1797,7 @@ int CZMPlayer::GetZMCommandInterruptFlags() const
     return atoi( val );
 }
 
-void CZMPlayer::GetMyRecipientFilter( CRecipientFilter& filter )
+void CZMPlayer::GetMyRecipientFilter( CRecipientFilter& filter ) const
 {
     filter.AddRecipient( this );
 

@@ -208,18 +208,18 @@ public:
 
 
     // Implemented in zm_player_shared
-    bool                HasEnoughResToSpawn( ZombieClass_t zclass );
-    bool                HasEnoughRes( int cost );
-    int                 GetWeaponSlotFlags();
-    int                 GetResources();
+    bool                HasEnoughResToSpawn( ZombieClass_t zclass ) const;
+    bool                HasEnoughRes( int cost ) const;
+    int                 GetWeaponSlotFlags() const;
+    int                 GetResources() const;
     void                IncResources( int res, bool bLimit = false );
     void                SetResources( int res );
-    float               GetFlashlightBattery();
+    float               GetFlashlightBattery() const;
     void                SetFlashlightBattery( float battery );
     bool                Weapon_CanSwitchTo( CBaseCombatWeapon* pWeapon ) OVERRIDE;
-    Participation_t     GetParticipation();
+    Participation_t     GetParticipation() const;
     virtual void        PlayStepSound( Vector& vecOrigin, surfacedata_t* psurface, float fvol, bool force ) OVERRIDE;
-    CBaseCombatWeapon*  GetWeaponForAmmo( int iAmmoType );
+    CBaseCombatWeapon*  GetWeaponForAmmo( int iAmmoType ) const;
     virtual Vector      GetAttackSpread( CBaseCombatWeapon* pWeapon, CBaseEntity* pTarget = nullptr ) OVERRIDE;
     virtual Vector      GetAutoaimVector( float flScale ) OVERRIDE;
     void                DoAnimationEvent( PlayerAnimEvent_t playerAnim, int nData = 0 );
@@ -235,9 +235,9 @@ public:
     int                 GetAmmoRoom( int iValidAmmoIndex ) const;
 
 
-    CZMBaseWeapon*  GetWeaponOfHighestSlot();
-    CZMBaseWeapon*  GetWeaponOfSlot( const char* szSlotName );
-    CZMBaseWeapon*  GetWeaponOfSlot( int slot );
+    CZMBaseWeapon*  GetWeaponOfHighestSlot() const;
+    CZMBaseWeapon*  GetWeaponOfSlot( const char* szSlotName ) const;
+    CZMBaseWeapon*  GetWeaponOfSlot( int slot ) const;
     void            SetWeaponSlotFlags( int flags ) { m_ZMLocal.m_fWeaponSlotFlags = flags; }
     void            AddWeaponSlotFlag( int flag ) { m_ZMLocal.m_fWeaponSlotFlags |= flag; }
     void            RemoveWeaponSlotFlag( int flag ) { m_ZMLocal.m_fWeaponSlotFlags &= ~flag; }
@@ -260,7 +260,7 @@ public:
 
     void            UpdatePlayerZMVars();
 
-    void            GetMyRecipientFilter( CRecipientFilter& filter );
+    void            GetMyRecipientFilter( CRecipientFilter& filter ) const;
 
     void InitZMFog();
 
@@ -305,7 +305,7 @@ private:
     float m_flInterpNPCTime;
 
     // Cache of client's ZM movement values
-    void SafelyClampZMValue( float& value, float min, float max );
+    static void SafelyClampZMValue( float& value, float min, float max );
     float m_flZMMoveSpeed;
     float m_flZMMoveAccel;
     float m_flZMMoveDecel;

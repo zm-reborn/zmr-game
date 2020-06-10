@@ -170,22 +170,22 @@ struct ZMFireBulletsInfo_t
 //
 
 
-bool CZMPlayer::HasEnoughResToSpawn( ZombieClass_t zclass )
+bool CZMPlayer::HasEnoughResToSpawn( ZombieClass_t zclass ) const
 {
     return GetResources() >= CZMBaseZombie::GetCost( zclass );
 }
 
-bool CZMPlayer::HasEnoughRes( int cost )
+bool CZMPlayer::HasEnoughRes( int cost ) const
 {
     return GetResources() >= cost;
 }
 
-int CZMPlayer::GetWeaponSlotFlags()
+int CZMPlayer::GetWeaponSlotFlags() const
 {
     return m_ZMLocal.m_fWeaponSlotFlags;
 }
 
-int CZMPlayer::GetResources()
+int CZMPlayer::GetResources() const
 {
     return m_ZMLocal.m_nResources;
 }
@@ -223,7 +223,7 @@ void CZMPlayer::SetResources( int res )
 #endif
 }
 
-float CZMPlayer::GetFlashlightBattery()
+float CZMPlayer::GetFlashlightBattery() const
 {
     return m_ZMLocal.m_flFlashlightBattery;
 }
@@ -256,7 +256,7 @@ bool CZMPlayer::Weapon_CanSwitchTo( CBaseCombatWeapon *pWeapon )
     return true;
 }
 
-Participation_t CZMPlayer::GetParticipation()
+Participation_t CZMPlayer::GetParticipation() const
 {
     Participation_t part;
 #ifdef CLIENT_DLL
@@ -310,7 +310,7 @@ void CZMPlayer::PlayStepSound( Vector& vecOrigin, surfacedata_t* psurface, float
 }
 
 // Shared version of Weapon_GetWpnForAmmo.
-CBaseCombatWeapon* CZMPlayer::GetWeaponForAmmo( int iAmmoType )
+CBaseCombatWeapon* CZMPlayer::GetWeaponForAmmo( int iAmmoType ) const
 {
     for ( int i = 0; i < MAX_WEAPONS; i++ )
     {

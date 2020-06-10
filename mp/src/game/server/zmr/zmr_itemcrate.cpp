@@ -25,8 +25,8 @@ public:
     void Spawn();
 
 
-    inline const char*  GetItemClass() { return STRING( m_iszItemClass ); };
-    inline int          GetItemCount() { return m_nItemCount; };
+    inline const char*  GetItemClass() const { return STRING( m_iszItemClass ); };
+    inline int          GetItemCount() const { return m_nItemCount; };
 
 private:
     virtual int     ObjectCaps() OVERRIDE { return BaseClass::ObjectCaps() | FCAP_WCEDIT_POSITION; };
@@ -37,8 +37,8 @@ private:
 
     int             TranslateItemClassToSkin();
 
-    CBaseEntity*    CreateItem();
-    CZMBaseWeapon*  CreateTemplateItem();
+    CBaseEntity*    CreateItem() const;
+    CZMBaseWeapon*  CreateTemplateItem() const;
 
 
 
@@ -221,12 +221,12 @@ void CZMEntItemCrate::OnBreak( const Vector& vecVelocity, const AngularImpulse& 
     }
 }
 
-CBaseEntity* CZMEntItemCrate::CreateItem()
+CBaseEntity* CZMEntItemCrate::CreateItem() const
 {
     return ( m_iszTemplateData != NULL_STRING ) ? CreateTemplateItem() : CreateEntityByName( STRING( m_iszItemClass ) );
 }
 
-CZMBaseWeapon* CZMEntItemCrate::CreateTemplateItem()
+CZMBaseWeapon* CZMEntItemCrate::CreateTemplateItem() const
 {
     CBaseEntity* pEntity = nullptr;
 

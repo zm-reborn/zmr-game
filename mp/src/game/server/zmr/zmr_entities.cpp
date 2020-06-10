@@ -332,7 +332,7 @@ void CZMEntZombieSpawn::InputUnhide( inputdata_t &inputdata )
     StartSpawning();
 }
 
-bool CZMEntZombieSpawn::CanSpawn( ZombieClass_t zclass )
+bool CZMEntZombieSpawn::CanSpawn( ZombieClass_t zclass ) const
 {
     return (GetZombieFlags() == 0 || (GetZombieFlags() & (1 << zclass)) );
 }

@@ -92,20 +92,20 @@ public:
     static C_ZMPlayer* GetLocalPlayer();
 
     // Implemented in zm_player_shared
-    bool                    HasEnoughResToSpawn( ZombieClass_t zclass );
-    bool                    HasEnoughRes( int cost );
-    int                     GetWeaponSlotFlags();
-    int                     GetResources();
+    bool                    HasEnoughResToSpawn( ZombieClass_t zclass ) const;
+    bool                    HasEnoughRes( int cost ) const;
+    int                     GetWeaponSlotFlags() const;
+    int                     GetResources() const;
     void                    IncResources( int res, bool bLimit = false );
     void                    SetResources( int res );
-    float                   GetFlashlightBattery();
+    float                   GetFlashlightBattery() const;
     void                    SetFlashlightBattery( float battery );
     bool                    Weapon_CanSwitchTo( C_BaseCombatWeapon* pWeapon ) OVERRIDE;
-    Participation_t         GetParticipation();
+    Participation_t         GetParticipation() const;
     static Participation_t  GetLocalParticipation();
     static void             SetLocalParticipation( Participation_t part );
     virtual void            PlayStepSound( Vector& vecOrigin, surfacedata_t* psurface, float fvol, bool force ) OVERRIDE;
-    C_BaseCombatWeapon*     GetWeaponForAmmo( int iAmmoType );
+    C_BaseCombatWeapon*     GetWeaponForAmmo( int iAmmoType ) const;
     Vector                  GetAttackSpread( C_BaseCombatWeapon* pWeapon, C_BaseEntity* pTarget = nullptr );
     Vector                  GetAutoaimVector( float flScale ) OVERRIDE;
     void                    DoAnimationEvent( PlayerAnimEvent_t playerAnim, int nData = 0 );
