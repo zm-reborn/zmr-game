@@ -43,7 +43,7 @@ public:
     bool PerformIronSight( Vector& vecPos, QAngle& ang, const QAngle& origAng );
 
     bool PerformLag( Vector& vecPos, QAngle& ang, const Vector& origPos, const QAngle& origAng );
-    bool PerformAngleLag( Vector& vecPos, QAngle& ang, const QAngle& origAng );
+    bool PerformAngleLag( Vector& vecPos, QAngle& ang, const QAngle& origAng, const Vector& right, const Vector& up );
     bool PerformMovementLag( Vector& vecPos, QAngle& ang, const Vector& fwd, const Vector& right );
     bool PerformImpactLag( Vector& vecPos, QAngle& ang, const Vector& origPos );
 #endif

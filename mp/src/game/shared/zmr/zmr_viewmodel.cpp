@@ -293,18 +293,19 @@ bool C_ZMViewModel::PerformIronSight( Vector& vecOut, QAngle& angOut, const QAng
 
 
 ConVar zm_cl_bob_lag_interp( "zm_cl_bob_lag_interp", "0.1" );
-ConVar zm_cl_bob_lag_angle_mult( "zm_cl_bob_lag_angle_mult", "0.1" );
+ConVar zm_cl_bob_lag_angle_mult( "zm_cl_bob_lag_angle_mult", "0.07" );
+ConVar zm_cl_bob_lag_angle_move_mult( "zm_cl_bob_lag_angle_move_mult", "0.01" );
 //ConVar zm_cl_bob_lag_movement_fwd_pitch_mult( "zm_cl_bob_lag_movement_fwd_pitch_mult", "0.1" );
 ConVar zm_cl_bob_lag_movement_side_roll_mult( "zm_cl_bob_lag_movement_side_roll_mult", "3" );
 ConVar zm_cl_bob_lag_movement_side_yaw_mult( "zm_cl_bob_lag_movement_side_yaw_mult", "2" );
 
 bool C_ZMViewModel::PerformLag( Vector& vecPos, QAngle& ang, const Vector& origPos, const QAngle& origAng )
 {
-    Vector fwd, right;
-    AngleVectors( origAng, &fwd, &right, nullptr );
+    Vector fwd, right, up;
+    AngleVectors( origAng, &fwd, &right, &up );
 
     // Looking around moves the vm
-    PerformAngleLag( vecPos, ang, origAng );
+    PerformAngleLag( vecPos, ang, origAng, right, up );
     
     // Moving around moves the vm
     PerformMovementLag( vecPos, ang, fwd, right );
@@ -319,7 +320,7 @@ bool C_ZMViewModel::PerformLag( Vector& vecPos, QAngle& ang, const Vector& origP
     return true;
 }
 
-bool C_ZMViewModel::PerformAngleLag( Vector& vecPos, QAngle& ang, const QAngle& origAng )
+bool C_ZMViewModel::PerformAngleLag( Vector& vecPos, QAngle& ang, const QAngle& origAng, const Vector& right, const Vector& up )
 {
     const float flInterp = zm_cl_bob_lag_interp.GetFloat();
 
@@ -337,6 +338,9 @@ bool C_ZMViewModel::PerformAngleLag( Vector& vecPos, QAngle& ang, const QAngle& 
     NormalizeAngles( angleDiff );
 
     ang += angleDiff * zm_cl_bob_lag_angle_mult.GetFloat();
+
+    vecPos -= up * angleDiff.x * zm_cl_bob_lag_angle_move_mult.GetFloat();
+    vecPos -= right * angleDiff.y * zm_cl_bob_lag_angle_move_mult.GetFloat();
 
     return true;
 }
