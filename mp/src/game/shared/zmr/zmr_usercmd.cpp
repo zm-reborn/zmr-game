@@ -266,10 +266,10 @@ int CZMUserCmdSystem::ApplyDamage( CZMPlayer* pPlayer, const ZMServerWepData_t& 
 #endif
 
         int iLastHitGroup = -1;
-        for ( int i = 0; i < nHits; i++ )
+        for ( int j = 0; j < nHits; j++ )
         {
             // Entity needs hitgroups
-            tr.hitgroup = cmddata.hitgroups[i];
+            tr.hitgroup = cmddata.hitgroups[j];
 
 
             // Compute the trace end if the hitgroup changes.

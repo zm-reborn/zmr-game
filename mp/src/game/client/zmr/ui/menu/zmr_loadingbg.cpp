@@ -394,9 +394,9 @@ void CZMLoadingPanel::FindLoadingPanel()
             panel1 = ipanel()->GetChild( root, i );
             if ( Q_stricmp( ipanel()->GetName( panel1 ), "BaseGameUIPanel" ) == 0 )
             {
-                for ( int i = 0; i < ipanel()->GetChildCount( panel1 ); i++ )
+                for ( int j = 0; j < ipanel()->GetChildCount( panel1 ); j++ )
                 {
-                    panel2 = ipanel()->GetChild( panel1, i );
+                    panel2 = ipanel()->GetChild( panel1, j );
                     name = ipanel()->GetName( panel2 );
                     if ( Q_stricmp( name, "LoadingDialog" ) == 0 )
                     {
