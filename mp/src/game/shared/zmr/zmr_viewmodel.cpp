@@ -385,8 +385,8 @@ ConVar zm_cl_bob_lag_impact_air_rate( "zm_cl_bob_lag_impact_air_rate", "0.2" );
 ConVar zm_cl_bob_lag_impact_ground( "zm_cl_bob_lag_impact_ground", "5" );
 ConVar zm_cl_bob_lag_impact_ground_rate( "zm_cl_bob_lag_impact_ground_rate", "0.15" );
 
-ConVar zm_cl_bob_lag_impact_land( "zm_cl_bob_lag_impact_land", "250" );
-ConVar zm_cl_bob_lag_impact_land_rate( "zm_cl_bob_lag_impact_land_rate", "30" );
+ConVar zm_cl_bob_lag_impact_land( "zm_cl_bob_lag_impact_land", "700" );
+ConVar zm_cl_bob_lag_impact_land_rate( "zm_cl_bob_lag_impact_land_rate", "400" );
 
 bool C_ZMViewModel::PerformImpactLag( Vector& vecPos, QAngle& ang, const Vector& origPos )
 {
