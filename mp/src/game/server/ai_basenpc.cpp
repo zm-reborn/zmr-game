@@ -73,7 +73,6 @@
 #ifdef HL2_DLL
 #include "npc_bullseye.h"
 #include "hl2_player.h"
-#include "weapon_physcannon.h"
 #endif
 #include "waterbullet.h"
 #include "in_buttons.h"
@@ -11734,28 +11733,6 @@ void CAI_BaseNPC::CleanupScriptsOnTeleport( bool bEnrouteAsWell )
 //-----------------------------------------------------------------------------
 bool CAI_BaseNPC::HandleInteraction(int interactionType, void *data, CBaseCombatCharacter* sourceEnt)
 {
-#ifdef HL2_DLL
-	if ( interactionType == g_interactionBarnacleVictimGrab )
-	{
-		// Make the victim stop thinking so they're as good as dead without 
-		// shocking the system by destroying the entity.
-		StopLoopingSounds();
-		BarnacleDeathSound();
- 		SetThink( NULL );
-
-		// Gag the NPC so they won't talk anymore
-		AddSpawnFlags( SF_NPC_GAG );
-
-		// Drop any weapon they're holding
-		if ( GetActiveWeapon() )
-		{
-			Weapon_Drop( GetActiveWeapon() );
-		}
-
-		return true;
-	}
-#endif // HL2_DLL
-
 	return BaseClass::HandleInteraction( interactionType, data, sourceEnt );
 }
 

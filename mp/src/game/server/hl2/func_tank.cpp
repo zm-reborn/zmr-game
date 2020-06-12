@@ -28,7 +28,7 @@
 #include "IEffects.h"
 #include "ai_basenpc.h"
 #include "ai_behavior_functank.h"
-#include "weapon_rpg.h"
+#include "hl2compatibility/missiles.h"
 #include "effects.h"
 #include "iservervehicle.h"
 #include "soundenvelope.h"

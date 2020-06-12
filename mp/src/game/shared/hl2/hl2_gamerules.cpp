@@ -21,7 +21,6 @@
 	#include "voice_gamemgr.h"
 	#include "globalstate.h"
 	#include "ai_basenpc.h"
-	#include "weapon_physcannon.h"
 #endif
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -1391,39 +1390,6 @@ ConVar  alyx_darkness_force( "alyx_darkness_force", "0", FCVAR_CHEAT | FCVAR_REP
   	//-----------------------------------------------------------------------------
  	bool CHalfLife2::AllowDamage( CBaseEntity *pVictim, const CTakeDamageInfo &info )
   	{
-#ifndef CLIENT_DLL
-	if( (info.GetDamageType() & DMG_CRUSH) && info.GetInflictor() && pVictim->MyNPCPointer() )
-	{
-		if( pVictim->MyNPCPointer()->IsPlayerAlly() )
-		{
-			// A physics object has struck a player ally. Don't allow damage if it
-			// came from the player's physcannon. 
-			CBasePlayer *pPlayer = UTIL_PlayerByIndex(1);
-
-			if( pPlayer )
-			{
-				CBaseEntity *pWeapon = pPlayer->HasNamedPlayerItem("weapon_physcannon");
-
-				if( pWeapon )
-				{
-					CBaseCombatWeapon *pCannon = assert_cast <CBaseCombatWeapon*>(pWeapon);
-
-					if( pCannon )
-					{
-						if( PhysCannonAccountableForObject(pCannon, info.GetInflictor() ) )
-						{
-							// Antlions can always be squashed!
-							if ( pVictim->Classify() == CLASS_ANTLION )
-								return true;
-
-  							return false;
-						}
-					}
-				}
-			}
-		}
-	}
-#endif
   		return true;
   	}
 	//-----------------------------------------------------------------------------

@@ -41,9 +41,7 @@
 #include "tf_gamerules.h"
 #endif
 
-#ifdef HL2_DLL
-#include "weapon_physcannon.h"
-#endif
+
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -1035,7 +1033,7 @@ void CC_Player_PhysSwap( void )
 
 			if ( !Q_stricmp( strWeaponName, "weapon_physcannon" ) )
 			{
-				PhysCannonForceDrop( pWeapon, NULL );
+				//PhysCannonForceDrop( pWeapon, NULL );
 				pPlayer->SelectLastItem();
 			}
 			else

@@ -77,10 +77,7 @@
 // NVNT haptic utils
 #include "haptics/haptic_utils.h"
 
-#ifdef HL2_DLL
-#include "combine_mine.h"
-#include "weapon_physcannon.h"
-#endif
+
 
 ConVar autoaim_max_dist( "autoaim_max_dist", "2160" ); // 2160 = 180 feet
 ConVar autoaim_max_deflect( "autoaim_max_deflect", "0.99" );
@@ -2836,11 +2833,6 @@ bool CBasePlayer::CanPickupObject( CBaseEntity *pObject, float massLimit, float 
 
 	if ( checkEnable )
 	{
-		// Allowing picking up of bouncebombs.
-		CBounceBomb *pBomb = dynamic_cast<CBounceBomb*>(pObject);
-		if( pBomb )
-			return true;
-
 		// Allow pickup of phys props that are motion enabled on player pickup
 		CPhysicsProp *pProp = dynamic_cast<CPhysicsProp*>(pObject);
 		CPhysBox *pBox = dynamic_cast<CPhysBox*>(pObject);
@@ -6667,18 +6659,6 @@ bool CBasePlayer::BumpWeapon( CBaseCombatWeapon *pWeapon )
 				hint.sprintf( "#valve_hint_select_%s", pWeapon->GetClassname() );
 				UTIL_HudHintText( this, hint.Access() );
 			}
-
-			// Always switch to a newly-picked up weapon
-			if ( !PlayerHasMegaPhysCannon() )
-			{
-				// If it uses clips, load it full. (this is the first time you've picked up this type of weapon)
-				if ( pWeapon->UsesClipsForAmmo1() )
-				{
-					pWeapon->m_iClip1 = pWeapon->GetMaxClip1();
-				}
-
-				Weapon_Switch( pWeapon );
-			}
 #endif
 		}
 		return true;
@@ -7367,13 +7347,7 @@ void CBasePlayer::Weapon_Equip( CBaseCombatWeapon *pWeapon )
 
 	bool bShouldSwitch = g_pGameRules->FShouldSwitchWeapon( this, pWeapon );
 
-#ifdef HL2_DLL
-	if ( bShouldSwitch == false && PhysCannonGetHeldEntity( GetActiveWeapon() ) == pWeapon && 
-		 Weapon_OwnsThisType( pWeapon->GetClassname(), pWeapon->GetSubType()) )
-	{
-		bShouldSwitch = true;
-	}
-#endif//HL2_DLL
+
 
 	// should we switch to this item?
 	if ( bShouldSwitch )

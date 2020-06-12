@@ -5,7 +5,6 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include "weapon_physcannon.h"
 #include "hl2_player.h"
 #include "saverestore_utlvector.h"
 #include "triggers.h"
@@ -245,7 +244,7 @@ void CTriggerWeaponDissolve::DissolveThink( void )
 				CreateBeam( m_pConduitPoints[i]->GetAbsOrigin(), pWeapon, 4.0f );
 			}
 
-			PhysCannonBeginUpgrade( pWeapon );
+			//PhysCannonBeginUpgrade( pWeapon );
 			m_OnChargingPhyscannon.FireOutput( this, this );
 
 			EmitSound( "WeaponDissolve.Beam" );
@@ -460,7 +459,7 @@ void CTriggerPhysicsTrap::Touch( CBaseEntity *pOther )
 	// HACK: Upgrade the physcannon
 	if ( FClassnameIs( pAnim, "weapon_physcannon" ) )
 	{
-		PhysCannonBeginUpgrade( pAnim );
+		//PhysCannonBeginUpgrade( pAnim );
 		return;
 	}
 #endif
@@ -825,53 +824,4 @@ void CTriggerWateryDeath::EndTouch( CBaseEntity *pOther )
 #endif
 
 	BaseClass::EndTouch( pOther );
-}
-
-
-//-----------------------------------------------------------------------------
-// Purpose: Triggers whenever an RPG is fired within it
-//-----------------------------------------------------------------------------
-class CTriggerRPGFire : public CTriggerMultiple
-{
-	DECLARE_CLASS( CTriggerRPGFire, CTriggerMultiple );
-public:
-	~CTriggerRPGFire();
-
-	void Spawn( void );
-	void OnRestore( void );
-};
-
-LINK_ENTITY_TO_CLASS( trigger_rpgfire, CTriggerRPGFire );
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-CTriggerRPGFire::~CTriggerRPGFire( void )
-{
-	g_hWeaponFireTriggers.FindAndRemove( this );
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: Called when spawning, after keyvalues have been handled.
-//-----------------------------------------------------------------------------
-void CTriggerRPGFire::Spawn( void )
-{
-	BaseClass::Spawn();
-
-	InitTrigger();
-
-	g_hWeaponFireTriggers.AddToTail( this );
-
-	// Stomp the touch function, because we don't want to respond to touch
-	SetTouch( NULL );
-}
-
-//------------------------------------------------------------------------------
-// Purpose:
-//------------------------------------------------------------------------------
-void CTriggerRPGFire::OnRestore()
-{
-	BaseClass::OnRestore();
-
-	g_hWeaponFireTriggers.AddToTail( this );
 }

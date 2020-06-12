@@ -9,7 +9,6 @@
 #include "hud_numericdisplay.h"
 #include <vgui_controls/Panel.h>
 #include "hud.h"
-#include "hud_suitpower.h"
 #include "hud_macros.h"
 #include "iclientmode.h"
 #include <vgui_controls/AnimationController.h>

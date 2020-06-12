@@ -15,7 +15,6 @@ $MacroRequired "GAMENAME"
 
 $include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
 $include "$SRCDIR\vpc_scripts\protobuf_builder.vpc"
-$Include "$SRCDIR\vpc_scripts\source_replay.vpc"	[$TF]
 $Include "$SRCDIR\game\protobuf_include.vpc"
 
 $Configuration	"Debug"
@@ -68,22 +67,10 @@ $Configuration
 
 $Project
 {
-	$Folder "Replay"
-	{
-		$File	"gamedll_replay.cpp"
-		$File	"$SRCDIR\common\replay\ireplaysessionrecorder.h"
-		
-		$File	"$SRCDIR\game\shared\replay_gamestats_shared.cpp"	[$BUILD_REPLAY]
-		$File	"$SRCDIR\game\shared\replay_gamestats_shared.h"	[$BUILD_REPLAY]
-	}
-	
 	$Folder	"Source Files"
 	{
-		$File	"$SRCDIR\game\shared\achievement_saverestore.cpp"
-		$File	"$SRCDIR\game\shared\achievement_saverestore.h"
 		$File	"$SRCDIR\game\shared\achievementmgr.cpp"
 		$File	"$SRCDIR\game\shared\achievementmgr.h"
-		$File	"$SRCDIR\game\shared\achievements_hlx.cpp"
 		$File	"$SRCDIR\game\shared\activitylist.cpp"
 		$File	"$SRCDIR\game\shared\activitylist.h"
 		$File	"ai_activity.cpp"
@@ -184,8 +171,6 @@ $Project
 		$File	"ai_route.cpp"
 		$File	"ai_route.h"
 		$File	"ai_routedist.h"
-		$File	"ai_saverestore.cpp"
-		$File	"ai_saverestore.h"
 		$File	"ai_schedule.cpp"
 		$File	"ai_schedule.h"
 		$File	"ai_scriptconditions.cpp"
@@ -846,7 +831,6 @@ $Project
 		$File	"globals.h"
 		$File	"$SRCDIR\public\globalvars_base.h"
 		$File	"$SRCDIR\game\shared\groundlink.h"
-		$File	"$SRCDIR\game\shared\hl2\hl2_vehicle_radar.h"
 		$File	"$SRCDIR\public\iachievementmgr.h"
 		$File	"$SRCDIR\public\appframework\IAppSystem.h"
 		$File	"$SRCDIR\public\icliententity.h"

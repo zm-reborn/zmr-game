@@ -5,7 +5,6 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include "weapon_hl2mpbasehlmpcombatweapon.h"
 #include "hl2mp_player.h"
 #include "globalstate.h"
 #include "game.h"
@@ -16,10 +15,6 @@
 #include "hl2mp_gamerules.h"
 #include "KeyValues.h"
 #include "team.h"
-#include "weapon_hl2mpbase.h"
-#ifndef ZMR // ZMRCHANGE: Useless shit.
-#include "grenade_satchel.h"
-#endif
 #include "eventqueue.h"
 #include "gamestats.h"
 
@@ -594,12 +589,12 @@ void CHL2MP_Player::FireBullets ( const FireBulletsInfo_t &info )
 
 	FireBulletsInfo_t modinfo = info;
 
-	CWeaponHL2MPBase *pWeapon = dynamic_cast<CWeaponHL2MPBase *>( GetActiveWeapon() );
+	//CWeaponHL2MPBase *pWeapon = dynamic_cast<CWeaponHL2MPBase *>( GetActiveWeapon() );
 
-	if ( pWeapon )
-	{
-		modinfo.m_iPlayerDamage = modinfo.m_flDamage = pWeapon->GetHL2MPWpnData().m_iPlayerDamage;
-	}
+	//if ( pWeapon )
+	//{
+	//	modinfo.m_iPlayerDamage = modinfo.m_flDamage = pWeapon->GetHL2MPWpnData().m_iPlayerDamage;
+	//}
 
 	NoteWeaponFired();
 
