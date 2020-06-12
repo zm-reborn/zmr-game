@@ -1,0 +1,8 @@
+PBR
+{
+	$basetexture "models/weapons/new_pistol/p220_bc"
+	$bumpmap "models/weapons/new_pistol/p220_normal"
+	$mraotexture	"models/weapons/new_pistol/p220_mrao"
+	$emissiontexture	"models/weapons/new_pistol/p220_emissive"
+	$model 1
+}
