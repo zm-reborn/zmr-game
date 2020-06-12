@@ -7,7 +7,7 @@ on:
     - dev
     - hotfix*
     paths:
-    - mp/src/*
+    - mp/src/**
     - forcebuild.txt
 
 jobs:
