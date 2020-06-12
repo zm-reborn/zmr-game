@@ -30,9 +30,7 @@
 	#include "waterbullet.h"
 	#include "func_break.h"
 
-#ifdef HL2MP
-	#include "te_hl2mp_shotgun_shot.h"
-#endif
+
 
 	#include "gamestats.h"
 
@@ -1708,7 +1706,7 @@ void CBaseEntity::FireBullets( const FireBulletsInfo_t &info )
 	}
 
 #if defined( HL2MP ) && defined( GAME_DLL )
-	int iEffectSeed = iSeed;
+	//int iEffectSeed = iSeed;
 #endif
 	//-----------------------------------------------------
 	// Set up our shot manipulator.
@@ -2038,7 +2036,7 @@ void CBaseEntity::FireBullets( const FireBulletsInfo_t &info )
 #if defined( HL2MP ) && defined( GAME_DLL )
 	if ( bDoServerEffects == false )
 	{
-		TE_HL2MPFireBullets( entindex(), tr.startpos, info.m_vecDirShooting, info.m_iAmmoType, iEffectSeed, info.m_iShots, info.m_vecSpread.x, bDoTracers, bDoImpacts );
+		//TE_HL2MPFireBullets( entindex(), tr.startpos, info.m_vecDirShooting, info.m_iAmmoType, iEffectSeed, info.m_iShots, info.m_vecSpread.x, bDoTracers, bDoImpacts );
 	}
 #endif
 

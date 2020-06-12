@@ -27,7 +27,26 @@ using namespace ZMWeaponConfig;
 
 
 #ifdef CLIENT_DLL
-void UTIL_ClipPunchAngleOffset( QAngle &in, const QAngle &punch, const QAngle &clip );
+void UTIL_ClipPunchAngleOffset( QAngle &in, const QAngle &punch, const QAngle &clip )
+{
+	QAngle result = in + punch;
+
+	//Clip each component
+	for ( int i = 0; i < 3; i++ )
+	{
+		if ( result[i] > clip[i] )
+		{
+			result[i] = clip[i];
+		}
+		else if ( result[i] < -clip[i] )
+		{
+			result[i] = -clip[i];
+		}
+
+		// Return the result
+		in[i] = result[i] - punch[i];
+	}
+}
 
 
 ConVar zm_cl_glow_weapon( "zm_cl_glow_weapon", "1 .2 .2", FCVAR_ARCHIVE );
@@ -1799,8 +1818,8 @@ ConVar cl_bobvertscale( "cl_bobvertscale", "0.6", 0, "Vertical scale" ); // Def.
 ConVar cl_boblatscale( "cl_boblatscale", "0.8", 0, "Lateral scale" );
 ConVar cl_bobenable( "cl_bobenable", "1" );
 
-extern float g_lateralBob;
-extern float g_verticalBob;
+float g_lateralBob;
+float g_verticalBob;
 
 float CZMBaseWeapon::CalcViewmodelBob()
 {

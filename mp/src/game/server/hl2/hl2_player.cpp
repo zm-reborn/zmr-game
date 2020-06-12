@@ -30,17 +30,13 @@
 #include "effect_color_tables.h"
 #include "vphysics/player_controller.h"
 #include "player_pickup.h"
-#include "weapon_physcannon.h"
-#include "script_intro.h"
 #include "effect_dispatch_data.h"
 #include "te_effect_dispatch.h" 
 #include "ai_basenpc.h"
 #include "AI_Criteria.h"
-#include "npc_barnacle.h"
 #include "entitylist.h"
 #include "env_zoom.h"
 #include "hl2_gamerules.h"
-#include "prop_combine_ball.h"
 #include "datacache/imdlcache.h"
 #include "eventqueue.h"
 #include "gamestats.h"
@@ -837,34 +833,6 @@ void CHL2_Player::PreThink(void)
 		m_Local.m_flFallVelocity = -GetAbsVelocity().z;
 	}
 
-	if ( m_afPhysicsFlags & PFLAG_ONBARNACLE )
-	{
-		bool bOnBarnacle = false;
-		CNPC_Barnacle *pBarnacle = NULL;
-		do
-		{
-			// FIXME: Not a good or fast solution, but maybe it will catch the bug!
-			pBarnacle = (CNPC_Barnacle*)gEntList.FindEntityByClassname( pBarnacle, "npc_barnacle" );
-			if ( pBarnacle )
-			{
-				if ( pBarnacle->GetEnemy() == this )
-				{
-					bOnBarnacle = true;
-				}
-			}
-		} while ( pBarnacle );
-		
-		if ( !bOnBarnacle )
-		{
-			Warning( "Attached to barnacle?\n" );
-			Assert( 0 );
-			m_afPhysicsFlags &= ~PFLAG_ONBARNACLE;
-		}
-		else
-		{
-			SetAbsVelocity( vec3_origin );
-		}
-	}
 	// StudioFrameAdvance( );//!!!HACKHACK!!! Can't be hit by traceline when not animating?
 
 	// Update weapon's ready status
@@ -1019,33 +987,6 @@ Class_T  CHL2_Player::Classify ( void )
 //-----------------------------------------------------------------------------
 bool CHL2_Player::HandleInteraction(int interactionType, void *data, CBaseCombatCharacter* sourceEnt)
 {
-	if ( interactionType == g_interactionBarnacleVictimDangle )
-		return false;
-	
-	if (interactionType ==	g_interactionBarnacleVictimReleased)
-	{
-		m_afPhysicsFlags &= ~PFLAG_ONBARNACLE;
-		SetMoveType( MOVETYPE_WALK );
-		return true;
-	}
-	else if (interactionType ==	g_interactionBarnacleVictimGrab)
-	{
-#ifdef HL2_EPISODIC
-		CNPC_Alyx *pAlyx = CNPC_Alyx::GetAlyx();
-		if ( pAlyx )
-		{
-			// Make Alyx totally hate this barnacle so that she saves the player.
-			int priority;
-
-			priority = pAlyx->IRelationPriority(sourceEnt);
-			pAlyx->AddEntityRelationship( sourceEnt, D_HT, priority + 5 );
-		}
-#endif//HL2_EPISODIC
-
-		m_afPhysicsFlags |= PFLAG_ONBARNACLE;
-		ClearUseEntity();
-		return true;
-	}
 	return false;
 }
 
@@ -1404,7 +1345,7 @@ bool CHL2_Player::CommanderFindGoal( commandgoal_t *pGoal )
 	
 	//---------------------------------
 	// MASK_SHOT on purpose! So that you don't hit the invisible hulls of the NPCs.
-	CTraceFilterSkipTwoEntities filter( this, PhysCannonGetHeldEntity( GetActiveWeapon() ), COLLISION_GROUP_INTERACTIVE_DEBRIS );
+	CTraceFilterSkipTwoEntities filter( this, nullptr, COLLISION_GROUP_INTERACTIVE_DEBRIS );
 
 	UTIL_TraceLine( EyePosition(), EyePosition() + forward * MAX_COORD_RANGE, MASK_SHOT, &filter, &tr );
 
@@ -1767,23 +1708,6 @@ void CHL2_Player::SetupVisibility( CBaseEntity *pViewEntity, unsigned char *pvs,
 
 	int area = pViewEntity ? pViewEntity->NetworkProp()->AreaNum() : NetworkProp()->AreaNum();
 	PointCameraSetupVisibility( this, area, pvs, pvssize );
-
-	// If the intro script is playing, we want to get it's visibility points
-	if ( g_hIntroScript )
-	{
-		Vector vecOrigin;
-		CBaseEntity *pCamera;
-		if ( g_hIntroScript->GetIncludedPVSOrigin( &vecOrigin, &pCamera ) )
-		{
-			// If it's a point camera, turn it on
-			CPointCamera *pPointCamera = dynamic_cast< CPointCamera* >(pCamera); 
-			if ( pPointCamera )
-			{
-				pPointCamera->SetActive( true );
-			}
-			engine->AddOriginToPVS( vecOrigin );
-		}
-	}
 }
 
 
@@ -3110,12 +3034,6 @@ bool CHL2_Player::Weapon_CanSwitchTo( CBaseCombatWeapon *pWeapon )
 
 	if ( GetActiveWeapon() )
 	{
-		if ( PhysCannonGetHeldEntity( GetActiveWeapon() ) == pWeapon && 
-			Weapon_OwnsThisType( pWeapon->GetClassname(), pWeapon->GetSubType()) )
-		{
-			return true;
-		}
-
 		if ( !GetActiveWeapon()->CanHolster() )
 			return false;
 	}
@@ -3148,17 +3066,12 @@ void CHL2_Player::PickupObject( CBaseEntity *pObject, bool bLimitMassAndSize )
 //-----------------------------------------------------------------------------
 bool CHL2_Player::IsHoldingEntity( CBaseEntity *pEnt )
 {
-	return PlayerPickupControllerIsHoldingEntity( m_hUseEntity, pEnt );
+	return false;
 }
 
 float CHL2_Player::GetHeldObjectMass( IPhysicsObject *pHeldObject )
 {
-	float mass = PlayerPickupGetHeldObjectMass( m_hUseEntity, pHeldObject );
-	if ( mass == 0.0f )
-	{
-		mass = PhysCannonGetHeldObjectMass( GetActiveWeapon(), pHeldObject );
-	}
-	return mass;
+	return 1.0f;
 }
 
 //-----------------------------------------------------------------------------
@@ -3186,9 +3099,6 @@ void CHL2_Player::ForceDropOfCarriedPhysObjects( CBaseEntity *pOnlyIfHoldingThis
 
 	// Drop any objects being handheld.
 	ClearUseEntity();
-
-	// Then force the physcannon to drop anything it's holding, if it's our active weapon
-	PhysCannonForceDrop( GetActiveWeapon(), NULL );
 }
 
 void CHL2_Player::InputForceDropPhysObjects( inputdata_t &data )

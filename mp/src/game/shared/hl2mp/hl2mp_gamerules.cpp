@@ -27,15 +27,10 @@
 	#include "voice_gamemgr.h"
 	#include "iscorer.h"
 	#include "hl2mp_player.h"
-	#include "weapon_hl2mpbasehlmpcombatweapon.h"
 	#include "team.h"
 	#include "voice_gamemgr.h"
-	#include "hl2mp_gameinterface.h"
 	#include "hl2mp_cvars.h"
 
-#ifdef DEBUG	
-	#include "hl2mp_bot_temp.h"
-#endif
 
 extern void respawn(CBaseEntity *pEdict, bool fCopyCorpse);
 
@@ -451,12 +446,12 @@ float CHL2MPRules::FlWeaponTryRespawn( CBaseCombatWeapon *pWeapon )
 Vector CHL2MPRules::VecWeaponRespawnSpot( CBaseCombatWeapon *pWeapon )
 {
 #ifndef CLIENT_DLL
-	CWeaponHL2MPBase *pHL2Weapon = dynamic_cast< CWeaponHL2MPBase*>( pWeapon );
+	//CWeaponHL2MPBase *pHL2Weapon = dynamic_cast< CWeaponHL2MPBase*>( pWeapon );
 
-	if ( pHL2Weapon )
-	{
-		return pHL2Weapon->GetOriginalSpawnOrigin();
-	}
+	//if ( pHL2Weapon )
+	//{
+	//	return pHL2Weapon->GetOriginalSpawnOrigin();
+	//}
 #endif
 	
 	return pWeapon->GetAbsOrigin();
@@ -464,94 +459,8 @@ Vector CHL2MPRules::VecWeaponRespawnSpot( CBaseCombatWeapon *pWeapon )
 
 #ifndef CLIENT_DLL
 
-CItem* IsManagedObjectAnItem( CBaseEntity *pObject )
-{
-	return dynamic_cast< CItem*>( pObject );
-}
-
-CWeaponHL2MPBase* IsManagedObjectAWeapon( CBaseEntity *pObject )
-{
-	return dynamic_cast< CWeaponHL2MPBase*>( pObject );
-}
-
-bool GetObjectsOriginalParameters( CBaseEntity *pObject, Vector &vOriginalOrigin, QAngle &vOriginalAngles )
-{
-	if ( CItem *pItem = IsManagedObjectAnItem( pObject ) )
-	{
-		if ( pItem->m_flNextResetCheckTime > gpGlobals->curtime )
-			 return false;
-		
-		vOriginalOrigin = pItem->GetOriginalSpawnOrigin();
-		vOriginalAngles = pItem->GetOriginalSpawnAngles();
-
-		pItem->m_flNextResetCheckTime = gpGlobals->curtime + sv_hl2mp_item_respawn_time.GetFloat();
-		return true;
-	}
-	else if ( CWeaponHL2MPBase *pWeapon = IsManagedObjectAWeapon( pObject )) 
-	{
-		if ( pWeapon->m_flNextResetCheckTime > gpGlobals->curtime )
-			 return false;
-
-		vOriginalOrigin = pWeapon->GetOriginalSpawnOrigin();
-		vOriginalAngles = pWeapon->GetOriginalSpawnAngles();
-
-		pWeapon->m_flNextResetCheckTime = gpGlobals->curtime + sv_hl2mp_weapon_respawn_time.GetFloat();
-		return true;
-	}
-
-	return false;
-}
-
 void CHL2MPRules::ManageObjectRelocation( void )
 {
-	int iTotal = m_hRespawnableItemsAndWeapons.Count();
-
-	if ( iTotal > 0 )
-	{
-		for ( int i = 0; i < iTotal; i++ )
-		{
-			CBaseEntity *pObject = m_hRespawnableItemsAndWeapons[i].Get();
-			
-			if ( pObject )
-			{
-				Vector vSpawOrigin;
-				QAngle vSpawnAngles;
-
-				if ( GetObjectsOriginalParameters( pObject, vSpawOrigin, vSpawnAngles ) == true )
-				{
-					float flDistanceFromSpawn = (pObject->GetAbsOrigin() - vSpawOrigin ).Length();
-
-					if ( flDistanceFromSpawn > WEAPON_MAX_DISTANCE_FROM_SPAWN )
-					{
-						bool shouldReset = false;
-						IPhysicsObject *pPhysics = pObject->VPhysicsGetObject();
-
-						if ( pPhysics )
-						{
-							shouldReset = pPhysics->IsAsleep();
-						}
-						else
-						{
-							shouldReset = (pObject->GetFlags() & FL_ONGROUND) ? true : false;
-						}
-
-						if ( shouldReset )
-						{
-							pObject->Teleport( &vSpawOrigin, &vSpawnAngles, NULL );
-							pObject->EmitSound( "AlyxEmp.Charge" );
-
-							IPhysicsObject *pPhys = pObject->VPhysicsGetObject();
-
-							if ( pPhys )
-							{
-								pPhys->Wake();
-							}
-						}
-					}
-				}
-			}
-		}
-	}
 }
 
 //=========================================================
@@ -1064,99 +973,7 @@ void CHL2MPRules::RestartGame()
 
 void CHL2MPRules::CleanUpMap()
 {
-	// Recreate all the map entities from the map data (preserving their indices),
-	// then remove everything else except the players.
 
-	// Get rid of all entities except players.
-	CBaseEntity *pCur = gEntList.FirstEnt();
-	while ( pCur )
-	{
-		CBaseHL2MPCombatWeapon *pWeapon = dynamic_cast< CBaseHL2MPCombatWeapon* >( pCur );
-		// Weapons with owners don't want to be removed..
-		if ( pWeapon )
-		{
-			if ( !pWeapon->GetPlayerOwner() )
-			{
-				UTIL_Remove( pCur );
-			}
-		}
-		// remove entities that has to be restored on roundrestart (breakables etc)
-		else if ( !FindInList( s_PreserveEnts, pCur->GetClassname() ) )
-		{
-			UTIL_Remove( pCur );
-		}
-
-		pCur = gEntList.NextEnt( pCur );
-	}
-
-	// Really remove the entities so we can have access to their slots below.
-	gEntList.CleanupDeleteList();
-
-	// Cancel all queued events, in case a func_bomb_target fired some delayed outputs that
-	// could kill respawning CTs
-	g_EventQueue.Clear();
-
-	// Now reload the map entities.
-	class CHL2MPMapEntityFilter : public IMapEntityFilter
-	{
-	public:
-		virtual bool ShouldCreateEntity( const char *pClassname )
-		{
-			// Don't recreate the preserved entities.
-			if ( !FindInList( s_PreserveEnts, pClassname ) )
-			{
-				return true;
-			}
-			else
-			{
-				// Increment our iterator since it's not going to call CreateNextEntity for this ent.
-				if ( m_iIterator != g_MapEntityRefs.InvalidIndex() )
-					m_iIterator = g_MapEntityRefs.Next( m_iIterator );
-
-				return false;
-			}
-		}
-
-
-		virtual CBaseEntity* CreateNextEntity( const char *pClassname )
-		{
-			if ( m_iIterator == g_MapEntityRefs.InvalidIndex() )
-			{
-				// This shouldn't be possible. When we loaded the map, it should have used 
-				// CCSMapLoadEntityFilter, which should have built the g_MapEntityRefs list
-				// with the same list of entities we're referring to here.
-				Assert( false );
-				return NULL;
-			}
-			else
-			{
-				CMapEntityRef &ref = g_MapEntityRefs[m_iIterator];
-				m_iIterator = g_MapEntityRefs.Next( m_iIterator );	// Seek to the next entity.
-
-				if ( ref.m_iEdict == -1 || engine->PEntityOfEntIndex( ref.m_iEdict ) )
-				{
-					// Doh! The entity was delete and its slot was reused.
-					// Just use any old edict slot. This case sucks because we lose the baseline.
-					return CreateEntityByName( pClassname );
-				}
-				else
-				{
-					// Cool, the slot where this entity was is free again (most likely, the entity was 
-					// freed above). Now create an entity with this specific index.
-					return CreateEntityByName( pClassname, ref.m_iEdict );
-				}
-			}
-		}
-
-	public:
-		int m_iIterator; // Iterator into g_MapEntityRefs.
-	};
-	CHL2MPMapEntityFilter filter;
-	filter.m_iIterator = g_MapEntityRefs.Head();
-
-	// DO NOT CALL SPAWN ON info_node ENTITIES!
-
-	MapEntity_ParseAllEntities( engine->GetMapEntitiesString(), &filter, true );
 }
 
 void CHL2MPRules::CheckChatForReadySignal( CHL2MP_Player *pPlayer, const char *chatmsg )
