@@ -21,7 +21,6 @@ static const char* g_PreserveEnts[] =
 {
     "ai_network",
     "ai_hint",
-    "hl2mp_gamerules", // Not used.
     "team_manager",
     "player_manager",
     "env_soundscape",
