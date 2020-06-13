@@ -6,10 +6,6 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-/*
-    NOTE: Remove GetAmmoDef() from hl2mp/hl2mp_gamerules.cpp
-*/
-
 #define BULLET_MASS_GRAINS_TO_LB(grains)	(0.002285*(grains)/16.0f)
 #define BULLET_MASS_GRAINS_TO_KG(grains)	lbs2kg(BULLET_MASS_GRAINS_TO_LB(grains))
 
