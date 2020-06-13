@@ -113,8 +113,6 @@ $Project "Server (ZMR)"
 		$Folder	"HL2MP"
 		{
 			$File	"hl2mp\hl2mp_cvars.cpp"
-			$File	"$SRCDIR\game\shared\hl2mp\hl2mp_gamerules.cpp"
-			$File	"$SRCDIR\game\shared\hl2mp\hl2mp_gamerules.h"
 			$File	"hl2mp\hl2mp_player.cpp"
 			$File	"hl2mp\hl2mp_player.h"
 			$File	"$SRCDIR\game\shared\hl2mp\hl2mp_player_shared.cpp"

@@ -12,7 +12,6 @@
 #include "hl2mp_player_shared.h"
 #include "predicted_viewmodel.h"
 #include "in_buttons.h"
-#include "hl2mp_gamerules.h"
 #include "KeyValues.h"
 #include "team.h"
 #include "eventqueue.h"
@@ -231,11 +230,14 @@ void CHL2MP_Player::GiveDefaultItems( void )
 	}
 }
 
+#define TEAM_COMBINE 2
+#define TEAM_REBELS 3
+
 void CHL2MP_Player::PickDefaultSpawnTeam( void )
 {
 	if ( GetTeamNumber() == 0 )
 	{
-		if ( HL2MPRules()->IsTeamplay() == false )
+		if ( GameRules()->IsTeamplay() == false )
 		{
 			if ( GetModelPtr() == NULL )
 			{
@@ -314,7 +316,7 @@ void CHL2MP_Player::Spawn(void)
 
 	m_impactEnergyScale = HL2MPPLAYER_PHYSDAMAGE_SCALE;
 
-	if ( HL2MPRules()->IsIntermission() )
+	if ( g_fGameOver )
 	{
 		AddFlag( FL_FROZEN );
 	}
@@ -561,7 +563,7 @@ void CHL2MP_Player::PostThink( void )
 	
 	if ( GetFlags() & FL_DUCKING )
 	{
-		SetCollisionBounds( VEC_CROUCH_TRACE_MIN, VEC_CROUCH_TRACE_MAX );
+		//SetCollisionBounds( VEC_CROUCH_TRACE_MIN, VEC_CROUCH_TRACE_MAX );
 	}
 
 	m_PlayerAnimState.Update();
@@ -653,8 +655,8 @@ bool CHL2MP_Player::WantsLagCompensationOnEntity( const CBasePlayer *pPlayer, co
 
 Activity CHL2MP_Player::TranslateTeamActivity( Activity ActToTranslate )
 {
-	if ( m_iModelType == TEAM_COMBINE )
-		 return ActToTranslate;
+	//if ( m_iModelType == TEAM_COMBINE )
+	//	 return ActToTranslate;
 	
 	if ( ActToTranslate == ACT_RUN )
 		 return ACT_RUN_AIM_AGITATED;
@@ -900,13 +902,13 @@ void CHL2MP_Player::ChangeTeam( int iTeam )
 
 	bool bKill = false;
 
-	if ( HL2MPRules()->IsTeamplay() != true && iTeam != TEAM_SPECTATOR )
+	if ( GameRules()->IsTeamplay() != true && iTeam != TEAM_SPECTATOR )
 	{
 		//don't let them try to join combine or rebels during deathmatch.
 		iTeam = TEAM_UNASSIGNED;
 	}
 
-	if ( HL2MPRules()->IsTeamplay() == true )
+	if ( GameRules()->IsTeamplay() == true )
 	{
 		if ( iTeam != GetTeamNumber() && GetTeamNumber() != TEAM_UNASSIGNED )
 		{
@@ -918,7 +920,7 @@ void CHL2MP_Player::ChangeTeam( int iTeam )
 
 	m_flNextTeamChangeTime = gpGlobals->curtime + TEAM_CHANGE_INTERVAL;
 
-	if ( HL2MPRules()->IsTeamplay() == true )
+	if ( GameRules()->IsTeamplay() == true )
 	{
 		SetPlayerTeamModel();
 	}
@@ -950,6 +952,7 @@ bool CHL2MP_Player::HandleCommand_JoinTeam( int team )
 
 	if ( team == TEAM_SPECTATOR )
 	{
+		extern ConVar mp_allowspectators;
 		// Prevent this is the cvar is set
 		if ( !mp_allowspectators.GetInt() )
 		{
@@ -1320,7 +1323,7 @@ CBaseEntity* CHL2MP_Player::EntSelectSpawnPoint( void )
 	edict_t		*player = edict();
 	const char *pSpawnpointName = "info_player_deathmatch";
 
-	if ( HL2MPRules()->IsTeamplay() == true )
+	if ( GameRules()->IsTeamplay() == true )
 	{
 		if ( GetTeamNumber() == TEAM_COMBINE )
 		{
@@ -1393,7 +1396,7 @@ CBaseEntity* CHL2MP_Player::EntSelectSpawnPoint( void )
 
 ReturnSpot:
 
-	if ( HL2MPRules()->IsTeamplay() == true )
+	if ( GameRules()->IsTeamplay() == true )
 	{
 		if ( GetTeamNumber() == TEAM_COMBINE )
 		{
@@ -1417,7 +1420,7 @@ CON_COMMAND( timeleft, "prints the time remaining in the match" )
 {
 	CHL2MP_Player *pPlayer = ToHL2MPPlayer( UTIL_GetCommandClient() );
 
-	int iTimeRemaining = (int)HL2MPRules()->GetMapRemainingTime();
+	int iTimeRemaining = 0;
     
 	if ( iTimeRemaining == 0 )
 	{
@@ -1472,29 +1475,7 @@ void CHL2MP_Player::SetReady( bool bReady )
 
 void CHL2MP_Player::CheckChatText( char *p, int bufsize )
 {
-	//Look for escape sequences and replace
 
-	char *buf = new char[bufsize];
-	int pos = 0;
-
-	// Parse say text for escape sequences
-	for ( char *pSrc = p; pSrc != NULL && *pSrc != 0 && pos < bufsize-1; pSrc++ )
-	{
-		// copy each char across
-		buf[pos] = *pSrc;
-		pos++;
-	}
-
-	buf[pos] = '\0';
-
-	// copy buf back into p
-	Q_strncpy( p, buf, bufsize );
-
-	delete[] buf;	
-
-	const char *pReadyCheck = p;
-
-	HL2MPRules()->CheckChatForReadySignal( this, pReadyCheck );
 }
 
 void CHL2MP_Player::State_Transition( HL2MPPlayerState newState )
