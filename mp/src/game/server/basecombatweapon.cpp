@@ -27,9 +27,6 @@
 #include "iservervehicle.h"
 #include "func_break.h"
 
-#ifdef HL2MP
-	#include "hl2mp_gamerules.h"
-#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -581,8 +578,6 @@ void CBaseCombatWeapon::Materialize( void )
 	{
 		VPhysicsInitNormal( SOLID_BBOX, GetSolidFlags() | FSOLID_TRIGGER, false );
 		SetMoveType( MOVETYPE_VPHYSICS );
-
-		HL2MPRules()->AddLevelDesignerPlacedObject( this );
 	}
 #else
 	SetSolid( SOLID_BBOX );

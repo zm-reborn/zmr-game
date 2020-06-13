@@ -7,6 +7,8 @@
 #include "gameinterface.h"
 #include "teamplayroundbased_gamerules.h"
 #include "eventqueue.h"
+#include "viewport_panel_names.h"
+#include "voice_gamemgr.h"
 #endif
 
 #ifndef CLIENT_DLL
@@ -49,8 +51,23 @@ ConVar zm_sv_reward_kill( "zm_sv_reward_kill", "100", FCVAR_NOTIFY | FCVAR_ARCHI
 
 
 
+#ifndef CLIENT_DLL
+class CVoiceGameMgrHelper : public IVoiceGameMgrHelper
+{
+public:
+    virtual bool CanPlayerHearPlayer( CBasePlayer* pListener, CBasePlayer* pTalker, bool& bProximity ) OVERRIDE
+    {
+        return ( pListener->GetTeamNumber() == pTalker->GetTeamNumber() );
+    }
+};
+
+CVoiceGameMgrHelper g_VoiceGameMgrHelper;
+IVoiceGameMgrHelper* g_pVoiceGameMgrHelper = &g_VoiceGameMgrHelper;
+#endif
+
+
 static CZMViewVectors g_ZMViewVectors(
-    Vector( 0, 0, 64 ),         //VEC_VIEW (m_vView) 
+    Vector( 0, 0, 64 ),         //VEC_VIEW (m_vView)
                               
     Vector(-16, -16, 0 ),       //VEC_HULL_MIN (m_vHullMin)
     Vector( 16,  16,  72 ),     //VEC_HULL_MAX (m_vHullMax)
@@ -63,11 +80,6 @@ static CZMViewVectors g_ZMViewVectors(
     Vector( 10,  10,  10 ),     //VEC_OBS_HULL_MAX	(m_vObsHullMax)
                                                 
     Vector( 0, 0, 14 ),         //VEC_DEAD_VIEWHEIGHT (m_vDeadViewHeight)
-
-    Vector(-16, -16, 0 ),       //VEC_CROUCH_TRACE_MIN (m_vCrouchTraceMin)
-    Vector( 16,  16,  60 ),     //VEC_CROUCH_TRACE_MAX (m_vCrouchTraceMax)
-    
-
 
     // To keep things like before, we need to keep the view offset the same.
     Vector( -16, -16, 48 ),    //VEC_ZM_HULL_MIN (vZMHullMin)
@@ -188,7 +200,7 @@ CZMRules::CZMRules()
 #endif
 }
 
-CZMRules::~CZMRules( void )
+CZMRules::~CZMRules()
 {
 #ifndef CLIENT_DLL
     g_Teams.Purge();
@@ -272,20 +284,42 @@ void CZMRules::LevelInitPostEntity()
     Assert( pEnt );
     m_pZMFog = pEnt;
 }
+
+void CZMRules::Precache()
+{
+}
 #endif
 
-void CZMRules::Precache( void )
+float CZMRules::GetMapRemainingTime()
 {
-    BaseClass::Precache();
+    // if timelimit is disabled, return 0
+    if ( mp_timelimit.GetInt() <= 0 )
+        return 0;
+
+    // timelimit is in minutes
+    float timeleft = ( mp_timelimit.GetInt() * 60.0f ) - gpGlobals->curtime;
+
+    return timeleft;
 }
 
 ConVar zm_sv_playercollision( "zm_sv_playercollision", "1", FCVAR_NOTIFY | FCVAR_ARCHIVE | FCVAR_REPLICATED, "Is player collision enabled?" );
 
 bool CZMRules::ShouldCollide( int collisionGroup0, int collisionGroup1 )
 {
+    // Swap so that lowest is always first
+    if ( collisionGroup0 > collisionGroup1 )
+    {
+        V_swap( collisionGroup0,collisionGroup1 );
+    }
+
+    if ( (collisionGroup0 == COLLISION_GROUP_PLAYER || collisionGroup0 == COLLISION_GROUP_PLAYER_MOVEMENT) &&
+        collisionGroup1 == COLLISION_GROUP_WEAPON )
+    {
+        return false;
+    }
+
     // Disable player collision.
-    if ((collisionGroup0 == COLLISION_GROUP_PLAYER || collisionGroup0 == COLLISION_GROUP_PLAYER_MOVEMENT)
-    &&  (collisionGroup1 == COLLISION_GROUP_PLAYER || collisionGroup1 == COLLISION_GROUP_PLAYER_MOVEMENT)
+    if (collisionGroup0 == COLLISION_GROUP_PLAYER && collisionGroup1 == COLLISION_GROUP_PLAYER_MOVEMENT
     &&  zm_sv_playercollision.GetInt() <= 1)
     {
         return false;
@@ -294,9 +328,60 @@ bool CZMRules::ShouldCollide( int collisionGroup0, int collisionGroup1 )
     return BaseClass::ShouldCollide( collisionGroup0, collisionGroup1 );
 }
 
+bool CZMRules::IsConnectedUserInfoChangeAllowed( CBasePlayer *pPlayer )
+{
+    return true;
+}
+
+const CViewVectors* CZMRules::GetViewVectors() const
+{
+	return &g_ZMViewVectors;
+}
+
+const CZMViewVectors* CZMRules::GetZMViewVectors() const
+{
+	return &g_ZMViewVectors;
+}
+
+#ifndef CLIENT_DLL
+
+bool CZMRules::FShouldSwitchWeapon( CBasePlayer* pPlayer, CBaseCombatWeapon* pWeapon )
+{
+    if ( pPlayer->GetActiveWeapon() && pPlayer->IsNetClient() )
+    {
+        // Player has an active item, so let's check cl_autowepswitch.
+        const char* cl_autowepswitch = engine->GetClientConVarValue( pPlayer->entindex(), "cl_autowepswitch" );
+        if ( cl_autowepswitch && Q_atoi( cl_autowepswitch ) <= 0 )
+        {
+            return false;
+        }
+    }
+
+    return BaseClass::FShouldSwitchWeapon( pPlayer, pWeapon );
+}
+
+int CZMRules::PlayerRelationship( CBaseEntity* pPlayer, CBaseEntity* pTarget )
+{
+    if ( !pPlayer || !pTarget ) return GR_NOTTEAMMATE;
+
+    return ( pPlayer->GetTeamNumber() == pTarget->GetTeamNumber() ) ? GR_TEAMMATE : GR_ENEMY;
+}
+
+bool CZMRules::ClientCommand( CBaseEntity* pEdict, const CCommand& args )
+{
+	if ( BaseClass::ClientCommand( pEdict, args ) )
+		return true;
+
+	auto* pPlayer = ToZMPlayer( pEdict );
+
+	if ( pPlayer && pPlayer->ClientCommand( args ) )
+		return true;
+
+    return false;
+}
+
 void CZMRules::DeathNotice( CBasePlayer* pVictim, const CTakeDamageInfo& info )
 {
-#ifndef CLIENT_DLL
     // Work out what killed the player, and send a message to all clients about it
     const char* killer_weapon_name = "world";		// by default, the player is killed by the world
     int killer_ID = 0;
@@ -371,20 +456,8 @@ void CZMRules::DeathNotice( CBasePlayer* pVictim, const CTakeDamageInfo& info )
         event->SetInt( "priority", 7 );
         gameeventmanager->FireEvent( event );
     }
-#endif
 }
 
-const CViewVectors* CZMRules::GetViewVectors() const
-{
-	return &g_ZMViewVectors;
-}
-
-const CZMViewVectors* CZMRules::GetZMViewVectors() const
-{
-	return &g_ZMViewVectors;
-}
-
-#ifndef CLIENT_DLL
 
 void CZMRules::ClientSettingsChanged( CBasePlayer* pPlayer )
 {
@@ -432,10 +505,13 @@ void CZMRules::ClientSettingsChanged( CBasePlayer* pPlayer )
     pZMPlayer->UpdatePlayerInterpNPC();
     pZMPlayer->UpdatePlayerZMVars();
 
-    // Don't use HL2DM rules, it'll change player's team.
-    CTeamplayRules::ClientSettingsChanged( pPlayer );
+    BaseClass::ClientSettingsChanged( pPlayer );
 }
 
+const char* CZMRules::GetGameDescription()
+{
+    return ZMR_GAMEDESC;
+}
 
 const char* CZMRules::GetChatFormat( bool bTeamOnly, CBasePlayer* pPlayer )
 {
@@ -470,8 +546,7 @@ static ConVar zm_sv_norestartround( "zm_sv_norestartround", "0" );
 
 void CZMRules::Think()
 {
-    // Don't call HL2MP think since it has some stuff we wouldn't be able to control.
-    CGameRules::Think();
+    BaseClass::Think();
 
     
     if ( g_fGameOver )
@@ -499,6 +574,30 @@ void CZMRules::Think()
         GoToIntermission();
         return;
     }
+}
+
+extern ConVar mp_chattime;
+
+void CZMRules::GoToIntermission()
+{
+	if ( g_fGameOver )
+		return;
+
+	g_fGameOver = true;
+
+
+	m_flIntermissionEndTime = gpGlobals->curtime + mp_chattime.GetInt();
+
+
+	for ( int i = 1; i <= gpGlobals->maxClients; i++ )
+	{
+		auto* pPlayer = UTIL_PlayerByIndex( i );
+		if ( !pPlayer )
+			continue;
+
+		pPlayer->ShowViewPortPanel( PANEL_SCOREBOARD );
+		pPlayer->AddFlag( FL_FROZEN );
+	}
 }
 
 
@@ -594,6 +693,14 @@ void CZMRules::ClientDisconnected( edict_t* pClient )
 
         CTeam* teamplayer = pPlayer->GetTeam();
 
+        if ( !teamplayer )
+        {
+            Assert( 0 );
+            Warning( "Player left the game but didn't have a team!" );
+        }
+
+
+
         CTeam* teamhuman = GetGlobalTeam( ZMTEAM_HUMAN );
         CTeam* teamzm = GetGlobalTeam( ZMTEAM_ZM );
 
@@ -602,6 +709,13 @@ void CZMRules::ClientDisconnected( edict_t* pClient )
         &&  teamplayer->GetNumPlayers() <= 1 )
         {
             EndRound( ( teamplayer == teamzm ) ? ZMROUND_ZMSUBMIT : ZMROUND_HUMANDEAD );
+        }
+
+
+        // Remove the player from his team
+        if ( teamplayer )
+        {
+            teamplayer->RemovePlayer( pPlayer );
         }
     }
 

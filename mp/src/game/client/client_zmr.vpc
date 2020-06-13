@@ -85,8 +85,6 @@ $Project "Client (ZMR)"
 		{
 			$File	"hl2mp\c_hl2mp_player.cpp"
 			$File	"hl2mp\c_hl2mp_player.h"
-			$File	"$SRCDIR\game\shared\hl2mp\hl2mp_gamerules.cpp"
-			$File	"$SRCDIR\game\shared\hl2mp\hl2mp_gamerules.h"
 			$File	"$SRCDIR\game\shared\hl2mp\hl2mp_player_shared.cpp"
 			$File	"$SRCDIR\game\shared\hl2mp\hl2mp_player_shared.h"
 			$File	"$SRCDIR\game\shared\hl2mp\hl2mp_weapon_parse.cpp"

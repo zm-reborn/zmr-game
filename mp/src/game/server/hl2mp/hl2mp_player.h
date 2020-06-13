@@ -17,7 +17,6 @@ class CHL2MP_Player;
 #include "simtimer.h"
 #include "soundenvelope.h"
 #include "hl2mp_player_shared.h"
-#include "hl2mp_gamerules.h"
 #include "utldict.h"
 
 //=============================================================================

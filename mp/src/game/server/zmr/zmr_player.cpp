@@ -1229,6 +1229,8 @@ void CZMPlayer::Event_Killed( const CTakeDamageInfo &info )
     StopWaterDeathSounds();
 }
 
+extern ConVar friendlyfire;
+
 int CZMPlayer::OnTakeDamage( const CTakeDamageInfo& inputInfo )
 {
     // Fix for molotov fire damaging other players.

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "cbase.h"
-#include "hl2mp/hl2mp_gamerules.h"
+#include "teamplay_gamerules.h"
 
 #include "zmr/zmr_player_shared.h"
 #include "zmr_shareddefs.h"
@@ -29,7 +29,7 @@ enum
 };
 
 
-class CZMViewVectors : public HL2MPViewVectors
+class CZMViewVectors : public CViewVectors
 {
 public:
     CZMViewVectors( 
@@ -42,12 +42,10 @@ public:
         Vector vObsHullMin,
         Vector vObsHullMax,
         Vector vDeadViewHeight,
-        Vector vCrouchTraceMin,
-        Vector vCrouchTraceMax,
         Vector vZMHullMin,
         Vector vZMHullMax,
         Vector vZMView ) :
-            HL2MPViewVectors( 
+            CViewVectors( 
                 vView,
                 vHullMin,
                 vHullMax,
@@ -56,9 +54,7 @@ public:
                 vDuckView,
                 vObsHullMin,
                 vObsHullMax,
-                vDeadViewHeight,
-                vCrouchTraceMin,
-                vCrouchTraceMax )
+                vDeadViewHeight )
     {
         m_vZMHullMin = vZMHullMin;
         m_vZMHullMax = vZMHullMax;
@@ -78,10 +74,10 @@ public:
 	DECLARE_NETWORKCLASS();
 };
 
-class CZMRules : public CHL2MPRules //CHL2MPRules CTeamplayRules
+class CZMRules : public CTeamplayRules //CHL2MPRules CTeamplayRules
 {
 public:
-	DECLARE_CLASS( CZMRules, CHL2MPRules );
+	DECLARE_CLASS( CZMRules, CTeamplayRules );
 
     // This makes datatables able to access our private vars.
 #ifdef CLIENT_DLL
@@ -91,57 +87,64 @@ public:
 #endif
 
     CZMRules();
-    ~CZMRules( void );
+    ~CZMRules();
 
 
-    virtual void Precache( void ) OVERRIDE;
+    virtual bool ShouldCollide( int collisionGroup0, int collisionGroup1 ) OVERRIDE;
 
-    virtual bool ShouldCollide( int, int ) OVERRIDE;
-
-    virtual void DeathNotice( CBasePlayer*, const CTakeDamageInfo& ) OVERRIDE;
-
-
-    virtual const CViewVectors* GetViewVectors() const;
+    virtual const CViewVectors* GetViewVectors() const OVERRIDE;
     const CZMViewVectors* GetZMViewVectors() const;
 
+    static float GetMapRemainingTime();
+
+
+    virtual bool IsConnectedUserInfoChangeAllowed( CBasePlayer *pPlayer ) OVERRIDE;
+
 #ifndef CLIENT_DLL
+    virtual void Precache() OVERRIDE;
+    virtual void DeathNotice( CBasePlayer* pVictim, const CTakeDamageInfo& info ) OVERRIDE;
+    virtual bool FShouldSwitchWeapon( CBasePlayer* pPlayer, CBaseCombatWeapon* pWeapon ) OVERRIDE;
+    virtual int PlayerRelationship( CBaseEntity* pPlayer, CBaseEntity* pTarget ) OVERRIDE;
+    virtual bool ClientCommand( CBaseEntity* pEdict, const CCommand& args ) OVERRIDE;
+
+
     void ExecuteMapConfigs();
 
     virtual void CreateStandardEntities() OVERRIDE;
     virtual void LevelInitPostEntity() OVERRIDE;
 
-    void ClientSettingsChanged( CBasePlayer* ) OVERRIDE;
+    void ClientSettingsChanged( CBasePlayer* pPlayer ) OVERRIDE;
 
-    virtual const char* GetGameDescription( void ) OVERRIDE { return ZMR_GAMEDESC; };
+    virtual const char* GetGameDescription() OVERRIDE;
 
     virtual void Think() OVERRIDE;
 
     virtual void PlayerSpawn( CBasePlayer* pPlayer ) OVERRIDE;
-    virtual void PlayerThink( CBasePlayer* ) OVERRIDE;
+    virtual void PlayerThink( CBasePlayer* pPlayer ) OVERRIDE;
 
-    virtual const char* GetChatFormat( bool bTeamOnly, CBasePlayer* ) OVERRIDE;
-    virtual const char* GetChatPrefix( bool bTeamOnly, CBasePlayer* ) OVERRIDE { return ""; };
-    virtual const char* GetChatLocation( bool bTeamOnly, CBasePlayer* ) OVERRIDE { return nullptr; };
+    virtual const char* GetChatFormat( bool bTeamOnly, CBasePlayer* pPlayer ) OVERRIDE;
+    virtual const char* GetChatPrefix( bool bTeamOnly, CBasePlayer* pPlayer ) OVERRIDE { return ""; };
+    virtual const char* GetChatLocation( bool bTeamOnly, CBasePlayer* pPlayer ) OVERRIDE { return nullptr; };
 
-    virtual int WeaponShouldRespawn( CBaseCombatWeapon* ) OVERRIDE;
+    virtual int WeaponShouldRespawn( CBaseCombatWeapon* pWeapon ) OVERRIDE;
 
     // Yes, always teamplay.
     virtual bool IsTeamplay( void ) OVERRIDE { return true; };
     virtual int GetAutoAimMode() OVERRIDE { return AUTOAIM_NONE; };
 
-    virtual int ItemShouldRespawn( CItem* ) OVERRIDE;
-	virtual bool CanHaveAmmo( CBaseCombatCharacter*, int ) OVERRIDE; // can this player take more of this ammo?
-	virtual bool CanHaveAmmo( CBaseCombatCharacter*, const char* ) OVERRIDE;
-    virtual bool CanHavePlayerItem( CBasePlayer*, CBaseCombatWeapon* ) OVERRIDE;
+    virtual int ItemShouldRespawn( CItem* pItem ) OVERRIDE;
+	virtual bool CanHaveAmmo( CBaseCombatCharacter* pPlayer, int iAmmoIndex ) OVERRIDE; // can this player take more of this ammo?
+	virtual bool CanHaveAmmo( CBaseCombatCharacter* pPlayer, const char* szName ) OVERRIDE;
+    virtual bool CanHavePlayerItem( CBasePlayer* pPlayer, CBaseCombatWeapon* pWeapon ) OVERRIDE;
 
-    virtual const char* SetDefaultPlayerTeam( CBasePlayer* ) OVERRIDE;
+    virtual const char* SetDefaultPlayerTeam( CBasePlayer* pPlayer ) OVERRIDE;
 
-    virtual CBaseEntity* GetPlayerSpawnSpot( CBasePlayer* ) OVERRIDE;
+    virtual CBaseEntity* GetPlayerSpawnSpot( CBasePlayer* pPlayer ) OVERRIDE;
 
-    virtual bool IsSpawnPointValid( CBaseEntity*, CBasePlayer* ) OVERRIDE;
+    virtual bool IsSpawnPointValid( CBaseEntity* pSpawn, CBasePlayer* pPlayer ) OVERRIDE;
     
-    virtual void ClientDisconnected( edict_t* ) OVERRIDE;
-    virtual void PlayerKilled( CBasePlayer*, const CTakeDamageInfo& ) OVERRIDE;
+    virtual void ClientDisconnected( edict_t* pPlayer ) OVERRIDE;
+    virtual void PlayerKilled( CBasePlayer* pPlayer, const CTakeDamageInfo& info ) OVERRIDE;
 
     virtual bool UseSuicidePenalty() OVERRIDE { return false; };
     virtual bool FlPlayerFallDeathDoesScreenFade( CBasePlayer* pPlayer ) OVERRIDE { return false; }; // Don't fade to eternal darkness when getting killed.
@@ -152,31 +155,31 @@ public:
 
     static void IncPopCount( ZombieClass_t );
 
-    void OnClientFinishedPutInServer( CZMPlayer* );
+    void OnClientFinishedPutInServer( CZMPlayer* pPlayer );
 
-    bool CanInactivityPunish( CZMPlayer* );
-    void PunishInactivity( CZMPlayer* );
-    bool ReplaceZM( CZMPlayer* );
+    bool CanInactivityPunish( CZMPlayer* pPlayer );
+    void PunishInactivity( CZMPlayer* pPlayer );
+    bool ReplaceZM( CZMPlayer* pPlayer );
 
     //bool RoundCleanupShouldIgnore( CBaseEntity* ) OVERRIDE;
-    void EndRound( ZMRoundEndReason_t );
+    void EndRound( ZMRoundEndReason_t reason );
     void ResetWorld();
     void RestoreMap();
 
 
-    bool ShouldLateSpawn( CZMPlayer* );
-    inline float GetRoundStartTime() { return m_flRoundStartTime; };
-    inline bool IsInRoundEnd() { return m_bInRoundEnd; };
+    bool ShouldLateSpawn( CZMPlayer* pPlayer );
+    inline float GetRoundStartTime() const { return m_flRoundStartTime; };
+    inline bool IsInRoundEnd() const { return m_bInRoundEnd; };
 
 
     static int GetNumAliveHumans();
 
     inline void SetZombiePop( int n ) { m_nZombiePop = n; };
 
-    inline CZMEntLoadout* GetLoadoutEnt() { return m_pLoadoutEnt; };
+    inline CZMEntLoadout* GetLoadoutEnt() const { return m_pLoadoutEnt; };
     inline void SetLoadoutEnt( CZMEntLoadout* pEnt ) { m_pLoadoutEnt = pEnt; }
 
-    inline CZMEntObjectivesManager* GetObjManager() { return m_pObjManager; };
+    inline CZMEntObjectivesManager* GetObjManager() const { return m_pObjManager; };
     inline void SetObjManager( CZMEntObjectivesManager* pEnt ) { m_pObjManager = pEnt; }
 
     CZMEntFogController* GetZMFogController() const { return m_pZMFog; }
@@ -192,6 +195,11 @@ public:
     static void RewardScoreZM( int points );
 #endif
 
+protected:
+#ifndef CLIENT_DLL
+    virtual void GoToIntermission() OVERRIDE;
+#endif
+
 private:
     CNetworkVar( int, m_nZombiePop );
     CNetworkVar( int, m_nRounds ); // Number of "valid" rounds played. If the round is short, it will be skipped.
@@ -200,10 +208,10 @@ private:
     
 
 #ifndef CLIENT_DLL
-    void RewardPoints( ZMRoundEndReason_t );
+    void RewardPoints( ZMRoundEndReason_t reason );
 
     CZMPlayer* ChooseZM();
-    void BeginRound( CZMPlayer* );
+    void BeginRound( CZMPlayer* pZM );
 
 
     int m_flRoundRestartTime;
