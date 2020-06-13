@@ -19,6 +19,7 @@
 
 #include "zmr/zmr_player.h"
 #include "zmr/zmr_mapentities.h"
+#include "zmr_resource_system.h"
 #else
 #include "zmr/c_zmr_player.h"
 #endif
@@ -32,10 +33,6 @@
 #ifndef CLIENT_DLL
 extern CAmmoDef* GetAmmoDef();
 #endif
-
-
-
-ConVar zm_sv_resource_max( "zm_sv_resource_max", "5000", FCVAR_NOTIFY | FCVAR_REPLICATED );
 
 ConVar zm_sv_participation( "zm_sv_participation", "0", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE, "0 = No limit, 1 = Don't allow only human, 2 = Don't allow only spec, 3 = Don't allow only spec/human" );
 
@@ -1285,6 +1282,8 @@ void CZMRules::ResetWorld()
         GetLoadoutEnt()->Reset();
     }
 
+    g_ZMResourceSystem.OnRoundStart();
+
     // Choose ZM and begin the round!
     CZMPlayer* pZM = ChooseZM();
 
@@ -1337,46 +1336,8 @@ void CZMRules::PlayerSpawn( CBasePlayer* pPlayer )
     }
 }
 
-ConVar zm_sv_resource_rate( "zm_sv_resource_rate", "5", FCVAR_NOTIFY );
-ConVar zm_sv_resource_refill_min( "zm_sv_resource_refill_min", "35", FCVAR_NOTIFY );
-ConVar zm_sv_resource_refill_max( "zm_sv_resource_refill_max", "100", FCVAR_NOTIFY );
-ConVar zm_sv_resource_refill_roundstartcount( "zm_sv_resource_refill_roundstartcount", "1", FCVAR_NOTIFY, "Is refilling based on current human count or count at the start of the round." );
-
 void CZMRules::PlayerThink( CBasePlayer* pPlayer )
 {
-    CZMPlayer* pZMPlayer = ToZMPlayer( pPlayer );
-
-    if ( pZMPlayer && pZMPlayer->IsZM() && pZMPlayer->m_flNextResourceInc < gpGlobals->curtime )
-    {
-        int limit = zm_sv_resource_max.GetInt();
-
-        if ( pZMPlayer->GetResources() < limit )
-        {
-            int num;
-            if ( zm_sv_resource_refill_roundstartcount.GetBool() )
-            {
-                // Always choose the higher one. We never know if players late-spawn, etc.
-                num = max( m_nRoundMaxHumansAlive, GetNumAliveHumans() );
-
-                // Update max humans.
-                m_nRoundMaxHumansAlive = num;
-            }
-            else
-            {
-                num = GetNumAliveHumans();
-            }
-
-            pZMPlayer->IncResources( (int)SimpleSplineRemapVal(
-                    num,
-                    1, gpGlobals->maxClients - 1,
-                    zm_sv_resource_refill_min.GetFloat(),
-                    zm_sv_resource_refill_max.GetFloat() ), true );
-        }
-
-        pZMPlayer->m_flNextResourceInc = gpGlobals->curtime + zm_sv_resource_rate.GetFloat();
-    }
-
-
     BaseClass::PlayerThink( pPlayer );
 }
 

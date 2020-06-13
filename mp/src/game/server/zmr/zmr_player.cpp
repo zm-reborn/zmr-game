@@ -17,6 +17,7 @@
 #include "zmr/zmr_playermodels.h"
 #include "weapons/zmr_fistscarry.h"
 #include "zmr_ammodef.h"
+#include "zmr_resource_system.h"
 #include "zmr_player.h"
 
 
@@ -137,8 +138,6 @@ CZMPlayer::CZMPlayer()
     m_flLastActivity = gpGlobals->curtime;
     m_flLastActivityWarning = 0.0f;
 
-    m_flNextResourceInc = 0.0f;
-
     
     SetWeaponSlotFlags( 0 );
 
@@ -230,6 +229,11 @@ void CZMPlayer::PreThink( void )
     }
 
 
+    if ( IsZM() )
+    {
+        g_ZMResourceSystem.GainResources( this );
+    }
+
     if ( IsAlive() )
     {
         UpdateAccuracyRatio();
@@ -286,7 +290,6 @@ void CZMPlayer::PreThink( void )
 void CZMPlayer::PostThink()
 {
     HandleDamagesFromUserCmd();
-
 
     BaseClass::PostThink();
     

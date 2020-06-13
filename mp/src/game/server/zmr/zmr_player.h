@@ -177,8 +177,6 @@ public:
     inline bool IsZM() const { return GetTeamNumber() == ZMTEAM_ZM; }
     inline bool IsHuman() const { return GetTeamNumber() == ZMTEAM_HUMAN; }
 
-    float m_flNextResourceInc;
-
 
     void SetMenuEnt( CZMEntBaseUsable* pEnt )
     {
