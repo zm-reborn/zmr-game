@@ -2,7 +2,8 @@
 #include "hudelement.h"
 #include "hud_macros.h"
 #include "c_playerresource.h"
-#include "clientmode_hl2mpnormal.h"
+#include "clientmode.h"
+#include "baseviewport.h"
 #include <vgui_controls/Panel.h>
 #include <vgui/ISurface.h>
 #include <vgui/ILocalize.h>

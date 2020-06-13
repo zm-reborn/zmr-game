@@ -5,8 +5,6 @@
 #include "vgui/ILocalize.h"
 #include "c_team.h"
 #include "c_playerresource.h"
-#include "c_hl2mp_player.h"
-#include "hl2mp_gamerules.h"
 #include "ihudlcd.h"
 
 #include "zmr_shareddefs.h"
