@@ -24,6 +24,7 @@
 #include "c_zmr_colorcorrection.h"
 
 #include "c_zmr_flashlighteffect.h"
+#include "zmr_resource_system.h"
 #include "c_zmr_player.h"
 #include "c_zmr_zmvision.h"
 
@@ -206,6 +207,11 @@ void C_ZMPlayer::PreThink()
         {
             UpdateAccuracyRatio();
         }
+
+        //if ( IsZM() )
+        //{
+        //    g_ZMResourceSystem.GainResources( this );
+        //}
     }
 
 

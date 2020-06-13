@@ -9,7 +9,7 @@
 #ifndef CLIENT_DLL
 BEGIN_SEND_TABLE_NOBASE( CZMPlayerLocalData, DT_ZM_PlyLocal )
     SendPropInt( SENDINFO( m_fWeaponSlotFlags ), -1, SPROP_UNSIGNED ),
-    SendPropInt( SENDINFO( m_nResources ), -1, SPROP_UNSIGNED ),
+    SendPropInt( SENDINFO( m_nResources ), -1, SPROP_UNSIGNED | SPROP_CHANGES_OFTEN ),
     SendPropFloat( SENDINFO( m_flFlashlightBattery ), 10, SPROP_UNSIGNED | SPROP_ROUNDUP, 0.0f, 100.0f ),
     SendPropFloat( SENDINFO( m_flAccuracyRatio ), 8, SPROP_CHANGES_OFTEN, 0.0f, 1.0f ),
 END_SEND_TABLE()

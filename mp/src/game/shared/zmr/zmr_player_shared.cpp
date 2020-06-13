@@ -19,6 +19,7 @@
 
 
 #include "zmr_ammodef.h"
+#include "zmr_resource_system.h"
 #include "zmr_player_shared.h"
 
 
@@ -42,8 +43,6 @@
 
 extern ConVar zm_cl_participation;
 #endif
-
-extern ConVar zm_sv_resource_max;
 
 
 ConVar zm_sv_bulletspassplayers( "zm_sv_bulletspassplayers", "1", FCVAR_NOTIFY | FCVAR_ARCHIVE | FCVAR_REPLICATED, "Do bullets players shoot pass through other players?" );
@@ -192,12 +191,9 @@ int CZMPlayer::GetResources() const
 
 void CZMPlayer::IncResources( int res, bool bLimit )
 {
-#ifdef CLIENT_DLL
-
-#else
     int oldres = GetResources();
     int newres = oldres + res;
-    int max = zm_sv_resource_max.GetInt();
+    int max = g_ZMResourceSystem.GetResourceLimit();
 
 
     if ( bLimit && newres > max )
@@ -209,18 +205,13 @@ void CZMPlayer::IncResources( int res, bool bLimit )
     }
 
     SetResources( newres );
-#endif
 }
 
 void CZMPlayer::SetResources( int res )
 {
-#ifdef CLIENT_DLL
-
-#else
     if ( res < 0 ) res = 0;
 
     m_ZMLocal.m_nResources = res;
-#endif
 }
 
 float CZMPlayer::GetFlashlightBattery() const
