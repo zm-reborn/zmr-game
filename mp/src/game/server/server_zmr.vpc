@@ -110,16 +110,6 @@ $Project "Server (ZMR)"
 			$File	"hl2compatibility\missiles.cpp"
 			$File	"hl2compatibility\missiles.h"
 		}
-		$Folder	"HL2MP"
-		{
-			$File	"hl2mp\hl2mp_cvars.cpp"
-			$File	"hl2mp\hl2mp_player.cpp"
-			$File	"hl2mp\hl2mp_player.h"
-			$File	"$SRCDIR\game\shared\hl2mp\hl2mp_player_shared.cpp"
-			$File	"$SRCDIR\game\shared\hl2mp\hl2mp_player_shared.h"
-			$File	"$SRCDIR\game\shared\hl2mp\hl2mp_weapon_parse.cpp"
-			$File	"$SRCDIR\game\shared\hl2mp\hl2mp_weapon_parse.h"
-		}
 		$Folder "ZMR"
 		{
 			$Folder "GlowStencil"

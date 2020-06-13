@@ -83,13 +83,6 @@ $Project "Client (ZMR)"
 		}
 		$Folder	"HL2MP"
 		{
-			$File	"hl2mp\c_hl2mp_player.cpp"
-			$File	"hl2mp\c_hl2mp_player.h"
-			$File	"$SRCDIR\game\shared\hl2mp\hl2mp_player_shared.cpp"
-			$File	"$SRCDIR\game\shared\hl2mp\hl2mp_player_shared.h"
-			$File	"$SRCDIR\game\shared\hl2mp\hl2mp_weapon_parse.cpp"
-			$File	"$SRCDIR\game\shared\hl2mp\hl2mp_weapon_parse.h"
-
 			$Folder	"UI"
 			{
 				$File	"hl2mp\ui\backgroundpanel.cpp"
