@@ -1,6 +1,7 @@
 #include "cbase.h"
 #include "voice_common.h"
 #include "usermessages.h"
+#include <haptics/haptic_msgs.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -59,6 +60,10 @@ void RegisterUserMessages()
 	usermessages->Register( "LogoTimeMsg", 4 );
 	usermessages->Register( "AchievementEvent", -1 );
 
+#ifndef _X360
+	// NVNT register haptic user messages
+	RegisterHapticMessages();
+#endif
 
     RegisterZMUserMessages();
 }
