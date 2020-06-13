@@ -7,6 +7,7 @@
 
 #include "zmr/c_zmr_player.h"
 #include "zmr/zmr_gamerules.h"
+#include "zmr/zmr_resource_system.h"
 #include "zmr/npcs/c_zmr_zombiebase.h"
 #include "zmr/c_zmr_util.h"
 
@@ -52,7 +53,7 @@ private:
     int m_nTexBgId;
 
     int m_nResCount;
-    int m_nResCountDif;
+    float m_flResPerMin;
     int m_nPopCount;
     int m_nPopMax;
     int m_nSelected;
@@ -115,7 +116,7 @@ void CZMResourceHud::LoadIcons()
 void CZMResourceHud::Reset()
 {
     m_nResCount = 0;
-    m_nResCountDif = 0;
+    m_flResPerMin = 0.0f;
     m_nPopCount = 0;
     m_nSelected = 0;
 
@@ -153,8 +154,8 @@ void CZMResourceHud::OnThink()
 
     int newres = pPlayer->GetResources();
 
-    if ( (newres - m_nResCount) > 0 )
-        m_nResCountDif = newres - m_nResCount; 
+    g_ZMResourceSystem.UpdateState();
+    m_flResPerMin = g_ZMResourceSystem.GetResourcesPerMinute();
 
     m_nResCount = newres;
 }
@@ -174,7 +175,7 @@ void CZMResourceHud::Paint()
     PaintBg();
 
 
-    wchar_t text[32];
+    static wchar_t text[32];
     int w, h;
 
     const int offsety = 45;
@@ -189,7 +190,7 @@ void CZMResourceHud::Paint()
     surface()->GetTextSize( m_hLargeFont, text, w, h );
 
 
-    _snwprintf( text, ARRAYSIZE(text) - 1, L"+%i", m_nResCountDif );
+    _snwprintf( text, ARRAYSIZE(text) - 1, L"%.0f rpm", m_flResPerMin );
 
     int w2;
     surface()->GetTextSize( m_hMediumFont, text, w2, h );
