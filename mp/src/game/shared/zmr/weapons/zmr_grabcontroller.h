@@ -28,7 +28,6 @@ public:
 
     QAngle			m_attachedAnglesPlayerSpace;
     Vector			m_attachedPositionObjectSpace;
-
 private:
     // Compute the max speed for an attached object
     void ComputeMaxSpeed( CBaseEntity *pEntity, IPhysicsObject *pPhysics );
@@ -46,8 +45,6 @@ private:
     float			m_savedRotDamping[VPHYSICS_MAX_OBJECT_LIST_COUNT];
     float			m_savedMass[VPHYSICS_MAX_OBJECT_LIST_COUNT];
     EHANDLE			m_attachedEntity;
-    QAngle			m_vecPreferredCarryAngles;
-    bool			m_bHasPreferredCarryAngles;
 
 
     IPhysicsMotionController *m_controller;

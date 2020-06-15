@@ -794,21 +794,7 @@ bool CGrabController::UpdateObject( CBasePlayer *pPlayer, float flError )
                             0.0f );
 #endif
     }
-    
-#ifndef CLIENT_DLL
-    // If it has a preferred orientation, update to ensure we're still oriented correctly.
-    Pickup_GetPreferredCarryAngles( pEntity, pPlayer, pPlayer->EntityToWorldTransform(), angles );
 
-
-    // We may be holding a prop that has preferred carry angles
-    if ( m_bHasPreferredCarryAngles )
-    {
-        matrix3x4_t tmp;
-        ComputePlayerMatrix( pPlayer, tmp );
-        angles = TransformAnglesToWorldSpace( m_vecPreferredCarryAngles, tmp );
-    }
-
-#endif
 
     matrix3x4_t attachedToWorld;
     Vector offset;

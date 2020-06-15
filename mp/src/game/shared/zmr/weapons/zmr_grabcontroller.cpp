@@ -4,6 +4,10 @@
 
 #ifdef GAME_DLL
 #include "props.h"
+#else
+#include "c_physicsprop.h"
+
+#define CPhysicsProp C_PhysicsProp
 #endif
 
 #include "zmr_grabcontroller.h"
@@ -92,8 +96,6 @@ CGrabController::CGrabController( void )
     m_shadow.maxDampSpeed = m_shadow.maxSpeed*2;
     m_shadow.maxDampAngular = m_shadow.maxAngular;
     m_attachedEntity = NULL;
-    m_vecPreferredCarryAngles = vec3_angle;
-    m_bHasPreferredCarryAngles = false;
 }
 
 CGrabController::~CGrabController( void )
@@ -250,17 +252,65 @@ QAngle CGrabController::TransformAnglesFromPlayerSpace( const QAngle &anglesIn, 
 #endif
 }
 
+bool GetModelPreferredAngles_( CBaseAnimating* pEnt, QAngle& anglesOut )
+{
+    auto* pModel = pEnt->GetModel();
+    if ( !pModel ) return false;
+
+    auto* kv = new KeyValues( "" );
+	if ( kv->LoadFromBuffer( modelinfo->GetModelName( pModel ), modelinfo->GetModelKeyValueText( pModel ) ) )
+	{
+		auto* interactions = kv->FindKey( "physgun_interactions" );
+		if ( interactions )
+		{
+			auto* pszAngles = interactions->GetString( "preferred_carryangles" );
+			if ( pszAngles && *pszAngles )
+			{
+				UTIL_StringToVector( anglesOut.Base(), pszAngles );
+				kv->deleteThis();
+				return true;
+			}
+		}
+	}
+
+	kv->deleteThis();
+	return false;
+}
+
+#ifdef GAME_DLL
+bool GetPreferredCarryAngles_( CBaseEntity* pObject, CBasePlayer* pPlayer, QAngle& anglesOut )
+{
+	auto* pPickup = dynamic_cast<IPlayerPickupVPhysics*>( pObject );
+	if ( pPickup )
+	{
+		if ( pPickup->HasPreferredCarryAnglesForPlayer( pPlayer ) )
+		{
+			anglesOut = pPickup->PreferredCarryAngles();
+			return true;
+		}
+	}
+
+	return false;
+}
+#endif
 
 void CGrabController::AttachEntity( CBasePlayer *pPlayer, CBaseEntity *pEntity, IPhysicsObject *pPhys, bool bIsMegaPhysCannon )
 {
+    bool bHasPreferredAngles = false;
+
     // play the impact sound of the object hitting the player
     // used as feedback to let the player know he picked up the object
 #ifndef CLIENT_DLL
     PhysicsImpactSound( pPlayer, pPhys, CHAN_STATIC, pPhys->GetMaterialIndex(), pPlayer->VPhysicsGetObject()->GetMaterialIndex(), 1.0, 64 );
 #endif
+
+
     Vector position;
     QAngle angles;
+    QAngle preferredAngles;
     pPhys->GetPosition( &position, &angles );
+    
+    
     // If it has a preferred orientation, use that instead.
 #ifndef CLIENT_DLL
     // ZMR
@@ -269,26 +319,20 @@ void CGrabController::AttachEntity( CBasePlayer *pPlayer, CBaseEntity *pEntity, 
     // This only applies carry angles if:
     // It has a special prop interaction. Only sawblade and a few other props use it.
     // It's a func_physbox with custom carry angles defined.
-    bool bHasAngles = Pickup_GetPreferredCarryAngles( pEntity, pPlayer, pPlayer->EntityToWorldTransform(), angles );
-
-
-    // If it's a prop, see if it has desired carry angles
-    // Yes, this is separate from the above one.
-    CPhysicsProp* pProp = dynamic_cast<CPhysicsProp*>( pEntity );
-    if ( pProp )
-    {
-        m_bHasPreferredCarryAngles = pProp->GetPropDataAngles( "preferred_carryangles", m_vecPreferredCarryAngles );
-        if ( !bHasAngles && m_bHasPreferredCarryAngles )
-            angles = m_vecPreferredCarryAngles;
-    }
-    else
-    {
-        m_bHasPreferredCarryAngles = false;
-    }
-#else
-
-    m_bHasPreferredCarryAngles = false;
+    bHasPreferredAngles = GetPreferredCarryAngles_( pEntity, pPlayer, preferredAngles );
 #endif
+
+
+    if ( !bHasPreferredAngles )
+    {
+        // If it's a prop, see if it has desired carry angles
+        // Yes, this is separate from the above one.
+        CPhysicsProp* pProp = dynamic_cast<CPhysicsProp*>( pEntity );
+        if ( pProp )
+        {
+            bHasPreferredAngles = GetModelPreferredAngles_( pProp, preferredAngles );
+        }
+    }
 
 //	ComputeMaxSpeed( pEntity, pPhys );
 
@@ -333,7 +377,15 @@ void CGrabController::AttachEntity( CBasePlayer *pPlayer, CBaseEntity *pEntity, 
     m_error = 0;
     m_contactAmount = 0;
 
-    m_attachedAnglesPlayerSpace = TransformAnglesToPlayerSpace( angles, pPlayer );
+    if ( bHasPreferredAngles )
+    {
+        m_attachedAnglesPlayerSpace = preferredAngles;
+    }
+    else
+    {
+        m_attachedAnglesPlayerSpace = TransformAnglesToPlayerSpace( angles, pPlayer );
+    }
+
     if ( m_angleAlignment != 0 )
     {
         m_attachedAnglesPlayerSpace = AlignAngles( m_attachedAnglesPlayerSpace, m_angleAlignment );
