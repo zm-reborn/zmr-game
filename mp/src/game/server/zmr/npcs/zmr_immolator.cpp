@@ -16,6 +16,7 @@ ConVar zm_sv_immolator_burndmgdist( "zm_sv_immolator_burndmgdist", "132", FCVAR_
 ConVar zm_sv_immolator_burndmgtime( "zm_sv_immolator_burndmgtime", "8", FCVAR_NOTIFY, "The time those near me will burn for." );
 ConVar zm_sv_immolator_burndmg( "zm_sv_immolator_burndmg", "1", FCVAR_NOTIFY );
 ConVar zm_sv_immolator_burnhealthcap( "zm_sv_immolator_burnhealthcap", "1", FCVAR_NOTIFY, "The health cap at which the immolator will ignite the player." );
+ConVar zm_sv_immolator_waterdmg( "zm_sv_immolator_waterdmg", "10", FCVAR_NOTIFY, "The damage we take every second from water." );
 
 #define BURNOTHER_INTERVAL          1.0f
 
@@ -82,6 +83,14 @@ void CZMImmolator::PreUpdate()
         {
             Ignite( 1337.0f );
         }
+    }
+
+    if ( GetWaterLevel() >= WL_Waist )
+    {
+        float dmg = zm_sv_immolator_waterdmg.GetFloat() * GetUpdateInterval();
+        
+        CTakeDamageInfo dmgInfo( this, this, dmg, DMG_GENERIC );
+        TakeDamage( dmgInfo );
     }
 
 
