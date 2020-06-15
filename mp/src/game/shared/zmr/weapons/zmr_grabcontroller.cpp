@@ -95,7 +95,7 @@ CGrabController::CGrabController( void )
     m_shadow.maxAngular = DEFAULT_MAX_ANGULAR;
     m_shadow.maxDampSpeed = m_shadow.maxSpeed*2;
     m_shadow.maxDampAngular = m_shadow.maxAngular;
-    m_attachedEntity = NULL;
+    m_attachedEntity = nullptr;
 }
 
 CGrabController::~CGrabController( void )
@@ -123,7 +123,7 @@ void CGrabController::SetTargetPosition( const Vector &target, const QAngle &tar
     {
         IPhysicsObject *pObj = pAttached->VPhysicsGetObject();
         
-        if ( pObj != NULL )
+        if ( pObj )
         {
             pObj->Wake();
         }
@@ -147,7 +147,7 @@ float CGrabController::ComputeError()
         
         if ( pObj )
         {	
-            pObj->GetShadowPosition( &pos, NULL );
+            pObj->GetShadowPosition( &pos, nullptr );
 
             float error = (m_shadow.targetPosition - pos).Length();
             if ( m_errorTime > 0 )
@@ -360,13 +360,13 @@ void CGrabController::AttachEntity( CBasePlayer *pPlayer, CBaseEntity *pEntity, 
     for ( int i = 0; i < count; i++ )
     {
         float mass = pList[i]->GetMass();
-        pList[i]->GetDamping( NULL, &m_savedRotDamping[i] );
+        pList[i]->GetDamping( nullptr, &m_savedRotDamping[i] );
         m_flLoadWeight += mass;
         m_savedMass[i] = mass;
 
         // reduce the mass to prevent the player from adding crazy amounts of energy to the system
         pList[i]->SetMass( REDUCED_CARRY_MASS / flFactor );
-        pList[i]->SetDamping( NULL, &damping );
+        pList[i]->SetDamping( nullptr, &damping );
     }
     
     // Give extra mass to the phys object we're actually picking up
@@ -428,7 +428,7 @@ void CGrabController::DetachEntity( bool bClearVelocity )
             pPhys->EnableDrag( true );
             pPhys->Wake();
             pPhys->SetMass( m_savedMass[i] );
-            pPhys->SetDamping( NULL, &m_savedRotDamping[i] );
+            pPhys->SetDamping( nullptr, &m_savedRotDamping[i] );
             PhysClearGameFlags( pPhys, FVPHYSICS_PLAYER_HELD );
             if ( bClearVelocity )
             {
@@ -445,12 +445,12 @@ void CGrabController::DetachEntity( bool bClearVelocity )
         }
     }
 
-    m_attachedEntity = NULL;
+    m_attachedEntity = nullptr;
     if ( physenv )
     {
         physenv->DestroyMotionController( m_controller );
     }
-    m_controller = NULL;
+    m_controller = nullptr;
 }
 
 static bool InContactWithHeavyObject( IPhysicsObject *pObject, float heavyMass )
@@ -494,7 +494,7 @@ IMotionEvent::simresult_e CGrabController::Simulate( IPhysicsMotionController *p
     AngularImpulse angVel;
     pObject->GetVelocity( &velocity, &angVel );
     PhysComputeSlideDirection( pObject, velocity, angVel, &velocity, &angVel, GetLoadWeight() );
-    pObject->SetVelocityInstantaneous( &velocity, NULL );
+    pObject->SetVelocityInstantaneous( &velocity, nullptr );
 
     linear.Init();
     angular.Init();

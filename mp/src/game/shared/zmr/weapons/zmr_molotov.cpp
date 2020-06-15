@@ -572,7 +572,7 @@ void CZMWeaponMolotov::HandleAnimEventLight()
 
     if (m_iThrowState >= MOLOTOVSTATE_DRAWBACK ||
         (m_iThrowState < MOLOTOVSTATE_DRAWBACK
-    &&  random->RandomInt( 0, 100 ) < min( pPlayer->GetHealth(), 100 )) )
+    &&  random->RandomInt( 0, 100 ) < MIN( pPlayer->GetHealth(), 100 )) )
     {
         m_iThrowState = MOLOTOVSTATE_DRAWBACK;
 

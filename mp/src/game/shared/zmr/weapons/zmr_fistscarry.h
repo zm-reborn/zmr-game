@@ -80,7 +80,7 @@ protected:
     // Pickup and throw objects.
     bool CheckForTarget();
     
-    CBaseEntity*	FindObject( Vector* pvecHitPos = nullptr );
+    CBaseEntity*	FindObject( Vector* pvecHitPos = nullptr ) const;
     bool			AttachObject( CBaseEntity* pObject );
 
     void			UpdateObject();
