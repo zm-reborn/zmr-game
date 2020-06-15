@@ -111,7 +111,10 @@ void CZMImmolator::Event_Killed( const CTakeDamageInfo& info )
     BaseClass::Event_Killed( info );
 
     // We need to call this last or we will go on an endless loop
-    StartFires();
+    if ( GetWaterLevel() == WL_NotInWater )
+    {
+        StartFires();
+    }
 }
 
 void CZMImmolator::BurnHurtOthers()
