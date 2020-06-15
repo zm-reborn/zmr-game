@@ -650,7 +650,7 @@ bool CZMWeaponHands::AttachObject( CBaseEntity *pObject )
     return true;
 }
 
-CBaseEntity* CZMWeaponHands::FindObject( Vector* pvecHitPos )
+CBaseEntity* CZMWeaponHands::FindObject( Vector* pvecHitPos ) const
 {
     const int iMask = MASK_SHOT|CONTENTS_GRATE;
     const Vector vecHull = Vector( 8, 8, 8 );
@@ -898,7 +898,7 @@ void CZMWeaponHands::ManagePredictedObject()
                 m_grabController.SetIgnorePitch( false );
                 m_grabController.SetAngleAlignment( 0 );
 
-                GetGrabController().AttachEntity( ToBasePlayer( GetOwner() ), pAttachedObject, pPhysics, false );
+                GetGrabController().AttachEntity( GetPlayerOwner(), pAttachedObject, pPhysics, false );
                 GetGrabController().m_attachedPositionObjectSpace = m_attachedPositionObjectSpace;
                 GetGrabController().m_attachedAnglesPlayerSpace = m_attachedAnglesPlayerSpace;
             }
