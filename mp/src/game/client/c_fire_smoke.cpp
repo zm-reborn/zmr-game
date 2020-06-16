@@ -16,6 +16,10 @@
 #include "dlight.h"
 #include "tier0/icommandline.h"
 
+#ifdef ZMR
+#include "zmr/c_zmr_fireglow_system.h"
+#endif
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -107,6 +111,8 @@ C_FireSmoke::~C_FireSmoke()
 		m_hEffect = NULL;
 	}
 
+
+	g_ZMFireGlowSystem.RemoveFireEntity( this );
 }
 
 //-----------------------------------------------------------------------------
@@ -190,6 +196,7 @@ void C_FireSmoke::Start( void )
 	// Create the effect of the correct size
 	m_hEffect = ParticleProp()->Create( lpszEffectName, PATTACH_ABSORIGIN );
 
+	g_ZMFireGlowSystem.AddFireEntity( this );
 }
 
 
