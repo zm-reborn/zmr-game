@@ -15,6 +15,7 @@
 
 
 ConVar zm_sv_debug_nav_transient( "zm_sv_debug_nav_transient", "0" );
+ConVar zm_sv_debug_nav_transient_nofloor( "zm_sv_debug_nav_transient_nofloor", "0" );
 ConVar zm_sv_debug_nav_block( "zm_sv_debug_nav_block", "0" );
 
 
@@ -114,7 +115,7 @@ void CZMRNavMesh::UpdateFloorCheckAreas()
 
     Vector mins, maxs, center;
 
-    const bool bDebugging = zm_sv_debug_nav_transient.GetBool();
+    const bool bDebugging = zm_sv_debug_nav_transient_nofloor.GetBool();
 
 
     FOR_EACH_VEC( areas, i )
