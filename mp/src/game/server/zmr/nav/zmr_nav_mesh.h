@@ -7,6 +7,14 @@
 #define NAV_MESH_ZMR_NOFLOOR    0x00040000
 
 
+class CZMNavTransientFilter : public CTraceFilterSimple
+{
+public:
+    CZMNavTransientFilter();
+
+    virtual bool ShouldHitEntity( IHandleEntity* pHandleEntity, int contentsMask ) OVERRIDE;
+};
+
 class CZMRNavMesh : public CNavMesh
 {
 public:

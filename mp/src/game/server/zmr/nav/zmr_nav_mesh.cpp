@@ -1,5 +1,6 @@
 #include "cbase.h"
-
+#include "props.h"
+#include "physobj.h"
 
 #include "npcr/npcr_basenpc.h"
 #include "npcr/npcr_manager.h"
@@ -8,7 +9,8 @@
 #include "zmr_nav_mesh.h"
 
 
-#define MASK_TRANSIENT          (CONTENTS_SOLID|CONTENTS_GRATE|CONTENTS_WINDOW|CONTENTS_MOVEABLE)
+// This is basically MASK_SOLID
+#define MASK_TRANSIENT          (CONTENTS_SOLID|CONTENTS_GRATE|CONTENTS_WINDOW|CONTENTS_MOVEABLE|CONTENTS_MONSTER)
 
 
 #define ZMR_NAV_TRANSIENT_HEIGHT    17.0f
@@ -18,6 +20,44 @@ ConVar zm_sv_debug_nav_transient( "zm_sv_debug_nav_transient", "0" );
 ConVar zm_sv_debug_nav_transient_nofloor( "zm_sv_debug_nav_transient_nofloor", "0" );
 ConVar zm_sv_debug_nav_block( "zm_sv_debug_nav_block", "0" );
 
+
+CZMNavTransientFilter::CZMNavTransientFilter() : CTraceFilterSimple( nullptr, COLLISION_GROUP_NONE, nullptr )
+{
+}
+
+bool CZMNavTransientFilter::ShouldHitEntity( IHandleEntity* pHandleEntity, int contentsMask )
+{
+    if ( !pHandleEntity ) return false;
+    auto* pEnt = EntityFromEntityHandle( pHandleEntity );
+    if ( !pEnt ) return false;
+
+    // World will never move, so assume the nav mesh creator knows this.
+    if ( pEnt->IsWorld() ) return false;
+
+    // Player / npc
+    if ( pEnt->IsCombatCharacter() ) return false;
+
+    if ( !pEnt->IsSolid() ) return false;
+
+    //auto* pParent = pEnt->GetRootMoveParent();
+    //if ( pParent )
+    //    pEnt = pParent;
+        
+    // ZMRTODO: Are we big enough to block mesh?
+    if ( pEnt->IsBSPModel() )
+    {
+        auto* pPhysBox = dynamic_cast<CPhysBox*>( pEnt );
+        if ( pPhysBox ) return false;
+    }
+    else
+    {
+        auto* pPhysProp = dynamic_cast<CPhysicsProp*>( pEnt );
+        if ( pPhysProp ) return false;
+    }
+
+
+    return true;
+}
 
 
 CZMRNavMesh::CZMRNavMesh()
@@ -54,8 +94,8 @@ void CZMRNavMesh::Update()
 void CZMRNavMesh::UpdateTransientAreas()
 {
     auto& areas = GetTransientAreas();
-    auto* pWorld = GetContainingEntity( INDEXENT( 0 ) );
 
+    CZMNavTransientFilter filter;
     Vector mins, maxs, center;
 
     const bool bDebugging = zm_sv_debug_nav_transient.GetBool();
@@ -86,7 +126,6 @@ void CZMRNavMesh::UpdateTransientAreas()
         maxs = maxs - center;
         
 
-        CTraceFilterSimple filter( pWorld, COLLISION_GROUP_NONE );
         trace_t tr;
         
         UTIL_TraceHull( center, center, mins, maxs, MASK_TRANSIENT, &filter, &tr );
@@ -111,8 +150,8 @@ void CZMRNavMesh::UpdateTransientAreas()
 void CZMRNavMesh::UpdateFloorCheckAreas()
 {
     auto& areas = GetTransientAreas();
-    auto* pWorld = GetContainingEntity( INDEXENT( 0 ) );
 
+    CZMNavTransientFilter filter;
     Vector mins, maxs, center;
 
     const bool bDebugging = zm_sv_debug_nav_transient_nofloor.GetBool();
@@ -140,7 +179,6 @@ void CZMRNavMesh::UpdateFloorCheckAreas()
         maxs = maxs - center;
 
 
-        CTraceFilterSimple filter( pWorld, COLLISION_GROUP_NONE );
         trace_t tr;
 
         UTIL_TraceHull( center, center, mins, maxs, MASK_TRANSIENT, &filter, &tr );
