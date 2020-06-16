@@ -21,6 +21,8 @@ public:
     virtual bool IsBlocked( int teamID, bool ignoreNavBlockers = false ) const OVERRIDE;
     void SetNoFloor( bool state ) { m_bHasNoFloor = state; }
 
+    void GetWorldBounds( Vector& mins, Vector& maxs ) const;
+    
 private:
     bool m_bHasNoFloor;
 };

@@ -103,7 +103,7 @@ void CZMRNavMesh::UpdateTransientAreas()
 
     FOR_EACH_VEC( areas, i )
     {
-        auto* area = areas[i];
+        auto* area = static_cast<CZMRNavArea*>( areas[i] );
 
         if ( area->GetAttributes() & NAV_MESH_ZMR_NOFLOOR )
             continue;
@@ -111,7 +111,7 @@ void CZMRNavMesh::UpdateTransientAreas()
             continue;
 
 
-        GetAreaBounds( area, mins, maxs );
+        area->GetWorldBounds( mins, maxs );
 
 
         // Trace right above us
@@ -165,7 +165,7 @@ void CZMRNavMesh::UpdateFloorCheckAreas()
             continue;
 
 
-        GetAreaBounds( area, mins, maxs );
+        area->GetWorldBounds( mins, maxs );
 
         // Trace right below us
         float offset = GetTransientCheckStartHeight();
@@ -277,33 +277,6 @@ void CZMRNavMesh::FireGameEvent( IGameEvent* pEvent )
 
 
     BaseClass::FireGameEvent( pEvent );
-}
-
-void CZMRNavMesh::GetAreaBounds( const CNavArea* pArea, Vector& mins, Vector& maxs )
-{
-    Vector temp;
-
-    mins = Vector( FLT_MAX, FLT_MAX, FLT_MAX );
-    maxs = Vector( -FLT_MAX, -FLT_MAX, -FLT_MAX );
-
-    // Find heights for proper bounds.
-    for ( int j = 0; j < NUM_CORNERS; j++ )
-    {
-        temp = pArea->GetCorner( (NavCornerType)j );
-        if ( temp.x < mins.x )
-            mins.x = temp.x;
-        if ( temp.y < mins.y )
-            mins.y = temp.y;
-        if ( temp.z < mins.z )
-            mins.z = temp.z;
-
-        if ( temp.x > maxs.x )
-            maxs.x = temp.x;
-        if ( temp.y > maxs.y )
-            maxs.y = temp.y;
-        if ( temp.z > maxs.z )
-            maxs.z = temp.z;
-    }
 }
 
 CON_COMMAND_F( zm_nav_checknofloor, "", FCVAR_GAMEDLL | FCVAR_CHEAT )

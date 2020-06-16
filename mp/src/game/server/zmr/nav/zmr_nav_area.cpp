@@ -1,5 +1,6 @@
 #include "cbase.h"
 
+#include "zmr_nav_mesh.h"
 #include "zmr_nav_area.h"
 
 
@@ -102,4 +103,30 @@ void CZMRNavArea::UpdateBlocked( bool force, int teamID )
 bool CZMRNavArea::IsBlocked( int teamID, bool ignoreNavBlockers ) const
 {
     return BaseClass::IsBlocked( teamID, ignoreNavBlockers ) || m_bHasNoFloor;
+}
+
+void CZMRNavArea::GetWorldBounds( Vector& mins, Vector& maxs ) const
+{
+    Vector temp;
+    mins = Vector( FLT_MAX, FLT_MAX, FLT_MAX );
+    maxs = Vector( -FLT_MAX, -FLT_MAX, -FLT_MAX );
+
+    // Find heights for proper bounds.
+    for ( int j = 0; j < NUM_CORNERS; j++ )
+    {
+        temp = GetCorner( (NavCornerType)j );
+        if ( temp.x < mins.x )
+            mins.x = temp.x;
+        if ( temp.y < mins.y )
+            mins.y = temp.y;
+        if ( temp.z < mins.z )
+            mins.z = temp.z;
+
+        if ( temp.x > maxs.x )
+            maxs.x = temp.x;
+        if ( temp.y > maxs.y )
+            maxs.y = temp.y;
+        if ( temp.z > maxs.z )
+            maxs.z = temp.z;
+    }
 }
