@@ -40,10 +40,6 @@
 // NVNT turret recoil
 #include "haptics/haptic_utils.h"
 
-#ifdef HL2_DLL
-#include "hl2_player.h"
-#endif //HL2_DLL
-
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 

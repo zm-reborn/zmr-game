@@ -3,6 +3,8 @@
 
 #include "networkvar.h"
 
+#include "hl_movedata.h"
+
 #ifdef CLIENT_DLL
 #define CZMPlayerLocalData C_ZMPlayerLocalData
 #endif
@@ -21,6 +23,11 @@ public:
     CNetworkVar( float, m_flFlashlightBattery );
     CNetworkVar( float, m_flAccuracyRatio );
     //float m_flAccuracyRatio;
+
+
+	// Ladder related data
+	CNetworkVar( EHANDLE, m_hLadder );
+	LadderMove_t m_LadderMove;
 };
 
 #ifdef CLIENT_DLL
