@@ -72,7 +72,6 @@
 #include "filters.h"
 #ifdef HL2_DLL
 #include "npc_bullseye.h"
-#include "hl2_player.h"
 #endif
 #include "waterbullet.h"
 #include "in_buttons.h"

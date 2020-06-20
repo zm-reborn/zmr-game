@@ -17,7 +17,6 @@
 	#include "game.h"
 	#include "gamerules.h"
 	#include "teamplay_gamerules.h"
-	#include "hl2_player.h"
 	#include "voice_gamemgr.h"
 	#include "globalstate.h"
 	#include "ai_basenpc.h"
@@ -265,7 +264,7 @@ ConVar  alyx_darkness_force( "alyx_darkness_force", "0", FCVAR_CHEAT | FCVAR_REP
 		if( BaseClass::ClientCommand( pEdict, args ) )
 			return true;
 
-		CHL2_Player *pPlayer = (CHL2_Player *) pEdict;
+		CBasePlayer* pPlayer = (CBasePlayer *) pEdict;
 
 		if ( pPlayer->ClientCommand( args ) )
 			return true;

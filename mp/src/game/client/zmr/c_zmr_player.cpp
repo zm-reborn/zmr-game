@@ -123,6 +123,14 @@ CZMPlayerAnimState* CreateZMPlayerAnimState( C_ZMPlayer* pPlayer );
 C_ZMPlayer::C_ZMPlayer() : m_iv_angEyeAngles( "C_ZMPlayer::m_iv_angEyeAngles" )
 {
     AddVar( &m_angEyeAngles, &m_iv_angEyeAngles, LATCH_SIMULATION_VAR );
+	AddVar( &m_Local.m_vecPunchAngle, &m_Local.m_iv_vecPunchAngle, LATCH_SIMULATION_VAR );
+	AddVar( &m_Local.m_vecPunchAngleVel, &m_Local.m_iv_vecPunchAngleVel, LATCH_SIMULATION_VAR );
+
+	m_flZoomStart		= 0.0f;
+	m_flZoomEnd			= 0.0f;
+	m_flZoomRate		= 0.0f;
+	m_flZoomStartTime	= 0.0f;
+
 
     //m_EntClientFlags |= ENTCLIENTFLAG_DONTUSEIK;
 
@@ -637,6 +645,37 @@ float C_ZMPlayer::GetFOV()
     float fov = C_BasePlayer::GetFOV() + GetZoom();
     
     return MAX( GetMinFOV(), fov );
+}
+
+void C_ZMPlayer::Zoom( float fov, float flTime )
+{
+	m_flZoomStart		= GetZoom();
+	m_flZoomEnd			= fov;
+	m_flZoomRate		= flTime;
+	m_flZoomStartTime	= gpGlobals->curtime;
+}
+
+float C_ZMPlayer::GetZoom()
+{
+	float fFOV = m_flZoomEnd;
+
+	// See if we need to lerp the values
+	if ( ( m_flZoomStart != m_flZoomEnd ) && ( m_flZoomRate > 0.0f ) )
+	{
+		float deltaTime = ( gpGlobals->curtime - m_flZoomStartTime ) / m_flZoomRate;
+
+		if ( deltaTime >= 1.0f )
+		{
+			// If we're past the zoom time, just take the new value and stop lerping
+			fFOV = m_flZoomStart = m_flZoomEnd;
+		}
+		else
+		{
+			fFOV = SimpleSplineRemapVal( deltaTime, 0.0f, 1.0f, m_flZoomStart, m_flZoomEnd );
+		}
+	}
+
+	return fFOV;
 }
 
 extern ConVar default_fov;
