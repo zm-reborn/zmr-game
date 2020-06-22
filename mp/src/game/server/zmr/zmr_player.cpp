@@ -1779,19 +1779,33 @@ void CZMPlayer::DeselectAllZombies()
     } );
 }
 
-void CZMPlayer::PlayerUse( void )
+void CZMPlayer::PlayerUse()
 {
-    if ( !IsHuman() )
+    auto* pOldUseEntity = GetUseEntity();
+
+    bool bCanUse = IsHuman() && IsAlive() && GetMoveType() != MOVETYPE_LADDER;
+
+    if ( !bCanUse )
     {
+        if ( pOldUseEntity )
+        {
+            ClearUseEntity();
+        }
+
+        m_afPhysicsFlags &= ~PFLAG_USING;
         return;
     }
 
 
+    bool bPressedUse = (m_afButtonPressed & IN_USE) != 0;
+    bool bReleasedUse = (m_afButtonReleased & IN_USE) != 0;
+    bool bHoldingUse = (m_nButtons & IN_USE) != 0;
+
 	// Was use pressed or released?
-	if ( ! ((m_nButtons | m_afButtonPressed | m_afButtonReleased) & IN_USE) )
+	if ( !bPressedUse && !bReleasedUse && !bHoldingUse )
 		return;
 
-	if ( m_afButtonPressed & IN_USE )
+	if ( bPressedUse )
 	{
 		// Currently using a latched entity?
 		if ( ClearUseEntity() )
@@ -1812,73 +1826,62 @@ void CZMPlayer::PlayerUse( void )
 				if ( pTrain && !(m_nButtons & IN_JUMP) && (GetFlags() & FL_ONGROUND) && (pTrain->ObjectCaps() & FCAP_DIRECTIONAL_USE) && pTrain->OnControls(this) )
 				{
 					m_afPhysicsFlags |= PFLAG_DIROVERRIDE;
-					m_iTrain = TrainSpeed(pTrain->m_flSpeed, pTrain->GetMaxSpeed());
+					m_iTrain = TrainSpeed( pTrain->m_flSpeed, pTrain->GetMaxSpeed() );
 					m_iTrain |= TRAIN_NEW;
 					EmitSound( "HL2Player.TrainUse" );
 					return;
 				}
 			}
 		}
-
-		// Tracker 3926:  We can't +USE something if we're climbing a ladder
-		if ( GetMoveType() == MOVETYPE_LADDER )
-		{
-			return;
-		}
 	}
 
-	CBaseEntity *pUseEntity = FindUseEntity();
+	CBaseEntity* pUseEntity = FindUseEntity();
 
-	bool usedSomething = false;
+	bool bUsedEntity = false;
 
 	// Found an object
 	if ( pUseEntity )
 	{
-		//!!!UNDONE: traceline here to prevent +USEing buttons through walls			
 		int caps = pUseEntity->ObjectCaps();
 		variant_t emptyVariant;
 
-		if ( m_afButtonPressed & IN_USE )
-		{
-			// Robin: Don't play sounds for NPCs, because NPCs will allow respond with speech.
-			if ( !pUseEntity->MyNPCPointer() )
-			{
-				EmitSound( "HL2Player.Use" );
-			}
-		}
 
-		if ( ( (m_nButtons & IN_USE) && (caps & FCAP_CONTINUOUS_USE) ) ||
-			 ( (m_afButtonPressed & IN_USE) && (caps & (FCAP_IMPULSE_USE|FCAP_ONOFF_USE)) ) )
+		if ( ( bHoldingUse && (caps & FCAP_CONTINUOUS_USE) ) ||
+			 ( bPressedUse && (caps & (FCAP_IMPULSE_USE|FCAP_ONOFF_USE)) ) )
 		{
 			if ( caps & FCAP_CONTINUOUS_USE )
 				m_afPhysicsFlags |= PFLAG_USING;
 
-			pUseEntity->AcceptInput( "Use", this, this, emptyVariant, USE_TOGGLE );
+            if ( caps & FCAP_ONOFF_USE )
+            {
+                pUseEntity->AcceptInput( "Use", this, this, emptyVariant, USE_ON );
+            }
+            else
+            {
+                pUseEntity->AcceptInput( "Use", this, this, emptyVariant, USE_TOGGLE );
+            }
 
-			usedSomething = true;
+			bUsedEntity = true;
 		}
-		// UNDONE: Send different USE codes for ON/OFF.  Cache last ONOFF_USE object to send 'off' if you turn away
-		else if ( (m_afButtonReleased & IN_USE) && (pUseEntity->ObjectCaps() & FCAP_ONOFF_USE) )	// BUGBUG This is an "off" use
+		else if ( bReleasedUse && (caps & FCAP_ONOFF_USE) )
 		{
-			pUseEntity->AcceptInput( "Use", this, this, emptyVariant, USE_TOGGLE );
+			pUseEntity->AcceptInput( "Use", this, this, emptyVariant, USE_OFF );
 
-			usedSomething = true;
+			bUsedEntity = true;
 		}
 	}
-	else if ( m_afButtonPressed & IN_USE )
+	
+    if ( !bUsedEntity && bPressedUse )
 	{
 		// Signal that we want to play the deny sound, unless the user is +USEing on a ladder!
 		// The sound is emitted in ItemPostFrame, since that occurs after GameMovement::ProcessMove which
 		// lets the ladder code unset this flag.
 		m_bPlayUseDenySound = true;
 	}
-
-	// Debounce the use key
-	if ( usedSomething && pUseEntity )
-	{
-		m_Local.m_nOldButtons |= IN_USE;
-		m_afButtonPressed &= ~IN_USE;
-	}
+    else if ( bUsedEntity && bPressedUse )
+    {
+        EmitSound( "HL2Player.Use" );
+    }
 }
 
 void CZMPlayer::ItemPostFrame()
