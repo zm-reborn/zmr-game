@@ -177,11 +177,12 @@ void CZMPlayer::Precache()
     PrecacheScriptSound( "ZMPlayer.PickupWeapon" );
     PrecacheScriptSound( "ZMPlayer.PickupAmmo" );
 
+	PrecacheScriptSound( "ZMPlayer.FlashLightOn" );
+	PrecacheScriptSound( "ZMPlayer.FlashLightOff" );
+
 	PrecacheScriptSound( "HL2Player.SprintNoPower" );
 	PrecacheScriptSound( "HL2Player.SprintStart" );
 	PrecacheScriptSound( "HL2Player.UseDeny" );
-	PrecacheScriptSound( "HL2Player.FlashLightOn" );
-	PrecacheScriptSound( "HL2Player.FlashLightOff" );
 	PrecacheScriptSound( "HL2Player.PickupWeapon" );
 	PrecacheScriptSound( "HL2Player.TrainUse" );
 	PrecacheScriptSound( "HL2Player.Use" );
@@ -1026,23 +1027,32 @@ void CZMPlayer::RemoveAllItems( bool removeSuit )
     }
 }
 
+int CZMPlayer::FlashlightIsOn()
+{
+    return IsFlashlightOn();
+}
+
 void CZMPlayer::FlashlightTurnOn()
 {
     if ( IsHuman() && IsAlive() && GetFlashlightBattery() > 0.0f )
     {
+        if ( !IsFlashlightOn() )
+        {
+            EmitSound( "ZMPlayer.FlashlightOn" );
+        }
+
         AddEffects( EF_DIMLIGHT );
-        EmitSound( "HL2Player.FlashlightOn" );
     }
 }
 
 void CZMPlayer::FlashlightTurnOff()
 {
-    RemoveEffects( EF_DIMLIGHT );
-
-    if ( IsHuman() && IsAlive() )
+    if ( IsHuman() && IsAlive() && IsFlashlightOn() )
     {
-        EmitSound( "HL2Player.FlashlightOff" );
+        EmitSound( "ZMPlayer.FlashlightOff" );
     }
+
+    RemoveEffects( EF_DIMLIGHT );
 }
 
 void CZMPlayer::SetAnimation( PLAYER_ANIM playerAnim )

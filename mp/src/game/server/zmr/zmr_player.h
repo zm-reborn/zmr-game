@@ -146,6 +146,7 @@ public:
     virtual void    CreateViewModel( int index = 0 ) OVERRIDE;
 
 
+    virtual int     FlashlightIsOn() OVERRIDE;
     virtual void    FlashlightTurnOn() OVERRIDE;
     virtual void    FlashlightTurnOff() OVERRIDE;
 
@@ -257,6 +258,7 @@ public:
     virtual void        DoMuzzleFlash() OVERRIDE;
     int                 GetTotalAmmoAmount( int iValidAmmoIndex ) const;
     int                 GetAmmoRoom( int iValidAmmoIndex ) const;
+    bool                IsFlashlightOn() const;
 
 
     CZMBaseWeapon*  GetWeaponOfHighestSlot() const;

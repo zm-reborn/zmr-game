@@ -424,7 +424,7 @@ void C_ZMPlayer::TeamChangeStatic( int iNewTeam )
 void C_ZMPlayer::UpdateFlashlight()
 {
     // Flashlight isn't on.
-    if ( !IsEffectActive( EF_DIMLIGHT ) )
+    if ( !IsFlashlightOn() )
     {
         if ( m_pFlashlight )
             m_pFlashlight->TurnOff();

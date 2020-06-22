@@ -121,6 +121,7 @@ public:
     virtual void            DoMuzzleFlash() OVERRIDE;
     int                     GetTotalAmmoAmount( int iValidAmmoIndex ) const;
     int                     GetAmmoRoom( int iValidAmmoIndex ) const;
+    bool                    IsFlashlightOn() const;
 
     void SetMouseWheelMove( float dir );
 
