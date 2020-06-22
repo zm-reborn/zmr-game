@@ -296,11 +296,23 @@ void CZMPlayer::PreThink()
         CheckObserverSettings();
 
 
+    // Baseclass think
+    PreThink_HL2();
 
-    //
-    // Start hl2 prethink
-    //
 
+
+    SetMaxSpeed( ZM_WALK_SPEED );
+    State_PreThink();
+
+    // Reset bullet force accumulator, only lasts one frame
+    m_vecTotalBulletForce = vec3_origin;
+}
+
+//
+// This is the base prethink
+//
+void CZMPlayer::PreThink_HL2()
+{
 	// Riding a vehicle?
 	if ( IsInAVehicle() )	
 	{
@@ -313,124 +325,23 @@ void CZMPlayer::PreThink()
 		return;
 	}
 
+	ItemPreFrame();
 
-	if ( g_fGameOver || IsPlayerLockedInPlace() )
-		return;         // finale
-
-	VPROF_SCOPE_BEGIN( "CZMPlayer::PreThink-ItemPreFrame" );
-	ItemPreFrame( );
-	VPROF_SCOPE_END();
-
-	VPROF_SCOPE_BEGIN( "CZMPlayer::PreThink-WaterMove" );
 	WaterMove();
-	VPROF_SCOPE_END();
 
 	// checks if new client data (for HUD and view control) needs to be sent to the client
-	VPROF_SCOPE_BEGIN( "CZMPlayer::PreThink-UpdateClientData" );
 	UpdateClientData();
-	VPROF_SCOPE_END();
 	
-	VPROF_SCOPE_BEGIN( "CZMPlayer::PreThink-CheckTimeBasedDamage" );
 	CheckTimeBasedDamage();
-	VPROF_SCOPE_END();
 
-	if (m_lifeState >= LIFE_DYING)
+	if ( m_lifeState >= LIFE_DYING )
 	{
 		PlayerDeathThink();
 		return;
 	}
 
 
-	// So the correct flags get sent to client asap.
-	//
-	if ( m_afPhysicsFlags & PFLAG_DIROVERRIDE )
-		AddFlag( FL_ONTRAIN );
-	else 
-		RemoveFlag( FL_ONTRAIN );
-
-	// Train speed control
-	if ( m_afPhysicsFlags & PFLAG_DIROVERRIDE )
-	{
-		CBaseEntity *pTrain = GetGroundEntity();
-		float vel;
-
-		if ( pTrain )
-		{
-			if ( !(pTrain->ObjectCaps() & FCAP_DIRECTIONAL_USE) )
-				pTrain = NULL;
-		}
-		
-		if ( !pTrain )
-		{
-			if ( GetActiveWeapon() && (GetActiveWeapon()->ObjectCaps() & FCAP_DIRECTIONAL_USE) )
-			{
-				m_iTrain = TRAIN_ACTIVE | TRAIN_NEW;
-
-				if ( m_nButtons & IN_FORWARD )
-				{
-					m_iTrain |= TRAIN_FAST;
-				}
-				else if ( m_nButtons & IN_BACK )
-				{
-					m_iTrain |= TRAIN_BACK;
-				}
-				else
-				{
-					m_iTrain |= TRAIN_NEUTRAL;
-				}
-				return;
-			}
-			else
-			{
-				trace_t trainTrace;
-				// Maybe this is on the other side of a level transition
-				UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() + Vector(0,0,-38), 
-					MASK_PLAYERSOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &trainTrace );
-
-				if ( trainTrace.fraction != 1.0 && trainTrace.m_pEnt )
-					pTrain = trainTrace.m_pEnt;
-
-
-				if ( !pTrain || !(pTrain->ObjectCaps() & FCAP_DIRECTIONAL_USE) || !pTrain->OnControls(this) )
-				{
-					m_afPhysicsFlags &= ~PFLAG_DIROVERRIDE;
-					m_iTrain = TRAIN_NEW|TRAIN_OFF;
-					return;
-				}
-			}
-		}
-		else if ( !( GetFlags() & FL_ONGROUND ) || pTrain->HasSpawnFlags( SF_TRACKTRAIN_NOCONTROL ) || (m_nButtons & (IN_MOVELEFT|IN_MOVERIGHT) ) )
-		{
-			// Turn off the train if you jump, strafe, or the train controls go dead
-			m_afPhysicsFlags &= ~PFLAG_DIROVERRIDE;
-			m_iTrain = TRAIN_NEW|TRAIN_OFF;
-			return;
-		}
-
-		SetAbsVelocity( vec3_origin );
-		vel = 0;
-		if ( m_afButtonPressed & IN_FORWARD )
-		{
-			vel = 1;
-			pTrain->Use( this, this, USE_SET, (float)vel );
-		}
-		else if ( m_afButtonPressed & IN_BACK )
-		{
-			vel = -1;
-			pTrain->Use( this, this, USE_SET, (float)vel );
-		}
-
-		if (vel)
-		{
-			m_iTrain = TrainSpeed(pTrain->m_flSpeed, ((CFuncTrackTrain*)pTrain)->GetMaxSpeed());
-			m_iTrain |= TRAIN_ACTIVE|TRAIN_NEW;
-		}
-	} 
-	else if (m_iTrain & TRAIN_ACTIVE)
-	{
-		m_iTrain = TRAIN_NEW; // turn off train
-	}
-
+    UpdateControllableTrain();
 
 	//
 	// If we're not on the ground, we're falling. Update our falling velocity.
@@ -439,22 +350,108 @@ void CZMPlayer::PreThink()
 	{
 		m_Local.m_flFallVelocity = -GetAbsVelocity().z;
 	}
+}
+
+//
+// Certain func_tracktrains can be controlled
+// Literally the only map to use this is zm_ballworks
+//
+void CZMPlayer::UpdateControllableTrain()
+{
+    bool bWasOnTrain = ( m_afPhysicsFlags & PFLAG_DIROVERRIDE ) != 0;
+    bool bOnTrain = bWasOnTrain && IsAlive() && IsHuman();
+
+    int trainFlags = 0;
+
+
+	// Train speed control
+	if ( bOnTrain )
+	{
+		auto* pTrain = dynamic_cast<CFuncTrackTrain*>( GetGroundEntity() );
+		float vel = 0.0f;
+
+
+		if ( !pTrain )
+		{
+            // Trace to find the train
+			trace_t trainTrace;
+			UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() + Vector( 0, 0, -38 ), 
+				MASK_PLAYERSOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &trainTrace );
+
+			if ( trainTrace.fraction != 1.0 && trainTrace.m_pEnt )
+				pTrain = dynamic_cast<CFuncTrackTrain*>( trainTrace.m_pEnt );
+
+
+            // No controllable train found.
+			if ( !pTrain || !pTrain->OnControls( this ) )
+			{
+                bOnTrain = false;
+
+                trainFlags |= TRAIN_OFF;
+			}
+		}
+
+        // Turn off the train if you jump, strafe, or the train controls go dead
+		if (    !pTrain
+            ||  pTrain->HasSpawnFlags( SF_TRACKTRAIN_NOCONTROL )
+            ||  !(pTrain->ObjectCaps() & FCAP_DIRECTIONAL_USE)
+            ||  !( GetFlags() & FL_ONGROUND )
+            ||  (m_nButtons & (IN_MOVELEFT|IN_MOVERIGHT|IN_JUMP) ) )
+		{
+            bOnTrain = false;
+
+            trainFlags |= TRAIN_OFF;
+		}
+
+        if ( pTrain && bOnTrain )
+        {
+		    SetAbsVelocity( vec3_origin );
+
+		    if ( m_afButtonPressed & IN_FORWARD )
+		    {
+			    vel = 1;
+			    pTrain->Use( this, this, USE_SET, vel );
+		    }
+		    else if ( m_afButtonPressed & IN_BACK )
+		    {
+			    vel = -1;
+			    pTrain->Use( this, this, USE_SET, vel );
+		    }
+
+		    if ( vel )
+		    {
+			    m_iTrain = TrainSpeed( pTrain->m_flSpeed, pTrain->GetMaxSpeed() );
+			    m_iTrain |= TRAIN_ACTIVE | TRAIN_NEW;
+		    }
+        }
+	} 
+
+
+    if ( bOnTrain != bWasOnTrain )
+    {
+        if ( bOnTrain )
+        {
+            m_afPhysicsFlags |= PFLAG_DIROVERRIDE;
+            m_iTrain |= TRAIN_ACTIVE;
+        }
+        else
+        {
+            m_afPhysicsFlags &= ~PFLAG_DIROVERRIDE;
+            m_iTrain &= ~TRAIN_ACTIVE;
+        }
+
+        // Send a usermessage telling them the train state changed.
+        m_iTrain |= TRAIN_NEW | trainFlags;
+    }
+
 
     //
-    // End hl2 prethink
-    //
-
-
-
-
-
-
-
-    SetMaxSpeed( ZM_WALK_SPEED );
-    State_PreThink();
-
-    // Reset bullet force accumulator, only lasts one frame
-    m_vecTotalBulletForce = vec3_origin;
+	// So the correct flags get sent to client asap.
+	//
+	if ( m_afPhysicsFlags & PFLAG_DIROVERRIDE )
+		AddFlag( FL_ONTRAIN );
+	else 
+		RemoveFlag( FL_ONTRAIN );
 }
 
 void CZMPlayer::PostThink()
