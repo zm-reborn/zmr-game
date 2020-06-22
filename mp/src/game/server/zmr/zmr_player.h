@@ -101,6 +101,8 @@ public:
 	virtual void StopLoopingSounds() OVERRIDE;
 	virtual void Splash() OVERRIDE;
     virtual void ItemPostFrame() OVERRIDE;
+    void PreThink_HL2();
+    void UpdateControllableTrain();
     
     void StartWaterDeathSounds();
 	void StopWaterDeathSounds();
