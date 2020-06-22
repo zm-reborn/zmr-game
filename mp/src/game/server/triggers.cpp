@@ -35,10 +35,6 @@
 #include "gameinterface.h"
 #include "ilagcompensationmanager.h"
 
-#ifdef HL2_DLL
-#include "hl2_player.h"
-#endif
-
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 

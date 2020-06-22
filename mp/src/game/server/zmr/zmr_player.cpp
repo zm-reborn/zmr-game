@@ -7,6 +7,13 @@
 #include "predicted_viewmodel.h"
 #include "filesystem.h"
 #include "EntityFlame.h"
+#include "in_buttons.h"
+#include "trains.h"
+#include "info_camera_link.h"
+#include <vphysics/player_controller.h>
+#include "effect_dispatch_data.h"
+#include "te_effect_dispatch.h"
+#include "soundenvelope.h"
 
 #include "zmr_rejoindata.h"
 #include "npcs/zmr_zombiebase.h"
@@ -26,6 +33,8 @@
 #define VMHANDS_FALLBACKMODEL   "models/weapons/c_arms_citizen.mdl"
 
 
+
+extern int TrainSpeed( int iSpeed, int iMax );
 
 
 static ConVar zm_sv_modelchangedelay( "zm_sv_modelchangedelay", "6", FCVAR_NOTIFY | FCVAR_ARCHIVE, "", true, 0.0f, false, 0.0f );
@@ -168,6 +177,17 @@ void CZMPlayer::Precache()
     PrecacheScriptSound( "ZMPlayer.PickupWeapon" );
     PrecacheScriptSound( "ZMPlayer.PickupAmmo" );
 
+	PrecacheScriptSound( "ZMPlayer.FlashLightOn" );
+	PrecacheScriptSound( "ZMPlayer.FlashLightOff" );
+
+	PrecacheScriptSound( "HL2Player.SprintNoPower" );
+	PrecacheScriptSound( "HL2Player.SprintStart" );
+	PrecacheScriptSound( "HL2Player.UseDeny" );
+	PrecacheScriptSound( "HL2Player.PickupWeapon" );
+	PrecacheScriptSound( "HL2Player.TrainUse" );
+	PrecacheScriptSound( "HL2Player.Use" );
+	PrecacheScriptSound( "HL2Player.BurnPain" );
+
 
     ZMGetPlayerModels()->LoadModelsFromFile();
 
@@ -202,7 +222,7 @@ extern ConVar zm_sv_antiafk_punish;
 ConVar zm_sv_flashlightdrainrate( "zm_sv_flashlightdrainrate", "0.6", FCVAR_NOTIFY, "How fast the flashlight battery drains per second. (out of 100)" ); // Originally 0.4
 ConVar zm_sv_flashlightrechargerate( "zm_sv_flashlightrechargerate", "0.6", FCVAR_NOTIFY, "How fast the flashlight battery recharges per second. (out of 100)" ); // Originally 0.1
 
-void CZMPlayer::PreThink( void )
+void CZMPlayer::PreThink()
 {
     // Erase our denied ammo.
     m_vAmmoDenied.Purge();
@@ -277,14 +297,162 @@ void CZMPlayer::PreThink( void )
         CheckObserverSettings();
 
 
+    // Baseclass think
+    PreThink_HL2();
 
-    BaseClass::PreThink();
+
 
     SetMaxSpeed( ZM_WALK_SPEED );
     State_PreThink();
 
     // Reset bullet force accumulator, only lasts one frame
     m_vecTotalBulletForce = vec3_origin;
+}
+
+//
+// This is the base prethink
+//
+void CZMPlayer::PreThink_HL2()
+{
+	// Riding a vehicle?
+	if ( IsInAVehicle() )	
+	{
+		VPROF( "CZMPlayer::PreThink-Vehicle" );
+		// make sure we update the client, check for timed damage and update suit even if we are in a vehicle
+		UpdateClientData();		
+		CheckTimeBasedDamage();
+
+		WaterMove();	
+		return;
+	}
+
+	ItemPreFrame();
+
+	WaterMove();
+
+	// checks if new client data (for HUD and view control) needs to be sent to the client
+	UpdateClientData();
+	
+	CheckTimeBasedDamage();
+
+	if ( m_lifeState >= LIFE_DYING )
+	{
+		PlayerDeathThink();
+		return;
+	}
+
+
+    UpdateControllableTrain();
+
+	//
+	// If we're not on the ground, we're falling. Update our falling velocity.
+	//
+	if ( !( GetFlags() & FL_ONGROUND ) )
+	{
+		m_Local.m_flFallVelocity = -GetAbsVelocity().z;
+	}
+}
+
+//
+// Certain func_tracktrains can be controlled
+// Literally the only map to use this is zm_ballworks
+//
+void CZMPlayer::UpdateControllableTrain()
+{
+    bool bWasOnTrain = ( m_afPhysicsFlags & PFLAG_DIROVERRIDE ) != 0;
+    bool bOnTrain = bWasOnTrain && IsAlive() && IsHuman();
+
+    int trainFlags = 0;
+
+
+	// Train speed control
+	if ( bOnTrain )
+	{
+		auto* pTrain = dynamic_cast<CFuncTrackTrain*>( GetGroundEntity() );
+		float vel = 0.0f;
+
+
+		if ( !pTrain )
+		{
+            // Trace to find the train
+			trace_t trainTrace;
+			UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() + Vector( 0, 0, -38 ), 
+				MASK_PLAYERSOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &trainTrace );
+
+			if ( trainTrace.fraction != 1.0 && trainTrace.m_pEnt )
+				pTrain = dynamic_cast<CFuncTrackTrain*>( trainTrace.m_pEnt );
+
+
+            // No controllable train found.
+			if ( !pTrain || !pTrain->OnControls( this ) )
+			{
+                bOnTrain = false;
+
+                trainFlags |= TRAIN_OFF;
+			}
+		}
+
+        // Turn off the train if you jump, strafe, or the train controls go dead
+		if (    !pTrain
+            ||  pTrain->HasSpawnFlags( SF_TRACKTRAIN_NOCONTROL )
+            ||  !(pTrain->ObjectCaps() & FCAP_DIRECTIONAL_USE)
+            ||  !( GetFlags() & FL_ONGROUND )
+            ||  (m_nButtons & (IN_MOVELEFT|IN_MOVERIGHT|IN_JUMP) ) )
+		{
+            bOnTrain = false;
+
+            trainFlags |= TRAIN_OFF;
+		}
+
+        if ( pTrain && bOnTrain )
+        {
+		    SetAbsVelocity( vec3_origin );
+
+		    if ( m_afButtonPressed & IN_FORWARD )
+		    {
+			    vel = 1;
+			    pTrain->Use( this, this, USE_SET, vel );
+		    }
+		    else if ( m_afButtonPressed & IN_BACK )
+		    {
+			    vel = -1;
+			    pTrain->Use( this, this, USE_SET, vel );
+		    }
+
+		    if ( vel )
+		    {
+			    m_iTrain = TrainSpeed( pTrain->m_flSpeed, pTrain->GetMaxSpeed() );
+			    m_iTrain |= TRAIN_ACTIVE | TRAIN_NEW;
+		    }
+        }
+	} 
+
+
+    if ( bOnTrain != bWasOnTrain )
+    {
+        if ( bOnTrain )
+        {
+            m_afPhysicsFlags |= PFLAG_DIROVERRIDE;
+            m_iTrain |= TRAIN_ACTIVE;
+        }
+        else
+        {
+            m_afPhysicsFlags &= ~PFLAG_DIROVERRIDE;
+            m_iTrain &= ~TRAIN_ACTIVE;
+        }
+
+        // Send a usermessage telling them the train state changed.
+        m_iTrain |= TRAIN_NEW | trainFlags;
+    }
+
+
+    //
+	// So the correct flags get sent to client asap.
+	//
+	if ( m_afPhysicsFlags & PFLAG_DIROVERRIDE )
+		AddFlag( FL_ONTRAIN );
+	else 
+		RemoveFlag( FL_ONTRAIN );
 }
 
 void CZMPlayer::PostThink()
@@ -365,6 +533,48 @@ void CZMPlayer::PlayerDeathThink()
     {
         BaseClass::PlayerDeathThink();
     }
+}
+
+class CPhysicsPlayerCallback : public IPhysicsPlayerControllerEvent
+{
+public:
+	virtual int ShouldMoveTo( IPhysicsObject* pObject, const Vector& position ) OVERRIDE
+	{
+		auto* pPlayer = ToZMPlayer( (CBaseEntity*)pObject->GetGameData() );
+		if ( pPlayer )
+		{
+			if ( pPlayer->TouchedPhysics() )
+			{
+				return 0;
+			}
+		}
+		return 1;
+	}
+};
+
+static CPhysicsPlayerCallback playerCallback;
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CZMPlayer::InitVCollision( const Vector& vecAbsOrigin, const Vector& vecAbsVelocity )
+{
+	BaseClass::InitVCollision( vecAbsOrigin, vecAbsVelocity );
+
+	// Setup the HL2 specific callback.
+	IPhysicsPlayerController *pPlayerController = GetPhysicsController();
+	if ( pPlayerController )
+	{
+		pPlayerController->SetEventHandler( &playerCallback );
+	}
+}
+
+void CZMPlayer::SetupVisibility( CBaseEntity* pViewEntity, unsigned char* pvs, int pvssize )
+{
+	BaseClass::SetupVisibility( pViewEntity, pvs, pvssize );
+
+	int area = pViewEntity ? pViewEntity->NetworkProp()->AreaNum() : NetworkProp()->AreaNum();
+	PointCameraSetupVisibility( this, area, pvs, pvssize );
 }
 
 void CZMPlayer::PushAway( const Vector& pos, float force )
@@ -817,23 +1027,32 @@ void CZMPlayer::RemoveAllItems( bool removeSuit )
     }
 }
 
+int CZMPlayer::FlashlightIsOn()
+{
+    return IsFlashlightOn();
+}
+
 void CZMPlayer::FlashlightTurnOn()
 {
     if ( IsHuman() && IsAlive() && GetFlashlightBattery() > 0.0f )
     {
+        if ( !IsFlashlightOn() )
+        {
+            EmitSound( "ZMPlayer.FlashlightOn" );
+        }
+
         AddEffects( EF_DIMLIGHT );
-        EmitSound( "HL2Player.FlashlightOn" );
     }
 }
 
 void CZMPlayer::FlashlightTurnOff()
 {
-    RemoveEffects( EF_DIMLIGHT );
-
-    if ( IsHuman() && IsAlive() )
+    if ( IsHuman() && IsAlive() && IsFlashlightOn() )
     {
-        EmitSound( "HL2Player.FlashlightOff" );
+        EmitSound( "ZMPlayer.FlashlightOff" );
     }
+
+    RemoveEffects( EF_DIMLIGHT );
 }
 
 void CZMPlayer::SetAnimation( PLAYER_ANIM playerAnim )
@@ -1226,7 +1445,6 @@ void CZMPlayer::Event_Killed( const CTakeDamageInfo &info )
     m_lifeState = LIFE_DEAD;
 
     RemoveEffects( EF_NODRAW );	// still draw player body
-    StopZooming();
 
     // ZMRTODO: Figure out how to call EndTouch for all entities on death.
     StopWaterDeathSounds();
@@ -1255,6 +1473,31 @@ int CZMPlayer::OnTakeDamage( const CTakeDamageInfo& inputInfo )
     //gamestats->Event_PlayerDamage( this, inputInfo );
 
     return BaseClass::OnTakeDamage( inputInfo );
+}
+
+int CZMPlayer::OnTakeDamage_Alive( const CTakeDamageInfo& info )
+{
+	// Drown
+	if( info.GetDamageType() & DMG_DROWN )
+	{
+		if( m_idrowndmg == m_idrownrestored )
+		{
+			EmitSound( "Player.DrownStart" );
+		}
+		else
+		{
+			EmitSound( "Player.DrownContinue" );
+		}
+	}
+
+	// Burnt
+	if ( info.GetDamageType() & DMG_BURN )
+	{
+		EmitSound( "HL2Player.BurnPain" );
+	}
+
+	// Call the base class implementation
+	return BaseClass::OnTakeDamage_Alive( info );
 }
 
 void CZMPlayer::CommitSuicide( bool bExplode, bool bForce )
@@ -1322,12 +1565,12 @@ void CZMPlayer::PickupObject( CBaseEntity *pObject, bool bLimitMassAndSize )
     PlayerAttemptPickup( this, pObject );
 }
 
-bool CZMPlayer::IsHoldingEntity( CBaseEntity *pEnt )
-{
-    // Ask our carrying weapon if we're holding it
-    CZMWeaponHands* pWeapon = static_cast<CZMWeaponHands*>( Weapon_OwnsThisType( "weapon_zm_fistscarry" ) );
-    return pWeapon ? pWeapon->IsCarryingObject( pEnt ) : false;
-}
+//bool CZMPlayer::IsHoldingEntity( CBaseEntity *pEnt )
+//{
+//    // Ask our carrying weapon if we're holding it
+//    CZMWeaponHands* pWeapon = static_cast<CZMWeaponHands*>( Weapon_OwnsThisType( "weapon_zm_fistscarry" ) );
+//    return pWeapon ? pWeapon->IsCarryingObject( pEnt ) : false;
+//}
 
 float CZMPlayer::GetHeldObjectMass( IPhysicsObject *pHeldObject )
 {
@@ -1546,15 +1789,212 @@ void CZMPlayer::DeselectAllZombies()
     } );
 }
 
-void CZMPlayer::PlayerUse( void )
+void CZMPlayer::PlayerUse()
 {
-    if ( !IsHuman() )
+    auto* pOldUseEntity = GetUseEntity();
+
+    bool bCanUse = IsHuman() && IsAlive() && GetMoveType() != MOVETYPE_LADDER;
+
+    if ( !bCanUse )
     {
+        if ( pOldUseEntity )
+        {
+            ClearUseEntity();
+        }
+
+        m_afPhysicsFlags &= ~PFLAG_USING;
         return;
     }
 
-    BaseClass::PlayerUse();
+
+    bool bPressedUse = (m_afButtonPressed & IN_USE) != 0;
+    bool bReleasedUse = (m_afButtonReleased & IN_USE) != 0;
+    bool bHoldingUse = (m_nButtons & IN_USE) != 0;
+
+	// Was use pressed or released?
+	if ( !bPressedUse && !bReleasedUse && !bHoldingUse )
+		return;
+
+	if ( bPressedUse )
+	{
+		// Currently using a latched entity?
+		if ( ClearUseEntity() )
+		{
+			return;
+		}
+		else
+		{
+			if ( m_afPhysicsFlags & PFLAG_DIROVERRIDE )
+			{
+				m_afPhysicsFlags &= ~PFLAG_DIROVERRIDE;
+				m_iTrain = TRAIN_NEW|TRAIN_OFF;
+				return;
+			}
+			else
+			{	// Start controlling the train!
+				auto* pTrain = dynamic_cast<CFuncTrackTrain*>( GetGroundEntity() );
+				if ( pTrain && !(m_nButtons & IN_JUMP) && (GetFlags() & FL_ONGROUND) && (pTrain->ObjectCaps() & FCAP_DIRECTIONAL_USE) && pTrain->OnControls(this) )
+				{
+					m_afPhysicsFlags |= PFLAG_DIROVERRIDE;
+					m_iTrain = TrainSpeed( pTrain->m_flSpeed, pTrain->GetMaxSpeed() );
+					m_iTrain |= TRAIN_NEW;
+					EmitSound( "HL2Player.TrainUse" );
+					return;
+				}
+			}
+		}
+	}
+
+	CBaseEntity* pUseEntity = FindUseEntity();
+
+	bool bUsedEntity = false;
+
+	// Found an object
+	if ( pUseEntity )
+	{
+		int caps = pUseEntity->ObjectCaps();
+		variant_t emptyVariant;
+
+
+		if ( ( bHoldingUse && (caps & FCAP_CONTINUOUS_USE) ) ||
+			 ( bPressedUse && (caps & (FCAP_IMPULSE_USE|FCAP_ONOFF_USE)) ) )
+		{
+			if ( caps & FCAP_CONTINUOUS_USE )
+				m_afPhysicsFlags |= PFLAG_USING;
+
+            if ( caps & FCAP_ONOFF_USE )
+            {
+                pUseEntity->AcceptInput( "Use", this, this, emptyVariant, USE_ON );
+            }
+            else
+            {
+                pUseEntity->AcceptInput( "Use", this, this, emptyVariant, USE_TOGGLE );
+            }
+
+			bUsedEntity = true;
+		}
+		else if ( bReleasedUse && (caps & FCAP_ONOFF_USE) )
+		{
+			pUseEntity->AcceptInput( "Use", this, this, emptyVariant, USE_OFF );
+
+			bUsedEntity = true;
+		}
+	}
+	
+    if ( !bUsedEntity && bPressedUse )
+	{
+		// Signal that we want to play the deny sound, unless the user is +USEing on a ladder!
+		// The sound is emitted in ItemPostFrame, since that occurs after GameMovement::ProcessMove which
+		// lets the ladder code unset this flag.
+		m_bPlayUseDenySound = true;
+	}
+    else if ( bUsedEntity && bPressedUse )
+    {
+        EmitSound( "HL2Player.Use" );
+    }
 }
+
+void CZMPlayer::ItemPostFrame()
+{
+	BaseClass::ItemPostFrame();
+
+	if ( m_bPlayUseDenySound )
+	{
+		m_bPlayUseDenySound = false;
+		EmitSound( "HL2Player.UseDeny" );
+	}
+}
+
+
+void CZMPlayer::StartWaterDeathSounds()
+{
+	CPASAttenuationFilter filter( this );
+
+	if ( !m_sndLeeches )
+	{
+		m_sndLeeches = (CSoundEnvelopeController::GetController()).SoundCreate( filter, entindex(), CHAN_STATIC, "coast.leech_bites_loop" , ATTN_NORM );
+	}
+
+	if ( m_sndLeeches )
+	{
+		(CSoundEnvelopeController::GetController()).Play( m_sndLeeches, 1.0f, 100 );
+	}
+
+	if ( !m_sndWaterSplashes )
+	{
+		m_sndWaterSplashes = (CSoundEnvelopeController::GetController()).SoundCreate( filter, entindex(), CHAN_STATIC, "coast.leech_water_churn_loop" , ATTN_NORM );
+	}
+
+	if ( m_sndWaterSplashes )
+	{
+		(CSoundEnvelopeController::GetController()).Play( m_sndWaterSplashes, 1.0f, 100 );
+	}
+}
+
+void CZMPlayer::StopWaterDeathSounds()
+{
+	if ( m_sndLeeches )
+	{
+		(CSoundEnvelopeController::GetController()).SoundFadeOut( m_sndLeeches, 0.5f, true );
+		m_sndLeeches = nullptr;
+	}
+
+	if ( m_sndWaterSplashes )
+	{
+		(CSoundEnvelopeController::GetController()).SoundFadeOut( m_sndWaterSplashes, 0.5f, true );
+		m_sndWaterSplashes = nullptr;
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Shuts down sounds
+//-----------------------------------------------------------------------------
+void CZMPlayer::StopLoopingSounds( void )
+{
+	if ( m_sndLeeches )
+	{
+		 (CSoundEnvelopeController::GetController()).SoundDestroy( m_sndLeeches );
+		 m_sndLeeches = nullptr;
+	}
+
+	if ( m_sndWaterSplashes )
+	{
+		 (CSoundEnvelopeController::GetController()).SoundDestroy( m_sndWaterSplashes );
+		 m_sndWaterSplashes = nullptr;
+	}
+
+	BaseClass::StopLoopingSounds();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Makes a splash when the player transitions between water states
+//-----------------------------------------------------------------------------
+void CZMPlayer::Splash()
+{
+	CEffectData data;
+	data.m_fFlags = 0;
+	data.m_vOrigin = GetAbsOrigin();
+	data.m_vNormal = Vector( 0, 0, 1 );
+	data.m_vAngles = QAngle( 0, 0, 0 );
+	
+	if ( GetWaterType() & CONTENTS_SLIME )
+	{
+		data.m_fFlags |= FX_WATER_IN_SLIME;
+	}
+
+	float flSpeed = GetAbsVelocity().Length();
+	if ( flSpeed < 300.0f )
+	{
+		data.m_flScale = random->RandomFloat( 10, 12 );
+		DispatchEffect( "waterripple", data );
+	}
+	else
+	{
+		data.m_flScale = random->RandomFloat( 6, 8 );
+		DispatchEffect( "watersplash", data );
+	}
+}
+
 
 CZMBaseWeapon* CZMPlayer::GetWeaponOfHighestSlot() const
 {
@@ -1790,6 +2230,85 @@ void CZMPlayer::State_PreThink_ACTIVE()
 
 
     UpdateLastKnownArea();
+}
+
+void CZMPlayer::UpdateClientData()
+{
+	if (m_DmgTake || m_DmgSave || m_bitsHUDDamage != m_bitsDamageType)
+	{
+		// Comes from inside me if not set
+		Vector damageOrigin = GetLocalOrigin();
+		// send "damage" message
+		// causes screen to flash, and pain compass to show direction of damage
+		damageOrigin = m_DmgOrigin;
+
+		// only send down damage type that have hud art
+		int iShowHudDamage = g_pGameRules->Damage_GetShowOnHud();
+		int visibleDamageBits = m_bitsDamageType & iShowHudDamage;
+
+		m_DmgTake = clamp( m_DmgTake, 0, 255 );
+		m_DmgSave = clamp( m_DmgSave, 0, 255 );
+
+		// If we're poisoned, but it wasn't this frame, don't send the indicator
+		// Without this check, any damage that occured to the player while they were
+		// recovering from a poison bite would register as poisonous as well and flash
+		// the whole screen! -- jdw
+		if ( visibleDamageBits & DMG_POISON )
+		{
+			float flLastPoisonedDelta = gpGlobals->curtime - m_tbdPrev;
+			if ( flLastPoisonedDelta > 0.1f )
+			{
+				visibleDamageBits &= ~DMG_POISON;
+			}
+		}
+
+		CSingleUserRecipientFilter user( this );
+		user.MakeReliable();
+		UserMessageBegin( user, "Damage" );
+			WRITE_BYTE( m_DmgSave );
+			WRITE_BYTE( m_DmgTake );
+			WRITE_LONG( visibleDamageBits );
+			WRITE_FLOAT( damageOrigin.x );	//BUG: Should be fixed point (to hud) not floats
+			WRITE_FLOAT( damageOrigin.y );	//BUG: However, the HUD does _not_ implement bitfield messages (yet)
+			WRITE_FLOAT( damageOrigin.z );	//BUG: We use WRITE_VEC3COORD for everything else
+		MessageEnd();
+	
+		m_DmgTake = 0;
+		m_DmgSave = 0;
+		m_bitsHUDDamage = m_bitsDamageType;
+		
+		// Clear off non-time-based damage indicators
+		int iTimeBasedDamage = g_pGameRules->Damage_GetTimeBased();
+		m_bitsDamageType &= iTimeBasedDamage;
+	}
+
+	BaseClass::UpdateClientData();
+}
+
+void CZMPlayer::ExitLadder()
+{
+	if ( MOVETYPE_LADDER != GetMoveType() )
+		return;
+	
+	SetMoveType( MOVETYPE_WALK );
+	SetMoveCollide( MOVECOLLIDE_DEFAULT );
+	// Remove from ladder
+	m_ZMLocal.m_hLadder.Set( nullptr );
+}
+
+surfacedata_t* CZMPlayer::GetLadderSurface( const Vector& origin )
+{
+	extern const char* FuncLadder_GetSurfaceprops( CBaseEntity* pLadderEntity );
+
+	CBaseEntity* pLadder = m_ZMLocal.m_hLadder.Get();
+	if ( pLadder )
+	{
+		const char* pszSurfaceprops = FuncLadder_GetSurfaceprops(pLadder);
+		// get ladder material from func_ladder
+		return physprops->GetSurfaceData( physprops->GetSurfaceIndex( pszSurfaceprops ) );
+
+	}
+	return BaseClass::GetLadderSurface(origin);
 }
 
 int CZMPlayer::GetZMCommandInterruptFlags() const

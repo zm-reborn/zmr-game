@@ -31,7 +31,6 @@
 	#include "world.h"
 	#include "doors.h"
 	#include "ai_basenpc.h"
-	#include "env_zoom.h"
 
 	extern int TrainSpeed(int iSpeed, int iMax);
 	
@@ -1941,10 +1940,7 @@ bool CBasePlayer::SetFOV( CBaseEntity *pRequester, int FOV, float zoomRate, int 
 	// If we already have an owner, we only allow requests from that owner
 	if ( ( m_hZoomOwner.Get() != NULL ) && ( m_hZoomOwner.Get() != pRequester ) )
 	{
-#ifdef GAME_DLL
-		if ( CanOverrideEnvZoomOwner( m_hZoomOwner.Get() ) == false )
-#endif
-			return false;
+		return false;
 	}
 	else
 	{

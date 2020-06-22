@@ -15,7 +15,6 @@
 #include "vphysics/constraints.h"
 #include "vcollide_parse.h"
 #include "ndebugoverlay.h"
-#include "hl2_player.h"
 #include "props.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

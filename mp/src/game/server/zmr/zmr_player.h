@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include "hl2/hl2_player.h"
+#include "player.h"
 
 #include "zmr/zmr_player_shared.h"
 #include "zmr/zmr_entities.h"
@@ -31,6 +31,8 @@ class CZMBaseZombie;
 class CZMBaseWeapon;
 class CZMRagdoll;
 class CZMPlayerModelData;
+
+extern void CopyToBodyQue( CBaseAnimating *pCorpse );
 
 enum ZMPlayerState_t
 {
@@ -73,10 +75,10 @@ struct ZMServerWepData_t
     bool bIsMelee;
 };
 
-class CZMPlayer : public CHL2_Player
+class CZMPlayer : public CBasePlayer
 {
 public:
-    DECLARE_CLASS( CZMPlayer, CHL2_Player )
+    DECLARE_CLASS( CZMPlayer, CBasePlayer )
     DECLARE_SERVERCLASS()
     //DECLARE_PREDICTABLE()
     DECLARE_DATADESC()
@@ -93,6 +95,31 @@ public:
 
 
     virtual void    Precache() OVERRIDE;
+
+    virtual void CreateCorpse() OVERRIDE { CopyToBodyQue( this ); }
+	virtual void UpdateClientData() OVERRIDE;
+	virtual void StopLoopingSounds() OVERRIDE;
+	virtual void Splash() OVERRIDE;
+    virtual void ItemPostFrame() OVERRIDE;
+    void PreThink_HL2();
+    void UpdateControllableTrain();
+    
+    void StartWaterDeathSounds();
+	void StopWaterDeathSounds();
+
+	CSoundPatch* m_sndLeeches;
+	CSoundPatch* m_sndWaterSplashes;
+
+    LadderMove_t* GetLadderMove() { return &m_ZMLocal.m_LadderMove; }
+	virtual void ExitLadder() OVERRIDE;
+	virtual surfacedata_t* GetLadderSurface( const Vector& origin ) OVERRIDE;
+	
+
+
+	virtual void InitVCollision( const Vector& vecAbsOrigin, const Vector& vecAbsVelocity ) OVERRIDE;
+
+	virtual void SetupVisibility( CBaseEntity* pViewEntity, unsigned char* pvs, int pvssize ) OVERRIDE;
+
 
     virtual void    InitialSpawn() OVERRIDE;
     virtual void    Spawn() OVERRIDE;
@@ -119,19 +146,18 @@ public:
     virtual void    CreateViewModel( int index = 0 ) OVERRIDE;
 
 
+    virtual int     FlashlightIsOn() OVERRIDE;
     virtual void    FlashlightTurnOn() OVERRIDE;
     virtual void    FlashlightTurnOff() OVERRIDE;
 
     virtual bool    BecomeRagdollOnClient( const Vector& force ) OVERRIDE;
     void            CreateRagdollEntity();
 
-    virtual bool Weapon_Lower() OVERRIDE { return false; };
-    
-    virtual void PickupObject( CBaseEntity *pObject, bool bLimitMassAndSize ) OVERRIDE;
-    virtual	bool IsHoldingEntity( CBaseEntity *pEnt ) OVERRIDE;
-    virtual float GetHeldObjectMass( IPhysicsObject *pHeldObject ) OVERRIDE;
+    virtual void PickupObject( CBaseEntity* pObject, bool bLimitMassAndSize ) OVERRIDE;
+    virtual float GetHeldObjectMass( IPhysicsObject* pHeldObject ) OVERRIDE;
+    //virtual void ForceDropOfCarriedPhysObjects( CBaseEntity* pOnlyIfHoldindThis ) OVERRIDE;
 
-    virtual bool BumpWeapon( CBaseCombatWeapon *pWeapon ) OVERRIDE;
+    virtual bool BumpWeapon( CBaseCombatWeapon* pWeapon ) OVERRIDE;
 
     // Lag compensation stuff...
     bool WantsLagCompensationOnNPC( const CZMBaseZombie* pZombie, const CUserCmd* pCmd, const CBitVec<MAX_EDICTS>* pEntityTransmitBits ) const;
@@ -140,6 +166,7 @@ public:
     virtual void    DeathSound( const CTakeDamageInfo& info ) OVERRIDE;
     virtual void    Event_Killed( const CTakeDamageInfo& info ) OVERRIDE;
     virtual int     OnTakeDamage( const CTakeDamageInfo& info ) OVERRIDE;
+    virtual int     OnTakeDamage_Alive( const CTakeDamageInfo& info ) OVERRIDE;
 	virtual void    CommitSuicide( bool bExplode = false, bool bForce = false ) OVERRIDE;
 	virtual void    CommitSuicide( const Vector &vecForce, bool bExplode = false, bool bForce = false ) OVERRIDE;
     virtual void    Ignite( float flFlameLifetime, bool bNPCOnly, float flSize, bool bCalledByLevelDesigner ) OVERRIDE;
@@ -154,7 +181,7 @@ public:
     virtual void    EquipSuit( bool bPlayEffects = false ) OVERRIDE;
     virtual void    RemoveAllItems( bool removeSuit ) OVERRIDE;
 
-    virtual void PlayerUse( void ) OVERRIDE;
+    virtual void PlayerUse() OVERRIDE;
     //virtual void PlayUseDenySound() OVERRIDE;
 
 
@@ -231,6 +258,7 @@ public:
     virtual void        DoMuzzleFlash() OVERRIDE;
     int                 GetTotalAmmoAmount( int iValidAmmoIndex ) const;
     int                 GetAmmoRoom( int iValidAmmoIndex ) const;
+    bool                IsFlashlightOn() const;
 
 
     CZMBaseWeapon*  GetWeaponOfHighestSlot() const;
@@ -307,6 +335,8 @@ private:
     float m_flZMMoveSpeed;
     float m_flZMMoveAccel;
     float m_flZMMoveDecel;
+
+    bool m_bPlayUseDenySound;
 };
 
 inline CZMPlayer* ToZMPlayer( CBaseEntity* pEntity )

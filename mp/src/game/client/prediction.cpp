@@ -21,10 +21,6 @@
 #include "hud_pdump.h"
 #include "datacache/imdlcache.h"
 
-#ifdef HL2_CLIENT_DLL
-#include "c_basehlplayer.h"
-#endif
-
 #include "tier0/vprof.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -667,17 +663,6 @@ void CPrediction::SetupMove( C_BasePlayer *player, CUserCmd *ucmd, IMoveHelper *
 	move->m_flConstraintRadius = player->m_flConstraintRadius;
 	move->m_flConstraintWidth = player->m_flConstraintWidth;
 	move->m_flConstraintSpeedFactor = player->m_flConstraintSpeedFactor;
-
-#ifdef HL2_CLIENT_DLL
-	// Convert to HL2 data.
-	C_BaseHLPlayer *pHLPlayer = static_cast<C_BaseHLPlayer*>( player );
-	Assert( pHLPlayer );
-
-	CHLMoveData *pHLMove = static_cast<CHLMoveData*>( move );
-	Assert( pHLMove );
-
-	pHLMove->m_bIsSprinting = pHLPlayer->IsSprinting();
-#endif
 #endif
 }
 

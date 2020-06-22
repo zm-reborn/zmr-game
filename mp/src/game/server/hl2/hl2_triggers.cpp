@@ -5,7 +5,7 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include "hl2_player.h"
+#include "zmr/zmr_player.h"
 #include "saverestore_utlvector.h"
 #include "triggers.h"
 
@@ -760,7 +760,7 @@ void CTriggerWateryDeath::StartTouch(CBaseEntity *pOther)
 		SpawnLeeches( pOther );
 #endif
 
-		CHL2_Player *pHL2Player = dynamic_cast<CHL2_Player*>( pOther );
+		auto* pHL2Player = dynamic_cast<CZMPlayer*>( pOther );
 
 		if ( pHL2Player )
 		{
@@ -807,7 +807,7 @@ void CTriggerWateryDeath::EndTouch( CBaseEntity *pOther )
 		if ( m_hLeeches.Count() > 0 )
 			 m_hLeeches.Purge();
 
-		CHL2_Player *pHL2Player = dynamic_cast<CHL2_Player*>( pOther );
+        auto* pHL2Player = dynamic_cast<CZMPlayer*>( pOther );
 
 		if ( pHL2Player )
 		{
