@@ -1111,3 +1111,8 @@ int CZMPlayer::GetAmmoRoom( int iValidAmmoIndex ) const
     auto* pAmmoDef = ZMAmmoDef();
     return pAmmoDef->MaxCarry( iValidAmmoIndex ) + pAmmoDef->m_Additional[iValidAmmoIndex].nDropAmount;
 }
+
+bool CZMPlayer::IsFlashlightOn() const
+{
+    return IsEffectActive( EF_DIMLIGHT );
+}

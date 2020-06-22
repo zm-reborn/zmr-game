@@ -2,31 +2,16 @@
 
 
 #include "gamemovement.h"
-#include "hl2/hl_gamemovement.h"
 
 #include "func_ladder.h"
 
-#ifndef CLIENT_DLL
-#include "hl2/hl2_player.h"
-#else
-#include "hl2/c_basehlplayer.h"
-#endif
-
 #include "zmr_player_shared.h"
 
-/*
-    NOTE:
-    You have to set m_HL2Local to public in hl2/hl2_player.h ...
 
-
-    Remove hl2/hl_gamemovement.cpp from project.
-*/
-
-
-class CZMGameMovement : public CHL2GameMovement
+class CZMGameMovement : public CGameMovement
 {
 public:
-    typedef CHL2GameMovement BaseClass;
+    typedef CGameMovement BaseClass;
 
     virtual void PlayerMove() OVERRIDE;
 

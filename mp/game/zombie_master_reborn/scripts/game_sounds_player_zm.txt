@@ -25,3 +25,23 @@
 		"wave"		"items/ammo_pickup-2.wav"
 	}
 }
+
+"ZMPlayer.FlashLightOn"
+{
+	"channel"	"CHAN_WEAPON"
+	"volume"	"0.8"
+	"soundlevel"    "SNDLVL_75dB"
+	"pitch"	"PITCH_NORM"
+
+	"wave" "items/survivor_flashlight_on.wav"
+}
+
+"ZMPlayer.FlashLightOff"
+{
+	"channel"	"CHAN_WEAPON"
+	"volume"	"0.8"
+	"soundlevel"  "SNDLVL_75dB"
+	"pitch"	"PITCH_NORM"
+
+	"wave" "items/survivor_flashlight_off.wav"
+}

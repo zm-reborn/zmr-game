@@ -311,8 +311,6 @@ $Project
 		$File	"env_tonemap_controller.cpp"
 		$File	"$SRCDIR\game\shared\env_wind_shared.cpp"
 		$File	"$SRCDIR\game\shared\env_wind_shared.h"
-		$File	"env_zoom.cpp"
-		$File	"env_zoom.h"
 		$File	"EnvBeam.cpp"
 		$File	"EnvFade.cpp"
 		$File	"EnvHudHint.cpp"

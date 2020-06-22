@@ -16,26 +16,6 @@
 	"wave"	"player/suit_sprint.wav"
 }
 
-"HL2Player.FlashLightOn"
-{
-	"channel"	"CHAN_WEAPON"
-	"volume"	"0.8"
-	"soundlevel"    "SNDLVL_75dB"
-	"pitch"	"PITCH_NORM"
-
-	"wave" "items/flashlight1.wav"
-}
-
-"HL2Player.FlashLightOff"
-{
-	"channel"	"CHAN_WEAPON"
-	"volume"	"0.8"
-	"soundlevel"  "SNDLVL_75dB"
-	"pitch"	"PITCH_NORM"
-
-	"wave" "items/flashlight1.wav"
-}
-
 "HL2Player.PickupWeapon"
 {
 	"channel"	"CHAN_ITEM"

@@ -1,7 +1,6 @@
 #pragma once
 
-//#include "c_baseplayer.h"
-#include "hl2/c_basehlplayer.h"
+#include "c_baseplayer.h"
 #include "beamdraw.h"
 
 #include "c_zmr_charcircle.h"
@@ -21,10 +20,10 @@ class C_ZMBaseWeapon;
 class CZMFlashlightEffect;
 
 
-class C_ZMPlayer : public C_BaseHLPlayer
+class C_ZMPlayer : public C_BasePlayer
 {
 public:
-    DECLARE_CLASS( C_ZMPlayer, C_BaseHLPlayer );
+    DECLARE_CLASS( C_ZMPlayer, C_BasePlayer );
     DECLARE_CLIENTCLASS();
     DECLARE_PREDICTABLE(); 
     DECLARE_INTERPOLATION();
@@ -32,6 +31,9 @@ public:
 
     C_ZMPlayer();
     ~C_ZMPlayer();
+
+	void				Zoom( float fov, float flTime );
+	float				GetZoom();
 
     virtual void Spawn() OVERRIDE;
     virtual void ClientThink() OVERRIDE;
@@ -119,6 +121,7 @@ public:
     virtual void            DoMuzzleFlash() OVERRIDE;
     int                     GetTotalAmmoAmount( int iValidAmmoIndex ) const;
     int                     GetAmmoRoom( int iValidAmmoIndex ) const;
+    bool                    IsFlashlightOn() const;
 
     void SetMouseWheelMove( float dir );
 
@@ -156,6 +159,11 @@ private:
     // Only used locally.
     float m_flUpMove;
     float m_flNextUpMove;
+
+	float				m_flZoomStart;
+	float				m_flZoomEnd;
+	float				m_flZoomRate;
+	float				m_flZoomStartTime;
 };
 
 inline C_ZMPlayer* ToZMPlayer( C_BaseEntity* pEntity )
