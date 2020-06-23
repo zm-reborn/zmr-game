@@ -41,19 +41,10 @@ COptionsSubVoice::COptionsSubVoice(vgui::Panel *parent) : PropertyPage(parent, N
 	m_pMicrophoneVolume->SetRange( 0, 100 );
 	m_pMicrophoneVolume->AddActionSignalTarget( this );
 
-#ifndef ZMR
 	m_pVoiceEnableCheckButton = new CCvarToggleCheckButton( this, "voice_modenable", "#GameUI_EnableVoice", "voice_modenable" );
-#endif
 
 	m_pMicBoost = new CheckButton(this, "MicBoost", "#GameUI_BoostMicrophone" );
 	m_pMicBoost->AddActionSignalTarget( this );
-
-	// Open mic controls
-#ifndef ZMR
-	m_pThresholdSliderLabel = new Label(this, "ThresholdLabel", "#GameUI_VoiceThreshold");
-	m_pThresholdVolume = new CCvarSlider( this, "VoiceThreshold", "#GameUI_VoiceThreshold", 0, 16384, "voice_threshold" );
-	m_pOpenMicEnableCheckButton = new CCvarToggleCheckButton( this, "voice_vox", "#GameUI_EnableOpenMic", "voice_vox" );
-#endif
 
 	m_pTestMicrophoneButton = new Button(this, "TestMicrophone", "#GameUI_TestMicrophone");
 
@@ -66,15 +57,9 @@ COptionsSubVoice::COptionsSubVoice(vgui::Panel *parent) : PropertyPage(parent, N
     {
         m_pReceiveVolume->SetEnabled(false);
         m_pMicrophoneVolume->SetEnabled(false);
-#ifndef ZMR
         m_pVoiceEnableCheckButton->SetEnabled(false);
-#endif
         m_pMicBoost->SetEnabled(false);
         m_pTestMicrophoneButton->SetEnabled(false);
-#ifndef ZMR
-		m_pOpenMicEnableCheckButton->SetEnabled(false);
-		m_pThresholdVolume->SetEnabled(false);
-#endif
     }
     else
     {
@@ -114,15 +99,7 @@ void COptionsSubVoice::OnResetData()
     m_pReceiveVolume->Reset();
     m_fReceiveVolume = m_pReceiveVolume->GetSliderValue();
 
-#ifndef ZMR
-    m_pThresholdVolume->Reset();
-	m_nVoiceThresholdValue = m_pThresholdVolume->GetSliderValue();
-	
-	m_pOpenMicEnableCheckButton->Reset();
-	m_bOpenMicSelected = m_pOpenMicEnableCheckButton->IsSelected();
-
 	m_pVoiceEnableCheckButton->Reset();
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -136,15 +113,6 @@ void COptionsSubVoice::OnSliderMoved( int position )
         {
             PostActionSignal(new KeyValues("ApplyButtonEnable"));
         }
-		
-#ifndef ZMR
-		if ( m_pThresholdVolume->GetSliderValue() != m_nVoiceThresholdValue )
-		{
-			PostActionSignal(new KeyValues("ApplyButtonEnable"));
-			m_pThresholdVolume->ApplyChanges();
-			m_nVoiceThresholdValue = m_pThresholdVolume->GetSliderValue();
-		}
-#endif
     }
 }
 
@@ -160,15 +128,6 @@ void COptionsSubVoice::OnCheckButtonChecked( int state )
         {
             PostActionSignal(new KeyValues("ApplyButtonEnable"));
         }
-		
-#ifndef ZMR
-		if ( m_pOpenMicEnableCheckButton->IsSelected() != m_bOpenMicSelected )
-		{
-			PostActionSignal(new KeyValues("ApplyButtonEnable"));
-			m_pOpenMicEnableCheckButton->ApplyChanges();
-			m_bOpenMicSelected = m_pOpenMicEnableCheckButton->IsSelected();
-		}
-#endif
     }
 }
 
@@ -190,14 +149,7 @@ void COptionsSubVoice::OnApplyChanges()
     m_pReceiveVolume->ApplyChanges();
     m_fReceiveVolume = m_pReceiveVolume->GetSliderValue();
 
-#ifndef ZMR
-	m_pThresholdVolume->ApplyChanges();
-	m_nVoiceThresholdValue = m_pThresholdVolume->GetSliderValue();
-
-	m_pOpenMicEnableCheckButton->ApplyChanges();
-
 	m_pVoiceEnableCheckButton->ApplyChanges();
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -218,9 +170,7 @@ void COptionsSubVoice::StartTestMicrophone()
 
         m_pReceiveVolume->SetEnabled(false);
         m_pMicrophoneVolume->SetEnabled(false);
-#ifndef ZMR
         m_pVoiceEnableCheckButton->SetEnabled(false);
-#endif
         m_pMicBoost->SetEnabled(false);
         m_pMicrophoneSliderLabel->SetEnabled(false);
         m_pReceiveSliderLabel->SetEnabled(false);
@@ -253,11 +203,6 @@ void COptionsSubVoice::UseCurrentVoiceParameters()
     // get where the current slider is
     m_nReceiveSliderValue = m_pReceiveVolume->GetValue();
     m_pReceiveVolume->ApplyChanges();
-
-#ifndef ZMR
-	m_nVoiceThresholdValue = m_pThresholdVolume->GetValue();
-	m_pThresholdVolume->ApplyChanges();
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -297,10 +242,8 @@ void COptionsSubVoice::EndTestMicrophone()
 
     m_pReceiveVolume->SetEnabled(true);
     m_pMicrophoneVolume->SetEnabled(true);
-#ifndef ZMR
     m_pVoiceEnableCheckButton->SetEnabled(true);
-#endif
-    m_pMicBoost->SetEnabled(true);
+    //m_pMicBoost->SetEnabled(true); // Mic boost doesn't work.
     m_pMicrophoneSliderLabel->SetEnabled(true);
     m_pReceiveSliderLabel->SetEnabled(true);
     m_pMicMeter2->SetVisible(false);
@@ -369,19 +312,6 @@ void COptionsSubVoice::OnThink()
 		{
 			float val = m_pVoiceTweak->GetControlFloat( SpeakingVolume );
 			int nValue = static_cast<int>( val*32768.0f + 0.5f );
-
-#ifndef ZMR
-			// Throttle this if they're using "open mic" style communication
-			if ( m_pOpenMicEnableCheckButton->IsSelected() )
-			{
-				// Test against it our threshold value
-				float flThreshold = ( (float) m_pThresholdVolume->GetSliderValue() / 32768.0f );
-				if ( val < flThreshold )
-				{
-					nValue = 0;	// Zero the display
-				}
-			}
-#endif
 
 			int width = (BAR_WIDTH * nValue) / 32768;
 			width = ((width + (BAR_INCREMENT-1)) / BAR_INCREMENT) * BAR_INCREMENT;  // round to nearest BAR_INCREMENT
