@@ -1907,7 +1907,13 @@ void CBasePlayer::SetAnimation( PLAYER_ANIM playerAnim )
 WaterMove
 ============
 */
-#ifdef HL2_DLL
+#ifdef ZMR // ZMRCHANGE: Basically hl2 values but without the suit powered breathing.
+
+#define AIRTIME						22		// lung full of air lasts this many seconds
+#define DROWNING_DAMAGE_INITIAL		10
+#define DROWNING_DAMAGE_MAX			10
+
+#elif HL2_DLL
 
 // test for HL2 drowning damage increase (aux power used instead)
 #define AIRTIME						7		// lung full of air lasts this many seconds
