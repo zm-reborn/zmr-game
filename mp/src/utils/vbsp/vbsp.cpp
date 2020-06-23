@@ -43,7 +43,7 @@ qboolean	noshare;
 qboolean	nosubdiv;
 qboolean	notjunc;
 qboolean	noopt;
-qboolean	leaktest;
+qboolean	leaktest = true;
 qboolean	verboseentities;
 qboolean	dumpcollide = false;
 qboolean	g_bLowPriority = false;
@@ -1003,10 +1003,10 @@ int RunVBSP( int argc, char **argv )
 			Msg ("microvolume = %f\n", microvolume);
 			i++;
 		}
-		else if (!Q_stricmp(argv[i], "-leaktest"))
+		else if (!Q_stricmp(argv[i], "-noleaktest"))
 		{
-			Msg ("leaktest = true\n");
-			leaktest = true;
+			Msg ("leaktest = false\n");
+			leaktest = false;
 		}
 		else if (!Q_stricmp(argv[i], "-verboseentities"))
 		{
@@ -1217,7 +1217,7 @@ int RunVBSP( int argc, char **argv )
 				"                 than this number (default: 1.0).\n"
 				"  -fulldetail  : Mark all detail geometry as normal geometry (so all detail\n"
 				"                 geometry will affect visibility).\n"
-				"  -leaktest    : Stop processing the map if a leak is detected. Whether or not\n"
+				"  -noleaktest  : Keep processing the map if a leak is detected. Whether or not\n"
 				"                 this flag is set, a leak file will be written out at\n"
 				"                 <vmf filename>.lin, and it can be imported into Hammer.\n"
 				"  -bumpall     : Force all surfaces to be bump mapped.\n"
