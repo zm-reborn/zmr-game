@@ -442,6 +442,13 @@ const ItemBaseData_t* CZMMapItemSystem::GetItemData( int index )
     return nullptr;
 }
 
+const ItemBaseData_t* CZMMapItemSystem::GetItemData( const char* itemclass )
+{
+    int index = FindItemByClassname( itemclass );
+
+    return GetItemData( index );
+}
+
 bool CZMMapItemSystem::AffectsItem( const char* classname )
 {
     return FindItemByClassname( classname ) != -1;
