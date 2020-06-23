@@ -16,6 +16,8 @@ extern ConVar zm_cl_border_yawspeed;
 extern ConVar zm_cl_border_pitchspeed;
 extern ConVar zm_cl_border_scroll;
 
+extern ConVar cl_playermodel;
+
 
 CZMOptionsSubGeneral::CZMOptionsSubGeneral( Panel* parent ) : BaseClass( parent )
 {
@@ -103,8 +105,7 @@ void CZMOptionsSubGeneral::OnApplyChanges()
     zm_cl_border_pitchspeed.SetValue( m_pSlider_Pitch->GetValue() );
     zm_cl_border_scroll.SetValue( m_pSlider_Border->GetValue() );
 
-    ConVar* cl_playermodel = cvar->FindVar( "cl_playermodel" );
-    cl_playermodel->SetValue( GetCurrentPlayerModel() );
+    cl_playermodel.SetValue( GetCurrentPlayerModel() );
 }
 
 void CZMOptionsSubGeneral::OnResetData()
@@ -133,8 +134,7 @@ void CZMOptionsSubGeneral::OnResetData()
 
     bool bValidModel = false;
 
-    ConVar* cl_playermodel = cvar->FindVar( "cl_playermodel" );
-    const char* model = cl_playermodel->GetString();
+    const char* model = cl_playermodel.GetString();
 
     for ( int i = 0; i < m_pModelCombo->GetItemCount(); i++ )
     {
