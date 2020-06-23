@@ -859,7 +859,10 @@ void ProcessModels (void)
 	}
 
 	// Turn the skybox into a cubemap in case we don't build env_cubemap textures.
+#ifndef ZMR // ZMRCHANGE: We don't want cubemap creation.
 	Cubemap_CreateDefaultCubemaps();
+#endif
+
 	EndBSPFile ();
 }
 
