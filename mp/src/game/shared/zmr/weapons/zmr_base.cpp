@@ -129,6 +129,8 @@ CZMBaseWeapon::CZMBaseWeapon()
     m_OverrideViewModel = m_OverrideWorldModel = NULL_STRING;
     m_nOverrideDamage = -1;
     m_nOverrideClip1 = -1;
+
+    m_pConstraint = nullptr;
 #endif
 
     m_flNextClipFillTime = 0.0f;
@@ -148,6 +150,8 @@ CZMBaseWeapon::~CZMBaseWeapon()
     FreeWeaponSlot();
 
     SetReserveAmmo( 0 );
+
+    ReleaseConstraint();
 #endif
 }
 
@@ -1535,35 +1539,14 @@ void CZMBaseWeapon::Materialize()
 {
 	if ( IsEffectActive( EF_NODRAW ) )
 	{
-		// changing from invisible state to visible.
-		//EmitSound( "AlyxEmp.Charge" );
-		
 		RemoveEffects( EF_NODRAW );
-		//DoMuzzleFlash();
 	}
 
-	if ( /*HasSpawnFlags( SF_NORESPAWN ) == false*/ 1 )
-	{
-		VPhysicsInitNormal( SOLID_BBOX, GetSolidFlags() | FSOLID_TRIGGER, false );
-		SetMoveType( MOVETYPE_VPHYSICS );
-
-
-		//ZMRules()->AddLevelDesignerPlacedObject( this );
-
-	}
-
-	/*if ( HasSpawnFlags( SF_NORESPAWN ) == false )
-	{
-		if ( GetOriginalSpawnOrigin() == vec3_origin )
-		{
-			m_vOriginalSpawnOrigin = GetAbsOrigin();
-			m_vOriginalSpawnAngles = GetAbsAngles();
-		}
-	}*/
+    Assert( VPhysicsGetObject() );
 
 	SetPickupTouch();
 
-	SetThink (NULL);
+	SetThink( nullptr );
 }
 #endif
 
@@ -1573,70 +1556,79 @@ void CZMBaseWeapon::FallInit()
 	SetModel( GetWorldModel() );
 	VPhysicsDestroyObject();
 
-	if ( HasSpawnFlags( SF_NORESPAWN ) == false )
+	if ( VPhysicsInitNormal( SOLID_BBOX, GetSolidFlags() | FSOLID_TRIGGER, false ) )
 	{
-		SetMoveType( MOVETYPE_NONE );
-		SetSolid( SOLID_BBOX );
-		AddSolidFlags( FSOLID_TRIGGER );
-
-		UTIL_DropToFloor( this, MASK_SOLID );
-	}
-	else
-	{
-		if ( !VPhysicsInitNormal( SOLID_BBOX, GetSolidFlags() | FSOLID_TRIGGER, false ) )
+		// Constrain the weapon in place
+		if ( HasSpawnFlags( SF_WEAPON_START_CONSTRAINED ) )
 		{
-			SetMoveType( MOVETYPE_NONE );
-			SetSolid( SOLID_BBOX );
-			AddSolidFlags( FSOLID_TRIGGER );
-		}
-		else
-		{
-            // Fixes weapon still being constrained when dropped.
-            // The constraint is destroyed when picked up but this re-creates it.
+			auto* pReferenceObject = g_PhysWorldObject;
+			auto* pAttachedObject = VPhysicsGetObject();
 
-            // I'm leaving this piece of code here to remind Valve how shameful it is.
-            // Yeah, let's just create a constraint and NOT USE m_pConstraint to reference it, I bet the constraint isn't even freed anywhere.
-            // I know, people make mistakes and shit happens, but I spent way too much fucking time debugging this shit.
-            // Thanks, Valve.
-
-            /*
-			// Constrained start?
-			if ( HasSpawnFlags( SF_WEAPON_START_CONSTRAINED ) )
+			if ( pReferenceObject && pAttachedObject )
 			{
-				//Constrain the weapon in place
-				IPhysicsObject *pReferenceObject, *pAttachedObject;
-				
-				pReferenceObject = g_PhysWorldObject;
-				pAttachedObject = VPhysicsGetObject();
-
-				if ( pReferenceObject && pAttachedObject )
-				{
-					constraint_fixedparams_t fixed;
-					fixed.Defaults();
-					fixed.InitWithCurrentObjectState( pReferenceObject, pAttachedObject );
+				constraint_fixedparams_t fixed;
+				fixed.Defaults();
+				fixed.InitWithCurrentObjectState( pReferenceObject, pAttachedObject );
 					
-					fixed.constraint.forceLimit	= lbs2kg( 10000 );
-					fixed.constraint.torqueLimit = lbs2kg( 10000 );
+				fixed.constraint.forceLimit	= lbs2kg( 1000 );
+				fixed.constraint.torqueLimit = lbs2kg( 1000 );
 
-					IPhysicsConstraint *pConstraint = GetConstraint();
+				ReleaseConstraint();
 
-					pConstraint = physenv->CreateFixedConstraint( pReferenceObject, pAttachedObject, NULL, fixed );
+				m_pConstraint = physenv->CreateFixedConstraint( pReferenceObject, pAttachedObject, nullptr, fixed );
 
-					pConstraint->SetGameData( (void *) this );
-				}
+				m_pConstraint->SetGameData( (void*)this );
 			}
-            */
 		}
 	}
+    else
+    {
+        Assert( 0 );
+    }
 
 	SetPickupTouch();
 	
-	SetThink( &CBaseCombatWeapon::FallThink );
+	SetThink( &CZMBaseWeapon::FallThink );
 
 	SetNextThink( gpGlobals->curtime + 0.1f );
-
 #endif
 }
+
+#ifdef GAME_DLL
+void CZMBaseWeapon::ReleaseConstraint()
+{
+    if ( m_pConstraint )
+    {
+        physenv->DestroyConstraint( m_pConstraint );
+        m_pConstraint = nullptr;
+    }
+}
+
+void CZMBaseWeapon::FallThink()
+{
+	SetNextThink( gpGlobals->curtime + 0.1f );
+
+
+    auto* pPhys = VPhysicsGetObject();
+
+	bool shouldMaterialize = false;
+
+	if ( pPhys )
+	{
+		shouldMaterialize = pPhys->IsAsleep();
+	}
+	else
+	{
+        Assert( 0 );
+		shouldMaterialize = true;
+	}
+
+	if ( shouldMaterialize )
+	{
+		Materialize(); 
+	}
+}
+#endif
 
 void CZMBaseWeapon::SetPickupTouch()
 {
@@ -1799,6 +1791,9 @@ void CZMBaseWeapon::Equip( CBaseCombatCharacter* pCharacter )
     }
 
     TransferReserveAmmo( pCharacter );
+
+    ReleaseConstraint();
+    RemoveSpawnFlags( SF_WEAPON_START_CONSTRAINED );
 #endif
 
     BaseClass::Equip( pCharacter );

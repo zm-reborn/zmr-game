@@ -132,6 +132,8 @@ public:
     virtual bool IsTemplate() OVERRIDE;
 
     virtual void Materialize() OVERRIDE;
+
+    virtual void FallThink() OVERRIDE;
 #endif
     // Makes our weapons not cry about spawning.
     virtual void FallInit();
@@ -247,12 +249,19 @@ protected:
     // Mainly to fix prediction errors, since m_bInReload is not networked.
     CNetworkVar( bool, m_bInReload2 );
 
+#ifdef GAME_DLL
+    void ReleaseConstraint();
+    IPhysicsConstraint* GetConstraint() const { return m_pConstraint; }
+#endif
+
 private:
 #ifndef CLIENT_DLL
     string_t        m_OverrideViewModel;
     string_t        m_OverrideWorldModel;
 
     int             m_nOverrideDamage;
+
+    IPhysicsConstraint* m_pConstraint;
 #endif
     CNetworkVar( int, m_nOverrideClip1 );
 
