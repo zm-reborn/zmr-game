@@ -13,6 +13,7 @@
 #include "zmr/zmr_shareddefs.h"
 #include "npcs/zmr_zombiebase_shared.h"
 #include "zmr/weapons/zmr_base.h"
+#include "zmr_mapitemaction.h"
 
 #include "zmr_entities.h"
 
@@ -1676,22 +1677,23 @@ void CZMEntLoadout::DistributeToPlayer( CZMPlayer* pPlayer )
 
 void CZMEntLoadout::GiveWeapon( CZMPlayer* pPlayer, int loadout_wep )
 {
-    const char* weps[] = {
-        "weapon_zm_pistol",
-        "weapon_zm_shotgun",
-        "weapon_zm_rifle",
-        "weapon_zm_mac10",
+    // Loadout is a mix of items and item classes.
+    const char* loadouts[LO_MAX] = {
+        "Pistol",
+        "Shotgun",
+        "Rifle",
+        "SMG",
         "weapon_zm_molotov",
         "weapon_zm_sledge",
         "weapon_zm_improvised",
-        "weapon_zm_revolver",
+        "BigPistol",
     };
 
-    COMPILE_TIME_ASSERT( ARRAYSIZE( weps ) >= LO_MAX );
+    COMPILE_TIME_ASSERT( ARRAYSIZE( loadouts ) >= LO_MAX );
 
     Assert( loadout_wep >= 0 && loadout_wep < LO_MAX );
 
-    const char* wepname = weps[loadout_wep];
+    const char* loadoutClass = loadouts[loadout_wep];
 
 
     bool ammo = false;
@@ -1710,11 +1712,30 @@ void CZMEntLoadout::GiveWeapon( CZMPlayer* pPlayer, int loadout_wep )
     }
 
 
-    CZMBaseWeapon* pWeapon = ToZMBaseWeapon( pPlayer->Weapon_Create( wepname ) );
+    CUtlVector<const ZMItemAction::ItemBaseData_t*> items;
+
+    // See if it's a single item.
+    auto* pData = ZMItemAction::g_ZMMapItemSystem.GetItemData( loadoutClass );
+    
+    if ( pData )
+    {
+        items.AddToTail( pData );
+    }
+    else
+    {
+        // It's a class. Get all the items.
+        auto flag = ZMItemAction::g_ZMMapItemSystem.GetClassFlag( loadoutClass );
+        ZMItemAction::g_ZMMapItemSystem.GetMapItemsByClass( flag, items );
+    }
+
+
+    // Get a random weapon from the items.
+    const char* wepname = items.Count() > 0 ? items[random->RandomInt( 0, items.Count() - 1 )]->m_pszClassname : "";
+    auto* pWeapon = ToZMBaseWeapon( pPlayer->Weapon_Create( wepname ) );
 
     if ( !pWeapon )
     {
-        Warning( "Failed to give player loadout weapon %s!\n", wepname );
+        Warning( "Failed to give player loadout '%s'!\n", loadoutClass );
         return;
     }
 

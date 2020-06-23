@@ -76,6 +76,7 @@ namespace ZMItemAction
         static unsigned int GetItemFlags( const char* classname );
         static unsigned int GetClassFlag( const char* classname );
         static const ItemBaseData_t* GetItemData( int index );
+        static const ItemBaseData_t* GetItemData( const char* itemclass );
         static bool         GetMapItemsByClass( unsigned int flags, CUtlVector<const ItemBaseData_t*>& items );
 
 
