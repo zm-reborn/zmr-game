@@ -85,6 +85,11 @@ void C_ZMPrecipitationSystem::Update( float frametime )
     UpdateParticles();
 }
 
+void C_ZMPrecipitationSystem::LevelInitPostEntity()
+{
+    m_bInitialized = false;
+}
+
 bool C_ZMPrecipitationSystem::AddPrecipitation( C_ZMEntPrecipitation* pEnt )
 {
     if ( m_vPrecipitations.Find( pEnt ) != m_vPrecipitations.InvalidIndex() )
@@ -119,6 +124,31 @@ float C_ZMPrecipitationSystem::GetCurrentDensity() const
 PrecipitationQuality_t C_ZMPrecipitationSystem::GetQuality() const
 {
     return (PrecipitationQuality_t)zm_cl_precipitationquality.GetInt();
+}
+
+PrecipitationType_t C_ZMPrecipitationSystem::GetPrecipitationType() const
+{
+    auto precipType = (PrecipitationType_t)-1;
+
+    FOR_EACH_VEC( m_vPrecipitations, i )
+    {
+        auto mytype = m_vPrecipitations[i]->GetPrecipitationType();
+
+        if ( precipType != (PrecipitationType_t)-1 && mytype != precipType )
+        {
+            Warning( "Multiple func_precipitation types in a single level! This is not supported!\n" );
+        }
+
+        precipType = mytype;
+    }
+
+    // Default to rain.
+    if ( precipType == (PrecipitationType_t)-1 )
+    {
+        precipType = PRECIPITATION_TYPE_RAIN;
+    }
+
+    return precipType;
 }
 
 const CNewParticleEffect* C_ZMPrecipitationSystem::GetInner() const
@@ -237,6 +267,8 @@ void C_ZMPrecipitationSystem::BuildRayTracingEnv()
 
 void C_ZMPrecipitationSystem::InitializeParticles()
 {
+    auto precipType = GetPrecipitationType();
+
 //    //Set up which type of precipitation particle we'll use
 //    if ( m_nPrecipType == PRECIPITATION_TYPE_PARTICLEASH )
 //    {
@@ -266,6 +298,13 @@ void C_ZMPrecipitationSystem::InitializeParticles()
 //        m_pszParticleOuter = "rain_storm_outer";
 //        m_flParticleInnerDist = 0.0;
 //    }
+    if ( precipType == PRECIPITATION_TYPE_SNOW || precipType == PRECIPITATION_TYPE_SNOWFALL )
+    {
+        m_pszParticleInner = "snow";
+        m_pszParticleOuter = "snow_outer";
+        m_pszParticleMist = "snow_mist";
+    }
+    else  // Default to rain
     {
         if ( precipType != PRECIPITATION_TYPE_RAIN )
         {
