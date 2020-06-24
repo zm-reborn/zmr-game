@@ -1,6 +1,7 @@
 #include "cbase.h"
 #include "precipitation_shared.h"
 #include "timedevent.h"
+#include "debugoverlay_shared.h"
 
 #include <raytrace.h>
 #include <tier3/tier3.h>
@@ -17,9 +18,13 @@
 ConVar zm_cl_precipitationcenterdist( "zm_cl_precipitationcenterdist", "150" );
 ConVar zm_cl_precipitationheight( "zm_cl_precipitationheight", "180" );
 
+ConVar zm_cl_debug_precipitation_trace( "zm_cl_debug_precipitation_trace", "0", FCVAR_CHEAT );
+
+
 #define NEAR_OFFSET         zm_cl_precipitationcenterdist.GetFloat()
 #define HEIGHT_OFFSET       zm_cl_precipitationheight.GetFloat()
 
+#define UPDATE_RATE         8.0f
 
 CUtlVector<RayTracingEnvironment*> g_RayTraceEnvironments;
 
@@ -43,7 +48,7 @@ C_ZMPrecipitationSystem::C_ZMPrecipitationSystem() : CAutoGameSystemPerFrame( "Z
     m_pszParticleOuter = "";
 
 
-    m_tParticlePrecipTraceTimer.Init( 8 );
+    m_tParticlePrecipTraceTimer.Init( UPDATE_RATE );
 
 
     m_pParticlePrecipInner = nullptr;
@@ -295,6 +300,7 @@ void C_ZMPrecipitationSystem::UpdateParticles()
     while ( m_tParticlePrecipTraceTimer.NextEvent( flCurTime ) )
     {
         Vector vForward;
+        Vector vTraceForward;
         Vector vRight;
         Vector vUp;
 
@@ -308,15 +314,21 @@ void C_ZMPrecipitationSystem::UpdateParticles()
         vForward.z = 0.0f;
         vForward.NormalizeInPlace();
 
+        // Point the forward vector up a bit.
+        vTraceForward = vForward;
+        vTraceForward.z = 0.5f;
+        vTraceForward.NormalizeInPlace();
+
         VectorVectors( vForward, vRight, vUp );
 
-        Vector vForward45Right = vForward + vRight;
-        Vector vForward45Left = vForward - vRight;
-        vForward45Right.NormalizeInPlace();
-        vForward45Left.NormalizeInPlace();
+        // Trace more to the sides.
+        Vector vForwardRight = vTraceForward * 0.8f + vRight;
+        Vector vForwardLeft = vTraceForward * 0.8f - vRight;
+        vForwardRight.NormalizeInPlace();
+        vForwardLeft.NormalizeInPlace();
 
-        fltx4 TMax = ReplicateX4( 320.0f );
-        SubFloat( TMax, 3 ) = FLT_MAX;
+        fltx4 TMax = ReplicateX4( 600.0f );
+        SubFloat( TMax, 3 ) = 2048.0f;
 
 
         Vector vPlayerPos = pPlayer->EyePosition();
@@ -326,14 +338,13 @@ void C_ZMPrecipitationSystem::UpdateParticles()
         //Vector vDensity = Vector( r_RainParticleDensity.GetFloat(), 0, 0 ) * flDensity;
 
 
-
         // Our 4 Rays are forward, off to the left and right, and directly up.
         // Use the first three to determine if there's generally visible rain where we're looking.
         // The forth, straight up, tells us if we're standing inside a rain volume 
         // (based on the normal that we hit or if we miss entirely)
         FourRays frRays;
         FourVectors fvDirection;
-        fvDirection = FourVectors( vForward, vForward45Left, vForward45Right, Vector( 0, 0, 1 ) );
+        fvDirection = FourVectors( vTraceForward, vForwardLeft, vForwardRight, Vector( 0, 0, 1 ) );
         frRays.direction = fvDirection; 
         frRays.origin.DuplicateVector( vPlayerPos );
         RayTracingResult Result;
@@ -343,13 +354,37 @@ void C_ZMPrecipitationSystem::UpdateParticles()
         i32x4 in4HitIds = LoadAlignedIntSIMD( Result.HitIds );
         fltx4 fl4HitIds = SignedIntConvertToFltSIMD ( in4HitIds );
 
-        fltx4 fl4Tolerance = ReplicateX4( 300.0f );
-        // ignore upwards test for tolerance, as we may be below an area which is raining, but with it not visible in front of us
-        //SubFloat( fl4Tolerance, 3 ) = 0.0f;
+        bool bInside = ( Result.HitIds[3] != -1 );
+        bool bNearby = ( IsAnyNegative( CmpGeSIMD( fl4HitIds, Four_Zeros ) ) && IsAnyNegative( CmpLtSIMD( Result.HitDistance, TMax ) ) );
 
-        bool bInside = ( Result.HitIds[3] != -1 && Result.surface_normal.Vec( 3 ).z < 0.0f );
-        bool bNearby = ( IsAnyNegative( CmpGeSIMD( fl4HitIds, Four_Zeros ) ) && IsAnyNegative( CmpGeSIMD( fl4Tolerance, Result.HitDistance ) ) );
 
+        // Debug
+        if ( zm_cl_debug_precipitation_trace.GetBool() )
+        {
+            static bool bLastInside = false;
+            static bool bLastNearby = false;
+
+            for ( int i = 0; i < 4; i++ )
+            {
+                bool bHit = Result.HitIds[i] != -1;
+
+                Vector dir( SubFloat( frRays.direction[0], i ), SubFloat( frRays.direction[1], i ), SubFloat( frRays.direction[2], i ) );
+                NDebugOverlay::Line(
+                    vPlayerPos,
+                    vPlayerPos + dir *  SubFloat( Result.HitDistance, i ),
+                    (!bHit) ? 255: 0, bHit ? 255 : 0, 0,
+                    true, 1.0f / UPDATE_RATE );
+            }
+
+            if ( bLastInside != bInside || bLastNearby != bNearby )
+            {
+                Msg( "Inside: %i | Nearby: %i\n", (int)bInside, (int)bNearby );
+            }
+
+            bLastInside = bInside;
+            bLastNearby = bNearby;
+        }
+        
         if ( bInside || bNearby )
         {
             //
