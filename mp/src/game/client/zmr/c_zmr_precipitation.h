@@ -34,6 +34,7 @@ public:
 
     const CNewParticleEffect* GetInner() const;
     const CNewParticleEffect* GetOuter() const;
+    const CNewParticleEffect* GetMist() const;
 
 protected:
     void InitializeParticles();
@@ -43,8 +44,11 @@ protected:
 
     void DestroyInnerParticlePrecip();
     void DestroyOuterParticlePrecip();
+    void DestroyMistParticlePrecip();
+    void DestroyAllParticles();
 
     void DispatchOuterParticlePrecip( C_BasePlayer* pPlayer, const Vector& vForward );
+    void DispatchMistParticlePrecip( C_BasePlayer* pPlayer, const Vector& vForward );
     void DispatchInnerParticlePrecip( C_BasePlayer* pPlayer, const Vector& vForward );
 
 
@@ -55,10 +59,12 @@ protected:
 
     HPARTICLEFFECT m_pParticlePrecipInner;
     HPARTICLEFFECT m_pParticlePrecipOuter;
+    HPARTICLEFFECT m_pParticlePrecipMist;
 
 
     const char* m_pszParticleInner;
     const char* m_pszParticleOuter;
+    const char* m_pszParticleMist;
 
     bool m_bInitialized;
 

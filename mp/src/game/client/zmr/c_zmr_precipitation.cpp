@@ -46,6 +46,7 @@ C_ZMPrecipitationSystem::C_ZMPrecipitationSystem() : CAutoGameSystemPerFrame( "Z
 {
     m_pszParticleInner = "";
     m_pszParticleOuter = "";
+    m_pszParticleMist = "";
 
 
     m_tParticlePrecipTraceTimer.Init( UPDATE_RATE );
@@ -53,6 +54,7 @@ C_ZMPrecipitationSystem::C_ZMPrecipitationSystem() : CAutoGameSystemPerFrame( "Z
 
     m_pParticlePrecipInner = nullptr;
     m_pParticlePrecipOuter = nullptr;
+    m_pParticlePrecipMist = nullptr;
 
 
     m_bInitialized = false;
@@ -77,8 +79,7 @@ void C_ZMPrecipitationSystem::Update( float frametime )
         m_iLastQuality = GetQuality();
 
 
-        DestroyInnerParticlePrecip();
-        DestroyOuterParticlePrecip();
+        DestroyAllParticles();
     }
 
     UpdateParticles();
@@ -128,6 +129,11 @@ const CNewParticleEffect* C_ZMPrecipitationSystem::GetInner() const
 const CNewParticleEffect* C_ZMPrecipitationSystem::GetOuter() const
 {
     return m_pParticlePrecipOuter;
+}
+
+const CNewParticleEffect* C_ZMPrecipitationSystem::GetMist() const
+{
+    return m_pParticlePrecipMist;
 }
 
 CParticleProperty* C_ZMPrecipitationSystem::ParticleProp()
@@ -260,20 +266,26 @@ void C_ZMPrecipitationSystem::InitializeParticles()
 //        m_pszParticleOuter = "rain_storm_outer";
 //        m_flParticleInnerDist = 0.0;
 //    }
-//    else  //default to rain
     {
+        if ( precipType != PRECIPITATION_TYPE_RAIN )
+        {
+            Warning( "Precipitation type %i is not supported! Defaulting to rain...\n", precipType );
+        }
+
         m_pszParticleInner = "rain";
         m_pszParticleOuter = "rain_outer";
+        m_pszParticleMist = "rain_mist";
     }
 
 
-    Assert( m_pszParticleInner && m_pszParticleOuter );
+    Assert( m_pszParticleInner && m_pszParticleOuter && m_pszParticleMist );
 
     if ( !g_pParticleSystemMgr->FindParticleSystem( m_pszParticleInner ) )
         Warning( "Couldn't find rain particle effect '%s'!!\n", m_pszParticleInner );
     if ( !g_pParticleSystemMgr->FindParticleSystem( m_pszParticleOuter ) )
         Warning( "Couldn't find rain particle effect '%s'!!\n", m_pszParticleOuter );
-
+    if ( !g_pParticleSystemMgr->FindParticleSystem( m_pszParticleMist ) )
+        Warning( "Couldn't find rain particle effect '%s'!!\n", m_pszParticleMist );
 
     BuildRayTracingEnv();
 
@@ -289,8 +301,7 @@ void C_ZMPrecipitationSystem::UpdateParticles()
     ||  g_RayTraceEnvironments.Count() < 1
     ||  !ParticleProp() )
     {
-        DestroyInnerParticlePrecip();
-        DestroyOuterParticlePrecip();
+        DestroyAllParticles();
         return;
     }
 
@@ -414,11 +425,22 @@ void C_ZMPrecipitationSystem::UpdateParticles()
             {
                 DispatchOuterParticlePrecip( pPlayer, vForward );
             }
+
+            // Mist
+            if ( m_pParticlePrecipMist )
+            {
+                m_pParticlePrecipMist->SetControlPoint( 1, vOffsetPos );
+                //m_pParticlePrecipOuter->SetControlPoint( 3, vDensity );
+                m_pParticlePrecipMist->SetControlPoint( 3, vOffsetPosNear );
+            }
+            else
+            {
+                DispatchMistParticlePrecip( pPlayer, vForward );
+            }
         }
         else  // No rain in the area, kill any leftover systems.
         {
-            DestroyInnerParticlePrecip();
-            DestroyOuterParticlePrecip();
+            DestroyAllParticles();
         }
     }
 }
@@ -439,6 +461,22 @@ void C_ZMPrecipitationSystem::DestroyOuterParticlePrecip()
         m_pParticlePrecipOuter->StopEmission();
         m_pParticlePrecipOuter = nullptr;
     }
+}
+
+void C_ZMPrecipitationSystem::DestroyMistParticlePrecip()
+{
+    if ( m_pParticlePrecipMist )
+    {
+        m_pParticlePrecipMist->StopEmission();
+        m_pParticlePrecipMist = nullptr;
+    }
+}
+
+void C_ZMPrecipitationSystem::DestroyAllParticles()
+{
+    DestroyInnerParticlePrecip();
+    DestroyOuterParticlePrecip();
+    DestroyMistParticlePrecip();
 }
 
 void C_ZMPrecipitationSystem::DispatchOuterParticlePrecip( C_BasePlayer *pPlayer, const Vector& vForward )
@@ -462,6 +500,37 @@ void C_ZMPrecipitationSystem::DispatchOuterParticlePrecip( C_BasePlayer *pPlayer
     Assert( pParticles );
 
     m_pParticlePrecipOuter = pParticles->Create( m_pszParticleOuter, PATTACH_ABSORIGIN_FOLLOW );
+    Assert( m_pParticlePrecipOuter );
+
+
+    m_pParticlePrecipOuter->SetControlPointObject( 4, pPlayer );
+    m_pParticlePrecipOuter->SetControlPoint( 1, vOffsetPos );
+    m_pParticlePrecipOuter->SetControlPointEntity( 2, pPlayer );
+    m_pParticlePrecipOuter->SetControlPoint( 3, vOffsetPosNear );
+    //m_pParticlePrecipOuter->SetDrawOnlyForSplitScreenUser( nSlot );
+}
+
+void C_ZMPrecipitationSystem::DispatchMistParticlePrecip( C_BasePlayer *pPlayer, const Vector& vForward )
+{
+    DestroyOuterParticlePrecip();
+
+
+    // Medium quality gets no outer mist particles.
+    if ( m_iLastQuality <= PRECIPQ_MEDIUM )
+    {
+        return;
+    }
+
+
+    Vector vPlayerPos = pPlayer->EyePosition();
+    Vector vOffsetPos = vPlayerPos + Vector ( 0, 0, HEIGHT_OFFSET );
+    Vector vOffsetPosNear = vOffsetPos + ( vForward * NEAR_OFFSET );
+
+
+    auto* pParticles = ParticleProp();
+    Assert( pParticles );
+
+    m_pParticlePrecipOuter = pParticles->Create( m_pszParticleMist, PATTACH_ABSORIGIN_FOLLOW );
     Assert( m_pParticlePrecipOuter );
 
 
