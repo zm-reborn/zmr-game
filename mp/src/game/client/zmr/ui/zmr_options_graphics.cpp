@@ -40,7 +40,7 @@ CZMOptionsSubGraphics::CZMOptionsSubGraphics( Panel* parent ) : BaseClass( paren
 
     m_pRainBox->AddItem( L"None", tempkv ); // 0
     m_pRainBox->AddItem( L"Low", tempkv ); // 1
-    //m_pRainBox->AddItem( L"Medium", tempkv ); // Skip medium for now
+    m_pRainBox->AddItem( L"Medium", tempkv ); // 2
     m_pRainBox->AddItem( L"High", tempkv ); // 3
 
     m_pExpFlashlightAmtBox->AddItem( L"0", tempkv );
@@ -81,10 +81,11 @@ void CZMOptionsSubGraphics::OnApplyChanges()
     switch ( rainval )
     {
     case 0 :
-    case 1 : // None/Low
+    case 1 :
+    case 2 : // None/Low/Medium
         zm_cl_precipitationquality.SetValue( rainval );
         break;
-    case 2 : // High
+    case 3 : // High
     default :
         zm_cl_precipitationquality.SetValue( 3 );
         break;
@@ -112,12 +113,13 @@ void CZMOptionsSubGraphics::OnResetData()
     switch ( rainval )
     {
     case 0 :
-    case 1 : // None/Low
+    case 1 :
+    case 2 : // None/Low/Medium
         m_pRainBox->ActivateItem( rainval );
         break;
     case 3 : // High
     default :
-        m_pRainBox->ActivateItem( 2 );
+        m_pRainBox->ActivateItem( 3 );
         break;
     }
 
