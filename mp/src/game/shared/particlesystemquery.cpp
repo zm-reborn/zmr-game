@@ -178,8 +178,9 @@ bool CParticleSystemQuery::MovePointInsideControllingObject(
     {
         auto* inner = ZMGetPrecipitationSystem()->GetInner();
         auto* outer = ZMGetPrecipitationSystem()->GetOuter();
+        auto* mist = ZMGetPrecipitationSystem()->GetMist();
 
-        if ( pParticles == inner || pParticles == outer )
+        if ( pParticles == inner || pParticles == outer || pParticles == mist )
         {
             // Trace to check if the particle position is within the environment.
             // We have to use this 4 ray shit.
