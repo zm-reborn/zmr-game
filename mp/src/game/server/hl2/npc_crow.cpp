@@ -17,7 +17,6 @@
 #include "ai_hint.h"
 #include "ai_motor.h"
 #include "ai_navigator.h"
-#include "hl2_shareddefs.h"
 #include "ai_route.h"
 #include "npcevent.h"
 #include "gib.h"
@@ -123,7 +122,7 @@ void CNPC_Crow::Spawn( void )
 
 	m_nMorale = random->RandomInt( 0, 12 );
 	
-	SetCollisionGroup( HL2COLLISION_GROUP_CROW );
+	SetCollisionGroup( COLLISION_GROUP_NPC );
 
 	CapabilitiesClear();
 
@@ -641,7 +640,7 @@ bool CNPC_Crow::Probe( const Vector &vecMoveDir, float flSpeed, Vector &vecDefle
 	// Look 1/2 second ahead.
 	//
 	trace_t tr;
-	AI_TraceHull( GetAbsOrigin(), GetAbsOrigin() + vecMoveDir * flSpeed, GetHullMins(), GetHullMaxs(), MASK_NPCSOLID, this, HL2COLLISION_GROUP_CROW, &tr );
+	AI_TraceHull( GetAbsOrigin(), GetAbsOrigin() + vecMoveDir * flSpeed, GetHullMins(), GetHullMaxs(), MASK_NPCSOLID, this, GetCollisionGroup(), &tr );
 	if ( tr.fraction < 1.0f )
 	{
 		//
@@ -996,7 +995,7 @@ void CNPC_Crow::RunTask( const Task_t *pTask )
 				// We've hopped off of something! See if we're going to fall very far.
 				//
 				trace_t tr;
-				AI_TraceLine( GetAbsOrigin(), GetAbsOrigin() + Vector( 0, 0, -32 ), MASK_SOLID, this, HL2COLLISION_GROUP_CROW, &tr );
+				AI_TraceLine( GetAbsOrigin(), GetAbsOrigin() + Vector( 0, 0, -32 ), MASK_SOLID, this, GetCollisionGroup(), &tr );
 				if ( tr.fraction == 1.0f )
 				{
 					//

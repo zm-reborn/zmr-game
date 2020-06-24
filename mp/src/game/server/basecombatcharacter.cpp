@@ -43,10 +43,6 @@
 #include "NextBot/NextBotManager.h"
 #endif
 
-#ifdef HL2_DLL
-#include "hl2_gamerules.h"
-#endif
-
 #ifdef PORTAL
 	#include "portal_util_shared.h"
 	#include "prop_portal_shared.h"
