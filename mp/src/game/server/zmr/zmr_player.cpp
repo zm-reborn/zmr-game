@@ -1336,6 +1336,11 @@ void CZMPlayer::Spawn()
     DoAnimationEvent( PLAYERANIMEVENT_SPAWN );
 }
 
+void CZMPlayer::CreateCorpse()
+{
+    Assert( 0 );
+}
+
 bool CZMPlayer::BecomeRagdollOnClient( const Vector& force )
 {
     return true;

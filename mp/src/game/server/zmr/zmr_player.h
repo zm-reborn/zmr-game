@@ -32,8 +32,6 @@ class CZMBaseWeapon;
 class CZMRagdoll;
 class CZMPlayerModelData;
 
-extern void CopyToBodyQue( CBaseAnimating *pCorpse );
-
 enum ZMPlayerState_t
 {
     // Happily running around in the game.
@@ -95,41 +93,25 @@ public:
 
 
     virtual void    Precache() OVERRIDE;
-
-    virtual void CreateCorpse() OVERRIDE { CopyToBodyQue( this ); }
-	virtual void UpdateClientData() OVERRIDE;
-	virtual void StopLoopingSounds() OVERRIDE;
-	virtual void Splash() OVERRIDE;
-    void ItemPreFrame();
-    virtual void ItemPostFrame() OVERRIDE;
-    void PreThink_HL2();
-    void UpdateControllableTrain();
-    
-    void StartWaterDeathSounds();
-	void StopWaterDeathSounds();
-
-	CSoundPatch* m_sndLeeches;
-	CSoundPatch* m_sndWaterSplashes;
-
-    LadderMove_t* GetLadderMove() { return &m_ZMLocal.m_LadderMove; }
-	virtual void ExitLadder() OVERRIDE;
-	virtual surfacedata_t* GetLadderSurface( const Vector& origin ) OVERRIDE;
-	
-
-
-	virtual void InitVCollision( const Vector& vecAbsOrigin, const Vector& vecAbsVelocity ) OVERRIDE;
-
-	virtual void SetupVisibility( CBaseEntity* pViewEntity, unsigned char* pvs, int pvssize ) OVERRIDE;
-
-
     virtual void    InitialSpawn() OVERRIDE;
     virtual void    Spawn() OVERRIDE;
+
+	virtual void    InitVCollision( const Vector& vecAbsOrigin, const Vector& vecAbsVelocity ) OVERRIDE;
+	virtual void    SetupVisibility( CBaseEntity* pViewEntity, unsigned char* pvs, int pvssize ) OVERRIDE;
+
     virtual void    UpdateOnRemove() OVERRIDE;
     virtual void    PreThink() OVERRIDE;
     virtual void    PostThink() OVERRIDE;
     virtual void    PlayerDeathThink() OVERRIDE;
     virtual void    PhysicsSimulate() OVERRIDE;
+    void            ItemPreFrame();
+    virtual void    ItemPostFrame() OVERRIDE;
     virtual bool    ClientCommand( const CCommand& args ) OVERRIDE;
+
+	virtual void UpdateClientData() OVERRIDE;
+	virtual void StopLoopingSounds() OVERRIDE;
+	virtual void Splash() OVERRIDE;
+
     void            PickDefaultSpawnTeam();
     virtual void    ChangeTeam( int iTeam ) OVERRIDE;
     bool            ShouldSpawn();
@@ -152,8 +134,13 @@ public:
     virtual void    FlashlightTurnOn() OVERRIDE;
     virtual void    FlashlightTurnOff() OVERRIDE;
 
+    virtual void    CreateCorpse() OVERRIDE;
     virtual bool    BecomeRagdollOnClient( const Vector& force ) OVERRIDE;
     void            CreateRagdollEntity();
+
+    LadderMove_t* GetLadderMove() { return &m_ZMLocal.m_LadderMove; }
+	virtual void ExitLadder() OVERRIDE;
+	virtual surfacedata_t* GetLadderSurface( const Vector& origin ) OVERRIDE;
 
     virtual void PickupObject( CBaseEntity* pObject, bool bLimitMassAndSize ) OVERRIDE;
     virtual float GetHeldObjectMass( IPhysicsObject* pHeldObject ) OVERRIDE;
@@ -295,6 +282,16 @@ public:
 
     void CopyWeaponDamage( CZMBaseWeapon* pWeapon, const FireBulletsInfo_t& info );
     void CopyMeleeDamage( CZMBaseWeapon* pWeapon, const Vector& vecSrc, float flDamage );
+
+
+    void StartWaterDeathSounds();
+	void StopWaterDeathSounds();
+
+protected:
+    void PreThink_HL2();
+
+    void UpdateControllableTrain();
+
 private:
     void HandleDamagesFromUserCmd();
     ZMServerWepData_t m_ServerWepData;
@@ -339,6 +336,9 @@ private:
     float m_flZMMoveDecel;
 
     bool m_bPlayUseDenySound;
+
+	CSoundPatch* m_sndLeeches;
+	CSoundPatch* m_sndWaterSplashes;
 };
 
 inline CZMPlayer* ToZMPlayer( CBaseEntity* pEntity )
