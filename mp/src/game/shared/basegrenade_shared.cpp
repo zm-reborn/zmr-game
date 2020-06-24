@@ -24,7 +24,6 @@
 extern short	g_sModelIndexFireball;		// (in combatweapon.cpp) holds the index for the fireball 
 extern short	g_sModelIndexWExplosion;	// (in combatweapon.cpp) holds the index for the underwater explosion
 extern short	g_sModelIndexSmoke;			// (in combatweapon.cpp) holds the index for the smoke cloud
-extern ConVar    sk_plr_dmg_grenade;
 
 #if !defined( CLIENT_DLL )
 

@@ -23,7 +23,6 @@
 #include "triggers.h"
 #include "smoke_trail.h"
 #include "collisionutils.h"
-#include "hl2_shareddefs.h"
 #include "rumble_shared.h"
 #include "gamestats.h"
 
@@ -185,7 +184,7 @@ unsigned int CMissile::PhysicsSolidMaskForEntity( void ) const
 //---------------------------------------------------------
 int CMissile::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 {
-	if ( ( info.GetDamageType() & (DMG_MISSILEDEFENSE | DMG_AIRBOAT) ) == false )
+	if ( ( info.GetDamageType() & (/*DMG_MISSILEDEFENSE | */DMG_AIRBOAT) ) == false )
 		return 0;
 
 	bool bIsDamaged;

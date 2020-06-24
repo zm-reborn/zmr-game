@@ -25,7 +25,6 @@
 
 #ifdef HL2_DLL
 #include "ai_interactions.h"
-#include "hl2_gamerules.h"
 #endif // HL2_DLL
 
 #include "ai_network.h"
