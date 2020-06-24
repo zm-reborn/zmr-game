@@ -527,6 +527,31 @@ void CZMPlayer::HandleDamagesFromUserCmd()
     m_ServerWepData.Reset();
 }
 
+//
+// Player's Think function. Before PreThink/PostThink and all that.
+//
+void CZMPlayer::PhysicsSimulate()
+{
+    bool bDoSimulate = m_nSimulationTick != gpGlobals->tickcount;
+
+    BaseClass::PhysicsSimulate();
+
+    if ( bDoSimulate )
+    {
+        //
+        // Put everything here that is time sensitive.
+        // Usercmd rate can't be trusted. There maybe holes (as big as 0.1s)
+        // between usercmds depending on player's ping and loss.
+        // This can fuck up some logic.
+        //
+
+
+        // This fixes continuous use buttons (momentary_rot_button) changing directions.
+        // Their logic is run every 0.1s, so we need call Use within that time frame.
+        PlayerUse();
+    }
+}
+
 void CZMPlayer::PlayerDeathThink()
 {
     if( !IsObserver() )
@@ -1892,6 +1917,44 @@ void CZMPlayer::PlayerUse()
     {
         EmitSound( "HL2Player.Use" );
     }
+}
+
+//
+// Just stock ItemPreFrame, but without the PlayerUse.
+//
+void CZMPlayer::ItemPreFrame()
+{
+	//PlayerUse();
+
+	auto* pActive = GetActiveWeapon();
+
+	// Allow all the holstered weapons to update
+	for ( int i = 0; i < WeaponCount(); ++i )
+	{
+		auto* pWeapon = GetWeapon( i );
+
+		if ( !pWeapon )
+			continue;
+
+		if ( pActive == pWeapon )
+			continue;
+
+		pWeapon->ItemHolsterFrame();
+	}
+
+    if ( gpGlobals->curtime < m_flNextAttack )
+		return;
+
+	if ( !pActive )
+		return;
+
+#if defined( CLIENT_DLL )
+	// Not predicting this weapon
+	if ( !pActive->IsPredicted() )
+		return;
+#endif
+
+	pActive->ItemPreFrame();
 }
 
 void CZMPlayer::ItemPostFrame()
