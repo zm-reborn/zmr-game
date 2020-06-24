@@ -1,6 +1,9 @@
 #pragma once
 
 
+#include "precipitation_shared.h"
+
+
 enum PrecipitationQuality_t
 {
     PRECIPQ_NONE = 0,
@@ -22,12 +25,14 @@ public:
 
     virtual void PostInit() OVERRIDE;
     virtual void Update( float frametime ) OVERRIDE;
+    virtual void LevelInitPostEntity() OVERRIDE;
 
     bool AddPrecipitation( C_ZMEntPrecipitation* pEnt );
     bool RemovePrecipitation( C_ZMEntPrecipitation* pEnt );
 
     float GetCurrentDensity() const;
     PrecipitationQuality_t GetQuality() const;
+    PrecipitationType_t GetPrecipitationType() const;
 
     CParticleProperty* ParticleProp();
 

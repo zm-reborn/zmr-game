@@ -13,4 +13,5 @@ particles_manifest
 	
 	"file"		"!particles/molotov_particles.pcf"
 	"file"		"!particles/myrain.pcf"
+	"file"		"!particles/mysnow.pcf"
 }
