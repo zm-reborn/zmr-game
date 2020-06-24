@@ -100,6 +100,7 @@ public:
 	virtual void UpdateClientData() OVERRIDE;
 	virtual void StopLoopingSounds() OVERRIDE;
 	virtual void Splash() OVERRIDE;
+    void ItemPreFrame();
     virtual void ItemPostFrame() OVERRIDE;
     void PreThink_HL2();
     void UpdateControllableTrain();
@@ -127,6 +128,7 @@ public:
     virtual void    PreThink() OVERRIDE;
     virtual void    PostThink() OVERRIDE;
     virtual void    PlayerDeathThink() OVERRIDE;
+    virtual void    PhysicsSimulate() OVERRIDE;
     virtual bool    ClientCommand( const CCommand& args ) OVERRIDE;
     void            PickDefaultSpawnTeam();
     virtual void    ChangeTeam( int iTeam ) OVERRIDE;
