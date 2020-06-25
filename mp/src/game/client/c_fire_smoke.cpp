@@ -196,7 +196,10 @@ void C_FireSmoke::Start( void )
 	// Create the effect of the correct size
 	m_hEffect = ParticleProp()->Create( lpszEffectName, PATTACH_ABSORIGIN );
 
-	g_ZMFireGlowSystem.AddFireEntity( this );
+	if ( m_nFlags & bitsFIRESMOKE_GLOW )
+	{
+		g_ZMFireGlowSystem.AddFireEntity( this );
+	}
 }
 
 
