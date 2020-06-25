@@ -333,6 +333,8 @@ $Project "Client (ZMR)"
 			$File	"zmr\c_zmr_discord.cpp" [$WIN32]
 			$File	"zmr\c_zmr_entities.cpp"
 			$File	"zmr\c_zmr_entities.h"
+			$File	"zmr\c_zmr_fireglow_system.cpp"
+			$File	"zmr\c_zmr_fireglow_system.h"
 			$File	"zmr\c_zmr_flashlighteffect.cpp"
 			$File	"zmr\c_zmr_flashlighteffect.h"
 			$File	"zmr\c_zmr_flashlightsystem.cpp"
