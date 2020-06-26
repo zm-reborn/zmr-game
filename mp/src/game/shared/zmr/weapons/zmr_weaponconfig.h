@@ -241,6 +241,9 @@ namespace ZMWeaponConfig
         ~CZMWeaponConfigSystem();
 
 
+        static bool IsDebugging();
+
+
         virtual void PostInit() OVERRIDE;
         virtual void LevelInitPreEntity() OVERRIDE;
 

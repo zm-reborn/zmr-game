@@ -39,6 +39,7 @@ public:
     virtual void LevelInitPreEntity() OVERRIDE;
 #endif
 
+    static bool IsDebugging();
 
     ZMPlayerModelList_t* GetPlayerModels() { return &m_vPlayerModels; }
     static const char* GetDefaultPlayerModel();

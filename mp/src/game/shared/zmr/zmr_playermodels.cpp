@@ -10,6 +10,8 @@
 #include "tier0/memdbgon.h"
 
 
+ConVar zm_sv_debug_playermodels( "zm_sv_debug_playermodels", "0", FCVAR_REPLICATED );
+
 
 #define PLAYERMODEL_FILE            "resource/zmplayermodels.txt"
 #define PLAYERMODEL_FILE_CUSTOM     "resource/zmplayermodels_custom.txt"
@@ -68,6 +70,11 @@ void CZMPlayerModelSystem::LevelInitPreEntity()
     m_bLoadedFromFile = false;
 }
 #endif
+
+bool CZMPlayerModelSystem::IsDebugging()
+{
+    return zm_sv_debug_playermodels.GetBool();
+}
 
 const char* CZMPlayerModelSystem::GetDefaultPlayerModel()
 {
@@ -130,7 +137,10 @@ void CZMPlayerModelSystem::SaveCustomModelsToStringTable()
         }
     }
 
-    DevMsg( "Wrote %i custom player models to string table.\n", num );
+    if ( IsDebugging() )
+    {
+        Msg( "Wrote %i custom player models to string table.\n", num );
+    }
 }
 
 int CZMPlayerModelSystem::LoadModelsFromFile()
@@ -163,8 +173,10 @@ int CZMPlayerModelSystem::LoadModelsFromFile()
     }
 
 
-    DevMsg( "Total player models: %i\n", m_vPlayerModels.Count() );
-
+    if ( IsDebugging() )
+    {
+        Msg( "Total player models: %i\n", m_vPlayerModels.Count() );
+    }
 
     m_bLoadedFromFile = true;
 #endif
@@ -204,7 +216,10 @@ int CZMPlayerModelSystem::LoadCustomModels()
     kv->deleteThis();
 
 
-    DevMsg( "Loaded %i custom player models from file!\n", ret );
+    if ( IsDebugging() )
+    {
+        Msg( "Loaded %i custom player models from file!\n", ret );
+    }
 
     return ret;
 }
@@ -225,7 +240,8 @@ int CZMPlayerModelSystem::PrecachePlayerModels()
             {
                 if ( CBaseEntity::PrecacheModel( arms ) != -1 )
                 {
-                    DevMsg( "Precached player model arm model (%s) explicitly.\n", arms );
+                    if ( IsDebugging() )
+                        Msg( "Precached player model arm model (%s) explicitly.\n", arms );
                 }
                 else
                 {

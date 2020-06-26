@@ -58,6 +58,8 @@ public:
 
 	CZMBaseWeapon();
 	~CZMBaseWeapon();
+
+    static bool IsDebugging();
     
 #ifdef CLIENT_DLL
     virtual void Spawn() OVERRIDE;

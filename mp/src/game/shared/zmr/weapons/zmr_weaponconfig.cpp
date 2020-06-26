@@ -17,6 +17,9 @@
 #include "tier0/memdbgon.h"
 
 
+ConVar zm_sv_debug_weaponconfig( "zm_sv_debug_weaponconfig", "0", FCVAR_REPLICATED );
+
+
 #define DEFAULT_MAX_RANGE       1024.0f
 
 #define CONFIG_DIR      "scripts"
@@ -656,6 +659,11 @@ CZMWeaponConfigSystem::~CZMWeaponConfigSystem()
     {
         m_pConfigs[i] = nullptr;
     }
+}
+
+bool CZMWeaponConfigSystem::IsDebugging()
+{
+    return zm_sv_debug_weaponconfig.GetBool();
 }
 
 void CZMWeaponConfigSystem::PostInit()
