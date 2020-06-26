@@ -2604,6 +2604,10 @@ void CZMEntPrecipitation::Spawn()
     //}
 
     m_nRenderMode = kRenderEnvironmental;
+
+    // This fixes us casting shadows on client.
+    // There may be many different models which would then attempt to cast shadows costing us precious shadow slots.
+    AddEffects( EF_NODRAW );
 }
 
 int CZMEntPrecipitation::UpdateTransmitState()
