@@ -62,6 +62,8 @@ static ConVar zm_sv_weaponreserveammo( "zm_sv_weaponreserveammo", "1", FCVAR_NOT
 
 ConVar zm_sv_bulletsusemainview( "zm_sv_bulletsusemainview", "1", FCVAR_NOTIFY | FCVAR_REPLICATED, "When on, clients will use their current view's origin and angles instead of networked ones to determine the source of bullets." );
 
+ConVar zm_sv_debug_weapons( "zm_sv_debug_weapons", "0", FCVAR_REPLICATED );
+
 
 
 
@@ -153,6 +155,11 @@ CZMBaseWeapon::~CZMBaseWeapon()
 
     ReleaseConstraint();
 #endif
+}
+
+bool CZMBaseWeapon::IsDebugging()
+{
+    return zm_sv_debug_weapons.GetBool();
 }
 
 #ifndef CLIENT_DLL
@@ -1165,8 +1172,11 @@ void CZMBaseWeapon::SetWeaponVisible( bool visible )
 void CZMBaseWeapon::AssignWeaponConfigSlot()
 {
 #ifdef CLIENT_DLL
-    int index = entindex();
-    DevMsg( "Assigning weapon config slot to %i on client!\n", index );
+    if ( ZMWeaponConfig::CZMWeaponConfigSystem::IsDebugging() )
+    {
+        int index = entindex();
+        Msg( "Assigning weapon config slot to %i on client!\n", index );
+    }
 #endif
 
     if ( GetConfigSlot() == ZMCONFIGSLOT_INVALID )
@@ -1785,7 +1795,11 @@ void CZMBaseWeapon::Equip( CBaseCombatCharacter* pCharacter )
 
         if ( pPlayer )
         {
-            DevMsg( "Adding slot flag %i\n", GetSlotFlag() );
+            if ( IsDebugging() )
+            {
+                Msg( "Adding slot flag %i\n", GetSlotFlag() );
+            }
+            
             pPlayer->AddWeaponSlotFlag( GetSlotFlag() );
         }
     }
