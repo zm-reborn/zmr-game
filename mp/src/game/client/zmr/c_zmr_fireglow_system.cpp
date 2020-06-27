@@ -113,15 +113,15 @@ void FireGlow_t::Update( float flUpdateInterval )
     if ( vpEnts.Count() <= 0 )
         return;
 
-    auto* pEnt = vpEnts[0];
+    //auto* pEnt = vpEnts[0];
 
-    if ( bCheckPositionLightLevel && FireGlow_t::IsWorldLightSufficient( pEnt, glowType ) )
-    {
-        Kill();
-        return;
-    }
+    //if ( bCheckPositionLightLevel && FireGlow_t::IsWorldLightSufficient( pEnt, glowType ) )
+    //{
+    //    Kill();
+    //    return;
+    //}
 
-   bCheckPositionLightLevel = false;
+    //bCheckPositionLightLevel = false;
 
     if ( flNextUpdate > curtime )
         return;
