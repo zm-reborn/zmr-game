@@ -162,7 +162,7 @@ void FireGlow_t::Update( float flUpdateInterval )
 
 	vecLastPos = ComputePosition();
 	pLight->origin = vecLastPos;
-	pLight->die = curtime + MAX( flUpdateInterval, 0.1f );
+	pLight->die = curtime + MAX( flUpdateInterval * 2, 0.1f );
     
 
     if ( CZMFireGlowSystem::IsDebugging() )
