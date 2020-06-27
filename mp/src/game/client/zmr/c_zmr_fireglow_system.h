@@ -35,6 +35,7 @@ struct FireGlow_t
     bool bDying;
     float flNextFlicker;
     bool bCheckPositionLightLevel;
+    int iLightIndex;
 };
 
 class CZMFireGlowSystem : public CAutoGameSystemPerFrame, public CGameEventListener
