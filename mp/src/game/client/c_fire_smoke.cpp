@@ -111,8 +111,9 @@ C_FireSmoke::~C_FireSmoke()
 		m_hEffect = NULL;
 	}
 
-
+#ifdef ZMR
 	g_ZMFireGlowSystem.RemoveFireEntity( this );
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -196,10 +197,12 @@ void C_FireSmoke::Start( void )
 	// Create the effect of the correct size
 	m_hEffect = ParticleProp()->Create( lpszEffectName, PATTACH_ABSORIGIN );
 
+#ifdef ZMR
 	if ( m_nFlags & bitsFIRESMOKE_GLOW )
 	{
-		g_ZMFireGlowSystem.AddFireEntity( this );
+		g_ZMFireGlowSystem.AddFireEntity( this, FireGlowType_t::GLOW_GENERIC_FIRE );
 	}
+#endif
 }
 
 
@@ -321,6 +324,10 @@ void C_EntityFlame::StopEffect( void )
 		
 		m_hEntAttached = NULL;
 	}
+
+#ifdef ZMR
+	g_ZMFireGlowSystem.RemoveFireEntity( this );
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -359,6 +366,15 @@ void C_EntityFlame::CreateEffect( void )
 		m_hEffect->SetControlPointEntity( 0, pEntity );
 		m_hEffect->SetControlPointEntity( 1, pEntity );
 	}
+
+#ifdef ZMR
+	auto* pBaseEnt = m_hEntAttached.Get();
+
+	if ( pBaseEnt )
+	{
+		g_ZMFireGlowSystem.AddFireEntity( this, FireGlowType_t::GLOW_ENTITY_FLAME );
+	}
+#endif
 }
 
 //-----------------------------------------------------------------------------
