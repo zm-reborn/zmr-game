@@ -10,12 +10,14 @@
 #include "tier0/memdbgon.h"
 
 
+#ifdef GAME_DLL
 // Unused
 ConVar zm_sv_resource_rate( "zm_sv_resource_rate", "5" );
+#endif
 
-ConVar zm_sv_resource_refill_min( "zm_sv_resource_refill_min", "420", FCVAR_NOTIFY, "Minimum amount of resources per minute." );
-ConVar zm_sv_resource_refill_max( "zm_sv_resource_refill_max", "1200", FCVAR_NOTIFY, "Maximum amount of resources per minute." );
-ConVar zm_sv_resource_refill_usehighest( "zm_sv_resource_refill_usehighest", "1", FCVAR_NOTIFY, "Is refilling based on current human count or count at the start of the round." );
+ConVar zm_sv_resource_refill_min( "zm_sv_resource_refill_min", "420", FCVAR_NOTIFY | FCVAR_REPLICATED, "Minimum amount of resources per minute." );
+ConVar zm_sv_resource_refill_max( "zm_sv_resource_refill_max", "1200", FCVAR_NOTIFY | FCVAR_REPLICATED, "Maximum amount of resources per minute." );
+ConVar zm_sv_resource_refill_usehighest( "zm_sv_resource_refill_usehighest", "1", FCVAR_NOTIFY | FCVAR_REPLICATED, "Is refilling based on current human count or count at the start of the round." );
 ConVar zm_sv_resource_max( "zm_sv_resource_max", "5000", FCVAR_NOTIFY | FCVAR_REPLICATED );
 
 CZMResourceSystem::CZMResourceSystem()
