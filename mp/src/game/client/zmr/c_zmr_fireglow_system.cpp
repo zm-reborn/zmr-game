@@ -69,11 +69,18 @@ CON_COMMAND_F( zm_cl_debug_getlightatpos, "", FCVAR_CHEAT )
 
 FireGlow_t::FireGlow_t( FireGlowEnt_t* pEnt, FireGlowType_t glowType ) : glowType( glowType )
 {
+    static int lightIndices = 4096;
+
+
     pLight = nullptr;
     flNextUpdate = 0.0f;
     flNextFlicker = 0.0f;
 
     vpEnts.AddToTail( pEnt );
+
+    // If it's a client entity, it will have no index.
+    // Create a unique index if so.
+    iLightIndex = ( pEnt->index > 0 ) ? pEnt->index : lightIndices++;
 
     vecLastPos = ComputePosition();
 
@@ -125,7 +132,7 @@ void FireGlow_t::Update( float flUpdateInterval )
 
     if ( !pLight )
     {
-        pLight = effects->CL_AllocDlight( pEnt->index );
+        pLight = effects->CL_AllocDlight( iLightIndex );
 
         if ( !pLight )
         {
