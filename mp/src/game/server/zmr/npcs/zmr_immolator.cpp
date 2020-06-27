@@ -215,7 +215,8 @@ void CZMImmolator::StartFires()
 
         if( firetrace.fraction != 1.0 )
         {
-            FireSystem_StartFire( firetrace.endpos, scale, growth, 20.0f, (SF_FIRE_START_ON|SF_FIRE_SMOKELESS|SF_FIRE_NO_GLOW), nullptr, FIRE_NATURAL );
+            int flags = (SF_FIRE_START_ON); // SF_FIRE_SMOKELESS|SF_FIRE_NO_GLOW
+            FireSystem_StartFire( firetrace.endpos, scale, growth, 20.0f, flags, nullptr, FIRE_NATURAL );
         }
     }
 }
