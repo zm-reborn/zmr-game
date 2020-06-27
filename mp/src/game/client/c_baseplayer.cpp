@@ -7,7 +7,6 @@
 //===========================================================================//
 #include "cbase.h"
 #include "c_baseplayer.h"
-#include "flashlighteffect.h"
 #include "weapon_selection.h"
 #include "history_resource.h"
 #include "iinput.h"
@@ -417,8 +416,6 @@ C_BasePlayer::C_BasePlayer() : m_iv_vecViewOffset( "C_BasePlayer::m_iv_vecViewOf
 	m_vecOldViewAngles.Init();
 #endif
 
-	m_pFlashlight = NULL;
-
 	m_pCurrentVguiScreen = NULL;
 	m_pCurrentCommand = NULL;
 
@@ -458,8 +455,6 @@ C_BasePlayer::~C_BasePlayer()
 	{
 		s_pLocalPlayer = NULL;
 	}
-
-	delete m_pFlashlight;
 }
 
 
@@ -1225,32 +1220,6 @@ void C_BasePlayer::TeamChange( int iNewTeam )
 //-----------------------------------------------------------------------------
 void C_BasePlayer::UpdateFlashlight()
 {
-	// The dim light is the flashlight.
-	if ( IsEffectActive( EF_DIMLIGHT ) )
-	{
-		if (!m_pFlashlight)
-		{
-			// Turned on the headlight; create it.
-			m_pFlashlight = new CFlashlightEffect(index);
-
-			if (!m_pFlashlight)
-				return;
-
-			m_pFlashlight->TurnOn();
-		}
-
-		Vector vecForward, vecRight, vecUp;
-		EyeVectors( &vecForward, &vecRight, &vecUp );
-
-		// Update the light with the new position and direction.		
-		m_pFlashlight->UpdateLight( EyePosition(), vecForward, vecRight, vecUp, FLASHLIGHT_DISTANCE );
-	}
-	else if (m_pFlashlight)
-	{
-		// Turned off the flashlight; delete it.
-		delete m_pFlashlight;
-		m_pFlashlight = NULL;
-	}
 }
 
 

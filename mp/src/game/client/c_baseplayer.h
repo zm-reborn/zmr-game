@@ -35,7 +35,6 @@
 class C_BaseCombatWeapon;
 class C_BaseViewModel;
 class C_FuncLadder;
-class CFlashlightEffect;
 class C_EconWearable;
 
 extern int g_nKillCamMode;
@@ -524,10 +523,6 @@ private:
 	EHANDLE			m_pCurrentVguiScreen;
 
 	bool			m_bFiredWeapon;
-
-
-	// Player flashlight dynamic light pointers
-	CFlashlightEffect *m_pFlashlight;
 
 	typedef CHandle<C_BaseCombatWeapon> CBaseCombatWeaponHandle;
 	CNetworkVar( CBaseCombatWeaponHandle, m_hLastWeapon );
