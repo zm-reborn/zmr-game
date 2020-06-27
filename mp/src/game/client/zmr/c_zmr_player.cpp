@@ -7,7 +7,6 @@
 #include "takedamageinfo.h"
 #include "view.h"
 #include "bone_setup.h"
-#include "flashlighteffect.h"
 #include "in_buttons.h"
 #include "debugoverlay_shared.h"
 
