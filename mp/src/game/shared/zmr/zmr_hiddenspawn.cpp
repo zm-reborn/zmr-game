@@ -228,7 +228,10 @@ HiddenSpawnError_t CZMHiddenSpawnSystem::Spawn( ZombieClass_t zclass, CZMPlayer*
     if ( !pZombie ) return HSERROR_UNKNOWN;
 
 
-    DispatchSpawn( pZombie );
+    if ( DispatchSpawn( pZombie ) != 0 )
+    {
+        UTIL_RemoveImmediate( pZombie );
+    }
     
     const Vector findground( 0.0f, 0.0f, 2.0f );
 

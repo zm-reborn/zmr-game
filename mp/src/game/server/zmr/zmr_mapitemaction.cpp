@@ -395,8 +395,9 @@ void CZMMapItemSystem::SpawnItems()
 
         CEntityMapData entData( (char*)pEntData->pszEntData );
         pEnt->ParseMapData( &entData );
-        if ( DispatchSpawn( pEnt ) < 0 )
+        if ( DispatchSpawn( pEnt ) != 0 )
         {
+            UTIL_RemoveImmediate( pEnt );
             continue;
         }
 
