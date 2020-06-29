@@ -717,8 +717,10 @@ void ZM_Cmd_CreateAmbush( const CCommand &args )
     if ( !pTrigger ) return;
 
     if ( DispatchSpawn( pTrigger ) != 0 )
+    {
+        UTIL_RemoveImmediate( pTrigger );
         return;
-
+    }
 
     pTrigger->Teleport( &pos, nullptr, nullptr );
     pTrigger->Activate();

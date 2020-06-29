@@ -2163,31 +2163,33 @@ void CZMPhysExplosion::CreateEffects( float delay )
 
 
 
-    m_hSpark = dynamic_cast<CEnvSpark*>( CreateEntityByName( "env_spark" ) );
+    auto* pSpark = dynamic_cast<CEnvSpark*>( CreateEntityByName( "env_spark" ) );
 
-    if ( !m_hSpark ) return;
+    if ( !pSpark ) return;
 
 
     const int SF_SPARK_START_ON = 64;
     const int SF_SPARK_GLOW = 128;
     const int SF_SPARK_SILENT = 256;
 
-    m_hSpark->AddSpawnFlags( SF_SPARK_START_ON );
-    m_hSpark->AddSpawnFlags( SF_SPARK_GLOW );
-    m_hSpark->AddSpawnFlags( SF_SPARK_SILENT );
+    pSpark->AddSpawnFlags( SF_SPARK_START_ON );
+    pSpark->AddSpawnFlags( SF_SPARK_GLOW );
+    pSpark->AddSpawnFlags( SF_SPARK_SILENT );
 
-    m_hSpark->KeyValue( "MaxDelay" , 0.0f );
-    m_hSpark->KeyValue( "Magnitude" , 2 );
-    m_hSpark->KeyValue( "TrailLength" , 1.5 );
-    //m_pSparker->KeyValue( "DeathTime" , (gpGlobals->curtime + delay) );
+    pSpark->CBaseEntity::KeyValue( "MaxDelay", 0.0f );
+    pSpark->CBaseEntity::KeyValue( "Magnitude" , 2 );
+    pSpark->CBaseEntity::KeyValue( "TrailLength" , 1.5 );
+    //pSpark->CBaseEntity::KeyValue( "DeathTime" , (gpGlobals->curtime + delay) );
 
-    if ( DispatchSpawn( m_hSpark ) != 0 )
+    if ( DispatchSpawn( pSpark ) != 0 )
     {
+        UTIL_RemoveImmediate( pSpark );
         return;
     }
 
+    pSpark->Teleport( &GetAbsOrigin(), nullptr, nullptr );
 
-    m_hSpark->Teleport( &GetAbsOrigin(), nullptr, nullptr );
+    m_hSpark.Set( pSpark );
 }
 
 void CZMPhysExplosion::DelayedExplode( float delay )
