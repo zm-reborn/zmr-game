@@ -8,6 +8,15 @@
 #include "zmr_player_shared.h"
 
 
+enum LadderMoveRet_t
+{
+    LADDERMOVERET_NO_LADDER = 0,
+
+    LADDERMOVERET_ONLADDER,
+
+    LADDERMOVERET_DISMOUNTED
+};
+
 class CZMGameMovement : public CGameMovement
 {
 public:
@@ -39,8 +48,35 @@ public:
     virtual bool CanAccelerate() OVERRIDE { return !(player->GetWaterJumpTime()); }
     virtual void Accelerate( Vector& wishdir, float wishspeed, float accel ) OVERRIDE;
 
+    virtual float ClimbSpeed() const OVERRIDE;
+    virtual bool LadderMove() OVERRIDE;
+
 
     virtual void PlayerRoughLandingEffects( float fvol ) OVERRIDE;
 
     inline CZMPlayer* GetZMPlayer() const { return static_cast<CZMPlayer*>( player ); }
+
+protected:
+    //
+    // HL2 ladder specific stuff
+    //
+    CFuncLadder*    FindLadder( Vector& ladderOrigin, const CFuncLadder* skipLadder );
+    bool            CheckLadderMount( CFuncLadder* pLadder, Vector& vecBestPos );
+
+	bool		IsForceMoveActive();
+	// Start forcing player position
+	void		StartForcedMove( bool mounting, float transit_speed, const Vector& goalpos, CFuncLadder *ladder );
+	// Returns false when finished
+	bool		ContinueForcedMove();
+    bool		ExitLadderViaDismountNode( CFuncLadder* pLadder, bool strict );
+
+
+    LadderMove_t* GetLadderMove() const;
+
+    CFuncLadder* GetLadder() const;
+    void SetLadder( CFuncLadder* pLadder );
+
+
+    LadderMoveRet_t LadderMove_Brush();
+    LadderMoveRet_t LadderMove_HL2();
 };
