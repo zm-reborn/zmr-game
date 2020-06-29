@@ -1259,6 +1259,11 @@ void CZMPlayer::Spawn()
     {
         InitZMFog();
     }
+    else
+    {
+        // Make sure sky camera stuff gets updated on spawn.
+        m_Local.m_pOldSkyCamera = nullptr;
+    }
 
     if ( !m_Local.m_PlayerFog.m_hCtrl.Get() )
     {
