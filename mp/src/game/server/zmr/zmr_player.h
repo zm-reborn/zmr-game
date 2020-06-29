@@ -339,6 +339,9 @@ private:
 
 	CSoundPatch* m_sndLeeches;
 	CSoundPatch* m_sndWaterSplashes;
+
+
+    friend class CZMGameMovement;
 };
 
 inline CZMPlayer* ToZMPlayer( CBaseEntity* pEntity )

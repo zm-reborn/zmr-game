@@ -3,6 +3,8 @@
 
 #include "networkvar.h"
 
+#include "func_ladder.h"
+
 #include "hl_movedata.h"
 
 #ifdef CLIENT_DLL
@@ -26,7 +28,7 @@ public:
 
 
 	// Ladder related data
-	CNetworkVar( EHANDLE, m_hLadder );
+	CNetworkHandle( CFuncLadder, m_hLadder );
 	LadderMove_t m_LadderMove;
 };
 

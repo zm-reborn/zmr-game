@@ -164,6 +164,8 @@ private:
 	float				m_flZoomEnd;
 	float				m_flZoomRate;
 	float				m_flZoomStartTime;
+
+    friend class CZMGameMovement;
 };
 
 inline C_ZMPlayer* ToZMPlayer( C_BaseEntity* pEntity )
