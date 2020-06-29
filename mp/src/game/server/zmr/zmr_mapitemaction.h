@@ -3,8 +3,12 @@
 
 class CEntityMapData;
 
+//
+// Item action system performs custom actions on map entities (items, ie. weapons and ammo)
+//
 namespace ZMItemAction
 {
+    // Every item belongs to one or more classes.
     enum ItemClass_t
     {
         CLASS_WEAPON            = ( 1 << 0 ),
@@ -38,154 +42,10 @@ namespace ZMItemAction
         TIME_ENTSPAWN // Entity spawns (info_loadout)
     };
 
-    struct ItemBaseData_t;
-    struct ItemClassData_t;
-    struct ItemEntData_t;
-    class CZMMapItemAction;
-
-    typedef CUtlVector<ItemEntData_t*> ZMItems_t;
-
 
     //
-    struct ZMMapData_t
-    {
-        bool bIsOldMap;
-        ZMItems_t items;
-    };
+    // Holds the data for a specific item. An item is tied to an entity classname.
     //
-
-
-    //
-    class CZMMapItemSystem : public CAutoGameSystem
-    {
-    public:
-        CZMMapItemSystem();
-        ~CZMMapItemSystem();
-
-
-        // Entry points
-        virtual void LevelInitPreEntity() OVERRIDE;
-
-        void        SpawnItems();
-        const char* OnCreateItem( const char* classname );
-
-
-
-        static bool         ShouldAffectEntity( CEntityMapData& entData, char* buffer );
-        static bool         AffectsItem( const char* classname );
-        static unsigned int GetItemFlags( const char* classname );
-        static unsigned int GetClassFlag( const char* classname );
-        static const ItemBaseData_t* GetItemData( int index );
-        static const ItemBaseData_t* GetItemData( const char* itemclass );
-        static bool         GetMapItemsByClass( unsigned int flags, CUtlVector<const ItemBaseData_t*>& items );
-
-
-
-        static const ItemBaseData_t m_vItemData[];
-        static const ItemClassData_t m_vItemClasses[];
-
-        static int FindClassByName( const char* classname );
-        static int FindItemByClassname( const char* classname );
-
-    private:
-        bool LoadActionsFromFile( const char* filename );
-        bool LoadActionsFromMapFile();
-
-        void GetCopiedData( ZMItems_t& items );
-        void LoadItemsFromMap();
-        void ComputeMapVersion();
-
-
-
-        ZMItems_t m_vEntData;
-        CUtlVector<CZMMapItemAction*> m_vActions;
-
-
-        bool m_bIsOldMap;
-    };
-    //
-
-
-    //
-    class CZMMapItemAction
-    {
-    public:
-        virtual int     PerformAction( ZMMapData_t& mapdata, ItemSpawnTime_t status ) { return false; }
-        virtual bool    AffectsItem( ItemEntData_t& itemEntData, ItemSpawnTime_t status ) const { return false; }
-    };
-    //
-
-
-    //
-    class CZMMapItemActionAdd : public CZMMapItemAction
-    {
-    private:
-        CZMMapItemActionAdd();
-    public:
-        ~CZMMapItemActionAdd();
-
-
-        static void                 LoadActions( KeyValues* kv, CUtlVector<CZMMapItemAction*>& actions );
-        static CZMMapItemActionAdd* Create( KeyValues* kv );
-
-        virtual int PerformAction( ZMMapData_t& mapdata, ItemSpawnTime_t status ) { return false; }
-    };
-    //
-
-
-    //
-    class CZMMapItemActionReplace : public CZMMapItemAction
-    {
-    private:
-        CZMMapItemActionReplace();
-    public:
-        ~CZMMapItemActionReplace();
-
-
-        static void                     LoadActions( KeyValues* kv, CUtlVector<CZMMapItemAction*>& actions );
-        static CZMMapItemActionReplace* Create( KeyValues* kv );
-
-
-        virtual int     PerformAction( ZMMapData_t& mapdata, ItemSpawnTime_t status ) OVERRIDE;
-        virtual bool    AffectsItem( ItemEntData_t& itemEntData, ItemSpawnTime_t status ) const OVERRIDE;
-
-    private:
-        bool CalcChance();
-        void ReplacePerc( ZMItems_t& items );
-
-
-        bool ParseReplaceTarget( const char* target );
-        bool ParseReplaceFilter( KeyValues* kv );
-
-
-        bool Replace( ItemEntData_t& itemEntData );
-
-
-        float m_flChanceFrac;
-        float m_flReplaceFrac;
-
-        CUtlVector<CZMMapItemActionReplace*> m_vSubReplaces;
-    
-
-
-        unsigned int m_fFlag;
-        char m_szClassname[64];
-
-        float m_flRangeCheck;
-        Vector m_vecRangeCheckPos;
-        unsigned int m_fFilterFlags;
-        int m_iFilterItemIndex;
-
-        bool m_bMapItemsOnly;
-
-        bool m_bOnlyOldMaps;
-
-
-        friend class CZMMapItemActionReplace;
-    };
-    //
-
-
     struct ItemBaseData_t
     {
         ItemBaseData_t( const char* classname, unsigned int flags )
@@ -203,20 +63,28 @@ namespace ZMItemAction
         unsigned int m_fClassFlags;
     };
 
-    struct ItemClassData_t
+
+    //
+    // Holds the data for a specific class. A class is tied to its class name.
+    //
+    struct ClassData_t
     {
-        ItemClassData_t( const char* classname, unsigned int flag )
+        ClassData_t( const char* name, unsigned int flag )
         {
-            m_pszClassname = classname;
+            m_pszName = name;
             m_fClassFlag = flag;
         }
 
 
-        const char* m_pszClassname;
+        const char* m_pszName;
         unsigned int m_fClassFlag;
     };
 
 
+    //
+    // A wrapper for item data.
+    // The base data is stored in a keyvalue string. This will cache certain values for easy access.
+    //
     struct ItemEntData_t
     {
         ItemEntData_t( const char* pszClassname, unsigned int flags )
@@ -256,6 +124,155 @@ namespace ZMItemAction
     };
 
 
+    typedef CUtlVector<ItemEntData_t*> ItemList_t;
+
+    //
+    // The data actions will use.
+    //
+    struct ActionData_t
+    {
+        bool bIsOldMap;
+        ItemList_t items;
+    };
+    //
+
+
+    //
+    // The base action class.
+    // An action will affect items in some way.
+    //
+    abstract_class CZMMapItemAction
+    {
+    public:
+        virtual int     PerformAction( ActionData_t& actiondata, ItemSpawnTime_t status ) { return false; }
+        virtual bool    AffectsItem( ItemEntData_t& itemEntData, ItemSpawnTime_t status ) const { return false; }
+    };
+    //
+
+
+    //
+    // Add action. Add items to map.
+    //
+    class CZMMapItemActionAdd : public CZMMapItemAction
+    {
+    private:
+        CZMMapItemActionAdd();
+    public:
+        ~CZMMapItemActionAdd();
+
+
+        static void                 LoadActions( KeyValues* kv, CUtlVector<CZMMapItemAction*>& actions );
+        static CZMMapItemActionAdd* Create( KeyValues* kv );
+
+        virtual int PerformAction( ActionData_t& actiondata, ItemSpawnTime_t status ) { return false; }
+    };
+    //
+
+
+    //
+    // Replace action. Replace existing items.
+    //
+    class CZMMapItemActionReplace : public CZMMapItemAction
+    {
+    private:
+        CZMMapItemActionReplace();
+    public:
+        ~CZMMapItemActionReplace();
+
+
+        static void                     LoadActions( KeyValues* kv, CUtlVector<CZMMapItemAction*>& actions );
+        static CZMMapItemActionReplace* Create( KeyValues* kv );
+
+
+        virtual int     PerformAction( ActionData_t& actiondata, ItemSpawnTime_t status ) OVERRIDE;
+        virtual bool    AffectsItem( ItemEntData_t& itemEntData, ItemSpawnTime_t status ) const OVERRIDE;
+
+    private:
+        bool CalcChance();
+        void ReplacePerc( ItemList_t& items );
+
+
+        bool ParseReplaceTarget( const char* target );
+        bool ParseReplaceFilter( KeyValues* kv );
+
+
+        bool Replace( ItemEntData_t& itemEntData );
+
+
+        float m_flChanceFrac;
+        float m_flReplaceFrac;
+
+        CUtlVector<CZMMapItemActionReplace*> m_vSubReplaces;
+    
+
+
+        unsigned int m_fFlag;
+        char m_szClassname[64];
+
+        float m_flRangeCheck;
+        Vector m_vecRangeCheckPos;
+        unsigned int m_fFilterFlags;
+        int m_iFilterItemIndex;
+
+        bool m_bMapItemsOnly;
+
+        bool m_bOnlyOldMaps;
+
+
+        friend class CZMMapItemActionReplace;
+    };
+    //
+
+
+    //
+    class CZMMapItemSystem : public CAutoGameSystem
+    {
+    public:
+        CZMMapItemSystem();
+        ~CZMMapItemSystem();
+
+
+        // Entry points
+        virtual void LevelInitPreEntity() OVERRIDE;
+
+        void        SpawnItems();
+        const char* OnCreateItem( const char* classname );
+
+
+
+        static bool         ShouldAffectEntity( CEntityMapData& entData, char* buffer );
+        static bool         AffectsItem( const char* classname );
+        static unsigned int GetItemFlags( const char* classname );
+        static unsigned int GetClassFlagByName( const char* itemclass );
+        static const ItemBaseData_t* GetItemData( int index );
+        static const ItemBaseData_t* GetItemData( const char* itemclass );
+        static bool         GetMapItemsByClass( unsigned int classflags, CUtlVector<const ItemBaseData_t*>& items );
+
+
+
+        static const ItemBaseData_t m_ItemData[];
+        static const ClassData_t m_Classes[];
+
+        static int FindItemClassByName( const char* itemclass );
+        static int FindItemByClassname( const char* classname );
+
+    private:
+        bool LoadActionsFromFile( const char* filename );
+        bool LoadActionsFromMapFile();
+
+        void GetCopiedData( ItemList_t& items );
+        void LoadItemsFromMap();
+        void ComputeMapVersion();
+
+
+
+        ItemList_t m_vEntData;
+        CUtlVector<CZMMapItemAction*> m_vActions;
+
+
+        bool m_bIsOldMap;
+    };
+    //
 
     extern CZMMapItemSystem g_ZMMapItemSystem;
 }
