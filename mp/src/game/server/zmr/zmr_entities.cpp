@@ -1724,7 +1724,7 @@ void CZMEntLoadout::GiveWeapon( CZMPlayer* pPlayer, int loadout_wep )
     else
     {
         // It's a class. Get all the items.
-        auto flag = ZMItemAction::g_ZMMapItemSystem.GetClassFlag( loadoutClass );
+        auto flag = ZMItemAction::g_ZMMapItemSystem.GetClassFlagByName( loadoutClass );
         ZMItemAction::g_ZMMapItemSystem.GetMapItemsByClass( flag, items );
     }
 

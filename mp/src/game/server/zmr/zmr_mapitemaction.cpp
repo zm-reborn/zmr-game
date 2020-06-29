@@ -25,14 +25,14 @@ using namespace ZMItemAction;
 
 
 #define ITEMDATA( classname, flags )             ItemBaseData_t( #classname, flags )
-#define CLASSDATA( classname, flag )         ItemClassData_t( #classname, flag )
+#define CLASSDATA( classname, flag )         ClassData_t( #classname, flag )
 
 
 
 //
 //
 //
-ItemBaseData_t const CZMMapItemSystem::m_vItemData[] =
+ItemBaseData_t const CZMMapItemSystem::m_ItemData[] =
 {
     // Weapons
     ITEMDATA( weapon_zm_shotgun, CLASS_WEAPON|CLASS_SHOTGUN|CLASS_PRIMARY ),
@@ -61,7 +61,7 @@ ItemBaseData_t const CZMMapItemSystem::m_vItemData[] =
     ITEMDATA( item_item_crate, CLASS_ITEM_CRATE ),
 };
 
-const ItemClassData_t CZMMapItemSystem::m_vItemClasses[] =
+const ClassData_t CZMMapItemSystem::m_Classes[] =
 {
     // Weapons
     CLASSDATA( Weapon, CLASS_WEAPON ),
@@ -124,7 +124,10 @@ void CZMMapItemSystem::ComputeMapVersion()
     m_bIsOldMap = true;
 
 
-    static const int indices[] =
+    //
+    // Check if the map has any new items that don't exist in old maps.
+    //
+    static const int newitems[] =
     {
         FindItemByClassname( "weapon_zm_shotgun_sporting" ),
     };
@@ -133,11 +136,11 @@ void CZMMapItemSystem::ComputeMapVersion()
     {
         int index = FindItemByClassname( m_vEntData[i]->pszItemClassname );
 
-        for ( int j = 0; j < ARRAYSIZE( indices ); j++ )
+        for ( int j = 0; j < ARRAYSIZE( newitems ); j++ )
         {
-            Assert( indices[j] != -1 );
+            Assert( newitems[j] != -1 );
 
-            if ( indices[j] == index )
+            if ( newitems[j] == index )
             {
                 m_bIsOldMap = false;
                 return;
@@ -230,13 +233,13 @@ void CZMMapItemSystem::LoadItemsFromMap()
     }
 }
 
-unsigned int CZMMapItemSystem::GetClassFlag( const char* classname )
+unsigned int CZMMapItemSystem::GetClassFlagByName( const char* itemclass )
 {
-    int index = FindClassByName( classname );
+    int index = FindItemClassByName( itemclass );
 
     if ( index != -1 )
     {
-        return m_vItemClasses[index].m_fClassFlag;
+        return m_Classes[index].m_fClassFlag;
     }
     
     return 0;
@@ -248,21 +251,21 @@ unsigned int CZMMapItemSystem::GetItemFlags( const char* classname )
 
     if ( index != -1 )
     {
-        return m_vItemData[index].m_fClassFlags;
+        return m_ItemData[index].m_fClassFlags;
     }
     
     return 0;
 }
 
-bool CZMMapItemSystem::GetMapItemsByClass( unsigned int flags, CUtlVector<const ItemBaseData_t*>& items )
+bool CZMMapItemSystem::GetMapItemsByClass( unsigned int classflags, CUtlVector<const ItemBaseData_t*>& items )
 {
     int num = 0;
 
-    for ( int i = 0; i < ARRAYSIZE( m_vItemData ); i++ )
+    for ( int i = 0; i < ARRAYSIZE( m_ItemData ); i++ )
     {
-        if ( m_vItemData[i].m_fClassFlags & flags )
+        if ( m_ItemData[i].m_fClassFlags & classflags )
         {
-            items.AddToTail( &m_vItemData[i] );
+            items.AddToTail( &m_ItemData[i] );
             ++num;
         }
     }
@@ -270,11 +273,11 @@ bool CZMMapItemSystem::GetMapItemsByClass( unsigned int flags, CUtlVector<const 
     return num > 0;
 }
 
-int CZMMapItemSystem::FindClassByName( const char* classname )
+int CZMMapItemSystem::FindItemClassByName( const char* itemclass )
 {
-    for ( int i = 0; i < ARRAYSIZE( m_vItemClasses ); i++ )
+    for ( int i = 0; i < ARRAYSIZE( m_Classes ); i++ )
     {
-        if ( Q_stricmp( m_vItemClasses[i].m_pszClassname, classname ) == 0 )
+        if ( Q_stricmp( m_Classes[i].m_pszName, itemclass ) == 0 )
         {
             return i;
         }
@@ -285,9 +288,9 @@ int CZMMapItemSystem::FindClassByName( const char* classname )
 
 int CZMMapItemSystem::FindItemByClassname( const char* classname )
 {
-    for ( int i = 0; i < ARRAYSIZE( m_vItemData ); i++ )
+    for ( int i = 0; i < ARRAYSIZE( m_ItemData ); i++ )
     {
-        if ( Q_stricmp( m_vItemData[i].m_pszClassname, classname ) == 0 )
+        if ( Q_stricmp( m_ItemData[i].m_pszClassname, classname ) == 0 )
         {
             return i;
         }
@@ -306,8 +309,8 @@ const char* CZMMapItemSystem::OnCreateItem( const char* classname )
 
 
     ItemEntData_t itemdata(
-        m_vItemData[iItemIndex].m_pszClassname,
-        m_vItemData[iItemIndex].m_fClassFlags );
+        m_ItemData[iItemIndex].m_pszClassname,
+        m_ItemData[iItemIndex].m_fClassFlags );
 
 
     bool bAffected = false;
@@ -330,21 +333,24 @@ const char* CZMMapItemSystem::OnCreateItem( const char* classname )
 
 
 
-    ZMMapData_t mapdata;
-    mapdata.bIsOldMap = m_bIsOldMap;
-    mapdata.items.AddToTail( &itemdata );
+    ActionData_t actiondata;
+    actiondata.bIsOldMap = m_bIsOldMap;
+    actiondata.items.AddToTail( &itemdata );
 
 
     FOR_EACH_VEC( m_vActions, i )
     {
-        m_vActions[i]->PerformAction( mapdata, TIME_ENTSPAWN );
+        m_vActions[i]->PerformAction( actiondata, TIME_ENTSPAWN );
     }
 
 
     return itemdata.pszItemClassname;
 }
 
-void CZMMapItemSystem::GetCopiedData( ZMItems_t& items )
+//
+// Returns a new list of items from the map ent data.
+//
+void CZMMapItemSystem::GetCopiedData( ItemList_t& items )
 {
     FOR_EACH_VEC( m_vEntData, i )
     {
@@ -352,21 +358,24 @@ void CZMMapItemSystem::GetCopiedData( ZMItems_t& items )
     }
 }
 
+//
+// Force our system to spawn the entities we are holding.
+//
 void CZMMapItemSystem::SpawnItems()
 {
-    ZMMapData_t mapdata;
-    mapdata.bIsOldMap = m_bIsOldMap;
+    ActionData_t actiondata;
+    actiondata.bIsOldMap = m_bIsOldMap;
 
 
-    GetCopiedData( mapdata.items );
-    int len = mapdata.items.Count();
+    GetCopiedData( actiondata.items );
+    int len = actiondata.items.Count();
     if ( len < 1 )
         return;
 
 
     FOR_EACH_VEC( m_vActions, i )
     {
-        m_vActions[i]->PerformAction( mapdata, TIME_WORLDRESET );
+        m_vActions[i]->PerformAction( actiondata, TIME_WORLDRESET );
     }
 
 
@@ -375,7 +384,7 @@ void CZMMapItemSystem::SpawnItems()
 
     for ( int i = 0; i < len; i++ )
     {
-        auto* pEntData = mapdata.items[i];
+        auto* pEntData = actiondata.items[i];
 
 
         auto* pEnt = CreateEntityByName( pEntData->pszItemClassname );
@@ -395,7 +404,7 @@ void CZMMapItemSystem::SpawnItems()
     }
 
 
-    mapdata.items.PurgeAndDeleteElements();
+    actiondata.items.PurgeAndDeleteElements();
 
 
     bool bAsyncAnims = mdlcache->SetAsyncLoad( MDLCACHE_ANIMBLOCK, false );
@@ -434,9 +443,9 @@ bool CZMMapItemSystem::ShouldAffectEntity( CEntityMapData& entData, char* buffer
 
 const ItemBaseData_t* CZMMapItemSystem::GetItemData( int index )
 {
-    if ( index >= 0 && index < ARRAYSIZE( m_vItemData ) )
+    if ( index >= 0 && index < ARRAYSIZE( m_ItemData ) )
     {
-        return &m_vItemData[index];
+        return &m_ItemData[index];
     }
 
     return nullptr;
@@ -498,7 +507,7 @@ bool CZMMapItemActionReplace::CalcChance()
     return true;
 }
 
-void CZMMapItemActionReplace::ReplacePerc( ZMItems_t& items )
+void CZMMapItemActionReplace::ReplacePerc( ItemList_t& items )
 {
     // Remove some of items from our list
 
@@ -515,14 +524,14 @@ void CZMMapItemActionReplace::ReplacePerc( ZMItems_t& items )
     }
 }
 
-int CZMMapItemActionReplace::PerformAction( ZMMapData_t& mapdata, ItemSpawnTime_t status )
+int CZMMapItemActionReplace::PerformAction( ActionData_t& actiondata, ItemSpawnTime_t status )
 {
     if ( !CalcChance() )
     {
         return 0;
     }
 
-    if ( m_bOnlyOldMaps && !mapdata.bIsOldMap )
+    if ( m_bOnlyOldMaps && !actiondata.bIsOldMap )
     {
         return 0;
     }
@@ -533,13 +542,13 @@ int CZMMapItemActionReplace::PerformAction( ZMMapData_t& mapdata, ItemSpawnTime_
     {
         // Do the replacing
 
-        ZMItems_t myitems;
+        ItemList_t myitems;
 
-        FOR_EACH_VEC( mapdata.items, i )
+        FOR_EACH_VEC( actiondata.items, i )
         {
-            if ( AffectsItem( *mapdata.items[i], status ) )
+            if ( AffectsItem( *actiondata.items[i], status ) )
             {
-                myitems.AddToTail( mapdata.items[i] );
+                myitems.AddToTail( actiondata.items[i] );
             }
         }
     
@@ -559,7 +568,7 @@ int CZMMapItemActionReplace::PerformAction( ZMMapData_t& mapdata, ItemSpawnTime_
 
     FOR_EACH_VEC( m_vSubReplaces, i )
     {
-        nChanged += m_vSubReplaces[i]->PerformAction( mapdata, status );
+        nChanged += m_vSubReplaces[i]->PerformAction( actiondata, status );
     }
 
     return nChanged;
@@ -646,8 +655,8 @@ bool CZMMapItemActionReplace::Replace( ItemEntData_t& itemEntData )
         int iItemIndex = CZMMapItemSystem::FindItemByClassname( classname );
         if ( iItemIndex != -1 )
         {
-            itemEntData.pszItemClassname = CZMMapItemSystem::m_vItemData[iItemIndex].m_pszClassname;
-            itemEntData.fClassFlags = CZMMapItemSystem::m_vItemData[iItemIndex].m_fClassFlags;
+            itemEntData.pszItemClassname = CZMMapItemSystem::m_ItemData[iItemIndex].m_pszClassname;
+            itemEntData.fClassFlags = CZMMapItemSystem::m_ItemData[iItemIndex].m_fClassFlags;
         }
         else
         {
@@ -727,7 +736,7 @@ CZMMapItemActionReplace* CZMMapItemActionReplace::Create( KeyValues* kv )
 
 bool CZMMapItemActionReplace::ParseReplaceTarget( const char* target )
 {
-    auto flag = CZMMapItemSystem::GetClassFlag( target );
+    auto flag = CZMMapItemSystem::GetClassFlagByName( target );
 
     if ( flag )
     {
@@ -755,7 +764,7 @@ bool CZMMapItemActionReplace::ParseReplaceFilter( KeyValues* kv )
     }
 
 
-    m_fFilterFlags = CZMMapItemSystem::GetClassFlag( classfilter );
+    m_fFilterFlags = CZMMapItemSystem::GetClassFlagByName( classfilter );
     if ( !m_fFilterFlags )
     {
         m_iFilterItemIndex = CZMMapItemSystem::FindItemByClassname( classfilter );
@@ -856,8 +865,8 @@ ItemEntData_t* ItemEntData_t::Create( const char* pszEntData )
         return nullptr;
 
 
-    const char* classname = CZMMapItemSystem::m_vItemData[iItemIndex].m_pszClassname;
-    flags = CZMMapItemSystem::m_vItemData[iItemIndex].m_fClassFlags;
+    const char* classname = CZMMapItemSystem::m_ItemData[iItemIndex].m_pszClassname;
+    flags = CZMMapItemSystem::m_ItemData[iItemIndex].m_fClassFlags;
     if ( !flags )
         return nullptr;
 
