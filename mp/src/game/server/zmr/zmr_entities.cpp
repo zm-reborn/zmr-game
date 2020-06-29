@@ -295,9 +295,9 @@ void CZMEntZombieSpawn::Spawn()
 
     
     CBaseEntity* pEnt = nullptr;
-    while ( m_pRallyPoint == nullptr && (pEnt = gEntList.FindEntityByName( pEnt, m_sRallyName )) != nullptr )
+    while ( !m_hRallyPoint.Get() && (pEnt = gEntList.FindEntityByName( pEnt, m_sRallyName )) != nullptr )
     {
-        m_pRallyPoint = dynamic_cast<CZMEntRallyPoint*>( pEnt );
+        m_hRallyPoint.Set( dynamic_cast<CZMEntRallyPoint*>( pEnt ) );
     }
 }
 
@@ -480,11 +480,13 @@ void CZMEntZombieSpawn::SendMenuUpdate()
 
 void CZMEntZombieSpawn::SetRallyPoint( const Vector& pos )
 {
-    if ( !m_pRallyPoint )
+    auto* pRallypoint = m_hRallyPoint.Get();
+    if ( !pRallypoint )
     {
-        m_pRallyPoint = dynamic_cast<CZMEntRallyPoint*>( CBaseEntity::Create( "info_rallypoint", pos, vec3_angle, this ) );
+        pRallypoint = dynamic_cast<CZMEntRallyPoint*>( CBaseEntity::Create( "info_rallypoint", pos, vec3_angle, this ) );
+        m_hRallyPoint.Set( pRallypoint );
 
-        if ( !m_pRallyPoint )
+        if ( !pRallypoint )
         {
             Warning( "Unable to create rally point for zombie spawn %i!\n", entindex() );
         }
@@ -492,7 +494,7 @@ void CZMEntZombieSpawn::SetRallyPoint( const Vector& pos )
         return;
     }
 
-    m_pRallyPoint->Teleport( &pos, nullptr, nullptr );
+    pRallypoint->Teleport( &pos, nullptr, nullptr );
 }
 
 void CZMEntZombieSpawn::SpawnThink()
@@ -630,17 +632,18 @@ CZMBaseZombie* CZMEntZombieSpawn::CreateZombie( ZombieClass_t zclass )
     }
 
 
-    if ( m_pRallyPoint )
+    auto* pRallypoint = m_hRallyPoint.Get();
+    if ( pRallypoint )
     {
         DevMsg( "Commanding zombie to rallypoint...\n" );
 
         // Face the rallypoint instead.
-        Vector dir = m_pRallyPoint->GetAbsOrigin() - pZombie->GetAbsOrigin();
+        Vector dir = pRallypoint->GetAbsOrigin() - pZombie->GetAbsOrigin();
         ang.x = ang.z = 0.f;
         ang.y = RAD2DEG( atan2f( dir.y, dir.x ) );
         pZombie->SetAbsAngles( ang );
 
-        pZombie->Command( nullptr, m_pRallyPoint->GetAbsOrigin(), 256.0f ); // Some additional tolerance.
+        pZombie->Command( nullptr, pRallypoint->GetAbsOrigin(), 256.0f ); // Some additional tolerance.
     }
     
 
@@ -692,7 +695,7 @@ CBaseEntity* CZMEntZombieSpawn::FindSpawnPoint( CZMBaseZombie* pZombie, Vector& 
 
                     if ( recursive )
                     {
-                        Warning( "Detected recursion in spawn nodes!" );
+                        Warning( "Detected recursion in spawn nodes!\n" );
                         break;
                     }
 
@@ -724,7 +727,7 @@ CBaseEntity* CZMEntZombieSpawn::FindSpawnPoint( CZMBaseZombie* pZombie, Vector& 
         // Try random node.
         pNode = m_vSpawnNodes.Element( random->RandomInt( 0, m_vSpawnNodes.Count() - 1 ) );
 
-        if ( pZombie->CanSpawn( pNode->GetAbsOrigin() ) )
+        if ( pNode && pZombie->CanSpawn( pNode->GetAbsOrigin() ) )
         {
             outpos = pNode->GetAbsOrigin();
             outang = pNode->GetAbsAngles();
@@ -736,7 +739,7 @@ CBaseEntity* CZMEntZombieSpawn::FindSpawnPoint( CZMBaseZombie* pZombie, Vector& 
         {
             pNode = m_vSpawnNodes.Element( i );
 
-            if ( pZombie->CanSpawn( pNode->GetAbsOrigin() ) )
+            if ( pNode && pZombie->CanSpawn( pNode->GetAbsOrigin() ) )
             {
                 outpos = pNode->GetAbsOrigin();
                 outang = pNode->GetAbsAngles();

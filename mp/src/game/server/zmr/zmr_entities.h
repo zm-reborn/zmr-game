@@ -95,6 +95,9 @@ struct queue_info_t
     int m_iSpawnerIndex;
 };
 
+class CZMEntSpawnNode;
+class CZMEntRallyPoint;
+
 class CZMEntZombieSpawn : public CZMEntBaseUsable
 {
 public:
@@ -161,8 +164,8 @@ private:
 
     CUtlVector<queue_info_t> m_vSpawnQueue;
 
-    CUtlVector<CZMEntSpawnNode*> m_vSpawnNodes;
-    CZMEntRallyPoint* m_pRallyPoint;
+    CUtlVector<CHandle<CZMEntSpawnNode>> m_vSpawnNodes;
+    CHandle<CZMEntRallyPoint> m_hRallyPoint;
 
 
     //int m_nSpawnQueueCapacity;
@@ -270,6 +273,8 @@ private:
 
     Trap
 */
+class CZMEntManipulateTrigger;
+
 class CZMEntManipulate : public CZMEntBaseUsable
 {
 public:
@@ -320,7 +325,7 @@ private:
 
     bool m_bRemoveOnTrigger;
 
-    CUtlVector<CZMEntManipulateTrigger*> m_vTriggers;
+    CUtlVector<CHandle<CZMEntManipulateTrigger>> m_vTriggers;
 };
 
 
@@ -450,6 +455,8 @@ private:
 /*
     Phys explosion
 */
+class CEnvSpark;
+
 class CZMPhysExplosion : public CServerOnlyPointEntity
 {
 public:
@@ -481,7 +488,7 @@ private:
 
     void DelayedExplode( float delay );
 
-    EHANDLE m_hSpark;
+    CHandle<CEnvSpark> m_hSpark;
 
 
     float m_flMagnitude;
