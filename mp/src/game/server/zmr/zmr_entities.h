@@ -157,6 +157,7 @@ private:
     void StartSpawning();
     void StopSpawning();
 
+    void InitSpawnNodes();
     CBaseEntity* FindSpawnPoint( CZMBaseZombie* pZombie, Vector& output, QAngle& outang );
 
     void SetNextSpawnThink();
@@ -180,6 +181,8 @@ private:
 
     //int m_fZombieFlags;
     CNetworkVar( int, m_fZombieFlags );
+
+    int m_iZombieNodeCounter;
 };
 
 

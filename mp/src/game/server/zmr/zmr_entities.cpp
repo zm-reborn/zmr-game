@@ -258,6 +258,8 @@ CZMEntZombieSpawn::CZMEntZombieSpawn()
     {
         m_iZombieCosts.Set(i, -1);
     }
+
+    m_iZombieNodeCounter = 0;
 }
 
 void CZMEntZombieSpawn::Precache()
@@ -270,6 +272,8 @@ void CZMEntZombieSpawn::Spawn()
     BaseClass::Spawn();
 
     SetModel( MODEL_ZOMBIESPAWN );
+
+    InitSpawnNodes();
 
 
     //if ( m_nSpawnQueueCapacity < 1 )
@@ -590,7 +594,7 @@ CZMBaseZombie* CZMEntZombieSpawn::CreateZombie( ZombieClass_t zclass )
     Vector spawnpos;
     QAngle ang = vec3_angle;
 
-    CBaseEntity* pSpawnPoint = FindSpawnPoint( pZombie, spawnpos, ang );
+    auto* pSpawnPoint = FindSpawnPoint( pZombie, spawnpos, ang );
     if ( !pSpawnPoint )
     {
         UTIL_RemoveImmediate( pZombie );
@@ -650,93 +654,92 @@ CZMBaseZombie* CZMEntZombieSpawn::CreateZombie( ZombieClass_t zclass )
     return pZombie;
 }
 
+void CZMEntZombieSpawn::InitSpawnNodes()
+{
+    if ( m_vSpawnNodes.Count() )
+        return;
+
+ 
+    CZMEntSpawnNode* temp;
+    bool recursive = false;
+
+    CZMEntSpawnNode* start = nullptr;
+
+    CBaseEntity* pEnt = nullptr;
+    while ( start == nullptr && (pEnt = gEntList.FindEntityByName( pEnt, m_sFirstNodeName )) != nullptr )
+    {
+        start = dynamic_cast<CZMEntSpawnNode*>( pEnt );
+    }
+
+    if ( start )
+    {
+        pEnt = nullptr;
+
+        CZMEntSpawnNode* next = start;
+
+        m_vSpawnNodes.AddToTail( next );
+
+        while ( (pEnt = gEntList.FindEntityByName( pEnt, next->m_sNextNodeName )) != nullptr )
+        {
+            temp = dynamic_cast<CZMEntSpawnNode*>( pEnt );
+
+            if ( temp )
+            {
+                // Check for recursion.
+                for ( int i = 0; i < m_vSpawnNodes.Count(); i++ )
+                {
+                        if ( temp == m_vSpawnNodes.Element( i ) )
+                        {
+                            recursive = true;
+                            break;
+                        }
+                }
+
+                if ( recursive )
+                {
+                    Warning( "Detected recursion in spawn nodes!\n" );
+                    break;
+                }
+
+                pEnt = nullptr;
+                next = temp;
+
+                m_vSpawnNodes.AddToTail( next );
+            }
+        }
+    }
+}
+
 CBaseEntity* CZMEntZombieSpawn::FindSpawnPoint( CZMBaseZombie* pZombie, Vector& outpos, QAngle& outang )
 {
     if ( !pZombie ) return nullptr;
 
 
-    // We have no spawn nodes, so find em.
-    if ( !m_vSpawnNodes.Count() )
-    {
-        CZMEntSpawnNode* temp;
-        bool recursive = false;
+    const int nNodes =  m_vSpawnNodes.Count();
 
-        CZMEntSpawnNode* start = nullptr;
-
-        CBaseEntity* pEnt = nullptr;
-        while ( start == nullptr && (pEnt = gEntList.FindEntityByName( pEnt, m_sFirstNodeName )) != nullptr )
-        {
-            start = dynamic_cast<CZMEntSpawnNode*>( pEnt );
-        }
-
-        if ( start )
-        {
-            pEnt = nullptr;
-
-            CZMEntSpawnNode* next = start;
-
-            m_vSpawnNodes.AddToTail( next );
-
-            while ( (pEnt = gEntList.FindEntityByName( pEnt, next->m_sNextNodeName )) != nullptr )
-            {
-                temp = dynamic_cast<CZMEntSpawnNode*>( pEnt );
-
-                if ( temp )
-                {
-                    // Check for recursion.
-                    for ( int i = 0; i < m_vSpawnNodes.Count(); i++ )
-                    {
-                            if ( temp == m_vSpawnNodes.Element( i ) )
-                            {
-                                recursive = true;
-                                break;
-                            }
-                    }
-
-                    if ( recursive )
-                    {
-                        Warning( "Detected recursion in spawn nodes!\n" );
-                        break;
-                    }
-
-                    pEnt = nullptr;
-                    next = temp;
-
-                    m_vSpawnNodes.AddToTail( next );
-                }
-            }
-        }
-        else
-        {
-            CBaseEntity* pEnt = gEntList.FindEntityByName( nullptr, m_sFirstNodeName );
-
-            auto* pBrush = dynamic_cast<CZMEntTriggerSpawnVolume*>( pEnt );
-            if ( pBrush )
-            {
-                pBrush->GetPositionWithin( outpos );
-                return pBrush;
-            }
-        }
-    }
-
-
-    if ( m_vSpawnNodes.Count() )
+    //
+    // We have spawn nodes.
+    //
+    if ( nNodes )
     {
         CZMEntSpawnNode* pNode = nullptr;
 
-        // Try random node.
-        pNode = m_vSpawnNodes.Element( random->RandomInt( 0, m_vSpawnNodes.Count() - 1 ) );
+        ++m_iZombieNodeCounter;
+        if ( m_iZombieNodeCounter >= nNodes )
+            m_iZombieNodeCounter = 0;
 
-        if ( pNode && pZombie->CanSpawn( pNode->GetAbsOrigin() ) )
-        {
-            outpos = pNode->GetAbsOrigin();
-            outang = pNode->GetAbsAngles();
-            return pNode;
-        }
 
-        // Try any node.
-        for ( int i = 0; i < m_vSpawnNodes.Count(); i++ )
+        int startindex = m_iZombieNodeCounter;
+
+        int endindex = startindex - 1;
+        if ( endindex < 0 )
+            endindex = nNodes - 1;
+
+        for ( int i = startindex; i != endindex; i++ )
         {
+            if ( i >= nNodes )
+                i = 0;
+
             pNode = m_vSpawnNodes.Element( i );
 
             if ( pNode && pZombie->CanSpawn( pNode->GetAbsOrigin() ) )
@@ -745,6 +748,29 @@ CBaseEntity* CZMEntZombieSpawn::FindSpawnPoint( CZMBaseZombie* pZombie, Vector& 
                 outang = pNode->GetAbsAngles();
                 return pNode;
             }
+        }
+
+        // No open nodes found, just pick the next node
+        pNode = m_vSpawnNodes.Element( startindex );
+
+        if ( pNode )
+        {
+            outpos = pNode->GetAbsOrigin();
+            outang = pNode->GetAbsAngles();
+            return pNode;
+        }
+    }
+    //
+    // No nodes, check spawn volume.
+    //
+    else
+    {
+        auto* pBrush = dynamic_cast<CZMEntTriggerSpawnVolume*>( gEntList.FindEntityByName( nullptr, m_sFirstNodeName ) );
+
+        if ( pBrush )
+        {
+            pBrush->GetPositionWithin( outpos );
+            return pBrush;
         }
     }
 
