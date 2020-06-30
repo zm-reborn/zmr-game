@@ -63,6 +63,8 @@
 		"pos_x"	"float"
 		"pos_y"	"float"
 		"pos_z"	"float"
+		
+		"seed"	"short" // Seed for the random sound to be played. Negative value will be ignored.
 	}
 	
 	// Tell clients to reload their weapon configs.
