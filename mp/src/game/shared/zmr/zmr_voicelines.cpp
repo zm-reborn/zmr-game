@@ -177,7 +177,10 @@ void CZMVoiceLines::FireGameEvent( IGameEvent* pEvent )
             }
 
 
-            PlayVoiceLine( pOrigin, &pos, line );
+            int seed = pEvent->GetInt( "seed" );
+
+
+            PlayVoiceLine( pOrigin, &pos, line, seed );
         }
 
         
@@ -208,7 +211,7 @@ void CZMVoiceLines::FireGameEvent( IGameEvent* pEvent )
     }
 }
 
-void CZMVoiceLines::PlayVoiceLine( C_BasePlayer* pOrigin, const Vector* vecPos, const char* szLine )
+void CZMVoiceLines::PlayVoiceLine( C_BasePlayer* pOrigin, const Vector* vecPos, const char* szLine, int seed )
 {
     CLocalPlayerFilter filter;
     EmitSound_t params;
@@ -223,6 +226,12 @@ void CZMVoiceLines::PlayVoiceLine( C_BasePlayer* pOrigin, const Vector* vecPos, 
         params.m_pOrigin = vecPos;
     }
 
+    
+    if ( seed >= 0 )
+    {
+        RandomSeed( seed );
+    }
+    
     C_BaseEntity::EmitSound( filter, pOrigin ? pOrigin->entindex() : 0, params );
 }
 
@@ -283,6 +292,7 @@ void CZMVoiceLines::OnVoiceLine( CZMPlayer* pPlayer, int index )
         pEvent->SetFloat( "pos_x", origin.x );
         pEvent->SetFloat( "pos_y", origin.y );
         pEvent->SetFloat( "pos_z", origin.z );
+        pEvent->SetInt( "seed", RandomInt( 0, 100 ) );
         gameeventmanager->FireEvent( pEvent, false );
     }
 }

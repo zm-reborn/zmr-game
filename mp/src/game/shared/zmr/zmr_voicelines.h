@@ -49,7 +49,7 @@ public:
     virtual void FireGameEvent( IGameEvent* pEvent ) OVERRIDE;
 
 
-    static void PlayVoiceLine( C_BasePlayer* pOrigin, const Vector* vecPos, const char* szLine );
+    static void PlayVoiceLine( C_BasePlayer* pOrigin, const Vector* vecPos, const char* szLine, int seed = -1 );
 
     bool IsFemale( C_ZMPlayer* pPlayer ) const;
 #endif
