@@ -261,37 +261,6 @@ void CZMBaseWeapon::ItemPostFrame()
     // Check weapon idle anims.
     //
     WeaponIdle();
-
-
-//#ifdef GAME_DLL
-//    auto* pOwner = GetPlayerOwner();
-//    if ( !pOwner )
-//        return;
-//
-//
-//    // ZMRTODO: Put this somewhere else.
-//    auto* pVM = pOwner->GetViewModel( m_nViewModelIndex );
-//
-//    int iPoseParamIndex = pVM->LookupPoseParameter( "move_x" );
-//    if ( iPoseParamIndex != -1 )
-//    {
-//        float spd = pOwner->GetLocalVelocity().Length2D();
-//        float target = spd > 0.1f ? MIN( 1.0f, spd / 190.0f ) : 0.0f;
-//
-//        float cur = pVM->GetPoseParameter( iPoseParamIndex );
-//        float add = gpGlobals->frametime * 2.0f;
-//        if ( target < cur )
-//        {
-//            add *= -1.0f;
-//        }
-//        else if ( cur == target )
-//            return;
-//
-//        float newratio = cur + add;
-//
-//        pVM->SetPoseParameter( iPoseParamIndex, clamp( newratio, 0.0f, 1.0f ) );
-//    }
-//#endif
 }
 
 Activity CZMBaseWeapon::GetPrimaryAttackActivity()
@@ -416,7 +385,14 @@ void CZMBaseWeapon::WeaponIdle()
 {
     if ( HasWeaponIdleTimeElapsed() )
     {
-        SendWeaponAnim( GetIdleActivity() );
+        // Don't keep updating our activity as the idle should always loop.
+        // Resetting the idle animation manually can look bad when
+        // taking into account pose parameter anims.
+        auto curAct = GetActivity();
+        auto wantedAct = GetIdleActivity();
+
+        if ( curAct != wantedAct )
+            SendWeaponAnim( wantedAct );
     }
 }
 
@@ -1813,119 +1789,6 @@ void CZMBaseWeapon::Equip( CBaseCombatCharacter* pCharacter )
     BaseClass::Equip( pCharacter );
 }
 
-
-// Viewmodel stuff from basehl2mpcombatweapon.
-#ifdef CLIENT_DLL
-// Version of cl_bob* cvars that are actually useful...
-ConVar cl_bobcycle( "cl_bobcycle", "0.45", 0 , "How fast the bob cycles", true, 0.01f, false, 0.0f );
-ConVar cl_bobup( "cl_bobup", "0.5", 0 , "Don't change...", true, 0.01f, true, 0.99f );
-ConVar cl_bobvertscale( "cl_bobvertscale", "0.6", 0, "Vertical scale" ); // Def. is 0.1
-ConVar cl_boblatscale( "cl_boblatscale", "0.8", 0, "Lateral scale" );
-ConVar cl_bobenable( "cl_bobenable", "1" );
-
-float g_lateralBob;
-float g_verticalBob;
-
-float CZMBaseWeapon::CalcViewmodelBob()
-{
-    static float    bobtime;
-    static float    lastbobtime;
-    float           cycle;
-
-    float           bobup = cl_bobup.GetFloat();
-    float           bobcycle = cl_bobcycle.GetFloat();
-    
-
-    C_BasePlayer* player = GetPlayerOwner();
-
-    //NOTENOTE: For now, let this cycle continue when in the air, because it snaps badly without it
-
-    if (!player ||
-        !gpGlobals->frametime ||
-        bobcycle <= 0.0f ||
-        bobup <= 0.0f || bobup >= 1.0f)
-    {
-        return 0.0f;
-    }
-
-
-    float speed = player->GetLocalVelocity().Length2D();
-
-    speed = clamp( speed, -320, 320 );
-
-    float bob_offset = RemapVal( speed, 0, 320, 0.0f, 1.0f );
-    
-    bobtime += ( gpGlobals->curtime - lastbobtime ) * bob_offset;
-    lastbobtime = gpGlobals->curtime;
-
-    //Calculate the vertical bob
-    cycle = bobtime - (int)(bobtime/bobcycle)*bobcycle;
-    cycle /= bobcycle;
-
-    if ( cycle < bobup )
-    {
-        cycle = M_PI * cycle / bobup;
-    }
-    else
-    {
-        cycle = M_PI + M_PI*(cycle-bobup)/(1.0 - bobup);
-    }
-    
-    g_verticalBob = speed*0.005f;
-    g_verticalBob = g_verticalBob*0.3 + g_verticalBob*0.7*sin(cycle);
-
-    g_verticalBob = clamp( g_verticalBob, -7.0f, 4.0f );
-
-    //Calculate the lateral bob
-    cycle = bobtime - (int)(bobtime/bobcycle*2)*bobcycle*2;
-    cycle /= bobcycle*2;
-
-    if ( cycle < bobup )
-    {
-        cycle = M_PI * cycle / bobup;
-    }
-    else
-    {
-        cycle = M_PI + M_PI*(cycle-bobup)/(1.0 - bobup);
-    }
-
-    g_lateralBob = speed*0.005f;
-    g_lateralBob = g_lateralBob*0.3 + g_lateralBob*0.7*sin(cycle);
-    g_lateralBob = clamp( g_lateralBob, -7.0f, 4.0f );
-    
-    //NOTENOTE: We don't use this return value in our case (need to restructure the calculation function setup!)
-    return 0.0f;
-}
-
-void CZMBaseWeapon::AddViewmodelBob( CBaseViewModel *viewmodel, Vector& origin, QAngle& angles )
-{
-    if ( !cl_bobenable.GetBool() )
-        return;
-
-
-    Vector	forward, right;
-    AngleVectors( angles, &forward, &right, NULL );
-
-    CalcViewmodelBob();
-
-    // Apply bob, but scaled down to 40%
-    VectorMA( origin, g_verticalBob * cl_bobvertscale.GetFloat(), forward, origin );
-    
-    // Z bob a bit more
-    origin[2] += g_verticalBob * 0.1f;
-    
-    // bob the angles
-    angles[ ROLL ]	+= g_verticalBob * 0.5f;
-    angles[ PITCH ]	-= g_verticalBob * 0.4f;
-
-    angles[ YAW ]	-= g_lateralBob  * 0.3f;
-
-    VectorMA( origin, g_lateralBob * cl_boblatscale.GetFloat(), right, origin );
-}
-
-#else
-
-// Server stubs
 float CZMBaseWeapon::CalcViewmodelBob()
 {
     return 0.0f;
@@ -1934,11 +1797,6 @@ float CZMBaseWeapon::CalcViewmodelBob()
 void CZMBaseWeapon::AddViewmodelBob( CBaseViewModel *viewmodel, Vector &origin, QAngle &angles )
 {
 }
-
-#endif
-
-
-
 
 #ifndef CLIENT_DLL
 void CZMBaseWeapon::SaveReserveAmmo( CBaseCombatCharacter* pOwner )

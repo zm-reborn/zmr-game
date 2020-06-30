@@ -67,7 +67,7 @@ public:
 
 	virtual void			Spawn( void );
 
-	virtual CBaseEntity *GetOwner( void ) { return m_hOwner; };
+	CBaseEntity *GetOwner( void ) const { return m_hOwner; };
 
 	virtual void			AddEffects( int nEffects );
 	virtual void			RemoveEffects( int nEffects );
