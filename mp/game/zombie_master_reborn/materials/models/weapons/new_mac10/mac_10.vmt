@@ -1,21 +1,7 @@
-"VertexLitGeneric"
+PBR
 {
-	"$basetexture" "models/weapons/new_mac10/mac10_sheet"
-	
-	"$bumpmap" "models/weapons/new_mac10/mac10_sheet_n"
-	
-	"$surfaceprop" "metal"
-	
-	
-	$phong 1
-	$phongboost 1
-	$phongexponent 200
-	$phongfresnelranges 4
-	//$basemapluminancephongmask 1
-	
-	//"$envmap" "env_cubemap"
-	//"$envmapcontrast" ".6" // More contrast is usually good
-	//"$envmaptint" "[.5 .5 .5]" // Tone down the reflection
-	//"$envmapsaturation" "[.8 .8 .8]" // Saturate the reflection a bit
-	//"$normalmapalphaenvmapmask" 1
+	$basetexture "models/weapons/new_mac10/mac_10_bc"
+	$bumpmap "models/weapons/new_mac10/mac_10_normal"
+	$mraotexture	"models/weapons/new_mac10/mac_10_mrao"
+	$model 1
 }

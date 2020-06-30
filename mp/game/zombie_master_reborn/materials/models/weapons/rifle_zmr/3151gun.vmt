@@ -1,15 +1,18 @@
-VertexLitGeneric
+PBR
 {
-	"$basetexture" "models\weapons\rifle_zmr\gun_diff"
-	"$bumpmap" "models\weapons\rifle_zmr\gun_normspec"
-	"$surfaceprop" "metal"
-	
-	"$halflambert" "1"
-	"$model" 1
-
-
-	$phong 1
-	$phongexponenttexture models\weapons\rifle_zmr\gun_gloss
-	$phongboost	0.4
-	$phongfresnelranges	4
+	$basetexture "models/weapons/rifle_zmr/gun_bc"
+	$bumpmap "models/weapons/rifle_zmr/gun_n"
+	$mraotexture	"models/weapons/rifle_zmr/gun_mrao"
+	$model 1
+	//"$envmap" "env_cubemap"
+	//"$parallax" "1"
+	//"$parallaxdepth" "0.05"
+	//"$parallaxcenter" "0.5"
 }
+
+
+
+//	$basetexture	"models/dev/shaderball_cabbage_bc"
+//	$bumpmap		"models/dev/shaderball_cabbage_n"
+//	$mraotexture	"models/dev/shaderball_cabbage_mrao"
+//	$model			"1"
