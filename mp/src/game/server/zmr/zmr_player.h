@@ -275,6 +275,8 @@ public:
 
     void            UpdatePlayerZMVars();
 
+    void            UpdateFlashlight();
+
     void            GetMyRecipientFilter( CRecipientFilter& filter ) const;
 
     void InitZMFog();

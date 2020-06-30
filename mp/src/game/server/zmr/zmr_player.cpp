@@ -48,6 +48,11 @@ static ConVar zm_sv_npcheadpushoff( "zm_sv_npcheadpushoff", "200", FCVAR_NOTIFY 
 static ConVar zm_sv_comp_zmtargetname( "zm_sv_comp_zmtargetname", "", 0, "Gives the ZM a targetname on spawn. This is for compatibility with old maps!!!" );
 
 
+extern ConVar zm_sv_antiafk_punish;
+
+ConVar zm_sv_flashlightdrainrate( "zm_sv_flashlightdrainrate", "0.6", FCVAR_NOTIFY, "How fast the flashlight battery drains per second. (out of 100)" ); // Originally 0.4
+ConVar zm_sv_flashlightrechargerate( "zm_sv_flashlightrechargerate", "2.5", FCVAR_NOTIFY, "How fast the flashlight battery recharges per second. (out of 100)" ); // Originally 0.1
+
 
 
 void* SendProxy_SendNonLocalDataTable( const SendProp* pProp, const void* pStruct, const void* pVarData, CSendProxyRecipients* pRecipients, int objectID )
@@ -217,11 +222,6 @@ void CZMPlayer::NoteWeaponFired()
     }
 }
 
-extern ConVar zm_sv_antiafk_punish;
-
-ConVar zm_sv_flashlightdrainrate( "zm_sv_flashlightdrainrate", "0.6", FCVAR_NOTIFY, "How fast the flashlight battery drains per second. (out of 100)" ); // Originally 0.4
-ConVar zm_sv_flashlightrechargerate( "zm_sv_flashlightrechargerate", "0.6", FCVAR_NOTIFY, "How fast the flashlight battery recharges per second. (out of 100)" ); // Originally 0.1
-
 void CZMPlayer::PreThink()
 {
     // Erase our denied ammo.
@@ -258,26 +258,7 @@ void CZMPlayer::PreThink()
     {
         UpdateAccuracyRatio();
 
-
-        if ( FlashlightIsOn() )
-        {
-            SetFlashlightBattery( GetFlashlightBattery() - gpGlobals->frametime * zm_sv_flashlightdrainrate.GetFloat() );
-
-            if ( GetFlashlightBattery() < 0.0f )
-            {
-                SetFlashlightBattery( 0.0f );
-                FlashlightTurnOff();
-            }
-        }
-        else
-        {
-            SetFlashlightBattery( GetFlashlightBattery() + gpGlobals->frametime * zm_sv_flashlightrechargerate.GetFloat() );
-            
-            if ( GetFlashlightBattery() > 100.0f )
-            {
-                SetFlashlightBattery( 100.0f );
-            }
-        }
+        UpdateFlashlight();
 
         // Force player off the NPCs head!
         if ( zm_sv_npcheadpushoff.GetFloat() != 0.0f && GetGroundEntity() && !GetGroundEntity()->IsStandable() && GetGroundEntity()->IsBaseZombie() )
@@ -481,6 +462,29 @@ void CZMPlayer::PostThink()
 
     m_angEyeAngles = EyeAngles();
     m_pPlayerAnimState->Update( m_angEyeAngles[YAW], m_angEyeAngles[PITCH] );
+}
+
+void CZMPlayer::UpdateFlashlight()
+{
+    if ( FlashlightIsOn() )
+    {
+        SetFlashlightBattery( GetFlashlightBattery() - gpGlobals->frametime * zm_sv_flashlightdrainrate.GetFloat() );
+
+        if ( GetFlashlightBattery() < 0.0f )
+        {
+            SetFlashlightBattery( 0.0f );
+            FlashlightTurnOff();
+        }
+    }
+    else
+    {
+        SetFlashlightBattery( GetFlashlightBattery() + gpGlobals->frametime * zm_sv_flashlightrechargerate.GetFloat() );
+            
+        if ( GetFlashlightBattery() > 100.0f )
+        {
+            SetFlashlightBattery( 100.0f );
+        }
+    }
 }
 
 void CZMPlayer::CopyWeaponDamage( CZMBaseWeapon* pWeapon, const FireBulletsInfo_t& info )
