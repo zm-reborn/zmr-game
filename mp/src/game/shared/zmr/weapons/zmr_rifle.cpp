@@ -51,12 +51,12 @@ public:
     virtual void ItemBusyFrame() OVERRIDE;
     virtual void ItemPostFrame() OVERRIDE;
 
-
+    virtual Activity GetIdleActivity() const OVERRIDE { return IsZoomed() ? ACT_VM_IDLE_SPECIAL : BaseClass::GetIdleActivity(); }
     virtual Activity GetReloadStartAct() const OVERRIDE { return ACT_VM_RELOAD_START; }
     virtual Activity GetReloadEndAct() const OVERRIDE { return ACT_VM_RELOAD_FINISH; }
     virtual Activity GetPumpAct() const OVERRIDE { return ACT_SHOTGUN_PUMP; }
 
-    inline bool IsZoomed() const { return m_bInZoom; }
+    virtual bool IsZoomed() const OVERRIDE { return m_bInZoom; }
     void CheckToggleZoom();
     void CheckUnZoom();
     void ToggleZoom();
@@ -166,7 +166,7 @@ void CZMWeaponRifle::Zoom( CZMPlayer* pPlayer )
 
 void CZMWeaponRifle::UnZoom( CZMPlayer* pPlayer )
 {
-    pPlayer->SetFOV( this, 0, 0.2f );
+    pPlayer->SetFOV( this, 0, 0.1f );
 
     m_bInZoom = false;
 }
