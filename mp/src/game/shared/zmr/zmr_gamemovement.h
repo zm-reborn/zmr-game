@@ -63,18 +63,19 @@ protected:
     CFuncLadder*    FindLadder( Vector& ladderOrigin, const CFuncLadder* skipLadder );
     bool            CheckLadderMount( CFuncLadder* pLadder, Vector& vecBestPos );
 
-	bool		IsForceMoveActive();
-	// Start forcing player position
-	void		StartForcedMove( bool mounting, float transit_speed, const Vector& goalpos, CFuncLadder *ladder );
-	// Returns false when finished
-	bool		ContinueForcedMove();
-    bool		ExitLadderViaDismountNode( CFuncLadder* pLadder, bool strict );
+    bool            IsForceMoveActive();
+    // Start forcing player position
+    void            StartForcedMove( bool mounting, float transit_speed, const Vector& goalpos, CFuncLadder *ladder );
+    // Returns false when finished
+    bool            ContinueForcedMove();
+    bool            ExitLadderViaDismountNode( CFuncLadder* pLadder, bool strict );
 
 
-    LadderMove_t* GetLadderMove() const;
+    LadderMove_t*   GetLadderMove() const;
+    CFuncLadder*    GetLadder() const;
 
-    CFuncLadder* GetLadder() const;
-    void SetLadder( CFuncLadder* pLadder );
+    void            SetLadder( CFuncLadder* pLadder );
+    void            ExitLadder();
 
 
     LadderMoveRet_t LadderMove_Brush();

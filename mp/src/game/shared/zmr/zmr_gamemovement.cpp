@@ -33,6 +33,13 @@
 ConVar zm_sv_maxbunnyhopspeed( "zm_sv_maxbunnyhopspeed", "300", FCVAR_REPLICATED | FCVAR_NOTIFY );
 
 
+#define LADDER_AUTOMOUNT_DIST       32.0f
+#define LADDER_AUTOMOUNT_DOT        0.4f
+#define LADDER_DISMOUNT_DOT         0.6f
+#define LADDER_DISMOUNT_MAX_DIST    60.0f
+#define LADDER_MAX_DIST             64.0f
+
+
 extern bool g_bMovementOptimizations;
 
 
@@ -842,623 +849,605 @@ bool CZMGameMovement::CheckJumpButton( void )
 
 float CZMGameMovement::ClimbSpeed() const
 {
-    return 120.0f;
+    return 200.0f;
 }
 
 LadderMoveRet_t CZMGameMovement::LadderMove_Brush()
 {
-	trace_t pm;
-	bool onFloor;
-	Vector floor;
-	Vector wishdir;
-	Vector end;
+    trace_t pm;
+    bool onFloor;
+    Vector floor;
+    Vector wishdir;
+    Vector end;
 
-	if ( player->GetMoveType() == MOVETYPE_NOCLIP )
-		return LADDERMOVERET_NO_LADDER;
+    if ( player->GetMoveType() == MOVETYPE_NOCLIP )
+        return LADDERMOVERET_NO_LADDER;
 
 
-	// If I'm already moving on a ladder, use the previous ladder direction
-	if ( player->GetMoveType() == MOVETYPE_LADDER )
-	{
-		wishdir = -player->m_vecLadderNormal;
-	}
-	else
-	{
-		// otherwise, use the direction player is attempting to move
-		if ( mv->m_flForwardMove || mv->m_flSideMove )
-		{
-			for (int i=0 ; i<3 ; i++)       // Determine x and y parts of velocity
-				wishdir[i] = m_vecForward[i]*mv->m_flForwardMove + m_vecRight[i]*mv->m_flSideMove;
+    // If I'm already moving on a ladder, use the previous ladder direction
+    if ( player->GetMoveType() == MOVETYPE_LADDER )
+    {
+        wishdir = -player->m_vecLadderNormal;
+    }
+    else
+    {
+        // otherwise, use the direction player is attempting to move
+        if ( mv->m_flForwardMove || mv->m_flSideMove )
+        {
+            for (int i=0 ; i<3 ; i++)       // Determine x and y parts of velocity
+                wishdir[i] = m_vecForward[i]*mv->m_flForwardMove + m_vecRight[i]*mv->m_flSideMove;
 
-			VectorNormalize(wishdir);
-		}
-		else
-		{
-			// Player is not attempting to move, no ladder behavior
-			return LADDERMOVERET_NO_LADDER;
-		}
-	}
+            wishdir.NormalizeInPlace();
+        }
+        else
+        {
+            // Player is not attempting to move, no ladder behavior
+            return LADDERMOVERET_NO_LADDER;
+        }
+    }
 
-	// wishdir points toward the ladder if any exists
-	VectorMA( mv->GetAbsOrigin(), LadderDistance(), wishdir, end );
-	TracePlayerBBox( mv->GetAbsOrigin(), end, LadderMask(), COLLISION_GROUP_PLAYER_MOVEMENT, pm );
+    // wishdir points toward the ladder if any exists
+    end = mv->GetAbsOrigin() + wishdir * LadderDistance();
 
-	// no ladder in that direction, return
-	if ( pm.fraction == 1.0f || !OnLadder( pm ) )
-		return LADDERMOVERET_NO_LADDER;
+    TracePlayerBBox( mv->GetAbsOrigin(), end, LadderMask(), COLLISION_GROUP_PLAYER_MOVEMENT, pm );
 
-	player->SetMoveType( MOVETYPE_LADDER );
-	player->SetMoveCollide( MOVECOLLIDE_DEFAULT );
+    // no ladder in that direction, return
+    if ( pm.fraction == 1.0f || !OnLadder( pm ) )
+        return LADDERMOVERET_NO_LADDER;
 
-	player->m_vecLadderNormal = pm.plane.normal;
+    player->SetMoveType( MOVETYPE_LADDER );
+    player->SetMoveCollide( MOVECOLLIDE_DEFAULT );
 
-	// On ladder, convert movement to be relative to the ladder
+    player->m_vecLadderNormal = pm.plane.normal;
 
-	VectorCopy( mv->GetAbsOrigin(), floor );
-	floor[2] += GetPlayerMins()[2] - 1;
+    // On ladder, convert movement to be relative to the ladder
 
-	if( enginetrace->GetPointContents( floor ) == CONTENTS_SOLID || player->GetGroundEntity() != NULL )
-	{
-		onFloor = true;
-	}
-	else
-	{
-		onFloor = false;
-	}
+    floor = mv->GetAbsOrigin();
+    floor[2] += GetPlayerMins()[2] - 1;
 
-	player->SetGravity( 0 );
+    if( enginetrace->GetPointContents( floor ) == CONTENTS_SOLID || player->GetGroundEntity() )
+    {
+        onFloor = true;
+    }
+    else
+    {
+        onFloor = false;
+    }
 
-	float climbSpeed = ClimbSpeed();
 
-	float forwardSpeed = 0, rightSpeed = 0;
-	if ( mv->m_nButtons & IN_BACK )
-		forwardSpeed -= climbSpeed;
-	
-	if ( mv->m_nButtons & IN_FORWARD )
-		forwardSpeed += climbSpeed;
-	
-	if ( mv->m_nButtons & IN_MOVELEFT )
-		rightSpeed -= climbSpeed;
-	
-	if ( mv->m_nButtons & IN_MOVERIGHT )
-		rightSpeed += climbSpeed;
+    float climbSpeed = ClimbSpeed();
 
-	if ( mv->m_nButtons & IN_JUMP )
-	{
-		player->SetMoveType( MOVETYPE_WALK );
-		player->SetMoveCollide( MOVECOLLIDE_DEFAULT );
+    float forwardSpeed = 0, rightSpeed = 0;
+    if ( mv->m_nButtons & IN_BACK )
+        forwardSpeed -= climbSpeed;
+    
+    if ( mv->m_nButtons & IN_FORWARD )
+        forwardSpeed += climbSpeed;
+    
+    if ( mv->m_nButtons & IN_MOVELEFT )
+        rightSpeed -= climbSpeed;
+    
+    if ( mv->m_nButtons & IN_MOVERIGHT )
+        rightSpeed += climbSpeed;
 
-		VectorScale( pm.plane.normal, 270, mv->m_vecVelocity );
-	}
-	else
-	{
-		if ( forwardSpeed != 0 || rightSpeed != 0 )
-		{
-			Vector velocity, perp, cross, lateral, tmp;
+    if ( mv->m_nButtons & IN_JUMP )
+    {
+        ExitLadder();
 
-			//ALERT(at_console, "pev %.2f %.2f %.2f - ",
-			//	pev->velocity.x, pev->velocity.y, pev->velocity.z);
-			// Calculate player's intended velocity
-			//Vector velocity = (forward * gpGlobals->v_forward) + (right * gpGlobals->v_right);
-			VectorScale( m_vecForward, forwardSpeed, velocity );
-			VectorMA( velocity, rightSpeed, m_vecRight, velocity );
+        mv->m_vecVelocity = pm.plane.normal * climbSpeed;
 
-			// Perpendicular in the ladder plane
-			VectorCopy( vec3_origin, tmp );
-			tmp[2] = 1;
-			CrossProduct( tmp, pm.plane.normal, perp );
-			VectorNormalize( perp );
+        return LADDERMOVERET_DISMOUNTED;
+    }
+    else if ( forwardSpeed != 0 || rightSpeed != 0 )
+    {
+        Vector velocity, perp, cross, lateral, tmp;
 
-			// decompose velocity into ladder plane
-			float normal = DotProduct( velocity, pm.plane.normal );
+        //ALERT(at_console, "pev %.2f %.2f %.2f - ",
+        //	pev->velocity.x, pev->velocity.y, pev->velocity.z);
+        // Calculate player's intended velocity
+        //Vector velocity = (forward * gpGlobals->v_forward) + (right * gpGlobals->v_right);
+        velocity = m_vecForward * forwardSpeed;
+        velocity += m_vecRight * rightSpeed;
 
-			// This is the velocity into the face of the ladder
-			VectorScale( pm.plane.normal, normal, cross );
+        // Make sure player can't go faster than the climb speed.
+        velocity = velocity.Normalized() * climbSpeed;
 
-			// This is the player's additional velocity
-			VectorSubtract( velocity, cross, lateral );
+        // Perpendicular in the ladder plane
+        tmp = vec3_origin;
+        tmp[2] = 1;
+        perp = tmp.Cross( pm.plane.normal );
+        perp.NormalizeInPlace();
 
-			// This turns the velocity into the face of the ladder into velocity that
-			// is roughly vertically perpendicular to the face of the ladder.
-			// NOTE: It IS possible to face up and move down or face down and move up
-			// because the velocity is a sum of the directional velocity and the converted
-			// velocity through the face of the ladder -- by design.
-			CrossProduct( pm.plane.normal, perp, tmp );
+        // decompose velocity into ladder plane
+        float normal = velocity.Dot( pm.plane.normal );
 
-			//=============================================================================
-			// HPE_BEGIN
-			// [sbodenbender] make ladders easier to climb in cstrike
-			//=============================================================================
-#if defined (CSTRIKE_DLL)
-			// break lateral into direction along tmp (up the ladder) and direction along perp (perpendicular to ladder)
-			float tmpDist = DotProduct ( tmp, lateral );
-			float perpDist = DotProduct ( perp, lateral );
+        // This is the velocity into the face of the ladder
+        VectorScale( pm.plane.normal, normal, cross );
 
-			Vector angleVec = perp * perpDist;
-			angleVec += cross;
-			// angleVec is our desired movement in the ladder normal/perpendicular plane
-			VectorNormalize(angleVec);
-			float angleDot = DotProduct(angleVec, pm.plane.normal);
-			// angleDot is our angle of incidence to the laddernormal in the ladder normal/perpendicular plane
+        // This is the player's additional velocity
+        lateral = velocity - cross;
 
-			if (angleDot < sv_ladder_angle.GetFloat())
-				lateral = (tmp * tmpDist) + (perp * sv_ladder_dampen.GetFloat() * perpDist);
-#endif // CSTRIKE_DLL
-			//=============================================================================
-			// HPE_END
-			//=============================================================================
+        // This turns the velocity into the face of the ladder into velocity that
+        // is roughly vertically perpendicular to the face of the ladder.
+        // NOTE: It IS possible to face up and move down or face down and move up
+        // because the velocity is a sum of the directional velocity and the converted
+        // velocity through the face of the ladder -- by design.
+        tmp = pm.plane.normal.Cross( perp );
 
-			VectorMA( lateral, -normal, tmp, mv->m_vecVelocity );
 
-			if ( onFloor && normal > 0 )	// On ground moving away from the ladder
-			{
-				VectorMA( mv->m_vecVelocity, MAX_CLIMB_SPEED, pm.plane.normal, mv->m_vecVelocity );
-			}
-			//pev->velocity = lateral - (CrossProduct( trace.vecPlaneNormal, perp ) * normal);
-		}
-		else
-		{
-			mv->m_vecVelocity.Init();
-		}
-	}
+        VectorMA( lateral, -normal, tmp, mv->m_vecVelocity );
 
-	return LADDERMOVERET_ONLADDER;
+        if ( onFloor && normal > 0 )	// On ground moving away from the ladder
+        {
+            mv->m_vecVelocity += pm.plane.normal * climbSpeed;
+        }
+        //pev->velocity = lateral - (CrossProduct( trace.vecPlaneNormal, perp ) * normal);
+    }
+    else
+    {
+        mv->m_vecVelocity.Init();
+    }
+
+    return LADDERMOVERET_ONLADDER;
 }
 
 CFuncLadder* CZMGameMovement::FindLadder( Vector& ladderOrigin, const CFuncLadder* skipLadder )
 {
-	CFuncLadder* bestLadder = nullptr;
-	float bestDist = FLT_MAX;
-	Vector bestOrigin;
+    CFuncLadder* bestLadder = nullptr;
+    float bestDist = FLT_MAX;
+    Vector bestOrigin;
 
-	bestOrigin.Init();
+    bestOrigin.Init();
 
-	float maxdistSqr = 64.0f * 64.0f;
-
-
-	int c = CFuncLadder::GetLadderCount();
-	for ( int i = 0 ; i < c; i++ )
-	{
-		auto* pLadder = CFuncLadder::GetLadder( i );
-
-		if ( !pLadder->IsEnabled() )
-			continue;
-
-		if ( skipLadder && pLadder == skipLadder )
-			continue;
-
-		Vector topPosition;
-		Vector bottomPosition;
-
-		pLadder->GetTopPosition( topPosition );
-		pLadder->GetBottomPosition( bottomPosition );
-
-		Vector closest;
-		CalcClosestPointOnLineSegment( mv->GetAbsOrigin(), bottomPosition, topPosition, closest, NULL );
-
-		float distSqr = ( closest - mv->GetAbsOrigin() ).LengthSqr();
-
-		// Too far away
-		if ( distSqr > maxdistSqr )
-		{
-			continue;
-		}
-
-		// Need to trace to see if it's clear
-		trace_t tr;
-
-		UTIL_TraceLine( mv->GetAbsOrigin(), closest, 
-			MASK_PLAYERSOLID,
-			player,
-			COLLISION_GROUP_NONE,
-			&tr );
-
-		if ( tr.fraction != 1.0f &&
-			 tr.m_pEnt &&
-			 tr.m_pEnt != pLadder )
-		{
-			// Try a trace stepped up from the ground a bit, in case there's something at ground level blocking us.
-			float sizez = GetPlayerMaxs().z - GetPlayerMins().z;
-
-			UTIL_TraceLine( mv->GetAbsOrigin() + Vector( 0, 0, sizez * 0.5f ), closest, 
-				MASK_PLAYERSOLID,
-				player,
-				COLLISION_GROUP_NONE,
-				&tr );
-
-			if ( tr.fraction != 1.0f &&
-				 tr.m_pEnt &&
-				 tr.m_pEnt != pLadder &&
-				 !tr.m_pEnt->IsSolidFlagSet( FSOLID_TRIGGER ) )
-			{
-				continue;
-			}
-		}
-
-		// See if this is the best one so far
-		if ( distSqr < bestDist )
-		{
-			bestDist = distSqr;
-			bestLadder = pLadder;
-			bestOrigin = closest;
-		}
-	}
+    float maxdistSqr = LADDER_MAX_DIST * LADDER_MAX_DIST;
 
 
-	ladderOrigin = bestOrigin;
+    int c = CFuncLadder::GetLadderCount();
+    for ( int i = 0 ; i < c; i++ )
+    {
+        auto* pLadder = CFuncLadder::GetLadder( i );
 
-	return bestLadder;
+        if ( !pLadder->IsEnabled() )
+            continue;
+
+        if ( skipLadder && pLadder == skipLadder )
+            continue;
+
+        Vector topPosition;
+        Vector bottomPosition;
+
+        pLadder->GetTopPosition( topPosition );
+        pLadder->GetBottomPosition( bottomPosition );
+
+        Vector closest;
+        CalcClosestPointOnLineSegment( mv->GetAbsOrigin(), bottomPosition, topPosition, closest, nullptr );
+
+        float distSqr = ( closest - mv->GetAbsOrigin() ).LengthSqr();
+
+        // Too far away
+        if ( distSqr > maxdistSqr )
+        {
+            continue;
+        }
+
+        // Need to trace to see if it's clear
+        trace_t tr;
+
+        UTIL_TraceLine( mv->GetAbsOrigin(), closest, 
+            MASK_PLAYERSOLID,
+            player,
+            COLLISION_GROUP_NONE,
+            &tr );
+
+        if ( tr.fraction != 1.0f &&
+             tr.m_pEnt &&
+             tr.m_pEnt != pLadder )
+        {
+            // Try a trace stepped up from the ground a bit, in case there's something at ground level blocking us.
+            float sizez = GetPlayerMaxs().z - GetPlayerMins().z;
+
+            UTIL_TraceLine( mv->GetAbsOrigin() + Vector( 0, 0, sizez * 0.5f ), closest, 
+                MASK_PLAYERSOLID,
+                player,
+                COLLISION_GROUP_NONE,
+                &tr );
+
+            if ( tr.fraction != 1.0f &&
+                 tr.m_pEnt &&
+                 tr.m_pEnt != pLadder &&
+                 !tr.m_pEnt->IsSolidFlagSet( FSOLID_TRIGGER ) )
+            {
+                continue;
+            }
+        }
+
+        // See if this is the best one so far
+        if ( distSqr < bestDist )
+        {
+            bestDist = distSqr;
+            bestLadder = pLadder;
+            bestOrigin = closest;
+        }
+    }
+
+
+    ladderOrigin = bestOrigin;
+
+    return bestLadder;
 
 }
 
-
-#define LADDER_AUTOMOUNT_DIST		16.0f
-#define LADDER_AUTOMOUNT_DOT		0.4f
-#define LADDER_DISMOUNT_DOT			0.7f
-
 bool CZMGameMovement::CheckLadderMount( CFuncLadder* pLadder, Vector& vecBestPos )
 {
-	Assert( pLadder );
+    Assert( pLadder );
 
-	Vector top, bottom;
-	pLadder->GetTopPosition( top );
-	pLadder->GetBottomPosition( bottom );
-
-
-	int buttonsChanged	= ( mv->m_nOldButtons ^ mv->m_nButtons );	// These buttons have changed this frame
-	int buttonsPressed = buttonsChanged & mv->m_nButtons;
-	
-	bool bPressedUse = ( buttonsPressed & IN_USE ) ? true : false;
-
-	bool bOnGround = GetZMPlayer()->GetGroundEntity() != nullptr;
+    Vector top, bottom;
+    pLadder->GetTopPosition( top );
+    pLadder->GetBottomPosition( bottom );
 
 
-	float distToTop = ( top - mv->GetAbsOrigin() ).LengthSqr();
-	float distToBottom = ( bottom - mv->GetAbsOrigin() ).LengthSqr();
-	bool bBottomCloser = distToTop > distToBottom;
+    int buttonsChanged	= ( mv->m_nOldButtons ^ mv->m_nButtons );
+    int buttonsPressed = buttonsChanged & mv->m_nButtons;
+    
+    bool bPressedUse = ( buttonsPressed & IN_USE ) ? true : false;
+
+    bool bOnGround = GetZMPlayer()->GetGroundEntity() != nullptr;
 
 
-	if ( bOnGround && mv->m_flForwardMove != 0.0f )
-	{
-		//
-		// We're on ground, check if they are near top/bottom points.
-		//
-		if ( distToTop < (LADDER_AUTOMOUNT_DIST*LADDER_AUTOMOUNT_DIST) || distToBottom < (LADDER_AUTOMOUNT_DIST*LADDER_AUTOMOUNT_DIST) )
-		{
-			Vector ladderNormal;
+    Vector dirToTop = top - mv->GetAbsOrigin();
 
-			if ( !bBottomCloser )
-			{
-				// Close to top
-				ladderNormal = bottom - top;
-			}
-			else
-			{
-				ladderNormal = top - bottom;
-			}
-
-			VectorNormalize( ladderNormal );
-
-			if ( ladderNormal.Dot( m_vecForward ) > LADDER_AUTOMOUNT_DOT )
-			{
-				vecBestPos = bBottomCloser ? bottom : top;
-				return true;
-			}
-		}
-	}
+    float distToTop = dirToTop.NormalizeInPlace();
+    dirToTop.z = 0.0f;
+    dirToTop.NormalizeInPlace();
 
 
-	//
-	// Pressed use key, check if they are looking in the general
-	// direction of the ladder.
-	//
-	if ( bPressedUse || (!bOnGround && mv->m_flForwardMove > 0.0f) )
-	{
-		Vector pos = mv->GetAbsOrigin() + GetPlayerViewOffset( player->GetFlags() & FL_DUCKING );
+    Vector dirToBottom = bottom - mv->GetAbsOrigin();
+    float distToBottom = dirToBottom.NormalizeInPlace();
+    dirToBottom.z = 0.0f;
+    dirToBottom.NormalizeInPlace();
 
-		Vector dirTop = (top - pos).Normalized();
-		Vector dirBottom = (bottom - pos).Normalized();
 
-		if ((!bBottomCloser && dirTop.Dot( m_vecForward ) > LADDER_AUTOMOUNT_DOT)
-		||	(bBottomCloser && dirBottom.Dot( m_vecForward ) > LADDER_AUTOMOUNT_DOT) )
-		{
-			return true;
-		}
-	}
+    bool bBottomCloser = distToTop > distToBottom;
 
-	return false;
+    float flMoveTowardsLadderDot;
+    float flLookTowardsLadderDot;
+
+    {
+        Vector wishdir;
+        for ( int i = 0; i < 2; i++ )
+            wishdir[i] = mv->m_flForwardMove * m_vecForward[i] + mv->m_flSideMove * m_vecRight[i];
+        wishdir[2] = 0.0f;
+        wishdir.NormalizeInPlace();
+
+        flMoveTowardsLadderDot = bBottomCloser ? dirToBottom.Dot( wishdir ) : dirToTop.Dot( wishdir );
+
+
+        Vector fwd = m_vecForward;
+        fwd.z = 0.0f;
+        fwd.NormalizeInPlace();
+
+        flLookTowardsLadderDot = bBottomCloser ? dirToBottom.Dot( fwd ) : dirToTop.Dot( fwd );
+    }
+
+
+    bool bMovingTowardsLadder = flMoveTowardsLadderDot > 0.7f;
+
+
+    if ( bOnGround && bMovingTowardsLadder )
+    {
+        //
+        // We're on ground, check if they are near top/bottom points.
+        //
+        if ( distToTop < LADDER_AUTOMOUNT_DIST || distToBottom < LADDER_AUTOMOUNT_DIST )
+        {
+            Vector ladderNormal;
+
+
+            if ( !bBottomCloser )
+            {
+                // Close to top
+                ladderNormal = bottom - top;
+            }
+            else
+            {
+                ladderNormal = top - bottom;
+            }
+
+            VectorNormalize( ladderNormal );
+
+            if ( ladderNormal.Dot( m_vecForward ) > 0.0f )
+            {
+                vecBestPos = bBottomCloser ? bottom : top;
+                return true;
+            }
+        }
+    }
+
+
+    if ( bPressedUse || (!bOnGround && bMovingTowardsLadder) )
+    {
+        if ( flLookTowardsLadderDot > LADDER_AUTOMOUNT_DOT )
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 LadderMoveRet_t CZMGameMovement::LadderMove_HL2()
 {
-	if ( player->GetMoveType() == MOVETYPE_NOCLIP )
-	{
-		SetLadder( nullptr );
-		return LADDERMOVERET_NO_LADDER;
-	}
+    if ( player->GetMoveType() == MOVETYPE_NOCLIP )
+    {
+        ExitLadder();
+        return LADDERMOVERET_NO_LADDER;
+    }
 
-	// If being forced to mount/dismount continue to act like we are on the ladder
-	if ( IsForceMoveActive() && ContinueForcedMove() )
-	{
-		return LADDERMOVERET_ONLADDER;
-	}
+    // If being forced to mount/dismount continue to act like we are on the ladder
+    if ( IsForceMoveActive() && ContinueForcedMove() )
+    {
+        return LADDERMOVERET_ONLADDER;
+    }
 
-	CFuncLadder* pNewLadder = nullptr;
-	Vector bestOrigin( 0, 0, 0 );
+    CFuncLadder* pNewLadder = nullptr;
+    Vector bestOrigin( 0, 0, 0 );
 
-	auto* pLadder = GetLadder();
+    auto* pLadder = GetLadder();
 
-	// Something 1) deactivated the ladder...  or 2) something external applied
-	//  a force to us.  In either case  make the player fall, etc.
-	if ( (pLadder && !pLadder->IsEnabled()) || player->GetBaseVelocity().LengthSqr() > 1.0f )
-	{
-		GetZMPlayer()->ExitLadder();
+    // Something 1) deactivated the ladder...  or 2) something external applied
+    //  a force to us.  In either case  make the player fall, etc.
+    if ( (pLadder && !pLadder->IsEnabled()) || player->GetBaseVelocity().LengthSqr() > 1.0f )
+    {
+        ExitLadder();
 
-		return LADDERMOVERET_NO_LADDER;
-	}
+        return LADDERMOVERET_NO_LADDER;
+    }
 
-	if ( !pLadder )
-	{
-		pNewLadder = FindLadder( bestOrigin, nullptr );
-	}
-
-
-	if ( !pLadder && pNewLadder )
-	{
-		if ( CheckLadderMount( pNewLadder, bestOrigin ) )
-		{
-			StartForcedMove( true, player->MaxSpeed(), bestOrigin, pNewLadder );
-
-			return LADDERMOVERET_ONLADDER;
-		}
-	}
+    if ( !pLadder )
+    {
+        pNewLadder = FindLadder( bestOrigin, nullptr );
+    }
 
 
-	pLadder = GetLadder();
-	if ( !pLadder )
-	{
-		return LADDERMOVERET_NO_LADDER;
-	}
+    if ( !pLadder && pNewLadder )
+    {
+        if ( CheckLadderMount( pNewLadder, bestOrigin ) )
+        {
+            StartForcedMove( true, player->MaxSpeed(), bestOrigin, pNewLadder );
 
-	//
-	// We're on ladder, do the moving and stuff.
-	//
-	Vector top;
-	Vector bottom;
-
-	pLadder->GetTopPosition( top );
-	pLadder->GetBottomPosition( bottom );
+            return LADDERMOVERET_ONLADDER;
+        }
+    }
 
 
-	int buttonsChanged	= ( mv->m_nOldButtons ^ mv->m_nButtons );	// These buttons have changed this frame
-	int buttonsPressed = buttonsChanged & mv->m_nButtons;
+    pLadder = GetLadder();
+    if ( !pLadder )
+    {
+        return LADDERMOVERET_NO_LADDER;
+    }
+
+    //
+    // We're on ladder, do the moving and stuff.
+    //
+    Vector top;
+    Vector bottom;
+
+    pLadder->GetTopPosition( top );
+    pLadder->GetBottomPosition( bottom );
 
 
-	float distTopSqr = ( top - mv->GetAbsOrigin() ).LengthSqr();
-	float distBottomSqr = ( bottom - mv->GetAbsOrigin() ).LengthSqr();
-
-	bool bPressedJump = buttonsPressed & IN_JUMP;
-	bool bPressedUse = buttonsPressed & IN_USE;
-
-	bool bNearMountPoints = distTopSqr < (LADDER_AUTOMOUNT_DIST*LADDER_AUTOMOUNT_DIST) || distBottomSqr < (LADDER_AUTOMOUNT_DIST*LADDER_AUTOMOUNT_DIST);
-	
-	//
-	// Player wants to leave the ladder.
-	//
-	if ( bPressedJump || bPressedUse || bNearMountPoints )
-	{
-		bool forcedismount = bPressedJump || bPressedUse;
-
-		if ( ExitLadderViaDismountNode( pLadder, forcedismount ) )
-		{
-			return LADDERMOVERET_DISMOUNTED;
-		}
-
-		if ( forcedismount )
-		{
-			player->SetMoveType( MOVETYPE_WALK );
-			// Remove from ladder
-			SetLadder( nullptr );
+    int buttonsChanged	= ( mv->m_nOldButtons ^ mv->m_nButtons );	// These buttons have changed this frame
+    int buttonsPressed = buttonsChanged & mv->m_nButtons;
 
 
-			// Jump in view direction
-			if ( bPressedJump )
-			{
-				Vector jumpDir = m_vecForward;
+    float distTopSqr = ( top - mv->GetAbsOrigin() ).LengthSqr();
+    float distBottomSqr = ( bottom - mv->GetAbsOrigin() ).LengthSqr();
 
-				// unless pressing backward or something like that
-				if ( mv->m_flForwardMove < 0.0f )
-				{
-					jumpDir = -jumpDir;
-				}
+    bool bPressedJump = buttonsPressed & IN_JUMP;
+    bool bPressedUse = buttonsPressed & IN_USE;
 
-				VectorNormalize( jumpDir );
+    bool bNearMountPoints = distTopSqr < (LADDER_AUTOMOUNT_DIST*LADDER_AUTOMOUNT_DIST) || distBottomSqr < (LADDER_AUTOMOUNT_DIST*LADDER_AUTOMOUNT_DIST);
+    
+    //
+    // Player wants to leave the ladder.
+    //
+    if ( bPressedJump || bPressedUse || bNearMountPoints )
+    {
+        bool forcedismount = bPressedJump || bPressedUse;
 
-				VectorScale( jumpDir, MAX_CLIMB_SPEED, mv->m_vecVelocity );
-				// Tracker 13558:  Don't add any extra z velocity if facing downward at all
-				if ( m_vecForward.z >= 0.0f )
-				{
-					mv->m_vecVelocity.z = mv->m_vecVelocity.z + 50;
-				}
-			}
+        if ( ExitLadderViaDismountNode( pLadder, forcedismount ) )
+        {
+            return LADDERMOVERET_DISMOUNTED;
+        }
 
-			return LADDERMOVERET_DISMOUNTED;
-		}
-	}
-
+        if ( forcedismount )
+        {
+            ExitLadder();
 
 
-	// Make sure we are on the ladder
-	player->SetMoveType( MOVETYPE_LADDER );
-	player->SetMoveCollide( MOVECOLLIDE_DEFAULT );
+            // Jump in view direction
+            if ( bPressedJump )
+            {
+                Vector jumpDir = m_vecForward;
 
-	player->SetGravity( 0.0f );
-	
-	player->SetGroundEntity( nullptr );
+                // unless pressing backward or something like that
+                if ( mv->m_flForwardMove < 0.0f )
+                {
+                    jumpDir = -jumpDir;
+                }
+
+                jumpDir.NormalizeInPlace();
+
+                mv->m_vecVelocity = jumpDir * ClimbSpeed();
+
+                // Tracker 13558:  Don't add any extra z velocity if facing downward at all
+                if ( m_vecForward.z >= 0.0f )
+                {
+                    mv->m_vecVelocity.z = mv->m_vecVelocity.z + 50;
+                }
+            }
+
+            return LADDERMOVERET_DISMOUNTED;
+        }
+    }
 
 
-	float forwardSpeed = 0.0f;
-	float rightSpeed = 0.0f;
+#define MAX_DIST_FROM_LADDER_PATH		4.0f
 
-	float speed = player->MaxSpeed();
+    // Check to see if we've mounted the ladder in a bogus spot and, if so, just fall off the ladder...
+    float t;
+    float distFromLadderSqr = CalcDistanceSqrToLine( mv->GetAbsOrigin(), bottom, top, &t );
+    if ( distFromLadderSqr > (MAX_DIST_FROM_LADDER_PATH*MAX_DIST_FROM_LADDER_PATH) )
+    {
+        ExitLadder();
+        return LADDERMOVERET_DISMOUNTED;
+    }
 
-	if ( mv->m_nButtons & IN_BACK )
-	{
-		forwardSpeed -= speed;
-	}
-	
-	if ( mv->m_nButtons & IN_FORWARD )
-	{
-		forwardSpeed += speed;
-	}
-	
-	if ( mv->m_nButtons & IN_MOVELEFT )
-	{
-		rightSpeed -= speed;
-	}
-	
-	if ( mv->m_nButtons & IN_MOVERIGHT )
-	{
-		rightSpeed += speed;
-	}
+    // We need to be clamped to the ladder or the player may be able to climb to heaven
+    // if the dismount somehow fails.
+    if ( t < 0.0f )
+    {
+        mv->SetAbsOrigin( bottom );
+    }
+    else if ( t > 1.0f )
+    {
+        mv->SetAbsOrigin( top );
+    }
 
-	if ( forwardSpeed != 0 || rightSpeed != 0 )
-	{
-		// See if the player is looking toward the top or the bottom
-		Vector velocity;
 
-		VectorScale( m_vecForward, forwardSpeed, velocity );
-		VectorMA( velocity, rightSpeed, m_vecRight, velocity );
+    // Make sure we are on the ladder
+    player->SetMoveType( MOVETYPE_LADDER );
+    player->SetMoveCollide( MOVECOLLIDE_DEFAULT );
+    
+    player->SetGroundEntity( nullptr );
 
-		VectorNormalize( velocity );
 
-		Vector ladderUp;
-		pLadder->ComputeLadderDir( ladderUp );
-		VectorNormalize( ladderUp );
+    float forwardSpeed = 0.0f;
+    float rightSpeed = 0.0f;
 
-		Vector topPosition;
-		Vector bottomPosition;
+    float speed = player->MaxSpeed();
 
-		pLadder->GetTopPosition( topPosition );
-		pLadder->GetBottomPosition( bottomPosition );
+    if ( mv->m_nButtons & IN_BACK )
+    {
+        forwardSpeed -= speed;
+    }
+    
+    if ( mv->m_nButtons & IN_FORWARD )
+    {
+        forwardSpeed += speed;
+    }
+    
+    if ( mv->m_nButtons & IN_MOVELEFT )
+    {
+        rightSpeed -= speed;
+    }
+    
+    if ( mv->m_nButtons & IN_MOVERIGHT )
+    {
+        rightSpeed += speed;
+    }
 
-		// Check to see if we've mounted the ladder in a bogus spot and, if so, just fall off the ladder...
-		float dummyt = 0.0f;
-		float distFromLadderSqr = CalcDistanceSqrToLine( mv->GetAbsOrigin(), topPosition, bottomPosition, &dummyt );
-		if ( distFromLadderSqr > 36.0f )
-		{
-			// Uh oh, we fell off zee ladder...
-			player->SetMoveType( MOVETYPE_WALK );
-			// Remove from ladder
-			SetLadder( nullptr );
-			return LADDERMOVERET_DISMOUNTED;
-		}
+    if ( forwardSpeed != 0 || rightSpeed != 0 )
+    {
+        // See if the player is looking toward the top or the bottom
+        Vector velocity;
 
-		bool ishorizontal = fabs( topPosition.z - bottomPosition.z ) < 64.0f ? true : false;
+        VectorScale( m_vecForward, forwardSpeed, velocity );
+        VectorMA( velocity, rightSpeed, m_vecRight, velocity );
 
-		float changeover = ishorizontal ? 0.0f : 0.3f;
+        velocity.NormalizeInPlace();
 
-		float factor = 1.0f;
-		if ( velocity.z >= 0 )
-		{
-			float dotTop = ladderUp.Dot( velocity );
-			if ( dotTop < -changeover )
-			{
-				// Aimed at bottom
-				factor = -1.0f;
-			}
-		}
-		else
-		{
-			float dotBottom = -ladderUp.Dot( velocity );
-			if ( dotBottom > changeover )
-			{
-				factor = -1.0f;
-			}
-		}
+        Vector ladderUp;
+        pLadder->ComputeLadderDir( ladderUp );
+        ladderUp.NormalizeInPlace();
 
-		mv->m_vecVelocity = MAX_CLIMB_SPEED * factor * ladderUp;
-	}
-	else
-	{
-		mv->m_vecVelocity.Init();
-	}
 
-	return LADDERMOVERET_ONLADDER;
+        bool ishorizontal = fabs( top.z - bottom.z ) < 64.0f ? true : false;
+
+        float changeover = ishorizontal ? 0.0f : 0.3f;
+
+        float factor = 1.0f;
+        if ( velocity.z >= 0 )
+        {
+            float dotTop = ladderUp.Dot( velocity );
+            if ( dotTop < -changeover )
+            {
+                // Aimed at bottom
+                factor = -1.0f;
+            }
+        }
+        else
+        {
+            float dotBottom = -ladderUp.Dot( velocity );
+            if ( dotBottom > changeover )
+            {
+                factor = -1.0f;
+            }
+        }
+
+        mv->m_vecVelocity = ClimbSpeed() * factor * ladderUp;
+    }
+    else
+    {
+        mv->m_vecVelocity.Init();
+    }
+
+    return LADDERMOVERET_ONLADDER;
 }
 
 void CZMGameMovement::StartForcedMove( bool mounting, float transit_speed, const Vector& goalpos, CFuncLadder* pLadder )
 {
-	LadderMove_t* lm = GetLadderMove();
-	Assert( lm );
+    LadderMove_t* lm = GetLadderMove();
+    Assert( lm );
 
-	// Already active, just ignore
-	if ( lm->m_bForceLadderMove )
-	{
-		return;
-	}
+    // Already active, just ignore
+    if ( lm->m_bForceLadderMove )
+    {
+        return;
+    }
 
 #if !defined( CLIENT_DLL )
-	if ( pLadder )
-	{
-		pLadder->PlayerGotOn( GetZMPlayer() );
+    if ( pLadder )
+    {
+        pLadder->PlayerGotOn( GetZMPlayer() );
 
-		// If the Ladder only wants to be there for automount checking, abort now
-		if ( pLadder->DontGetOnLadder() )
-			return;
-	}
-		
-	// Reserve goal slot here
-	//bool valid = false;
-	//lm->m_hReservedSpot = CReservePlayerSpot::ReserveSpot( 
-	//	player, 
-	//	goalpos, 
-	//	GetPlayerMins( ( player->GetFlags() & FL_DUCKING ) ? true : false ), 
-	//	GetPlayerMaxs( ( player->GetFlags() & FL_DUCKING ) ? true : false ), 
-	//	valid );
-	//if ( !valid )
-	//{
-	//	// FIXME:  Play a deny sound?
-	//	if ( lm->m_hReservedSpot )
-	//	{
-	//		UTIL_Remove( lm->m_hReservedSpot );
-	//		lm->m_hReservedSpot = NULL;
-	//	}
-	//	return;
-	//}
+        // If the Ladder only wants to be there for automount checking, abort now
+        if ( pLadder->DontGetOnLadder() )
+            return;
+    }
 #endif
 
-	// Use current player origin as start and new origin as dest
-	lm->m_vecGoalPosition	= goalpos;
-	lm->m_vecStartPosition	= mv->GetAbsOrigin();
+    // Use current player origin as start and new origin as dest
+    lm->m_vecGoalPosition	= goalpos;
+    lm->m_vecStartPosition	= mv->GetAbsOrigin();
 
-	// Figure out how long it will take to make the gap based on transit_speed
-	Vector delta = lm->m_vecGoalPosition - lm->m_vecStartPosition;
+    // Figure out how long it will take to make the gap based on transit_speed
+    Vector delta = lm->m_vecGoalPosition - lm->m_vecStartPosition;
 
-	float distance = delta.Length();
-	
-	Assert( transit_speed > 0.001f );
+    float distance = delta.Length();
+    
+    Assert( transit_speed > 0.001f );
 
-	// Compute time required to move that distance
-	float transit_time = distance / transit_speed;
-	if ( transit_time < 0.001f )
-	{
-		transit_time = 0.001f;
-	}
+    // Compute time required to move that distance
+    float transit_time = distance / transit_speed;
+    if ( transit_time < 0.001f )
+    {
+        transit_time = 0.001f;
+    }
 
-	lm->m_bForceLadderMove	= true;
-	lm->m_bForceMount		= mounting;
+    lm->m_bForceLadderMove	= true;
+    lm->m_bForceMount		= mounting;
 
-	lm->m_flStartTime		= gpGlobals->curtime;
-	lm->m_flArrivalTime		= lm->m_flStartTime + transit_time;
+    lm->m_flStartTime		= gpGlobals->curtime;
+    lm->m_flArrivalTime		= lm->m_flStartTime + transit_time;
 
-	lm->m_hForceLadder.Set( pLadder );
+    lm->m_hForceLadder.Set( pLadder );
 
-	// Don't get stuck during this traversal since we'll just be slamming the player origin
-	player->SetMoveType( MOVETYPE_NONE );
-	player->SetMoveCollide( MOVECOLLIDE_DEFAULT );
-	player->SetSolid( SOLID_NONE );
-	SetLadder( pLadder );
+    // Don't get stuck during this traversal since we'll just be slamming the player origin
+    player->SetMoveType( MOVETYPE_NONE );
+    player->SetMoveCollide( MOVECOLLIDE_DEFAULT );
+    player->SetSolid( SOLID_NONE );
+    SetLadder( pLadder );
 }
 
 //-----------------------------------------------------------------------------
@@ -1466,201 +1455,251 @@ void CZMGameMovement::StartForcedMove( bool mounting, float transit_speed, const
 //-----------------------------------------------------------------------------
 bool CZMGameMovement::ContinueForcedMove()
 {
-	LadderMove_t* lm = GetLadderMove();
-	Assert( lm );
-	Assert( lm->m_bForceLadderMove );
+    LadderMove_t* lm = GetLadderMove();
+    Assert( lm );
+    Assert( lm->m_bForceLadderMove );
 
-	// Suppress regular motion
-	mv->m_flForwardMove = 0.0f;
-	mv->m_flSideMove = 0.0f;
-	mv->m_flUpMove = 0.0f;
+    // Suppress regular motion
+    mv->m_flForwardMove = 0.0f;
+    mv->m_flSideMove = 0.0f;
+    mv->m_flUpMove = 0.0f;
 
-	// How far along are we
-	float frac = ( gpGlobals->curtime - lm->m_flStartTime ) / ( lm->m_flArrivalTime - lm->m_flStartTime );
-	if ( frac > 1.0f )
-	{
-		lm->m_bForceLadderMove = false;
-#if !defined( CLIENT_DLL )
-		// Remove "reservation entity"
-		//if ( lm->m_hReservedSpot )
-		//{
-		//	UTIL_Remove( lm->m_hReservedSpot );
-		//	lm->m_hReservedSpot = NULL;
-		//}
-#endif
-	}
+    // How far along are we
+    float frac = ( gpGlobals->curtime - lm->m_flStartTime ) / ( lm->m_flArrivalTime - lm->m_flStartTime );
+    if ( frac > 1.0f )
+    {
+        lm->m_bForceLadderMove = false;
+    }
 
-	frac = clamp( frac, 0.0f, 1.0f );
+    auto smoothstep = []( float x ) { return x * x * (3 - 2 * x); };
 
-	// Move origin part of the way
-	Vector delta = lm->m_vecGoalPosition - lm->m_vecStartPosition;
+    frac = clamp( frac, 0.0f, 1.0f );
 
-	// Compute interpolated position
-	Vector org;
-	VectorMA( lm->m_vecStartPosition, frac, delta, org );
-	mv->SetAbsOrigin( org );
+    frac = smoothstep( frac );
 
-	// If finished moving, reset player to correct movetype (or put them on the ladder)
-	if ( !lm->m_bForceLadderMove )
-	{
-		player->SetSolid( SOLID_BBOX );
-		player->SetMoveType( MOVETYPE_WALK );
+    // Move origin part of the way
+    Vector delta = lm->m_vecGoalPosition - lm->m_vecStartPosition;
 
-		if ( lm->m_bForceMount && lm->m_hForceLadder != NULL )
-		{
-			player->SetMoveType( MOVETYPE_LADDER );
-			SetLadder( lm->m_hForceLadder );
-		}
+    // Compute interpolated position
+    Vector org;
+    VectorMA( lm->m_vecStartPosition, frac, delta, org );
+    mv->SetAbsOrigin( org );
 
-		// Zero out any velocity
-		mv->m_vecVelocity.Init();
-	}
+    // If finished moving, reset player to correct movetype (or put them on the ladder)
+    if ( !lm->m_bForceLadderMove )
+    {
+        player->SetSolid( SOLID_BBOX );
+        player->SetMoveType( MOVETYPE_WALK );
 
-	// Stil active
-	return lm->m_bForceLadderMove;
+        if ( lm->m_bForceMount && lm->m_hForceLadder.Get() )
+        {
+            player->SetMoveType( MOVETYPE_LADDER );
+            SetLadder( lm->m_hForceLadder );
+        }
+
+        // Zero out any velocity
+        mv->m_vecVelocity.Init();
+    }
+
+    // Stil active
+    return lm->m_bForceLadderMove;
 }
-
-#define LADDER_DISMOUNT_MAX_DIST		65.0f
 
 bool CZMGameMovement::ExitLadderViaDismountNode( CFuncLadder* pLadder, bool strict )
 {
-	// Find the best ladder exit node
-	float bestDot = -99999.0f;
-	float bestDistance = 99999.0f;
-	Vector bestDest;
-	bool found = false;
+    //
+    // Find the best ladder exit node
+    //
 
-	// For 'alternate' dismount
-	bool foundAlternate = false;
-	Vector alternateDest;
-	float alternateDist = 99999.0f;
+    // The player doesn't want to move anywhere, don't dismount.
+    if ( !strict && mv->m_flForwardMove == 0.0f && mv->m_flSideMove == 0.0f )
+    {
+        return false;
+    }
 
-
-	int nDismounts = pLadder->GetDismountCount();
-
-	for ( int i = 0; i < nDismounts; i++ )
-	{
-		auto* spot = pLadder->GetDismount( i );
-		if ( !spot )
-		{
-			continue;
-		}
-
-		// See if it's valid to put the player there...
-		Vector org = spot->GetAbsOrigin() + Vector( 0, 0, 1 );
-
-		// Too far away.
-		if ( org.DistToSqr( mv->GetAbsOrigin() ) > (LADDER_DISMOUNT_MAX_DIST*LADDER_DISMOUNT_MAX_DIST) )
-		{
-			continue;
-		}
+    float bestDot = -FLT_MAX;
+    float bestDistance = FLT_MAX;
+    Vector bestDest;
+    bool found = false;
 
 
-		trace_t tr;
-		UTIL_TraceHull(
-			org, 
-			org, 
-			GetPlayerMins( ( player->GetFlags() & FL_DUCKING ) ? true : false ),
-			GetPlayerMaxs( ( player->GetFlags() & FL_DUCKING ) ? true : false ),
-			MASK_PLAYERSOLID,
-			player,
-			COLLISION_GROUP_PLAYER_MOVEMENT,
-			&tr );
+    bool bFoundBackup = false;
+    Vector backupDest;
+    float backupDist = FLT_MAX;
 
-		// Nope...
-		if ( tr.startsolid )
-		{
-			continue;
-		}
-
-		// Find the best dot product
-		Vector pos = mv->GetAbsOrigin() + GetPlayerViewOffset( player->GetFlags() & FL_DUCKING );
-
-		Vector vecToSpot = org - pos;
-		float dist = VectorNormalize( vecToSpot );
-
-		float dot = vecToSpot.Dot( m_vecForward );
-
-		if ( dot > bestDot && dot > LADDER_DISMOUNT_DOT )
-		{
-			bestDest = org;
-			bestDistance = dist;
-			bestDot = dot;
-			found = true;
-		}
-
-		if ( dist < alternateDist )
-		{
-			alternateDest = org;
-			alternateDist = dist;
-			foundAlternate = true;
-		}
-	}
-
-	if ( found )
-	{
-		StartForcedMove( false, player->MaxSpeed(), bestDest, nullptr );
-		return true;
-	}
+    Vector fwdXY = m_vecForward;
+    fwdXY.z = 0.0f;
+    fwdXY.NormalizeInPlace();
 
 
-	if( foundAlternate && strict )
-	{
-		StartForcedMove( false, player->MaxSpeed(), alternateDest, nullptr );
-		return true;
-	}
+    Vector wishdir;
+    for ( int i = 0; i < 2; i++ )
+        wishdir[i] = m_vecForward[i] * mv->m_flForwardMove + m_vecRight[i] * mv->m_flSideMove;
+    wishdir[2] = 0.0f;
 
-	return false;
+    wishdir.NormalizeInPlace();
+
+
+
+    int nDismounts = pLadder->GetDismountCount();
+
+    for ( int i = 0; i < nDismounts; i++ )
+    {
+        auto* spot = pLadder->GetDismount( i );
+        if ( !spot )
+        {
+            continue;
+        }
+
+        // See if it's valid to put the player there...
+        Vector org = spot->GetAbsOrigin() + Vector( 0, 0, 1 );
+
+        // Too far away.
+        if ( org.DistToSqr( mv->GetAbsOrigin() ) > (LADDER_DISMOUNT_MAX_DIST*LADDER_DISMOUNT_MAX_DIST) )
+        {
+            continue;
+        }
+
+
+        trace_t tr;
+        UTIL_TraceHull(
+            org, 
+            org, 
+            GetPlayerMins( ( player->GetFlags() & FL_DUCKING ) ? true : false ),
+            GetPlayerMaxs( ( player->GetFlags() & FL_DUCKING ) ? true : false ),
+            MASK_PLAYERSOLID,
+            player,
+            COLLISION_GROUP_PLAYER_MOVEMENT,
+            &tr );
+
+        // Nope...
+        if ( tr.startsolid )
+        {
+            continue;
+        }
+
+        //
+        // Find the best dot product
+        //
+        Vector pos = mv->GetAbsOrigin();
+
+        Vector dirToSpot = org - pos;
+        dirToSpot.z = 0.0f;
+        float dist = dirToSpot.NormalizeInPlace();
+
+        float lookdot = dirToSpot.Dot( fwdXY );
+        float movedot = dirToSpot.Dot( wishdir );
+
+        //
+        // We must be looking or moving that way to use that spot.
+        //
+        if ((lookdot > bestDot && lookdot > LADDER_DISMOUNT_DOT)
+        ||	(movedot > bestDot && movedot > LADDER_DISMOUNT_DOT))
+        {
+            bestDest = org;
+            bestDistance = dist;
+            bestDot = MAX( movedot, lookdot );
+            found = true;
+        }
+
+        if ( dist < backupDist )
+        {
+            backupDest = org;
+            backupDist = dist;
+            bFoundBackup = true;
+        }
+    }
+
+    if ( found )
+    {
+        StartForcedMove( false, player->MaxSpeed(), bestDest, nullptr );
+        return true;
+    }
+
+
+    if( bFoundBackup && strict )
+    {
+        StartForcedMove( false, player->MaxSpeed(), backupDest, nullptr );
+        return true;
+    }
+
+    return false;
 }
 
 bool CZMGameMovement::IsForceMoveActive()
 {
-	LadderMove_t* lm = GetLadderMove();
-	return lm->m_bForceLadderMove;
+    LadderMove_t* lm = GetLadderMove();
+    return lm->m_bForceLadderMove;
 }
 
 LadderMove_t* CZMGameMovement::GetLadderMove() const
 {
-	return &GetZMPlayer()->m_ZMLocal.m_LadderMove;
+    return &GetZMPlayer()->m_ZMLocal.m_LadderMove;
 }
 
 CFuncLadder* CZMGameMovement::GetLadder() const
 {
-	return GetZMPlayer()->m_ZMLocal.m_hLadder.Get();
+    return GetZMPlayer()->m_ZMLocal.m_hLadder.Get();
 }
 
 void CZMGameMovement::SetLadder( CFuncLadder* pLadder )
 {
-	auto* pOldLadder = GetLadder();
+    auto* pOldLadder = GetLadder();
 
-	if ( pLadder != pOldLadder && pOldLadder )
-	{
-		pOldLadder->PlayerGotOff( GetZMPlayer() );
-	}
+    if ( pLadder != pOldLadder && pOldLadder )
+    {
+        pOldLadder->PlayerGotOff( player );
+    }
 
+    GetZMPlayer()->m_ZMLocal.m_hLadder.Set( pLadder );
+}
 
-	GetZMPlayer()->m_ZMLocal.m_hLadder.Set( pLadder );
+void CZMGameMovement::ExitLadder()
+{
+    auto* pOldLadder = GetLadder();
+    if ( pOldLadder )
+    {
+        pOldLadder->PlayerGotOff( player );
+    }
+
+    GetZMPlayer()->ExitLadder();
 }
 
 bool CZMGameMovement::LadderMove()
 {
-	LadderMoveRet_t ret = LADDERMOVERET_NO_LADDER;
+    LadderMoveRet_t ret = LADDERMOVERET_NO_LADDER;
 
-	bool bInHL2LadderMove = IsForceMoveActive() || GetZMPlayer()->m_ZMLocal.m_hLadder.Get();
+    bool bInHL2LadderMove = IsForceMoveActive() || GetZMPlayer()->m_ZMLocal.m_hLadder.Get();
 
-	if ( !bInHL2LadderMove )
-	{
-		// The old fashioned brush ladder move.
-		ret = LadderMove_Brush();
-	}
 
-	if ( ret == LADDERMOVERET_NO_LADDER )
-	{
-		// HL2 specific, func_ladder point entity one.
-		ret = LadderMove_HL2();
-	}
+    bool valid = GetZMPlayer()->IsHuman() && GetZMPlayer()->IsAlive();
 
-	return ret == LADDERMOVERET_ONLADDER;
+    if ( !valid )
+    {
+        ExitLadder();
+
+        return LADDERMOVERET_NO_LADDER;
+    }
+
+    if ( !bInHL2LadderMove )
+    {
+        // The old fashioned brush ladder move.
+        ret = LadderMove_Brush();
+    }
+
+    if ( ret == LADDERMOVERET_NO_LADDER )
+    {
+        // HL2 specific, func_ladder point entity one.
+        ret = LadderMove_HL2();
+    }
+
+
+    if ( ret != LADDERMOVERET_ONLADDER )
+    {
+        ExitLadder();
+    }
+
+    return ret == LADDERMOVERET_ONLADDER;
 }
 
 /*
