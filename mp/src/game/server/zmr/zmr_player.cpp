@@ -2360,11 +2360,12 @@ void CZMPlayer::UpdateClientData()
 
 void CZMPlayer::ExitLadder()
 {
-	if ( MOVETYPE_LADDER != GetMoveType() )
-		return;
-	
-	SetMoveType( MOVETYPE_WALK );
-	SetMoveCollide( MOVECOLLIDE_DEFAULT );
+	if ( GetMoveType() == MOVETYPE_LADDER )
+    {
+	    SetMoveType( MOVETYPE_WALK );
+	    SetMoveCollide( MOVECOLLIDE_DEFAULT );
+    }
+
 	// Remove from ladder
 	m_ZMLocal.m_hLadder.Set( nullptr );
 }
