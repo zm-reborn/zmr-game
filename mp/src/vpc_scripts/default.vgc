@@ -20,6 +20,9 @@ $Conditional "SOURCESDK" "1"
 // Switch on when building for steam.
 $Conditional "ZMR_STEAM" "0"
 
+// Use it for compiling release versions.
+$Conditional "ZMR_FINAL" "0"
+
 $Include "vpc_scripts\projects.vgc"
 $Include "vpc_scripts\groups.vgc"
 

@@ -17,6 +17,7 @@ $Configuration
 		$AdditionalIncludeDirectories		"$BASE;hl2mp\ui,.\hl2mp,$SRCDIR\game\shared\hl2mp,.\hl2,.\hl2\elements,$SRCDIR\game\shared\hl2,$SRCDIR\game\shared\zmr"
 		$PreprocessorDefinitions			"$BASE;HL2MP;HL2_CLIENT_DLL;ZMR"
 		$PreprocessorDefinitions			"$BASE;ZMR_STEAM" [$ZMR_STEAM]
+		$PreprocessorDefinitions			"$BASE;ZMR_FINAL" [$ZMR_FINAL]
 	}
 }
 
@@ -25,6 +26,7 @@ $Project "Client (ZMR)"
 	$Folder "Libs (ZMR)"
 	{
 		$Lib		discord-rpc [$WIN32]
+		$Lib		fmod_vc [$WIN32 && $ZMR_FINAL]
 		//$Lib		libdiscord-rpc [$LINUXALL]
 		$Lib		raytrace
 	}
@@ -339,12 +341,16 @@ $Project "Client (ZMR)"
 			$File	"zmr\c_zmr_flashlighteffect.h"
 			$File	"zmr\c_zmr_flashlightsystem.cpp"
 			$File	"zmr\c_zmr_flashlightsystem.h"
+			$File	"zmr\c_zmr_fmod.cpp" [$ZMR_FINAL]
+			$File	"zmr\c_zmr_fmod.h" [$ZMR_FINAL]
 			$File	"zmr\c_zmr_importancesystem.cpp"
 			$File	"zmr\c_zmr_importancesystem.h"
 			$File	"zmr\c_zmr_in_main.cpp"
 			$File	"zmr\c_zmr_in_main.h"
 			$File	"zmr\c_zmr_legacy_objpanel.cpp"
 			$File	"zmr\c_zmr_legacy_objpanel.h"
+			$File	"zmr\c_zmr_music.cpp" [$ZMR_FINAL]
+			$File	"zmr\c_zmr_music.h" [$ZMR_FINAL]
 			$File	"zmr\c_zmr_player.cpp"
 			$File	"zmr\c_zmr_player.h"
 			$File	"zmr\c_zmr_player_ragdoll.cpp"

@@ -67,7 +67,6 @@ IZMUi* g_pZMMainMenu = static_cast<IZMUi*>( &g_ZMMainMenuInt );
 
 
 bool CZMMainMenu::s_bWasInGame = false;
-bool CZMMainMenu::s_bStartedMainMenuMusic = false;
 
 
 CZMMainMenu::CZMMainMenu( VPANEL parent ) : BaseClass( nullptr, "ZMMainMenu" )
@@ -152,56 +151,6 @@ void CZMMainMenu::ReleaseGameUI()
 void CZMMainMenu::OnInGameStatusChanged( bool bInGame )
 {
     CheckInGameButtons( bInGame );
-
-    if ( !bInGame )
-    {
-        PlayMainMenuMusic();
-    }
-    else
-    {
-        // HACK: Force the main menu music to stop when in-game.
-        enginesound->StopAllSounds( false );
-    }
-}
-
-void CZMMainMenu::PlayMainMenuMusic()
-{
-    //
-    // ZMRTODO: Refactor me.
-    //
-    FileFindHandle_t fh = 0;
-
-    CUtlVectorAutoPurge<char*> vMusic;
-    char buffer[1024];
-
-    
-    for (   auto pszFileName = filesystem->FindFirstEx( "sound/music/zmr/*", "MOD", &fh );
-            pszFileName != nullptr;
-            pszFileName = filesystem->FindNext( fh ) )
-    {
-        if ( !Q_stristr( pszFileName, ".mp3" ) && !Q_stristr( pszFileName, ".wav" ) )
-        {
-            continue;
-        }
-
-
-        Q_snprintf( buffer, sizeof( buffer ), "music/zmr/%s", pszFileName );
-    
-        int len = Q_strlen( buffer ) + 1;
-        char* found = new char[len];
-
-        Q_strncpy( found, buffer, len );
-
-        vMusic.AddToTail( found );
-    }
-
-
-    if ( vMusic.Count() > 0 )
-    {
-        // #-sign is to consider it music.
-        Q_snprintf( buffer, sizeof( buffer ), "play *#%s", vMusic[random->RandomInt( 0, vMusic.Count() - 1)] );
-        engine->ClientCmd_Unrestricted( buffer );
-    }
 }
 
 void CZMMainMenu::OnThink()
@@ -209,12 +158,6 @@ void CZMMainMenu::OnThink()
     bool bInGame = engine->IsInGame();
     if ( bInGame && engine->IsLevelMainMenuBackground() )
         bInGame = false;
-
-    if ( !s_bStartedMainMenuMusic )
-    {
-        PlayMainMenuMusic();
-        s_bStartedMainMenuMusic = true;
-    }
 
     if ( s_bWasInGame != bInGame )
     {
