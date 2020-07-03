@@ -51,10 +51,8 @@ private:
     void SetLoadingScreenState( bool state );
 
     void OnInGameStatusChanged( bool bInGame );
-    void PlayMainMenuMusic();
     void CheckInGameButtons( bool bInGame );
     static bool s_bWasInGame;
-    static bool s_bStartedMainMenuMusic;
 
 
     IGameUI* m_pGameUI;

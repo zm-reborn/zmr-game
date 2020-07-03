@@ -1,0 +1,25 @@
+// All music.
+//
+// file				- File path relative to game folder.
+// mainmenu			- Music plays in main menu.
+// loadingscreen	- Music plays in loading screen.
+// 
+//
+"Music"
+{
+	"Alchemy"
+	{
+		"file"	"sound/music/zmr/rhett_dahl_alchemy.wav"
+		"mainmenu"	"1"
+	}
+	"The Controller"
+	{
+		"file"	"sound/music/zmr/rhett_dahl_thecontroller.wav"
+		"mainmenu"	"1"
+	}
+	"ZMR Menu"
+	{
+		"file"	"sound/music/zmr/rhett_dahl_zmr_menu.wav"
+		"mainmenu"	"1"
+	}
+}

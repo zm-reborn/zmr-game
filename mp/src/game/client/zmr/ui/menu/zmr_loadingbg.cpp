@@ -11,6 +11,7 @@
 
 #include "zmr/c_zmr_legacy_objpanel.h"
 #include "zmr/c_zmr_tips.h"
+#include "zmr/c_zmr_music.h"
 
 #include "zmr_mainmenu.h"
 #include "zmr_loadingbg.h"
@@ -269,6 +270,9 @@ void CZMLoadingPanel::OnActivate()
 
     ChangeTip();
 
+#ifdef ZMR_FINAL
+    ZMMusic::g_ZMMusicManager.SetMusicState( ZMMusic::MUSICSTATE_LOADINGSCREEN );
+#endif
 
 
     // Tell main menu we're being drawn.
@@ -285,6 +289,10 @@ void CZMLoadingPanel::OnActivate()
 
 void CZMLoadingPanel::OnDeactivate()
 {
+#ifdef ZMR_FINAL
+    ZMMusic::g_ZMMusicManager.SetMusicState( ZMMusic::MUSICSTATE_NONE );
+#endif
+
     // Tell main menu we're no longer drawn.
     auto mainMenuPanel = g_pZMMainMenu->GetPanel()->GetVPanel();
     auto myPanel = GetVPanel();

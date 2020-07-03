@@ -113,3 +113,4 @@ mp/src/materialsystem/stdshaders/inclist.txt
 *.VC.*
 *.FileListAbsolute.txt
 .vs
+mp/src/public/fmod/
