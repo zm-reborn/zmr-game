@@ -15,6 +15,8 @@ FMOD::System* CFMODSystem::s_pFMODSystem = nullptr;
 
 CFMODSystem::CFMODSystem() : CAutoGameSystemPerFrame( "ZMFModSystem" )
 {
+    m_bMuted = false;
+    m_flMasterVolume = 1.0f;
 }
 
 CFMODSystem::~CFMODSystem()
@@ -93,7 +95,11 @@ void CFMODSystem::Shutdown()
 
 void CFMODSystem::Update( float frametime )
 {
+    Assert( s_pFMODSystem );
     if ( !s_pFMODSystem ) return;
+
+
+    UpdateFocusVolume();
 
 
     FMOD_RESULT result = s_pFMODSystem->update();
@@ -104,6 +110,45 @@ void CFMODSystem::Update( float frametime )
     }
 }
 
+//
+// Update volume if window focus changes.
+//
+void CFMODSystem::UpdateFocusVolume()
+{
+    static ConVarRef snd_mute_losefocus( "snd_mute_losefocus" );
+
+    // No losefocus mute.
+    if ( !snd_mute_losefocus.GetBool() )
+    {
+        if ( m_bMuted )
+        {
+            SetMasterVolumeInternal( GetMasterVolume() );
+            m_bMuted = false;
+        }
+        
+        return;
+    }
+
+
+    bool bInFocus = engine->IsActiveApp();
+
+    if ( bInFocus )
+    {
+        if ( m_bMuted )
+        {
+            SetMasterVolumeInternal( GetMasterVolume() );
+            m_bMuted = false;
+        }
+    }
+    else
+    {
+        if ( !m_bMuted )
+        {
+            SetMasterVolumeInternal( 0.0f );
+            m_bMuted = true;
+        }
+    }
+}
 
 FMODSoundHandle_t CFMODSystem::RegisterSound( const char* path )
 {
@@ -142,18 +187,25 @@ FMODSoundHandle_t CFMODSystem::RegisterSound( const char* path )
 
 float CFMODSystem::GetMasterVolume() const
 {
-    Assert( s_pFMODSystem );
+    return m_flMasterVolume;
+}
 
-    FMOD::ChannelGroup* pMasterGroup = nullptr;
-    s_pFMODSystem->getMasterChannelGroup( &pMasterGroup );
-
-    float volume = 0.0f;
-    pMasterGroup->getVolume( &volume );
-
-    return volume;
+bool CFMODSystem::IsMuted() const
+{
+    return m_bMuted;
 }
 
 void CFMODSystem::SetMasterVolume( float volume )
+{
+    if ( !IsMuted() )
+    {
+        SetMasterVolumeInternal( volume );
+    }
+
+    m_flMasterVolume = volume;
+}
+
+void CFMODSystem::SetMasterVolumeInternal( float volume )
 {
     Assert( s_pFMODSystem );
 

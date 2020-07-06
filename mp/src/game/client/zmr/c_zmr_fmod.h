@@ -37,6 +37,7 @@ public:
 
     float               GetMasterVolume() const;
     void                SetMasterVolume( float volume );
+    bool                IsMuted() const;
 
     FMODChannelHandle_t StartSound( FMODSoundHandle_t hndl, float fadeintime = 0.0f );
     bool                StopSound( FMODChannelHandle_t hndl, float fadeouttime = 0.0f );
@@ -50,11 +51,18 @@ private:
     FMODSoundHandle_t   CreateSoundHandle();
     FMODChannelHandle_t CreateChannelHandle();
 
+    void SetMasterVolumeInternal( float volume );
+
+    void UpdateFocusVolume();
+
 
     CUtlVector<FMOD::Sound*>    m_vpSounds;
     CUtlVector<FMOD::Channel*>  m_vpChannels;
 
     static FMOD::System*        s_pFMODSystem;
+
+    float m_flMasterVolume;
+    bool m_bMuted;
 };
 
 extern CFMODSystem g_FMODSystem;
