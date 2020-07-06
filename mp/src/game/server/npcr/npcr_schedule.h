@@ -127,10 +127,10 @@ namespace NPCR
         ScheduleState_t Intercept( CSchedule<NPCRChar>* sched, const char* szReason = "" )
         {
             // Bad practice if we attempt this more than once... or a bug.
-            if ( IsIntercepted() )
+            if ( !IsRunning() )
             {
                 AssertMsg( 0, szReason );
-                return SCHED_INTERCEPTED;
+                return m_State;
             }
 
             Assert( sched != nullptr );
@@ -177,7 +177,7 @@ namespace NPCR
         void End( const char* szReason = "" )
         {
             // Bad practice if we attempt this more than once... or a bug.
-            if ( IsDone() )
+            if ( !IsRunning() )
             {
                 AssertMsg( 0, szReason );
                 return;
