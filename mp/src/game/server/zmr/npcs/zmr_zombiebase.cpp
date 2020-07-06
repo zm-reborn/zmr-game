@@ -1008,6 +1008,18 @@ bool CZMBaseZombie::SwatObject( CBaseEntity* pSwat )
     //    pPhys->Wake();
     //}
 
+
+    // Force the player to drop it!
+    if ( pPhys->GetGameFlags() & FVPHYSICS_PLAYER_HELD )
+    {
+        auto* pPlayer = ToZMPlayer( pSwat->GetOwnerEntity() );
+        
+        if ( pPlayer )
+        {
+            pPlayer->ForceDropOfCarriedPhysObjects( pSwat );
+        }
+    }
+
     pPhys->ApplyForceCenter( dir * force + uplift );
 
 
