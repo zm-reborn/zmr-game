@@ -144,7 +144,8 @@ public:
 
     virtual void PickupObject( CBaseEntity* pObject, bool bLimitMassAndSize ) OVERRIDE;
     virtual float GetHeldObjectMass( IPhysicsObject* pHeldObject ) OVERRIDE;
-    //virtual void ForceDropOfCarriedPhysObjects( CBaseEntity* pOnlyIfHoldindThis ) OVERRIDE;
+    virtual void ForceDropOfCarriedPhysObjects( CBaseEntity* pOnlyIfHoldindThis ) OVERRIDE;
+    void InputForceDropPhysObjects( inputdata_t &data );
 
     virtual bool BumpWeapon( CBaseCombatWeapon* pWeapon ) OVERRIDE;
 
