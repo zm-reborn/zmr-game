@@ -14,6 +14,7 @@
 #include "effect_dispatch_data.h"
 #include "te_effect_dispatch.h"
 #include "soundenvelope.h"
+#include "eventqueue.h"
 
 #include "zmr_rejoindata.h"
 #include "npcs/zmr_zombiebase.h"
@@ -119,6 +120,7 @@ END_SEND_TABLE()
 
 
 BEGIN_DATADESC( CZMPlayer )
+    DEFINE_INPUTFUNC( FIELD_VOID, "ForceDropPhysObjects", InputForceDropPhysObjects ),
 END_DATADESC()
 
 
@@ -1617,6 +1619,27 @@ float CZMPlayer::GetHeldObjectMass( IPhysicsObject *pHeldObject )
     CZMWeaponHands* pWeapon = static_cast<CZMWeaponHands*>( Weapon_OwnsThisType( "weapon_zm_fistscarry" ) );
 
     return pWeapon ? pWeapon->GetHeldObjectMass() : 0.0f;
+}
+
+void CZMPlayer::ForceDropOfCarriedPhysObjects( CBaseEntity *pOnlyIfHoldingThis )
+{
+	if ( PhysIsInCallback() )
+	{
+		variant_t value;
+		g_EventQueue.AddEvent( this, "ForceDropPhysObjects", value, 0.01f, pOnlyIfHoldingThis, this );
+		return;
+	}
+
+	// Let go of func_tanks.
+	ClearUseEntity();
+
+	// Do the actual dropping.
+	PhysCannonForceDrop( GetActiveWeapon(), nullptr );
+}
+
+void CZMPlayer::InputForceDropPhysObjects( inputdata_t &data )
+{
+	ForceDropOfCarriedPhysObjects( data.pActivator );
 }
 
 void CZMPlayer::SetHandsModel( const char* model )
