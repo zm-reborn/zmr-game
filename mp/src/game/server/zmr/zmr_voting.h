@@ -3,8 +3,8 @@
 #include "cbase.h"
 #include "vote_controller.h"
 
-#include "zmr/zmr_gamerules.h"
-#include "zmr/zmr_shareddefs.h"
+#include "zmr_gamerules.h"
+#include "zmr_shareddefs.h"
 
 
 class CZMVoteRoundRestart : public CBaseIssue

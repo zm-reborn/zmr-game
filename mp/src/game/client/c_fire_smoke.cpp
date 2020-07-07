@@ -17,7 +17,7 @@
 #include "tier0/icommandline.h"
 
 #ifdef ZMR
-#include "zmr/c_zmr_fireglow_system.h"
+#include "c_zmr_fireglow_system.h"
 #endif
 
 // memdbgon must be the last include file in a .cpp file!!!

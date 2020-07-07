@@ -3,7 +3,7 @@
 
 
 #include "zmr_options_misc.h"
-#include "zmr/c_zmr_player.h"
+#include "c_zmr_player.h"
 
 
 extern ConVar zm_cl_firstperson_deathcam;

@@ -11,7 +11,7 @@
 #endif
 
 #ifdef CLIENT_DLL
-#include "zmr/c_zmr_util.h"
+#include "c_zmr_util.h"
 #endif
 
 #include "zmr_player_shared.h"

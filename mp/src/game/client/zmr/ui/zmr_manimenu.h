@@ -11,7 +11,7 @@
 #include <game/client/iviewport.h>
 
 #include "zmr_manimenu_base.h"
-#include "zmr/zmr_shareddefs.h"
+#include "zmr_shareddefs.h"
 
 
 class CZMManiMenu : public CZMManiMenuBase

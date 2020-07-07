@@ -3,10 +3,10 @@
 
 #include "zmr_zombiebase_shared.h"
 
-#include "zmr/zmr_player_shared.h"
-#include "zmr/zmr_gamerules.h"
-#include "zmr/zmr_shareddefs.h"
-#include "zmr/npcs/zmr_zombieanimstate.h"
+#include "zmr_player_shared.h"
+#include "zmr_gamerules.h"
+#include "zmr_shareddefs.h"
+#include "npcs/zmr_zombieanimstate.h"
 
 
 

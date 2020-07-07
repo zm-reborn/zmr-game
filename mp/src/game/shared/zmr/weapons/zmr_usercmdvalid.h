@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include "zmr/zmr_usercmd.h"
+#include "zmr_usercmd.h"
 
 
 // Leaving empty classes for client.

@@ -1,8 +1,8 @@
 #pragma once
 
 
-#include "zmr/zmr_obj_manager.h"
-#include "zmr/zmr_shareddefs.h"
+#include "zmr_obj_manager.h"
+#include "zmr_shareddefs.h"
 
 
 class CObjLine

@@ -17,7 +17,7 @@
 
 #include "zmr_framepanel.h"
 
-#include "zmr/c_zmr_player.h"
+#include "c_zmr_player.h"
 #include "zmr_voicelines.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

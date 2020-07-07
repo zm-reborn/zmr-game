@@ -3,7 +3,7 @@
 #include "cbase.h"
 #include "precipitation_shared.h"
 
-#include "zmr/zmr_shareddefs.h"
+#include "zmr_shareddefs.h"
 
 class CZMBuildMenuBase;
 class CZMManiMenuBase;

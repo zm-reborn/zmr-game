@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include "zmr/zmr_shareddefs.h"
+#include "zmr_shareddefs.h"
 #include "zmr_imagerow.h"
 
 //

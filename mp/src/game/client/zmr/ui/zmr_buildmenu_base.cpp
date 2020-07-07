@@ -4,9 +4,9 @@
 
 #include "zmr_buildmenu.h"
 #include "zmr_zmview_base.h"
-#include "zmr/c_zmr_entities.h"
-#include "zmr/npcs/c_zmr_zombiebase.h"
-#include "zmr/c_zmr_clientmode.h"
+#include "c_zmr_entities.h"
+#include "npcs/c_zmr_zombiebase.h"
+#include "c_zmr_clientmode.h"
 #include "zmr_buildmenu_base.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

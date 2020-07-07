@@ -1,7 +1,7 @@
 #include "cbase.h"
 
 
-#include "zmr/zmr_shareddefs.h"
+#include "zmr_shareddefs.h"
 
 #include "c_zmr_player_resource.h"
 

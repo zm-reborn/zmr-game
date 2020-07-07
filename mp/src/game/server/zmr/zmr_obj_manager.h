@@ -1,7 +1,7 @@
 #pragma once
 
-#include "zmr/zmr_gamerules.h"
-#include "zmr/zmr_objectives.h"
+#include "zmr_gamerules.h"
+#include "zmr_objectives.h"
 
 
 struct ObjInputData_t

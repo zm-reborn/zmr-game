@@ -17,7 +17,7 @@
 #include "checksum_crc.h"
 
 #ifdef ZMR
-#include "zmr/zmr_usercmd.h"
+#include "zmr_usercmd.h"
 #endif
 
 

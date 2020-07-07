@@ -1,6 +1,6 @@
 #include "cbase.h"
 
-#include "zmr/npcs/zmr_zombiebase_shared.h"
+#include "npcs/zmr_zombiebase_shared.h"
 #include "zmr_util.h"
 
 

@@ -13,8 +13,8 @@
 
 
 #include "zmr_buildmenu_base.h"
-#include "zmr/c_zmr_entities.h"
-#include "zmr/zmr_shareddefs.h"
+#include "c_zmr_entities.h"
+#include "zmr_shareddefs.h"
 
 
 

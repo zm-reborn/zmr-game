@@ -1,7 +1,7 @@
 #include "cbase.h"
 #include "ammodef.h"
 
-#include "zmr/zmr_shareddefs.h"
+#include "zmr_shareddefs.h"
 #include "zmr_ammo.h"
 
 /*

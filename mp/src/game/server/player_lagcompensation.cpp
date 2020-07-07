@@ -16,7 +16,7 @@
 
 #ifdef ZMR
 #include "zmr_player_shared.h"
-#include "zmr/npcs/zmr_zombiebase_shared.h"
+#include "npcs/zmr_zombiebase_shared.h"
 #endif
 
 // memdbgon must be the last include file in a .cpp file!!!

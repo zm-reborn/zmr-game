@@ -3,9 +3,9 @@
 
 
 #ifndef CLIENT_DLL
-#include "zmr/zmr_player.h"
+#include "zmr_player.h"
 #else
-#include "zmr/c_zmr_player.h"
+#include "c_zmr_player.h"
 #endif
 
 #ifdef CLIENT_DLL

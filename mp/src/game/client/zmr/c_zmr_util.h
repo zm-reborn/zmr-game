@@ -1,8 +1,8 @@
 #pragma once
 
 
-#include "zmr/npcs/c_zmr_zombiebase.h"
-#include "zmr/zmr_shareddefs.h"
+#include "npcs/c_zmr_zombiebase.h"
+#include "zmr_shareddefs.h"
 
 namespace ZMClientUtil
 {

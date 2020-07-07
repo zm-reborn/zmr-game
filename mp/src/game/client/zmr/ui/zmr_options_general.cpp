@@ -3,8 +3,8 @@
 
 
 #include "zmr_options_general.h"
-#include "zmr/zmr_playermodels.h"
-#include "zmr/c_zmr_player.h"
+#include "zmr_playermodels.h"
+#include "c_zmr_player.h"
 
 
 extern ConVar zm_cl_usenewmenus;

@@ -3,11 +3,11 @@
 
 #include "npcr/c_npcr_nonplayer.h"
 
-#include "zmr/c_zmr_charcircle.h"
+#include "c_zmr_charcircle.h"
 #include "c_zmr_hat.h"
 
-#include "zmr/zmr_player_shared.h"
-#include "zmr/zmr_shareddefs.h"
+#include "zmr_player_shared.h"
+#include "zmr_shareddefs.h"
 
 
 class CZMZombieAnimState;

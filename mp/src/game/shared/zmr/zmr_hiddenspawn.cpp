@@ -2,10 +2,10 @@
 
 
 #ifdef GAME_DLL
-#include "zmr/zmr_util.h"
-#include "zmr/zmr_entities.h"
+#include "zmr_util.h"
+#include "zmr_entities.h"
 #endif
-#include "zmr/npcs/zmr_zombiebase_shared.h"
+#include "npcs/zmr_zombiebase_shared.h"
 #include "zmr_player_shared.h"
 #include "zmr_shareddefs.h"
 

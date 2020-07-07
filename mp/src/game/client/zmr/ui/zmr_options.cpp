@@ -8,7 +8,7 @@
 #include <vgui_controls/AnimationController.h>
 #include <vgui_controls/PropertySheet.h>
 
-#include "zmr/c_zmr_player.h"
+#include "c_zmr_player.h"
 #include "zmr_options_general.h"
 #include "zmr_options_graphics.h"
 #include "zmr_options_misc.h"

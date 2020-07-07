@@ -1,7 +1,7 @@
 #include "cbase.h"
 
 
-#include "zmr/zmr_player_shared.h"
+#include "zmr_player_shared.h"
 #include "zmr_viewmodel.h"
 
 #ifdef CLIENT_DLL

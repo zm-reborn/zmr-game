@@ -2,7 +2,7 @@
 
 #include "soundent.h"
 
-#include "zmr/npcs/zmr_playerbot.h"
+#include "npcs/zmr_playerbot.h"
 
 #include "npcr_motor.h"
 #include "npcr_path_cost.h"

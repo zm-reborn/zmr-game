@@ -31,7 +31,7 @@
 #include <vgui/IPanel.h>
 
 #ifdef ZMR
-#include "zmr/zmr_shareddefs.h"
+#include "zmr_shareddefs.h"
 #endif
 
 // memdbgon must be the last include file in a .cpp file!!!

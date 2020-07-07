@@ -5,11 +5,11 @@
 
 #include "c_zmr_charcircle.h"
 
-#include "zmr/zmr_playeranimstate.h"
-#include "zmr/zmr_shareddefs.h"
+#include "zmr_playeranimstate.h"
+#include "zmr_shareddefs.h"
 
 #include "weapons/zmr_base.h"
-#include "zmr/zmr_playerlocaldata.h"
+#include "zmr_playerlocaldata.h"
 
 
 struct ZMFireBulletsInfo_t;

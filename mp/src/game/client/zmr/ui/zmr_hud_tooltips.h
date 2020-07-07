@@ -6,7 +6,7 @@
 #include <vgui_controls/AnimationController.h>
 #include <vgui_controls/TextImage.h>
 
-#include "zmr/c_zmr_tips.h"
+#include "c_zmr_tips.h"
 
 
 class CZMHudTooltip : public CHudElement, public vgui::Panel

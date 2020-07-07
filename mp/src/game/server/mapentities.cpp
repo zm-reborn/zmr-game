@@ -20,7 +20,7 @@
 #include "toolframework/iserverenginetools.h"
 
 #ifdef ZMR
-#include "zmr/zmr_mapentities.h"
+#include "zmr_mapentities.h"
 #endif
 
 // memdbgon must be the last include file in a .cpp file!!!

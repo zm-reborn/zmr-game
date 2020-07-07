@@ -4,7 +4,7 @@
 
 #include "zmr_player_shared.h"
 #ifdef GAME_DLL
-#include "zmr/npcs/zmr_zombiebase.h"
+#include "npcs/zmr_zombiebase.h"
 #endif
 #include "zmr_softcollisions.h"
 

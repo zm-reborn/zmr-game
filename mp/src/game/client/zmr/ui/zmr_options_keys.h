@@ -6,7 +6,7 @@
 #include <vgui_controls/TextEntry.h>
 
 
-#include "zmr/c_zmr_zmkeys.h"
+#include "c_zmr_zmkeys.h"
 
 #include "zmr_options_tab.h"
 

@@ -27,7 +27,7 @@
 #endif // PORTAL
 
 #ifdef ZMR
-#include "zmr/c_zmr_player.h"
+#include "c_zmr_player.h"
 #endif
 
 // memdbgon must be the last include file in a .cpp file!!!

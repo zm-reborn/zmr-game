@@ -13,11 +13,11 @@
 #include <vphysics/constraints.h>
 
 
-#include "zmr/zmr_gamerules.h"
-#include "zmr/zmr_viewmodel.h"
-#include "zmr/zmr_ammodef.h"
-#include "zmr/weapons/zmr_base.h"
-#include "zmr/zmr_shareddefs.h"
+#include "zmr_gamerules.h"
+#include "zmr_viewmodel.h"
+#include "zmr_ammodef.h"
+#include "weapons/zmr_base.h"
+#include "zmr_shareddefs.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

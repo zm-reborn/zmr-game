@@ -16,12 +16,12 @@
 #include "zmr_gamerules.h"
 
 #ifndef CLIENT_DLL
-#include "zmr/zmr_player.h"
+#include "zmr_player.h"
 #else
-#include "zmr/c_zmr_player.h"
+#include "c_zmr_player.h"
 #endif
 
-#include "zmr/zmr_softcollisions.h"
+#include "zmr_softcollisions.h"
 #include "zmr_gamemovement.h"
 
 

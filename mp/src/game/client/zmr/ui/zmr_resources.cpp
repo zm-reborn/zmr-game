@@ -5,11 +5,11 @@
 #include "baseviewport.h"
 
 
-#include "zmr/c_zmr_player.h"
-#include "zmr/zmr_gamerules.h"
-#include "zmr/zmr_resource_system.h"
-#include "zmr/npcs/c_zmr_zombiebase.h"
-#include "zmr/c_zmr_util.h"
+#include "c_zmr_player.h"
+#include "zmr_gamerules.h"
+#include "zmr_resource_system.h"
+#include "npcs/c_zmr_zombiebase.h"
+#include "c_zmr_util.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

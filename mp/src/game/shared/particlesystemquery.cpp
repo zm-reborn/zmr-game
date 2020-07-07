@@ -13,7 +13,7 @@
 #if defined( ZMR ) && defined( CLIENT_DLL )
 #include "raytrace.h"
 
-#include "zmr/c_zmr_precipitation.h"
+#include "c_zmr_precipitation.h"
 #endif
 
 #if defined( CLIENT_DLL )

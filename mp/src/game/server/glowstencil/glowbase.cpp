@@ -1,7 +1,7 @@
 #include "cbase.h"
 #include "glowbase.h"
 
-#include "zmr/zmr_shareddefs.h"
+#include "zmr_shareddefs.h"
 
 
 #define GLOWTYPE_ALWAYS             0

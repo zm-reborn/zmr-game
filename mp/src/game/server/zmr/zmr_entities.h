@@ -6,7 +6,7 @@
 
 //#include "zmr_player.h"
 #//include "npcs/zmr_zombiebase.h"
-#include "zmr/zmr_shareddefs.h"
+#include "zmr_shareddefs.h"
 
 
 

@@ -1,9 +1,9 @@
 #pragma once
 
 
-#include "zmr/npcs/zmr_zombiebase.h"
-#include "zmr/npcs/zmr_banshee.h"
-#include "zmr/npcs/zmr_zombieanimstate.h"
+#include "npcs/zmr_zombiebase.h"
+#include "npcs/zmr_banshee.h"
+#include "npcs/zmr_zombieanimstate.h"
 
 
 extern ConVar zm_sk_banshee_dmg_leap;

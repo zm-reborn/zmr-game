@@ -7,13 +7,13 @@
 #include "npcr_senses.h"
 #include "npcr_path_cost.h"
 #include "npcr_path_follow.h"
-#include "zmr/npcs/zmr_npclagcomp.h"
+#include "npcs/zmr_npclagcomp.h"
 #include "zmr_cmd_queue.h"
 
 //#include "zmr_blockerfinder.h"
 
 #include "zmr_shareddefs.h"
-#include "zmr/zmr_player.h"
+#include "zmr_player.h"
 
 
 class CZMZombieAnimState;

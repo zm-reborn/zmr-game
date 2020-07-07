@@ -2,9 +2,9 @@
 #include "filesystem.h"
 #include "eventqueue.h"
 
-#include "zmr/zmr_player.h"
-#include "zmr/zmr_gamerules.h"
-#include "zmr/zmr_obj_manager.h"
+#include "zmr_player.h"
+#include "zmr_gamerules.h"
+#include "zmr_obj_manager.h"
 
 
 

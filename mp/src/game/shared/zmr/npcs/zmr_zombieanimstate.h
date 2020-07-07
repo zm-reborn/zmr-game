@@ -3,7 +3,7 @@
 #ifndef CLIENT_DLL
 #include "npcr_component.h"
 #endif
-#include "zmr/npcs/zmr_zombiebase_shared.h"
+#include "npcs/zmr_zombiebase_shared.h"
 
 
 enum ZMZombieAnimEvent_t

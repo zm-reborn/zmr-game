@@ -8,12 +8,12 @@
 #include "fx_quad.h"
 #include "IGameUIFuncs.h"
 
-#include "zmr/npcs/zmr_zombiebase_shared.h"
-#include "zmr/c_zmr_util.h"
-#include "zmr/c_zmr_clientmode.h"
-#include "zmr/zmr_hiddenspawn.h"
-#include "zmr/c_zmr_in_main.h"
-#include "zmr/c_zmr_tempmodel.h"
+#include "npcs/zmr_zombiebase_shared.h"
+#include "c_zmr_util.h"
+#include "c_zmr_clientmode.h"
+#include "zmr_hiddenspawn.h"
+#include "c_zmr_in_main.h"
+#include "c_zmr_tempmodel.h"
 #include "zmr_zmview_base.h"
 
 

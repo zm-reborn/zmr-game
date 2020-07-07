@@ -4,11 +4,11 @@
 #include "items.h"
 #endif
 
-#include "zmr/zmr_shareddefs.h"
+#include "zmr_shareddefs.h"
 #include "zmr_base.h"
 
 
-#include "zmr/zmr_player_shared.h"
+#include "zmr_player_shared.h"
 
 
 #ifdef CLIENT_DLL

@@ -1,7 +1,7 @@
 #include "cbase.h"
 
 #include "Multiplayer/multiplayer_animstate.h"
-#include "zmr/npcs/zmr_zombieanimstate.h"
+#include "npcs/zmr_zombieanimstate.h"
 
 #include "zmr_zombieanimevent.h"
 

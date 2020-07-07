@@ -5,7 +5,7 @@
 #include <vgui/IScheme.h>
 
 
-#include "zmr/zmr_shareddefs.h"
+#include "zmr_shareddefs.h"
 
 
 // memdbgon must be the last include file in a .cpp file!!!

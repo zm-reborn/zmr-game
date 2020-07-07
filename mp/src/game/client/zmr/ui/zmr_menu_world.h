@@ -6,7 +6,7 @@
 #include "iclientmode.h"
 #include <vgui_controls/Frame.h>
 
-#include "zmr/c_zmr_util.h"
+#include "c_zmr_util.h"
 
 
 abstract_class CZMWorldMenu

@@ -25,7 +25,7 @@
 #endif
 
 #ifdef ZMR
-#include "zmr/nav/zmr_nav_mesh.h"
+#include "nav/zmr_nav_mesh.h"
 #endif
 
 // memdbgon must be the last include file in a .cpp file!!!
