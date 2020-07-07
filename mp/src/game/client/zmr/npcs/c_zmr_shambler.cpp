@@ -4,6 +4,9 @@
 
 #include "c_zmr_shambler.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 #define ZOMBIE_SANTAHAT     "models/props/misc/zombie_santahat01.mdl"
 

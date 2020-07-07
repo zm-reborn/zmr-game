@@ -8,6 +8,9 @@
 #include "zmr_nav_area.h"
 #include "zmr_nav_mesh.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 // This is basically MASK_SOLID
 #define MASK_TRANSIENT          (CONTENTS_SOLID|CONTENTS_GRATE|CONTENTS_WINDOW|CONTENTS_MOVEABLE|CONTENTS_MONSTER)

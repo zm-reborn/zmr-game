@@ -2,6 +2,8 @@
 
 #include "c_zmr_colorcorrection.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
 
 
 #define ZMCC_DEATH              "materials/colorcorrection/game_death.raw"

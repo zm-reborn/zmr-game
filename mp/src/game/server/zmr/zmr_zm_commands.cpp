@@ -16,6 +16,9 @@
 #include "zmr_entities.h"
 #include "zmr_hiddenspawn.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 /*
     Move selected zombies.

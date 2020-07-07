@@ -6,6 +6,9 @@
 
 #include "zmr_zombie_senses.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 CZMZombieSenses::CZMZombieSenses( NPCR::CBaseNPC* pNPC ) : NPCR::CBaseSenses( pNPC )
 {

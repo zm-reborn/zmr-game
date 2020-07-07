@@ -5,6 +5,9 @@
 #include "zmr_gamerules.h"
 #include "zmr_shambler.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 extern ConVar zm_sk_shambler_health;
 extern ConVar zm_sk_shambler_dmg_oneslash;

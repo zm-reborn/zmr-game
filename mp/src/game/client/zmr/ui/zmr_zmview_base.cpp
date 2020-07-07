@@ -16,6 +16,8 @@
 #include "c_zmr_tempmodel.h"
 #include "zmr_zmview_base.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
 
 
 #define TEMPHIDDENSPAWN_MODEL           "models/zombie/zm_classic_01.mdl"

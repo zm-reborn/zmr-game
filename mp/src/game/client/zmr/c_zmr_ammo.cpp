@@ -4,6 +4,9 @@
 
 #include "c_zmr_player.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 ConVar zm_cl_glow_ammo( "zm_cl_glow_ammo", "1 .2 .2", FCVAR_ARCHIVE );
 ConVar zm_cl_glow_ammo_enabled( "zm_cl_glow_ammo_enabled", "1", FCVAR_ARCHIVE );

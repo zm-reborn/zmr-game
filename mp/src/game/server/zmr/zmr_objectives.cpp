@@ -4,6 +4,8 @@
 #include "zmr_team.h"
 #include "zmr_objectives.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
 
 
 void CObjLine::WriteEmptyDisplayUserMsg()

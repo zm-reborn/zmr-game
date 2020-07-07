@@ -2,6 +2,9 @@
 
 #include "c_zmr_zombieanimevent.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 IMPLEMENT_CLIENTCLASS_EVENT( C_ZMTEZombieAnimEvent, DT_ZM_TEZombieAnimEvent, CZMTEZombieAnimEvent );
 

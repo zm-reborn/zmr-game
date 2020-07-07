@@ -3,6 +3,9 @@
 #include "zmr_player.h"
 #include "zmr_gamerules.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 /*
     Endround (debugging)

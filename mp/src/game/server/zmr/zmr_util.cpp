@@ -3,6 +3,9 @@
 #include "npcs/zmr_zombiebase_shared.h"
 #include "zmr_util.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 int ZMUtil::GetSelectedZombieCount( int iPlayerIndex )
 {

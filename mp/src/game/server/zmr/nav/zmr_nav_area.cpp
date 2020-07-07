@@ -3,6 +3,9 @@
 #include "zmr_nav_mesh.h"
 #include "zmr_nav_area.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 CZMRNavArea::CZMRNavArea()
 {

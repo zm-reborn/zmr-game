@@ -5,6 +5,9 @@
 
 #include "zmr_options_graphics.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 extern ConVar zm_cl_glow_weapon_enabled;
 extern ConVar zm_cl_glow_ammo_enabled;

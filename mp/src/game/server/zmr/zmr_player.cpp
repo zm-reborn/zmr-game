@@ -28,7 +28,8 @@
 #include "zmr_resource_system.h"
 #include "zmr_player.h"
 
-
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
 
 
 #define VMHANDS_FALLBACKMODEL   "models/weapons/c_arms_citizen.mdl"

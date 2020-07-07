@@ -3,6 +3,9 @@
 #include "c_zmr_crosshair.h"
 #include "zmr_options_crosshair.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 CZMOptionsSubCrosshair::CZMOptionsSubCrosshair( Panel* parent ) : BaseClass( parent )
 {

@@ -2,6 +2,9 @@
 
 #include "zmr_playeranimevent.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 IMPLEMENT_SERVERCLASS_ST_NOBASE( CTEPlayerAnimEvent, DT_TEPlayerAnimEvent )
     SendPropEHandle( SENDINFO( m_hPlayer ) ),

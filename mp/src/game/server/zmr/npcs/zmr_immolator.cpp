@@ -5,6 +5,8 @@
 #include "zmr_gamerules.h"
 #include "zmr_immolator.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
 
 
 #define ZOMBIE_MODEL            "models/zombie/burnzie.mdl"

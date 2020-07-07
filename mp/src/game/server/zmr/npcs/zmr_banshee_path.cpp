@@ -3,6 +3,9 @@
 #include "zmr_banshee.h"
 #include "zmr_banshee_path.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 ConVar zm_sv_debug_banshee_path_jump( "zm_sv_debug_banshee_path_jump", "0" );
 
