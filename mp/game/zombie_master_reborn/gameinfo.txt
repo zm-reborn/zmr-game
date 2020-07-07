@@ -51,8 +51,6 @@
 			// folder.
 			//
 			// Note that this folder is scanned only when the game is booted.
-			//game+mod			hl2mp/custom/*
-			//game+mod			hl2/custom/*
 			game+mod			|gameinfo_path|custom/*
 
 			// Now search loose files.  We'll set the directory containing the gameinfo.txt file
@@ -85,10 +83,6 @@
 			game				hl2mp
 			// Fixes serverconfig.vdf and some other things being written into wrong places.
 			game_write			|gameinfo_path|
-
-			// Where the game's binaries are
-			//gamebin				hl2mp/bin
-			//gamebin				|gameinfo_path|bin // Already defined above.
 
 			// Last, mount in shared HL2 loose files
 			game				|all_source_engine_paths|hl2mp

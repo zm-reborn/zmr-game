@@ -515,59 +515,6 @@ Scheme
 				"custom"	"1"
 			}
 		}
-		Crosshairs
-		{
-			"1"
-			{
-				"name"		"HalfLife2"
-				"tall"		"40" [!$OSX]
-				"tall"		"41" [$OSX]
-				"weight"	"0"
-				"antialias" "0"
-				"additive"	"1"
-				"custom"	"1"
-				"yres"		"1 10000"
-			}
-		}
-		QuickInfo
-		{
-			"1"
-			{
-				"name"		"HL2cross"
-				"tall"		"28" [!$OSX]
-				"tall"		"50" [$OSX]
-				"weight"	"0"
-				"antialias" "1"
-				"additive"	"1"
-				"custom"	"1" [!$OSX]
-			}
-		}
-		HudNumbers
-		{
-			"1"
-			{
-				"name"		"HalfLife2"
-				"tall"		"32"
-				"weight"	"0"
-				"antialias" "1"
-				"additive"	"1"
-				"custom"	"1"
-			}
-		}
-		HudNumbersGlow
-		{
-			"1"
-			{
-				"name"		"HalfLife2"
-				"tall"		"32"
-				"weight"	"0"
-				"blur"		"4"
-				"scanlines" "2"
-				"antialias" "1"
-				"additive"	"1"
-				"custom"	"1"
-			}
-		}
 		ZMHudNumbers
 		{
 			"1"
@@ -1305,18 +1252,6 @@ Scheme
 				"additive"	"0"
 			}
 		}
-		"HL2MPTypeDeath"
-		{
-		   "1"
-		   {
-				"name"  "HL2MP" // csd.ttf
-				"tall"  "32"
-				"weight" "0"
-				"additive" "1"
-				"antialias" "1"
-				"custom" "1" [$OSX]
-		   }
-		}	
 		// Used by scoreboard and spectator UI for names which don't map in the normal fashion
 		"DefaultVerySmallFallBack"
 		{
@@ -2004,7 +1939,6 @@ Scheme
 	CustomFontFiles
 	{
 		"1"		"resource/HALFLIFE2.ttf"
-		"1"		"resource/HL2MP.ttf"
 		"2"		"resource/HL2crosshairs.ttf"
 		"1"		"resource/ZM.ttf" // ZMR
 		"1"		"resource/MONOFONT.ttf" // ZMR
