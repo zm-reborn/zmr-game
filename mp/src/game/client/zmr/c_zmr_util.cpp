@@ -7,9 +7,9 @@
 #include "cdll_client_int.h"
 #include "IGameUIFuncs.h"
 
-#include "zmr/npcs/zmr_zombiebase_shared.h"
-#include "zmr/ui/zmr_hud_chat.h"
-#include "zmr/ui/zmr_hud_tooltips.h"
+#include "npcs/zmr_zombiebase_shared.h"
+#include "ui/zmr_hud_chat.h"
+#include "ui/zmr_hud_tooltips.h"
 
 #include "c_zmr_tips.h"
 #include "c_zmr_util.h"

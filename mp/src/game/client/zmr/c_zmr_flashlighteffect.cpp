@@ -12,7 +12,7 @@
 #include "c_zmr_player.h"
 #include "c_zmr_flashlightsystem.h"
 #include "c_zmr_flashlighteffect.h"
-#include "zmr/zmr_player_shared.h"
+#include "zmr_player_shared.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

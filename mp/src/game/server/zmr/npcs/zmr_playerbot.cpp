@@ -8,7 +8,7 @@
 
 #include "zmr_playerbot.h"
 
-#include "zmr/npcs/sched/zmr_bot_main.h"
+#include "npcs/sched/zmr_bot_main.h"
 
 
 

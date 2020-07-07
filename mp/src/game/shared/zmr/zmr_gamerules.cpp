@@ -2,7 +2,7 @@
 
 #ifndef CLIENT_DLL
 #include "basecombatcharacter.h"
-#include "zmr/zmr_team.h"
+#include "zmr_team.h"
 #include "mapentities.h"
 #include "gameinterface.h"
 #include "teamplayroundbased_gamerules.h"
@@ -14,18 +14,18 @@
 #ifndef CLIENT_DLL
 #include "ammodef.h"
 
-#include "zmr/zmr_voting.h"
-#include "zmr/zmr_rejoindata.h"
+#include "zmr_voting.h"
+#include "zmr_rejoindata.h"
 
-#include "zmr/zmr_player.h"
-#include "zmr/zmr_mapentities.h"
+#include "zmr_player.h"
+#include "zmr_mapentities.h"
 #include "zmr_resource_system.h"
 #else
-#include "zmr/c_zmr_player.h"
+#include "c_zmr_player.h"
 #endif
 
 #include "zmr_gamerules.h"
-#include "zmr/weapons/zmr_base.h"
+#include "weapons/zmr_base.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

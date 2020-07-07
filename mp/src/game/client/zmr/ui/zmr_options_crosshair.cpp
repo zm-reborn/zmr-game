@@ -1,6 +1,6 @@
 #include "cbase.h"
 
-#include "zmr/c_zmr_crosshair.h"
+#include "c_zmr_crosshair.h"
 #include "zmr_options_crosshair.h"
 
 

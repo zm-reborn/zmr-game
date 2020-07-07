@@ -10,7 +10,7 @@
 #include "npcs/zmr_zombiebase_shared.h"
 #include "npcs/zmr_banshee.h"
 //#include "npcs/zmr_fastzombie.h"
-#include "zmr/zmr_util.h"
+#include "zmr_util.h"
 
 #include "zmr_player.h"
 #include "zmr_entities.h"

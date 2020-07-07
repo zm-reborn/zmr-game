@@ -3,13 +3,13 @@
 #include "cbase.h"
 #include "teamplay_gamerules.h"
 
-#include "zmr/zmr_player_shared.h"
+#include "zmr_player_shared.h"
 #include "zmr_shareddefs.h"
 
 #ifndef CLIENT_DLL
 #include "npcs/zmr_zombiebase_shared.h"
-#include "zmr/zmr_entities.h"
-#include "zmr/zmr_obj_manager.h"
+#include "zmr_entities.h"
+#include "zmr_obj_manager.h"
 #endif
 
 

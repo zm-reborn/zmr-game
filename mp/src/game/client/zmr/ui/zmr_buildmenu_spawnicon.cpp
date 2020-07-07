@@ -2,7 +2,7 @@
 #include <vgui/ISurface.h>
 
 
-#include "zmr/npcs/c_zmr_zombiebase.h"
+#include "npcs/c_zmr_zombiebase.h"
 #include "zmr_buildmenu_spawnicon.h"
 
 

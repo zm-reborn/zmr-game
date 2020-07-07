@@ -8,7 +8,7 @@
 
 #include <vgui/ISurface.h>
 
-#include "zmr/c_zmr_crosshair.h"
+#include "c_zmr_crosshair.h"
 #endif
 
 #include "zmr_weaponconfig.h"

@@ -1,7 +1,7 @@
 #include "cbase.h"
 
-#include "zmr/zmr_shareddefs.h"
-#include "zmr/zmr_web.h"
+#include "zmr_shareddefs.h"
+#include "zmr_web.h"
 
 #ifndef CLIENT_DLL
 #include "steam/steam_gameserver.h"

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "zmr/npcs/zmr_playerbot.h"
-//#include "zmr/npcs/zmr_zombiebase.h"
+#include "npcs/zmr_playerbot.h"
+//#include "npcs/zmr_zombiebase.h"
 
 #include "zmr_survivor_attack.h"
 

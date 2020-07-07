@@ -33,8 +33,8 @@
 #endif
 
 #ifdef ZMR
-#include "zmr/ui/menu/zmr_mainmenu.h"
-#include "zmr/ui/menu/zmr_loadingbg.h"
+#include "ui/menu/zmr_mainmenu.h"
+#include "ui/menu/zmr_loadingbg.h"
 #endif
 
 using namespace vgui;

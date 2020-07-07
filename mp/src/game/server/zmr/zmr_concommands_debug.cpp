@@ -1,7 +1,7 @@
 #include "cbase.h"
 
 #include "zmr_player.h"
-#include "zmr/zmr_gamerules.h"
+#include "zmr_gamerules.h"
 
 
 /*

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "zmr/npcs/zmr_zombiebase.h"
+#include "npcs/zmr_zombiebase.h"
 
 #include "npcr_path_cost.h"
 #include "zmr_zombie_swat.h"

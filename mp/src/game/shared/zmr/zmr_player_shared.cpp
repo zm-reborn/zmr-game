@@ -24,12 +24,12 @@
 
 
 #ifdef CLIENT_DLL
-#include "zmr/c_zmr_player.h"
-#include "zmr/npcs/c_zmr_zombiebase.h"
+#include "c_zmr_player.h"
+#include "npcs/c_zmr_zombiebase.h"
 #else
-#include "zmr/zmr_te_firebullets.h"
-#include "zmr/zmr_player.h"
-#include "zmr/npcs/zmr_zombiebase.h"
+#include "zmr_te_firebullets.h"
+#include "zmr_player.h"
+#include "npcs/zmr_zombiebase.h"
 #endif
 
 // memdbgon must be the last include file in a .cpp file!!!

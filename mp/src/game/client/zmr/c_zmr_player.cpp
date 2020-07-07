@@ -11,13 +11,13 @@
 #include "debugoverlay_shared.h"
 
 
-#include "zmr/c_zmr_util.h"
-#include "zmr/ui/zmr_zmview_base.h"
+#include "c_zmr_util.h"
+#include "ui/zmr_zmview_base.h"
 
 #include "npcs/c_zmr_zombiebase.h"
-#include "zmr/zmr_viewmodel.h"
+#include "zmr_viewmodel.h"
 #include "c_zmr_entities.h"
-#include "zmr/zmr_softcollisions.h"
+#include "zmr_softcollisions.h"
 #include "c_zmr_player_ragdoll.h"
 #include "c_zmr_teamkeys.h"
 #include "c_zmr_colorcorrection.h"

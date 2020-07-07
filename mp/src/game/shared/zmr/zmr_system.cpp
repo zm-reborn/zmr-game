@@ -14,8 +14,8 @@
 #include <engine/IEngineSound.h>
 
 
-#include "zmr/c_zmr_zmvision.h"
-#include "zmr/c_zmr_util.h"
+#include "c_zmr_zmvision.h"
+#include "c_zmr_util.h"
 
 
 #ifdef _WIN32
@@ -27,11 +27,11 @@
 #endif
 
 #else
-#include "zmr/zmr_rejoindata.h"
+#include "zmr_rejoindata.h"
 #endif
 
-#include "zmr/zmr_shareddefs.h"
-#include "zmr/zmr_web.h"
+#include "zmr_shareddefs.h"
+#include "zmr_web.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

@@ -8,7 +8,7 @@
 #include <vgui_controls/Frame.h>
 
 
-#include "zmr/c_zmr_entities.h"
+#include "c_zmr_entities.h"
 
 
 struct ZMQueueSlotData_t

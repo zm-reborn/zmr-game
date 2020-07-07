@@ -22,9 +22,9 @@
 #include "inputsystem/iinputsystem.h"
 #include "clientmode_shared.h"
 
-#include "zmr/zmr_shareddefs.h"
-#include "zmr/zmr_gamerules.h"
-#include "zmr/c_zmr_importancesystem.h"
+#include "zmr_shareddefs.h"
+#include "zmr_gamerules.h"
+#include "c_zmr_importancesystem.h"
 
 #include "zmr_listpanel.h"
 #include "zmr_scoreboard.h"

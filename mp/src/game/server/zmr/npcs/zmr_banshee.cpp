@@ -4,11 +4,11 @@
 #include "eventlist.h"
 
 #include "zmr_gamerules.h"
-#include "zmr/npcs/zmr_zombiebase.h"
+#include "npcs/zmr_zombiebase.h"
 #include "zmr_banshee_path.h"
 #include "zmr_banshee.h"
-#include "zmr/npcs/sched/zmr_zombie_banshee_ceil_ambush.h"
-#include "zmr/npcs/sched/zmr_zombie_banshee_leap.h"
+#include "npcs/sched/zmr_zombie_banshee_ceil_ambush.h"
+#include "npcs/sched/zmr_zombie_banshee_leap.h"
 
 
 ConVar zm_sv_debug_bansheerangeattack( "zm_sv_debug_bansheerangeattack", "0" );

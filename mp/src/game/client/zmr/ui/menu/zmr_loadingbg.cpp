@@ -9,9 +9,9 @@
 #include <ienginevgui.h>
 //#include "game_controls/vguitextwindow.h"
 
-#include "zmr/c_zmr_legacy_objpanel.h"
-#include "zmr/c_zmr_tips.h"
-#include "zmr/c_zmr_music.h"
+#include "c_zmr_legacy_objpanel.h"
+#include "c_zmr_tips.h"
+#include "c_zmr_music.h"
 
 #include "zmr_mainmenu.h"
 #include "zmr_loadingbg.h"

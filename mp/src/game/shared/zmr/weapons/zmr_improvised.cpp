@@ -3,8 +3,8 @@
 #include "in_buttons.h"
 
 
-#include "zmr/zmr_shareddefs.h"
-#include "zmr/zmr_player_shared.h"
+#include "zmr_shareddefs.h"
+#include "zmr_player_shared.h"
 
 #include "zmr_basemelee.h"
 

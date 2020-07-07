@@ -17,7 +17,7 @@
 
 
 
-#include "zmr/zmr_player_shared.h"
+#include "zmr_player_shared.h"
 
 #include "zmr_boxselect.h"
 

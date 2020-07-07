@@ -2,8 +2,8 @@
 #include "convar.h"
 
 
-#include "zmr/zmr_team.h"
-#include "zmr/zmr_shareddefs.h"
+#include "zmr_team.h"
+#include "zmr_shareddefs.h"
 
 
 static ConVar zm_sv_transmitdistance( "zm_sv_transmitdistance", "1600", FCVAR_NOTIFY, "How far, in units, objects are forced to be transmitted to ZM and ZM's spectators.", true, 0.0f, false, 0.0f );

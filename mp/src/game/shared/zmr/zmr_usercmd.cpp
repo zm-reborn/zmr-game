@@ -10,9 +10,9 @@
 
 #include "zmr_usercmd.h"
 #ifdef GAME_DLL
-#include "zmr/weapons/zmr_base.h"
-#include "zmr/npcs/zmr_zombiebase.h"
-#include "zmr/zmr_player.h"
+#include "weapons/zmr_base.h"
+#include "npcs/zmr_zombiebase.h"
+#include "zmr_player.h"
 #endif
 
 // memdbgon must be the last include file in a .cpp file!!!

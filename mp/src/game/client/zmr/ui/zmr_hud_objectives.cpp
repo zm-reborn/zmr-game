@@ -11,8 +11,8 @@
 #include "c_user_message_register.h"
 
 
-#include "zmr/c_zmr_player.h"
-#include "zmr/zmr_shareddefs.h"
+#include "c_zmr_player.h"
+#include "zmr_shareddefs.h"
 
 
 // memdbgon must be the last include file in a .cpp file!!!

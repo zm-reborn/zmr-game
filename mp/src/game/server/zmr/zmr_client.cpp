@@ -10,9 +10,9 @@
 #include "tier0/vprof.h"
 
 
-#include "zmr/zmr_gamerules.h"
+#include "zmr_gamerules.h"
 #include "zmr_player.h"
-//#include "zmr/zmr_player_shared.h"
+//#include "zmr_player_shared.h"
 #include "team.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

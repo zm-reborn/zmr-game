@@ -11,10 +11,10 @@
 
 
 #include "zmr_manimenu.h"
-#include "zmr/zmr_gamerules.h"
-#include "zmr/zmr_player_shared.h"
-#include "zmr/npcs/c_zmr_zombiebase.h"
-#include "zmr/c_zmr_util.h"
+#include "zmr_gamerules.h"
+#include "zmr_player_shared.h"
+#include "npcs/c_zmr_zombiebase.h"
+#include "c_zmr_util.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

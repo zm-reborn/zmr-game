@@ -6,10 +6,10 @@
 #include "vgui_bitmapbutton.h"
 
 
-#include "zmr/npcs/zmr_zombiebase_shared.h"
+#include "npcs/zmr_zombiebase_shared.h"
 #include "zmr_zmview_base.h"
 #include "zmr_cntrlpanel.h"
-#include "zmr/c_zmr_zmvision.h"
+#include "c_zmr_zmvision.h"
 
 
 // memdbgon must be the last include file in a .cpp file!!!

@@ -44,7 +44,7 @@
 
 
 #ifdef ZMR
-#include "zmr/zmr_player.h"
+#include "zmr_player.h"
 #endif
 
 // memdbgon must be the last include file in a .cpp file!!!

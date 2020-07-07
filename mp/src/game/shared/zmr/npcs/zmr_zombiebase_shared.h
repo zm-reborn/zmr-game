@@ -2,9 +2,9 @@
 
 
 #ifdef CLIENT_DLL
-#include "zmr/npcs/c_zmr_zombiebase.h"
+#include "npcs/c_zmr_zombiebase.h"
 #else
-#include "zmr/npcs/zmr_zombiebase.h"
+#include "npcs/zmr_zombiebase.h"
 #endif
 
 

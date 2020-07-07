@@ -4,7 +4,7 @@
 #include <vgui/ILocalize.h>
 #include <vgui/ISurface.h>
 
-#include "zmr/zmr_gamerules.h"
+#include "zmr_gamerules.h"
 #include "zmr_hud_centertext.h"
 
 

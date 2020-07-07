@@ -1,6 +1,6 @@
 #pragma once
 
-#include "zmr/npcs/zmr_playerbot.h"
+#include "npcs/zmr_playerbot.h"
 
 #include "zmr_survivor_combat.h"
 

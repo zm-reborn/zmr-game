@@ -1,7 +1,7 @@
 #pragma once
 
 #include "zmr_zombiebase.h"
-#include "zmr/zmr_shareddefs.h"
+#include "zmr_shareddefs.h"
 
 
 class CZMZombieModelGroup;

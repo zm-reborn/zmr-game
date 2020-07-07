@@ -2,9 +2,9 @@
 
 #include "c_zmr_precipitation.h"
 #include "c_zmr_entities.h"
-#include "zmr/zmr_player_shared.h"
-#include "zmr/ui/zmr_buildmenu_base.h"
-#include "zmr/ui/zmr_manimenu_base.h"
+#include "zmr_player_shared.h"
+#include "ui/zmr_buildmenu_base.h"
+#include "ui/zmr_manimenu_base.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

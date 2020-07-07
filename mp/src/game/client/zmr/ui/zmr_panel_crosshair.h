@@ -6,7 +6,7 @@
 //#include "GameEventListener.h"
 //#include "KeyValues.h"
 
-#include "zmr/c_zmr_crosshair.h"
+#include "c_zmr_crosshair.h"
 
 
 class CZMPanelCrosshair : public vgui::EditablePanel

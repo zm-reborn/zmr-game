@@ -5,7 +5,7 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include "zmr/zmr_player.h"
+#include "zmr_player.h"
 #include "saverestore_utlvector.h"
 #include "triggers.h"
 

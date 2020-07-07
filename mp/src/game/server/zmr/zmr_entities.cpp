@@ -8,11 +8,11 @@
 #include "precipitation_shared.h"
 
 
-#include "zmr/zmr_gamerules.h"
-#include "zmr/zmr_player.h"
-#include "zmr/zmr_shareddefs.h"
+#include "zmr_gamerules.h"
+#include "zmr_player.h"
+#include "zmr_shareddefs.h"
 #include "npcs/zmr_zombiebase_shared.h"
-#include "zmr/weapons/zmr_base.h"
+#include "weapons/zmr_base.h"
 #include "zmr_mapitemaction.h"
 
 #include "zmr_entities.h"

@@ -8,7 +8,7 @@
 #include "ihudlcd.h"
 
 #include "zmr_shareddefs.h"
-#include "zmr/c_zmr_importancesystem.h"
+#include "c_zmr_importancesystem.h"
 
 #include "zmr_hud_chat.h"
 

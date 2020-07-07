@@ -171,7 +171,7 @@ extern vgui::IInputInternal *g_InputInternal;
 #endif
 
 #ifdef ZMR
-#include "zmr/c_zmr_videosettings.h"
+#include "c_zmr_videosettings.h"
 #endif
 
 // memdbgon must be the last include file in a .cpp file!!!

@@ -11,7 +11,7 @@
 #include "zmr_playeranimstate.h"
 
 #include "zmr_player_shared.h"
-#include "zmr/zmr_shareddefs.h"
+#include "zmr_shareddefs.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

@@ -6,7 +6,7 @@
 #include <vgui_controls/Slider.h>
 
 #include "zmr_options_tab.h"
-#include "zmr/ui/zmr_panel_modelpanel.h"
+#include "ui/zmr_panel_modelpanel.h"
 
 
 class CZMOptionsSubGeneral : public CZMOptionsSub

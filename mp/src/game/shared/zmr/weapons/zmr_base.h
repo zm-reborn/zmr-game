@@ -6,13 +6,13 @@
 //#include "hl2mp/hl2mp_weapon_parse.h"
 
 #ifdef CLIENT_DLL
-#include "zmr/c_zmr_crosshair.h"
+#include "c_zmr_crosshair.h"
 #endif
-#include "zmr/zmr_weapon_parse.h"
+#include "zmr_weapon_parse.h"
 #include "zmr_usercmdvalid.h"
 #include "zmr_weaponconfig.h"
 
-#include "zmr/zmr_player_shared.h"
+#include "zmr_player_shared.h"
 
 
 

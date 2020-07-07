@@ -2,7 +2,7 @@
 
 #include "npcr/npcr_senses.h"
 
-#include "zmr/zmr_player.h"
+#include "zmr_player.h"
 #include "npcr/npcr_player.h"
 
 

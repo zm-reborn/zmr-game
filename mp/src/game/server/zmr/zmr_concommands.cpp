@@ -4,10 +4,10 @@
 
 
 #include "zmr_ammo.h"
-#include "zmr/weapons/zmr_base.h"
-#include "zmr/zmr_shareddefs.h"
+#include "weapons/zmr_base.h"
+#include "zmr_shareddefs.h"
 #include "zmr_player.h"
-#include "zmr/zmr_gamerules.h"
+#include "zmr_gamerules.h"
 #include "zmr_voicelines.h"
 
 

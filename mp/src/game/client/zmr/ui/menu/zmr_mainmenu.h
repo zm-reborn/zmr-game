@@ -4,7 +4,7 @@
 #include <vgui_controls/EditablePanel.h>
 #include <GameUI/IGameUI.h>
 
-#include "zmr/ui/zmr_int.h"
+#include "ui/zmr_int.h"
 
 
 class CZMMainMenuButton;

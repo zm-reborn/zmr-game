@@ -3,12 +3,12 @@
 
 #include "player.h"
 
-#include "zmr/zmr_player_shared.h"
-#include "zmr/zmr_entities.h"
-#include "zmr/weapons/zmr_base.h"
-#include "zmr/zmr_shareddefs.h"
-#include "zmr/zmr_playerlocaldata.h"
-#include "zmr/zmr_playeranimstate.h"
+#include "zmr_player_shared.h"
+#include "zmr_entities.h"
+#include "weapons/zmr_base.h"
+#include "zmr_shareddefs.h"
+#include "zmr_playerlocaldata.h"
+#include "zmr_playeranimstate.h"
 
 
 /*

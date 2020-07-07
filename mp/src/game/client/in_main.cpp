@@ -46,8 +46,8 @@ extern ConVar cam_idealyaw;
 
 
 #ifdef ZMR
-#include "zmr/zmr_shareddefs.h"
-#include "zmr/zmr_usercmd.h"
+#include "zmr_shareddefs.h"
+#include "zmr_usercmd.h"
 #endif
 
 // memdbgon must be the last include file in a .cpp file!!!

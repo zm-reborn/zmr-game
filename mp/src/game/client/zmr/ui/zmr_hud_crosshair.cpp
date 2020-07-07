@@ -9,8 +9,8 @@
 #include <vgui_controls/AnimationController.h>
 
 
-#include "zmr/c_zmr_player.h"
-#include "zmr/c_zmr_crosshair.h"
+#include "c_zmr_player.h"
+#include "c_zmr_crosshair.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

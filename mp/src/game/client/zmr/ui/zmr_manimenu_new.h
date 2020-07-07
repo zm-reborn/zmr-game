@@ -2,7 +2,7 @@
 
 #include "zmr_menu_world.h"
 #include "zmr_manimenu_base.h"
-#include "zmr/zmr_shareddefs.h"
+#include "zmr_shareddefs.h"
 
 
 class CZMRadialPanel;
