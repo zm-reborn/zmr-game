@@ -162,28 +162,10 @@ CZMRules::CZMRules()
     m_pLoadoutEnt = nullptr;
     m_pObjManager = nullptr;
 
-    // Remove old HL2MP teams.
-    // This proobabbllyy isn't the best way of doing this...
-    CTeam* pTeam;
-    int i;
-
-    for ( i = 0; i < g_Teams.Size(); i++ )
-    {
-        pTeam = g_Teams.Element( i );
-
-        if ( pTeam )
-        {
-            DevMsg( "Removing old team: %s\n", pTeam->GetName() );
-
-            UTIL_Remove( pTeam );
-        }
-
-        g_Teams.Remove( i );
-        --i;
-    }
+    Assert( g_Teams.Size() <= 0 );
 
     // Create the team managers
-    for ( i = 0; i < ARRAYSIZE( g_sTeamNames ); i++ )
+    for ( int i = 0; i < ARRAYSIZE( g_sTeamNames ); i++ )
     {
         CZMTeam* pTeam = static_cast<CZMTeam*>( CreateEntityByName( "team_manager" ) );
         pTeam->Init( g_sTeamNames[i], i );
@@ -236,8 +218,7 @@ void CZMRules::CreateStandardEntities()
     DevMsg( "Creating standard entities...\n" );
 
 
-    // NOTE: DO NOT CALL HL2MP RULES.
-    CGameRules::CreateStandardEntities();
+    BaseClass::CreateStandardEntities();
 
 
     
@@ -744,8 +725,7 @@ void CZMRules::PlayerKilled( CBasePlayer* pVictim, const CTakeDamageInfo& info )
         EndRound( ZMROUND_HUMANDEAD );
     }
 
-    // Don't call HL2MP...
-    CTeamplayRules::PlayerKilled( pVictim, info );
+    BaseClass::PlayerKilled( pVictim, info );
 }
 
 ConVar zm_sv_joingrace( "zm_sv_joingrace", "60", FCVAR_NOTIFY );
