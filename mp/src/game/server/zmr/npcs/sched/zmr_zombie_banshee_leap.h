@@ -138,21 +138,41 @@ public:
         float minspd = CZMBanshee::GetMinLeapAttackSpeed();
         if (!m_bDidLeapAttack
         &&  GetOuter()->GetVel().LengthSqr() > (minspd*minspd)
-        &&  pEnt && GetOuter()->IsEnemy( pEnt ))
+        &&  pEnt )
         {
+            //
+            // We're leaping and hit something.
+            //
             CZMBanshee* pOuter = GetOuter();
 
-            Vector fwd;
-            AngleVectors( pOuter->GetAngles(), &fwd );
-            QAngle angPunch( 15.0f, random->RandomInt( -5.0f, 5.0f ), random->RandomInt( -5.0f, 5.0f ) );
-            Vector vecPunchVel = fwd * 500.0f;
+            // Force players to drop this prop!
+            auto* pPhys = pEnt->VPhysicsGetObject();
+            if ( pPhys && pPhys->GetGameFlags() & FVPHYSICS_PLAYER_HELD )
+            {
+                auto* pPlayer = ToZMPlayer( pEnt->GetOwnerEntity() );
+        
+                if ( pPlayer )
+                {
+                    pPlayer->ForceDropOfCarriedPhysObjects( pEnt );
+                }
+            }
+
+            // Attack enemy.
+            if ( pOuter->IsEnemy( pEnt ) )
+            {
+                Vector fwd;
+                AngleVectors( pOuter->GetAngles(), &fwd );
+                QAngle angPunch( 15.0f, random->RandomInt( -5.0f, 5.0f ), random->RandomInt( -5.0f, 5.0f ) );
+                Vector vecPunchVel = fwd * 500.0f;
 
 
-            float damage = zm_sk_banshee_dmg_leap.GetFloat();
+                float damage = zm_sk_banshee_dmg_leap.GetFloat();
     
-            bool bHit = pOuter->LeapAttack( angPunch, vecPunchVel, damage );
+                bool bHit = pOuter->LeapAttack( angPunch, vecPunchVel, damage );
 
-            m_bDidLeapAttack = bHit;
+                m_bDidLeapAttack = bHit;
+            }
+
         }
     }
 
