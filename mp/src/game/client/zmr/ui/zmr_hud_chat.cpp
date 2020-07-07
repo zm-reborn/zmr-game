@@ -12,6 +12,9 @@
 
 #include "zmr_hud_chat.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 void UTIL_ParseColorFromString( const char* str, int clr[], int nColors );
 

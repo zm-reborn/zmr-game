@@ -1,9 +1,11 @@
 #include "cbase.h"
 #include "convar.h"
 
-
 #include "zmr_team.h"
 #include "zmr_shareddefs.h"
+
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
 
 
 static ConVar zm_sv_transmitdistance( "zm_sv_transmitdistance", "1600", FCVAR_NOTIFY, "How far, in units, objects are forced to be transmitted to ZM and ZM's spectators.", true, 0.0f, false, 0.0f );

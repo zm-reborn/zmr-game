@@ -3,6 +3,9 @@
 #include "zmr_gamerules.h"
 #include "zmr_rejoindata.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 extern ConVar zm_sv_debug_rejoindata;
 

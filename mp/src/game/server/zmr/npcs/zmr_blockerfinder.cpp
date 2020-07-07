@@ -3,6 +3,9 @@
 #include "zmr_zombiebase.h"
 #include "zmr_blockerfinder.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 ConVar npcr_debug_zm_blocker( "npcr_debug_zm_blocker", "0" );
 

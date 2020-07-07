@@ -5,6 +5,9 @@
 #include "zmr_options_misc.h"
 #include "c_zmr_player.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 extern ConVar zm_cl_firstperson_deathcam;
 extern ConVar zm_cl_deathnotice_enabled;

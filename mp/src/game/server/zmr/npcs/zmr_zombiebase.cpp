@@ -17,8 +17,8 @@
 #include "npcs/zmr_zombiebase_shared.h"
 #include "sched/zmr_zombie_main.h"
 
-
-
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
 
 
 ConVar zm_sv_debug_zombie_flinch( "zm_sv_debug_zombie_flinch", "0", 0, "Play flinching animations every time a zombie g ets shot." );

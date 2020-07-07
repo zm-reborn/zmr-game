@@ -10,6 +10,8 @@
 
 #include "npcs/sched/zmr_bot_main.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
 
 
 ConVar zm_sv_debug_bot_lookat( "zm_sv_debug_bot_lookat", "0" );

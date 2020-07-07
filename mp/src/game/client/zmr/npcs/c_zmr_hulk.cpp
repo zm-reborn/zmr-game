@@ -3,6 +3,9 @@
 #include "c_zmr_zombiebase.h"
 #include "c_zmr_hulk.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 #define HULKAMANIA_MODEL        "models/props/misc/hulkamania01.mdl"
 

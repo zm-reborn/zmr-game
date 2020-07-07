@@ -3,6 +3,8 @@
 
 #include "zmr_zombiemodelgroups.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
 
 
 #define DEF_MODELGROUP                  "DefaultModels"

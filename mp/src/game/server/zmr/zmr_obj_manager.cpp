@@ -6,6 +6,8 @@
 #include "zmr_gamerules.h"
 #include "zmr_obj_manager.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
 
 
 LINK_ENTITY_TO_CLASS( zm_objectives_manager, CZMEntObjectivesManager );

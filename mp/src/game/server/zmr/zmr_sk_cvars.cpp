@@ -1,6 +1,9 @@
 #include "cbase.h"
 #include "convar.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 ConVar zm_sk_default_hitmult_head( "zm_sk_default_hitmult_head", "2" );
 ConVar zm_sk_default_hitmult_head_buckshot( "zm_sk_default_hitmult_head_buckshot", "3" );

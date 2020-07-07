@@ -4,6 +4,9 @@
 #include "c_zmr_zombiebase.h"
 #include "c_zmr_banshee.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 IMPLEMENT_CLIENTCLASS_DT( C_ZMBanshee, DT_ZM_Banshee, CZMBanshee )
 END_RECV_TABLE()

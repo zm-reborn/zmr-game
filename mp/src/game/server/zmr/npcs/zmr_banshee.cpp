@@ -10,6 +10,9 @@
 #include "npcs/sched/zmr_zombie_banshee_ceil_ambush.h"
 #include "npcs/sched/zmr_zombie_banshee_leap.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 ConVar zm_sv_debug_bansheerangeattack( "zm_sv_debug_bansheerangeattack", "0" );
 

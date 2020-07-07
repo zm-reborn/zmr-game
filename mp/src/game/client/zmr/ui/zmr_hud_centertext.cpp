@@ -7,6 +7,8 @@
 #include "zmr_gamerules.h"
 #include "zmr_hud_centertext.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
 
 
 using namespace vgui;
