@@ -3,10 +3,14 @@
 // file				- File path relative to game folder.
 // mainmenu			- Music plays in main menu.
 // loadingscreen	- Music plays in loading screen.
+// ingame			- Music plays in game. Unused for now.
 // 
 //
 "Music"
 {
+	//
+	// Main menu
+	//
 	"Alchemy"
 	{
 		"file"	"sound/music/zmr/rhett_dahl_alchemy.wav"
@@ -22,4 +26,54 @@
 		"file"	"sound/music/zmr/rhett_dahl_zmr_menu.wav"
 		"mainmenu"	"1"
 	}
+	"ZMR Menu 2"
+	{
+		"file"	"sound/music/zmr/rhett_dahl_zmr_menu_2.wav"
+		"mainmenu"	"1"
+	}
+	"Dark Tetrad"
+	{
+		"file"	"sound/music/zmr/rhett_dahl_darktetrad.wav"
+		"mainmenu"	"1"
+	}
+	"Safehouse"
+	{
+		"file"	"sound/music/zmr/rhett_dahl_safehouse.wav"
+		"mainmenu"	"1"
+	}
+	"The Dead"
+	{
+		"file"	"sound/music/zmr/rhett_dahl_the_dead.wav"
+		"mainmenu"	"1"
+	}
+	
+	//
+	// Loading screen
+	//
+	"The Horde"
+	{
+		"file"	"sound/music/zmr/rhett_dahl_the_horde.wav"
+		"loadingscreen"	"1"
+	}
+	"Reborn"
+	{
+		"file"	"sound/music/zmr/rhett_dahl_reborn.wav"
+		"loadingscreen"	"1"
+	}
+	"Necromancy"
+	{
+		"file"	"sound/music/zmr/rhett_dahl_necromancy.wav"
+		"loadingscreen"	"1"
+	}
+
+	
+	//
+	// In game
+	//
+	//"Nuclear"
+	//{
+	//	"file"	"sound/music/zmr/rhett_dahl_nuclear.wav"
+	//	"ingame"	"1"
+	//}
+
 }
