@@ -17,6 +17,9 @@ ConVar zm_cl_music_fadein( "zm_cl_music_fadein", "2" );
 ConVar zm_cl_music_fadeout( "zm_cl_music_fadeout", "2" );
 
 
+#define ZMMUSIC_MAX_LOADINGSCREEN_TRACKS        3
+#define ZMMUSIC_MAX_MAINMENU_TRACKS             3
+
 
 #define ZMMUSIC_FILE            "resource/zmmusic.txt"
 
@@ -160,9 +163,65 @@ void ZMMusic::CZMMusicManager::RegisterMusic()
         list.AddToTail( { subkv->GetString( "file" ), (MusicState_t)state } );
     }
 
-    // ZMRTODO: Randomize music here, before registering the sound
+    //
+    // Randomize music before registering the sound
     // to prevent loading music into memory needlessly.
+    //
+    auto removeRandomMusic = []( CUtlVector<PotentialMusic_t>& list, MusicState_t state, int max )
+    {
+        auto getCountOfMusic = []( CUtlVector<PotentialMusic_t>& list, MusicState_t state )
+        {
+            int count = 0;
 
+            FOR_EACH_VEC( list, i )
+            {
+                if ( list[i].fMusicStates & state )
+                {
+                    ++count;
+                }
+            }
+
+            return count;
+        };
+
+
+        int removed = 0;
+
+        int count = 0;
+        while ( (count = getCountOfMusic( list, state )) > max )
+        {
+            int iRemoveIndex = random->RandomInt( 1, count );
+
+            bool bRemoved = false;
+            FOR_EACH_VEC( list, i )
+            {
+                if ( list[i].fMusicStates & state )
+                {
+                    if ( --iRemoveIndex <= 0 )
+                    {
+                        list.Remove( i );
+                        ++removed;
+
+                        bRemoved = true;
+                    }
+                }
+            }
+
+            if ( !bRemoved )
+                break;
+        }
+
+
+
+        return removed;
+    };
+
+
+    removeRandomMusic( list, MUSICSTATE_LOADINGSCREEN, ZMMUSIC_MAX_LOADINGSCREEN_TRACKS );
+    removeRandomMusic( list, MUSICSTATE_MAINMENU, ZMMUSIC_MAX_MAINMENU_TRACKS );
+
+
+    // Do the actual registering.
     FOR_EACH_VEC( list, i )
     {
         auto hndl = g_FMODSystem.RegisterSound( list[i].pszRelPath );
