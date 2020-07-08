@@ -181,6 +181,10 @@ ZMMusic::MusicState_t ZMMusic::CZMMusicManager::GetMusicState() const
 
 void ZMMusic::CZMMusicManager::SetMusicState( MusicState_t musicState )
 {
+    if ( musicState == GetMusicState() )
+        return;
+
+
     // Fade out all channels
     FOR_EACH_VEC( m_vpChannels, i )
     {
