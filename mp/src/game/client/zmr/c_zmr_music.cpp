@@ -34,7 +34,7 @@ ZMMusic::CMusic::~CMusic()
 
 bool ZMMusic::CMusic::IsPartOfMusicState( MusicState_t state ) const
 {
-    return (m_fMusicState & state) == state;
+    return state != MUSICSTATE_NONE && (m_fMusicState & state) == state;
 }
 
 bool ZMMusic::CMusic::IsReady() const
