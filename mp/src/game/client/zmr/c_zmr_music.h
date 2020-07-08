@@ -30,6 +30,9 @@ namespace ZMMusic
 
         bool PlayMe( FMODChannelHandle_t& handle );
 
+        const char* GetMusicStateName() const;
+        static const char* MusicStateToName( MusicState_t state );
+
     private:
         MusicState_t        m_fMusicState;
         FMODSoundHandle_t   m_SndHndl;
