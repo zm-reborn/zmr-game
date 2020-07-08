@@ -514,7 +514,7 @@ static void GetMapDisplayName( char* buffer, int len )
 
     // Replace underscore with space
     char* us = cpy;
-    while ( (us = Q_strrchr( us, '_' )) != nullptr )
+    while ( (us = Q_strstr( us, "_" )) != nullptr )
     {
         *us = ' ';
         ++us;
