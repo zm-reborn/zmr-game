@@ -51,6 +51,23 @@ bool ZMMusic::CMusic::PlayMe( FMODChannelHandle_t& handle )
     return handle != INVALID_FMODCHANNEL_HANDLE;
 }
 
+const char* ZMMusic::CMusic::GetMusicStateName() const
+{
+    return MusicStateToName( m_fMusicState );
+}
+
+const char* ZMMusic::CMusic::MusicStateToName( MusicState_t state )
+{
+    switch ( state )
+    {
+    case MUSICSTATE_INGAME :        return "In-Game";
+    case MUSICSTATE_LOADINGSCREEN : return "Loading Screen";
+    case MUSICSTATE_MAINMENU :      return "Main Menu";
+    case MUSICSTATE_NONE :          return "None";
+    default:
+        return "Multi state track";
+    }
+}
 
 
 //
@@ -157,7 +174,11 @@ void ZMMusic::CZMMusicManager::RegisterMusic()
         }
 
 
-        m_vpMusic.AddToTail( new CMusic( list[i].fMusicStates, hndl ) );
+        auto* pMusic = new CMusic( list[i].fMusicStates, hndl );
+
+        m_vpMusic.AddToTail( pMusic );
+
+        DevMsg( "Registered music: %s (%s)\n", list[i].pszRelPath, pMusic->GetMusicStateName() );
     }
 
     list.RemoveAll();
@@ -184,6 +205,8 @@ void ZMMusic::CZMMusicManager::SetMusicState( MusicState_t musicState )
     if ( musicState == GetMusicState() )
         return;
 
+
+    DevMsg( "Changing music state to %s!\n", CMusic::MusicStateToName( musicState ) );
 
     // Fade out all channels
     FOR_EACH_VEC( m_vpChannels, i )
