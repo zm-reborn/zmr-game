@@ -103,6 +103,8 @@ private:
     Color m_BgColor;
 
     IGameUI* m_pGameUI;
+
+    bool m_bActive;
 };
 
 class CZMLoadingPanelInterface : public IZMUi
@@ -138,6 +140,8 @@ IZMUi* g_pZMLoadingUI = static_cast<IZMUi*>( &g_ZMLoadingUIInt );
 CZMLoadingPanel::CZMLoadingPanel( VPANEL parent ) : BaseClass( nullptr, "ZMLoadingPanel" )
 {
     m_loadingDialog = NULL;
+
+    m_bActive = false;
 
     m_bHasMapName = false;
 
@@ -264,6 +268,23 @@ void CZMLoadingPanel::ApplySchemeSettings( IScheme* pScheme )
 
 void CZMLoadingPanel::OnActivate()
 {
+    if ( m_bActive )
+    {
+        //
+        // EXTREME SUPER DUPER HACK:
+        // Apparently this is called AGAIN if there's an error.
+        // Error will be displayed in the center, so hide the map text
+        // so the error can be seen fully.
+        //
+        m_pTextMessage->SetVisible( false );
+
+
+        return;
+    }
+
+    m_bActive = true;
+
+
     SetMapNameText( "" );
 
     m_pTextMessage->SetVisible( false );
@@ -289,6 +310,15 @@ void CZMLoadingPanel::OnActivate()
 
 void CZMLoadingPanel::OnDeactivate()
 {
+    if ( !m_bActive )
+    {
+        Assert( 0 );
+        return;
+    }
+
+    m_bActive = false;
+
+
 #ifdef ZMR_FINAL
     ZMMusic::g_ZMMusicManager.SetMusicState( ZMMusic::MUSICSTATE_NONE );
 #endif
@@ -372,7 +402,7 @@ void CZMLoadingPanel::Paint()
 
     // Unfortunately, we have to draw the loading dialog manually,
     // because we have to restrict the drawing to this panel, because
-    // we other main menu panels will draw on top of us.
+    // other main menu panels will draw on top of us.
     // Blah.
     if ( m_loadingDialog != NULL )
     {
