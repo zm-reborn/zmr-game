@@ -16,13 +16,12 @@ class CZMPlayerAnimState : public CMultiPlayerAnimState
 public:
 	DECLARE_CLASS( CZMPlayerAnimState, CMultiPlayerAnimState );
 
-	CZMPlayerAnimState();
 	CZMPlayerAnimState( CBasePlayer* pPlayer, MultiPlayerMovementData_t& movementData );
 	~CZMPlayerAnimState();
 
 
 	void InitZMAnimState( CZMPlayer* pPlayer );
-	CZMPlayer* GetZMPlayer() { return m_pZMPlayer; };
+	CZMPlayer* GetZMPlayer() const { return m_pZMPlayer; }
 
     virtual bool ShouldUpdateAnimState() OVERRIDE;
 	virtual void ClearAnimationState() OVERRIDE;
@@ -48,8 +47,6 @@ private:
 
 #ifdef CLIENT_DLL
     void            ComputePoseParam_Head( CStudioHdr* pStudioHdr );
-
-    //void            FixUnusedPoseParams( CStudioHdr* pStudioHdr );
 
     void            UpdateLookAt();
 #endif
