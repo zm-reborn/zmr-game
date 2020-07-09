@@ -102,18 +102,15 @@ void CZMVoiceLines::LoadVoiceLines()
         if ( index <= -1 )
             continue;
 
-#ifdef CLIENT_DLL
+
         const char* chatmsg = data->GetString( "chatmsg" );
-        const char* snd = data->GetString( "snd" );
-        if ( !(*snd) && !(*chatmsg) )
+        const char* szConcept = data->GetString( "concept" );
+        if ( !(*szConcept) && !(*chatmsg) )
             continue;
 
-        m_vLines.AddToTail( new ZMVoiceLine_t( index, chatmsg, snd ) );
-#else
         float delay = fabs( data->GetFloat( "delay", 3.0f ) );
 
-        m_vLines.AddToTail( new ZMVoiceLine_t( index, delay ) );
-#endif
+        m_vLines.AddToTail( new ZMVoiceLine_t( index, chatmsg, szConcept, delay ) );
     }
     while ( (data = data->GetNextKey()) != nullptr );
 
@@ -143,45 +140,45 @@ void CZMVoiceLines::FireGameEvent( IGameEvent* pEvent )
 
 
         // If the player is muted, don't do anything.
-        bool bIsMuted = GetLocalPlayerIndex() != index && GetClientVoiceMgr()->IsPlayerBlocked( index );
+        //bool bIsMuted = GetLocalPlayerIndex() != index && GetClientVoiceMgr()->IsPlayerBlocked( index );
 
         // Disable chat if we're the ZM as well.
         bool bDisableChat = zm_cl_voiceline_disablechat.GetBool()
                         ||  (pLocal->IsZM() && zm_cl_voiceline_disableforzm.GetBool());
 
 
-        C_ZMPlayer* pPlayer = ToZMPlayer( UTIL_PlayerByIndex( index ) );
+        //C_ZMPlayer* pPlayer = ToZMPlayer( UTIL_PlayerByIndex( index ) );
             
 
 
         // Play the sound
-        if ( pLine->m_szSoundBase[0] != NULL && !zm_cl_voiceline_disablesound.GetBool() && !bIsMuted )
-        {
-            const char* gender = IsFemale( pPlayer ) ? "Female" : "Male";
+        //if ( pLine->m_szSoundBase[0] != NULL && !zm_cl_voiceline_disablesound.GetBool() && !bIsMuted )
+        //{
+        //    const char* gender = IsFemale( pPlayer ) ? "Female" : "Male";
 
-            char line[256];
-            Q_snprintf( line, sizeof( line ), "%s.%s", pLine->m_szSoundBase, gender );
+        //    char line[256];
+        //    Q_snprintf( line, sizeof( line ), "%s.%s", pLine->m_szSoundBase, gender );
 
-            C_ZMPlayer* pOrigin = nullptr;
-            Vector pos;
+        //    C_ZMPlayer* pOrigin = nullptr;
+        //    Vector pos;
 
-            if ( pPlayer && !pPlayer->IsDormant() )
-            {
-                pOrigin = pPlayer;
-            }
-            else
-            {
-                pos.x = pEvent->GetFloat( "pos_x" );
-                pos.y = pEvent->GetFloat( "pos_y" );
-                pos.z = pEvent->GetFloat( "pos_z" );
-            }
-
-
-            int seed = pEvent->GetInt( "seed" );
+        //    if ( pPlayer && !pPlayer->IsDormant() )
+        //    {
+        //        pOrigin = pPlayer;
+        //    }
+        //    else
+        //    {
+        //        pos.x = pEvent->GetFloat( "pos_x" );
+        //        pos.y = pEvent->GetFloat( "pos_y" );
+        //        pos.z = pEvent->GetFloat( "pos_z" );
+        //    }
 
 
-            PlayVoiceLine( pOrigin, &pos, line, seed );
-        }
+        //    int seed = pEvent->GetInt( "seed" );
+
+
+        //    PlayVoiceLine( pOrigin, &pos, line, seed );
+        //}
 
         
         // Print chat message
@@ -262,39 +259,46 @@ bool CZMVoiceLines::IsFemale( C_ZMPlayer* pPlayer ) const
 #ifdef GAME_DLL
 void CZMVoiceLines::OnVoiceLine( CZMPlayer* pPlayer, int index )
 {
-    if ( zm_sv_voiceline_disable.GetBool() )
-        return;
-
-
     ZMVoiceLine_t* pLine = FindVoiceLineByIndex( index );
-    if ( !pLine )
-        return;
-
-
-    if ( !zm_sv_voiceline_madness.GetBool() )
+    if ( pLine )
     {
-        if ( pPlayer->GetNextVoiceLineTime() > gpGlobals->curtime )
-            return;
+        pPlayer->Speak( pLine->m_szConcept );
     }
 
-
-    pPlayer->SetNextVoiceLineTime( gpGlobals->curtime + pLine->m_flDelay );
-
-
-    Vector origin = pPlayer->EyePosition();
+    
+    //if ( zm_sv_voiceline_disable.GetBool() )
+    //    return;
 
 
-    IGameEvent* pEvent = gameeventmanager->CreateEvent( "voicemenu_use", true );
-    if ( pEvent )
-    {
-        pEvent->SetInt( "userid", pPlayer->GetUserID() );
-        pEvent->SetInt( "voiceline", index );
-        pEvent->SetFloat( "pos_x", origin.x );
-        pEvent->SetFloat( "pos_y", origin.y );
-        pEvent->SetFloat( "pos_z", origin.z );
-        pEvent->SetInt( "seed", RandomInt( 0, 100 ) );
-        gameeventmanager->FireEvent( pEvent, false );
-    }
+    //ZMVoiceLine_t* pLine = FindVoiceLineByIndex( index );
+    //if ( !pLine )
+    //    return;
+
+
+    //if ( !zm_sv_voiceline_madness.GetBool() )
+    //{
+    //    if ( pPlayer->GetNextVoiceLineTime() > gpGlobals->curtime )
+    //        return;
+    //}
+
+
+    //pPlayer->SetNextVoiceLineTime( gpGlobals->curtime + pLine->m_flDelay );
+
+
+    //Vector origin = pPlayer->EyePosition();
+
+
+    //IGameEvent* pEvent = gameeventmanager->CreateEvent( "voicemenu_use", true );
+    //if ( pEvent )
+    //{
+    //    pEvent->SetInt( "userid", pPlayer->GetUserID() );
+    //    pEvent->SetInt( "voiceline", index );
+    //    pEvent->SetFloat( "pos_x", origin.x );
+    //    pEvent->SetFloat( "pos_y", origin.y );
+    //    pEvent->SetFloat( "pos_z", origin.z );
+    //    pEvent->SetInt( "seed", RandomInt( 0, 100 ) );
+    //    gameeventmanager->FireEvent( pEvent, false );
+    //}
 }
 #else
 void CZMVoiceLines::SendVoiceLine( int index )

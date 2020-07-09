@@ -1,6 +1,7 @@
 #pragma once
 
 
+#include "ai_speech.h"
 #include "player.h"
 
 #include "zmr_player_shared.h"
@@ -73,10 +74,10 @@ struct ZMServerWepData_t
     bool bIsMelee;
 };
 
-class CZMPlayer : public CBasePlayer
+class CZMPlayer : public CAI_ExpresserHost<CBasePlayer>
 {
 public:
-    DECLARE_CLASS( CZMPlayer, CBasePlayer )
+    DECLARE_CLASS( CZMPlayer, CAI_ExpresserHost<CBasePlayer> )
     DECLARE_SERVERCLASS()
     //DECLARE_PREDICTABLE()
     DECLARE_DATADESC()
@@ -84,6 +85,11 @@ public:
     CZMPlayer();
     ~CZMPlayer();
 
+    virtual void PostConstructor( const char* szClassname ) OVERRIDE;
+
+    CAI_Expresser* CreateExpresser();
+    CMultiplayer_Expresser* m_pExpresser;
+	virtual CAI_Expresser* GetExpresser() OVERRIDE { return m_pExpresser; }
     
     static CZMPlayer* CreatePlayer( const char* className, edict_t* ed )
     {
@@ -294,6 +300,9 @@ protected:
     void PreThink_HL2();
 
     void UpdateControllableTrain();
+
+
+    virtual void ModifyOrAppendCriteria( AI_CriteriaSet& set ) OVERRIDE;
 
 private:
     void HandleDamagesFromUserCmd();

@@ -169,6 +169,22 @@ CZMPlayer::~CZMPlayer( void )
     m_pPlayerAnimState->Release();
 }
 
+CAI_Expresser* CZMPlayer::CreateExpresser()
+{
+	m_pExpresser = new CMultiplayer_Expresser( this );
+	if ( !m_pExpresser )
+		return nullptr;
+
+	m_pExpresser->Connect( this );
+	return m_pExpresser;
+}
+
+void CZMPlayer::PostConstructor( const char* szClassname )
+{
+    BaseClass::PostConstructor( szClassname );
+    CreateExpresser();
+}
+
 void CZMPlayer::Precache()
 {
     // Precache register makes sure we are already precached.
@@ -2439,4 +2455,34 @@ void CZMPlayer::GetMyRecipientFilter( CRecipientFilter& filter ) const
             filter.AddRecipient( pPlayer );
         }
     }
+}
+
+//
+// Modify criteria for response system.
+//
+void CZMPlayer::ModifyOrAppendCriteria( AI_CriteriaSet& set )
+{
+    BaseClass::ModifyOrAppendCriteria( set );
+
+
+    //
+    // playermodel (IsFemale / IsMale)
+    //
+    bool bMale = true;
+
+    int modelIndex = GetModelIndex();
+    if ( modelIndex > -1 )
+    {
+        const model_t* pModel = modelinfo->GetModel( modelIndex );
+        if ( pModel )
+        {
+            const char* modelname = modelinfo->GetModelName( pModel );
+            if ( modelname && (*modelname) )
+            {
+                 bMale = Q_strstr( modelname, "female" ) == nullptr;
+            }
+        }
+    }
+
+    set.AppendCriteria( "playermodel", bMale ? "male" : "female" );
 }

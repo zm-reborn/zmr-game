@@ -10,54 +10,54 @@
 	{
 		"index"		"0"
 		"chatmsg"		"#ZMVoiceMenuMsgYes"
-		"snd"		"ZMVoiceline.Yes"
 		"delay"		"3"
+		"concept"	"TLK_VOICECMD_YES"
 	}
 	"VoiceNo"
 	{
 		"index"		"1"
 		"chatmsg"		"#ZMVoiceMenuMsgNo"
-		"snd"		"ZMVoiceline.No"
 		"delay"		"3"
+		"concept"	"TLK_VOICECMD_NO"
 	}
 	"VoiceHelp"
 	{
 		"index"		"2"
 		"chatmsg"		"#ZMVoiceMenuMsgHelp"
-		"snd"		"ZMVoiceline.Help"
 		"delay"		"5"
+		"concept"	"TLK_VOICECMD_HELP"
 	}
 	"VoiceFollow"
 	{
 		"index"		"3"
 		"chatmsg"		"#ZMVoiceMenuMsgFollow"
-		"snd"		"ZMVoiceline.Follow"
 		"delay"		"5"
+		"concept"	"TLK_VOICECMD_FOLLOW"
 	}
 	"VoiceTaunt"
 	{
 		"index"		"4"
-		"snd"		"ZMVoiceline.Taunt"
 		"delay"		"6"
+		"concept"	"TLK_VOICECMD_TAUNT"
 	}
 	"VoiceLaugh"
 	{
 		"index"		"5"
-		"snd"		"ZMVoiceline.Laugh"
 		"delay"		"6"
+		"concept"	"TLK_VOICECMD_LAUGH"
 	}
 	"VoiceGo"
 	{
 		"index"		"6"
 		"chatmsg"		"#ZMVoiceMenuMsgGo"
-		"snd"		"ZMVoiceline.Go"
 		"delay"		"6"
+		"concept"	"TLK_VOICECMD_GO"
 	}
 	"VoiceAlert"
 	{
 		"index"		"7"
 		"chatmsg"		"#ZMVoiceMenuMsgAlert"
-		"snd"		"ZMVoiceline.Alert"
 		"delay"		"6"
+		"concept"	"TLK_VOICECMD_ALERT"
 	}
 }

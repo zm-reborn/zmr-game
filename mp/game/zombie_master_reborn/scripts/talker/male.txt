@@ -1,0 +1,111 @@
+//
+// Yes
+//
+Response SayYesMale
+{
+	speak "ZMVoiceline.Yes.Male"
+}
+
+rule SayYesMale
+{
+   criteria     ConceptVoiceCmdYes IsMale
+   response     SayYesMale
+}
+
+//
+// No
+//
+Response SayNoMale
+{
+	speak "ZMVoiceline.No.Male"
+}
+
+rule SayNoMale
+{
+   criteria     ConceptVoiceCmdNo IsMale
+   response     SayNoMale
+}
+
+//
+// Help
+//
+Response CallHelpMale
+{
+	speak "ZMVoiceline.Help.Male"
+}
+
+rule CallHelpMale
+{
+   criteria     ConceptVoiceCmdHelp IsMale
+   response     CallHelpMale
+}
+
+//
+// Follow
+//
+Response FollowMeMale
+{
+	speak "ZMVoiceline.Follow.Male"
+}
+
+rule FollowMeMale
+{
+   criteria     ConceptVoiceCmdFollow IsMale
+   response     FollowMeMale
+}
+
+//
+// Taunt
+//
+Response TauntMale
+{
+	speak "ZMVoiceline.Taunt.Male"
+}
+
+rule TauntMale
+{
+   criteria     ConceptVoiceCmdTaunt IsMale
+   response     TauntMale
+}
+
+//
+// Laugh
+//
+Response LaughMale
+{
+	speak "ZMVoiceline.Laugh.Male"
+}
+
+rule LaughMale
+{
+   criteria     ConceptVoiceCmdLaugh IsMale
+   response     LaughMale
+}
+
+//
+// Go
+//
+Response SayGoMale
+{
+	speak "ZMVoiceline.Go.Male"
+}
+
+rule SayGoMale
+{
+   criteria     ConceptVoiceCmdGo IsMale
+   response     SayGoMale
+}
+
+//
+// Alert
+//
+Response SayAlertMale
+{
+	speak "ZMVoiceline.Alert.Male"
+}
+
+rule SayAlertMale
+{
+   criteria     ConceptVoiceCmdAlert IsMale
+   response     SayAlertMale
+}

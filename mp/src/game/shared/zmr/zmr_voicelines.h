@@ -7,27 +7,18 @@
 
 struct ZMVoiceLine_t
 {
-#ifdef GAME_DLL
-    ZMVoiceLine_t( int index, float delay )
-    {
-        m_iIndex = index;
-        m_flDelay = delay;
-    }
-
-    int m_iIndex;
-    float m_flDelay;
-#else
-    ZMVoiceLine_t( int index, const char* chatmsg, const char* snd )
+    ZMVoiceLine_t( int index, const char* chatmsg, const char* cncpt, float flDelay )
     {
         m_iIndex = index;
         Q_strncpy( m_szChatMsg, chatmsg, sizeof( m_szChatMsg ) );
-        Q_strncpy( m_szSoundBase, snd, sizeof( m_szSoundBase ) );
+        Q_strncpy( m_szConcept, cncpt, sizeof( m_szConcept ) );
+        m_flDelay = flDelay;
     }
 
     int m_iIndex;
     char m_szChatMsg[64];
-    char m_szSoundBase[128];
-#endif
+    char m_szConcept[128];
+    float m_flDelay;
 };
 
 
