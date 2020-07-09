@@ -17,14 +17,13 @@
 #include "tier0/memdbgon.h"
 
 
+#define MAX_FEET_GOAL_DELTA         45.0f
+
 // Don't let the head spass out.
 #define ZM_LOOKAT_UPDATE_TIME       0.1f
 #define ZM_LOOKAT_DIST              100.0f
 #define ZM_LOOKAT_DOT               0.5f // < 0 is way too big of an angle.
 
-#ifdef CLIENT_DLL
-ConVar zm_cl_fix_unusedposeparameters( "zm_cl_fix_unusedposeparameters", "1", FCVAR_ARCHIVE );
-#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -43,7 +42,7 @@ CZMPlayerAnimState* CreateZMPlayerAnimState( CZMPlayer* pPlayer )
     movementData.m_flSprintSpeed = -1.0f;
 
     // Create animation state for this player.
-    CZMPlayerAnimState* pRet = new CZMPlayerAnimState( pPlayer, movementData );
+    auto* pRet = new CZMPlayerAnimState( pPlayer, movementData );
 
     // Specific ZM player initialization.
     pRet->InitZMAnimState( pPlayer );
@@ -53,25 +52,13 @@ CZMPlayerAnimState* CreateZMPlayerAnimState( CZMPlayer* pPlayer )
 
 //-----------------------------------------------------------------------------
 // Purpose: 
-// Input  :  - 
-//-----------------------------------------------------------------------------
-CZMPlayerAnimState::CZMPlayerAnimState()
-{
-    m_pZMPlayer = NULL;
-    // Don't initialize ZM specific variables here. Init them in InitZMAnimState()
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
 // Input  : *pPlayer - 
 //			&movementData - 
 //-----------------------------------------------------------------------------
 CZMPlayerAnimState::CZMPlayerAnimState( CBasePlayer* pPlayer, MultiPlayerMovementData_t& movementData )
-: CMultiPlayerAnimState( pPlayer, movementData )
+    : CMultiPlayerAnimState( pPlayer, movementData )
 {
-    m_pZMPlayer = NULL;
-
-    // Don't initialize ZM specific variables here. Init them in InitZMAnimState()
+    m_pZMPlayer = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -88,6 +75,7 @@ CZMPlayerAnimState::~CZMPlayerAnimState()
 //-----------------------------------------------------------------------------
 void CZMPlayerAnimState::InitZMAnimState( CZMPlayer* pPlayer )
 {
+    Assert( pPlayer );
     m_pZMPlayer = pPlayer;
 
     m_blinkTimer.Invalidate();
@@ -150,13 +138,8 @@ void CZMPlayerAnimState::Update( float eyeYaw, float eyePitch )
     // Profile the animation update.
     VPROF( "CZMPlayerAnimState::Update" );
 
-    // Get the ZM player.
-    CZMPlayer* pZMPlayer = GetZMPlayer();
-    if ( !pZMPlayer )
-        return;
-
     // Get the studio header for the player.
-    CStudioHdr *pStudioHdr = pZMPlayer->GetModelPtr();
+    auto* pStudioHdr = GetZMPlayer()->GetModelPtr();
     if ( !pStudioHdr )
         return;
 
@@ -199,51 +182,9 @@ void CZMPlayerAnimState::Update( float eyeYaw, float eyePitch )
         // IIRC pose parameters aren't lag compensated anyway.
 #ifdef CLIENT_DLL
         ComputePoseParam_Head( pStudioHdr );
-
-        // Possible workaround to pose parameter crash.
-        //FixUnusedPoseParams( pStudioHdr );
 #endif
     }
-
-#ifdef CLIENT_DLL 
-    if ( C_BasePlayer::ShouldDrawLocalPlayer() )
-    {
-        pZMPlayer->SetPlaybackRate( 1.0f );
-    }
-#endif
 }
-
-//#ifdef CLIENT_DLL
-//void CZMPlayerAnimState::FixUnusedPoseParams( CStudioHdr* pStudioHdr )
-//{
-//    if ( !zm_cl_fix_unusedposeparameters.GetBool() )
-//        return;
-//
-//    int num = pStudioHdr->GetNumPoseParameters();
-//    for ( int i = 0; i < num; i++ )
-//    {
-//        if ( m_PoseParameterData.m_iMoveX == i )
-//            continue;
-//        if ( m_PoseParameterData.m_iMoveY == i )
-//            continue;
-//        if ( m_PoseParameterData.m_iAimPitch == i )
-//            continue;
-//        if ( m_PoseParameterData.m_iAimYaw == i )
-//            continue;
-//        if ( m_headYawPoseParam == i )
-//            continue;
-//        if ( m_headPitchPoseParam == i )
-//            continue;
-//
-//        float curval = m_pZMPlayer->GetPoseParameter( i );
-//        if ( abs( curval ) > 1.0f )
-//        {
-//            Warning( "Poseparameter %s out of range! (%.3f) Resetting...", pStudioHdr->pPoseParameter( i ).pszName(), curval );
-//            m_pZMPlayer->SetPoseParameter( i, 0.0f );
-//        }
-//    }
-//}
-//#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -731,10 +672,11 @@ void CZMPlayerAnimState::ComputePoseParam_AimYaw( CStudioHdr *pStudioHdr )
         {
             float flYawDelta = AngleNormalize(  m_flGoalFeetYaw - m_flEyeYaw );
 
-            if ( fabs( flYawDelta ) > 45.0f )
+            const float flMaxDelta = MAX_FEET_GOAL_DELTA;
+
+            if ( fabs( flYawDelta ) > flMaxDelta )
             {
-                float flSide = ( flYawDelta > 0.0f ) ? -1.0f : 1.0f;
-                m_flGoalFeetYaw += ( 45.0f * flSide );
+                m_flGoalFeetYaw = m_flEyeYaw;
             }
         }
     }
