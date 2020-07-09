@@ -21,6 +21,7 @@
 #include "c_zmr_player_ragdoll.h"
 #include "c_zmr_teamkeys.h"
 #include "c_zmr_colorcorrection.h"
+#include "c_zmr_firstpersonbody.h"
 
 #include "c_zmr_flashlighteffect.h"
 #include "zmr_resource_system.h"
@@ -134,6 +135,8 @@ C_ZMPlayer::C_ZMPlayer() : m_iv_angEyeAngles( "C_ZMPlayer::m_iv_angEyeAngles" )
     //m_EntClientFlags |= ENTCLIENTFLAG_DONTUSEIK;
 
     m_pFlashlight = nullptr;
+    m_pFirstPersonBody = nullptr;
+
     m_iIDEntIndex = 0;
     m_iSpawnInterpCounterCache = 0;
 
@@ -162,6 +165,7 @@ C_ZMPlayer::C_ZMPlayer() : m_iv_angEyeAngles( "C_ZMPlayer::m_iv_angEyeAngles" )
 C_ZMPlayer::~C_ZMPlayer()
 {
     ReleaseFlashlight();
+    ReleaseFirstPersonBody();
 
     m_pPlayerAnimState->Release();
 
@@ -502,8 +506,23 @@ bool C_ZMPlayer::ShouldDraw()
 
     if ( IsRagdoll() )
         return false;
-
+    
+    //return true;
     return BaseClass::ShouldDraw();
+}
+
+void C_ZMPlayer::UpdateVisibility()
+{
+    BaseClass::UpdateVisibility();
+
+    // Stay parented, silly.
+    if ( m_pFirstPersonBody )
+    {
+        if ( !IsDormant() )
+        {
+            m_pFirstPersonBody->AttachToEntity( this );
+        }
+    }
 }
 
 int C_ZMPlayer::DrawModel( int flags )
@@ -517,7 +536,7 @@ int C_ZMPlayer::DrawModel( int flags )
     C_ZMPlayer* pPlayer = C_ZMPlayer::GetLocalPlayer();
     if ( !pPlayer || !pPlayer->IsZM() )
     {
-        return BaseClass::DrawModel( flags );
+        return C_BaseCombatCharacter::DrawModel( flags );
     }
 
 
@@ -581,7 +600,7 @@ int C_ZMPlayer::DrawModelAndEffects( int flags )
     const Vector reset( 1.0f, 1.0f, 1.0f );
 
 
-    ret = BaseClass::DrawModel( flags );
+    ret = C_BaseCombatCharacter::DrawModel( flags );
 
 
     if ( bNoLight )
@@ -614,6 +633,38 @@ bool C_ZMPlayer::ShouldReceiveProjectedTextures( int flags )
     }
 
     return BaseClass::ShouldReceiveProjectedTextures( flags );
+}
+
+ConVar zm_cl_firstpersonbody_shift( "zm_cl_firstpersonbody_shift", "24" );
+
+const Vector& C_ZMPlayer::GetRenderOrigin()
+{
+    if ( IsRagdoll() )
+    {
+        return vec3_origin;
+    }
+    else
+    {
+        // This is for the firstperson body.
+        // It will bonemerge to us.
+        if ( InFirstPersonView() )
+        {
+            static Vector vec;
+            vec = GetAbsOrigin();
+
+            Vector fwd;
+
+            auto angles = GetRenderAngles();
+
+            AngleVectors( angles, &fwd );
+
+            vec -= fwd * zm_cl_firstpersonbody_shift.GetFloat();
+
+            return vec;
+        }
+
+        return GetAbsOrigin();
+    }
 }
 
 const QAngle& C_ZMPlayer::GetRenderAngles()
@@ -894,6 +945,17 @@ CStudioHdr* C_ZMPlayer::OnNewModel( void )
     {
         m_pPlayerAnimState->OnNewModel();
     }
+
+
+    ReleaseFirstPersonBody();
+    m_pFirstPersonBody = new C_ZMFirstPersonBody();
+    if ( !m_pFirstPersonBody->Initialize( this ) )
+    {
+        ReleaseFirstPersonBody();
+
+        Warning( "Failed to initialize firstperson body!\n" );
+    }
+
     
     return hdr;
 }
@@ -977,6 +1039,14 @@ void C_ZMPlayer::ReleaseFlashlight()
     m_pFlashlight = nullptr;
 }
 
+void C_ZMPlayer::ReleaseFirstPersonBody()
+{
+    if ( m_pFirstPersonBody )
+    {
+        m_pFirstPersonBody->Release();
+        m_pFirstPersonBody = nullptr;
+    }
+}
 
 
 #define FLASH_NONE              0

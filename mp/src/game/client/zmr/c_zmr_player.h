@@ -18,6 +18,7 @@ class CZMPlayerAttackTraceFilter;
 class C_ZMRagdoll;
 class C_ZMBaseWeapon;
 class CZMFlashlightEffect;
+class C_ZMFirstPersonBody;
 
 
 class C_ZMPlayer : public C_BasePlayer
@@ -50,8 +51,10 @@ public:
     virtual ShadowType_t    ShadowCastType() OVERRIDE;
     virtual bool            ShouldReceiveProjectedTextures( int flags ) OVERRIDE;
     virtual bool            ShouldDraw() OVERRIDE;
+    virtual void            UpdateVisibility() OVERRIDE;
     virtual int             DrawModel( int flags ) OVERRIDE;
     int                     DrawModelAndEffects( int flags );
+    virtual const Vector&   GetRenderOrigin() OVERRIDE;
     virtual const QAngle&   GetRenderAngles() OVERRIDE;
     virtual const QAngle&   EyeAngles() OVERRIDE;
     void                    SetLocalAngles( const QAngle& angles );
@@ -154,6 +157,9 @@ private:
 
     void ReleaseFlashlight();
     CZMFlashlightEffect* m_pFlashlight;
+
+    void ReleaseFirstPersonBody();
+    C_ZMFirstPersonBody* m_pFirstPersonBody;
 
 
     // Only used locally.
