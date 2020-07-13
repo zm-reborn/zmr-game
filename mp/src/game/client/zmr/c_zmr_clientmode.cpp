@@ -14,6 +14,7 @@
 #include "c_zmr_util.h"
 #include "c_zmr_player.h"
 #include "c_zmr_teamkeys.h"
+#include "zmr_thirdpersonmanager.h"
 #include "c_zmr_clientmode.h"
 
 
@@ -262,6 +263,18 @@ int ClientModeZMNormal::ZMKeyInput( int down, ButtonCode_t keynum, const char* p
     }
 
     return -1;
+}
+
+bool ClientModeZMNormal::CreateMove( float flInputSampleTime, CUserCmd* pCmd )
+{
+    return BaseClass::CreateMove( flInputSampleTime, pCmd );
+}
+
+void ClientModeZMNormal::OverrideView( CViewSetup* pSetup )
+{
+    BaseClass::OverrideView( pSetup );
+
+    g_ZMThirdpersonManager.ComputeViewToThirdperson( pSetup->origin, pSetup->angles );
 }
 //
 

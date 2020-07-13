@@ -20,6 +20,8 @@ public:
 
     virtual int KeyInput( int down, ButtonCode_t keynum, const char* pszCurrentBinding );
 
+    virtual bool CreateMove( float flInputSampleTime, CUserCmd* pCmd ) OVERRIDE;
+    virtual void OverrideView( CViewSetup* pSetup ) OVERRIDE;
 
     bool IsZMHoldingCtrl() const { return m_bZMHoldingCtrl; }
     void SetZMHoldingCtrl( bool state ) { m_bZMHoldingCtrl = state; }

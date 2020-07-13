@@ -2,6 +2,7 @@
 #include "kbutton.h"
 #include "input.h"
 
+#include "zmr_thirdpersonmanager.h"
 #include "c_zmr_in_main.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -68,6 +69,10 @@ void CZMInput::AdjustYaw( float speed, QAngle& viewangles )
     }
 }
 
+int CZMInput::CAM_IsThirdPerson()
+{
+    return g_ZMThirdpersonManager.IsInThirdperson();
+}
 
 static CZMInput g_Input;
 

@@ -20,7 +20,8 @@ public:
         ScrollState_t iState;
         float flLastStateChange;
     };
-
+    
+    virtual int CAM_IsThirdPerson() OVERRIDE;
     virtual void AdjustYaw( float speed, QAngle& viewangles ) OVERRIDE;
 
 
