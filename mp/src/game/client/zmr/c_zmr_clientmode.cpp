@@ -267,7 +267,19 @@ int ClientModeZMNormal::ZMKeyInput( int down, ButtonCode_t keynum, const char* p
 
 bool ClientModeZMNormal::CreateMove( float flInputSampleTime, CUserCmd* pCmd )
 {
-    return BaseClass::CreateMove( flInputSampleTime, pCmd );
+    bool ret = BaseClass::CreateMove( flInputSampleTime, pCmd );
+
+
+	if ( !g_ZMThirdpersonManager.ComputeThirdpersonToUserCmd( pCmd ) )
+	{
+		pCmd->aimangles = pCmd->viewangles;
+	}
+    else
+    {
+        ret = true;
+    }
+
+    return ret;
 }
 
 void ClientModeZMNormal::OverrideView( CViewSetup* pSetup )

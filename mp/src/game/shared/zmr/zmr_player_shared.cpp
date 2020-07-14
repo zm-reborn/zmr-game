@@ -289,7 +289,19 @@ Vector CZMPlayer::GetAttackSpread( CBaseCombatWeapon *pWeapon, CBaseEntity *pTar
 Vector CZMPlayer::GetAutoaimVector( float flScale )
 {
     Vector fwd;
-    AngleVectors( EyeAngles() + m_Local.m_vecPunchAngle, &fwd );
+    QAngle angBase;
+    auto* pCmd = GetCurrentUserCommand();
+
+    if ( pCmd )
+    {
+        angBase = pCmd->aimangles;
+    }
+    else
+    {
+        angBase = GetAbsAngles();
+    }
+
+    AngleVectors( angBase + m_Local.m_vecPunchAngle, &fwd );
 
     return fwd;
 }

@@ -17,6 +17,9 @@
 #include "zmr_viewmodel.h"
 #include "zmr_ammodef.h"
 #include "weapons/zmr_base.h"
+#ifdef CLIENT_DLL
+#include "zmr_thirdpersonmanager.h"
+#endif
 #include "zmr_shareddefs.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -865,7 +868,7 @@ void CZMBaseWeapon::FireBullets( int numShots, int iAmmoType, float flMaxDist )
     // This fixes a problem of the client's shooting being off.
     // More noticeable with higher pings.
 #ifdef CLIENT_DLL
-    if ( zm_sv_bulletsusemainview.GetBool() )
+    if ( zm_sv_bulletsusemainview.GetBool() && !g_ZMThirdpersonManager.IsInThirdperson() )
     {
         info.m_vecSrc           = MainViewOrigin();
         info.m_vecDirShooting   = MainViewForward();
@@ -874,7 +877,7 @@ void CZMBaseWeapon::FireBullets( int numShots, int iAmmoType, float flMaxDist )
 #endif
     {
         info.m_vecSrc           = pPlayer->Weapon_ShootPosition();
-        info.m_vecDirShooting   = pPlayer->CBasePlayer::GetAutoaimVector( AUTOAIM_SCALE_DEFAULT );
+        info.m_vecDirShooting   = pPlayer->GetAutoaimVector( AUTOAIM_SCALE_DEFAULT );
     }
 
     info.m_iShots = numShots;

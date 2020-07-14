@@ -14,6 +14,8 @@ public:
     bool IsInThirdperson() const;
     void ToggleThirdperson();
 
+    static bool IsDebugging();
+
 private:
     bool m_bWantThirdperson;
     Vector m_vecLastThirdpersonSpot;

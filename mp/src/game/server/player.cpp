@@ -3528,6 +3528,9 @@ bool CBasePlayer::IsUserCmdDataValid( CUserCmd *pCmd )
 	bool bValid = ( pCmd->tick_count >= nMinDelta && pCmd->tick_count < nMaxDelta ) &&
 				  // Prevent clients from sending invalid view angles to try to get leaf server code to crash
 				  ( pCmd->viewangles.IsValid() && IsEntityQAngleReasonable( pCmd->viewangles ) ) &&
+#ifdef ZMR
+				  ( pCmd->aimangles.IsValid() && IsEntityQAngleReasonable( pCmd->aimangles ) ) &&
+#endif
 				  // Movement ranges
 				  ( IsFinite( pCmd->forwardmove ) && IsEntityCoordinateReasonable( pCmd->forwardmove ) ) &&
 				  ( IsFinite( pCmd->sidemove ) && IsEntityCoordinateReasonable( pCmd->sidemove ) ) &&

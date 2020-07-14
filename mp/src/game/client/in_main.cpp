@@ -1300,10 +1300,6 @@ void CInput::CreateMove ( int sequence_number, float input_sample_frametime, boo
 #ifdef ZMR
 	g_ZMUserCmdSystem.WriteToCmd( *cmd );
 	g_ZMUserCmdSystem.ClearDamage();
-
-	// This needs to be here, because we DON'T want to
-	// set the engine view angles.
-	g_ZMThirdpersonManager.ComputeThirdpersonToUserCmd( cmd );
 #endif
 
 	pVerified->m_cmd = *cmd;

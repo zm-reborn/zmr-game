@@ -204,6 +204,10 @@ void WriteUsercmd( bf_write *buf, const CUserCmd *to, const CUserCmd *from )
 	{
 		buf->WriteOneBit( 0 );
 	}
+
+	buf->WriteOneBit( 1 );
+	buf->WriteFloat( to->aimangles[0] );
+	buf->WriteFloat( to->aimangles[1] );
 #endif
 }
 
@@ -334,6 +338,12 @@ void ReadUsercmd( bf_read *buf, CUserCmd *move, CUserCmd *from )
 		{
             move->zmHitData[i].ReadFrom( buf );
 		}
+	}
+
+	if ( buf->ReadOneBit() )
+	{
+		move->aimangles[0] = buf->ReadFloat();
+		move->aimangles[1] = buf->ReadFloat();
 	}
 #endif
 }

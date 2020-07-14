@@ -67,6 +67,7 @@ public:
 #endif
 #ifdef ZMR
 		zmHitData.RemoveAll();
+		aimangles.Init();
 #endif
 	}
 
@@ -99,6 +100,8 @@ public:
 #endif
 #ifdef ZMR
 		zmHitData = src.zmHitData;
+		aimangles[0] = src.aimangles[0];
+		aimangles[1] = src.aimangles[1];
 #endif
 
 		return *this;
@@ -184,6 +187,7 @@ public:
 
 #ifdef ZMR
 	ZMUserCmdHitList_t zmHitData;
+	QAngle aimangles;
 #endif
 };
 
