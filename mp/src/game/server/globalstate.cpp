@@ -7,7 +7,6 @@
 //=============================================================================//
 #include "cbase.h"
 #include "basetypes.h"
-#include "saverestore.h"
 #include "saverestore_utlvector.h"
 #include "saverestore_utlsymbol.h"
 #include "globalstate.h"
@@ -290,15 +289,11 @@ void CGlobalState::Reset( void )
 
 void SaveGlobalState( CSaveRestoreData *pSaveData )
 {
-	CSave saveHelper( pSaveData );
-	gGlobalState.Save( saveHelper );
 }
 
 
 void RestoreGlobalState( CSaveRestoreData *pSaveData )
 {
-	CRestore restoreHelper( pSaveData );
-	gGlobalState.Restore( restoreHelper );
 }
 
 

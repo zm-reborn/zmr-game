@@ -30,8 +30,6 @@
 #include "RagdollBoogie.h"
 #include "EntityParticleTrail.h"
 #include "in_buttons.h"
-#include "ai_behavior_follow.h"
-#include "ai_behavior_lead.h"
 #include "gameinterface.h"
 #include "ilagcompensationmanager.h"
 
@@ -1565,22 +1563,22 @@ void CChangeLevel::NotifyEntitiesOutOfTransition()
 //------------------------------------------------------------------------------
 void CChangeLevel::WarnAboutActiveLead( void )
 {
-	int					i;
-	CAI_BaseNPC *		ai;
-	CAI_BehaviorBase *	behavior;
+	//int					i;
+	//CAI_BaseNPC *		ai;
+	//CAI_BehaviorBase *	behavior;
 
-	for ( i = 0; i < g_AI_Manager.NumAIs(); i++ )
-	{
-		ai = g_AI_Manager.AccessAIs()[i];
-		behavior = ai->GetRunningBehavior();
-		if ( behavior )
-		{
-			if ( dynamic_cast<CAI_LeadBehavior *>( behavior ) )
-			{
-				Warning( "Entity '%s' is still actively leading\n", STRING( ai->GetEntityName() ) );
-			} 
-		}
-	}
+	//for ( i = 0; i < g_AI_Manager.NumAIs(); i++ )
+	//{
+	//	ai = g_AI_Manager.AccessAIs()[i];
+	//	behavior = ai->GetRunningBehavior();
+	//	if ( behavior )
+	//	{
+	//		if ( dynamic_cast<CAI_LeadBehavior *>( behavior ) )
+	//		{
+	//			Warning( "Entity '%s' is still actively leading\n", STRING( ai->GetEntityName() ) );
+	//		} 
+	//	}
+	//}
 }
 
 void CChangeLevel::ChangeLevelNow( CBaseEntity *pActivator )
@@ -1667,15 +1665,6 @@ void CChangeLevel::ChangeLevelNow( CBaseEntity *pActivator )
 	}
 	else
 	{
-		// Build a change list so we can see what would be transitioning
-		CSaveRestoreData *pSaveData = SaveInit( 0 );
-		if ( pSaveData )
-		{
-			g_pGameSaveRestoreBlockSet->PreSave( pSaveData );
-			pSaveData->levelInfo.connectionCount = BuildChangeList( pSaveData->levelInfo.levelList, MAX_LEVEL_CONNECTIONS );
-			g_pGameSaveRestoreBlockSet->PostSave();
-		}
-
 		SetTouch( NULL );
 	}
 }
@@ -2033,79 +2022,7 @@ static inline void Set( char *pBuf, int nBit )
 #define MAX_ENTITY_BYTE_COUNT	(NUM_ENT_ENTRIES >> 3)
 int CChangeLevel::AddDependentEntities( int nCount, CBaseEntity **ppEntList, int *pEntityFlags, int nMaxList )
 {
-	char pEntitiesSaved[MAX_ENTITY_BYTE_COUNT];
-	memset( pEntitiesSaved, 0, MAX_ENTITY_BYTE_COUNT * sizeof(char) );
-			  
-	// Populate the initial bitfield
-	int i;
-	for ( i = 0; i < nCount; ++i )
-	{
-		// NOTE: Must use GetEntryIndex because we're saving non-networked entities
-		int nEntIndex = ppEntList[i]->GetRefEHandle().GetEntryIndex();
-
-		// We shouldn't already have this entity in the list!
-		Assert( !IsBitSet( pEntitiesSaved, nEntIndex ) );
-
-		// Mark the entity as being in the list
-		Set( pEntitiesSaved, nEntIndex );
-	}
-
-	IEntitySaveUtils *pSaveUtils = GetEntitySaveUtils();
-
-	// Iterate over entities whose dependencies we've not yet processed
-	// NOTE: nCount will change value during this loop in AddEntityToTransitionList
-	for ( i = 0; i < nCount; ++i )
-	{
-		CBaseEntity *pEntity = ppEntList[i];
-
-		// Find dependencies in the hash.
-		int nDepCount = pSaveUtils->GetEntityDependencyCount( pEntity );
-		if ( !nDepCount )
-			continue;
-
-		CBaseEntity **ppDependentEntities = (CBaseEntity**)stackalloc( nDepCount * sizeof(CBaseEntity*) );
-		pSaveUtils->GetEntityDependencies( pEntity, nDepCount, ppDependentEntities );
-		for ( int j = 0; j < nDepCount; ++j )
-		{
-			CBaseEntity *pDependent = ppDependentEntities[j];
-			if ( !pDependent )
-				continue;
-
-			// NOTE: Must use GetEntryIndex because we're saving non-networked entities
-			int nEntIndex = pDependent->GetRefEHandle().GetEntryIndex();
-
-			// Don't re-add it if it's already in the list
-			if ( IsBitSet( pEntitiesSaved, nEntIndex ) )
-				continue;
-
-			// Mark the entity as being in the list
-			Set( pEntitiesSaved, nEntIndex );
-
-			int flags = ComputeEntitySaveFlags( pEntity );
-			if ( flags )
-			{
-				if ( nCount >= nMaxList )
-				{
-					Warning( "Too many entities across a transition!\n" );
-					Assert( 0 );
-					return false;
-				}
-
-				if ( g_debug_transitions.GetInt() )
-				{
-					Msg( "ADDED DEPENDANCY: %s (%s)\n", pEntity->GetClassname(), pEntity->GetDebugName() );
-				}
-
-				nCount = AddEntityToTransitionList( pEntity, flags, nCount, ppEntList, pEntityFlags );
-			}
-			else
-			{
-				Warning("Warning!! Save dependency is linked to an entity that doesn't want to be saved!\n");
-			}
-		}
-	}
-
-	return nCount;
+	return 0;
 }
 
 
@@ -2120,40 +2037,7 @@ int CChangeLevel::AddDependentEntities( int nCount, CBaseEntity **ppEntList, int
 // FIXME: This has grown into a complicated beast. Can we make this more elegant?
 int CChangeLevel::ChangeList( levellist_t *pLevelList, int maxList )
 {
-	// Find all of the possible level changes on this BSP
-	int count = BuildChangeLevelList( pLevelList, maxList );
-
-	if ( !gpGlobals->pSaveData || ( static_cast<CSaveRestoreData *>(gpGlobals->pSaveData)->NumEntities() == 0 ) )
-		return count;
-
-	CSave saveHelper( static_cast<CSaveRestoreData *>(gpGlobals->pSaveData) );
-
-	// For each level change, find nearby entities and save them
-	int	i;
-	for ( i = 0; i < count; i++ )
-	{
-		CBaseEntity *pEntList[ MAX_ENTITY ];
-		int			 entityFlags[ MAX_ENTITY ];
-
-		// First, figure out which entities are near the transition
-		CBaseEntity *pLandmarkEntity = CBaseEntity::Instance( pLevelList[i].pentLandmark );
-		int iEntity = BuildEntityTransitionList( pLandmarkEntity, pLevelList[i].landmarkName, pEntList, entityFlags, MAX_ENTITY );
-
-		// FIXME: Activate if we have a dependency problem on level transition
-		// Next, add in all entities depended on by entities near the transition
-//		iEntity = AddDependentEntities( iEntity, pEntList, entityFlags, MAX_ENTITY );
-
-		int j;
-		for ( j = 0; j < iEntity; j++ )
-		{
-			// Mark entity table with 1<<i
-			int index = saveHelper.EntityIndex( pEntList[j] );
-			// Flag it with the level number
-			saveHelper.EntityFlagsSet( index, entityFlags[j] | (1<<i) );
-		}
-	}
-
-	return count;
+	return 0;
 }
 
 

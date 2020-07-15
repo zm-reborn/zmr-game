@@ -12,7 +12,6 @@
 #include "game.h"
 #include "entityapi.h"
 #include "client.h"
-#include "saverestore.h"
 #include "entitylist.h"
 #include "gamerules.h"
 #include "soundent.h"
@@ -155,9 +154,6 @@ IUploadGameStats *gamestatsuploader = NULL;
 #include "tier0/memdbgon.h"
 
 CTimedEventMgr g_NetworkPropertyEventMgr;
-
-ISaveRestoreBlockHandler *GetEventQueueSaveRestoreBlockHandler();
-ISaveRestoreBlockHandler *GetCommentarySaveRestoreBlockHandler();
 
 CUtlLinkedList<CMapEntityRef, unsigned short> g_MapEntityRefs;
 
@@ -676,13 +672,6 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 
 	sv_maxreplay = g_pCVar->FindVar( "sv_maxreplay" );
 
-	g_pGameSaveRestoreBlockSet->AddBlockHandler( GetEntitySaveRestoreBlockHandler() );
-	g_pGameSaveRestoreBlockSet->AddBlockHandler( GetPhysSaveRestoreBlockHandler() );
-	g_pGameSaveRestoreBlockSet->AddBlockHandler( GetTemplateSaveRestoreBlockHandler() );
-	g_pGameSaveRestoreBlockSet->AddBlockHandler( GetDefaultResponseSystemSaveRestoreBlockHandler() );
-	g_pGameSaveRestoreBlockSet->AddBlockHandler( GetCommentarySaveRestoreBlockHandler() );
-	g_pGameSaveRestoreBlockSet->AddBlockHandler( GetEventQueueSaveRestoreBlockHandler() );
-
 	// The string system must init first + shutdown last
 	IGameSystem::Add( GameStringSystem() );
 
@@ -756,13 +745,6 @@ void CServerGameDLL::DLLShutdown( void )
 
 	// Due to dependencies, these are not autogamesystems
 	ModelSoundsCacheShutdown();
-
-	g_pGameSaveRestoreBlockSet->RemoveBlockHandler( GetCommentarySaveRestoreBlockHandler() );
-	g_pGameSaveRestoreBlockSet->RemoveBlockHandler( GetEventQueueSaveRestoreBlockHandler() );
-	g_pGameSaveRestoreBlockSet->RemoveBlockHandler( GetDefaultResponseSystemSaveRestoreBlockHandler() );
-	g_pGameSaveRestoreBlockSet->RemoveBlockHandler( GetTemplateSaveRestoreBlockHandler() );
-	g_pGameSaveRestoreBlockSet->RemoveBlockHandler( GetPhysSaveRestoreBlockHandler() );
-	g_pGameSaveRestoreBlockSet->RemoveBlockHandler( GetEntitySaveRestoreBlockHandler() );
 
 	char *pFilename = g_TextStatsMgr.GetStatsFilename();
 	if ( !pFilename || !pFilename[0] )
@@ -1478,7 +1460,7 @@ void CServerGameDLL::CreateNetworkStringTables( void )
 
 CSaveRestoreData *CServerGameDLL::SaveInit( int size )
 {
-	return ::SaveInit(size);
+	return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -1491,8 +1473,6 @@ CSaveRestoreData *CServerGameDLL::SaveInit( int size )
 //-----------------------------------------------------------------------------
 void CServerGameDLL::SaveWriteFields( CSaveRestoreData *pSaveData, const char *pname, void *pBaseData, datamap_t *pMap, typedescription_t *pFields, int fieldCount )
 {
-	CSave saveHelper( pSaveData );
-	saveHelper.WriteFields( pname, pBaseData, pMap, pFields, fieldCount );
 }
 
 
@@ -1509,33 +1489,24 @@ void CServerGameDLL::SaveWriteFields( CSaveRestoreData *pSaveData, const char *p
 
 void CServerGameDLL::SaveReadFields( CSaveRestoreData *pSaveData, const char *pname, void *pBaseData, datamap_t *pMap, typedescription_t *pFields, int fieldCount )
 {
-	CRestore restoreHelper( pSaveData );
-	restoreHelper.ReadFields( pname, pBaseData, pMap, pFields, fieldCount );
 }
 
 //-----------------------------------------------------------------------------
 
 void CServerGameDLL::SaveGlobalState( CSaveRestoreData *s )
 {
-	::SaveGlobalState(s);
 }
 
 void CServerGameDLL::RestoreGlobalState(CSaveRestoreData *s)
 {
-	::RestoreGlobalState(s);
 }
 
 void CServerGameDLL::Save( CSaveRestoreData *s )
 {
-	CSave saveHelper( s );
-	g_pGameSaveRestoreBlockSet->Save( &saveHelper );
 }
 
 void CServerGameDLL::Restore( CSaveRestoreData *s, bool b)
 {
-	CRestore restore(s);
-	g_pGameSaveRestoreBlockSet->Restore( &restore, b );
-	g_pGameSaveRestoreBlockSet->PostRestore();
 }
 
 //-----------------------------------------------------------------------------
@@ -1563,24 +1534,11 @@ CStandardSendProxies* CServerGameDLL::GetStandardSendProxies()
 
 int	CServerGameDLL::CreateEntityTransitionList( CSaveRestoreData *s, int a)
 {
-	CRestore restoreHelper( s );
-	// save off file base
-	int base = restoreHelper.GetReadPos();
-
-	int movedCount = ::CreateEntityTransitionList(s, a);
-	if ( movedCount )
-	{
-		g_pGameSaveRestoreBlockSet->CallBlockHandlerRestore( GetPhysSaveRestoreBlockHandler(), base, &restoreHelper, false );
-	}
-
-	GetPhysSaveRestoreBlockHandler()->PostRestore();
-
-	return movedCount;
+	return 0;
 }
 
 void CServerGameDLL::PreSave( CSaveRestoreData *s )
 {
-	g_pGameSaveRestoreBlockSet->PreSave( s );
 }
 
 #include "client_textmessage.h"
@@ -1811,16 +1769,10 @@ void CServerGameDLL::GetSaveComment( char *text, int maxlength, float flMinutes,
 
 void CServerGameDLL::WriteSaveHeaders( CSaveRestoreData *s )
 {
-	CSave saveHelper( s );
-	g_pGameSaveRestoreBlockSet->WriteSaveHeaders( &saveHelper );
-	g_pGameSaveRestoreBlockSet->PostSave();
 }
 
 void CServerGameDLL::ReadRestoreHeaders( CSaveRestoreData *s )
 {
-	CRestore restoreHelper( s );
-	g_pGameSaveRestoreBlockSet->PreRestore();
-	g_pGameSaveRestoreBlockSet->ReadRestoreHeaders( &restoreHelper );
 }
 
 void CServerGameDLL::PreSaveGameLoaded( char const *pSaveName, bool bInGame )
