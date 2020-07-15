@@ -18,7 +18,6 @@
 #include "engine/IEngineSound.h"
 #include "ai_navigator.h"
 #include "saverestore_utlvector.h"
-#include "ai_baseactor.h"
 #include "AI_Criteria.h"
 #include "tier1/strtools.h"
 #include "checksum_crc.h"
@@ -32,6 +31,7 @@
 #include "scenefilecache/ISceneFileCache.h"
 #include "SceneCache.h"
 #include "scripted.h"
+#include "ai_speech.h"
 #include "env_debughistory.h"
 
 #ifdef HL2_EPISODIC
@@ -1706,17 +1706,17 @@ void CSceneEntity::DispatchStartSpeak( CChoreoScene *scene, CBaseFlex *actor, CC
 
 		// Add padding to prevent any other talker talking right after I'm done, because I might 
 		// be continuing speaking with another scene.
-		float flDuration = event->GetDuration() - time_in_past;
+		//float flDuration = event->GetDuration() - time_in_past;
 
-		CAI_BaseActor *pBaseActor = dynamic_cast<CAI_BaseActor*>(actor);
-		if ( pBaseActor )
-		{
-			pBaseActor->NoteSpeaking( flDuration, GetPostSpeakDelay() );
-		}
-		else if ( actor->IsNPC() )
-		{
-			GetSpeechSemaphore( actor->MyNPCPointer() )->Acquire( flDuration + GetPostSpeakDelay(), actor );
-		}
+		//CAI_BaseActor *pBaseActor = dynamic_cast<CAI_BaseActor*>(actor);
+		//if ( pBaseActor )
+		//{
+		//	pBaseActor->NoteSpeaking( flDuration, GetPostSpeakDelay() );
+		//}
+		//else if ( actor->IsNPC() )
+		//{
+		//	GetSpeechSemaphore( actor->MyNPCPointer() )->Acquire( flDuration + GetPostSpeakDelay(), actor );
+		//}
 
 		EmitSound_t es;
 		es.m_nChannel = CHAN_VOICE;
@@ -2173,62 +2173,62 @@ void CSceneEntity::InputInterjectResponse( inputdata_t &inputdata )
 	if ( !m_pScene )
 		return;
 
-	CUtlVector<CAI_BaseActor *> candidates;
+	//CUtlVector<CAI_BaseActor *> candidates;
 
-	for ( int i = 0 ; i < m_pScene->GetNumActors(); i++ )
-	{
-		CBaseFlex *pTestActor = FindNamedActor( i );
-		if ( !pTestActor )
-			continue;
+	//for ( int i = 0 ; i < m_pScene->GetNumActors(); i++ )
+	//{
+	//	CBaseFlex *pTestActor = FindNamedActor( i );
+	//	if ( !pTestActor )
+	//		continue;
 
-		CAI_BaseActor *pBaseActor = dynamic_cast<CAI_BaseActor *>(pTestActor);
-		if ( !pBaseActor || !pBaseActor->IsAlive() )
-			continue;
+	//	CAI_BaseActor *pBaseActor = dynamic_cast<CAI_BaseActor *>(pTestActor);
+	//	if ( !pBaseActor || !pBaseActor->IsAlive() )
+	//		continue;
 
-		candidates.AddToTail( pBaseActor );
-	}
+	//	candidates.AddToTail( pBaseActor );
+	//}
 
-	int c = candidates.Count();
-	if ( !c )
-		return;
+	//int c = candidates.Count();
+	//if ( !c )
+	//	return;
 
-	if ( !m_bIsPlayingBack )
-	{
-		// Use any actor if not playing a scene
-		// int useIndex = RandomInt( 0, c - 1 );
-		Assert( !"m_bIsPlayBack is false and this code does nothing. Should it?");
-	}
-	else
-	{
-		CUtlString modifiers("scene:");
-		modifiers += STRING( GetEntityName() );
+	//if ( !m_bIsPlayingBack )
+	//{
+	//	// Use any actor if not playing a scene
+	//	// int useIndex = RandomInt( 0, c - 1 );
+	//	Assert( !"m_bIsPlayBack is false and this code does nothing. Should it?");
+	//}
+	//else
+	//{
+	//	CUtlString modifiers("scene:");
+	//	modifiers += STRING( GetEntityName() );
 
-		while (candidates.Count() > 0)
-		{
-			// Pick a random slot in the candidates array.
-			int slot = RandomInt( 0, candidates.Count() - 1 );
+	//	while (candidates.Count() > 0)
+	//	{
+	//		// Pick a random slot in the candidates array.
+	//		int slot = RandomInt( 0, candidates.Count() - 1 );
 
-			CAI_BaseActor *npc = candidates[ slot ];
+	//		CAI_BaseActor *npc = candidates[ slot ];
 
-			// Try to find the response for this slot.
-			AI_Response response;
-			bool result = npc->SpeakFindResponse( response, inputdata.value.String(), modifiers.Get() );
-			if ( result )
-			{
-				float duration = npc->GetResponseDuration( response );
+	//		// Try to find the response for this slot.
+	//		AI_Response response;
+	//		bool result = npc->SpeakFindResponse( response, inputdata.value.String(), modifiers.Get() );
+	//		if ( result )
+	//		{
+	//			float duration = npc->GetResponseDuration( response );
 
-				if ( ( duration > 0.0f ) && npc->PermitResponse( duration ) )
-				{
-					// If we could look it up, dispatch it and bail.
-					npc->SpeakDispatchResponse( inputdata.value.String(), response );
-					return;
-				}
-			}
+	//			if ( ( duration > 0.0f ) && npc->PermitResponse( duration ) )
+	//			{
+	//				// If we could look it up, dispatch it and bail.
+	//				npc->SpeakDispatchResponse( inputdata.value.String(), response );
+	//				return;
+	//			}
+	//		}
 
-			// Remove this entry and look for another one.
-			candidates.FastRemove(slot);
-		}
-	}
+	//		// Remove this entry and look for another one.
+	//		candidates.FastRemove(slot);
+	//	}
+	//}
 }
 
 //-----------------------------------------------------------------------------
@@ -2741,21 +2741,21 @@ void CSceneEntity::QueueResumePlayback( void )
 		// HACKHACK: For now, get the first target, and see if we can find a response for him
 		if ( !bStartedScene )
 		{
-			CBaseFlex *pActor = FindNamedActor( 0 );
-			if ( pActor )
-			{
-				CAI_BaseActor *pBaseActor = dynamic_cast<CAI_BaseActor*>(pActor);
-				if ( pBaseActor )
-				{
-					AI_Response response;
-					bool result = pBaseActor->SpeakFindResponse( response, STRING(m_iszResumeSceneFile), NULL );
-					if ( result )
-					{
-						const char *szResponse = response.GetResponsePtr();
-						bStartedScene = InstancedScriptedScene( NULL, szResponse, &m_hWaitingForThisResumeScene, 0, false ) != 0;
-					}
-				}
-			}
+			//CBaseFlex *pActor = FindNamedActor( 0 );
+			//if ( pActor )
+			//{
+			//	CAI_BaseActor *pBaseActor = dynamic_cast<CAI_BaseActor*>(pActor);
+			//	if ( pBaseActor )
+			//	{
+			//		AI_Response response;
+			//		bool result = pBaseActor->SpeakFindResponse( response, STRING(m_iszResumeSceneFile), NULL );
+			//		if ( result )
+			//		{
+			//			const char *szResponse = response.GetResponsePtr();
+			//			bStartedScene = InstancedScriptedScene( NULL, szResponse, &m_hWaitingForThisResumeScene, 0, false ) != 0;
+			//		}
+			//	}
+			//}
 		}
 
 		// If we started a scene/response, wait for it to finish

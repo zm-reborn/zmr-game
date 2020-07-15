@@ -12,6 +12,18 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+
+BEGIN_SIMPLE_DATADESC( CAI_InterestTarget_t )
+	DEFINE_FIELD( m_eType,		FIELD_INTEGER ),
+	DEFINE_FIELD( m_hTarget,		FIELD_EHANDLE ),
+	DEFINE_FIELD( m_vecPosition,	FIELD_POSITION_VECTOR ),
+	DEFINE_FIELD( m_flStartTime,	FIELD_TIME ),
+	DEFINE_FIELD( m_flEndTime,	FIELD_TIME ),
+	DEFINE_FIELD( m_flRamp,		FIELD_FLOAT ),
+	DEFINE_FIELD( m_flInterest,	FIELD_FLOAT ),
+END_DATADESC()
+
+
 bool CAI_InterestTarget_t::IsThis( CBaseEntity *pThis )
 {
 	return (pThis == m_hTarget);

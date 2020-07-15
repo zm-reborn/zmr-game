@@ -20,7 +20,6 @@
 #include "ai_navigator.h"
 #include "ai_moveprobe.h"
 #include "sceneentity.h"
-#include "ai_baseactor.h"
 #include "datacache/imdlcache.h"
 #include "tier1/byteswap.h"
 
@@ -1659,29 +1658,29 @@ void CBaseFlex::AddFlexAnimation( CSceneEventInfo *info )
 
 				track->SetFlexControllerIndex( FindFlexController( name ), 0, 0 );
 
-				if ( CAI_BaseActor::IsServerSideFlexController( name ) )
-				{
-					Assert( !"Should stereo controllers ever be server side only?" );
-					track->SetServerSide( true );
-				}
+				//if ( CAI_BaseActor::IsServerSideFlexController( name ) )
+				//{
+				//	Assert( !"Should stereo controllers ever be server side only?" );
+				//	track->SetServerSide( true );
+				//}
 
 				Q_strncpy( name, "left_" ,sizeof(name));
 				Q_strncat( name, track->GetFlexControllerName(),sizeof(name), COPY_ALL_CHARACTERS );
 
 				track->SetFlexControllerIndex( FindFlexController( name ), 0, 1 );
 
-				if ( CAI_BaseActor::IsServerSideFlexController( name ) )
-				{
-					Assert( !"Should stereo controllers ever be server side only?" );
-					track->SetServerSide( true );
-				}
+				//if ( CAI_BaseActor::IsServerSideFlexController( name ) )
+				//{
+				//	Assert( !"Should stereo controllers ever be server side only?" );
+				//	track->SetServerSide( true );
+				//}
 			}
 			else
 			{
 				track->SetFlexControllerIndex( FindFlexController( (char *)track->GetFlexControllerName() ), 0 );
 
 				// Only non-combo tracks can be server side
-				track->SetServerSide( CAI_BaseActor::IsServerSideFlexController( track->GetFlexControllerName() ) );
+				//track->SetServerSide( CAI_BaseActor::IsServerSideFlexController( track->GetFlexControllerName() ) );
 			}
 		}
 
