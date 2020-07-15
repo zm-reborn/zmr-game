@@ -113,7 +113,6 @@ $Project
 		$File	"$SRCDIR\game\shared\beam_shared.cpp"
 		$File	"$SRCDIR\public\bone_accessor.cpp"
 		$File	"bone_merge_cache.cpp"
-		$File	"c_ai_basehumanoid.cpp"
 		$File	"c_ai_basenpc.cpp"
 		$File	"c_baseanimating.cpp"
 		$File	"c_baseanimatingoverlay.cpp"
@@ -271,7 +270,6 @@ $Project
 		$File	"in_main.cpp"
 		$File	"initializer.cpp"
 		$File	"interpolatedvar.cpp"
-		$File	"IsNPCProxy.cpp"
 		$File	"lampbeamproxy.cpp"
 		$File	"lamphaloproxy.cpp"
 		$File	"$SRCDIR\game\shared\mapentities_shared.cpp"
@@ -326,7 +324,6 @@ $Project
 		$File	"basepresence.cpp"			[$WIN32||$POSIX]
 		$File	"basepresence_xbox.cpp"		[$X360]
 		$File	"$SRCDIR\game\shared\rope_helpers.cpp"
-		$File	"$SRCDIR\game\shared\saverestore.cpp"
 		$File	"$SRCDIR\game\shared\sceneentity_shared.cpp"
 		$File	"ScreenSpaceEffects.cpp"
 		$File	"$SRCDIR\game\shared\sequence_Transitioner.cpp"
@@ -423,7 +420,6 @@ $Project
 				"$SRCDIR\public\scratchpad3d.cpp"					\
 				"$SRCDIR\public\ScratchPadUtils.cpp"				\
 				"$SRCDIR\public\sentence.cpp"						\
-				"$SRCDIR\game\shared\sheetsimulator.cpp"			\
 				"$SRCDIR\public\simple_physics.cpp"					\
 				"$SRCDIR\public\stringregistry.cpp"					\
 				"$SRCDIR\public\studio.cpp"							\
@@ -1061,7 +1057,6 @@ $Project
 		$File	"$SRCDIR\game\shared\predictioncopy.h"
 		$File	"$SRCDIR\game\shared\ragdoll_shared.h"
 		$File	"$SRCDIR\game\shared\rope_helpers.h"
-		$File	"$SRCDIR\game\shared\saverestore.h"
 		$File	"$SRCDIR\game\shared\saverestore_bitstring.h"
 		$File	"$SRCDIR\game\shared\saverestore_utlclass.h"
 		$File	"$SRCDIR\game\shared\saverestore_utlsymbol.h"
@@ -1072,7 +1067,6 @@ $Project
 		$File	"$SRCDIR\game\shared\shared_classnames.h"
 		$File	"$SRCDIR\game\shared\shareddefs.h"
 		$File	"$SRCDIR\game\shared\sharedInterface.h"
-		$File	"$SRCDIR\game\shared\sheetsimulator.h"
 		$File	"$SRCDIR\game\shared\shot_manipulator.h"
 		$File	"$SRCDIR\game\shared\simtimer.h"
 		$File	"$SRCDIR\game\shared\singleplay_gamerules.h"
