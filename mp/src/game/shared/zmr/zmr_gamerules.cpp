@@ -5,7 +5,6 @@
 #include "zmr_team.h"
 #include "mapentities.h"
 #include "gameinterface.h"
-#include "teamplayroundbased_gamerules.h"
 #include "eventqueue.h"
 #include "viewport_panel_names.h"
 #include "voice_gamemgr.h"

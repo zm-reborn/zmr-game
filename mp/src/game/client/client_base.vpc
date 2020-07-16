@@ -146,7 +146,6 @@ $Project
 		$File	"c_func_smokevolume.cpp"
 		$File	"c_func_tracktrain.cpp"
 		$File	"c_gib.cpp"
-		$File	"c_hairball.cpp"
 		$File	"c_info_overlay_accessor.cpp"
 		$File	"c_lightglow.cpp"
 		$File	"C_MaterialModifyControl.cpp"
@@ -166,8 +165,6 @@ $Project
 		$File	"c_rumble.cpp"
 		$File	"c_sceneentity.cpp"
 		$File	"c_shadowcontrol.cpp"
-		$File	"c_slideshow_display.cpp"
-		$File	"c_slideshow_display.h"
 		$File	"c_soundscape.cpp"
 		$File	"c_spotlight_end.cpp"
 		$File	"c_sprite.cpp"
@@ -305,8 +302,6 @@ $Project
 		$File	"physpropclientside.cpp"
 		$File	"playerandobjectenumerator.cpp"
 		$File	"playerspawncache.cpp"
-		$File	"$SRCDIR\game\shared\point_bonusmaps_accessor.cpp"
-		$File	"$SRCDIR\game\shared\point_bonusmaps_accessor.h"
 		$File	"$SRCDIR\game\shared\point_posecontroller.cpp"
 		$File	"$SRCDIR\game\shared\precache_register.cpp"
 		$File	"$SRCDIR\game\shared\predictableid.cpp"
@@ -341,7 +336,6 @@ $Project
 		$File	"studio_stats.h"
 		$File	"$SRCDIR\game\shared\takedamageinfo.cpp"
 		$File	"$SRCDIR\game\shared\teamplay_gamerules.cpp"
-		$File	"$SRCDIR\game\shared\teamplayroundbased_gamerules.cpp"
 		$File	"$SRCDIR\game\shared\test_ehandle.cpp"
 		$File	"text_message.cpp"
 		$File	"texturescrollmaterialproxy.cpp"
@@ -368,13 +362,10 @@ $Project
 		$File	"vgui_loadingdiscpanel.cpp"
 		$File	"vgui_messagechars.cpp"
 		$File	"vgui_netgraphpanel.cpp"
-		$File	"vgui_slideshow_display_screen.cpp"
 		$File	"view.cpp"
 		$File	"view_beams.cpp"
 		$File	"view_effects.cpp"
 		$File	"view_scene.cpp"
-		$File	"viewangleanim.cpp"
-		$File	"ViewConeImage.cpp"
 		$File	"viewdebug.cpp"
 		$File	"viewdebug.h"
 		$File	"viewpostprocess.cpp"
@@ -538,12 +529,6 @@ $Project
 			$File	"game_controls\IconPanel.cpp"
 		}
 
-	}
-
-	$Folder	"MP3" [$WIN32||$POSIX]
-	{
-		$File	"mp3player.cpp"
-		$File	"mp3player.h"
 	}
 	
 	$Folder	"Tool Framework"
@@ -727,7 +712,6 @@ $Project
 		$File	"smoke_fog_overlay.h"
 		$File	"splinepatch.h"
 		$File	"$SRCDIR\public\steam\steam_api.h"
-		$File	"TeamBitmapImage.h"
 		$File	"tempent.h"
 		$File	"text_message.h"
 		$File	"timedevent.h"
@@ -746,8 +730,6 @@ $Project
 		$File	"vguicenterprint.h"
 		$File	"view.h"
 		$File	"view_scene.h"
-		$File	"viewangleanim.h"
-		$File	"ViewConeImage.h"
 		$File	"viewrender.h"
 		$File	"weapon_selection.h"
 		$File	"weapons_resource.h"
@@ -1075,7 +1057,6 @@ $Project
 		$File	"$SRCDIR\game\shared\sun_shared.h"
 		$File	"$SRCDIR\game\shared\takedamageinfo.h"
 		$File	"$SRCDIR\game\shared\teamplay_gamerules.h"
-		$File	"$SRCDIR\game\shared\teamplayroundbased_gamerules.h"
 		$File	"$SRCDIR\game\shared\tempentity.h"
 		$File	"$SRCDIR\game\shared\touchlink.h"
 		$File	"$SRCDIR\game\shared\usercmd.h"
@@ -1092,7 +1073,6 @@ $Project
 		$File	"$SRCDIR\game\shared\vphysics_sound.h"
 		$File	"$SRCDIR\game\shared\weapon_parse.h"
 		$File	"$SRCDIR\game\shared\weapon_proficiency.h"
-		$File	"$SRCDIR\game\shared\weapon_ifmsteadycam.h"
 		$File	"$SRCDIR\game\shared\mp_shareddefs.h"
 	}
 

@@ -7,7 +7,6 @@
 #include "cbase.h"
 #include "team.h"
 #include "player.h"
-#include "team_spawnpoint.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -87,7 +86,6 @@ CTeam::CTeam( void )
 //-----------------------------------------------------------------------------
 CTeam::~CTeam( void )
 {
-	m_aSpawnPoints.Purge();
 	m_aPlayers.Purge();
 }
 
@@ -171,7 +169,6 @@ void CTeam::InitializeSpawnpoints( void )
 //-----------------------------------------------------------------------------
 void CTeam::AddSpawnpoint( CTeamSpawnPoint *pSpawnpoint )
 {
-	m_aSpawnPoints.AddToTail( pSpawnpoint );
 }
 
 //-----------------------------------------------------------------------------
@@ -179,14 +176,6 @@ void CTeam::AddSpawnpoint( CTeamSpawnPoint *pSpawnpoint )
 //-----------------------------------------------------------------------------
 void CTeam::RemoveSpawnpoint( CTeamSpawnPoint *pSpawnpoint )
 {
-	for (int i = 0; i < m_aSpawnPoints.Size(); i++ )
-	{
-		if ( m_aSpawnPoints[i] == pSpawnpoint )
-		{
-			m_aSpawnPoints.Remove( i );
-			return;
-		}
-	}
 }
 
 //-----------------------------------------------------------------------------
@@ -194,39 +183,7 @@ void CTeam::RemoveSpawnpoint( CTeamSpawnPoint *pSpawnpoint )
 //-----------------------------------------------------------------------------
 CBaseEntity *CTeam::SpawnPlayer( CBasePlayer *pPlayer )
 {
-	if ( m_aSpawnPoints.Size() == 0 )
-		return NULL;
-
-	// Randomize the start spot
-	int iSpawn = m_iLastSpawn + random->RandomInt( 1,3 );
-	if ( iSpawn >= m_aSpawnPoints.Size() )
-		iSpawn -= m_aSpawnPoints.Size();
-	int iStartingSpawn = iSpawn;
-
-	// Now loop through the spawnpoints and pick one
-	int loopCount = 0;
-	do 
-	{
-		if ( iSpawn >= m_aSpawnPoints.Size() )
-		{
-			++loopCount;
-			iSpawn = 0;
-		}
-
-		// check if pSpot is valid, and that the player is on the right team
-		if ( (loopCount > 3) || m_aSpawnPoints[iSpawn]->IsValid( pPlayer ) )
-		{
-			// DevMsg( 1, "player: spawning at (%s)\n", STRING(m_aSpawnPoints[iSpawn]->m_iName) );
-			m_aSpawnPoints[iSpawn]->m_OnPlayerSpawn.FireOutput( pPlayer, m_aSpawnPoints[iSpawn] );
-
-			m_iLastSpawn = iSpawn;
-			return m_aSpawnPoints[iSpawn];
-		}
-
-		iSpawn++;
-	} while ( iSpawn != iStartingSpawn ); // loop if we're not back to the start
-
-	return NULL;
+	return nullptr;
 }
 
 //------------------------------------------------------------------------------------------------------------------

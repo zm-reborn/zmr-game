@@ -28,8 +28,6 @@
 #define SF_SPEAKER_START_SILENT		1
 #define SF_SPEAKER_EVERYWHERE		2
 
-extern ISaveRestoreOps *responseSystemSaveRestoreOps;
-#include "saverestore.h"
 
 LINK_ENTITY_TO_CLASS( env_speaker, CSpeaker );
 
@@ -104,22 +102,7 @@ void CSpeaker::Precache( void )
 //-----------------------------------------------------------------------------
 int	CSpeaker::Save( ISave &save )
 {
-	int iret = BaseClass::Save( save );
-	if ( iret )
-	{
-		bool doSave = ( m_pInstancedResponseSystem && ( m_iszRuleScriptFile != NULL_STRING ) ) ? true : false;
-		save.WriteBool( &doSave );
-		if ( doSave )
-		{
-			save.StartBlock( "InstancedResponseSystem" );
-			{
-				SaveRestoreFieldInfo_t fieldInfo = { &m_pInstancedResponseSystem, 0, NULL };
-				responseSystemSaveRestoreOps->Save( fieldInfo, &save );
-			}
-			save.EndBlock();
-		}
-	}
-	return iret;
+	return 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -128,36 +111,7 @@ int	CSpeaker::Save( ISave &save )
 //-----------------------------------------------------------------------------
 int	CSpeaker::Restore( IRestore &restore )
 {
-	int iret = BaseClass::Restore( restore );
-	if ( iret )
-	{
-		bool doRead = false;
-		restore.ReadBool( &doRead );
-		if ( doRead )
-		{
-			char szResponseSystemBlockName[SIZE_BLOCK_NAME_BUF];
-			restore.StartBlock( szResponseSystemBlockName );
-			if ( !Q_stricmp( szResponseSystemBlockName, "InstancedResponseSystem" ) )
-			{
-				if ( !m_pInstancedResponseSystem && Q_strlen( STRING(m_iszRuleScriptFile) ) > 0 )
-				{
-					m_pInstancedResponseSystem = PrecacheCustomResponseSystem( STRING( m_iszRuleScriptFile ) );
-					if ( m_pInstancedResponseSystem )
-					{
-						SaveRestoreFieldInfo_t fieldInfo =
-						{
-							&m_pInstancedResponseSystem,
-							0,
-							NULL
-						};
-						responseSystemSaveRestoreOps->Restore( fieldInfo, &restore );
-					}
-				}
-			}
-			restore.EndBlock();
-		}
-	}
-	return iret;
+	return 0;
 }
 
 void CSpeaker::SpeakerThink( void )

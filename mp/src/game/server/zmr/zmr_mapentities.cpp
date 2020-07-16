@@ -14,7 +14,18 @@
 ConVar zm_sv_debug_mapentities( "zm_sv_debug_mapentities", "0" );
 
 
-bool FindInList( const char **pStrings, const char *pToFind );
+bool FindInList( const char** pStrings, const char* pToFind )
+{
+	int i = 0;
+	while ( pStrings[i][0] != 0 )
+	{
+		if ( Q_stricmp( pStrings[i], pToFind ) == 0 )
+			return true;
+		i++;
+	}
+
+	return false;
+}
 
 
 static const char* g_PreserveEnts[] =

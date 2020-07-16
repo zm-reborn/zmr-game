@@ -79,7 +79,6 @@ public:
 	virtual int GetAliveMembers( void );
 
 public:
-	CUtlVector< CTeamSpawnPoint * > m_aSpawnPoints;
 	CUtlVector< CBasePlayer * >		m_aPlayers;
 
 	// Data

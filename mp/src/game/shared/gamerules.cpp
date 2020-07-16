@@ -25,7 +25,6 @@
 	#include "voice_gamemgr.h"
 	#include "globalstate.h"
 	#include "player_resource.h"
-	#include "tactical_mission.h"
 	#include "gamestats.h"
 
 #endif
@@ -874,7 +873,7 @@ void CGameRules::ClientSettingsChanged( CBasePlayer *pPlayer )
 
 CTacticalMissionManager *CGameRules::TacticalMissionManagerFactory( void )
 {
-	return new CTacticalMissionManager;
+	return nullptr;
 }
 
 #endif
