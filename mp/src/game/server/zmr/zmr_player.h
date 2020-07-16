@@ -294,6 +294,7 @@ protected:
     void PreThink_HL2();
 
     void UpdateControllableTrain();
+    virtual void CheckTrainUpdate() OVERRIDE;
 
 private:
     void HandleDamagesFromUserCmd();

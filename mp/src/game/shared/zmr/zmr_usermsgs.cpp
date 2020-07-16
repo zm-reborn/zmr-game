@@ -35,7 +35,7 @@ void RegisterZMUserMessages( void )
 void RegisterUserMessages()
 {
 	usermessages->Register( "Geiger", 1 );
-	usermessages->Register( "Train", 1 );
+	//usermessages->Register( "Train", 1 );
 	usermessages->Register( "HudText", -1 );
 	usermessages->Register( "SayText", -1 );
 	usermessages->Register( "SayText2", -1 );

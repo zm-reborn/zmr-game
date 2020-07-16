@@ -80,7 +80,6 @@ $Project
 		$File	"geiger.cpp"
 		$File	"history_resource.cpp"
 		//$File	"hud_weapon.cpp"
-		$File	"train.cpp"
 		$File	"$SRCDIR\game\shared\weapon_parse_default.cpp"
 		$File	"$SRCDIR\game\shared\achievementmgr.cpp"
 		$File	"$SRCDIR\game\shared\achievementmgr.h"

@@ -439,6 +439,24 @@ void CZMPlayer::UpdateControllableTrain()
 		RemoveFlag( FL_ONTRAIN );
 }
 
+void CZMPlayer::CheckTrainUpdate()
+{
+    if ( (m_iTrain & TRAIN_NEW) != 0 )
+    {
+        // We don't need this.
+
+        //CSingleUserRecipientFilter user( this );
+        //user.MakeReliable();
+
+        //// send "Train" update message
+        //UserMessageBegin( user, "Train" );
+        //    WRITE_BYTE(m_iTrain & 0xF);
+        //MessageEnd();
+
+        m_iTrain &= ~TRAIN_NEW;
+    }
+}
+
 void CZMPlayer::PostThink()
 {
     HandleDamagesFromUserCmd();
