@@ -7,7 +7,6 @@
 #include "cbase.h"
 #include "ai_basenpc.h"
 #include "player.h"
-#include "saverestore.h"
 #include "gamerules.h"
 #include "entityapi.h"
 #include "entitylist.h"
