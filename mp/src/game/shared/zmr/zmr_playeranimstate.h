@@ -39,6 +39,8 @@ public:
 
 	virtual float GetCurrentMaxGroundSpeed() OVERRIDE;
 
+	bool Uses9WayAnim() const { return m_bIs9Way; }
+
 private:
 
 	bool            SetupPoseParameters( CStudioHdr* pStudioHdr );
@@ -72,4 +74,6 @@ private:
     float m_flCurrentHeadPitch;
     float m_flCurrentAimYaw;
     CountdownTimer m_blinkTimer;
+
+	bool m_bIs9Way;
 };

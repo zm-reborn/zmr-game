@@ -440,21 +440,46 @@ bool CZMPlayerAnimState::SetupPoseParameters( CStudioHdr *pStudioHdr )
     if ( !pStudioHdr )
         return false;
 
-    // Tony; just set them both to the same for now.
-    m_PoseParameterData.m_iMoveX = m_pZMPlayer->LookupPoseParameter( pStudioHdr, "move_yaw" );
-    m_PoseParameterData.m_iMoveY = m_pZMPlayer->LookupPoseParameter( pStudioHdr, "move_yaw" );
-    if ( ( m_PoseParameterData.m_iMoveX < 0 ) || ( m_PoseParameterData.m_iMoveY < 0 ) )
-        return false;
 
-    // Look for the aim pitch blender.
-    m_PoseParameterData.m_iAimPitch = m_pZMPlayer->LookupPoseParameter( pStudioHdr, "aim_pitch" );
-    if ( m_PoseParameterData.m_iAimPitch < 0 )
-        return false;
+    
+    m_bIs9Way = false;
 
-    // Look for aim yaw blender.
-    m_PoseParameterData.m_iAimYaw = m_pZMPlayer->LookupPoseParameter( pStudioHdr, "aim_yaw" );
-    if ( m_PoseParameterData.m_iAimYaw < 0 )
-        return false;
+    m_PoseParameterData.m_iMoveX = m_pZMPlayer->LookupPoseParameter( pStudioHdr, "move_x" );
+    m_PoseParameterData.m_iMoveY = m_pZMPlayer->LookupPoseParameter( pStudioHdr, "move_y" );
+
+    if ( m_PoseParameterData.m_iMoveX >= 0 && m_PoseParameterData.m_iMoveY >= 0 )
+    {
+        m_bIs9Way = true;
+
+        m_PoseParameterData.m_iAimPitch = m_pZMPlayer->LookupPoseParameter( pStudioHdr, "body_pitch" );
+        if ( m_PoseParameterData.m_iAimPitch < 0 )
+            return false;
+
+        m_PoseParameterData.m_iAimYaw = m_pZMPlayer->LookupPoseParameter( pStudioHdr, "body_yaw" );
+        if ( m_PoseParameterData.m_iAimYaw < 0 )
+            return false;
+    }
+    //
+    // Fallback to 8way blending
+    //
+    else
+    {
+        // 8way blending doesn't use move_x/move_y
+        // and it only has one "move_yaw" param.
+        m_PoseParameterData.m_iMoveX =
+        m_PoseParameterData.m_iMoveY = m_pZMPlayer->LookupPoseParameter( pStudioHdr, "move_yaw" );
+        if ( ( m_PoseParameterData.m_iMoveX < 0 ) || ( m_PoseParameterData.m_iMoveY < 0 ) )
+            return false;
+
+        m_PoseParameterData.m_iAimPitch = m_pZMPlayer->LookupPoseParameter( pStudioHdr, "aim_pitch" );
+        if ( m_PoseParameterData.m_iAimPitch < 0 )
+            return false;
+
+        m_PoseParameterData.m_iAimYaw = m_pZMPlayer->LookupPoseParameter( pStudioHdr, "aim_yaw" );
+        if ( m_PoseParameterData.m_iAimYaw < 0 )
+            return false;
+    }
+
 
 #ifdef CLIENT_DLL
     // ZMR
@@ -484,72 +509,73 @@ void CZMPlayerAnimState::EstimateYaw()
     if ( flDeltaTime == 0.0f )
         return;
 
-#if 0 // 9way
-    // Get the player's velocity and angles.
-    Vector vecEstVelocity;
-    GetOuterAbsVelocity( vecEstVelocity );
-    QAngle angles = GetBasePlayer()->GetLocalAngles();
-
-    // If we are not moving, sync up the feet and eyes slowly.
-    if ( vecEstVelocity.x == 0.0f && vecEstVelocity.y == 0.0f )
+    if ( Uses9WayAnim() )
     {
-        float flYawDelta = angles[YAW] - m_PoseParameterData.m_flEstimateYaw;
-        flYawDelta = AngleNormalize( flYawDelta );
+        // Get the player's velocity and angles.
+        Vector vecEstVelocity;
+        GetOuterAbsVelocity( vecEstVelocity );
+        QAngle angles = GetBasePlayer()->GetLocalAngles();
 
-        if ( flDeltaTime < 0.25f )
+        // If we are not moving, sync up the feet and eyes slowly.
+        if ( vecEstVelocity.x == 0.0f && vecEstVelocity.y == 0.0f )
         {
-            flYawDelta *= ( flDeltaTime * 4.0f );
+            float flYawDelta = angles[YAW] - m_PoseParameterData.m_flEstimateYaw;
+            flYawDelta = AngleNormalize( flYawDelta );
+
+            if ( flDeltaTime < 0.25f )
+            {
+                flYawDelta *= ( flDeltaTime * 4.0f );
+            }
+            else
+            {
+                flYawDelta *= flDeltaTime;
+            }
+
+            m_PoseParameterData.m_flEstimateYaw += flYawDelta;
+            AngleNormalize( m_PoseParameterData.m_flEstimateYaw );
         }
         else
         {
-            flYawDelta *= flDeltaTime;
+            m_PoseParameterData.m_flEstimateYaw = ( atan2( vecEstVelocity.y, vecEstVelocity.x ) * 180.0f / M_PI );
+            m_PoseParameterData.m_flEstimateYaw = clamp( m_PoseParameterData.m_flEstimateYaw, -180.0f, 180.0f );
         }
-
-        m_PoseParameterData.m_flEstimateYaw += flYawDelta;
-        AngleNormalize( m_PoseParameterData.m_flEstimateYaw );
     }
     else
     {
-        m_PoseParameterData.m_flEstimateYaw = ( atan2( vecEstVelocity.y, vecEstVelocity.x ) * 180.0f / M_PI );
-        m_PoseParameterData.m_flEstimateYaw = clamp( m_PoseParameterData.m_flEstimateYaw, -180.0f, 180.0f );
-    }
-#else
-    float dt = gpGlobals->frametime;
+        // Get the player's velocity and angles.
+        Vector vecEstVelocity;
+        GetOuterAbsVelocity( vecEstVelocity );
+        // ZMRCHANGE: Use eye yaw.
+        //QAngle angles = GetBasePlayer()->GetLocalAngles();
+        QAngle angles = QAngle( 0.0f, m_flEyeYaw, 0.0f );
 
-    // Get the player's velocity and angles.
-    Vector vecEstVelocity;
-    GetOuterAbsVelocity( vecEstVelocity );
-    // ZMRCHANGE: Use eye yaw.
-    //QAngle angles = GetBasePlayer()->GetLocalAngles();
-    QAngle angles = QAngle( 0.0f, m_flEyeYaw, 0.0f );
+        if ( vecEstVelocity.y == 0 && vecEstVelocity.x == 0 )
+        {
+            float flYawDiff = angles[YAW] - m_PoseParameterData.m_flEstimateYaw;
+            flYawDiff = flYawDiff - (int)(flYawDiff / 360) * 360;
+            if (flYawDiff > 180)
+                flYawDiff -= 360;
+            if (flYawDiff < -180)
+                flYawDiff += 360;
 
-    if ( vecEstVelocity.y == 0 && vecEstVelocity.x == 0 )
-    {
-        float flYawDiff = angles[YAW] - m_PoseParameterData.m_flEstimateYaw;
-        flYawDiff = flYawDiff - (int)(flYawDiff / 360) * 360;
-        if (flYawDiff > 180)
-            flYawDiff -= 360;
-        if (flYawDiff < -180)
-            flYawDiff += 360;
+            if (flDeltaTime < 0.25)
+                flYawDiff *= flDeltaTime * 4;
+            else
+                flYawDiff *= flDeltaTime;
 
-        if (dt < 0.25)
-            flYawDiff *= dt * 4;
+            m_PoseParameterData.m_flEstimateYaw += flYawDiff;
+            m_PoseParameterData.m_flEstimateYaw = m_PoseParameterData.m_flEstimateYaw - (int)(m_PoseParameterData.m_flEstimateYaw / 360) * 360;
+        }
         else
-            flYawDiff *= dt;
+        {
+            m_PoseParameterData.m_flEstimateYaw = (atan2(vecEstVelocity.y, vecEstVelocity.x) * 180 / M_PI);
 
-        m_PoseParameterData.m_flEstimateYaw += flYawDiff;
-        m_PoseParameterData.m_flEstimateYaw = m_PoseParameterData.m_flEstimateYaw - (int)(m_PoseParameterData.m_flEstimateYaw / 360) * 360;
+            if (m_PoseParameterData.m_flEstimateYaw > 180)
+                m_PoseParameterData.m_flEstimateYaw = 180;
+            else if (m_PoseParameterData.m_flEstimateYaw < -180)
+                m_PoseParameterData.m_flEstimateYaw = -180;
+        }
     }
-    else
-    {
-        m_PoseParameterData.m_flEstimateYaw = (atan2(vecEstVelocity.y, vecEstVelocity.x) * 180 / M_PI);
-
-        if (m_PoseParameterData.m_flEstimateYaw > 180)
-            m_PoseParameterData.m_flEstimateYaw = 180;
-        else if (m_PoseParameterData.m_flEstimateYaw < -180)
-            m_PoseParameterData.m_flEstimateYaw = -180;
-    }
-#endif
 }
 //-----------------------------------------------------------------------------
 // Purpose: Override for backpeddling
@@ -561,75 +587,76 @@ void CZMPlayerAnimState::ComputePoseParam_MoveYaw( CStudioHdr *pStudioHdr )
     // Get the estimated movement yaw.
     EstimateYaw();
 
-#if 0 // 9way
-    ConVarRef mp_slammoveyaw("mp_slammoveyaw");
-
-    // Get the view yaw.
-    float flAngle = AngleNormalize( m_flEyeYaw );
-
-    // Calc side to side turning - the view vs. movement yaw.
-    float flYaw = flAngle - m_PoseParameterData.m_flEstimateYaw;
-    flYaw = AngleNormalize( -flYaw );
-
-    // Get the current speed the character is running.
-    bool bIsMoving;
-    float flPlaybackRate = 	CalcMovementPlaybackRate( &bIsMoving );
-
-    // Setup the 9-way blend parameters based on our speed and direction.
-    Vector2D vecCurrentMoveYaw( 0.0f, 0.0f );
-    if ( bIsMoving )
+    if ( Uses9WayAnim() )
     {
-        if ( mp_slammoveyaw.GetBool() )
-            flYaw = SnapYawTo( flYaw );
+        ConVarRef mp_slammoveyaw("mp_slammoveyaw");
 
-        vecCurrentMoveYaw.x = cos( DEG2RAD( flYaw ) ) * flPlaybackRate;
-        vecCurrentMoveYaw.y = -sin( DEG2RAD( flYaw ) ) * flPlaybackRate;
+        // Get the view yaw.
+        float flAngle = AngleNormalize( m_flEyeYaw );
+
+        // Calc side to side turning - the view vs. movement yaw.
+        float flYaw = flAngle - m_PoseParameterData.m_flEstimateYaw;
+        flYaw = AngleNormalize( -flYaw );
+
+        // Get the current speed the character is running.
+        bool bIsMoving;
+        float flPlaybackRate = 	CalcMovementPlaybackRate( &bIsMoving );
+
+        // Setup the 9-way blend parameters based on our speed and direction.
+        Vector2D vecCurrentMoveYaw( 0.0f, 0.0f );
+        if ( bIsMoving )
+        {
+            if ( mp_slammoveyaw.GetBool() )
+                flYaw = SnapYawTo( flYaw );
+
+            vecCurrentMoveYaw.x = cos( DEG2RAD( flYaw ) ) * flPlaybackRate;
+            vecCurrentMoveYaw.y = sin( DEG2RAD( flYaw ) ) * flPlaybackRate;
+        }
+
+        GetBasePlayer()->SetPoseParameter( pStudioHdr, m_PoseParameterData.m_iMoveX, vecCurrentMoveYaw.x );
+        GetBasePlayer()->SetPoseParameter( pStudioHdr, m_PoseParameterData.m_iMoveY, vecCurrentMoveYaw.y );
+
+        m_DebugAnimData.m_vecMoveYaw = vecCurrentMoveYaw;
     }
-
-    GetBasePlayer()->SetPoseParameter( pStudioHdr, m_PoseParameterData.m_iMoveX, vecCurrentMoveYaw.x );
-    GetBasePlayer()->SetPoseParameter( pStudioHdr, m_PoseParameterData.m_iMoveY, vecCurrentMoveYaw.y );
-
-    m_DebugAnimData.m_vecMoveYaw = vecCurrentMoveYaw;
-#else
-    // view direction relative to movement
-    float flYaw;	 
-
-    // ZMRCHANGE: This fucked feet movement.
-    // I spent way too much time (AGAIN) debugging this shit.
-    // The above code has it right. Why the fuck was it changed?
-    // AFAIK, it wouldn't only affect us. Really weird that it wasn't caught. It probably was but I copied an older version. Oh well...
-    //QAngle	angles = GetBasePlayer()->GetAbsAngles();
-    //float ang = angles[ YAW ];
-    float ang = m_flEyeYaw;
-    if ( ang > 180.0f )
+    else
     {
-        ang -= 360.0f;
-    }
-    else if ( ang < -180.0f )
-    {
-        ang += 360.0f;
-    }
+        // view direction relative to movement
+        float flYaw;	 
 
-    // calc side to side turning
-    flYaw = ang - m_PoseParameterData.m_flEstimateYaw;
-    // Invert for mapping into 8way blend
-    flYaw = -flYaw;
-    flYaw = flYaw - (int)(flYaw / 360) * 360;
+        // ZMRCHANGE: This fucked feet movement.
+        // I spent way too much time (AGAIN) debugging this shit.
+        // The above code has it right. Why the fuck was it changed?
+        // AFAIK, it wouldn't only affect us. Really weird that it wasn't caught. It probably was but I copied an older version. Oh well...
+        //QAngle	angles = GetBasePlayer()->GetAbsAngles();
+        //float ang = angles[ YAW ];
+        float ang = m_flEyeYaw;
+        if ( ang > 180.0f )
+        {
+            ang -= 360.0f;
+        }
+        else if ( ang < -180.0f )
+        {
+            ang += 360.0f;
+        }
 
-    if (flYaw < -180)
-    {
-        flYaw = flYaw + 360;
+        // calc side to side turning
+        flYaw = ang - m_PoseParameterData.m_flEstimateYaw;
+        // Invert for mapping into 8way blend
+        flYaw = -flYaw;
+        flYaw = flYaw - (int)(flYaw / 360) * 360;
+
+        if (flYaw < -180)
+        {
+            flYaw = flYaw + 360;
+        }
+        else if (flYaw > 180)
+        {
+            flYaw = flYaw - 360;
+        }
+
+        //Tony; oops, i inverted this previously above.
+        m_pZMPlayer->SetPoseParameter( pStudioHdr, m_PoseParameterData.m_iMoveY, flYaw );
     }
-    else if (flYaw > 180)
-    {
-        flYaw = flYaw - 360;
-    }
-
-    //Tony; oops, i inverted this previously above.
-    m_pZMPlayer->SetPoseParameter( pStudioHdr, m_PoseParameterData.m_iMoveY, flYaw );
-
-#endif
-    
 }
 
 //-----------------------------------------------------------------------------
