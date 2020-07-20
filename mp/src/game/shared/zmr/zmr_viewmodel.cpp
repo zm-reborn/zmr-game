@@ -209,8 +209,8 @@ bool C_ZMViewModel::IsInIronsights() const
     return m_bInIronSight;
 }
 
-ConVar zm_cl_ironsight_zoom_rate( "zm_cl_ironsight_zoom_rate", "1.2" );
-ConVar zm_cl_ironsight_unzoom_rate( "zm_cl_ironsight_unzoom_rate", "1.2" );
+ConVar zm_cl_ironsight_zoom_rate( "zm_cl_ironsight_zoom_rate", "6" );
+ConVar zm_cl_ironsight_unzoom_rate( "zm_cl_ironsight_unzoom_rate", "5" );
 
 bool C_ZMViewModel::PerformIronSight( Vector& vecOut, QAngle& angOut, const QAngle& origAng )
 {
