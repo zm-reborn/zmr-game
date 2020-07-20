@@ -735,7 +735,7 @@ CBaseEntity* CZMEntZombieSpawn::FindSpawnPoint( CZMBaseZombie* pZombie, Vector& 
         if ( endindex < 0 )
             endindex = nNodes - 1;
 
-        for ( int i = startindex; i != endindex; i++ )
+        for ( int i = startindex; ; i++ )
         {
             if ( i >= nNodes )
                 i = 0;
@@ -748,6 +748,9 @@ CBaseEntity* CZMEntZombieSpawn::FindSpawnPoint( CZMBaseZombie* pZombie, Vector& 
                 outang = pNode->GetAbsAngles();
                 return pNode;
             }
+
+            if ( i == endindex )
+                break;
         }
 
         // No open nodes found, just pick the next node
