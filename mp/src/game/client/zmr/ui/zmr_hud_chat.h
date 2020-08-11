@@ -45,4 +45,5 @@ public:
 
     virtual Color GetClientColor( int clientIndex ) OVERRIDE;
 
+    virtual void MsgFunc_SayText2( bf_read &msg ) OVERRIDE;
 };
