@@ -9,7 +9,7 @@ enum ZMImportance_t
     ZMIMPORTANCE_NONE = -1,
 
     ZMIMPORTANCE_DEV,
-    ZMIMPORTANCE_TRUSTED,
+    ZMIMPORTANCE_VIP,
     ZMIMPORTANCE_PLAYTESTER,
 
     ZMIMPORTANCE_MAX
@@ -64,7 +64,7 @@ protected:
 
 private:
     vgui::IImage* m_pImageDev;
-    vgui::IImage* m_pImageTrusted;
+    vgui::IImage* m_pImageVIP;
     vgui::IImage* m_pImagePlaytester;
 
 

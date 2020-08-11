@@ -43,7 +43,7 @@ bool C_ZMImportanceSystem::ImportanceData_t::IsValid( int playerIndex ) const
 C_ZMImportanceSystem::C_ZMImportanceSystem()
 {
     m_pImageDev = nullptr;
-    m_pImageTrusted = nullptr;
+    m_pImageVIP = nullptr;
     m_pImagePlaytester = nullptr;
 
     Reset();
@@ -70,7 +70,7 @@ void C_ZMImportanceSystem::LevelInitPostEntity()
 void C_ZMImportanceSystem::InitImages()
 {
     m_pImageDev = vgui::scheme()->GetImage( "zmr_misc/dev", true );
-    m_pImageTrusted = vgui::scheme()->GetImage( "zmr_misc/trusted", true );
+    m_pImageVIP = vgui::scheme()->GetImage( "zmr_misc/trusted", true );
     m_pImagePlaytester = vgui::scheme()->GetImage( "zmr_misc/playtester", true );
 }
 
@@ -197,7 +197,7 @@ vgui::IImage* C_ZMImportanceSystem::ImportanceToImage( ZMImportance_t index ) co
     switch ( index )
     {
     case ZMIMPORTANCE_DEV : return m_pImageDev;
-    case ZMIMPORTANCE_TRUSTED : return m_pImageTrusted;
+    case ZMIMPORTANCE_VIP : return m_pImageVIP;
     case ZMIMPORTANCE_PLAYTESTER : return m_pImagePlaytester;
     default : return nullptr;
     }
@@ -208,7 +208,7 @@ const char* C_ZMImportanceSystem::ImportanceToName( ZMImportance_t index )
     switch ( index )
     {
     case ZMIMPORTANCE_DEV : return "Developer";
-    case ZMIMPORTANCE_TRUSTED : return "Trusted";
+    case ZMIMPORTANCE_VIP : return "VIP";
     case ZMIMPORTANCE_PLAYTESTER : return "Playtester";
     default : return "";
     }
@@ -216,9 +216,9 @@ const char* C_ZMImportanceSystem::ImportanceToName( ZMImportance_t index )
 
 ZMImportance_t C_ZMImportanceSystem::ImportanceNameToIndex( const char* name )
 {
-    if ( Q_stricmp( "Trusted", name ) == 0 )
+    if ( Q_stricmp( "VIP", name ) == 0 )
     {
-        return ZMIMPORTANCE_TRUSTED;
+        return ZMIMPORTANCE_VIP;
     }
 
     if ( Q_stricmp( "Playtester", name ) == 0 )
