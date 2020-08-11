@@ -24,12 +24,13 @@ END_SEND_TABLE()
 
 void TE_ZombieAnimEvent( CZMBaseZombie* pZombie, ZMZombieAnimEvent_t anim, int nData )
 {
-    CPVSFilter filter( pZombie->WorldSpaceCenter() );
+    // We need to send this to all players always, because some animations
+    // affect the state of the zombie fundamentally.
+    // ie. banshee ceiling ambush will have wrong anims if banshee was not in PVS.
+    // or just ZM being outside the map and the zombie attacking something.
+    CRecipientFilter filter;
+    filter.AddAllPlayers();
 
-
-    // It's possible to get here from the player class.
-    //filter.UsePredictionRules();
-    
     g_ZMTEZombieAnimEvent.m_hZombie = pZombie;
     g_ZMTEZombieAnimEvent.m_iEvent = anim;
     g_ZMTEZombieAnimEvent.m_nData = nData;
