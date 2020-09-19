@@ -86,6 +86,13 @@ void CZMPlayerAnimState::InitZMAnimState( CZMPlayer* pPlayer )
     m_flCurrentHeadPitch = 0.0f;
 }
 
+// For animations, why would ever want to use the absolute velocity?
+// You want the local velocity, the thing that's not affected by outside sources (ie. moving platforms)
+// ???????
+void CZMPlayerAnimState::GetOuterAbsVelocity( Vector& vel )
+{
+    vel = GetZMPlayer()->GetLocalVelocity();
+}
 
 bool CZMPlayerAnimState::ShouldUpdateAnimState()
 {

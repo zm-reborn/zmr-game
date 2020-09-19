@@ -823,6 +823,7 @@ void C_BasePlayer::PostDataUpdate( DataUpdateType_t updateType )
 	{
 		SetSimulatedEveryTick( false );
 
+#ifndef ZMR // ZMRCHANGE: We network the velocity to all players. No need to estimate.
 		// estimate velocity for non local players
 		float flTimeDelta = m_flSimulationTime - m_flOldSimulationTime;
 		if ( flTimeDelta > 0  &&  !( IsNoInterpolationFrame() || bForceEFNoInterp ) )
@@ -830,6 +831,7 @@ void C_BasePlayer::PostDataUpdate( DataUpdateType_t updateType )
 			Vector newVelo = (GetNetworkOrigin() - GetOldOrigin()  ) / flTimeDelta;
 			SetAbsVelocity( newVelo);
 		}
+#endif
 	}
 
 	BaseClass::PostDataUpdate( updateType );

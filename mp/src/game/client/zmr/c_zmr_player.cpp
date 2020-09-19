@@ -83,6 +83,9 @@ BEGIN_RECV_TABLE_NOBASE( C_ZMPlayer, DT_ZMNonLocalPlayerExclusive )
     RecvPropFloat( RECVINFO( m_angEyeAngles[0] ) ),
     RecvPropFloat( RECVINFO( m_angEyeAngles[1] ) ),
 
+    RecvPropFloat( RECVINFO( m_vecVelocity[0] ) ),
+    RecvPropFloat( RECVINFO( m_vecVelocity[1] ) ),
+
     RecvPropInt( RECVINFO( m_nMuzzleFlashParity ) ),
 END_RECV_TABLE()
 

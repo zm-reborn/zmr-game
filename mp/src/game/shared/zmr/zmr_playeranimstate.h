@@ -23,6 +23,8 @@ public:
 	void InitZMAnimState( CZMPlayer* pPlayer );
 	CZMPlayer* GetZMPlayer() const { return m_pZMPlayer; }
 
+	virtual void GetOuterAbsVelocity( Vector& vel ) OVERRIDE;
+
     virtual bool ShouldUpdateAnimState() OVERRIDE;
 	virtual void ClearAnimationState() OVERRIDE;
 	virtual Activity TranslateActivity( Activity actDesired ) OVERRIDE;
