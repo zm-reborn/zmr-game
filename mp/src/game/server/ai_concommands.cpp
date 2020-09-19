@@ -390,6 +390,8 @@ void CC_NPC_Focus( const CCommand &args )
 static ConCommand npc_focus("npc_focus", CC_NPC_Focus, "Displays red line to NPC's enemy (if has one) and blue line to NPC's target entity (if has one)\n\tArguments:   	{npc_name} / {npc class_name} / no argument picks what player is looking at", FCVAR_CHEAT);
 
 ConVar npc_create_equipment("npc_create_equipment", "");
+
+#ifndef ZMR
 //------------------------------------------------------------------------------
 // Purpose: Create an NPC of the given type
 //------------------------------------------------------------------------------
@@ -455,7 +457,7 @@ void CC_NPC_Create( const CCommand &args )
 	CBaseEntity::SetAllowPrecache( allowPrecache );
 }
 static ConCommand npc_create("npc_create", CC_NPC_Create, "Creates an NPC of the given type where the player is looking (if the given NPC can actually stand at that location).  Note that this only works for npc classes that are already in the world.  You can not create an entity that doesn't have an instance in the level.\n\tArguments:	{npc_class_name}", FCVAR_CHEAT);
-
+#endif
 
 //------------------------------------------------------------------------------
 // Purpose: Create an NPC of the given type

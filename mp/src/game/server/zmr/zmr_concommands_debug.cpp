@@ -293,3 +293,100 @@ void ZM_GibZombies( const CCommand &args )
 
 static ConCommand zm_gibzombies( "zm_gibzombies", ZM_GibZombies );
 
+/*
+    Create zombie at crosshair.
+*/
+static int zm_zombie_create_completion( const char* partial, char commands[ COMMAND_COMPLETION_MAXITEMS ][ COMMAND_COMPLETION_ITEM_LENGTH ] )
+{
+    // Autocomplete zombie classnames.
+    const char* completions[] = {
+        "npc_zombie",
+        "npc_fastzombie",
+        "npc_poisonzombie",
+        "npc_dragzombie",
+        "npc_burnzombie"
+    };
+
+
+    char cmd[128];
+    Q_strncpy( cmd, partial, sizeof( cmd ) );
+
+    
+    // Skip the command part to compare the argument.
+    auto* pszArg = Q_strstr( cmd, " " );
+    if ( pszArg )
+    {
+        *pszArg = NULL;
+
+        ++pszArg;
+
+        if ( !Q_strlen( pszArg ) )
+            pszArg = nullptr;
+    }
+
+
+    int cmds = 0;
+    for ( int i = 0; i < ARRAYSIZE( completions ); i++ )
+    {
+        if ( !pszArg || Q_strstr( completions[i], pszArg ) == completions[i] )
+        {
+            Q_snprintf( commands[cmds++], COMMAND_COMPLETION_ITEM_LENGTH, "%s %s", cmd, completions[i] );
+        }
+    }
+
+    return cmds;
+}
+
+static void ZM_Zombie_Create( const CCommand& args )
+{
+    CBasePlayer* pPlayer = UTIL_GetCommandClient();
+    if ( !pPlayer ) return;
+
+    if ( !UTIL_IsCommandIssuedByServerAdmin() && !sv_cheats->GetBool() )
+    {
+        return;
+    }
+
+
+    Vector fwd;
+    trace_t tr;
+    AngleVectors( pPlayer->EyeAngles(), &fwd );
+    UTIL_TraceLine( pPlayer->EyePosition(), pPlayer->EyePosition() + fwd * MAX_COORD_FLOAT, MASK_NPCSOLID & ~CONTENTS_MONSTER, pPlayer, COLLISION_GROUP_NONE, &tr );
+
+    if ( tr.fraction == 1.0f || tr.startsolid )
+        return;
+
+
+    const char* classname = "npc_zombie";
+    const char* arg = args.Arg( 1 );
+    if ( arg && *arg )
+    {
+        classname = arg;
+    }
+
+
+    CBaseEntity* pEnt = CreateEntityByName( classname );
+    if ( !pEnt )
+        return;
+
+    CZMBaseZombie* pZombie = dynamic_cast<CZMBaseZombie*>( pEnt );
+    if ( !pZombie || !pZombie->CanSpawn( tr.endpos ) )
+    {
+        UTIL_RemoveImmediate( pEnt );
+        return;
+    }
+
+    pZombie->SetAbsOrigin( tr.endpos );
+
+
+    QAngle ang = pPlayer->EyeAngles();
+    ang.x = ang.z = 0.0f;
+    pZombie->SetAbsAngles( ang );
+
+    DispatchSpawn( pZombie );
+}
+
+#define ZOMBIECREATE_DESC "Creates a zombie at your crosshair. Takes a zombie classname."
+
+static ConCommand zm_zombie_create( "zm_zombie_create", ZM_Zombie_Create, ZOMBIECREATE_DESC, 0, zm_zombie_create_completion );
+static ConCommand npc_create( "npc_create", ZM_Zombie_Create, ZOMBIECREATE_DESC, 0, zm_zombie_create_completion );
