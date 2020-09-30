@@ -30,6 +30,8 @@ public:
 	void	Precache(void);
 	void	Spawn(void);
 	virtual void Activate();
+	virtual void UpdateOnRemove(void);
+
 
 	virtual void OnEntityEvent( EntityEvent_t event, void *pEventData );
 
@@ -292,6 +294,17 @@ void CPointSpotlight::OnEntityEvent( EntityEvent_t event, void *pEventData )
 	BaseClass::OnEntityEvent( event, pEventData );
 }
 
+
+//-----------------------------------------------------------------------------
+// Purpose: Destroy the beam related entities when we get killed.
+//-----------------------------------------------------------------------------
+void CPointSpotlight::UpdateOnRemove(void)
+{
+	SpotlightDestroy();
+
+	BaseClass::UpdateOnRemove();
+}
+
 	
 //-------------------------------------------------------------------------------------
 // Purpose : Send even though we don't have a model so spotlight gets proper position
@@ -418,7 +431,13 @@ void CPointSpotlight::SpotlightDestroy(void)
 		m_OnOff.FireOutput( this, this );
 
 		UTIL_Remove(m_hSpotlight);
+		m_hSpotlight = nullptr;
+	}
+
+	if ( m_hSpotlightTarget )
+	{
 		UTIL_Remove(m_hSpotlightTarget);
+		m_hSpotlightTarget = nullptr;
 	}
 }
 
