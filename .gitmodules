@@ -1,0 +1,4 @@
+[submodule "mp/game/zombie_master_reborn"]
+	path = mp/game/zombie_master_reborn
+	url = https://github.com/zm-reborn/zmr-files
+	branch = dev
