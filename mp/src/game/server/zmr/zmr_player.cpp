@@ -657,6 +657,10 @@ void CZMPlayer::ChangeTeam( int iTeam )
     // Change the team silently...
     CBasePlayer::ChangeTeam( iTeam, true, true );
 
+    // We might have something parented to us by the map.
+    // Remove it.
+    UnlinkAndRemoveChildren();
+
 
     if ( oldteam != ZMTEAM_UNASSIGNED && ShouldSpawn() )
     {
@@ -891,6 +895,28 @@ void CZMPlayer::SetTeamSpecificProps()
     }
 }
 
+void CZMPlayer::UnlinkAndRemoveChildren()
+{
+    //
+    // So we don't have flying props parented to us when we
+    // die or change team.
+    //
+    auto* pChild = FirstMoveChild();
+    while ( pChild )
+    {
+        auto* pNext = pChild->NextMovePeer();
+
+        UnlinkFromParent( pChild );
+
+        // Pls don't parent other players to players.
+        // I've seen it happen!
+        Assert( !pChild->IsPlayer() );
+        if ( !pChild->IsPlayer() )
+            UTIL_Remove( pChild );
+
+        pChild = pNext;
+    }
+}
 
 void CZMPlayer::PickDefaultSpawnTeam()
 {
@@ -1512,6 +1538,10 @@ void CZMPlayer::Event_Killed( const CTakeDamageInfo &info )
 
     // ZMRTODO: Figure out how to call EndTouch for all entities on death.
     StopWaterDeathSounds();
+
+    // We might have something parented to us by the map.
+    // Remove it.
+    UnlinkAndRemoveChildren();
 }
 
 extern ConVar friendlyfire;

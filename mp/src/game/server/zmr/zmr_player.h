@@ -219,6 +219,7 @@ public:
 
 
     void SetTeamSpecificProps();
+    void UnlinkAndRemoveChildren();
     void PushAway( const Vector& pos, float force );
 
 
