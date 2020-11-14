@@ -163,7 +163,29 @@ CZMClientScoreBoardDialog::CZMClientScoreBoardDialog( IViewPort* pViewPort ) : C
     m_iVoiceOn = m_pList->AddImage( scheme()->GetImage( "zmr_misc/voice_on", true ) );
 
 
-    g_ZMImportanceSystem.InitImages();
+    //
+    // Importance images.
+    //
+    COMPILE_TIME_ASSERT( ARRAYSIZE( m_pImportanceImages ) == ZMIMPORTANCE_MAX );
+
+    for ( int i = 0; i < ARRAYSIZE( m_pImportanceImages ); i++ )
+    {
+        m_pImportanceImages[i] = nullptr;
+    }
+
+    m_pImportanceImages[ZMIMPORTANCE_DEV] = vgui::scheme()->GetImage( "zmr_misc/dev", true );
+    m_pImportanceImages[ZMIMPORTANCE_VIP] = vgui::scheme()->GetImage( "zmr_misc/trusted", true );
+    m_pImportanceImages[ZMIMPORTANCE_PLAYTESTER] = vgui::scheme()->GetImage( "zmr_misc/playtester", true );
+
+
+    int imagesize = 24;
+    for ( int i = 0; i < ARRAYSIZE( m_pImportanceImages ); i++ )
+    {
+        if ( m_pImportanceImages[i] != nullptr )
+        {
+            m_pImportanceImages[i]->SetSize( imagesize, imagesize );
+        }
+    }
 }
 
 CZMClientScoreBoardDialog::~CZMClientScoreBoardDialog()
@@ -563,12 +585,12 @@ void CZMClientScoreBoardDialog::GetPlayerScoreInfo( int playerIndex, KeyValues* 
 
 
     // Importance
-    auto* pImage = g_ZMImportanceSystem.GetPlayerImportanceImageIndex( playerIndex );
+    auto importance = g_ZMImportanceSystem.GetPlayerImportance( playerIndex );
     int iImage = -1;
 
-    if ( pImage )
+    if ( importance >= 0 && importance < ARRAYSIZE( m_pImportanceImages ) )
     {
-        iImage = m_pList->AddImage( pImage );
+        iImage = m_pList->AddImage( m_pImportanceImages[importance] );
     }
 
     kv->SetInt( "importance", iImage );

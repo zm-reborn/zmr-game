@@ -1,9 +1,6 @@
 #pragma once
 
 
-#include <vgui/IImage.h>
-
-
 enum ZMImportance_t
 {
     ZMIMPORTANCE_NONE = -1,
@@ -41,10 +38,8 @@ public:
 
 
 
-    void InitImages();
     void Reset();
 
-    vgui::IImage* GetPlayerImportanceImageIndex( int playerIndex );
     const char* GetPlayerImportanceName( int playerIndex );
     ZMImportance_t GetPlayerImportance( int playerIndex );
 
@@ -57,17 +52,10 @@ protected:
 
     bool ComputePlayerImportance( int playerIndex );
 
-    vgui::IImage* ImportanceToImage( ZMImportance_t index ) const;
-
     static const char* ImportanceToName( ZMImportance_t index );
     static ZMImportance_t ImportanceNameToIndex( const char* name );
 
 private:
-    vgui::IImage* m_pImageDev;
-    vgui::IImage* m_pImageVIP;
-    vgui::IImage* m_pImagePlaytester;
-
-
     ImportanceData_t m_Importance[MAX_PLAYERS];
 
 

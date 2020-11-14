@@ -42,10 +42,6 @@ bool C_ZMImportanceSystem::ImportanceData_t::IsValid( int playerIndex ) const
 
 C_ZMImportanceSystem::C_ZMImportanceSystem()
 {
-    m_pImageDev = nullptr;
-    m_pImageVIP = nullptr;
-    m_pImagePlaytester = nullptr;
-
     Reset();
 }
 
@@ -65,13 +61,6 @@ void C_ZMImportanceSystem::PostInit()
 void C_ZMImportanceSystem::LevelInitPostEntity()
 {
     Reset();
-}
-
-void C_ZMImportanceSystem::InitImages()
-{
-    m_pImageDev = vgui::scheme()->GetImage( "zmr_misc/dev", true );
-    m_pImageVIP = vgui::scheme()->GetImage( "zmr_misc/trusted", true );
-    m_pImagePlaytester = vgui::scheme()->GetImage( "zmr_misc/playtester", true );
 }
 
 bool C_ZMImportanceSystem::LoadFromFile()
@@ -149,16 +138,6 @@ int C_ZMImportanceSystem::FindSteamIdIndex( uint64 steamId )
     return (int)(found - begin);
 }
 
-vgui::IImage* C_ZMImportanceSystem::GetPlayerImportanceImageIndex( int playerIndex )
-{
-    if ( !IsCached( playerIndex ) )
-    {
-        ComputePlayerImportance( playerIndex );
-    }
-
-    return ImportanceToImage( m_Importance[playerIndex].importance );
-}
-
 const char* C_ZMImportanceSystem::GetPlayerImportanceName( int playerIndex )
 {
     if ( !IsCached( playerIndex ) )
@@ -189,17 +168,6 @@ void C_ZMImportanceSystem::Reset()
     for ( int i = 0; i < ARRAYSIZE( m_Importance ); i++ )
     {
         m_Importance[i].Init( -1 );
-    }
-}
-
-vgui::IImage* C_ZMImportanceSystem::ImportanceToImage( ZMImportance_t index ) const
-{
-    switch ( index )
-    {
-    case ZMIMPORTANCE_DEV : return m_pImageDev;
-    case ZMIMPORTANCE_VIP : return m_pImageVIP;
-    case ZMIMPORTANCE_PLAYTESTER : return m_pImagePlaytester;
-    default : return nullptr;
     }
 }
 

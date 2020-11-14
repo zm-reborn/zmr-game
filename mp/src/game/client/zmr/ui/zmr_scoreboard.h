@@ -1,7 +1,11 @@
 #pragma once
 
 #include <clientscoreboarddialog.h>
+#include <vgui/IImage.h>
+
+
 #include "zmr_framepanel.h"
+#include "c_zmr_importancesystem.h"
 
 class CZMListRow;
 class CZMListSection;
@@ -87,6 +91,8 @@ private:
 
 
     CZMListPanel* m_pList;
+
+    vgui::IImage* m_pImportanceImages[ZMIMPORTANCE_MAX];
 
     int     m_iPlayerIndexSymbol;
     float   m_flNextUpdateTime;
