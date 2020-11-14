@@ -176,6 +176,7 @@ CZMClientScoreBoardDialog::CZMClientScoreBoardDialog( IViewPort* pViewPort ) : C
     m_pImportanceImages[ZMIMPORTANCE_DEV] = vgui::scheme()->GetImage( "zmr_misc/dev", true );
     m_pImportanceImages[ZMIMPORTANCE_VIP] = vgui::scheme()->GetImage( "zmr_misc/trusted", true );
     m_pImportanceImages[ZMIMPORTANCE_PLAYTESTER] = vgui::scheme()->GetImage( "zmr_misc/playtester", true );
+    m_pImportanceImages[ZMIMPORTANCE_LEAD] = vgui::scheme()->GetImage( "zmr_misc/lead", true );
 
 
     int imagesize = 24;

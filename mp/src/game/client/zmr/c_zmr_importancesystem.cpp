@@ -178,6 +178,7 @@ const char* C_ZMImportanceSystem::ImportanceToName( ZMImportance_t index )
     case ZMIMPORTANCE_DEV : return "Developer";
     case ZMIMPORTANCE_VIP : return "VIP";
     case ZMIMPORTANCE_PLAYTESTER : return "Playtester";
+    case ZMIMPORTANCE_LEAD : return "Lead Developer";
     default : return "";
     }
 }
@@ -197,6 +198,11 @@ ZMImportance_t C_ZMImportanceSystem::ImportanceNameToIndex( const char* name )
     if ( Q_stricmp( "Developer", name ) == 0 )
     {
         return ZMIMPORTANCE_DEV;
+    }
+
+    if ( Q_stricmp( "Lead Developer", name ) == 0 )
+    {
+        return ZMIMPORTANCE_LEAD;
     }
 
     return ZMIMPORTANCE_NONE;
