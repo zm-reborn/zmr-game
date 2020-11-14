@@ -17,6 +17,10 @@
 #include "tier0/memdbgon.h"
 
 
+ConVar zm_cl_chat_color_dev( "zm_cl_chat_color_dev", "255 255 64" );
+ConVar zm_cl_chat_color_lead( "zm_cl_chat_color_lead", "231 76 60" );
+
+
 void UTIL_ParseColorFromString( const char* str, int clr[], int nColors );
 
 
@@ -142,12 +146,32 @@ void CHudChat::MsgFunc_SayText2( bf_read &msg )
 
 
     // Add star next to dev name.
-    if ( g_ZMImportanceSystem.GetPlayerImportance( client ) == ZMIMPORTANCE_DEV )
+    auto importance = g_ZMImportanceSystem.GetPlayerImportance( client );
+    if ( importance == ZMIMPORTANCE_DEV || importance == ZMIMPORTANCE_LEAD )
     {
+        // Rewrite the name to include the text color.
         wchar_t szTemp[256];
         V_wcsncpy( szTemp, szBuf[1], sizeof( szTemp ) );
+        V_snwprintf( szBuf[1], ARRAYSIZE( szBuf[1] ), L"%s\x01", szTemp );
 
-        V_snwprintf( szBuf[1], ARRAYSIZE( szBuf[1] ), L"★ %s", szTemp );
+
+        // Rewrite the format to include the star and the coloring.
+        V_wcsncpy( szTemp, szBuf[0], sizeof( szTemp ) );
+
+        // Get rid of the x02 at the start.
+        int index = 0;
+        if ( szTemp[0] == '\x02' )
+        {
+            index = 1;
+        }
+
+        auto clrstr = importance == ZMIMPORTANCE_LEAD ? zm_cl_chat_color_lead.GetString() : zm_cl_chat_color_dev.GetString();
+        int clr[3];
+        UTIL_ParseColorFromString( clrstr, clr, ARRAYSIZE( clr ) );
+
+        // x03 = team color
+        // \a = hex color
+        V_snwprintf( szBuf[0], ARRAYSIZE( szBuf[0] ), L"\x01\a%x%x%x★ \x03%s", clr[0], clr[1], clr[2], &szTemp[index] );
     }
 
 
