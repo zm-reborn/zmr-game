@@ -769,30 +769,22 @@ bool CGrabController::UpdateObject( CBasePlayer *pPlayer, float flError )
     // Show overlays of radius
     if ( zm_sv_debug_carry.GetBool() )
     {
+        int r, g, b;
 
+        r = g = b = 0;
 #ifdef CLIENT_DLL
+        r = 255;
+#else
+        b = 255;
+#endif
+        NDebugOverlay::Axis( end, vec3_angle, 8.0f, true, 0.0f );
 
-        debugoverlay->AddBoxOverlay( end, -Vector( 2,2,2 ), Vector(2,2,2), angles, 0, 255, 255, true, 0 );
-
-        debugoverlay->AddBoxOverlay( GetAttached()->WorldSpaceCenter(), 
+        NDebugOverlay::BoxAngles( GetAttached()->WorldSpaceCenter(), 
                             -Vector( radius, radius, radius), 
                             Vector( radius, radius, radius ),
                             angles,
-                            255, 255, 0,
-                            true,
+                            r, g, b, 0,
                             0.0f );
-
-#else
-
-        NDebugOverlay::Box( end, -Vector( 2,2,2 ), Vector(2,2,2), 0, 255, 0, true, 0 );
-
-        NDebugOverlay::Box( GetAttached()->WorldSpaceCenter(), 
-                            -Vector( radius+5, radius+5, radius+5), 
-                            Vector( radius+5, radius+5, radius+5 ),
-                            255, 0, 0,
-                            true,
-                            0.0f );
-#endif
     }
 
 
