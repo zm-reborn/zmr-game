@@ -6,6 +6,7 @@
 
 
 #include "weapons/zmr_base.h"
+#include "zmr_mapitemaction.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -223,7 +224,38 @@ void CZMEntItemCrate::OnBreak( const Vector& vecVelocity, const AngularImpulse& 
 
 CBaseEntity* CZMEntItemCrate::CreateItem() const
 {
-    return ( m_iszTemplateData != NULL_STRING ) ? CreateTemplateItem() : CreateEntityByName( STRING( m_iszItemClass ) );
+    // It's a template, spawn that.
+    if ( m_iszTemplateData != NULL_STRING )
+    {
+        return CreateTemplateItem();
+    }
+    
+    //
+    // Check if we should spawn other types of this item.
+    // Eg. weapon_zm_shotgun and weapon_zm_shotgun_sporting
+    //
+    auto* classname = STRING( m_iszItemClass );
+
+
+    auto flags = ZMItemAction::g_ZMMapItemSystem.GetItemFlags( classname );
+
+    // It's a weapon.
+    if ( flags & ZMItemAction::CLASS_WEAPON )
+    {
+        // Collect the possible weapons we could give.
+        CUtlVector<const ZMItemAction::ItemBaseData_t*> items;
+        ZMItemAction::CZMMapItemSystem::GetMapItems( [ flags ]( const ZMItemAction::ItemBaseData_t& itemdata )
+        {
+            return itemdata.m_fClassFlags == flags;
+        }, items );
+
+        if ( items.Count() > 1 )
+        {
+            return CreateEntityByName( items[random->RandomInt( 0, items.Count() - 1 )]->m_pszClassname );
+        }
+    }
+
+    return CreateEntityByName( classname );
 }
 
 CZMBaseWeapon* CZMEntItemCrate::CreateTemplateItem() const
