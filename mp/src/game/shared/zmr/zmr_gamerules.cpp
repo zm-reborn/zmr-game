@@ -33,6 +33,8 @@
 extern CAmmoDef* GetAmmoDef();
 #endif
 
+ConVar zm_sv_roundintermissiontime( "zm_sv_roundintermissiontime", "5", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE, "How many seconds of wait there is before another round begins." );
+
 ConVar zm_sv_participation( "zm_sv_participation", "0", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE, "0 = No limit, 1 = Don't allow only human, 2 = Don't allow only spec, 3 = Don't allow only spec/human" );
 
 ConVar zm_sv_glow_item_enabled( "zm_sv_glow_item_enabled", "1", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE, "Is item (weapon/ammo) glow allowed?" );
@@ -959,7 +961,6 @@ bool CZMRules::FAllowNPCs()
 }
 
 ConVar zm_mp_roundlimit( "zm_mp_roundlimit", "0", FCVAR_NOTIFY, "How many rounds do we play before going into intermission. 0 = Disable" );
-ConVar zm_sv_roundintermissiontime( "zm_sv_roundintermissiontime", "5", FCVAR_NOTIFY, "How many seconds of wait there is before another round begins." );
 ConVar zm_sv_roundmintime( "zm_sv_roundmintime", "20", FCVAR_NOTIFY, "Minimum amount of time that is considered as a full round." );
 
 void CZMRules::EndRound( ZMRoundEndReason_t reason )
