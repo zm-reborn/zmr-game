@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 
 class CEntityMapData;
 
@@ -247,6 +248,8 @@ namespace ZMItemAction
         static const ItemBaseData_t* GetItemData( int index );
         static const ItemBaseData_t* GetItemData( const char* itemclass );
         static bool         GetMapItemsByClass( unsigned int classflags, CUtlVector<const ItemBaseData_t*>& items );
+        static bool         GetMapItems( std::function<bool(const ItemBaseData_t&)> func, CUtlVector<const ItemBaseData_t*>& items );
+ 
 
 
 

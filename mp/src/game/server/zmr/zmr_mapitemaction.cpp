@@ -273,6 +273,22 @@ bool CZMMapItemSystem::GetMapItemsByClass( unsigned int classflags, CUtlVector<c
     return num > 0;
 }
 
+bool CZMMapItemSystem::GetMapItems( std::function<bool(const ItemBaseData_t&)> func, CUtlVector<const ItemBaseData_t*>& items )
+{
+    int num = 0;
+
+    for ( int i = 0; i < ARRAYSIZE( m_ItemData ); i++ )
+    {
+        if ( func( m_ItemData[i] ) )
+        {
+            items.AddToTail( &m_ItemData[i] );
+            ++num;
+        }
+    }
+
+    return num > 0;
+}
+
 int CZMMapItemSystem::FindItemClassByName( const char* itemclass )
 {
     for ( int i = 0; i < ARRAYSIZE( m_Classes ); i++ )
