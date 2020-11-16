@@ -15,6 +15,12 @@
 using namespace vgui;
 
 
+extern ConVar zm_sv_roundintermissiontime;
+extern ConVar zm_cl_round_cinematic_effects_duration;
+
+ConVar zm_cl_round_cinematic_effects( "zm_cl_round_cinematic_effects", "1", FCVAR_ARCHIVE, "The cinematic effects (black bars)" );
+
+
 #define SHOW_BARS           g_pClientMode->GetViewportAnimationController()->StartAnimationSequence( "ZMBarsShow" )
 #define HIDE_BARS           g_pClientMode->GetViewportAnimationController()->StartAnimationSequence( "ZMBarsHide" )
 
@@ -37,6 +43,9 @@ CZMHudBars::CZMHudBars( const char *pElementName ) : CHudElement( pElementName )
 {
     SetPaintBackgroundEnabled( false );
     SetZPos( 9000 );
+
+    ListenForGameEvent( "round_end_post" );
+    ListenForGameEvent( "round_restart_post" );
 }
 
 void CZMHudBars::Init()
@@ -59,6 +68,28 @@ void CZMHudBars::LevelInit()
 void CZMHudBars::Reset()
 {
     SetWide( ScreenWidth() );
+}
+
+void CZMHudBars::FireGameEvent( IGameEvent* pEvent )
+{
+    //
+    // Round start/end effects
+    //
+    if ( Q_strcmp( pEvent->GetName(), "round_end_post" ) == 0 )
+    {
+        if ( zm_cl_round_cinematic_effects.GetBool() )
+        {
+            // Add a bit of padding in case of lag.
+            ShowBars( zm_sv_roundintermissiontime.GetFloat() + 0.5f );
+        }
+    }
+    else if ( Q_strcmp( pEvent->GetName(), "round_restart_post" ) == 0 )
+    {
+        if ( zm_cl_round_cinematic_effects.GetBool() )
+        {
+            ShowBars( zm_cl_round_cinematic_effects_duration.GetFloat() );
+        }
+    }
 }
 
 void CZMHudBars::OnThink()

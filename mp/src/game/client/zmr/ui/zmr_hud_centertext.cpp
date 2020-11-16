@@ -14,6 +14,10 @@
 using namespace vgui;
 
 
+extern ConVar zm_sv_roundintermissiontime;
+
+ConVar zm_cl_round_cinematic_effects_text( "zm_cl_round_cinematic_effects_text", "1", FCVAR_ARCHIVE, "Center text" );
+ConVar zm_cl_round_cinematic_effects_duration( "zm_cl_round_cinematic_effects_duration", "5", FCVAR_ARCHIVE, "The cinematic effects duration." );
 
 
 CON_COMMAND( zm_hudcentertext, "Displays a center text message." )
@@ -43,6 +47,10 @@ CZMHudCenterText::CZMHudCenterText( const char *pElementName ) : CHudElement( pE
 
 
     Reset();
+
+
+    ListenForGameEvent( "round_end_post" );
+    ListenForGameEvent( "round_restart_post" );
 }
 
 CZMHudCenterText::~CZMHudCenterText()
@@ -71,6 +79,23 @@ void CZMHudCenterText::Reset()
     m_szSmall[0] = NULL;
     m_flShowSmall = 0.0f;
     m_flNextHide = 0.0f;
+}
+
+void CZMHudCenterText::FireGameEvent( IGameEvent* pEvent )
+{
+    //
+    // Round start/end effects
+    //
+    if ( Q_strcmp( pEvent->GetName(), "round_end_post" ) == 0 )
+    {
+        ZMRoundEndReason_t reason = (ZMRoundEndReason_t)pEvent->GetInt( "reason", ZMROUND_GAMEBEGIN );
+
+        ShowRoundEnd( reason );
+    }
+    else if ( Q_strcmp( pEvent->GetName(), "round_restart_post" ) == 0 )
+    {
+        ShowRoundStart();
+    }
 }
 
 void CZMHudCenterText::OnThink()
@@ -132,14 +157,19 @@ void CZMHudCenterText::Paint()
 
 void CZMHudCenterText::ShowRoundStart( const char* insmalltxt )
 {
-    /*
-    CZMHudCenterText* center = GET_HUDELEMENT( CZMHudCenterText );
+    if ( !zm_cl_round_cinematic_effects_text.GetBool() )
+    {
+        return;
+    }
 
-    if ( !center ) return;
+
+    //CZMHudCenterText* center = GET_HUDELEMENT( CZMHudCenterText );
+
+    //if ( !center ) return;
 
 
     CZMRules* pRules = ZMRules();
-    if ( !pRules ) return;
+    
 
 
     wchar_t txt[128];
@@ -147,22 +177,59 @@ void CZMHudCenterText::ShowRoundStart( const char* insmalltxt )
     txt[0] = NULL;
     smalltxt[0] = NULL;
 
-    // This is just silly...
     wchar_t wround[64];
-    char round[32];
-    Q_snprintf( round, sizeof( round ), "%i", pRules->GetRounds() );
-    g_pVGuiLocalize->ConvertANSIToUnicode( round, wround, sizeof( wround ) );
-
+    wround[0] = NULL;
+    if ( pRules )
+    {
+        // This is just silly...
+        char round[32];
+        Q_snprintf( round, sizeof( round ), "%i", pRules->GetRoundsPlayed() + 1 );
+        g_pVGuiLocalize->ConvertANSIToUnicode( round, wround, sizeof( wround ) );
+    }
 
     g_pVGuiLocalize->ConstructString( txt, sizeof( txt ), g_pVGuiLocalize->Find( "#ZMRoundCount" ), 1, wround );
 
-    if ( insmalltxt )
+
+    if ( insmalltxt && *insmalltxt )
     {
-        g_pVGuiLocalize->ConvertANSIToUnicode( insmalltxt, smalltxt, sizeof( smalltxt ) );
+        // It's a localized text.
+        if ( *insmalltxt == '#' )
+        {
+            Q_wcsncpy( smalltxt, g_pVGuiLocalize->Find( insmalltxt ), sizeof( smalltxt ) );
+        }
+        // Just copy over.
+        else
+        {
+            g_pVGuiLocalize->ConvertANSIToUnicode( insmalltxt, smalltxt, sizeof( smalltxt ) );
+        }
     }
 
 
-    center->ShowText( txt, smalltxt, 1.0f, 5.0f );*/
+    ShowText( txt, smalltxt, 1.0f, zm_cl_round_cinematic_effects_duration.GetFloat() );
+}
+
+void CZMHudCenterText::ShowRoundEnd( ZMRoundEndReason_t reason )
+{
+    if ( !zm_cl_round_cinematic_effects_text.GetBool() )
+    {
+        return;
+    }
+
+
+    const char* localized = nullptr;
+    switch ( reason )
+    {
+    case ZMROUND_GAMEBEGIN : localized = "#ZMRoundEndShortGameBegin"; break;
+    case ZMROUND_HUMANDEAD : localized = "#ZMRoundEndShortHumanDead"; break;
+    case ZMROUND_HUMANLOSE : localized = "#ZMRoundEndShortHumanLose"; break;
+    case ZMROUND_HUMANWIN : localized = "#ZMRoundEndShortHumanWin"; break;
+    case ZMROUND_VOTERESTART : localized = "#ZMRoundEndShortVoteRestart"; break;
+    case ZMROUND_ZMSUBMIT : localized = "#ZMRoundEndShortSubmit"; break;
+    default : localized = "#ZMRoundEndShortGeneric"; break;
+    }
+
+    // Add a bit of padding in case of lag.
+    ShowText( localized, nullptr, 0.0f, zm_sv_roundintermissiontime.GetFloat() + 0.5f );
 }
 
 void CZMHudCenterText::ShowText( const char* bigtxt, const char* smalltxt, float smalldelay, float displaytime )

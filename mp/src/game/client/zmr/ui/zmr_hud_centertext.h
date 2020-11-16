@@ -19,8 +19,11 @@ public:
     virtual void OnThink() OVERRIDE;
     virtual void Paint() OVERRIDE;
 
+    virtual void FireGameEvent( IGameEvent* pEvent ) OVERRIDE;
 
-    static void ShowRoundStart( const char* smalltxt );
+
+    void ShowRoundStart( const char* smalltxt = nullptr );
+    void ShowRoundEnd( ZMRoundEndReason_t reason );
 
     void ShowText( const char* bigtxt = nullptr, const char* smalltxt = nullptr, float smalldelay = 0.0f, float displaytime = 5.0f );
     void ShowText( const wchar_t* bigtxt = nullptr, const wchar_t* smalltxt = nullptr, float smalldelay = 0.0f, float displaytime = 5.0f );
