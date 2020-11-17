@@ -46,6 +46,9 @@ CZMHudBars::CZMHudBars( const char *pElementName ) : CHudElement( pElementName )
 
     ListenForGameEvent( "round_end_post" );
     ListenForGameEvent( "round_restart_post" );
+
+    m_nTexPanelBgEdgesId = surface()->CreateNewTextureID();
+    surface()->DrawSetTextureFile( m_nTexPanelBgEdgesId, "zmr_effects/hud_blackbars_top", true, false );
 }
 
 void CZMHudBars::Init()
@@ -100,6 +103,27 @@ void CZMHudBars::OnThink()
     }
 }
 
+void CZMHudBars::PaintBorder( int border_y, int border_height, bool bFlip )
+{
+    const int w = ScreenWidth();
+
+    float tx0 = 0.0f;
+    float ty0 = 0.0f;
+    float tx1 = (float)w / 512.0f;
+    float ty1 = 1.0f;
+
+
+    if ( bFlip )
+    {
+        tx0 = tx1; ty0 = ty1;
+        tx1 = ty1 = 0.0f;
+    }
+
+
+    surface()->DrawSetTexture( m_nTexPanelBgEdgesId );
+    surface()->DrawTexturedSubRect( 0, border_y, w, border_y + border_height, tx0, ty0, tx1, ty1 );
+}
+
 void CZMHudBars::Paint()
 {
     if ( m_flAlpha <= 0.0f ) return;
@@ -109,17 +133,34 @@ void CZMHudBars::Paint()
 
     surface()->DrawSetColor( clr );
 
-    int w = GetWide();
-    int h = GetTall();
 
+    const int w = ScreenWidth();
+    const int h = GetTall();
+
+
+    const int border_height = 64;
+
+
+    //
+    // Top bar
+    //
     if ( m_flTopBarY > 0.0f )
     {
-        surface()->DrawFilledRect( 0, 0, w, YRES( m_flTopBarY ) );
+        int y = YRES( m_flTopBarY ) - border_height;
+        surface()->DrawFilledRect( 0, 0, w, y );
+
+        PaintBorder( y, border_height, true );
     }
 
+    //
+    // Bottom bar
+    //
     if ( m_flBottomBarY < 480.0f )
     {
-        surface()->DrawFilledRect( 0, YRES( m_flBottomBarY ), w, h );
+        int y = YRES( m_flBottomBarY ) + border_height;
+        surface()->DrawFilledRect( 0, y, w, h );
+
+        PaintBorder( y - border_height, border_height, false );
     }
 }
 

@@ -30,9 +30,11 @@ public:
     void HideBars();
 private:
 
+    void PaintBorder( int border_y, int border_height, bool bFlip );
 
     float m_flNextHide;
 
+    int m_nTexPanelBgEdgesId;
 
     CPanelAnimationVar( float, m_flAlpha, "BarAlpha", "255" );
     CPanelAnimationVar( float, m_flTopBarY, "TopBarY", "0" );
