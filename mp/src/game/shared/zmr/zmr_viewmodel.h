@@ -76,6 +76,8 @@ private:
     CInterpolatedVar<float> m_flLagEyePosZHistory;
     float m_flLagEyePosZ;
 
+    float m_flLastEyePosZ;
+
 
     bool m_bDrawVM; // We have to override this so the client can decide whether to draw it.
 
@@ -97,6 +99,8 @@ private:
     float m_flLastImpactDelta;
     float m_flImpactVel;
     float m_flImpactVelOrig;
+
+    Vector m_vecLastVel;
 #endif
 };
 

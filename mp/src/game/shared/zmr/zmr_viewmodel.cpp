@@ -15,6 +15,9 @@
 #include "tier0/memdbgon.h"
 
 
+static float ApproachSmooth( float target, float value, float speed, float smoothness_start, float epsilon = 0.01f );
+
+
 LINK_ENTITY_TO_CLASS( zm_viewmodel, CZMViewModel );
 
 IMPLEMENT_NETWORKCLASS_ALIASED( ZMViewModel, DT_ZM_ViewModel )
@@ -83,12 +86,16 @@ CZMViewModel::CZMViewModel()
     m_flLagEyePosZ = 0.0f;
     m_flLagEyePosZHistory.Setup( &m_flLagEyePosZ, 0 );
 
+    m_flLastEyePosZ = 0.0f;
+
     m_flLastImpactDelta = 0.0f;
     m_flImpactTargetDelta = 0.0f;
     m_flImpactVel = 0.0f;
 
     m_iPoseParamMoveX = -1;
     m_iPoseParamVertAim = -1;
+
+    m_vecLastVel.Init();
 #else
     SetModelColor2( 1.0f, 1.0f, 1.0f );
 #endif
@@ -361,6 +368,11 @@ bool C_ZMViewModel::PerformMovementLag( Vector& vecPos, QAngle& ang, const Vecto
 
     Vector vel = pOwner->GetLocalVelocity();
 
+    // Smooth out the movement a bit.
+    vel.x = ApproachSmooth( vel.x, m_vecLastVel.x, 1000.0f * gpGlobals->frametime, 150.0f );
+    vel.y = ApproachSmooth( vel.y, m_vecLastVel.y, 1000.0f * gpGlobals->frametime, 150.0f );
+    m_vecLastVel = vel;
+
     Vector vecVelDir = vel;
     vecVelDir.x = vecVelDir.x / flMaxGroundSpeed;
     vecVelDir.y = vecVelDir.y / flMaxGroundSpeed;
@@ -412,8 +424,11 @@ bool C_ZMViewModel::PerformImpactLag( Vector& vecPos, QAngle& ang, const Vector&
     // Interpolate back 100ms.
     m_flLagEyePosZHistory.Interpolate( gpGlobals->curtime, flInterp );
 
+    // Smooth out the movement a bit.
+    float eyepos = ApproachSmooth( m_flLagEyePosZ, m_flLastEyePosZ, gpGlobals->frametime * 120.0f, 24.0f );
+    m_flLastEyePosZ = eyepos;
 
-    float delta = origPos.z - m_flLagEyePosZ;
+    float delta = origPos.z - eyepos;
 
     
     
@@ -834,3 +849,49 @@ IMaterial* CViewModelColorMaterialProxy::GetMaterial()
 
 EXPOSE_INTERFACE( CViewModelColorMaterialProxy, IMaterialProxy, "ViewModelColor" IMATERIAL_PROXY_INTERFACE_VERSION );
 #endif
+
+//
+// Approach a value with inverse square smoothing.
+//
+static float ApproachSmooth( float target, float value, float speed, float smoothness_start, float epsilon )
+{
+    float dif, f;
+    if ( target < value )
+    {
+        dif = value - target;
+
+        if ( dif < epsilon )
+            return target;
+
+
+        f = dif / smoothness_start;
+
+        if ( f < 1.0f )
+        {
+            f = 1 - f;
+            speed *= 1 - f*f;
+        }
+
+        float newvalue = value - speed;
+        return MAX( newvalue, target );
+    }
+    else
+    {
+        dif = target - value;
+
+        if ( dif < epsilon )
+            return target;
+
+
+        f = dif / smoothness_start;
+
+        if ( f < 1.0f )
+        {
+            f = 1 - f;
+            speed *= 1 - f*f;
+        }
+
+        float newvalue = value + speed;
+        return MIN( newvalue, target );
+    }
+}
