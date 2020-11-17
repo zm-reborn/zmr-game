@@ -68,7 +68,7 @@ static CZMViewVectors g_ZMViewVectors(
     Vector( 0, 0, 64 ),         //VEC_VIEW (m_vView)
                               
     Vector(-16, -16, 0 ),       //VEC_HULL_MIN (m_vHullMin)
-    Vector( 16,  16,  72 ),     //VEC_HULL_MAX (m_vHullMax)
+    Vector( 16,  16,  65 ),     //VEC_HULL_MAX (m_vHullMax)
                                                 
     Vector(-16, -16, 0 ),       //VEC_DUCK_HULL_MIN (m_vDuckHullMin)
     Vector( 16,  16,  36 ),     //VEC_DUCK_HULL_MAX	(m_vDuckHullMax)

@@ -776,22 +776,18 @@ bool CZMGameMovement::CheckJumpButton( void )
         flGroundFactor = player->m_pSurfaceData->game.jumpFactor; 
     }
 
-    float flMul;
-    if ( g_bMovementOptimizations )
-    {
-#if defined(HL2_DLL) || defined(HL2_CLIENT_DLL)
-        Assert( GetCurrentGravity() == 600.0f );
-        flMul = 160.0f;	// approx. 21 units.
-#else
-        Assert( GetCurrentGravity() == 800.0f );
-        flMul = 268.3281572999747f;
-#endif
 
-    }
-    else
-    {
-        flMul = sqrt(2 * GetCurrentGravity() * GAMEMOVEMENT_JUMP_HEIGHT);
-    }
+    //
+    // IMPORTANT:
+    // Player hull size was changed to stop the view jerking
+    // when crouching/uncrouching in air. Crouch jumping gets affected by this change.
+    // You cannot reach as high. Here we increase the normal jump height by 7
+    // to maintain the same height.
+    // 21.333... is the normal intended jump height.
+    //
+    Assert( GetCurrentGravity() == 600.0f );
+    float flMul = sqrt( 2 * GetCurrentGravity() * (21.333333f + 7) );
+
 
     // Acclerate upward
     // If we are ducking...
