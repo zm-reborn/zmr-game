@@ -46,7 +46,7 @@ CZMHudCenterText::CZMHudCenterText( const char *pElementName ) : CHudElement( pE
     SetPaintBackgroundEnabled( false );
 
 
-    Reset();
+    Reset_();
 
 
     ListenForGameEvent( "round_end_post" );
@@ -62,15 +62,17 @@ void CZMHudCenterText::Init()
 {
     HOOK_HUD_MESSAGE( CZMHudCenterText, ZMCenterText );
 
-    Reset();
+    Reset_();
 }
 
 void CZMHudCenterText::VidInit()
 {
-    Reset();
+    Reset_();
 }
 
-void CZMHudCenterText::Reset()
+// Reset() is called on player spawn
+// We don't like that.
+void CZMHudCenterText::Reset_()
 {
     SetWide( ScreenWidth() );
 

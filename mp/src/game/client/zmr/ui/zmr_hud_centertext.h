@@ -15,7 +15,6 @@ public:
 
     virtual void Init( void ) OVERRIDE;
     virtual void VidInit( void ) OVERRIDE;
-    virtual void Reset() OVERRIDE;
     virtual void OnThink() OVERRIDE;
     virtual void Paint() OVERRIDE;
 
@@ -32,6 +31,8 @@ public:
 
 private:
     void PaintString( const vgui::HFont, const vgui::HFont, const Color&, int x, int y, const wchar_t* );
+
+    void Reset_();
 
 
     float m_flShowSmall;
