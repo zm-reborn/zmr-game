@@ -232,6 +232,8 @@ bool CZMBanshee::HasConditionsForRangeAttack( CBaseEntity* pEnemy ) const
     if ( GetNextMove() > gpGlobals->curtime )
         return false;
 
+    if ( !GetMotor()->IsOnGround() )
+        return false;
 
     const Vector vecStart = WorldSpaceCenter();
     const Vector vecEnd = pEnemy->WorldSpaceCenter();

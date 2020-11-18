@@ -45,6 +45,11 @@ public:
             return;
         }
 
+        if ( !pOuter->GetMotor()->IsOnGround() )
+        {
+            End( "We're not on ground!" );
+            return;
+        }
 
         pOuter->SetNextLeapAttack( gpGlobals->curtime + 4.0f );
     }
