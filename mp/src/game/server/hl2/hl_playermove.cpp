@@ -66,8 +66,6 @@ void CHLPlayerMove::SetupMove( CBasePlayer *player, CUserCmd *ucmd, IMoveHelper 
 	// Call the default SetupMove code.
 	BaseClass::SetupMove( player, ucmd, pHelper, move );
 
-	CHLMoveData *pHLMove = static_cast<CHLMoveData*>( move );
-	Assert( pHLMove );
 
 	player->m_flForwardMove = ucmd->forwardmove;
 	player->m_flSideMove = ucmd->sidemove;
