@@ -16,6 +16,8 @@ ConVar zm_sv_immolator_burndist( "zm_sv_immolator_burndist", "250", FCVAR_NOTIFY
 
 ConVar zm_sv_immolator_burndmgdist( "zm_sv_immolator_burndmgdist", "132", FCVAR_NOTIFY, "The distance at which we will hurt others when burning." );
 ConVar zm_sv_immolator_burndmgtime( "zm_sv_immolator_burndmgtime", "8", FCVAR_NOTIFY, "The time those near me will burn for." );
+ConVar zm_sv_immolator_burndmgtime_prop( "zm_sv_immolator_burndmgtime_prop", "5", FCVAR_NOTIFY, "The time props will burn for. 0 = Disable" );
+ConVar zm_sv_immolator_burn_explosives( "zm_sv_immolator_burn_explosives", "1", FCVAR_NOTIFY, "Do we ignite explosives?" );
 ConVar zm_sv_immolator_burndmg( "zm_sv_immolator_burndmg", "1", FCVAR_NOTIFY );
 ConVar zm_sv_immolator_burnhealthcap( "zm_sv_immolator_burnhealthcap", "1", FCVAR_NOTIFY, "The health cap at which the immolator will ignite the player." );
 ConVar zm_sv_immolator_waterdmg( "zm_sv_immolator_waterdmg", "10", FCVAR_NOTIFY, "The damage we take every second from water." );
@@ -138,6 +140,7 @@ void CZMImmolator::BurnHurtOthers()
     const Vector mypos = WorldSpaceCenter();
 
     const float flBurnTime = zm_sv_immolator_burndmgtime.GetFloat();
+    const float flPropBurnTime = zm_sv_immolator_burndmgtime_prop.GetFloat();
     
     while ( (pEnt = gEntList.FindEntityInSphere( pEnt, mypos, zm_sv_immolator_burndmgdist.GetFloat() )) != nullptr )
     {
@@ -172,11 +175,58 @@ void CZMImmolator::BurnHurtOthers()
         }
         else
         {
+            //
             // Ignite props normally.
+            //
             auto* pBreak = dynamic_cast<CBreakableProp*>( pEnt );
-            if ( pBreak )
+            if ( flPropBurnTime > 0.0f && pBreak && pEnt->m_takedamage == DAMAGE_YES && pEnt->GetHealth() > 0 )
             {
-                pBreak->Ignite( flBurnTime, false );
+                auto* pPhys = pEnt->VPhysicsGetObject();
+                auto matIndex = pPhys ? pPhys->GetMaterialIndex() : -1;
+
+                DevMsg( "My index: %i | Surface prop name: %s\n",
+                    matIndex,
+                    matIndex >= 0 ? physprops->GetPropName( matIndex ) : "N/A" );
+
+                //
+                // We must be flammable.
+                //
+                bool bFlammable = pBreak->HasInteraction( PROPINTER_FIRE_FLAMMABLE );
+
+                // Check material index if they are flammable.
+                if ( !bFlammable )
+                {
+                    static const int flammableIndices[] =
+                    {
+                        physprops->GetSurfaceIndex( "wood" ),
+                        physprops->GetSurfaceIndex( "wood_crate" ),
+                    };
+
+                    for ( int i = 0; i < ARRAYSIZE( flammableIndices ); i++ )
+                    {
+                        if ( matIndex == flammableIndices[i] )
+                        {
+                            bFlammable = true;
+                            break;
+                        }
+                    }
+                }
+
+                // Check if they can explode.
+                bool bExplode = pBreak->GetExplosiveDamage() > 0
+                            ||  pBreak->GetExplosiveRadius() > 0
+                            ||  pBreak->HasInteraction( PROPINTER_PHYSGUN_BREAK_EXPLODE );
+
+
+                // Only ignite if we are flammable and
+                // if it's an explosive, we are allowed to ignite it.
+                bool bIgnite = bFlammable && (!bExplode || zm_sv_immolator_burn_explosives.GetBool());
+
+                if ( bIgnite )
+                {
+                    pBreak->CBaseAnimating::Ignite( flPropBurnTime, false );
+                }
+                
             }
         }
     }
