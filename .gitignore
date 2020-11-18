@@ -49,6 +49,7 @@ config.cfg
 *.lib
 Release_*/
 Debug_*/
+*.recipe
 
 # Tool (vbsp/vvis/vrad) compilation output
 *.dll
