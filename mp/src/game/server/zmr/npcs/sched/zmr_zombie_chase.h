@@ -20,6 +20,7 @@ private:
     CountdownTimer m_SwatScanTimer;
     CountdownTimer m_BlockerTimer;
     CountdownTimer m_EnemyScanTimer;
+    CountdownTimer m_StuckTimer;
 
     NPCR::CChaseNavPath m_Path;
     NPCR::CPathCostGroundOnly m_PathCost;
@@ -90,6 +91,7 @@ public:
 
         m_SwatScanTimer.Start( 3.0f );
         m_BlockerTimer.Start( 0.2f );
+        m_StuckTimer.Invalidate();
 
         pOuter->OnChase( pEnemy );
     }
@@ -170,7 +172,15 @@ public:
         if ( m_BlockerTimer.IsElapsed() && pOuter->GetBlockerFinder()->GetTimesBlocked() > 1 && pOuter->GetBlockerFinder()->GetBlocker() )
         {
             CBaseEntity* pBlocker = pOuter->GetBlockerFinder()->GetBlocker();
-            if ( pOuter->CanBreakObject( pBlocker, true ) )
+
+            // Only swat if we've been stuck for a while.
+            bool bSwat =    pOuter->CanSwatPhysicsObjects()
+                    &&      CZMBaseZombie::CanSwatObject( pBlocker )
+                    &&      m_StuckTimer.HasStarted()
+                    &&      !m_StuckTimer.IsElapsed();
+
+            bool bBreak = pOuter->CanBreakObject( pBlocker, true );
+            if ( bSwat || bBreak )
             {
                 pOuter->GetBlockerFinder()->ClearBlocker();
                 pOuter->GetBlockerFinder()->ClearTimesBlocked();
@@ -209,5 +219,10 @@ public:
     virtual void OnCommanded( ZombieCommandType_t com ) OVERRIDE
     {
         TryEnd( "We were commanded to do something else!" );
+    }
+
+    virtual void OnStuck() OVERRIDE
+    {
+        m_StuckTimer.Start( 1.0f );
     }
 };
