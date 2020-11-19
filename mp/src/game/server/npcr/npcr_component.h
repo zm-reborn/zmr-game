@@ -44,6 +44,7 @@ namespace NPCR
         virtual void OnMoveFailed( CBaseNavPath* pPath ) {}
         virtual void OnNavJump() {}
         virtual void OnForcedMove( CNavArea* pArea ) {} // Used for debugging.
+        virtual void OnStuck() {} // We've been stuck for a while.
         // Zombie events
         virtual void OnCommanded( ZombieCommandType_t com ) {}
         virtual void OnQueuedCommand( CBasePlayer* pPlayer, ZombieCommandType_t com ) {}
@@ -184,6 +185,7 @@ namespace NPCR
         COMP_DISPATCH_1ARG( OnCommanded, ZombieCommandType_t, com )
         COMP_DISPATCH_2ARG( OnQueuedCommand, CBasePlayer*, pPlayer, ZombieCommandType_t, com )
         COMP_DISPATCH( OnAttacked )
+        COMP_DISPATCH( OnStuck )
 
         // Queries
         COMP_DISPATCH_Q( IsBusy )

@@ -596,6 +596,7 @@ int NPCR::CFollowNavPath::CheckStuck( CBaseNPC* pNPC, Vector& vecGoalPos )
         if ( timeStuck > 0.4f )
         {
             // We've been stuck for a while.
+            pNPC->OnStuck();
 
 
             if ( npcr_debug_path_stuck.GetBool() )
