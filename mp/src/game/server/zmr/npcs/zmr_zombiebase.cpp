@@ -49,6 +49,7 @@ public:
         m_pAttacker = pMe;
         m_pDmgInfo = &info;
         m_vecCenter = m_pAttacker->WorldSpaceCenter();
+        m_vecAttackPos = m_pAttacker->GetAttackPos();
     }
 
     bool DidHit() const { return m_vHitEnts.Count() > 0; }
@@ -67,13 +68,38 @@ public:
             return false;
         if ( !g_pGameRules->ShouldCollide( COLLISION_GROUP_PROJECTILE, pEnt->GetCollisionGroup() ) )
             return false;
+
+
+        //
+        // Trace to see if we can see this entity.
+        //
+        auto CantSee = [ pEnt ]( const trace_t& tr )
+        {
+            return tr.fraction != 1.0f && tr.m_pEnt != pEnt;
+        };
         
         trace_t tr;
-        UTIL_TraceLine( m_pAttacker->GetAttackPos(), pEnt->WorldSpaceCenter(), MASK_NPCSOLID, &m_Filter, &tr );
-        if ( tr.fraction != 1.0f && tr.m_pEnt != pEnt )
+        UTIL_TraceLine( m_vecAttackPos, pEnt->WorldSpaceCenter(), MASK_NPCSOLID, &m_Filter, &tr );
+        if ( CantSee( tr ) )
         {
-            return false;
+            // We didn't hit, check their eye position as well
+            // Fixes some edge cases where the body is hidden even though
+            // the eyes are clearly visible.
+            if ( pEnt->MyCombatCharacterPointer() != nullptr )
+            {
+                UTIL_TraceLine( m_vecAttackPos, pEnt->EyePosition(), MASK_NPCSOLID, &m_Filter, &tr );
+                if ( CantSee( tr ) )
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
         }
+
+
 
         bool bDamage = false;
 
@@ -112,6 +138,7 @@ private:
     int                         m_fMask;
     const CTakeDamageInfo*      m_pDmgInfo;
     Vector                      m_vecCenter;
+    Vector                      m_vecAttackPos;
     CZMLOSFilter                m_Filter;
 
     CUtlVector<CBaseEntity*>    m_vHitEnts;
