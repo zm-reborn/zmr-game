@@ -192,10 +192,10 @@ bool CZMBanshee::IsAttacking() const
     return BaseClass::IsAttacking();
 }
 
-void CZMBanshee::StartCeilingAmbush()
+void CZMBanshee::StartCeilingAmbush( CZMPlayer* pCommander )
 {
-    GetCommandQueue()->QueueCommand( new CZMCommandCeilingAmbush );
-    OnQueuedCommand( nullptr, COMMAND_CEILINGAMBUSH );
+    GetCommandQueue()->QueueCommand( new CZMCommandCeilingAmbush( pCommander ) );
+    OnQueuedCommand( pCommander, COMMAND_CEILINGAMBUSH );
 }
 
 bool CZMBanshee::LeapAttack( const QAngle& angPunch, const Vector& vecPunchVel, float flDamage )

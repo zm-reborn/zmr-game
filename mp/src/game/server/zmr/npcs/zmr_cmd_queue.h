@@ -18,8 +18,11 @@ enum ZombieCommandType_t : unsigned char
 abstract_class CZMCommandBase
 {
 public:
+    CZMCommandBase( CZMPlayer* pCommander ) { m_hCommander.Set( pCommander ); }
+
     virtual ZombieCommandType_t     GetCommandType() const { return COMMAND_NONE; }
 
+    CZMPlayer*                      GetCommander() const { return m_hCommander.Get(); }
 
     //virtual bool                    IsSameCommand( CZMCommandBase* pCom ) { return GetCommandType() == pCom->GetCommandType(); }
 
@@ -31,12 +34,18 @@ public:
 
     virtual const Vector&           GetVectorTarget() const { return vec3_origin; }
     virtual void                    SetVectorTarget( const Vector& vecPos ) {}
+
+private:
+    CHandle<CZMPlayer> m_hCommander;
 };
 
 class CZMCommandMove : public CZMCommandBase
 {
 public:
-    CZMCommandMove( const Vector& vecPos ) { m_vecTarget = vecPos; }
+    CZMCommandMove( CZMPlayer* pCommander, const Vector& vecPos ) : CZMCommandBase( pCommander )
+    {
+        m_vecTarget = vecPos;
+    }
 
     virtual ZombieCommandType_t     GetCommandType() const OVERRIDE { return COMMAND_MOVE; }
 
@@ -50,7 +59,7 @@ private:
 class CZMCommandSwat : public CZMCommandBase
 {
 public:
-    CZMCommandSwat( CBaseEntity* pEnt, bool bBreak = false )
+    CZMCommandSwat( CZMPlayer* pCommander, CBaseEntity* pEnt, bool bBreak = false ) : CZMCommandBase( pCommander )
     {
         Assert( pEnt );
         m_hSwatObject.Set( pEnt );
@@ -87,6 +96,9 @@ private:
 class CZMCommandCeilingAmbush : public CZMCommandBase
 {
 public:
+    CZMCommandCeilingAmbush( CZMPlayer* pCommander ) : CZMCommandBase( pCommander ) {}
+
+
     virtual ZombieCommandType_t     GetCommandType() const OVERRIDE { return COMMAND_CEILINGAMBUSH; }
 
     virtual float                   GetExpireTime() const OVERRIDE { return 3.0f; }

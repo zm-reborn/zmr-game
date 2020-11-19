@@ -62,7 +62,7 @@ public:
     virtual bool IsAttacking() const OVERRIDE;
 
 
-    void StartCeilingAmbush();
+    void StartCeilingAmbush( CZMPlayer* pCommander );
     bool LeapAttack( const QAngle& angPunch, const Vector& vecPunchVel, float flDamage );
 
 

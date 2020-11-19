@@ -991,7 +991,7 @@ bool CZMBaseZombie::Swat( CZMPlayer* pZM, CBaseEntity* pSwat, bool bBreak )
     //m_bSwatBreakable = bBreak;
 
 
-    m_CmdQueue.QueueCommand( new CZMCommandSwat( pSwat, bBreak ) );
+    m_CmdQueue.QueueCommand( new CZMCommandSwat( pZM, pSwat, bBreak ) );
     OnQueuedCommand( pZM, COMMAND_SWAT );
 
     return true;
@@ -1119,7 +1119,7 @@ void CZMBaseZombie::Command( CZMPlayer* pZM, const Vector& vecPos, float flToler
     m_flMoveWaitFinished = gpGlobals->curtime;*/
 
 
-    m_CmdQueue.QueueCommand( new CZMCommandMove( vecPos ) );
+    m_CmdQueue.QueueCommand( new CZMCommandMove( pZM, vecPos ) );
     OnQueuedCommand( pZM, COMMAND_MOVE );
 }
 

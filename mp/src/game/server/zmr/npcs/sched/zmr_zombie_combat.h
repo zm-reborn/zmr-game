@@ -208,7 +208,7 @@ public:
         }
     }
 
-    virtual void OnCommanded( ZombieCommandType_t com ) OVERRIDE
+    virtual void OnCommanded( CBasePlayer* pCommander, ZombieCommandType_t com ) OVERRIDE
     {
         OnContinue();
 

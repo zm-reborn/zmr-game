@@ -112,7 +112,7 @@ public:
                 // Command the zombie back to start.
                 if ( pEnemy && !ShouldDefendFrom( pEnemy ) )
                 {
-                    Command( defpos );
+                    Command( nullptr, defpos );
                     return;
                 }
             }
@@ -133,10 +133,10 @@ public:
                 switch ( pQueued->GetCommandType() )
                 {
                 case COMMAND_MOVE :
-                    Command( pQueued->GetVectorTarget() );
+                    Command( pQueued->GetCommander(), pQueued->GetVectorTarget() );
                     break;
                 case COMMAND_SWAT :
-                    CommandSwat( pQueued->GetObjectTarget(), static_cast<CZMCommandSwat*>( pQueued )->BreakObject() );
+                    CommandSwat( pQueued->GetCommander(), pQueued->GetObjectTarget(), static_cast<CZMCommandSwat*>( pQueued )->BreakObject() );
                     break;
                 default :
                     bRes = false;
@@ -149,7 +149,7 @@ public:
         }
     }
 
-    virtual void OnCommanded( ZombieCommandType_t type )
+    virtual void OnCommanded( CBasePlayer* pCommander, ZombieCommandType_t type ) OVERRIDE
     {
         // Lose enemy when we're commanded so we don't keep going for them forever.
         GetOuter()->LostEnemy();
@@ -189,7 +189,7 @@ public:
     //
     // Commanded to move somewhere.
     //
-    bool Command( const Vector& vecPos )
+    bool Command( CZMPlayer* pCommander, const Vector& vecPos )
     {
         UpdateGoal( vecPos );
 
@@ -236,7 +236,7 @@ public:
         if ( m_pPath->IsValid() )
             pOuter->SetCurrentPath( m_pPath );
 
-        pOuter->OnCommanded( COMMAND_MOVE );
+        pOuter->OnCommanded( pCommander, COMMAND_MOVE );
 
         return true;
     }
@@ -244,7 +244,7 @@ public:
     //
     // Commanded to swat some object.
     //
-    bool CommandSwat( CBaseEntity* pEnt, bool bBreak = true )
+    bool CommandSwat( CZMPlayer* pCommander, CBaseEntity* pEnt, bool bBreak = true )
     {
         if ( !pEnt )
             return false;
@@ -257,7 +257,7 @@ public:
 
 
 
-        pOuter->OnCommanded( COMMAND_SWAT );
+        pOuter->OnCommanded( pCommander, COMMAND_SWAT );
 
 
         m_pGotoSwatSched->SetBreakObject( bBreak );

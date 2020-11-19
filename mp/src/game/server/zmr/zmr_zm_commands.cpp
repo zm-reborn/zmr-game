@@ -672,7 +672,7 @@ void ZM_Cmd_SetBansheeCeil( const CCommand &args )
 
     bool bSet = false;
 
-    g_ZombieManager.ForEachSelectedZombie( pPlayer, [ &bSet ]( CZMBaseZombie* pZombie )
+    g_ZombieManager.ForEachSelectedZombie( pPlayer, [ pPlayer, &bSet ]( CZMBaseZombie* pZombie )
     {
         if ( pZombie->GetZombieClass() != ZMCLASS_BANSHEE )
             return;
@@ -680,7 +680,7 @@ void ZM_Cmd_SetBansheeCeil( const CCommand &args )
 
         bSet = true;
 
-        static_cast<CZMBanshee*>( pZombie )->StartCeilingAmbush();
+        static_cast<CZMBanshee*>( pZombie )->StartCeilingAmbush( pPlayer );
     } );
 
     ZMUtil::PrintNotify( pPlayer, ZMCHATNOTIFY_ZM, bSet ? "#ZMBansheeCeilSet" : "#ZMBansheeCeilNoSel" );
