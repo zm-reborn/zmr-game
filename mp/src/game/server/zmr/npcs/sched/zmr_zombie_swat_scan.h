@@ -108,16 +108,6 @@ public:
     CBaseEntity* FindNearestSwatObject( const Vector& vecDirToGoal, const Vector& vecTarget, float flFurthestDist )
     {
         CBaseEntity* pList[ZOMBIE_PHYSICS_SEARCH_DEPTH];
-        CBaseEntity* pNearest = nullptr;
-        float flNearestDist = 1000.0f;
-        float flDist;
-        IPhysicsObject* pPhysObj;
-        int i;
-        trace_t tr;
-
-        const unsigned int tracemask = MASK_SOLID & ~(CONTENTS_MONSTER);
-        CTraceFilterWorldOnly filter;
-
 
         CZMBaseZombie* pOuter = GetOuter();
         const Vector vecMyPos = pOuter->GetAbsOrigin();
@@ -126,7 +116,7 @@ public:
 
 
         // Find objects within a box between us and the enemy
-        Vector vecDelta( flFurthestDist / 2.0f, flFurthestDist / 2.0f, pOuter->GetMotor()->GetHullHeight() / 2.0f );
+        Vector vecDelta( flFurthestDist * 0.5f, flFurthestDist * 0.5f, pOuter->GetMotor()->GetHullHeight() * 0.5f );
 
         Vector vecBoxOrigin = vecMyPos + vecDirToGoal * vecDelta;
         vecBoxOrigin.z += vecDelta.z;
@@ -153,6 +143,13 @@ public:
                 if ( !CZMBaseZombie::CanSwatObject( pEnt ) )
                     return ITERATION_CONTINUE;
 
+                // Don't swat server ragdolls!
+                if ( FClassnameIs( pEnt, "physics_prop_ragdoll" ) )
+                    return ITERATION_CONTINUE;
+            
+                if ( FClassnameIs( pEnt, "prop_ragdoll" ) )
+                    return ITERATION_CONTINUE;
+
 
                 return CFlaggedEntitiesEnum::EnumElement( pHandleEntity );
             }
@@ -167,37 +164,63 @@ public:
         // We can only reach this low to break the object.
         Vector vecLowest = vecMyPos + Vector( 0.0f, 0.0f, pOuter->GetAttackLowest() );
 
-        for ( i = 0; i < count; i++ )
+        const unsigned int tracemask = MASK_SOLID & ~(CONTENTS_MONSTER);
+        CTraceFilterWorldOnly filter;
+        CBaseEntity* pNearest = nullptr;
+        float flNearestDist = FLT_MAX;
+        trace_t tr;
+        Vector dir, center, closestPoint;
+        float flDist;
+
+        for ( int i = 0; i < count; i++ )
         {
-            pPhysObj = pList[ i ]->VPhysicsGetObject();
+            center = pList[ i ]->WorldSpaceCenter();
 
-            Assert( pPhysObj );
-
-
-            Vector center = pList[ i ]->WorldSpaceCenter();
-            Vector dir = center - vecMyPos;
+            // Check if the prop is COMPLETELY opposite.
+            // There are cases where the prop is large enough
+            // To have the center be a bit behind us.
+            dir = center - vecMyPos;
             dir.z = 0.0f;
-            flDist = dir.NormalizeInPlace();
+            dir.NormalizeInPlace();
 
-            if ( flDist >= flNearestDist )
-                continue;
-        
-
-            // This object is closer... but is it between the player and the zombie?
-            if ( DotProduct( vecDirToGoal, dir ) < 0.9f )
+            if ( vecDirToGoal.Dot( dir ) < -0.6f )
                 continue;
 
-            //if ( flDist >= UTIL_DistApprox2D( center, vecTarget ) )
-            //    continue;
 
-            // don't swat things where the highest point is under my knees
+            // Don't swat things where the highest point is under my knees
             // NOTE: This is a rough test; a more exact test is going to occur below
             if ( (center.z + pList[i]->BoundingRadius()) < vecLowest.z )
                 continue;
-
-            // don't swat things that are over my head.
+            
+            // Don't swat things that are over my head.
             if ( center.z > pOuter->EyePosition().z )
                 continue;
+
+
+            auto* pCollide = modelinfo->GetVCollide( pList[i]->GetModelIndex() );
+        
+            Vector objMins, objMaxs;
+            physcollision->CollideGetAABB( &objMins, &objMaxs, pCollide->solids[0], pList[i]->GetAbsOrigin(), pList[i]->GetAbsAngles() );
+
+            // Highest point too low.
+            if ( objMaxs.z < vecLowest.z )
+                continue;
+
+
+            // Check the closest point direction.
+            // This ensures we get the closest possible prop to swat.
+            CalcClosestPointOnAABB( objMins, objMaxs, vecMyPos, closestPoint );
+            dir = closestPoint - vecMyPos;
+            dir.z = 0.0f;
+            flDist = dir.NormalizeInPlace();
+
+            // It's possible to be inside the bounding box.
+            if ( flDist > 0.0f )
+            {
+                // Must be head-on
+                if ( vecDirToGoal.Dot( dir ) < 0.9f )
+                    continue;
+            }
 
 
             // We must see the prop.
@@ -214,25 +237,7 @@ public:
             }
 
 
-            vcollide_t *pCollide = modelinfo->GetVCollide( pList[i]->GetModelIndex() );
-        
-            Vector objMins, objMaxs;
-            physcollision->CollideGetAABB( &objMins, &objMaxs, pCollide->solids[0], pList[i]->GetAbsOrigin(), pList[i]->GetAbsAngles() );
-
-            if ( objMaxs.z < vecLowest.z )
-                continue;
-
-
-            // Make this the last check, since it makes a string.
-            // Don't swat server ragdolls!
-            if ( FClassnameIs( pList[ i ], "physics_prop_ragdoll" ) )
-                continue;
-            
-            if ( FClassnameIs( pList[ i ], "prop_ragdoll" ) )
-                continue;
-
-            // The object must also be closer to the zombie than it is to the enemy
-            pNearest = pList[ i ];
+            pNearest = pList[i];
             flNearestDist = flDist;
         }
 
