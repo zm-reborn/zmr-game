@@ -34,6 +34,8 @@ namespace NPCR
         virtual void OnAnimActivityFinished( Activity completedActivity ) {}
         virtual void OnSightGained( CBaseEntity* pEnt ) {}
         virtual void OnSightLost( CBaseEntity* pEnt ) {}
+        virtual void OnAcquiredEnemy( CBaseEntity* pEnt ) {} // A new enemy acquired!
+        virtual void OnLostEnemy( CBaseEntity* pEnt ) {} // We no longer know about this enemy.
         virtual void OnDamaged( const CTakeDamageInfo& info ) {}
         virtual void OnHeardSound( CSound* pSound ) {}
         virtual void OnChase( CBaseEntity* pEnt ) {} // When enemy is being chased.
@@ -174,6 +176,8 @@ namespace NPCR
         COMP_DISPATCH_1ARG( OnAnimActivityFinished, Activity, completedActivity )
         COMP_DISPATCH_1ARG( OnSightGained, CBaseEntity*, pEnt )
         COMP_DISPATCH_1ARG( OnSightLost, CBaseEntity*, pEnt )
+        COMP_DISPATCH_1ARG( OnAcquiredEnemy, CBaseEntity*, pEnt )
+        COMP_DISPATCH_1ARG( OnLostEnemy, CBaseEntity*, pEnt )
         COMP_DISPATCH_1ARG( OnDamaged, const CTakeDamageInfo&, info )
         COMP_DISPATCH_1ARG( OnHeardSound, CSound*, pSound )
         COMP_DISPATCH_1ARG( OnChase, CBaseEntity*, pEnt )
