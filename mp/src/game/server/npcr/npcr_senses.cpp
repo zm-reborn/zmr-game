@@ -6,7 +6,8 @@
 
 
 
-#define VISION_LASTSEEN_GRACE   0.5f
+#define VISION_LASTSEEN_GRACE   0.2f
+#define KNOWN_FORGET_TIME       6.0f
 
 
 class CVisionFilter : public CTraceFilterSimple
@@ -45,7 +46,7 @@ NPCR::CBaseSenses::CBaseSenses( NPCR::CBaseNPC* pNPC ) : NPCR::CEventListener( p
 
 NPCR::CBaseSenses::~CBaseSenses()
 {
-    m_vVisionEnts.PurgeAndDeleteElements();
+    m_vKnownEnts.PurgeAndDeleteElements();
 }
 
 void NPCR::CBaseSenses::Update()
@@ -131,47 +132,53 @@ void NPCR::CBaseSenses::UpdateVision()
     m_flFovCos = cosf( DEG2RAD( GetFieldOfView() / 2.0f ) );
 
 
-    for ( int i = m_vVisionEnts.Count() - 1; i >= 0; i-- )
+    //
+    // Update all the known entities.
+    //
+    for ( int i = m_vKnownEnts.Count() - 1; i >= 0; i-- )
     {
-        VisionEntity* pVision = m_vVisionEnts[i];
-        CBaseEntity* pLost = pVision->GetEntity();
+        auto* pKnown = m_vKnownEnts[i];
+        CBaseEntity* pLost = pKnown->GetEntity();
 
-        if ( !IsValidVisionEntity( pLost ) || !CanSee( pVision ) )
+        bool bValid = IsValidKnownEntity( pLost );
+
+        // Update vision
+        if ( bValid )
         {
-            if ( pLost )
-                GetNPC()->OnSightLost( pLost );
+            UpdateVisionForKnown( pKnown );
+        }
 
-            m_vVisionEnts.Remove( i );
-            delete pVision;
+        // Remove forgettable entities.
+        if ( !bValid || ShouldForgetEntity( pKnown ) )
+        {
+            if ( bValid )
+                GetNPC()->OnLostEnemy( pLost );
+
+            m_vKnownEnts.Remove( i );
+            delete pKnown;
         }
     }
     
+    //
+    // Find new entities.
+    //
     CUtlVector<CBaseEntity*> vListEnts;
     FindNewEntities( vListEnts );
 
     FOR_EACH_VEC( vListEnts, i )
     {
-        if ( !CanSee( vListEnts[i]->WorldSpaceCenter() ) )
+        // We already know about this entity.
+        if ( GetKnownOf( vListEnts[i] ) )
             continue;
 
-        bool bSeen = false;
 
-        FOR_EACH_VEC( m_vVisionEnts, j )
-        {
-            if ( vListEnts[i] == m_vVisionEnts[j]->GetEntity() )
-            {
-                //m_vVisionEnts[j]->UpdateLastSeen();
-                bSeen = true;
-                break;
-            }
-        }
+        if ( !CanSeeCharacter( vListEnts[i] ) )
+            continue;
 
-        if ( !bSeen )
-        {
-            m_vVisionEnts.AddToTail( new VisionEntity( vListEnts[i] ) );
 
-            GetNPC()->OnSightGained( vListEnts[i] );
-        }
+        m_vKnownEnts.AddToTail( new KnownEntity( vListEnts[i], true ) );
+
+        GetNPC()->OnAcquiredEnemy( vListEnts[i] );
     }
 
     m_NextVisionTimer.Start( 0.1f );
@@ -189,47 +196,74 @@ void NPCR::CBaseSenses::FindNewEntities( CUtlVector<CBaseEntity*>& vListEnts )
     }
 }
 
-NPCR::VisionEntity* NPCR::CBaseSenses::GetEntityOf( CBaseEntity* pEnt ) const
+const NPCR::KnownEntity* NPCR::CBaseSenses::GetKnownOf( CBaseEntity* pEnt ) const
 {
-    FOR_EACH_VEC( m_vVisionEnts, i )
+    return FindKnownOf( pEnt );
+}
+
+NPCR::KnownEntity* NPCR::CBaseSenses::FindKnownOf( CBaseEntity* pEnt ) const
+{
+    if ( !pEnt ) return nullptr;
+
+
+    FOR_EACH_VEC( m_vKnownEnts, i )
     {
-        if ( m_vVisionEnts[i]->GetEntity() == pEnt )
-            return m_vVisionEnts[i];
+        if ( m_vKnownEnts[i]->GetEntity() == pEnt )
+            return m_vKnownEnts[i];
     }
 
     return nullptr;
 }
 
+bool NPCR::CBaseSenses::ShouldForgetEntity( const KnownEntity* pKnown ) const
+{
+    return gpGlobals->curtime - pKnown->LastKnownTime() > KNOWN_FORGET_TIME;
+}
+
+void NPCR::CBaseSenses::UpdateVisionForKnown( KnownEntity* pKnown )
+{
+    auto* pEnt = pKnown->GetEntity();
+    if ( !pEnt )
+        return;
+
+    if ( (gpGlobals->curtime - pKnown->LastSeenTime()) < VISION_LASTSEEN_GRACE )
+        return;
+
+
+    bool bDidSee = pKnown->CanSee();
+    bool bCanSee = CanSeeCharacter( pEnt );
+
+
+    if ( bCanSee )
+    {
+        if ( !bDidSee )
+            GetNPC()->OnSightGained( pEnt );
+
+        pKnown->UpdateLastSeen();
+    }
+    else
+    {
+        if ( bDidSee )
+            GetNPC()->OnSightLost( pEnt );
+
+        pKnown->SetCantSee();
+    }
+}
+
 bool NPCR::CBaseSenses::CanSee( CBaseEntity* pEnt ) const
 {
-    FOR_EACH_VEC( m_vVisionEnts, i )
+    FOR_EACH_VEC( m_vKnownEnts, i )
     {
-        if ( m_vVisionEnts[i]->GetEntity() == pEnt )
-            return CanSee( m_vVisionEnts[i] );
+        if ( m_vKnownEnts[i]->GetEntity() == pEnt )
+            return CanSee( m_vKnownEnts[i] );
     }
 
     return false;
 }
 
-bool NPCR::CBaseSenses::CanSee( VisionEntity* pVision ) const
+bool NPCR::CBaseSenses::CanSee( KnownEntity* pKnown ) const
 {
-    CBaseEntity* pEnt = pVision->GetEntity();
-    if ( !pEnt )
-        return false;
-    if ( (gpGlobals->curtime - pVision->LastSeen()) < VISION_LASTSEEN_GRACE )
-        return true;
-
-
-    //GetNPC();
-    //UTIL_TraceLine(  )
-
-    if ( CanSee( pEnt->WorldSpaceCenter() ) )
-    {
-        pVision->UpdateLastSeen();
-        return true;
-    }
-
-    return false;
+    return pKnown->CanSee();
 }
 
 bool NPCR::CBaseSenses::CanSee( const Vector& vecPos ) const
@@ -275,10 +309,10 @@ CBaseEntity* NPCR::CBaseSenses::GetClosestEntity() const
     const Vector vecMyPos = GetOuter()->WorldSpaceCenter();
     CBaseEntity* pClosest = nullptr;
 
-    int len = m_vVisionEnts.Count();
+    int len = m_vKnownEnts.Count();
     for ( int i = 0; i < len; i++ )
     {
-        CBaseEntity* pEnt = m_vVisionEnts[i]->GetEntity();
+        CBaseEntity* pEnt = m_vKnownEnts[i]->GetEntity();
         if ( !pEnt ) continue;
 
 
@@ -293,7 +327,38 @@ CBaseEntity* NPCR::CBaseSenses::GetClosestEntity() const
     return pClosest;
 }
 
-bool NPCR::CBaseSenses::IsValidVisionEntity( CBaseEntity* pEnt ) const
+bool NPCR::CBaseSenses::IsValidKnownEntity( CBaseEntity* pEnt ) const
 {
     return pEnt && GetNPC()->IsEnemy( pEnt );
+}
+
+bool NPCR::CBaseSenses::CanSeeCharacter( CBaseEntity* pEnt ) const
+{
+    // Check plausible spots
+    Vector checkSpots[] =
+    {
+        pEnt->WorldSpaceCenter(),
+        pEnt->EyePosition()
+    };
+
+    for ( auto& pos : checkSpots )
+    {
+        if ( CanSee( pos ) )
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void NPCR::CBaseSenses::OnHeardSound( CSound* pSound )
+{
+    auto* pSrc = pSound->m_hOwner.Get();
+
+    auto* pKnown = FindKnownOf( pSrc );
+    if ( pKnown )
+    {
+        pKnown->UpdateLastKnown();
+    }
 }

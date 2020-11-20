@@ -238,7 +238,8 @@ void CNPCRNonPlayer::PostUpdate()
         //
         if ( m_flNextLOSOutputs <= gpGlobals->curtime )
         {
-            const bool bCanSee = GetSenses()->GetEntityOf( pCurEnemy ) != nullptr;
+            auto* pKnown = GetSenses()->GetKnownOf( pCurEnemy );
+            const bool bCanSee = pKnown ? pKnown->CanSee() : false;
             
             // Player varients are kept for backwards compatibility. (damn you, zm_kink)
             if ( !bCanSee && m_bDidSeeEnemyLastTime )

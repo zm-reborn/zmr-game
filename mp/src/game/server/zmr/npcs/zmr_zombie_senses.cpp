@@ -27,19 +27,18 @@ void CZMZombieSenses::OnDamaged( const CTakeDamageInfo& info )
 
     if ( pAttacker && GetNPC()->IsEnemy( pAttacker ) )
     {
-        auto* pVision = GetEntityOf( pAttacker );
+        auto* pKnown = FindKnownOf( pAttacker );
 
-        if ( !pVision )
+        if ( !pKnown )
         {
-            pVision = new NPCR::VisionEntity( pAttacker );
+            pKnown = new NPCR::KnownEntity( pAttacker, false );
             
 
-            m_vVisionEnts.AddToTail( pVision );
+            m_vKnownEnts.AddToTail( pKnown );
             
-            GetNPC()->OnSightGained( pAttacker );
+            GetNPC()->OnAcquiredEnemy( pAttacker );
         }
 
-        // Give them some time to think about it.
-        pVision->SetLastSeen( gpGlobals->curtime + 3.0f );
+        pKnown->UpdateLastKnown();
     }
 }
