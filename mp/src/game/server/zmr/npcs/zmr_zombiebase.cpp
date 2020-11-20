@@ -285,6 +285,8 @@ CZMBaseZombie::CZMBaseZombie()
 
 
     g_ZombieManager.AddZombie( this );
+
+    m_MyCommandStyle = ZCOMMANDSTYLE_DEFAULT;
 }
 
 CZMBaseZombie::~CZMBaseZombie()
@@ -994,6 +996,8 @@ bool CZMBaseZombie::Swat( CZMPlayer* pZM, CBaseEntity* pSwat, bool bBreak )
     m_CmdQueue.QueueCommand( new CZMCommandSwat( pZM, pSwat, bBreak ) );
     OnQueuedCommand( pZM, COMMAND_SWAT );
 
+    SetMyCommandStyle( pZM );
+
     return true;
 }
 
@@ -1070,57 +1074,21 @@ bool CZMBaseZombie::SwatObject( CBaseEntity* pSwat )
 
 void CZMBaseZombie::Command( CZMPlayer* pZM, const Vector& vecPos, float flTolerance )
 {
-    /*m_vecLastPosition = vecPos;
-
-    //AI_NavGoal_t goal;
-    //goal.dest = pos;
-    
-    //GetMotor()->SetGoal( goal );
-    //SetCommandGoal( pos );
-
-    //GetMotor()->SetGoalTolerance( 128.0f );
-
-    // This allows rally points to work without having to fuck around with the base class.
-    if ( GetState() <= NPC_STATE_NONE )
-    {
-        SetState( NPC_STATE_ALERT );
-    }
-    
-
-    if ( bPlayerCommanded )
-    {
-        SetCondition( COND_RECEIVED_ORDERS );
-        SetSchedule( SCHED_ZM_FORCED_GO );
-    }
-    else
-    {
-        ClearCondition( COND_RECEIVED_ORDERS );
-        SetSchedule( SCHED_ZM_GO );
-    }
-
-
-    // HACK: Force us to instantly start the tasks next frame.
-    if ( (gpGlobals->curtime - m_flLastCommand) > 0.5f )
-    {
-        // Keep last efficiency.
-        AI_Efficiency_t eff = GetEfficiency();
-        ForceDecisionThink();
-        SetEfficiency( eff );
-
-        SetNextThink( gpGlobals->curtime );
-    }
-
-    m_flLastCommand = gpGlobals->curtime;
-    m_vecLastCommandPos = pos;
-    m_bCommanded = true;
-    m_flAddGoalTolerance = tolerance;
-
-    // Don't wait, move instantly.
-    m_flMoveWaitFinished = gpGlobals->curtime;*/
-
+    SetMyCommandStyle( pZM );
 
     m_CmdQueue.QueueCommand( new CZMCommandMove( pZM, vecPos ) );
     OnQueuedCommand( pZM, COMMAND_MOVE );
+}
+
+//
+// Let our commander dictate certain behaviors.
+//
+void CZMBaseZombie::SetMyCommandStyle( const CZMPlayer* pZM )
+{
+    if ( pZM )
+    {
+        m_MyCommandStyle = pZM->GetZMCommandStyle();
+    }
 }
 
 bool CZMBaseZombie::CanSpawn( const Vector& vecPos ) const

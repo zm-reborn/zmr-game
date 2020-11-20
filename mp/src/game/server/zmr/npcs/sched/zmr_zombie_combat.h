@@ -115,19 +115,18 @@ public:
         // Check for any enemies we might see.
         if ( !m_NextEnemyScan.HasStarted() || m_NextEnemyScan.IsElapsed() )
         {
-            CBaseEntity* pClosest = pOuter->GetSenses()->GetClosestEntity();
-            CBaseEntity* pOldEnemy = pOuter->GetEnemy();
-
             // Make sure our current enemy is valid.
+            CBaseEntity* pOldEnemy = pOuter->GetEnemy();
             if ( pOldEnemy && !pOuter->IsEnemy( pOldEnemy ) )
             {
                 pOuter->LostEnemy();
                 pOldEnemy = nullptr;
             }
 
-            CBaseEntity* pEnemy = pClosest && pOuter->IsEnemy( pClosest ) ? pClosest : pOldEnemy;
+            // Find an enemy to attack!
+            CBaseEntity* pEnemy = EvaluateEnemies();
 
-            if ( pEnemy && pOuter->ShouldChase( pEnemy ) != NPCR::RES_NO )
+            if ( pEnemy )
             {
                 pOuter->AcquireEnemy( pEnemy );
 
@@ -160,8 +159,16 @@ public:
         }
     }
 
+    virtual void OnAcquiredEnemy( CBaseEntity* pEnt ) OVERRIDE
+    {
+        OnSightGained( pEnt );
+    }
+
     virtual void OnSightGained( CBaseEntity* pEnt ) OVERRIDE
     {
+        //
+        // Don't sleep any longer if we see a new enemy!
+        //
         if ( GetOuter()->IsEnemy( pEnt ) )
         {
             m_NextEnemyScan.Invalidate();
@@ -171,6 +178,7 @@ public:
 
     virtual void OnDamaged( const CTakeDamageInfo& info ) OVERRIDE
     {
+        // Face towards our attacker.
         CBaseEntity* pAttacker = info.GetAttacker();
         if ( pAttacker && GetOuter()->IsEnemy( pAttacker ) )
         {
@@ -233,6 +241,9 @@ public:
         return !m_NextThreat.HasStarted() || m_NextThreat.IsElapsed();
     }
 
+    //
+    // There's something interesting near-by, go investigate.
+    //
     bool GotoThreatPosition( const Vector& vecEnd )
     {
         if ( !m_NextMove.IsElapsed() )
@@ -317,5 +328,106 @@ public:
 
 
         return true;
+    }
+
+    //
+    // Find an enemy to attack!
+    //
+    CBaseEntity* EvaluateEnemies()
+    {
+        auto* pOuter = GetOuter();
+
+        //
+        // Iterate through our enemies.
+        // Pick the closest one we can find.
+        // And also the newest acquired one in case
+        // of the ZM command style.
+        //
+        CBaseEntity* pClosest = nullptr;
+        float flClosestDistSqr = FLT_MAX;
+
+        CBaseEntity* pNewestAcquiredEnemy = nullptr;
+        float flAcquiredDistSqr = FLT_MAX;
+        float flAcquiredTime = 0.0f;
+
+        const Vector vecMyPos = pOuter->GetAbsOrigin();
+
+        const bool bMoving = pOuter->GetMotor()->IsMoving();
+
+        pOuter->GetSenses()->IterateKnown( [ & ]( const NPCR::KnownEntity* pKnown )
+        {
+            auto* pEnt = pKnown->GetEntity();
+            if ( !pEnt ) return false;
+
+            if ( !pOuter->IsEnemy( pEnt ) || pOuter->ShouldChase( pEnt ) == NPCR::RES_NO )
+            {
+                return false;
+            }
+
+
+            float distSqr = pEnt->GetAbsOrigin().DistToSqr( vecMyPos );
+
+            // Pick closest.
+            // The closest one must be seen
+            // or we're not moving at all and we heard them recently.
+            // or they are within attack range.
+            float flLastKnew = gpGlobals->curtime - pKnown->LastKnownTime();
+            if ( pKnown->CanSee() || (!bMoving && flLastKnew < 0.5f) || pOuter->HasConditionsForClawAttack( pEnt ) )
+            {
+                if ( !pClosest || distSqr < flClosestDistSqr )
+                {
+                    pClosest = pEnt;
+                    flClosestDistSqr = distSqr;
+                }
+            }
+
+
+            // Pick newest acquired.
+            if ( pKnown->AcquiredTime() > flAcquiredTime )
+            {
+                if ( !pNewestAcquiredEnemy || distSqr < flAcquiredDistSqr )
+                {
+                    pNewestAcquiredEnemy = pEnt;
+                    flAcquiredDistSqr = distSqr;
+                    flAcquiredTime = pKnown->AcquiredTime();
+                }
+            }
+
+
+
+            return false;
+        } );
+
+
+        // The zombie may only have a free will if:
+        // it's allowed to have one or 
+        // it's not moving or it can attack somebody!
+        bool bHasFreeWill = pOuter->GetMyCommandStyle() != ZCOMMANDSTYLE_OLD
+                        ||  !bMoving
+                        ||  (pClosest && pOuter->HasConditionsForClawAttack( pClosest ));
+
+
+        if ( bHasFreeWill )
+        {
+            // Go after the closest one we got!
+            if ( pClosest )
+            {
+                return pClosest;
+            }
+        }
+
+        // Quit here if the newest one was found
+        // before us being commanded.
+        if ( flAcquiredTime < pOuter->GetLastTimeCommanded() )
+            return nullptr;
+
+        // If we don't have a free will, only go after enemies
+        // we've newly acquired.
+        if ( pNewestAcquiredEnemy )
+        {
+            return pNewestAcquiredEnemy;
+        }
+
+        return nullptr;
     }
 };

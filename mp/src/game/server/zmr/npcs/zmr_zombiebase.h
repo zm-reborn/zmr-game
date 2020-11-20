@@ -205,6 +205,10 @@ public:
 
     CZMCommandQueue*    GetCommandQueue() const { return const_cast<CZMCommandQueue*>( &m_CmdQueue ); }
 
+    // Let our commander dictate certain behaviors.
+    ZombieCommandStyle_t    GetMyCommandStyle() const { return m_MyCommandStyle; }
+    void                    SetMyCommandStyle( const CZMPlayer* pZM );
+
 
     const char* GetZombieModelGroupName() const { return STRING( m_strModelGroup ); }
     void SetZombieModelGroupName( string_t name ) { m_strModelGroup = name; }
@@ -267,6 +271,9 @@ private:
 
 
     CZMCommandQueue m_CmdQueue;
+
+    // Changes depending on who is commanding us.
+    ZombieCommandStyle_t m_MyCommandStyle;
 
 
 

@@ -139,7 +139,7 @@ public:
     void SpawnThink();
 
 
-    CZMBaseZombie* CreateZombie( ZombieClass_t zclass );
+    CZMBaseZombie* CreateZombie( ZombieClass_t zclass, CZMPlayer* pSpawner );
 
     bool QueueUnit( CZMPlayer* pPlayer, ZombieClass_t zclass, int amount );
     void QueueClear( int inamount = -1, int inpos = -1 );

@@ -270,7 +270,8 @@ public:
     inline float    GetNextVoiceLineTime() const { return m_flNextVoiceLineTime; }
     inline void     SetNextVoiceLineTime( float t ) { m_flNextVoiceLineTime = t; }
 
-    int             GetZMCommandInterruptFlags() const;
+    int                     GetZMCommandInterruptFlags() const;
+    ZombieCommandStyle_t    GetZMCommandStyle() const;
 
     float           GetInterpNPCTime() const { return m_flInterpNPCTime; }
     void            UpdatePlayerInterpNPC();

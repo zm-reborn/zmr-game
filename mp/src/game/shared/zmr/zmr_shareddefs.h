@@ -192,6 +192,27 @@ enum ZombieCommandInterrupt_t
     ZCO_ATTACK = ( 1 << 1 )
 };
 
+// How zombies will behave when ZM commands them to do something.
+enum ZombieCommandStyle_t
+{
+    // The default commanding style
+    // allows the zombie to be a lot more stubborn.
+    // Fit for more casual commanding.
+    // Will go after survivors if:
+    // - Survivor is seen.
+    // - They are damaged.
+    // - Survivor is heard.
+    // - Survivor within melee range.
+    ZCOMMANDSTYLE_DEFAULT = 0,
+
+    // Old 1.2.1 style in which
+    // zombies will only start chasing enemies if:
+    // - They aren't doing anything.
+    // - They acquire a new enemy they don't know about.
+    // - Survivor is within melee range.
+    ZCOMMANDSTYLE_OLD,
+};
+
 enum ZMZombieGibType_t
 {
     ZMGIBTYPE_NONE = 0,

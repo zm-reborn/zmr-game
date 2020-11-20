@@ -339,7 +339,7 @@ static int zm_zombie_create_completion( const char* partial, char commands[ COMM
 
 static void ZM_Zombie_Create( const CCommand& args )
 {
-    CBasePlayer* pPlayer = UTIL_GetCommandClient();
+    auto* pPlayer = ToZMPlayer( UTIL_GetCommandClient() );
     if ( !pPlayer ) return;
 
     if ( !UTIL_IsCommandIssuedByServerAdmin() && !sv_cheats->GetBool() )
@@ -384,6 +384,8 @@ static void ZM_Zombie_Create( const CCommand& args )
     pZombie->SetAbsAngles( ang );
 
     DispatchSpawn( pZombie );
+
+    pZombie->SetMyCommandStyle( pPlayer );
 }
 
 #define ZOMBIECREATE_DESC "Creates a zombie at your crosshair. Takes a zombie classname."

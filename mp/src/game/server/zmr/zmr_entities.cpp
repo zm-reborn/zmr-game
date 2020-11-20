@@ -540,7 +540,7 @@ void CZMEntZombieSpawn::SpawnThink()
         bCreate = false;
 
     
-    if ( bCreate && CreateZombie( zclass ) )
+    if ( bCreate && CreateZombie( zclass, pPlayer ) )
     {
         queue.m_nCount--;
 
@@ -575,7 +575,7 @@ void CZMEntZombieSpawn::SpawnThink()
     }
 }
 
-CZMBaseZombie* CZMEntZombieSpawn::CreateZombie( ZombieClass_t zclass )
+CZMBaseZombie* CZMEntZombieSpawn::CreateZombie( ZombieClass_t zclass, CZMPlayer* pSpawner )
 {
     const char* classname = CZMBaseZombie::ClassToName( zclass );
 
@@ -618,6 +618,8 @@ CZMBaseZombie* CZMEntZombieSpawn::CreateZombie( ZombieClass_t zclass )
         UTIL_RemoveImmediate( pZombie );
         return nullptr;
     }
+
+    pZombie->SetMyCommandStyle( pSpawner );
 
     pZombie->Activate();
 

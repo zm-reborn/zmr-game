@@ -2475,6 +2475,19 @@ int CZMPlayer::GetZMCommandInterruptFlags() const
     return atoi( val );
 }
 
+//
+// How zombies will behave.
+//
+ZombieCommandStyle_t CZMPlayer::GetZMCommandStyle() const
+{
+    const char* val = engine->GetClientConVarValue( entindex(), "zm_cl_zmcontrolstyle" );
+
+    if ( !val || !(*val) )
+        return ZCOMMANDSTYLE_DEFAULT;
+
+    return (ZombieCommandStyle_t)atoi( val );
+}
+
 void CZMPlayer::GetMyRecipientFilter( CRecipientFilter& filter ) const
 {
     filter.AddRecipient( this );
