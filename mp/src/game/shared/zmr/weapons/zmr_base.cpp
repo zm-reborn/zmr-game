@@ -376,7 +376,6 @@ bool CZMBaseWeapon::UsesDryActivity( Activity act )
     auto* pVM = pOwner->GetViewModel( m_nViewModelIndex );
 
     Assert( pVM && m_nViewModelIndex == VMINDEX_WEP );
-    // Yes, this is possible. Regression from client animated VMs?
     if ( !pVM )
     {
         return false;

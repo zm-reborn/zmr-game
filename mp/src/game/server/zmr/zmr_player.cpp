@@ -906,13 +906,19 @@ void CZMPlayer::UnlinkAndRemoveChildren()
     {
         auto* pNext = pChild->NextMovePeer();
 
-        UnlinkFromParent( pChild );
+        // Don't touch viewmodels :)
+        bool bViewModel = dynamic_cast<CBaseViewModel*>( pChild ) != nullptr;
 
-        // Pls don't parent other players to players.
-        // I've seen it happen!
-        Assert( !pChild->IsPlayer() );
-        if ( !pChild->IsPlayer() )
-            UTIL_Remove( pChild );
+        if ( !bViewModel )
+        {
+            UnlinkFromParent( pChild );
+
+            // Pls don't parent other players to players.
+            // I've seen it happen!
+            Assert( !pChild->IsPlayer() );
+            if ( !pChild->IsPlayer() )
+                UTIL_Remove( pChild );
+        }
 
         pChild = pNext;
     }
