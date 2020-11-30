@@ -261,7 +261,7 @@ public:
 	static CBasePlayer		*CreatePlayer( const char *className, edict_t *ed );
 
 	virtual void			CreateViewModel( int viewmodelindex = 0 );
-	CBaseViewModel			*GetViewModel( int viewmodelindex = 0, bool bObserverOK = true );
+	CBaseViewModel			*GetViewModel( int viewmodelindex = 0, bool bObserverOK = true ) const;
 	void					HideViewModels( void );
 	void					DestroyViewModels( void );
 
