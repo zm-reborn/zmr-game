@@ -1116,3 +1116,8 @@ bool CZMPlayer::IsFlashlightOn() const
 {
     return IsEffectActive( EF_DIMLIGHT );
 }
+
+CZMViewModel* CZMPlayer::GetViewModel( int vmIndex, bool bObserverOk ) const
+{
+    return static_cast<CZMViewModel*>( BaseClass::GetViewModel( vmIndex, bObserverOk ) );
+}

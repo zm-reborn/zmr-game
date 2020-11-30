@@ -1,12 +1,18 @@
 #pragma once
 
-#include "baseviewmodel_shared.h"
-
-#include "weapons/zmr_base.h"
 
 #ifdef CLIENT_DLL
 #define CZMViewModel C_ZMViewModel
 #endif
+
+#include "baseviewmodel_shared.h"
+
+#include "weapons/zmr_base.h"
+
+
+class CZMPlayer;
+class CZMBaseWeapon;
+
 
 class CZMViewModel : public CBaseViewModel
 {
@@ -32,7 +38,7 @@ public:
     virtual bool                ShouldPredict() OVERRIDE;
     virtual bool                Interpolate( float currentTime ) OVERRIDE;
 
-    CZMBaseWeapon* GetWeapon() const { return static_cast<CZMBaseWeapon*>( CBaseViewModel::GetWeapon() ); }
+    CZMBaseWeapon* GetWeapon() const;
 
 
     bool CanAnimBob() const;
@@ -48,7 +54,7 @@ public:
     bool PerformImpactLag( Vector& vecPos, QAngle& ang, const Vector& origPos );
 #endif
 
-    CZMPlayer* GetOwner() const { return static_cast<CZMPlayer*>( CBaseViewModel::GetOwner() ); };
+    CZMPlayer* GetOwner() const;
 
     virtual void CalcViewModelView( CBasePlayer* pOwner, const Vector& eyePosition, const QAngle& eyeAngles ) OVERRIDE;
 

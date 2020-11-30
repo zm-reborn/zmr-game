@@ -183,7 +183,17 @@ void CZMViewModel::CalcViewModelView( CBasePlayer* pOwner, const Vector& eyePosi
     SetLocalAngles( newAng );
 }
 
+CZMPlayer* CZMViewModel::GetOwner() const
+{
+    return static_cast<CZMPlayer*>( CBaseViewModel::GetOwner() );
+}
+
 #ifdef CLIENT_DLL
+CZMBaseWeapon* CZMViewModel::GetWeapon() const
+{
+    return static_cast<CZMBaseWeapon*>( CBaseViewModel::GetWeapon() );
+}
+
 void C_ZMViewModel::UpdateClientSideAnimation()
 {
     PerformAnimBobbing();

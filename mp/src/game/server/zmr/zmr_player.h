@@ -9,6 +9,7 @@
 #include "zmr_shareddefs.h"
 #include "zmr_playerlocaldata.h"
 #include "zmr_playeranimstate.h"
+#include "zmr_viewmodel.h"
 
 
 /*
@@ -31,6 +32,7 @@ class CZMBaseZombie;
 class CZMBaseWeapon;
 class CZMRagdoll;
 class CZMPlayerModelData;
+class CZMViewModel;
 
 enum ZMPlayerState_t
 {
@@ -250,6 +252,7 @@ public:
     int                 GetTotalAmmoAmount( int iValidAmmoIndex ) const;
     int                 GetAmmoRoom( int iValidAmmoIndex ) const;
     bool                IsFlashlightOn() const;
+    CZMViewModel*       GetViewModel( int vmIndex = VMINDEX_WEP, bool bObserverOk = true ) const;
 
 
     CZMBaseWeapon*  GetWeaponOfHighestSlot() const;
