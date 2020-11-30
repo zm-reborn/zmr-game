@@ -436,7 +436,7 @@ bool C_ZMViewModel::PerformImpactLag( Vector& vecPos, QAngle& ang, const Vector&
 
     // Smooth out the movement a bit.
     float eyepos = ApproachSmooth( m_flLagEyePosZ, m_flLastEyePosZ, gpGlobals->frametime * 120.0f, 24.0f );
-    m_flLastEyePosZ = eyepos;
+    m_flLastEyePosZ = clamp( eyepos, m_flLagEyePosZ - 24.0f, m_flLagEyePosZ + 24.0f );
 
     float delta = origPos.z - eyepos;
 
