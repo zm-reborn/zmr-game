@@ -97,11 +97,11 @@ public:
 
 #ifdef CLIENT_DLL
     virtual void    ClientThink() OVERRIDE;
-    virtual void    GetGlowEffectColor( float& r, float& g, float& b ) OVERRIDE;
+    virtual void    GetGlowEffectColor( float& r, float& g, float& b ) const OVERRIDE;
     void            UpdateGlow();
 
-    virtual bool    GlowOccluded() OVERRIDE { return false; }
-    virtual bool    GlowUnoccluded() OVERRIDE { return true; }
+    virtual bool    GlowOccluded() const OVERRIDE { return false; }
+    virtual bool    GlowUnoccluded() const OVERRIDE { return true; }
 
 
     virtual ShadowType_t ShadowCastType() OVERRIDE;

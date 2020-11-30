@@ -30,10 +30,10 @@ public:
 
 
     void            UpdateGlow();
-    virtual void    GetGlowEffectColor( float& r, float& g, float& b ) OVERRIDE;
+    virtual void    GetGlowEffectColor( float& r, float& g, float& b ) const OVERRIDE;
     
-    virtual bool    GlowOccluded() OVERRIDE { return false; };
-    virtual bool    GlowUnoccluded() OVERRIDE { return true; };
+    virtual bool    GlowOccluded() const OVERRIDE { return false; };
+    virtual bool    GlowUnoccluded() const OVERRIDE { return true; };
 
 protected:
     CNetworkVar( int, m_iAmmoType );
@@ -99,7 +99,7 @@ void C_ZMAmmo::UpdateGlow()
 
 void UTIL_ParseFloatColorFromString( const char* str, float clr[], int nColors );
 
-void C_ZMAmmo::GetGlowEffectColor( float& r, float& g, float& b )
+void C_ZMAmmo::GetGlowEffectColor( float& r, float& g, float& b ) const
 {
     float clr[3];
     UTIL_ParseFloatColorFromString( zm_cl_glow_ammo.GetString(), clr, ARRAYSIZE( clr ) );

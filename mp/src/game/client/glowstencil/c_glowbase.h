@@ -15,14 +15,14 @@ public:
     ~C_BaseGlowEntity();
 
 
-    CGlowObject*    GetGlowObject() { return m_pGlowEffect; };
-    virtual bool    ShouldCreateGlow() { return m_bClientSideGlowEnabled; };
-    virtual void    GetGlowEffectColor( float& r, float& g, float& b ) { r = g = b = 1.0f; };
+    CGlowObject*    GetGlowObject() const { return m_pGlowEffect; };
+    virtual bool    ShouldCreateGlow() const { return m_bClientSideGlowEnabled; };
+    virtual void    GetGlowEffectColor( float& r, float& g, float& b ) const { r = g = b = 1.0f; };
     void            SetClientSideGlowEnabled( bool bEnabled ) { m_bClientSideGlowEnabled = bEnabled; UpdateGlowEffect(); };
-    inline bool     IsClientSideGlowEnabled() { return m_bClientSideGlowEnabled; };
+    inline bool     IsClientSideGlowEnabled() const { return m_bClientSideGlowEnabled; };
 
-    virtual bool    GlowOccluded() { return true; };
-    virtual bool    GlowUnoccluded() { return true; };
+    virtual bool    GlowOccluded() const { return true; };
+    virtual bool    GlowUnoccluded() const { return true; };
 
 protected:
     virtual void    UpdateGlowEffect();
@@ -43,11 +43,11 @@ public:
     virtual void    OnPreDataChanged( DataUpdateType_t updateType ) OVERRIDE;
     virtual void    OnDataChanged( DataUpdateType_t updateType ) OVERRIDE;
 
-    virtual bool    ShouldCreateGlow() OVERRIDE;
-    virtual void    GetGlowEffectColor( float& r, float& g, float& b ) OVERRIDE;
+    virtual bool    ShouldCreateGlow() const OVERRIDE;
+    virtual void    GetGlowEffectColor( float& r, float& g, float& b ) const OVERRIDE;
 
-    virtual bool    GlowOccluded() OVERRIDE;
-    virtual bool    GlowUnoccluded() OVERRIDE;
+    virtual bool    GlowOccluded() const OVERRIDE;
+    virtual bool    GlowUnoccluded() const OVERRIDE;
 
 protected:
     CNetworkVar( bool, m_bGlowEnabled );

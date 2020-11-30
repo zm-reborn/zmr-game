@@ -1325,7 +1325,7 @@ void CZMBaseWeapon::UpdateGlow()
 
 void UTIL_ParseFloatColorFromString( const char* str, float clr[], int nColors );
 
-void CZMBaseWeapon::GetGlowEffectColor( float& r, float& g, float& b )
+void CZMBaseWeapon::GetGlowEffectColor( float& r, float& g, float& b ) const
 {
     float clr[3];
     UTIL_ParseFloatColorFromString( zm_cl_glow_weapon.GetString(), clr, ARRAYSIZE( clr ) );

@@ -78,24 +78,24 @@ void C_BaseGlowProp::OnDataChanged( DataUpdateType_t updateType )
     }
 }
 
-bool C_BaseGlowProp::ShouldCreateGlow()
+bool C_BaseGlowProp::ShouldCreateGlow() const
 {
     return m_bGlowEnabled || m_bClientSideGlowEnabled;
 }
 
-void C_BaseGlowProp::GetGlowEffectColor( float& r, float& g, float& b )
+void C_BaseGlowProp::GetGlowEffectColor( float& r, float& g, float& b ) const
 {
     r = m_GlowColor.GetR() / 255.0f;
     g = m_GlowColor.GetG() / 255.0f;
     b = m_GlowColor.GetB() / 255.0f;
 }
 
-bool C_BaseGlowProp::GlowOccluded()
+bool C_BaseGlowProp::GlowOccluded() const
 {
     return (m_fGlowType & GLOWFLAG_OCCLUDED) != 0;
 }
 
-bool C_BaseGlowProp::GlowUnoccluded()
+bool C_BaseGlowProp::GlowUnoccluded() const
 {
     return (m_fGlowType & GLOWFLAG_UNOCCLUDED) != 0;
 }
