@@ -483,8 +483,18 @@ void C_ZMPlayer::Simulate()
     C_BaseEntity::Simulate();
 
 
+    //
+    // When we get teleported.
+    //
     if ( IsNoInterpolationFrame() || Teleported() )
     {
+        // Tell VM to release history.
+        auto* pVM = GetViewModel();
+        if ( pVM )
+        {
+            pVM->OnTeleported();
+        }
+
         ResetLatched();
     }
 }

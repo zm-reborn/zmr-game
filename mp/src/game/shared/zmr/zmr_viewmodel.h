@@ -37,6 +37,7 @@ public:
 
     virtual bool                ShouldPredict() OVERRIDE;
     virtual bool                Interpolate( float currentTime ) OVERRIDE;
+    void                        OnTeleported();
 
     CZMBaseWeapon* GetWeapon() const;
 

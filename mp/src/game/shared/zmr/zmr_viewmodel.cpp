@@ -81,10 +81,9 @@ CZMViewModel::CZMViewModel()
 
 
     m_vLagAngles.Init();
-    m_LagAnglesHistory.Setup( &m_vLagAngles, 0 );
-
     m_flLagEyePosZ = 0.0f;
-    m_flLagEyePosZHistory.Setup( &m_flLagEyePosZ, 0 );
+    AddVar( &m_vLagAngles, &m_LagAnglesHistory, 0, true );
+    AddVar( &m_flLagEyePosZ, &m_flLagEyePosZHistory, 0, true );
 
     m_flLastEyePosZ = 0.0f;
 
@@ -219,6 +218,19 @@ bool C_ZMViewModel::Interpolate( float currentTime )
     UpdateAnimationParity();
 
     return C_BaseAnimating::Interpolate( currentTime );
+}
+
+// Release interpolated stuff.
+// This is separate from ResetLatched because it gets called pretty often.
+void C_ZMViewModel::OnTeleported()
+{
+    auto* pOwner = GetOwner();
+    if ( pOwner )
+    {
+        m_flLastEyePosZ = pOwner->EyePosition().z;
+    }
+
+    m_vecLastVel = vec3_origin;
 }
 
 bool C_ZMViewModel::IsInIronsights() const
