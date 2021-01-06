@@ -24,7 +24,8 @@ namespace ZMClientUtil
 
     void SelectAllZombies( bool bSendCommand = true );
     void DeselectAllZombies( bool bSendCommand = true );
-    void SelectSingleZombie( C_ZMBaseZombie*, bool bSticky );
+    void SelectSingleZombie( C_ZMBaseZombie* pZombie, bool bSticky );
+    void SelectZombiesInRadius( const Vector& vecPos, float radius, bool bSticky );
     void SelectZombies( const CUtlVector<C_ZMBaseZombie*>&, bool bSticky );
 
     int GetGroupZombieCount( int group );

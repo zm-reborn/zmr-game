@@ -309,6 +309,23 @@ void ZMClientUtil::SelectSingleZombie( C_ZMBaseZombie* pZombie, bool bSticky )
     pZombie->SetSelector( index );
 }
 
+void ZMClientUtil::SelectZombiesInRadius( const Vector& vecPos, float radius, bool bSticky )
+{
+    float flRadiusSqr = radius * radius;
+    CUtlVector<CZMBaseZombie*> vZombies;
+
+
+    g_ZombieManager.ForEachZombie( [ &vecPos, flRadiusSqr, &vZombies ]( C_ZMBaseZombie* pZombie )
+    {
+        if ( pZombie->GetAbsOrigin().DistToSqr( vecPos ) < flRadiusSqr )
+        {
+            vZombies.AddToTail( pZombie );
+        }
+    } );
+
+    SelectZombies( vZombies, bSticky );
+}
+
 void ZMClientUtil::SelectZombies( const CUtlVector<C_ZMBaseZombie*>& vZombies, bool bSticky )
 {
     C_ZMBaseZombie* pZombie;

@@ -24,6 +24,7 @@ static const char* g_szZMCommands[] = {
     "roundrestart",
     "+zm_cmd_moveup",
     "+zm_cmd_movedown",
+    "zm_cmd_select_radius",
 };
 
 // All commands we consider survivor/spectator commands

@@ -99,6 +99,7 @@ public:
 
     bool UseSwitchedButtons() const;
 
+    bool IsInObserverMode();
 
 
     static void TraceScreenToWorld( int mx, int my, trace_t* res, CTraceFilterSimple* filter, int mask );

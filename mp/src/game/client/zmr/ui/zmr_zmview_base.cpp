@@ -37,6 +37,8 @@ ConVar zm_cl_poweruser( "zm_cl_poweruser", "0", FCVAR_ARCHIVE, "Select spawns/tr
 ConVar zm_cl_hidemouseinscore( "zm_cl_hidemouseinscore", "1", FCVAR_ARCHIVE, "Is mouse input disabled while having scoreboard open?" );
 ConVar zm_cl_border_scroll( "zm_cl_border_scroll", "10", FCVAR_ARCHIVE, "Border scrolling in pixels." );
 
+ConVar zm_cl_select_radius_size( "zm_cl_select_radius_size", "256", FCVAR_ARCHIVE, "How big the radius select size is in units." );
+
 
 
 
@@ -97,6 +99,46 @@ CON_COMMAND( zm_hiddenspawn, "" )
     {
         g_pZMView->SetClickMode( ZMCLICKMODE_HIDDEN );
     }
+}
+
+CON_COMMAND( zm_cmd_select_radius, "Selects zombies in a radius." )
+{
+    if ( !g_pZMView || !CZMViewBase::UsesZMView() )
+        return;
+
+    if ( g_pZMView->IsInObserverMode() )
+        return;
+
+    // Trace to see where their cursor is.
+    int mx, my;
+    ::input->GetFullscreenMousePos( &mx, &my );
+
+    trace_t trace;
+    CTraceFilterNoNPCsOrPlayer filter( nullptr, COLLISION_GROUP_NONE );
+    CZMViewBase::TraceScreenToWorld( mx, my, &trace, &filter, MASK_ZMTARGET );
+
+    // Do the selecting.
+    bool bSticky = GetZMClientMode()->IsZMHoldingCtrl();
+    float radius = zm_cl_select_radius_size.GetFloat();
+
+    ZMClientUtil::SelectZombiesInRadius( trace.endpos, radius, bSticky );
+
+
+    // Add an effect.
+    FX_AddQuad( trace.endpos + trace.plane.normal * 2.0f,
+                Vector( 0, 0, 1 ), // Normal
+                0.0f, // Start size
+                radius * 2.4f, // End size
+                0,
+                0.2f, // Start alpha
+                0.8f, // End alpha
+                0.4f,
+                random->RandomInt( 0, 360 ), // Yaw
+                0,
+                Vector( 1.0f, 1.0f, 1.0f ), // Color
+                0.2f, // Lifetime
+                MAT_RING,
+                (FXQUAD_BIAS_ALPHA) );
 }
 
 
@@ -222,6 +264,11 @@ bool CZMViewBase::IsDraggingRight() const
 bool CZMViewBase::UseSwitchedButtons() const
 {
     return zm_cl_zmview_switchmousebuttons.GetBool();
+}
+
+bool CZMViewBase::IsInObserverMode()
+{
+    return !IsVisible();
 }
 
 MouseCode CZMViewBase::SwitchMouseButtons( MouseCode code )
