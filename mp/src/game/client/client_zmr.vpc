@@ -25,7 +25,7 @@ $Project "Client (ZMR)"
 {
 	$Folder "Libs (ZMR)"
 	{
-		$Lib		discord-rpc [$WIN32]
+		$Lib		discord-rpc [$WIN32 && $ZMR_FINAL]
 		$Lib		fmod_vc [$WIN32 && $ZMR_FINAL]
 		//$Lib		libdiscord-rpc [$LINUXALL]
 		$Lib		raytrace
@@ -326,7 +326,7 @@ $Project "Client (ZMR)"
 			$File	"zmr\c_zmr_concommands.cpp"
 			$File	"zmr\c_zmr_crosshair.cpp"
 			$File	"zmr\c_zmr_crosshair.h"
-			$File	"zmr\c_zmr_discord.cpp" [$WIN32]
+			$File	"zmr\c_zmr_discord.cpp" [$WIN32 && $ZMR_FINAL]
 			$File	"zmr\c_zmr_entities.cpp"
 			$File	"zmr\c_zmr_entities.h"
 			$File	"zmr\c_zmr_fireglow_system.cpp"
