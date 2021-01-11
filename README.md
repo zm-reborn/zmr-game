@@ -1,18 +1,41 @@
 # **Zombie Master: Reborn**
-An FPS/RTS hybrid game on Source 2013 engine, supporting Linux and Windows.
+An FPS/RTS hybrid game on Source 2013 engine, supporting Linux and Windows. See more info at our [ModDB page](https://www.moddb.com/mods/zombie-master-reborn)!
 
 ## License
 You can read it [here](https://github.com/zm-reborn/zmr-game/blob/master/LICENSE).
 
 ## Building
-- Follow [this tutorial](https://developer.valvesoftware.com/wiki/Source_SDK_2013) in Valve wiki for **Linux building steps**.
-- Download [Visual Studio 2019](https://visualstudio.microsoft.com/vs/)
-- You need components: **MSVC v142** and **Windows SDK 10.0** .
-- Run `mp/src/fix_vcxproj.bat` and `mp/src/creategameprojects.bat`, preferably in cmd with admin privileges. (right click Windows icon -> Windows Powershell (Admin) -> `cmd` -> cd your way to project folder)
-- If you're having problems, just [ask Mehis in Discord](https://discord.gg/tZTUex3).
 
-### FAQ
-**Is Linux compiling really this convoluted?**
+### Windows
+1. Download [Visual Studio 2019](https://visualstudio.microsoft.com/vs/)
+2. Download components: **MSVC v142** and **Windows SDK 10.0** .
+3. Run `mp/src/fix_vcxproj.bat` and `mp/src/creategameprojects.bat`, preferably in cmd with admin privileges. (right click Windows icon -> Windows Powershell (Admin) -> `cmd` -> cd your way to project folder)
+4. You now have a solution file mp/src/zmr-games.sln
+
+### Linux
+
+Follow [this tutorial](https://developer.valvesoftware.com/wiki/Source_SDK_2013) in Valve developer wiki for the steps.
+
+## Running
+
+- Requires Source SDK Base 2013 Multiplayer to be downloaded from Steam. (In the Tools-page)
+- Make sure you have cloned the game-folder submodule (`mp/game/zombie_master_reborn`).
+
+
+You can create a symbolic link of `mp/game/zombie_master_reborn` in your `<Steam>/steamapps/common/Source SDK Base 2013 Multiplayer`-folder and then run `hl2.exe` with arguments `-game zombie_master_reborn`
+
+Or you can use the script below.
+
+### Windows Script
+Run `zmr_dev_setup.ps1` inside `mp/game/zombie_master_reborn`. There should now be a `zmr_dev.bat`-batch file in your `Source SDK Base 2013 Multiplayer`-folder which you can run to start the mod.
+
+### Linux
+
+Start hl2 with the Steam runtime.
+`~/.local/share/Steam/ubuntu12_32/steam-runtime/run.sh ./hl2.sh -game zombie_master_reborn`
+
+## FAQ
+**Is compiling on Linux really this convoluted?**
 Yes.
 
 **Opening the solution says something about upgrading.**
@@ -21,6 +44,8 @@ Yes.
 **Project refuses to compile, says something about wrong/missing toolset.**
 Open project settings and make sure `Platform Toolset` is `v142` and `Windows SDK Version` is `10.0` (other 10.X versions should also work).
 If it says one of them is missing, you need to download them from Visual Studio Installer (Tools -> Get Tools and Features)
+
+If you're having problems, just [ask Mehis in Discord](https://discord.gg/tZTUex3).
 
 ## Contributing
 
