@@ -12,6 +12,8 @@ enum ZMImportance_t
 
     ZMIMPORTANCE_LEAD,
 
+    ZMIMPORTANCE_CONTRIBUTOR,
+
     ZMIMPORTANCE_MAX
 };
 

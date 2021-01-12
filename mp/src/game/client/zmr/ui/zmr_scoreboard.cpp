@@ -177,6 +177,7 @@ CZMClientScoreBoardDialog::CZMClientScoreBoardDialog( IViewPort* pViewPort ) : C
     m_pImportanceImages[ZMIMPORTANCE_VIP] = vgui::scheme()->GetImage( "zmr_misc/trusted", true );
     m_pImportanceImages[ZMIMPORTANCE_PLAYTESTER] = vgui::scheme()->GetImage( "zmr_misc/playtester", true );
     m_pImportanceImages[ZMIMPORTANCE_LEAD] = vgui::scheme()->GetImage( "zmr_misc/lead", true );
+    m_pImportanceImages[ZMIMPORTANCE_CONTRIBUTOR] = vgui::scheme()->GetImage( "zmr_misc/contributor", true );
 
 
     int imagesize = 24;
@@ -589,7 +590,7 @@ void CZMClientScoreBoardDialog::GetPlayerScoreInfo( int playerIndex, KeyValues* 
     auto importance = g_ZMImportanceSystem.GetPlayerImportance( playerIndex );
     int iImage = -1;
 
-    if ( importance >= 0 && importance < ARRAYSIZE( m_pImportanceImages ) )
+    if ( importance >= 0 && importance < ARRAYSIZE( m_pImportanceImages ) && m_pImportanceImages[importance] != nullptr )
     {
         iImage = m_pList->AddImage( m_pImportanceImages[importance] );
     }
