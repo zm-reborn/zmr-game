@@ -28,6 +28,7 @@ namespace ZMWeaponConfig
         ZMCONFIGSLOT_MAC10,
 
         ZMCONFIGSLOT_RIFLE,
+        ZMCONFIGSLOT_R700,
 
         ZMCONFIGSLOT_MOLOTOV,
 

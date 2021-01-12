@@ -650,6 +650,7 @@ CZMWeaponConfigSystem::CZMWeaponConfigSystem() : CAutoGameSystem( "ZMWeaponConfi
     m_ConfigRegisters[ZMCONFIGSLOT_SHOTGUNSPORTING].pszWeaponName = "weapon_zm_shotgun_sporting";
     m_ConfigRegisters[ZMCONFIGSLOT_MAC10].pszWeaponName = "weapon_zm_mac10";
     m_ConfigRegisters[ZMCONFIGSLOT_RIFLE].pszWeaponName = "weapon_zm_rifle";
+    m_ConfigRegisters[ZMCONFIGSLOT_R700].pszWeaponName = "weapon_zm_r700";
     m_ConfigRegisters[ZMCONFIGSLOT_MOLOTOV].pszWeaponName = "weapon_zm_molotov";
 }
 
