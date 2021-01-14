@@ -20,7 +20,6 @@ public:
 
     virtual void OnCursorExited() OVERRIDE;
 
-    virtual void ApplySchemeSettings( vgui::IScheme* pScheme ) OVERRIDE;
     virtual void ApplySettings( KeyValues* kv ) OVERRIDE;
 
     virtual void PerformLayout() OVERRIDE;
@@ -44,6 +43,9 @@ public:
     float GetUnarmedTime() const { return m_flUnarmedTime; }
     int GetSubButtonCount() const { return m_vSubBtns.Count(); }
 
+    bool IsLayoutHorizontally() const { return m_bLayoutHorizontally; }
+    int GetHorizontalMargin() const { return m_nHorizontalMargin; }
+    
     bool IsSubButtonsVisible() const;
     bool DrawOnlyInGame() const { return m_bOnlyInGame; }
     bool DrawOnlyNotInGame() const { return m_bOnlyNotInGame; }
@@ -61,6 +63,9 @@ private:
 
     bool m_bOnlyInGame;
     bool m_bOnlyNotInGame;
+
+    bool m_bLayoutHorizontally;
+    int m_nHorizontalMargin;
     
     int m_nMaxSubTextWidth;
     int m_nSubBtnHeight;

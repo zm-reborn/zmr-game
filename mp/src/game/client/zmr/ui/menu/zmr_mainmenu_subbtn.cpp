@@ -82,14 +82,6 @@ void CZMMainMenuSubButton::FireActionSignal()
     BaseClass::FireActionSignal();
 }
 
-void CZMMainMenuSubButton::ApplySchemeSettings( IScheme* pScheme )
-{
-    BaseClass::ApplySchemeSettings( pScheme );
-
-    SetFont( pScheme->GetFont( "ZMMainMenuSubButton", IsProportional() ) );
-    //SetContentAlignment( Label::Alignment::a_center );
-}
-
 void CZMMainMenuSubButton::FadeIn( float fade )
 {
     if ( m_flFadeIn != 0.0f && m_flFadeIn > gpGlobals->realtime )

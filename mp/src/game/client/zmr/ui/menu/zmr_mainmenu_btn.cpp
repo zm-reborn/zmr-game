@@ -21,6 +21,7 @@ using namespace vgui;
 CZMMainMenuButton::CZMMainMenuButton( Panel* pParent, const char* name ) : BaseClass( pParent, name )
 {
     m_bOnlyInGame = false;
+    m_bOnlyNotInGame = false;
 
     m_nMaxSubTextWidth = 0;
     m_nSubBtnHeight = 0;
@@ -99,18 +100,12 @@ void CZMMainMenuButton::SetArmed( bool state )
     }
 }
 
-void CZMMainMenuButton::ApplySchemeSettings( IScheme* pScheme )
-{
-    BaseClass::ApplySchemeSettings( pScheme );
-
-    //PositionSubButtons();
-}
-
 void CZMMainMenuButton::ApplySettings( KeyValues* kv )
 {
     m_bOnlyInGame = kv->GetBool( "onlyingame" );
     m_bOnlyNotInGame = kv->GetBool( "onlynotingame" );
-
+    m_bLayoutHorizontally = kv->GetBool( "layout_horizontal" );
+    m_nHorizontalMargin = kv->GetInt( "horizontal_margin" );
 
     KeyValues* subkv = kv->FindKey( "subbuttons" );
     if ( subkv )
@@ -128,8 +123,8 @@ void CZMMainMenuButton::PerformLayout()
 {
     BaseClass::PerformLayout();
 
-
     ComputeMaxTextWidth();
+    PositionSubButtons();
 }
 
 void CZMMainMenuButton::ComputeMaxTextWidth()
@@ -184,9 +179,6 @@ void CZMMainMenuButton::AttemptToShowButtons()
 
 void CZMMainMenuButton::ShowSubButtons()
 {
-    PositionSubButtons();
-
-
     FOR_EACH_VEC( m_vSubBtns, i )
     {
         m_vSubBtns[i]->FadeIn( 0.1f + (i * 0.1f) );
@@ -227,7 +219,8 @@ void CZMMainMenuButton::PositionSubButtons()
         m_vSubBtns[i]->SetPos(
             px + offset_x,
             py + offset_y - i * size_y );
-        m_vSubBtns[i]->SetSize( size_x, size_y );
+
+        m_vSubBtns[i]->SetSize( m_nMaxSubTextWidth, size_y );
     }
 }
 

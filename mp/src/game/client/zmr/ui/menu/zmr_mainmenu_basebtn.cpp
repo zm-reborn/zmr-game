@@ -22,6 +22,9 @@ CZMMainMenuBaseButton::CZMMainMenuBaseButton( Panel* pParent, const char* name )
 
 
     m_pImage = nullptr;
+    m_iImageX = 0;
+    m_iImageY = 0;
+    m_nImageMargin = 0;
 }
 
 CZMMainMenuBaseButton::~CZMMainMenuBaseButton()
@@ -34,15 +37,30 @@ void CZMMainMenuBaseButton::Paint()
     if ( m_pImage )
     {
         const Color clr = GetButtonFgColor();
+        const int image_size = GetImageSize();
 
         m_pImage->SetColor( clr );
         m_pImage->SetPos( m_iImageX, m_iImageY );
-        m_pImage->SetSize( m_iImageSize, m_iImageSize );
+        m_pImage->SetSize( image_size, image_size );
         m_pImage->Paint();
     }
 
 
     BaseClass::Paint();
+}
+
+void CZMMainMenuBaseButton::GetContentSize( int& wide, int& tall )
+{
+    BaseClass::GetContentSize( wide, tall );
+
+    wide += m_pImage ? GetImageSize() : 0;
+}
+
+void CZMMainMenuBaseButton::PerformLayout()
+{
+    BaseClass::PerformLayout();
+
+    LayoutImage();
 }
 
 void CZMMainMenuBaseButton::ApplySettings( KeyValues* in )
@@ -61,6 +79,22 @@ void CZMMainMenuBaseButton::ApplySettings( KeyValues* in )
             m_pImage = pImage;
         }
     }
+
+
+    m_nImageMargin = in->GetInt( "image_margin", 4 );
+
+    // We have to layout here already to
+    // account for auto-wide changes...
+    LayoutImage();
+}
+
+int CZMMainMenuBaseButton::GetImageSize()
+{
+    int h = GetTall();
+    int image_size = h * 0.5f;
+    image_size += (image_size % 2) ? 1 : 0; // Make sure our size is even
+
+    return image_size;
 }
 
 void CZMMainMenuBaseButton::ApplySchemeSettings( IScheme* pScheme )
@@ -87,15 +121,12 @@ void CZMMainMenuBaseButton::LayoutImage()
     if ( m_pImage == nullptr )
         return;
 
+    //
+    // Layout the image and text
+    //
 
-    // Layout the image
-    
-    int h = GetTall();
-    int image_size = h * 0.5f;
-    image_size += (image_size % 2) ? 1 : 0; // Make sure our size is even
-
-
-    int image_y = h / 2 - image_size / 2;
+    int image_size = GetImageSize();
+    int image_y = GetTall() / 2 - image_size / 2;
 
     
 
@@ -103,20 +134,21 @@ void CZMMainMenuBaseButton::LayoutImage()
     ComputeAlignment( tx0, ty0, tx1, ty1 );
 
 
-    int image_x = tx0 - image_size - 4;
+    int image_x = tx0 - image_size - m_nImageMargin;
 
     if ( image_x < 0 )
     {
+        // Move the text to the right to leave room for the image.
         int ix, iy;
         GetTextInset( &ix, &iy );
-        SetTextInset( ix + -1 * image_x, iy );
+        SetTextInset( -image_x, iy );
+
         image_x = 0;
     }
             
 
     m_iImageX = image_x;
     m_iImageY = image_y;
-    m_iImageSize = image_size;
 }
 
 CZMMainMenu* CZMMainMenuBaseButton::GetMainMenu()

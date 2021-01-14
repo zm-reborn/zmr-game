@@ -20,7 +20,6 @@ public:
     virtual void Paint() OVERRIDE;
 
     virtual void FireActionSignal() OVERRIDE;
-    virtual void ApplySchemeSettings( vgui::IScheme* pScheme ) OVERRIDE;
 
 
     void FadeIn( float fade );

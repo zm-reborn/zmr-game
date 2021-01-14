@@ -17,12 +17,17 @@ public:
     CZMMainMenuBaseButton( vgui::Panel* pParent, const char* name );
     ~CZMMainMenuBaseButton();
 
+    virtual void GetContentSize( int& wide, int& tall ) OVERRIDE;
+
+    virtual void PerformLayout() OVERRIDE;
 
     virtual void ApplySettings( KeyValues* in ) OVERRIDE;
 
     virtual void ApplySchemeSettings( vgui::IScheme* pScheme ) OVERRIDE;
 
     virtual void Paint() OVERRIDE;
+
+    int GetImageSize();
 
     void LayoutImage();
 
@@ -32,5 +37,5 @@ public:
     vgui::IImage* m_pImage;
     int m_iImageX;
     int m_iImageY;
-    int m_iImageSize;
+    int m_nImageMargin;
 };

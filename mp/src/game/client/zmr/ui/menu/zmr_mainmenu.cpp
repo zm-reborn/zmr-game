@@ -316,22 +316,73 @@ void CZMMainMenu::Repaint()
 
 void CZMMainMenu::PerformLayout()
 {
-    // Layout the child buttons accordingly
-    int len = GetChildCount();
+    BaseClass::PerformLayout();
+
+
+    int len;
+
+    //
+    // Layout the big buttons on the horizontal line when they get auto-sized.
+    //
+    len = m_vBtns.Count();
     for ( int i = 0; i < len; i++ )
     {
-        Panel* pChild = GetChild( i );
-
-        auto* pList = dynamic_cast<CZMMainMenuContactButtonList*>( pChild );
-        if ( pList )
-        {
-            pChild->SetPos( GetXPos(), GetTall() - GetChild( i )->GetTall() );
-
+        auto* pCur = m_vBtns[i];
+        if ( !pCur->IsLayoutHorizontally() )
             continue;
+
+        auto bCurOnlyInGame = pCur->DrawOnlyInGame();
+        auto bCurOnlyNotInGame = pCur->DrawOnlyNotInGame();
+
+        // Only layout others if drawn together.
+        auto IsDrawnTogether = [ bCurOnlyInGame, bCurOnlyNotInGame ] ( CZMMainMenuButton* pBtn )
+        {
+            // Always drawn
+            if ( !bCurOnlyInGame && !bCurOnlyNotInGame )
+                return true;
+
+            if ( pBtn->DrawOnlyInGame() == bCurOnlyInGame )
+                return true;
+
+            if ( pBtn->DrawOnlyNotInGame() == bCurOnlyNotInGame )
+                return true;
+
+            return false;
+        };
+
+
+        int w, h;
+        pCur->GetContentSize( w, h );
+
+        int end_x = pCur->GetXPos() + w + pCur->GetHorizontalMargin();
+
+        // Find the next button(s) on the line
+        // and move them further right.
+        for ( int j = i + 1; j < len; j++ )
+        {
+            auto* pNext = m_vBtns[j];
+            if ( pNext->IsLayoutHorizontally() )
+            {
+                if ( pNext->GetXPos() < end_x && IsDrawnTogether( pNext ) )
+                {
+                    pNext->SetPos( end_x, pNext->GetYPos() );
+                }
+            }
         }
     }
 
-    BaseClass::PerformLayout();
+    //
+    // Layout the contact buttons to the bottom left.
+    //
+    len = GetChildCount();
+    for ( int i = 0; i < len; i++ )
+    {
+        auto* pList = dynamic_cast<CZMMainMenuContactButtonList*>( GetChild( i ) );
+        if ( pList )
+        {
+            pList->SetPos( GetXPos(), GetTall() - pList->GetTall() );
+        }
+    }
 }
 
 void CZMMainMenu::ApplySettings( KeyValues* kv )
