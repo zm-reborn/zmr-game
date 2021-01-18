@@ -147,7 +147,10 @@ public:
     virtual void PickupObject( CBaseEntity* pObject, bool bLimitMassAndSize ) OVERRIDE;
     virtual float GetHeldObjectMass( IPhysicsObject* pHeldObject ) OVERRIDE;
     virtual void ForceDropOfCarriedPhysObjects( CBaseEntity* pOnlyIfHoldindThis ) OVERRIDE;
-    void InputForceDropPhysObjects( inputdata_t &data );
+
+    void InputForceDropPhysObjects( inputdata_t& data );
+    void InputIgnoreFallDamage( inputdata_t& data );
+    void InputIgnoreFallDamageWithoutReset( inputdata_t& data );
 
     virtual bool BumpWeapon( CBaseCombatWeapon* pWeapon ) OVERRIDE;
 
@@ -348,6 +351,10 @@ private:
 
 	CSoundPatch* m_sndLeeches;
 	CSoundPatch* m_sndWaterSplashes;
+
+    // Falldamage related
+    float m_flTimeIgnoreFallDamage;
+    bool m_bIgnoreFallDamageResetAfterImpact;
 
 
     friend class CZMGameMovement;

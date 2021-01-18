@@ -126,6 +126,9 @@ END_SEND_TABLE()
 
 BEGIN_DATADESC( CZMPlayer )
     DEFINE_INPUTFUNC( FIELD_VOID, "ForceDropPhysObjects", InputForceDropPhysObjects ),
+
+    DEFINE_INPUTFUNC( FIELD_FLOAT, "IgnoreFallDamage", InputIgnoreFallDamage ),
+    DEFINE_INPUTFUNC( FIELD_FLOAT, "IgnoreFallDamageWithoutReset", InputIgnoreFallDamageWithoutReset ),
 END_DATADESC()
 
 
@@ -166,6 +169,10 @@ CZMPlayer::CZMPlayer()
     m_flZMMoveSpeed = 1600.0f;
     m_flZMMoveAccel = 5.0f;
     m_flZMMoveDecel = 4.0f;
+
+
+    m_flTimeIgnoreFallDamage = 0.0f;
+    m_bIgnoreFallDamageResetAfterImpact = true;
 }
 
 CZMPlayer::~CZMPlayer( void )
@@ -1554,6 +1561,18 @@ extern ConVar friendlyfire;
 
 int CZMPlayer::OnTakeDamage( const CTakeDamageInfo& inputInfo )
 {
+    // Ignore fall damage
+    if ( inputInfo.GetDamageType() & DMG_FALL && m_flTimeIgnoreFallDamage  > gpGlobals->curtime )
+    {
+        // Stop ignoring after first impact.
+        if ( m_bIgnoreFallDamageResetAfterImpact )
+        {
+            m_flTimeIgnoreFallDamage = 0.0f;
+        }
+
+        return 0;
+    }
+
     // Fix for molotov fire damaging other players.
     if ( !friendlyfire.GetBool() )
     {
@@ -1699,6 +1718,32 @@ void CZMPlayer::ForceDropOfCarriedPhysObjects( CBaseEntity *pOnlyIfHoldingThis )
 void CZMPlayer::InputForceDropPhysObjects( inputdata_t &data )
 {
 	ForceDropOfCarriedPhysObjects( data.pActivator );
+}
+
+void CZMPlayer::InputIgnoreFallDamage( inputdata_t& data )
+{
+    float timeToIgnore = data.value.Float();
+
+    if ( timeToIgnore <= 0.0f )
+    {
+        timeToIgnore = 10.0f;
+    }
+
+    m_flTimeIgnoreFallDamage = gpGlobals->curtime + timeToIgnore;
+    m_bIgnoreFallDamageResetAfterImpact = true;
+}
+
+void CZMPlayer::InputIgnoreFallDamageWithoutReset( inputdata_t& data )
+{
+    float timeToIgnore = data.value.Float();
+
+    if ( timeToIgnore <= 0.0f )
+    {
+        timeToIgnore = 10.0f;
+    }
+
+    m_flTimeIgnoreFallDamage = gpGlobals->curtime + timeToIgnore;
+    m_bIgnoreFallDamageResetAfterImpact = false;
 }
 
 void CZMPlayer::SetHandsModel( const char* model )
