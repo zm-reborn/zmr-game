@@ -94,6 +94,7 @@ CZMViewModel::CZMViewModel()
 
     m_iPoseParamMoveX = -1;
     m_iPoseParamVertAim = -1;
+    m_iAttachmentIronsight = -1;
 
     m_vecLastVel.Init();
 #else
@@ -649,6 +650,7 @@ bool C_ZMViewModel::PerformOldBobbing( Vector& vecPos, QAngle& ang )
 
 ConVar zm_cl_bob_anim_accel( "zm_cl_bob_anim_accel", "1" );
 ConVar zm_cl_bob_anim_decel( "zm_cl_bob_anim_decel", "1.2" );
+ConVar zm_cl_bob_ironsight_max( "zm_cl_bob_ironsight_max", "0.1" );
 
 void C_ZMViewModel::PerformAnimBobbing()
 {
@@ -668,7 +670,13 @@ void C_ZMViewModel::PerformAnimBobbing()
 
         float spd = pOwner->GetLocalVelocity().Length2D();
         float target = spd > 0.1f ? spd / flMaxGroundSpeed : 0.0f;
-        target = clamp( target, 0.0f, 1.0f );
+
+        float max = 1.0f;
+
+        if ( IsInIronsights() )
+            max = zm_cl_bob_ironsight_max.GetFloat();
+
+        target = clamp( target, 0.0f, max );
 
         //
         // The pose parameter goes from:
