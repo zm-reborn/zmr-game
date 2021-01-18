@@ -1,4 +1,5 @@
 #include "cbase.h"
+#include "clienteffectprecachesystem.h"
 
 #include "c_zmr_precipitation.h"
 #include "c_zmr_entities.h"
@@ -8,6 +9,15 @@
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
+
+
+#define MAT_SPAWNSPRITE         "zmr_effects/orb_red"
+#define MAT_MANISPRITE          "zmr_effects/orb_orange"
+
+CLIENTEFFECT_REGISTER_BEGIN( PrecacheEffectZMUseableEnts )
+CLIENTEFFECT_MATERIAL( MAT_SPAWNSPRITE )
+CLIENTEFFECT_MATERIAL( MAT_MANISPRITE )
+CLIENTEFFECT_REGISTER_END()
 
 
 /*
@@ -54,10 +64,6 @@ void C_ZMEntBaseSimple::OnDataChanged( DataUpdateType_t type )
 /*
     Base usable
 */
-#define MAT_SPAWNSPRITE         "zmr_effects/orb_red"
-#define MAT_MANISPRITE          "zmr_effects/orb_orange"
-
-
 IMPLEMENT_CLIENTCLASS_DT( C_ZMEntBaseUsable, DT_ZM_EntBaseUsable, CZMEntBaseUsable )
 END_RECV_TABLE()
 
