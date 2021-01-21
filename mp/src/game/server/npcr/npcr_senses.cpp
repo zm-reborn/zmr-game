@@ -9,6 +9,8 @@
 #define VISION_LASTSEEN_GRACE   0.2f
 #define KNOWN_FORGET_TIME       6.0f
 
+ConVar npcr_debug_senses( "npcr_debug_senses", "0" );
+
 
 class CVisionFilter : public CTraceFilterSimple
 {
@@ -56,6 +58,29 @@ void NPCR::CBaseSenses::Update()
 
     if ( ShouldUpdateHearing() )
         UpdateHearing();
+
+
+    if ( IsDebugging() )
+    {
+        float interval = GetNPC()->GetUpdateInterval();
+        char buffer[256];
+        float curtime = gpGlobals->curtime;
+
+        FOR_EACH_VEC( m_vKnownEnts, i )
+        {
+            auto& known = m_vKnownEnts[i];
+
+            auto* pEnt = known->GetEntity();
+            if ( !pEnt ) continue;
+
+
+            Q_snprintf( buffer, sizeof( buffer ), "Sensed: %.1f | Seen: %.1f",
+                curtime - known->LastSensedTime(),
+                curtime - known->LastSeenTime() );
+            NDebugOverlay::Text( pEnt->GetAbsOrigin(), buffer, true, interval );
+        }
+        
+    }
 }
 
 bool NPCR::CBaseSenses::ShouldUpdateVision()
@@ -361,4 +386,9 @@ void NPCR::CBaseSenses::OnHeardSound( CSound* pSound )
     {
         pKnown->UpdateLastSensed();
     }
+}
+
+bool NPCR::CBaseSenses::IsDebugging() const
+{
+    return npcr_debug_senses.GetInt() == GetOuter()->entindex() || npcr_debug_senses.GetInt() == 1;
 }

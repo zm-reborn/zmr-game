@@ -148,6 +148,8 @@ namespace NPCR
 
         KnownEntity* FindKnownOf( CBaseEntity* pEnt ) const;
 
+        bool IsDebugging() const;
+
 
         CUtlVector<KnownEntity*> m_vKnownEnts;
         float m_flFovCos;
