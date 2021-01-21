@@ -1433,13 +1433,14 @@ bool CZMRules::ShouldLateSpawn( CZMPlayer* pPlayer )
     }
 
     // Outside late spawning grace period?
-    if ( gpGlobals->curtime < (ZMRules()->GetRoundStartTime() + zm_sv_joingrace.GetFloat()) )
+    if ( gpGlobals->curtime > (ZMRules()->GetRoundStartTime() + zm_sv_joingrace.GetFloat()) )
     {
         return false;
     }
 
     
-    // Check if we were spawned this round already.
+    // Check if we were spawned this round already
+    // to stop people from exploiting retry.
     auto* pData = GetZMRejoinSystem()->FindPlayerData( pPlayer, "Late spawn" );
 
     return pData ? pData->Validate() : true;
