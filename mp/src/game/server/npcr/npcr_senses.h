@@ -22,7 +22,7 @@ namespace NPCR
             m_pEnt = pEnt;
             m_flAcquiredTime = gpGlobals->curtime;
 
-            UpdateLastKnown();
+            UpdateLastSensed();
 
             m_bCanSee = bSees;
 
@@ -38,12 +38,12 @@ namespace NPCR
 
         float   AcquiredTime() const { return m_flAcquiredTime; }
         float   LastSeenTime() const { return m_flLastSeenTime; }
-        float   LastKnownTime() const { return m_flLastKnownTime; }
+        float   LastSensedTime() const { return m_flLastSensedTime; }
         bool    CanSee() const { return m_bCanSee; }
 
         void UpdateLastSeen()
         {
-            UpdateLastKnown();
+            UpdateLastSensed();
 
             float newtime = gpGlobals->curtime;
             if ( newtime > m_flLastSeenTime )
@@ -57,11 +57,11 @@ namespace NPCR
             m_bCanSee = false;
         }
 
-        void UpdateLastKnown()
+        void UpdateLastSensed()
         {
             float newtime = gpGlobals->curtime;
-            if ( newtime > m_flLastKnownTime )
-                m_flLastKnownTime = newtime;
+            if ( newtime > m_flLastSensedTime )
+                m_flLastSensedTime = newtime;
         }
 
     private:
@@ -71,7 +71,7 @@ namespace NPCR
         float m_flLastSeenTime;
 
         // Last time we heard/saw the entity.
-        float m_flLastKnownTime;
+        float m_flLastSensedTime;
 
         // When we acquired this entity.
         float m_flAcquiredTime;

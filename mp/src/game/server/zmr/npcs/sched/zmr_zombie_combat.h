@@ -371,8 +371,8 @@ public:
             // The closest one must be seen
             // or we're not moving at all and we heard them recently.
             // or they are within attack range.
-            float flLastKnew = gpGlobals->curtime - pKnown->LastKnownTime();
-            if ( pKnown->CanSee() || (!bMoving && flLastKnew < 0.5f) || pOuter->HasConditionsForClawAttack( pEnt ) )
+            float flLastSensed = gpGlobals->curtime - pKnown->LastSensedTime();
+            if ( pKnown->CanSee() || (!bMoving && flLastSensed < 0.5f) || pOuter->HasConditionsForClawAttack( pEnt ) )
             {
                 if ( !pClosest || distSqr < flClosestDistSqr )
                 {

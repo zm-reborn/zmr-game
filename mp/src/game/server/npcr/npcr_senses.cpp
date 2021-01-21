@@ -217,7 +217,7 @@ NPCR::KnownEntity* NPCR::CBaseSenses::FindKnownOf( CBaseEntity* pEnt ) const
 
 bool NPCR::CBaseSenses::ShouldForgetEntity( const KnownEntity* pKnown ) const
 {
-    return gpGlobals->curtime - pKnown->LastKnownTime() > KNOWN_FORGET_TIME;
+    return gpGlobals->curtime - pKnown->LastSensedTime() > KNOWN_FORGET_TIME;
 }
 
 void NPCR::CBaseSenses::UpdateVisionForKnown( KnownEntity* pKnown )
@@ -359,6 +359,6 @@ void NPCR::CBaseSenses::OnHeardSound( CSound* pSound )
     auto* pKnown = FindKnownOf( pSrc );
     if ( pKnown )
     {
-        pKnown->UpdateLastKnown();
+        pKnown->UpdateLastSensed();
     }
 }

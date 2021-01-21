@@ -39,6 +39,6 @@ void CZMZombieSenses::OnDamaged( const CTakeDamageInfo& info )
             GetNPC()->OnAcquiredEnemy( pAttacker );
         }
 
-        pKnown->UpdateLastKnown();
+        pKnown->UpdateLastSensed();
     }
 }
