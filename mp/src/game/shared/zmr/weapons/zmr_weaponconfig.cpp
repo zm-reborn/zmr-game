@@ -903,7 +903,7 @@ const char* CZMWeaponConfigSystem::GetBaseClassname( WeaponConfigSlot_t baseslot
 
 CZMBaseWeaponConfig* CZMWeaponConfigSystem::LoadConfigFromFile( const char* szWeaponName, CreateWeaponConfigFn fn )
 {
-    DevMsg( "Loading weapon config '%s'...\n", szWeaponName );
+    DevMsg( "Loading weapon config '%s' (%s)...\n", szWeaponName, gpGlobals->IsClient() ? "CLIENT" : "SERVER" );
 
 
     char file[256];
