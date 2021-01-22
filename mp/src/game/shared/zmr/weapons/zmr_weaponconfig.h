@@ -265,6 +265,8 @@ namespace ZMWeaponConfig
 
         const CZMBaseWeaponConfig* GetConfigBySlot( WeaponConfigSlot_t slot );
 
+        acttable_t* GetActivityList( const char* szAnimName, int& nActivityCount ) const;
+
     protected:
         void RegisterBaseConfig( WeaponConfigSlot_t slot, CreateWeaponConfigFn fn );
         
@@ -289,6 +291,14 @@ namespace ZMWeaponConfig
 
         CreateWeaponConfig_t m_ConfigRegisters[ZMCONFIGSLOT_REGISTERED_END];
 
+
+        struct ZMAnimMapData_t
+        {
+            acttable_t* actTable;
+            int nActivityCount;
+        };
+
+        CUtlDict<ZMAnimMapData_t, int> m_mAnimationMap;
 
         friend class CZMWepConfigReg;
     };

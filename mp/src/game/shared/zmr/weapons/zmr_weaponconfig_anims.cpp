@@ -2,24 +2,11 @@
 
 #include "zmr_weaponconfig.h"
 
-#include <unordered_map>
-#include <string>
-
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
 
 using namespace ZMWeaponConfig;
-
-
-struct ZMAnimMapData_t
-{
-    acttable_t* actTable;
-    int nActivityCount;
-};
-
-
-static std::unordered_map<std::string, ZMAnimMapData_t> mAnimationMap;
 
 
 //
@@ -150,7 +137,7 @@ static acttable_t sporting_anims[] =
 };
 
 #define IMPLEMENT_WEAPON_ACTTABLE( wep_name, arr ) \
-    mAnimationMap[wep_name] = { arr, ARRAYSIZE(arr) };
+    m_mAnimationMap.Insert( wep_name, { arr, ARRAYSIZE( arr ) } );
 
 
 void CZMWeaponConfigSystem::InitPlayerAnimMap()
@@ -170,17 +157,26 @@ void CZMWeaponConfigSystem::InitPlayerAnimMap()
     IMPLEMENT_WEAPON_ACTTABLE( "sporting", sporting_anims );
 }
 
+acttable_t* CZMWeaponConfigSystem::GetActivityList( const char* szAnimName, int& nActivityCount ) const
+{
+    auto index = m_mAnimationMap.Find( szAnimName );
+    if ( index != m_mAnimationMap.InvalidIndex() )
+    {
+        auto& elem = m_mAnimationMap.Element( index );
+        nActivityCount = elem.nActivityCount;
+        return elem.actTable;
+    }
+
+    Assert( 0 );
+    nActivityCount = 0;
+    return nullptr;
+}
 
 acttable_t* CZMBaseWeaponConfig::GetActivityList( int& nActivityCount ) const
 {
     if ( pszPlayerAnimsName )
     {
-        auto it = mAnimationMap.find( pszPlayerAnimsName );
-        if ( it != mAnimationMap.end() )
-        {
-            nActivityCount = it->second.nActivityCount;
-            return it->second.actTable;
-        }
+        return GetWeaponConfigSystem()->GetActivityList( pszPlayerAnimsName, nActivityCount );
     }
 
     AssertMsg( 0, "Weapon config couldn't find player animations '%s'!", pszPlayerAnimsName ? pszPlayerAnimsName : "" );
