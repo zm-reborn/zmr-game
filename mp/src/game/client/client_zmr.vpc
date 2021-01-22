@@ -106,7 +106,7 @@ $Project "Client (ZMR)"
 				$File	"$SRCDIR\game\shared\npcr\npcr_nonplayer_shared.cpp"
 				$File	"$SRCDIR\game\shared\npcr\npcr_nonplayer_shared.h"
 			}
-			$Folder "Npcs"
+			$Folder "NPCs"
 			{
 				$File	"zmr\npcs\c_zmr_banshee.cpp"
 				$File	"zmr\npcs\c_zmr_banshee.h"

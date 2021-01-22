@@ -138,7 +138,7 @@ $Project "Server (ZMR)"
 				$File	"$SRCDIR\game\shared\npcr\npcr_nonplayer_shared.cpp"
 				$File	"$SRCDIR\game\shared\npcr\npcr_nonplayer_shared.h"
 			}
-			$Folder "Npcs"
+			$Folder "NPCs"
 			{
 				$Folder "Schedules"
 				{
