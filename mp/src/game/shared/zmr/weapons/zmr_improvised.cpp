@@ -19,7 +19,6 @@ public:
 	DECLARE_CLASS( CZMWeaponImprovised, CZMBaseMeleeWeapon );
 	DECLARE_NETWORKCLASS(); 
 	DECLARE_PREDICTABLE();
-	DECLARE_ACTTABLE();
 
     CZMWeaponImprovised();
 
@@ -45,29 +44,6 @@ LINK_ENTITY_TO_CLASS( weapon_crowbar, CZMWeaponImprovised ); // // Some shit map
 #endif
 PRECACHE_WEAPON_REGISTER( weapon_zm_improvised );
 
-acttable_t	CZMWeaponImprovised::m_acttable[] = 
-{
-    /*
-    { ACT_RANGE_ATTACK1,				ACT_RANGE_ATTACK_SLAM,                  true },
-    { ACT_HL2MP_IDLE,					ACT_HL2MP_IDLE_MELEE,					false },
-    { ACT_HL2MP_RUN,					ACT_HL2MP_RUN_MELEE,					false },
-    { ACT_HL2MP_IDLE_CROUCH,			ACT_HL2MP_IDLE_CROUCH_MELEE,			false },
-    { ACT_HL2MP_WALK_CROUCH,			ACT_HL2MP_WALK_CROUCH_MELEE,			false },
-    { ACT_HL2MP_GESTURE_RANGE_ATTACK,	ACT_HL2MP_GESTURE_RANGE_ATTACK_MELEE,	false },
-    { ACT_HL2MP_GESTURE_RELOAD,			ACT_HL2MP_GESTURE_RELOAD_MELEE,			false },
-    { ACT_HL2MP_JUMP,					ACT_HL2MP_JUMP_MELEE,					false },
-    */
-    { ACT_MP_STAND_IDLE,				ACT_HL2MP_IDLE_MELEE,                   false },
-    { ACT_MP_CROUCH_IDLE,				ACT_HL2MP_IDLE_CROUCH_MELEE,			false },
-    { ACT_MP_RUN,					    ACT_HL2MP_RUN_MELEE,					false },
-    { ACT_MP_CROUCHWALK,			    ACT_HL2MP_WALK_CROUCH_MELEE,			false },
-    { ACT_MP_ATTACK_STAND_PRIMARYFIRE,  ACT_HL2MP_GESTURE_RANGE_ATTACK_MELEE,   false },
-    { ACT_MP_ATTACK_CROUCH_PRIMARYFIRE,	ACT_HL2MP_GESTURE_RANGE_ATTACK_MELEE,	false },
-    { ACT_MP_RELOAD_STAND,			    ACT_HL2MP_GESTURE_RELOAD_MELEE,			false },
-    { ACT_MP_RELOAD_CROUCH,				ACT_HL2MP_GESTURE_RELOAD_MELEE,			false },
-    { ACT_MP_JUMP,					    ACT_HL2MP_JUMP_MELEE,					false },
-};
-IMPLEMENT_ACTTABLE( CZMWeaponImprovised );
 
 CZMWeaponImprovised::CZMWeaponImprovised()
 {

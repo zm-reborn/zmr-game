@@ -304,6 +304,7 @@ $Project "Client (ZMR)"
 				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_usercmdvalid.h"
 				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_weaponconfig.cpp"
 				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_weaponconfig.h"
+				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_weaponconfig_anims.cpp"
 			}
 			$Folder "Color Corrections"
 			{

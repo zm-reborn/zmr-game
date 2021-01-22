@@ -73,6 +73,7 @@ public:
     virtual bool DefaultDeploy();
     virtual bool Holster( CBaseCombatWeapon* pSwitchingTo = nullptr ) OVERRIDE;
 
+    virtual acttable_t* ActivityList( int& iActivityCount ) OVERRIDE;
     virtual Activity GetPrimaryAttackActivity() OVERRIDE;
     //virtual Activity GetSecondaryAttackActivity() OVERRIDE;
     virtual Activity GetDrawActivity() OVERRIDE;

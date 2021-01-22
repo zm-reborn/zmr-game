@@ -22,7 +22,6 @@ public:
     DECLARE_CLASS( CZMWeaponHands, CZMBaseMeleeWeapon );
     DECLARE_NETWORKCLASS();
     DECLARE_PREDICTABLE(); // Requires semicolon, thanks Valve.
-    DECLARE_ACTTABLE();
 
     CZMWeaponHands();
 

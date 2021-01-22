@@ -14,7 +14,6 @@ public:
     DECLARE_CLASS( CZMWeaponRifle, CZMBasePumpWeapon );
     DECLARE_NETWORKCLASS();
     DECLARE_PREDICTABLE();
-    DECLARE_ACTTABLE();
 
     CZMWeaponRifle();
     ~CZMWeaponRifle();

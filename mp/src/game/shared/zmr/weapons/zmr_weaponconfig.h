@@ -96,6 +96,8 @@ namespace ZMWeaponConfig
 
         int GetPrimaryAmmoIndex() const;
 
+        virtual acttable_t* GetActivityList( int& nActivityCount ) const;
+
 
         virtual bool OverrideFromConfig( KeyValues* kv );
         void OverrideAttack( KeyValues* kv, ZMAttackConfig_t& attack );
@@ -115,7 +117,7 @@ namespace ZMWeaponConfig
 
 
         //
-        char* pszAnimPrefix;
+        char* pszPlayerAnimsName;
         char* pszModel_View;
         char* pszModel_World;
 
@@ -276,6 +278,7 @@ namespace ZMWeaponConfig
 
     private:
         void InitBaseConfigs();
+        void InitPlayerAnimMap();
 
         CZMBaseWeaponConfig* LoadConfigFromFile( const char* szWeaponName, CreateWeaponConfigFn fn );
         CZMBaseWeaponConfig* LoadCustomConfigFromFile( WeaponConfigSlot_t baseslot, const char* filepath );

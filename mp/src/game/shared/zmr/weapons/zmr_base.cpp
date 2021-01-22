@@ -263,6 +263,11 @@ void CZMBaseWeapon::ItemPostFrame()
     WeaponIdle();
 }
 
+acttable_t* CZMBaseWeapon::ActivityList( int& iActivityCount )
+{
+    return GetWeaponConfig()->GetActivityList( iActivityCount );
+}
+
 Activity CZMBaseWeapon::GetPrimaryAttackActivity()
 {
     auto* pOwner = GetPlayerOwner();
@@ -302,9 +307,6 @@ bool CZMBaseWeapon::DefaultDeploy()
     {
         if ( !pOwner->IsAlive() )
             return false;
-
-
-        pOwner->SetAnimationExtension( GetAnimPrefix() );
 
         SetViewModel();
         SendWeaponAnim( GetDrawActivity() );
@@ -701,7 +703,11 @@ const char* CZMBaseWeapon::GetWorldModel() const
 
 const char* CZMBaseWeapon::GetAnimPrefix() const
 {
-    return GetWeaponConfig()->pszAnimPrefix;
+    // Anim prefixes were used with the server-simulated animations.
+    // We don't use this anymore.
+    // See the weapon act table for the player animations.
+    Assert( 0 );
+    return "";
 }
 
 int CZMBaseWeapon::GetMaxClip1() const

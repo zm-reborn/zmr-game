@@ -104,7 +104,7 @@ CZMBaseWeaponConfig::CZMBaseWeaponConfig( const char* wepname, const char* confi
 
     pszPrintName = nullptr;
 
-    pszAnimPrefix = nullptr;
+    pszPlayerAnimsName = nullptr;
     pszModel_View = nullptr;
     pszModel_World = nullptr;
 
@@ -137,7 +137,7 @@ CZMBaseWeaponConfig::~CZMBaseWeaponConfig()
 {
     delete[] pszWeaponName;
     delete[] pszConfigFilePath;
-    delete[] pszAnimPrefix;
+    delete[] pszPlayerAnimsName;
     delete[] pszModel_View;
     delete[] pszModel_World;
     delete[] pszAmmoName;
@@ -154,7 +154,9 @@ void CZMBaseWeaponConfig::LoadFromConfig( KeyValues* kv )
 {
     CopyAllocString( kv->GetString( "printname" ), &pszPrintName );
 
-    CopyAllocString( kv->GetString( "anim_prefix" ), &pszAnimPrefix );
+    // Fallback to anim_prefix
+    CopyAllocString( kv->GetString( "player_anims", kv->GetString( "anim_prefix" ) ), &pszPlayerAnimsName );
+
     CopyAllocString( kv->GetString( "viewmodel" ), &pszModel_View );
     CopyAllocString( kv->GetString( "worldmodel" ), &pszModel_World );
 
@@ -257,7 +259,7 @@ KeyValues* CZMBaseWeaponConfig::ToKeyValues() const
 
 
     kv->SetString( "printname", pszPrintName );
-    kv->SetString( "anim_prefix", pszAnimPrefix );
+    kv->SetString( "player_anims", pszPlayerAnimsName );
     kv->SetString( "viewmodel", pszModel_View );
     kv->SetString( "worldmodel", pszModel_World );
 
@@ -524,9 +526,10 @@ bool CZMBaseWeaponConfig::OverrideFromConfig( KeyValues* kv )
     }
 
 
-    pszTmp = kv->GetString( "anim_prefix", nullptr );
+    // Fallback to anim_prefix value
+    pszTmp = kv->GetString( "player_anims", kv->GetString( "anim_prefix", nullptr ) );
     if ( pszTmp )
-        CopyAllocString( pszTmp, &pszAnimPrefix );
+        CopyAllocString( pszTmp, &pszPlayerAnimsName );
 
     pszTmp = kv->GetString( "primary_ammo", nullptr );
     if ( pszTmp )
@@ -652,6 +655,9 @@ CZMWeaponConfigSystem::CZMWeaponConfigSystem() : CAutoGameSystem( "ZMWeaponConfi
     m_ConfigRegisters[ZMCONFIGSLOT_RIFLE].pszWeaponName = "weapon_zm_rifle";
     m_ConfigRegisters[ZMCONFIGSLOT_R700].pszWeaponName = "weapon_zm_r700";
     m_ConfigRegisters[ZMCONFIGSLOT_MOLOTOV].pszWeaponName = "weapon_zm_molotov";
+
+
+    InitPlayerAnimMap();
 }
 
 CZMWeaponConfigSystem::~CZMWeaponConfigSystem()
