@@ -984,7 +984,16 @@ void CZMRules::EndRound( ZMRoundEndReason_t reason )
     RewardPoints( reason );
 
 
-    m_flRoundRestartTime = gpGlobals->curtime + zm_sv_roundintermissiontime.GetFloat();
+    float flIntermissionTime = zm_sv_roundintermissiontime.GetFloat();
+
+    // Remove intermission times on game begin for listen servers.
+    // Faster testing for mappers :)
+    if ( reason == ZMROUND_GAMEBEGIN && !engine->IsDedicatedServer() )
+    {
+        flIntermissionTime = 0.0f;
+    }
+
+    m_flRoundRestartTime = gpGlobals->curtime + flIntermissionTime;
     m_bInRoundEnd = true;
 
 
