@@ -80,10 +80,9 @@ private:
     CInterpolatedVar<QAngle> m_LagAnglesHistory;
     QAngle m_vLagAngles;
 
-    CInterpolatedVar<float> m_flLagEyePosZHistory;
-    float m_flLagEyePosZ;
-
-    float m_flLastEyePosZ;
+    float m_flLastImpactValue;
+    float m_flLastImpactGroundOffsetZ;
+    bool m_bWasOnGround;
 
 
     bool m_bDrawVM; // We have to override this so the client can decide whether to draw it.
@@ -98,14 +97,7 @@ private:
     int m_iPoseParamMoveX;
     int m_iPoseParamVertAim;
     int m_iAttachmentIronsight;
-
-    bool m_bOnGround;
-    float m_flGroundTime; // When we left or arrived.
-
-    float m_flImpactTargetDelta;
-    float m_flLastImpactDelta;
-    float m_flImpactVel;
-    float m_flImpactVelOrig;
+    
 
     Vector m_vecLastVel;
 #endif

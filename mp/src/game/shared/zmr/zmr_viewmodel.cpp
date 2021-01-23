@@ -66,7 +66,7 @@ END_PREDICTION_DATA()
 #endif
 
 #ifdef CLIENT_DLL
-CZMViewModel::CZMViewModel() : m_LagAnglesHistory( "CZMViewModel::m_LagAnglesHistory" ), m_flLagEyePosZHistory( "CZMViewModel::m_flLagEyePosZHistory")
+CZMViewModel::CZMViewModel() : m_LagAnglesHistory( "CZMViewModel::m_LagAnglesHistory" )
 #else
 CZMViewModel::CZMViewModel()
 #endif
@@ -82,15 +82,11 @@ CZMViewModel::CZMViewModel()
 
 
     m_vLagAngles.Init();
-    m_flLagEyePosZ = 0.0f;
     AddVar( &m_vLagAngles, &m_LagAnglesHistory, 0, true );
-    AddVar( &m_flLagEyePosZ, &m_flLagEyePosZHistory, 0, true );
 
-    m_flLastEyePosZ = 0.0f;
-
-    m_flLastImpactDelta = 0.0f;
-    m_flImpactTargetDelta = 0.0f;
-    m_flImpactVel = 0.0f;
+    m_flLastImpactValue = 0.0f;
+    m_flLastImpactGroundOffsetZ = 0;
+    m_bWasOnGround = false;
 
     m_iPoseParamMoveX = -1;
     m_iPoseParamVertAim = -1;
@@ -226,12 +222,6 @@ bool C_ZMViewModel::Interpolate( float currentTime )
 // This is separate from ResetLatched because it gets called pretty often.
 void C_ZMViewModel::OnTeleported()
 {
-    auto* pOwner = GetOwner();
-    if ( pOwner )
-    {
-        m_flLastEyePosZ = pOwner->EyePosition().z;
-    }
-
     m_vecLastVel = vec3_origin;
 }
 
@@ -417,16 +407,19 @@ bool C_ZMViewModel::PerformMovementLag( Vector& vecPos, QAngle& ang, const Vecto
     return true;
 }
 
-ConVar zm_cl_bob_lag_impact_interp( "zm_cl_bob_lag_impact_interp", "0.1" );
 
-ConVar zm_cl_bob_lag_impact_air( "zm_cl_bob_lag_impact_air", "4" );
-ConVar zm_cl_bob_lag_impact_air_rate( "zm_cl_bob_lag_impact_air_rate", "0.2" );
+ConVar zm_cl_bob_lag_impact_approachspeed( "zm_cl_bob_lag_impact_approachspeed", "120" );
+ConVar zm_cl_bob_lag_impact_approachsmooth( "zm_cl_bob_lag_impact_approachsmooth", "24" );
 
-ConVar zm_cl_bob_lag_impact_ground( "zm_cl_bob_lag_impact_ground", "5" );
-ConVar zm_cl_bob_lag_impact_ground_rate( "zm_cl_bob_lag_impact_ground_rate", "0.15" );
+ConVar zm_cl_bob_lag_impact_air_angle( "zm_cl_bob_lag_impact_air_angle", "4" );
+ConVar zm_cl_bob_lag_impact_air_move( "zm_cl_bob_lag_impact_air_move", "1" );
+ConVar zm_cl_bob_lag_impact_air_vel_rate( "zm_cl_bob_lag_impact_air_vel_rate", "0.1" );
+ConVar zm_cl_bob_lag_impact_air_vel_max( "zm_cl_bob_lag_impact_air_vel_max", "300" );
 
-ConVar zm_cl_bob_lag_impact_land( "zm_cl_bob_lag_impact_land", "700" );
-ConVar zm_cl_bob_lag_impact_land_rate( "zm_cl_bob_lag_impact_land_rate", "400" );
+ConVar zm_cl_bob_lag_impact_ground_angle( "zm_cl_bob_lag_impact_ground_angle", "5" );
+ConVar zm_cl_bob_lag_impact_ground_move( "zm_cl_bob_lag_impact_ground_move", "1" );
+
+ConVar zm_cl_bob_lag_impact_rate( "zm_cl_bob_lag_impact_rate", "0.1" );
 
 bool C_ZMViewModel::PerformImpactLag( Vector& vecPos, QAngle& ang, const Vector& origPos )
 {
@@ -435,95 +428,85 @@ bool C_ZMViewModel::PerformImpactLag( Vector& vecPos, QAngle& ang, const Vector&
         return false;
 
 
-    const float flInterp = zm_cl_bob_lag_impact_interp.GetFloat();
-
 
     bool bOnGround = (pOwner->GetFlags() & FL_ONGROUND) != 0;
 
 
-    // Add an entry to history.
-    m_flLagEyePosZ = origPos.z;
-    m_flLagEyePosZHistory.NoteChanged( gpGlobals->curtime, flInterp, false );
+    float flBaseValue = pOwner->GetViewOffset().z;
 
-    // Interpolate back 100ms.
-    m_flLagEyePosZHistory.Interpolate( gpGlobals->curtime, flInterp );
-
-    // Smooth out the movement a bit.
-    float eyepos = ApproachSmooth( m_flLagEyePosZ, m_flLastEyePosZ, gpGlobals->frametime * 120.0f, 24.0f );
-    m_flLastEyePosZ = clamp( eyepos, m_flLagEyePosZ - 24.0f, m_flLagEyePosZ + 24.0f );
-
-    float delta = origPos.z - eyepos;
-
-    
-    
-    if ( bOnGround )
+    if ( !bOnGround )
     {
-        float maxvalue = fabsf( zm_cl_bob_lag_impact_ground.GetFloat() );
-        delta *= zm_cl_bob_lag_impact_ground_rate.GetFloat();
-        delta = clamp( delta, -maxvalue, maxvalue );
+        // The view offset changes jarringly in the air when crouching/uncrouching.
+        flBaseValue = m_flLastImpactGroundOffsetZ;
     }
     else
     {
-        float maxvalue = fabsf( zm_cl_bob_lag_impact_air.GetFloat() );
-        delta *= zm_cl_bob_lag_impact_air_rate.GetFloat();
-        delta = clamp( delta, -maxvalue, maxvalue );
+        // Once we're back on ground, translate it.
+        if ( !m_bWasOnGround )
+        {
+            m_flLastImpactValue += flBaseValue - m_flLastImpactGroundOffsetZ;
+        }
+
+        m_flLastImpactGroundOffsetZ = flBaseValue;
     }
 
-    float flOriginalDelta = delta;
+    float flCurValue = flBaseValue;
 
-
-    float flNextDelta = flOriginalDelta;
-    
-    
-    // Jumping/landing
-    if ( bOnGround != m_bOnGround )
+    if ( !bOnGround )
     {
-        m_bOnGround = bOnGround;
-        m_flGroundTime = gpGlobals->curtime;
-
-        if ( bOnGround )
+        if ( pOwner->GetMoveType() != MOVETYPE_NOCLIP )
         {
-            // We landed, init the impact logic.
-            const float flMaxLandingSpeed = 400.0f;
+            float maxvelocity = zm_cl_bob_lag_impact_air_vel_max.GetFloat();
+            float vel = clamp( pOwner->GetLocalVelocity().z, -maxvelocity, maxvelocity );
 
-
-            float impactSpd = fabsf( delta ) / flInterp;
-            impactSpd = MAX( impactSpd, 0.0f );
-
-            float mult = impactSpd / flMaxLandingSpeed;
-            mult = MIN( mult, 1.0f );
-
-            m_flImpactTargetDelta = m_flLastImpactDelta;
-            m_flImpactVel = zm_cl_bob_lag_impact_land.GetFloat() * mult;
-            m_flImpactVelOrig = m_flImpactVel;
+            flCurValue -= vel * zm_cl_bob_lag_impact_air_vel_rate.GetFloat();
         }
     }
 
+
+    // Approach the value smoothly
+    float flNewValue = ApproachSmooth(
+        flCurValue,
+        m_flLastImpactValue,
+        gpGlobals->frametime * zm_cl_bob_lag_impact_approachspeed.GetFloat(),
+        zm_cl_bob_lag_impact_approachsmooth.GetFloat() );
+
+
+    float delta = flBaseValue - flNewValue;
+
+    float flAngleValue = delta;
+    float flMoveValue = delta;
+
+    float flAngleMax;
+    float flMoveMax;
+
+    float flRate = zm_cl_bob_lag_impact_rate.GetFloat();
     
+
     if ( bOnGround )
     {
-        // We're doing the impact effect.
-        if ( m_flImpactVel > 0.0f || m_flImpactTargetDelta > flOriginalDelta )
-        {
-            m_flImpactVel -= zm_cl_bob_lag_impact_land_rate.GetFloat() * gpGlobals->frametime;
-
-            // Still above our intended spot, maintain velocity.
-            if ( m_flImpactTargetDelta < flOriginalDelta )
-            {
-                m_flImpactVel = MAX( m_flImpactVel, m_flImpactVelOrig );
-            }
-
-            m_flImpactTargetDelta += m_flImpactVel * gpGlobals->frametime;
-            flNextDelta = m_flImpactTargetDelta;
-        }
+        flAngleMax = fabsf( zm_cl_bob_lag_impact_ground_angle.GetFloat() );
+        flMoveMax = fabsf( zm_cl_bob_lag_impact_ground_move.GetFloat() );
     }
-
-    ang.x += flNextDelta;
-
-    if ( !bOnGround ) // Save our last delta for the impact effect.
+    else
     {
-        m_flLastImpactDelta = flNextDelta;
+        flAngleMax = fabsf( zm_cl_bob_lag_impact_air_angle.GetFloat() );
+        flMoveMax = fabsf( zm_cl_bob_lag_impact_air_move.GetFloat() );
     }
+
+
+    flAngleValue *= flRate;
+    flMoveValue *= flRate;
+
+    flAngleValue = clamp( flAngleValue, -flAngleMax, flAngleMax );
+    flMoveValue = clamp( flMoveValue, -flMoveMax, flMoveMax );
+    
+    ang.x += flAngleValue;
+    vecPos.z -= flMoveValue;
+
+
+    m_flLastImpactValue = flNewValue;
+    m_bWasOnGround = bOnGround;
 
     return true;
 }
@@ -756,7 +739,6 @@ CStudioHdr* C_ZMViewModel::OnNewModel()
 
 
     m_LagAnglesHistory.ClearHistory();
-    m_flLagEyePosZHistory.ClearHistory();
 
 
     return pHdr;
