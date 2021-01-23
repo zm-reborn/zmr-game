@@ -317,8 +317,9 @@ ConVar zm_cl_bob_lag_interp( "zm_cl_bob_lag_interp", "0.1" );
 ConVar zm_cl_bob_lag_angle_mult( "zm_cl_bob_lag_angle_mult", "0.07" );
 ConVar zm_cl_bob_lag_angle_move_mult( "zm_cl_bob_lag_angle_move_mult", "0.01" );
 //ConVar zm_cl_bob_lag_movement_fwd_pitch_mult( "zm_cl_bob_lag_movement_fwd_pitch_mult", "0.1" );
-ConVar zm_cl_bob_lag_movement_side_roll_mult( "zm_cl_bob_lag_movement_side_roll_mult", "3" );
-ConVar zm_cl_bob_lag_movement_side_yaw_mult( "zm_cl_bob_lag_movement_side_yaw_mult", "2" );
+ConVar zm_cl_bob_lag_movement_side_roll_mult( "zm_cl_bob_lag_movement_side_roll_mult", "2.5" );
+ConVar zm_cl_bob_lag_movement_side_yaw_mult( "zm_cl_bob_lag_movement_side_yaw_mult", "1" );
+ConVar zm_cl_bob_lag_movement_side_move_mult( "zm_cl_bob_lag_movement_side_move_mult", "0.5" );
 
 bool C_ZMViewModel::PerformLag( Vector& vecPos, QAngle& ang, const Vector& origPos, const QAngle& origAng )
 {
@@ -403,6 +404,8 @@ bool C_ZMViewModel::PerformMovementLag( Vector& vecPos, QAngle& ang, const Vecto
     //ang.x += dotFwd * zm_cl_bob_lag_movement_fwd_pitch_mult.GetFloat();
     ang.y -= dotRight * zm_cl_bob_lag_movement_side_yaw_mult.GetFloat();
     ang.z -= dotRight * zm_cl_bob_lag_movement_side_roll_mult.GetFloat();
+
+    vecPos += right * dotRight * zm_cl_bob_lag_movement_side_move_mult.GetFloat();
 
     return true;
 }
