@@ -34,14 +34,23 @@ Run `zmr_dev_setup.ps1` inside `mp/game/zombie_master_reborn`. There should now 
 Start hl2 with the Steam runtime.
 `~/.local/share/Steam/ubuntu12_32/steam-runtime/run.sh ./hl2.sh -game zombie_master_reborn`
 
+## Final Build
+
+Turning on the conditional `ZMR_FINAL` in `mp/src/vpc_scripts/default.vgc` will enable FMOD sound engine and Discord RPC. FMOD headers need to be placed in `public/fmod/` (they cannot be distributed here).
+
+You'll also need a copy of the binaries to run the game. (discord-rpc.dll & fmod.dll)
+
 ## FAQ
 **Is compiling on Linux really this convoluted?**
+
 Yes.
 
 **Opening the solution says something about upgrading.**
+ 
  Run `mp/src/fix_vcxproj.bat`. If it still complains about upgrading, see below.
 
 **Project refuses to compile, says something about wrong/missing toolset.**
+
 Open project settings and make sure `Platform Toolset` is `v142` and `Windows SDK Version` is `10.0` (other 10.X versions should also work).
 If it says one of them is missing, you need to download them from Visual Studio Installer (Tools -> Get Tools and Features)
 
