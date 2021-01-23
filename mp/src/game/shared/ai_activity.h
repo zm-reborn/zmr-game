@@ -2209,6 +2209,8 @@ typedef enum
     ACT_FASTZOMBIE_LAND_RIGHT,
     ACT_FASTZOMBIE_LAND_LEFT,
     ACT_FASTZOMBIE_LEAP_STRIKE,
+
+	ACT_ZM_FIDGET,
 #endif
 
 	// this is the end of the global activities, private per-monster activities start here.
