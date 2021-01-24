@@ -19,6 +19,7 @@
 #include "zmr_player.h"
 #include "zmr_mapentities.h"
 #include "zmr_resource_system.h"
+#include "zmr_util.h"
 #else
 #include "c_zmr_player.h"
 #endif
@@ -777,6 +778,10 @@ bool CZMRules::CanInactivityPunish( CZMPlayer* pPlayer )
     // Ignore bots.
     // For testing purposes and ZM AI ;)
     if ( pPlayer->IsBot() )
+        return false;
+
+    // No afk punishing when alone in listen server.
+    if ( !engine->IsDedicatedServer() && ZMUtil::CountPlayers( true ) <= 1 )
         return false;
 
 
