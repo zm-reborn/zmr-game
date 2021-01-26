@@ -126,6 +126,14 @@ BEGIN_DATADESC( CZMEntObjectives )
     DEFINE_INPUTFUNC( FIELD_FLOAT, "IncChild3TextArg", InputIncChild3TextArg ),
     DEFINE_INPUTFUNC( FIELD_FLOAT, "IncChild4TextArg", InputIncChild4TextArg ),
 
+    // Like InValue in other entities.
+    // Just sets the argument value.
+    DEFINE_INPUTFUNC( FIELD_FLOAT, "InValueMainArg", InputMainArg ),
+    DEFINE_INPUTFUNC( FIELD_FLOAT, "InValueChild1Arg", InputChild1Arg ),
+    DEFINE_INPUTFUNC( FIELD_FLOAT, "InValueChild2Arg", InputChild2Arg ),
+    DEFINE_INPUTFUNC( FIELD_FLOAT, "InValueChild3Arg", InputChild3Arg ),
+    DEFINE_INPUTFUNC( FIELD_FLOAT, "InValueChild4Arg", InputChild4Arg ),
+
     DEFINE_INPUTFUNC( FIELD_VOID, "CompleteMain", InputCompleteMain ),
     DEFINE_INPUTFUNC( FIELD_VOID, "CompleteChild1", InputCompleteChild1 ),
     DEFINE_INPUTFUNC( FIELD_VOID, "CompleteChild2", InputCompleteChild2 ),
@@ -191,6 +199,7 @@ void CZMEntObjectives::InputReset( inputdata_t& inputData ) { Reset(); }
 void CZMEntObjectives::InputSetMainText( inputdata_t& inputData ) { m_Lines[0].SetText( inputData.value.String() ); }
 void CZMEntObjectives::InputSetMainTextArg( inputdata_t& inputData ) { m_Lines[0].ParseArg( inputData.value.String() ); }
 void CZMEntObjectives::InputIncMainTextArg( inputdata_t& inputData ) { m_Lines[0].m_flTextArgNum += inputData.value.Float(); }
+void CZMEntObjectives::InputMainArg( inputdata_t& inputData ) { m_Lines[0].m_flTextArgNum = inputData.value.Float(); }
 void CZMEntObjectives::InputCompleteMain( inputdata_t& inputData ) { m_Lines[0].m_bComplete = true; }
 void CZMEntObjectives::InputInCompleteMain( inputdata_t& inputData ) { m_Lines[0].m_bComplete = false; }
 void CZMEntObjectives::InputResetMain( inputdata_t& inputData ) { m_Lines[0].Reset(); }
@@ -204,6 +213,7 @@ void CZMEntObjectives::InputUpdateMainText( inputdata_t& inputData )
 void CZMEntObjectives::InputSetChild1Text( inputdata_t& inputData ) { m_Lines[1].SetText( inputData.value.String() ); }
 void CZMEntObjectives::InputSetChild1TextArg( inputdata_t& inputData ) { m_Lines[1].ParseArg( inputData.value.String() ); }
 void CZMEntObjectives::InputIncChild1TextArg( inputdata_t& inputData ) { m_Lines[1].m_flTextArgNum += inputData.value.Float(); }
+void CZMEntObjectives::InputChild1Arg( inputdata_t& inputData ) { m_Lines[1].m_flTextArgNum = inputData.value.Float(); }
 void CZMEntObjectives::InputCompleteChild1( inputdata_t& inputData ) { m_Lines[1].m_bComplete = true; }
 void CZMEntObjectives::InputInCompleteChild1( inputdata_t& inputData ) { m_Lines[1].m_bComplete = false; }
 void CZMEntObjectives::InputResetChild1( inputdata_t& inputData ) { m_Lines[1].Reset(); }
@@ -217,6 +227,7 @@ void CZMEntObjectives::InputUpdateChild1Text( inputdata_t& inputData )
 void CZMEntObjectives::InputSetChild2Text( inputdata_t& inputData ) { m_Lines[2].SetText( inputData.value.String() ); }
 void CZMEntObjectives::InputSetChild2TextArg( inputdata_t& inputData ) { m_Lines[2].ParseArg( inputData.value.String() ); }
 void CZMEntObjectives::InputIncChild2TextArg( inputdata_t& inputData ) { m_Lines[2].m_flTextArgNum += inputData.value.Float(); }
+void CZMEntObjectives::InputChild2Arg( inputdata_t& inputData ) { m_Lines[2].m_flTextArgNum = inputData.value.Float(); }
 void CZMEntObjectives::InputCompleteChild2( inputdata_t& inputData ) { m_Lines[2].m_bComplete = true; }
 void CZMEntObjectives::InputInCompleteChild2( inputdata_t& inputData ) { m_Lines[2].m_bComplete = false; }
 void CZMEntObjectives::InputResetChild2( inputdata_t& inputData ) { m_Lines[2].Reset(); }
@@ -230,6 +241,7 @@ void CZMEntObjectives::InputUpdateChild2Text( inputdata_t& inputData )
 void CZMEntObjectives::InputSetChild3Text( inputdata_t& inputData ) { m_Lines[3].SetText( inputData.value.String() ); }
 void CZMEntObjectives::InputSetChild3TextArg( inputdata_t& inputData ) { m_Lines[3].ParseArg( inputData.value.String() ); }
 void CZMEntObjectives::InputIncChild3TextArg( inputdata_t& inputData ) { m_Lines[3].m_flTextArgNum += inputData.value.Float(); }
+void CZMEntObjectives::InputChild3Arg( inputdata_t& inputData ) { m_Lines[3].m_flTextArgNum = inputData.value.Float(); }
 void CZMEntObjectives::InputCompleteChild3( inputdata_t& inputData ) { m_Lines[3].m_bComplete = true; }
 void CZMEntObjectives::InputInCompleteChild3( inputdata_t& inputData ) { m_Lines[3].m_bComplete = false; }
 void CZMEntObjectives::InputResetChild3( inputdata_t& inputData ) { m_Lines[3].Reset(); }
@@ -243,6 +255,7 @@ void CZMEntObjectives::InputUpdateChild3Text( inputdata_t& inputData )
 void CZMEntObjectives::InputSetChild4Text( inputdata_t& inputData ) { m_Lines[4].SetText( inputData.value.String() ); }
 void CZMEntObjectives::InputSetChild4TextArg( inputdata_t& inputData ) { m_Lines[4].ParseArg( inputData.value.String() ); }
 void CZMEntObjectives::InputIncChild4TextArg( inputdata_t& inputData ) { m_Lines[4].m_flTextArgNum += inputData.value.Float(); }
+void CZMEntObjectives::InputChild4Arg( inputdata_t& inputData ) { m_Lines[4].m_flTextArgNum = inputData.value.Float(); }
 void CZMEntObjectives::InputCompleteChild4( inputdata_t& inputData ) { m_Lines[4].m_bComplete = true; }
 void CZMEntObjectives::InputInCompleteChild4( inputdata_t& inputData ) { m_Lines[4].m_bComplete = false; }
 void CZMEntObjectives::InputResetChild4( inputdata_t& inputData ) { m_Lines[4].Reset(); }

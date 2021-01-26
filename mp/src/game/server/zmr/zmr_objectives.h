@@ -80,6 +80,12 @@ public:
     void InputIncChild3TextArg( inputdata_t &inputData );
     void InputIncChild4TextArg( inputdata_t &inputData );
 
+    void InputMainArg( inputdata_t &inputData );
+    void InputChild1Arg( inputdata_t &inputData );
+    void InputChild2Arg( inputdata_t &inputData );
+    void InputChild3Arg( inputdata_t &inputData );
+    void InputChild4Arg( inputdata_t &inputData );
+
     void InputCompleteMain( inputdata_t &inputData );
     void InputCompleteChild1( inputdata_t &inputData );
     void InputCompleteChild2( inputdata_t &inputData );
