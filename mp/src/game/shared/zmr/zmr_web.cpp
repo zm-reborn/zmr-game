@@ -15,24 +15,16 @@
 #include "tier0/memdbgon.h"
 
 
-#define VERSION_URL     "https://raw.githubusercontent.com/zm-reborn/zmr-game/master/version.txt"
+#define VERSION_URL     "http://version.zmreborn.com"
 
-#ifndef CLIENT_DLL
-CON_COMMAND( zm_queryversion, "" )
-{
-    g_pZMWeb->QueryVersionNumber();
-}
-#endif
-
-
-#ifndef CLIENT_DLL
-ConVar zm_sv_checkversion( "zm_sv_checkversion", "1" );
-#endif
 
 void CZMWeb::Get( const char* url, HTTPCallback::func_t func )
 {
-    if ( !STEAM_API || !STEAM_API->SteamHTTP() ) return;
-    
+    if ( !STEAM_API || !STEAM_API->SteamHTTP() )
+    {
+        Assert( 0 );
+        return;
+    }
     
     HTTPRequestHandle req = STEAM_API->SteamHTTP()->CreateHTTPRequest( k_EHTTPMethodGET, url );
 
@@ -53,46 +45,55 @@ void CZMWeb::QueryVersionNumber()
 {
     DevMsg( "Querying version...\n" );
 
-#ifndef CLIENT_DLL
-    if ( zm_sv_checkversion.GetBool() )
-#endif
-    {
-        Get( VERSION_URL, &CZMWeb::Callback_Version );
-    }
+    Get( VERSION_URL, &CZMWeb::Callback_Version );
 }
 
 void CZMWeb::Callback_Version( HTTPRequestCompleted_t* pResult, bool bIOFailure )
 {
-    if ( !STEAM_API || !STEAM_API->SteamHTTP() ) return;
+    if ( !STEAM_API || !STEAM_API->SteamHTTP() )
+    {
+        Assert( 0 );
+        return;
+    }
 
-    if ( bIOFailure ) return;
-
-    if ( !pResult || !pResult->m_bRequestSuccessful ) return;
-
-    if ( pResult->m_eStatusCode == k_EHTTPStatusCode502BadGateway ) return;
-
-
-    uint32 size;
-    STEAM_API->SteamHTTP()->GetHTTPResponseBodySize( pResult->m_hRequest, &size );
-
-    if ( !size ) return;
+    if ( !pResult || !pResult->m_hRequest ) return;
 
 
-    uint8* data = new uint8[size];
-    STEAM_API->SteamHTTP()->GetHTTPResponseBodyData( pResult->m_hRequest, data, size );
+    if (!bIOFailure &&
+        pResult->m_bRequestSuccessful &&
+        pResult->m_eStatusCode == k_EHTTPStatusCode200OK &&
+        pResult->m_unBodySize > 0 )
+    {
+        uint8* data = new uint8[pResult->m_unBodySize + 1];
+        STEAM_API->SteamHTTP()->GetHTTPResponseBodyData( pResult->m_hRequest, data, pResult->m_unBodySize );
+        data[pResult->m_unBodySize] = NULL;
 
+        ParseVersion( reinterpret_cast<char*>( data ) );
 
-    ParseVersion( reinterpret_cast<char*>( data ) );
+        delete[] data;
+    }
 
-    delete[] data;
     STEAM_API->SteamHTTP()->ReleaseHTTPRequest( pResult->m_hRequest );
 }
 
-void CZMWeb::ParseVersion( const char* data )
+void CZMWeb::ParseVersion( const char* pszVersionString )
 {
+    // Typical version string should be
+    // cXX.sXX
+    // Where
+    // cXX = client version
+    // sXX = server version
+    //
+    if ( pszVersionString[0] != 'c' && pszVersionString[0] != 's' )
+    {
+        Assert( 0 );
+        return;
+    }
+
+
     const char* sep[] = { ".", "\n" };
 
-    CSplitString strs( data, sep, ARRAYSIZE( sep ) );
+    CSplitString strs( pszVersionString, sep, ARRAYSIZE( sep ) );
 
 
     int len = strs.Count() >= 2 ? 2 : 0;
@@ -109,12 +110,14 @@ void CZMWeb::ParseVersion( const char* data )
         if ( !FStrEq( &(strs[i][1]), ZMR_VERSION ) )
         {
 #ifdef CLIENT_DLL
-			engine->ClientCmd_Unrestricted( "OpenZMNewVersion" );
+            engine->ClientCmd_Unrestricted( "OpenZMNewVersion" );
 #else
             UTIL_LogPrintf( "New version of %s is available!\n", ZMR_NAME );
 #endif
 
             Msg( "*\n*\n* New version of %s is available!\n*\n*\n", ZMR_NAME );
+
+            DevMsg( "Version string: %s\n", pszVersionString );
 
             return;
         }

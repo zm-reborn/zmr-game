@@ -13,13 +13,13 @@ private:
     typedef CCallResult<CZMWeb, HTTPRequestCompleted_t> HTTPCallback;
 
 
-    void Get( const char* url, HTTPCallback::func_t );
+    void Get( const char* url, HTTPCallback::func_t func );
+
+    void Callback_Version( HTTPRequestCompleted_t* pResult, bool bIOFailure );
+    void ParseVersion( const char* pszVersionString );
+
 
     HTTPCallback m_Callback;
-
-
-    void Callback_Version( HTTPRequestCompleted_t*, bool );
-    void ParseVersion( const char* );
 };
 
 extern CZMWeb* g_pZMWeb;

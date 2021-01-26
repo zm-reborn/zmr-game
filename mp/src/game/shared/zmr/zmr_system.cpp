@@ -42,7 +42,14 @@
 #ifdef CLIENT_DLL
 ConVar zm_cl_roundrestart_flashtaskbar( "zm_cl_roundrestart_flashtaskbar", "1", 0, "Flash the taskbar icon (Windows) whenever round restarts. 1 = Only when window is not active, 2 = Always" );
 ConVar zm_cl_roundrestart_sound( "zm_cl_roundrestart_sound", "1", 0, "Play a sound whenever round restarts. (Windows) 1 = Only when window is not active, 2 = Always" );
-#endif
+#else // CLIENT_DLL
+
+#ifndef ZMR_STEAM
+ConVar zm_sv_checkversion( "zm_sv_checkversion", "1", 0, "Is the game version checked every map change?" );
+#endif // ZMR_STEAM
+
+#endif // CLIENT_DLL
+
 
 
 class CZMSystem : public CAutoGameSystem, public CGameEventListener
@@ -151,7 +158,10 @@ void CZMSystem::LevelInitPostEntity()
         }
         
 #if !defined( _DEBUG ) && !defined( ZMR_STEAM )
-        g_pZMWeb->QueryVersionNumber();
+        if ( zm_sv_checkversion.GetBool() )
+        {
+            g_pZMWeb->QueryVersionNumber();
+        }
 #endif
     }
 
