@@ -4,6 +4,7 @@
 #include "eventlist.h"
 
 #include "zmr_gamerules.h"
+#include "npcs/zmr_zombieanimstate.h"
 #include "npcs/zmr_zombiebase.h"
 #include "zmr_banshee_path.h"
 #include "zmr_banshee.h"
@@ -87,8 +88,8 @@ CZMBanshee::CZMBanshee()
     m_nMeleeAttacks = 0;
 
 
-    m_pLeapSched = new BansheeLeapSched;
-    m_pCeilAmbushSched = new BansheeCeilAmbushSched;
+    m_pLeapSched = new CBansheeLeapSchedule;
+    m_pCeilAmbushSched = new CBansheeCeilAmbushSchedule;
 }
 
 CZMBanshee::~CZMBanshee()

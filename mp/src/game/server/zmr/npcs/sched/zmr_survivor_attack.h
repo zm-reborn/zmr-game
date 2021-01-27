@@ -1,6 +1,9 @@
 #pragma once
 
-class CZMSurvivorAttackInt
+//
+// Interface for the survivor attack schedules
+//
+class CSurvivorAttackInt
 {
 public:
     CBaseEntity*    GetAttackTarget() const { return m_pEnemy.Get(); }

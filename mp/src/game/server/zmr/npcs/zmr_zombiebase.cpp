@@ -328,7 +328,7 @@ bool CZMBaseZombie::CreateComponents()
 
 NPCR::CScheduleInterface* CZMBaseZombie::CreateScheduleInterface()
 {
-    return new NPCR::CScheduleInterface( this, new MoveSchedule );
+    return new NPCR::CScheduleInterface( this, new CZombieMainSchedule );
 }
 
 NPCR::CBaseSenses* CZMBaseZombie::CreateSenses()

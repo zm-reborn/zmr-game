@@ -1,6 +1,7 @@
 #include "cbase.h"
 #include "gameinterface.h"
 #include "in_buttons.h"
+#include "soundent.h"
 
 
 #include "npcr/npcr_schedule.h"
@@ -60,7 +61,7 @@ CZMPlayerBot::~CZMPlayerBot()
 
 NPCR::CScheduleInterface* CZMPlayerBot::CreateScheduleInterface()
 {
-    return new NPCR::CScheduleInterface( this, new BotMainSchedule );
+    return new NPCR::CScheduleInterface( this, new CPlayerBotMainSchedule );
 }
 
 NPCR::CBaseSenses* CZMPlayerBot::CreateSenses()
