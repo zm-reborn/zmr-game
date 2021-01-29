@@ -34,7 +34,7 @@ namespace ZMItemAction
 
         CLASS_MELEE             = ( 1 << 16 ),
 
-        CLASS_DONTUSE           = ( 1 << 7 ), // Class that shouldn't be used. Ie. this item shouldn't be spawned.
+        CLASS_DONTUSE           = ( 1 << 17 ), // Class that shouldn't be used. Ie. this item shouldn't be spawned.
     };
 
     enum ItemSpawnTime_t
