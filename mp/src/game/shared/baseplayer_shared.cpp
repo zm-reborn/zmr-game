@@ -228,7 +228,7 @@ void CBasePlayer::ItemPostFrame()
 {
 	VPROF( "CBasePlayer::ItemPostFrame" );
 
-#if defined(GAME_DLL) || !defined(ZMR) // ZMRCHANGE: This fucks up viewmodel swaying on the client.
+#if defined(GAME_DLL)
 	// Put viewmodels into basically correct place based on new player origin
 	CalcViewModelView( EyePosition(), EyeAngles() );
 #endif

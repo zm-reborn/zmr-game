@@ -38,29 +38,16 @@ BEGIN_NETWORK_TABLE( CZMViewModel, DT_ZM_ViewModel )
 
     SendPropExclude( "DT_BaseAnimating", "m_flEncodedController" ),
 
-    SendPropExclude( "DT_BaseAnimating", "m_flPlaybackRate" ),
-    SendPropExclude( "DT_BaseViewModel", "m_flPlaybackRate" ),
-
     SendPropExclude( "DT_BaseAnimatingOverlay", "overlay_vars" ),
-
-    SendPropExclude( "DT_ServerAnimationData" , "m_flCycle" ),	
-    SendPropExclude( "DT_AnimTimeMustBeFirst" , "m_flAnimTime" ),
 #endif
 END_NETWORK_TABLE()
 
 #ifdef CLIENT_DLL
 BEGIN_PREDICTION_DATA( C_ZMViewModel )
 
-    DEFINE_PRED_FIELD( m_flCycle, FIELD_FLOAT, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
-    DEFINE_PRED_FIELD( m_flAnimTime, FIELD_FLOAT, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
-
-    DEFINE_PRED_FIELD( m_flPlaybackRate, FIELD_FLOAT, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
     DEFINE_PRED_ARRAY( m_flPoseParameter, FIELD_FLOAT, MAXSTUDIOPOSEPARAM, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
 
     DEFINE_PRED_ARRAY( m_flEncodedController, FIELD_FLOAT, MAXSTUDIOBONECTRLS, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
-
-    DEFINE_PRED_FIELD( m_vecOrigin, FIELD_VECTOR, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
-    DEFINE_PRED_FIELD( m_angRotation, FIELD_VECTOR, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
 
 END_PREDICTION_DATA()
 #endif
@@ -96,8 +83,6 @@ CZMViewModel::CZMViewModel()
 #else
     SetModelColor2( 1.0f, 1.0f, 1.0f );
 #endif
-
-    UseClientSideAnimation();
 }
 
 CZMViewModel::~CZMViewModel()
@@ -165,14 +150,28 @@ void CZMViewModel::CalcViewModelView( CBasePlayer* pOwner, const Vector& eyePosi
     if ( ViewModelIndex() == VMINDEX_WEP )
     {
 #ifdef CLIENT_DLL
-        // Let the viewmodel shake at about 10% of the amplitude of the player's view
-        vieweffects->ApplyShake( newPos, newAng, 0.1f );
+        // HACK: We need to manually advance the idle animations because
+        // they are no longer interpolated. (pose parameter bobbing)
+        // Make sure this is called every frame.
+        Activity activity = GetSequenceActivity( GetSequence() );
+        if ( activity == ACT_VM_IDLE || activity == ACT_VM_IDLE_EMPTY )
+        {
+            FrameAdvance();
+        }
 
-        PerformIronSight( newPos, newAng, originalAng );
+        if ( !prediction->InPrediction() )
+        {
+            PerformAnimBobbing();
 
-        PerformOldBobbing( newPos, newAng );
+            // Let the viewmodel shake at about 10% of the amplitude of the player's view
+            vieweffects->ApplyShake( newPos, newAng, 0.1f );
 
-        PerformLag( newPos, newAng, originalPos, originalAng );
+            PerformIronSight( newPos, newAng, originalAng );
+
+            PerformOldBobbing( newPos, newAng );
+
+            PerformLag( newPos, newAng, originalPos, originalAng );
+        }
 #endif
     }
 
@@ -189,33 +188,6 @@ CZMPlayer* CZMViewModel::GetOwner() const
 CZMBaseWeapon* CZMViewModel::GetWeapon() const
 {
     return static_cast<CZMBaseWeapon*>( CBaseViewModel::GetWeapon() );
-}
-
-void C_ZMViewModel::UpdateClientSideAnimation()
-{
-    PerformAnimBobbing();
-
-    BaseClass::UpdateClientSideAnimation();
-}
-
-bool C_ZMViewModel::ShouldPredict()
-{
-    auto* pOwner = GetOwner();
-    if ( pOwner && pOwner == C_ZMPlayer::GetLocalPlayer() )
-        return true;
-
-    return BaseClass::ShouldPredict();
-}
-
-bool C_ZMViewModel::Interpolate( float currentTime )
-{
-    // We need to skip the C_BaseViewModel interpolation as it fucks up our client-side cycle.
-    
-    // Animation parity makes sure our animation cycle is up-to-date
-    // in case unpredicted thing happens.
-    UpdateAnimationParity();
-
-    return C_BaseAnimating::Interpolate( currentTime );
 }
 
 // Release interpolated stuff.

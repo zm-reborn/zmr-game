@@ -33,10 +33,6 @@ public:
     virtual bool                ShouldReceiveProjectedTextures( int flags ) OVERRIDE;
     virtual C_BaseAnimating*    FindFollowedEntity() OVERRIDE;
 
-    virtual void                UpdateClientSideAnimation() OVERRIDE;
-
-    virtual bool                ShouldPredict() OVERRIDE;
-    virtual bool                Interpolate( float currentTime ) OVERRIDE;
     void                        OnTeleported();
 
     CZMBaseWeapon* GetWeapon() const;

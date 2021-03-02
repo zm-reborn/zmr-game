@@ -154,6 +154,17 @@ bool C_BaseViewModel::Interpolate( float currentTime )
 
 	bool bret = BaseClass::Interpolate( currentTime );
 
+	// ZMRCHANGE: Fix the pose parameter weapon bobbing by not interpolating idle animations.
+	// Changing the pose parameters changes the cycle rate and makes the animations all screwy here.
+	// The idle animations do need to be updated manually. See CZMViewModel::CalcViewModelView.
+#ifdef ZMR
+	Activity activity = GetSequenceActivity( GetSequence() );
+	if ( activity == ACT_VM_IDLE || activity == ACT_VM_IDLE_EMPTY )
+	{
+		return bret;
+	}
+#endif
+	
 	// Hack to extrapolate cycle counter for view model
 	float elapsed_time = currentTime - m_flAnimTime;
 	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
