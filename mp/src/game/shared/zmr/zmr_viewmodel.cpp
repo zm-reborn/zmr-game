@@ -15,6 +15,11 @@
 #include "tier0/memdbgon.h"
 
 
+#ifdef CLIENT_DLL
+ConVar zm_cl_crosshair_draw_ironsights( "zm_cl_crosshair_draw_ironsights", "0", FCVAR_ARCHIVE, "Is the crosshair drawn when zoomed in into ironsights." );
+#endif // CLIENT_DLL
+
+
 static float ApproachSmooth( float target, float value, float speed, float smoothness_start, float epsilon = 0.01f );
 
 
@@ -200,6 +205,11 @@ void C_ZMViewModel::OnTeleported()
 bool C_ZMViewModel::IsInIronsights() const
 {
     return m_bInIronSight;
+}
+
+bool C_ZMViewModel::ShouldDrawCrosshair() const
+{
+    return !IsInIronsights() || zm_cl_crosshair_draw_ironsights.GetBool();
 }
 
 ConVar zm_cl_ironsight_zoom_rate( "zm_cl_ironsight_zoom_rate", "6" );

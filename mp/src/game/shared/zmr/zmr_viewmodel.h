@@ -42,6 +42,7 @@ public:
     bool PerformOldBobbing( Vector& vecPos, QAngle& ang );
     void PerformAnimBobbing();
 
+    bool ShouldDrawCrosshair() const;
     bool IsInIronsights() const;
     bool PerformIronSight( Vector& vecPos, QAngle& ang, const QAngle& origAng );
 

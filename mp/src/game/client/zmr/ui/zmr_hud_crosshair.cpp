@@ -73,6 +73,10 @@ bool CZMHudCrosshair::ShouldDraw()
     if ( pWeapon && !pWeapon->ShouldDrawCrosshair() )
         return false;
 
+    auto* pVM = pPlayer->GetViewModel( VMINDEX_WEP );
+    if ( pVM && !pVM->ShouldDrawCrosshair() )
+        return false;
+
     if ( !zm_cl_zmcrosshair.GetBool() && ToZMPlayer( pPlayer )->IsZM() )
     {
         return false;
