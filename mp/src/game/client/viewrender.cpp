@@ -77,6 +77,11 @@
 // Projective textures
 #include "C_Env_Projected_Texture.h"
 
+#ifdef ZMR
+#include "zmr_viewmodel.h"
+#include "zmr_player_shared.h"
+#endif
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -1965,6 +1970,10 @@ void CViewRender::RenderView( const CViewSetup &view, int nClearFlags, int whatT
 		}
 	#endif
 
+#ifdef ZMR
+		DrawScope( GetView( STEREO_EYE_MONO ) );
+#endif
+
 		g_bRenderingView = true;
 
 		// Must be first 
@@ -3035,6 +3044,166 @@ void CViewRender::ViewDrawScene_Intro( const CViewSetup &view, int nClearFlags, 
 		g_pClientShadowMgr->UnlockAllShadowDepthTextures();
 	}
 }
+
+#ifdef ZMR
+ConVar zm_cl_scope_fov( "zm_cl_scope_fov", "10" );
+
+ITexture* GetScopeTexture()
+{ 
+    static CTextureReference s_pScopeTexture;
+    if ( !s_pScopeTexture.IsValid() )
+    {
+        s_pScopeTexture.Init( materials->FindTexture( "_rt_Scope", TEXTURE_GROUP_RENDER_TARGET ) );
+        Assert( !IsErrorTexture( s_pScopeTexture ) );
+    }
+
+    return s_pScopeTexture;
+}
+
+IMaterial* GetScopeReticleMaterial()
+{
+	static IMaterial* s_pScopeReticle = nullptr;
+	if ( !s_pScopeReticle )
+	{
+		s_pScopeReticle = materials->FindMaterial( "models/weapons/scope/reticle", TEXTURE_GROUP_CLIENT_EFFECTS, false );
+
+		if ( s_pScopeReticle )
+		{
+			s_pScopeReticle->IncrementReferenceCount();
+		}
+	}
+
+	return s_pScopeReticle;
+}
+
+IMaterial* GetScopeBordersMaterial()
+{
+	static IMaterial* s_pScopeBorders = nullptr;
+	if ( !s_pScopeBorders )
+	{
+		s_pScopeBorders = materials->FindMaterial( "models/weapons/scope/scope_end_mask", TEXTURE_GROUP_CLIENT_EFFECTS, false );
+
+		if ( s_pScopeBorders )
+		{
+			s_pScopeBorders->IncrementReferenceCount();
+		}
+	}
+
+	return s_pScopeBorders;
+}
+
+void CViewRender::DrawScope( const CViewSetup &cameraView )
+{
+	auto* pLocalPlayer = C_ZMPlayer::GetLocalPlayer();
+	if ( !pLocalPlayer ) return;
+
+	auto* pVM = pLocalPlayer->GetViewModel();
+	if ( !pVM ) return;
+
+	auto* pScopeTexture = GetScopeTexture();
+	if ( !pScopeTexture ) return;
+
+	if ( !pVM->ShouldRenderScope() ) return;
+
+
+	static bool bRenderedEmpty = false;
+
+
+	const float flIronsightFrac = pVM->GetIronSightFraction();
+	const float flScopeAlphaFracStart = 0.5f;
+
+	float flScopeAlpha;
+
+	if ( flIronsightFrac < flScopeAlphaFracStart )
+	{
+		flScopeAlpha = 0.0f;
+	}
+	else
+	{
+		flScopeAlpha = (flIronsightFrac - flScopeAlphaFracStart) / (1.0f - flScopeAlphaFracStart);
+	}
+
+
+	if ( flScopeAlpha <= 0.0f )
+	{
+		if ( bRenderedEmpty )
+			return;
+
+		bRenderedEmpty = true;
+	}
+	else
+	{
+		bRenderedEmpty = false;
+	}
+
+
+	VPROF_INCREMENT_COUNTER( "scopes rendered", 1 );
+
+
+
+	//
+	// Setup view.
+	//
+	CMatRenderContextPtr pRenderContext( materials );
+
+	CViewSetup scopeView = cameraView;
+
+	pVM->GetScopeEndPosition( scopeView.origin, scopeView.angles );
+
+	scopeView.x = 0;
+	scopeView.y = 0;
+	scopeView.width = pScopeTexture->GetActualWidth();
+	scopeView.height = pScopeTexture->GetActualHeight();
+	scopeView.m_bOrtho = false;
+	scopeView.m_flAspectRatio = 1.0f;
+	scopeView.m_bViewToProjectionOverride = false;
+	scopeView.fov = zm_cl_scope_fov.GetFloat();
+
+
+	
+	pRenderContext->ClearColor4ub( 0, 0, 0, 255 * flScopeAlpha );
+
+	static Frustum dummyFrustum;
+	render->Push3DView( scopeView, VIEW_CLEAR_COLOR | VIEW_CLEAR_DEPTH, pScopeTexture, dummyFrustum );
+
+
+	// Draw the scope scene
+	pRenderContext->OverrideAlphaWriteEnable( true, false );
+
+	ViewDrawScene( false, SKYBOX_2DSKYBOX_VISIBLE, scopeView, 0, VIEW_MONITOR );
+
+	pRenderContext->OverrideAlphaWriteEnable( false, true );
+	
+
+	// Apply the reticle on top of the world texture.
+	// We assume the survivor has corrected the scope parallax :P
+	auto* pReticleOverlay = GetScopeReticleMaterial();
+	if ( pReticleOverlay && !IsErrorMaterial( pReticleOverlay ) )
+	{
+		pRenderContext->DrawScreenSpaceRectangle(
+			pReticleOverlay,
+			0, 0, scopeView.width, scopeView.height,
+			0, 0, scopeView.width - 1, scopeView.height - 1,
+			scopeView.width, scopeView.height );
+	}
+
+	// Apply scope.
+	auto* pScopeBorders = GetScopeBordersMaterial();
+	if ( pScopeBorders && !IsErrorMaterial( pScopeBorders ) )
+	{
+		pRenderContext->DrawScreenSpaceRectangle(
+			pScopeBorders,
+			0, 0, scopeView.width, scopeView.height,
+			0, 0, scopeView.width - 1, scopeView.height - 1,
+			scopeView.width, scopeView.height );
+	}
+
+	// Done
+	render->PopView( dummyFrustum );
+
+	pRenderContext->ClearColor4ub( 0, 0, 0, 255 );
+}
+#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: Sets up scene and renders camera view

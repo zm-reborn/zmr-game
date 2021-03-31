@@ -83,6 +83,7 @@ CZMViewModel::CZMViewModel()
     m_iPoseParamMoveX = -1;
     m_iPoseParamVertAim = -1;
     m_iAttachmentIronsight = -1;
+    m_iAttachmentScopeEnd = -1;
 
     m_vecLastVel.Init();
 #else
@@ -294,6 +295,19 @@ bool C_ZMViewModel::PerformIronSight( Vector& vecOut, QAngle& angOut, const QAng
     return true;
 }
 
+bool C_ZMViewModel::ShouldRenderScope() const
+{
+    return m_iAttachmentScopeEnd > 0 && !IsEffectActive( EF_NODRAW );
+}
+
+void C_ZMViewModel::GetScopeEndPosition( Vector& pos, QAngle& ang )
+{
+    if ( m_iAttachmentScopeEnd <= 0 )
+        return;
+
+
+    GetAttachment( m_iAttachmentScopeEnd, pos, ang );
+}
 
 ConVar zm_cl_bob_lag_interp( "zm_cl_bob_lag_interp", "0.1" );
 ConVar zm_cl_bob_lag_angle_mult( "zm_cl_bob_lag_angle_mult", "0.07" );
@@ -721,6 +735,7 @@ CStudioHdr* C_ZMViewModel::OnNewModel()
     m_iPoseParamVertAim = LookupPoseParameter( "ver_aims" );
 
     m_iAttachmentIronsight = LookupAttachment( "ironsight" );
+    m_iAttachmentScopeEnd = LookupAttachment( "scope_end" );
 
 
     m_LagAnglesHistory.ClearHistory();

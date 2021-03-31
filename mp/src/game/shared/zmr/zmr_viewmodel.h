@@ -46,6 +46,11 @@ public:
     bool IsInIronsights() const;
     bool PerformIronSight( Vector& vecPos, QAngle& ang, const QAngle& origAng );
 
+    bool ShouldRenderScope() const;
+    void GetScopeEndPosition( Vector& pos, QAngle& ang );
+    float GetIronSightFraction() const { return m_flIronSightFrac; }
+
+
     bool PerformLag( Vector& vecPos, QAngle& ang, const Vector& origPos, const QAngle& origAng );
     bool PerformAngleLag( Vector& vecPos, QAngle& ang, const QAngle& origAng, const Vector& right, const Vector& up );
     bool PerformMovementLag( Vector& vecPos, QAngle& ang, const Vector& fwd, const Vector& right );
@@ -94,6 +99,7 @@ private:
     int m_iPoseParamMoveX;
     int m_iPoseParamVertAim;
     int m_iAttachmentIronsight;
+    int m_iAttachmentScopeEnd;
     
 
     Vector m_vecLastVel;
