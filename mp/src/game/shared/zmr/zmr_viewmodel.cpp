@@ -268,8 +268,18 @@ bool C_ZMViewModel::PerformIronSight( Vector& vecOut, QAngle& angOut, const QAng
     auto& attachment = pHdr->pAttachment( m_iAttachmentIronsight-1 );
 
     // The attachment position is local to the bone.
-    // Here we are assuming that the bone is at origin.
     MatrixPosition( attachment.local, vecLocal );
+
+    mstudiobone_t* pBone = nullptr;
+    if ( attachment.localbone >= 0 )
+    {
+        pBone = pHdr->pBone( attachment.localbone );
+    }
+    
+    if ( pBone )
+    {
+        vecLocal += pBone->pos;
+    }
 
     
     VectorRotate( vecLocal, origAng, vecIronsightPos );
