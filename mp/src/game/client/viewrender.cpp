@@ -3116,6 +3116,9 @@ void CViewRender::DrawScope( const CViewSetup &cameraView )
 	auto* pVM = pLocalPlayer->GetViewModel();
 	if ( !pVM ) return;
 
+	auto* pWeapon = pLocalPlayer->GetActiveZMWeapon();
+	if ( !pWeapon ) return;
+
 	auto* pScopeTexture = GetScopeTexture();
 	if ( !pScopeTexture ) return;
 
@@ -3173,7 +3176,7 @@ void CViewRender::DrawScope( const CViewSetup &cameraView )
 	scopeView.m_bOrtho = false;
 	scopeView.m_flAspectRatio = 1.0f;
 	scopeView.m_bViewToProjectionOverride = false;
-	scopeView.fov = zm_cl_scope_fov.GetFloat();
+	scopeView.fov = pLocalPlayer->GetFOV() * pWeapon->GetScopeFOVModifier() * 0.5f; // This 0.5 is a supa hack.
 
 
 	

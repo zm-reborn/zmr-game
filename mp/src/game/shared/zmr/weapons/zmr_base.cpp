@@ -1433,6 +1433,11 @@ CZMBaseCrosshair* CZMBaseWeapon::GetWeaponCrosshair() const
 {
     return g_ZMCrosshairs.GetCrosshairByIndex( GetWeaponConfig()->iCrosshair );
 }
+
+float CZMBaseWeapon::GetScopeFOVModifier() const
+{
+    return 1.0f;
+}
 #endif
 
 CZMPlayer* CZMBaseWeapon::GetPlayerOwner() const

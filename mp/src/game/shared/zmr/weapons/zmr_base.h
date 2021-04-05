@@ -120,6 +120,8 @@ public:
 
 #ifdef CLIENT_DLL
     virtual CZMBaseCrosshair* GetWeaponCrosshair() const;
+
+    virtual float GetScopeFOVModifier() const;
 #endif
 
     
