@@ -3060,6 +3060,22 @@ ITexture* GetScopeTexture()
     return s_pScopeTexture;
 }
 
+IMaterial* GetScopeRefractionMaterial()
+{
+	static IMaterial* s_pScopeRefraction = nullptr;
+	if ( !s_pScopeRefraction )
+	{
+		s_pScopeRefraction = materials->FindMaterial( "models/weapons/scope/scope_refract", TEXTURE_GROUP_CLIENT_EFFECTS, false );
+
+		if ( s_pScopeRefraction )
+		{
+			s_pScopeRefraction->IncrementReferenceCount();
+		}
+	}
+
+	return s_pScopeRefraction;
+}
+
 IMaterial* GetScopeReticleMaterial()
 {
 	static IMaterial* s_pScopeReticle = nullptr;
@@ -3173,6 +3189,17 @@ void CViewRender::DrawScope( const CViewSetup &cameraView )
 	ViewDrawScene( false, SKYBOX_2DSKYBOX_VISIBLE, scopeView, 0, VIEW_MONITOR );
 
 	pRenderContext->OverrideAlphaWriteEnable( false, true );
+
+	// The distortion effect
+	auto* pRefractionOverlay = GetScopeRefractionMaterial();
+	if ( pRefractionOverlay && !IsErrorMaterial( pRefractionOverlay ) )
+	{
+		pRenderContext->DrawScreenSpaceRectangle(
+			pRefractionOverlay,
+			0, 0, scopeView.width, scopeView.height,
+			0, 0, scopeView.width - 1, scopeView.height - 1,
+			scopeView.width, scopeView.height );
+	}
 	
 
 	// Apply the reticle on top of the world texture.
