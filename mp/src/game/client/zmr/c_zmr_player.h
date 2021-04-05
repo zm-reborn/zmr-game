@@ -19,7 +19,8 @@ class CZMPlayerAttackTraceFilter;
 class C_ZMRagdoll;
 class C_ZMBaseWeapon;
 class CZMFlashlightEffect;
-class CZMViewModel;
+class C_ZMViewModel;
+class C_ZMBaseWeapon;
 
 
 class C_ZMPlayer : public C_BasePlayer
@@ -124,7 +125,8 @@ public:
     int                     GetTotalAmmoAmount( int iValidAmmoIndex ) const;
     int                     GetAmmoRoom( int iValidAmmoIndex ) const;
     bool                    IsFlashlightOn() const;
-    CZMViewModel*           GetViewModel( int vmIndex = VMINDEX_WEP, bool bObserverOk = true ) const;
+    C_ZMViewModel*          GetViewModel( int vmIndex = VMINDEX_WEP, bool bObserverOk = true ) const;
+    C_ZMBaseWeapon*         GetActiveZMWeapon() const;
 
     void SetMouseWheelMove( float dir );
 

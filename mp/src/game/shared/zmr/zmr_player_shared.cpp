@@ -1121,3 +1121,8 @@ CZMViewModel* CZMPlayer::GetViewModel( int vmIndex, bool bObserverOk ) const
 {
     return static_cast<CZMViewModel*>( BaseClass::GetViewModel( vmIndex, bObserverOk ) );
 }
+
+CZMBaseWeapon* CZMPlayer::GetActiveZMWeapon() const
+{
+    return static_cast<CZMBaseWeapon*>( CBasePlayer::GetActiveWeapon() );
+}

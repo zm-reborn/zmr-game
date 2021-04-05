@@ -256,6 +256,7 @@ public:
     int                 GetAmmoRoom( int iValidAmmoIndex ) const;
     bool                IsFlashlightOn() const;
     CZMViewModel*       GetViewModel( int vmIndex = VMINDEX_WEP, bool bObserverOk = true ) const;
+    CZMBaseWeapon*      GetActiveZMWeapon() const;
 
 
     CZMBaseWeapon*  GetWeaponOfHighestSlot() const;
