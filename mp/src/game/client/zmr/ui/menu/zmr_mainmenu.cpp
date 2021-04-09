@@ -75,6 +75,9 @@ CZMMainMenu::CZMMainMenu( VPANEL parent ) : BaseClass( nullptr, "ZMMainMenu" )
     m_szBottomStrip[0] = NULL;
     m_bInLoadingScreen = false;
 
+    m_pVideoMaterial = nullptr;
+    m_pMaterial = nullptr;
+
 
     // Has to be set to load fonts correctly.
     SetScheme( vgui::scheme()->LoadSchemeFromFile( "resource/ClientScheme.res", "ClientScheme" ) );
@@ -108,6 +111,11 @@ CZMMainMenu::CZMMainMenu( VPANEL parent ) : BaseClass( nullptr, "ZMMainMenu" )
 
     m_nTexSectionBgId = surface()->CreateNewTextureID();
     surface()->DrawSetTextureFile( m_nTexSectionBgId, "zmr_mainmenu/bg_section", true, false );
+
+
+    InitVideoBackground();
+    
+
 
     RequestFocus();
 }
@@ -148,9 +156,52 @@ void CZMMainMenu::ReleaseGameUI()
     m_pGameUI = nullptr;
 }
 
+void CZMMainMenu::InitVideoBackground()
+{
+    ReleaseVideoBackground();
+
+    m_pMaterial = nullptr;
+    m_pVideoMaterial = g_pVideo->CreateVideoMaterial("VideoMaterial",
+                                                     "media/zmr_background01.bik",
+                                                     "MOD",
+                                                     VideoPlaybackFlags::DEFAULT_MATERIAL_OPTIONS,
+                                                     VideoSystem::DETERMINE_FROM_FILE_EXTENSION,
+                                                     false );
+    if ( !m_pVideoMaterial )
+    {
+        return;
+    }
+
+    m_pVideoMaterial->SetLooping( true );
+    m_pMaterial = m_pVideoMaterial->GetMaterial();
+}
+
+void CZMMainMenu::ReleaseVideoBackground()
+{
+    if ( !m_pVideoMaterial )
+        return;
+
+
+    g_pVideo->DestroyVideoMaterial( m_pVideoMaterial );
+    m_pVideoMaterial = nullptr;
+    m_pMaterial = nullptr;
+}
+
 void CZMMainMenu::OnInGameStatusChanged( bool bInGame )
 {
     CheckInGameButtons( bInGame );
+
+    if ( bInGame )
+    {
+        ReleaseVideoBackground();
+    }
+    else
+    {
+        if ( !m_pVideoMaterial )
+        {
+            InitVideoBackground();
+        }
+    }
 }
 
 void CZMMainMenu::OnThink()
@@ -178,8 +229,108 @@ bool CZMMainMenu::IsVisible()
     return BaseClass::IsVisible();
 }
 
+void CZMMainMenu::PaintVideoBackground()
+{
+    // No video to play, so do nothing
+    if ( !m_pVideoMaterial )
+        return;
+
+    if ( !m_pMaterial )
+        return;
+
+    // Update our frame
+    if ( !m_pVideoMaterial->Update() )
+    {
+        // Will get here if not set to loop.
+        Assert( 0 );
+        return;
+    }
+
+
+    int nWidth, nHeight;
+    float u, v;
+
+    m_pVideoMaterial->GetVideoImageSize( &nWidth, &nHeight );
+    m_pVideoMaterial->GetVideoTexCoordRange( &u, &v );
+
+
+    // Draw the polys to draw this out
+    CMatRenderContextPtr pRenderContext( materials );
+
+    // Override depth to fix model panel rendering.
+    pRenderContext->OverrideDepthEnable( true, false );
+
+    pRenderContext->MatrixMode( MATERIAL_VIEW );
+    pRenderContext->PushMatrix();
+    pRenderContext->LoadIdentity();
+
+    pRenderContext->MatrixMode( MATERIAL_PROJECTION );
+    pRenderContext->PushMatrix();
+    pRenderContext->LoadIdentity();
+
+    pRenderContext->Bind( m_pMaterial, nullptr );
+
+    CMeshBuilder meshBuilder;
+    auto* pMesh = pRenderContext->GetDynamicMesh( true );
+    meshBuilder.Begin( pMesh, MATERIAL_QUADS, 1 );
+
+    float flLeftX = 0;
+    float flRightX = nWidth - 1;
+
+    float flTopY = 0;
+    float flBottomY = nHeight - 1;
+
+    // Map our UVs to cut out just the portion of the video we're interested in
+    float flLeftU = 0.0f;
+    float flTopV = 0.0f;
+
+    // We need to subtract off a pixel to make sure we don't bleed
+    float flRightU = u - ( 1.0f / (float)nWidth );
+    float flBottomV = v - ( 1.0f / (float)nHeight );
+
+    // Get the current viewport size
+    int vx, vy, vw, vh;
+    pRenderContext->GetViewport( vx, vy, vw, vh );
+
+    // Map from screen pixel coords to -1..1
+    flRightX = FLerp( -1, 1, 0, vw, flRightX );
+    flLeftX = FLerp( -1, 1, 0, vw, flLeftX );
+    flTopY = FLerp( 1, -1, 0, vh , flTopY );
+    flBottomY = FLerp( 1, -1, 0, vh, flBottomY );
+
+    float alpha = ( (float)GetFgColor()[3] / 255.0f );
+
+    for ( int corner = 0; corner < 4; corner++ )
+    {
+        bool bLeft = ( corner == 0 ) || ( corner == 3 );
+        meshBuilder.Position3f( ( bLeft ) ? flLeftX : flRightX, ( corner & 2 ) ? flBottomY : flTopY, 0.0f );
+        meshBuilder.Normal3f( 0.0f, 0.0f, 1.0f );
+        meshBuilder.TexCoord2f( 0, ( bLeft ) ? flLeftU : flRightU, ( corner & 2 ) ? flBottomV : flTopV );
+        meshBuilder.TangentS3f( 0.0f, 1.0f, 0.0f );
+        meshBuilder.TangentT3f( 1.0f, 0.0f, 0.0f );
+        meshBuilder.Color4f( 1.0f, 1.0f, 1.0f, alpha );
+        meshBuilder.AdvanceVertex();
+    }
+
+    meshBuilder.End();
+    pMesh->Draw();
+
+    pRenderContext->MatrixMode( MATERIAL_VIEW );
+    pRenderContext->PopMatrix();
+
+    pRenderContext->MatrixMode( MATERIAL_PROJECTION );
+    pRenderContext->PopMatrix();
+
+    pRenderContext->OverrideDepthEnable( false, false );
+}
+
 void CZMMainMenu::PaintBackground()
 {
+    if ( !s_bWasInGame )
+    {
+        PaintVideoBackground();
+    }
+
     //
     // Draw the sub button background
     //

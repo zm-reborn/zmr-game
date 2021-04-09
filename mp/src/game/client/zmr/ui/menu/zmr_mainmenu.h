@@ -3,6 +3,7 @@
 
 #include <vgui_controls/EditablePanel.h>
 #include <GameUI/IGameUI.h>
+#include <video/ivideoservices.h>
 
 #include "ui/zmr_int.h"
 
@@ -46,7 +47,10 @@ private:
     bool LoadGameUI();
     void ReleaseGameUI();
 
-    
+    void InitVideoBackground();
+    void ReleaseVideoBackground();
+
+    void PaintVideoBackground();
 
     void SetLoadingScreenState( bool state );
 
@@ -56,6 +60,8 @@ private:
 
 
     IGameUI* m_pGameUI;
+    IVideoMaterial* m_pVideoMaterial;
+    IMaterial* m_pMaterial;
 
     int m_nTexBgId;
     Color m_BgColor;
