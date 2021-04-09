@@ -2486,7 +2486,36 @@ void CZMPlayer::UpdateClientData()
 		m_bitsDamageType &= iTimeBasedDamage;
 	}
 
-	BaseClass::UpdateClientData();
+    //
+    // Copy of CBasePlayer::UpdateClientData
+    // without the ResetHud crap.
+    // ResetHud would get called on Spawn
+    // which interfered with hud animations, freezing them.
+    //
+    CheckTrainUpdate();
+
+    // Update all the items
+    for ( int i = 0; i < WeaponCount(); i++ )
+    {
+        if ( GetWeapon(i) )  // each item updates it's successors
+            GetWeapon(i)->UpdateClientData( this );
+    }
+
+    // update the client with our poison state
+    m_Local.m_bPoisoned =   ( m_bitsDamageType & DMG_POISON ) 
+                        &&  ( m_nPoisonDmg > m_nPoisonRestored ) 
+                        &&  ( GetHealth() < GetMaxHealth() );
+
+    /*
+    // Check if the bonus progress HUD element should be displayed
+    if ( m_iBonusChallenge == 0 && m_iBonusProgress == 0 && !( m_Local.m_iHideHUD & HIDEHUD_BONUS_PROGRESS ) )
+        m_Local.m_iHideHUD |= HIDEHUD_BONUS_PROGRESS;
+    if ( ( m_iBonusChallenge != 0 )&& ( m_Local.m_iHideHUD & HIDEHUD_BONUS_PROGRESS ) )
+        m_Local.m_iHideHUD &= ~HIDEHUD_BONUS_PROGRESS;
+    */
+
+    // Let any global rules update the HUD, too
+    g_pGameRules->UpdateClientData( this );
 }
 
 void CZMPlayer::ExitLadder()
