@@ -71,6 +71,13 @@ void CZMHudBars::LevelInit()
 void CZMHudBars::Reset()
 {
     SetWide( ScreenWidth() );
+
+    // IMPORTANT!!! Animation variables must be reset here.
+    // All animations are removed on Reset.
+    // If there are still animations going, they'll be frozen.
+    m_flAlpha = 0.0f;
+    m_flTopBarY = 0.0f;
+    m_flBottomBarY = 480.0f;
 }
 
 void CZMHudBars::FireGameEvent( IGameEvent* pEvent )

@@ -46,7 +46,7 @@ CZMHudCenterText::CZMHudCenterText( const char *pElementName ) : CHudElement( pE
     SetPaintBackgroundEnabled( false );
 
 
-    Reset_();
+    Reset();
 
 
     ListenForGameEvent( "round_end_post" );
@@ -62,25 +62,28 @@ void CZMHudCenterText::Init()
 {
     HOOK_HUD_MESSAGE( CZMHudCenterText, ZMCenterText );
 
-    Reset_();
+    Reset();
 }
 
 void CZMHudCenterText::VidInit()
 {
-    Reset_();
+    Reset();
 }
 
-// Reset() is called on player spawn
-// We don't like that.
-void CZMHudCenterText::Reset_()
+void CZMHudCenterText::Reset()
 {
     SetWide( ScreenWidth() );
 
 
+    // IMPORTANT!!! Animation variables must be reset here.
+    // All animations are removed on Reset.
+    // If there are still animations going, they'll be frozen.
     m_szBig[0] = NULL;
     m_szSmall[0] = NULL;
     m_flShowSmall = 0.0f;
     m_flNextHide = 0.0f;
+    m_flSmallAlpha = 0.0f;
+    m_flBigAlpha = 0.0f;
 }
 
 void CZMHudCenterText::FireGameEvent( IGameEvent* pEvent )

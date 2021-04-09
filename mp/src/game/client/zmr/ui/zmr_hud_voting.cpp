@@ -131,6 +131,11 @@ void CZMHudVote::VidInit( void )
 
 void CZMHudVote::Reset()
 {
+    // IMPORTANT!!! Animation variables must be reset here.
+    // All animations are removed on Reset.
+    // If there are still animations going, they'll be frozen.
+    m_bDrawVote = false;
+
     InitVoting();
 }
 
@@ -161,6 +166,7 @@ void CZMHudVote::InitVoting()
     if ( !m_bDrawVote )
     {
         m_VoteColor[3] = 0;
+        m_ReasonColor[3] = 0;
     }
 }
 
