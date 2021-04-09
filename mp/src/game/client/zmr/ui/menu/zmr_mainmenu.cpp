@@ -52,7 +52,7 @@ public:
     {
         if ( m_Panel )
         {
-            m_Panel->SetParent( nullptr );
+            m_Panel->SetParent( (vgui::Panel*)nullptr );
             delete m_Panel;
         }
     }
