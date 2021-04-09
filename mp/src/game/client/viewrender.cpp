@@ -3046,8 +3046,6 @@ void CViewRender::ViewDrawScene_Intro( const CViewSetup &view, int nClearFlags, 
 }
 
 #ifdef ZMR
-ConVar zm_cl_scope_fov( "zm_cl_scope_fov", "10" );
-
 ITexture* GetScopeTexture()
 { 
     static CTextureReference s_pScopeTexture;
