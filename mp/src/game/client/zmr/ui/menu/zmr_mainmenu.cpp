@@ -77,6 +77,8 @@ CZMMainMenu::CZMMainMenu( VPANEL parent ) : BaseClass( nullptr, "ZMMainMenu" )
 
     m_pVideoMaterial = nullptr;
     m_pMaterial = nullptr;
+    m_nVideoWidth = m_nVideoHeight = 0;
+    m_flVideoU = m_flVideoV = 0;
 
 
     // Has to be set to load fonts correctly.
@@ -174,6 +176,8 @@ void CZMMainMenu::InitVideoBackground()
 
     m_pVideoMaterial->SetLooping( true );
     m_pMaterial = m_pVideoMaterial->GetMaterial();
+    m_pVideoMaterial->GetVideoImageSize( &m_nVideoWidth, &m_nVideoHeight );
+    m_pVideoMaterial->GetVideoTexCoordRange( &m_flVideoU, &m_flVideoV );
 }
 
 void CZMMainMenu::ReleaseVideoBackground()
@@ -247,13 +251,6 @@ void CZMMainMenu::PaintVideoBackground()
     }
 
 
-    int nWidth, nHeight;
-    float u, v;
-
-    m_pVideoMaterial->GetVideoImageSize( &nWidth, &nHeight );
-    m_pVideoMaterial->GetVideoTexCoordRange( &u, &v );
-
-
     // Draw the polys to draw this out
     CMatRenderContextPtr pRenderContext( materials );
 
@@ -275,18 +272,18 @@ void CZMMainMenu::PaintVideoBackground()
     meshBuilder.Begin( pMesh, MATERIAL_QUADS, 1 );
 
     float flLeftX = 0;
-    float flRightX = nWidth - 1;
+    float flRightX = m_nVideoWidth - 1;
 
     float flTopY = 0;
-    float flBottomY = nHeight - 1;
+    float flBottomY = m_nVideoHeight - 1;
 
     // Map our UVs to cut out just the portion of the video we're interested in
     float flLeftU = 0.0f;
     float flTopV = 0.0f;
 
     // We need to subtract off a pixel to make sure we don't bleed
-    float flRightU = u - ( 1.0f / (float)nWidth );
-    float flBottomV = v - ( 1.0f / (float)nHeight );
+    float flRightU = m_flVideoU - ( 1.0f / (float)m_nVideoWidth );
+    float flBottomV = m_flVideoV - ( 1.0f / (float)m_nVideoHeight );
 
     // Get the current viewport size
     int vx, vy, vw, vh;

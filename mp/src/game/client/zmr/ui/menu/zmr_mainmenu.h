@@ -60,8 +60,15 @@ private:
 
 
     IGameUI* m_pGameUI;
-    IVideoMaterial* m_pVideoMaterial;
-    IMaterial* m_pMaterial;
+
+    //
+    IVideoMaterial*     m_pVideoMaterial;
+    IMaterial*          m_pMaterial;
+    int                 m_nVideoWidth;
+    int                 m_nVideoHeight;
+    float               m_flVideoU;
+    float               m_flVideoV;
+    //
 
     int m_nTexBgId;
     Color m_BgColor;
