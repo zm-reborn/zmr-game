@@ -3106,29 +3106,63 @@ IMaterial* GetScopeBordersMaterial()
 	return s_pScopeBorders;
 }
 
+static float s_bRenderedEmptyScopeAlpha = -1.0f;
+
+void RenderEmptyScope( ITexture* pScopeTexture, float alpha = 0.0f )
+{
+	// Don't need to rerender with the same alpha.
+	if ( alpha == s_bRenderedEmptyScopeAlpha ) return;
+
+
+	CMatRenderContextPtr pRenderContext( materials );
+	pRenderContext->PushRenderTargetAndViewport( pScopeTexture );
+	
+	{
+		pRenderContext->OverrideAlphaWriteEnable( true, true );
+
+		pRenderContext->ClearColor4ub( 0, 0, 0, 255 * alpha );
+		pRenderContext->ClearBuffers( true, false );
+
+		pRenderContext->OverrideAlphaWriteEnable( false, false );
+	}
+	
+	pRenderContext->PopRenderTargetAndViewport();
+
+
+	s_bRenderedEmptyScopeAlpha = alpha;
+}
+
 void CViewRender::DrawScope( const CViewSetup &cameraView )
 {
-	auto* pLocalPlayer = C_ZMPlayer::GetLocalPlayer();
-	if ( !pLocalPlayer ) return;
-
-	auto* pVM = pLocalPlayer->GetViewModel();
-	if ( !pVM ) return;
-
-	auto* pWeapon = pLocalPlayer->GetActiveZMWeapon();
-	if ( !pWeapon ) return;
-
 	auto* pScopeTexture = GetScopeTexture();
 	if ( !pScopeTexture ) return;
 
-	if ( !pVM->ShouldRenderScope() ) return;
+
+	// Always render an empty scope
+	// In case something is trying to draw one.
+	auto* pLocalPlayer = C_ZMPlayer::GetLocalPlayer();
+	if ( !pLocalPlayer )
+	{
+		RenderEmptyScope( pScopeTexture );
+		return;
+	}
+
+	auto* pVM = pLocalPlayer->GetViewModel();
+	auto* pWeapon = pLocalPlayer->GetActiveZMWeapon();
+	if ( !pVM || !pWeapon || !pVM->ShouldRenderScope() )
+	{
+		RenderEmptyScope( pScopeTexture );
+		return;
+	}
 
 
-	static bool bRenderedEmpty = false;
+
 
 
 	const float flIronsightFrac = pVM->GetIronSightFraction();
 	const float flScopeAlphaFracStart = 0.5f;
 
+	// Fade in the scope when the eye gets near it.
 	float flScopeAlpha;
 
 	if ( flIronsightFrac < flScopeAlphaFracStart )
@@ -3141,32 +3175,50 @@ void CViewRender::DrawScope( const CViewSetup &cameraView )
 	}
 
 
+	// Nothing to render!
 	if ( flScopeAlpha <= 0.0f )
 	{
-		if ( bRenderedEmpty )
-			return;
+		RenderEmptyScope( pScopeTexture );
+		return;
+	}
 
-		bRenderedEmpty = true;
-	}
-	else
+	
+	Vector vecScopePos;
+	QAngle angScope;
+	pVM->GetScopeEndPosition( vecScopePos, angScope );
+	
+	Vector fwd;
+	AngleVectors( angScope, &fwd );
+
+
+	// Check to see if there's something in front of
+	// the camera to not render things through walls.
+	trace_t tr;
+	UTIL_TraceLine( MainViewOrigin(), vecScopePos + fwd * 10.0f, MASK_SOLID, nullptr, &tr );
+
+	if ( tr.fraction != 1.0f )
 	{
-		bRenderedEmpty = false;
+		RenderEmptyScope( pScopeTexture, flScopeAlpha );
+		return;
 	}
+
+
+	//
+	// Render the scope view!
+	//
+	s_bRenderedEmptyScopeAlpha = -1.0f;
 
 
 	VPROF_INCREMENT_COUNTER( "scopes rendered", 1 );
 
-
-
-	//
-	// Setup view.
-	//
+	
 	CMatRenderContextPtr pRenderContext( materials );
-
+	
+	// Setup view.
 	CViewSetup scopeView = cameraView;
 
-	pVM->GetScopeEndPosition( scopeView.origin, scopeView.angles );
-
+	scopeView.origin = vecScopePos;
+	scopeView.angles = angScope;
 	scopeView.x = 0;
 	scopeView.y = 0;
 	scopeView.width = pScopeTexture->GetActualWidth();
