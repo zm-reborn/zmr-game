@@ -271,11 +271,7 @@ void CZMMainMenu::PaintVideoBackground()
     auto* pMesh = pRenderContext->GetDynamicMesh( true );
     meshBuilder.Begin( pMesh, MATERIAL_QUADS, 1 );
 
-    float flLeftX = 0;
-    float flRightX = m_nVideoWidth - 1;
 
-    float flTopY = 0;
-    float flBottomY = m_nVideoHeight - 1;
 
     // Map our UVs to cut out just the portion of the video we're interested in
     float flLeftU = 0.0f;
@@ -289,13 +285,19 @@ void CZMMainMenu::PaintVideoBackground()
     int vx, vy, vw, vh;
     pRenderContext->GetViewport( vx, vy, vw, vh );
 
+    float flLeftX = 0;
+    float flRightX = vw - 1;
+
+    float flTopY = 0;
+    float flBottomY = vh - 1;
+
     // Map from screen pixel coords to -1..1
     flRightX = FLerp( -1, 1, 0, vw, flRightX );
     flLeftX = FLerp( -1, 1, 0, vw, flLeftX );
     flTopY = FLerp( 1, -1, 0, vh , flTopY );
     flBottomY = FLerp( 1, -1, 0, vh, flBottomY );
 
-    float alpha = ( (float)GetFgColor()[3] / 255.0f );
+    float alpha = 1.0f;//( (float)GetFgColor()[3] / 255.0f );
 
     for ( int corner = 0; corner < 4; corner++ )
     {
