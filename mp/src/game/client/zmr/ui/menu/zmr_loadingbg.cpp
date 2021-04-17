@@ -211,7 +211,8 @@ void CZMLoadingPanel::FireGameEvent( IGameEvent* pEvent )
             buffer[0] = NULL;
             ZMLegacyObjPanel::LoadObjectivesFromFile( mapname, buffer, 4096 );
 
-            if ( *buffer )
+            // Don't display html.
+            if ( *buffer && Q_stristr( buffer, "html" ) == nullptr )
             {
 	            m_pTextMessage->SetVisible( true );
 	            m_pTextMessage->SetText( buffer );
