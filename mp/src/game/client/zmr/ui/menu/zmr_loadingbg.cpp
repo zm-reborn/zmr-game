@@ -159,6 +159,9 @@ CZMLoadingPanel::CZMLoadingPanel( VPANEL parent ) : BaseClass( nullptr, "ZMLoadi
     SetScheme( vgui::scheme()->LoadSchemeFromFile( "resource/ClientScheme.res", "ClientScheme" ) );
 
 
+    SetProportional( true );
+
+
     SetParent( parent );
 
     m_pGameUI = nullptr;
@@ -263,7 +266,7 @@ void CZMLoadingPanel::ApplySchemeSettings( IScheme* pScheme )
 
     int w, h;
     surface()->GetScreenSize( w, h );
-    SetSize( w, h );
+    SetBounds( 0, 0, w, h );
 }
 
 void CZMLoadingPanel::OnActivate()
