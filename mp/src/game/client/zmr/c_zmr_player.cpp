@@ -383,8 +383,8 @@ void C_ZMPlayer::TeamChange( int iNewTeam )
 
     if ( iNewTeam == ZMTEAM_ZM )
     {
-        ZMClientUtil::QueueTooltip( "zmintro", 1.0f );
-        ZMClientUtil::QueueTooltip( "zmmoving", 12.0f );
+        ZMClientUtil::QueueTooltip( "zmintro", 6.0f );
+        ZMClientUtil::QueueTooltip( "zmmoving", 16.0f );
     }
 
 
