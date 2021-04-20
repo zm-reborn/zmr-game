@@ -10,6 +10,9 @@
 #include "tier0/memdbgon.h"
 
 
+ConVar zm_sv_debug_objectives( "zm_sv_debug_objectives", "0" );
+
+
 LINK_ENTITY_TO_CLASS( zm_objectives_manager, CZMEntObjectivesManager );
 
 BEGIN_DATADESC( CZMEntObjectivesManager )
@@ -94,6 +97,14 @@ void CZMEntObjectivesManager::Display( CZMEntObjectives* pObj, CBaseEntity* pAct
 
     pObj->GetRecipientFilter( pActivator, filter, rec );
 
+    if ( zm_sv_debug_objectives.GetBool() )
+    {
+        DevMsg( "Displaying objectives to %i players! (Recipient type: %i | Activator Ent Index: %i)\n",
+               filter.GetRecipientCount(),
+               rec,
+               pActivator ? pActivator->entindex() : -1 );
+    }
+
     if ( filter.GetRecipientCount() < 1 )
         return;
 
@@ -116,6 +127,14 @@ void CZMEntObjectivesManager::Update( CZMEntObjectives* pObj, CBaseEntity* pActi
 
     pObj->GetRecipientFilter( pActivator, filter, rec );
 
+    if ( zm_sv_debug_objectives.GetBool() )
+    {
+        DevMsg( "Updating objectives to %i players! (Recipient type: %i | Activator Ent Index: %i)\n",
+               filter.GetRecipientCount(),
+               rec,
+               pActivator ? pActivator->entindex() : -1 );
+    }
+
     if ( filter.GetRecipientCount() < 1 )
         return;
 
@@ -135,6 +154,15 @@ void CZMEntObjectivesManager::UpdateLine( CZMEntObjectives* pObj, int line, CBas
     CRecipientFilter filter;
 
     pObj->GetRecipientFilter( pActivator, filter, rec );
+
+    if ( zm_sv_debug_objectives.GetBool() )
+    {
+        DevMsg( "Updating line %i to %i players! (Recipient type: %i | Activator Ent Index: %i)\n",
+               line,
+               filter.GetRecipientCount(),
+               rec,
+               pActivator ? pActivator->entindex() : -1 );
+    }
 
     if ( filter.GetRecipientCount() < 1 )
         return;
