@@ -7,131 +7,15 @@
 #include "zmr_shareddefs.h"
 #include "zmr_player_shared.h"
 
-#include "zmr_weaponconfig.h"
-#include "zmr_basemelee.h"
-
-
-#ifdef CLIENT_DLL
-#define CZMWeaponSledge C_ZMWeaponSledge
-#endif
+#include "zmr_sledge.h"
 
 
 using namespace ZMWeaponConfig;
 
-class CZMSledgeConfig : public CZMBaseWeaponConfig
-{
-public:
-    CZMSledgeConfig( const char* wepname, const char* configpath ) : CZMBaseWeaponConfig( wepname, configpath )
-    {
-        flPrimaryRandomMultMin = 1.0f;
-        flPrimaryRandomMultMax = 1.0f;
-
-        flSecondaryRandomMultMin = 1.0f;
-        flSecondaryRandomMultMax = 1.0f;
-    }
-
-    virtual void LoadFromConfig( KeyValues* kv ) OVERRIDE
-    {
-        CZMBaseWeaponConfig::LoadFromConfig( kv );
-
-        KeyValues* inner;
-
-        inner = kv->FindKey( "PrimaryAttack" );
-        if ( inner )
-        {
-            flPrimaryRandomMultMin = inner->GetFloat( "sledge_min_mult" );
-            flPrimaryRandomMultMax = inner->GetFloat( "sledge_max_mult" );
-        }
-
-        inner = kv->FindKey( "SecondaryAttack" );
-        if ( inner )
-        {
-            flSecondaryRandomMultMin = inner->GetFloat( "sledge_min_mult" );
-            flSecondaryRandomMultMax = inner->GetFloat( "sledge_max_mult" );
-        }
-    }
-
-    virtual KeyValues* ToKeyValues() const OVERRIDE
-    {
-        auto* kv = CZMBaseWeaponConfig::ToKeyValues();
-
-        KeyValues* inner;
-
-        inner = kv->FindKey( "PrimaryAttack" );
-        if ( inner )
-        {
-            inner->SetFloat( "sledge_min_mult", flPrimaryRandomMultMin );
-            inner->SetFloat( "sledge_max_mult", flPrimaryRandomMultMax );
-        }
-
-        inner = kv->FindKey( "SecondaryAttack" );
-        if ( inner )
-        {
-            inner->SetFloat( "sledge_min_mult", flSecondaryRandomMultMin );
-            inner->SetFloat( "sledge_max_mult", flSecondaryRandomMultMax );
-        }
-
-        return kv;
-    }
-
-    
-    float flPrimaryRandomMultMin;
-    float flPrimaryRandomMultMax;
-
-    float flSecondaryRandomMultMin;
-    float flSecondaryRandomMultMax;
-};
 
 
 REGISTER_WEAPON_CONFIG( ZMCONFIGSLOT_SLEDGE, CZMSledgeConfig );
 
-
-
-class CZMWeaponSledge : public CZMBaseMeleeWeapon
-{
-public:
-	DECLARE_CLASS( CZMWeaponSledge, CZMBaseMeleeWeapon );
-	DECLARE_NETWORKCLASS(); 
-	DECLARE_PREDICTABLE();
-
-    CZMWeaponSledge();
-
-
-    virtual void PrimaryAttack() OVERRIDE;
-    virtual void SecondaryAttack() OVERRIDE;
-
-
-    const CZMSledgeConfig* GetSledgeConfig() const { return static_cast<const CZMSledgeConfig*>( GetWeaponConfig() ); }
-
-
-    virtual bool CanSecondaryAttack() const OVERRIDE { return true; }
-    virtual WeaponSound_t GetSecondaryAttackSound() const { return SPECIAL1; }
-
-    virtual bool UsesAnimEvent( bool bSecondary ) const OVERRIDE { return true; }
-
-
-    virtual float GetDamageForActivity( Activity act ) const OVERRIDE
-    {
-        // ZMRTODO: Stop using random values.
-        float damage = BaseClass::GetDamageForActivity( act );
-
-
-        auto* pConfig = GetSledgeConfig();
-
-        if ( act == ACT_VM_HITCENTER2 )
-        {
-            damage *= random->RandomFloat( pConfig->flSecondaryRandomMultMin, pConfig->flSecondaryRandomMultMax );
-        }
-        else
-        {
-            damage *= random->RandomFloat( pConfig->flPrimaryRandomMultMin, pConfig->flPrimaryRandomMultMax );
-        }
-
-        return damage;
-    };
-
-    virtual void Hit( trace_t& traceHit, Activity iHitActivity ) OVERRIDE;
-};
 
 IMPLEMENT_NETWORKCLASS_ALIASED( ZMWeaponSledge, DT_ZM_WeaponSledge )
 
@@ -152,6 +36,47 @@ CZMWeaponSledge::CZMWeaponSledge()
 {
     SetSlotFlag( ZMWEAPONSLOT_MELEE );
     SetConfigSlot( ZMCONFIGSLOT_SLEDGE );
+}
+
+const CZMSledgeConfig* CZMWeaponSledge::GetSledgeConfig() const
+{
+    return static_cast<const CZMSledgeConfig*>( GetWeaponConfig() );
+}
+
+bool CZMWeaponSledge::CanSecondaryAttack() const
+{
+    return true;
+}
+
+WeaponSound_t CZMWeaponSledge::GetSecondaryAttackSound() const
+{
+    return SPECIAL1;
+}
+
+bool CZMWeaponSledge::UsesAnimEvent( bool bSecondary ) const
+{
+    return true;
+}
+
+
+float CZMWeaponSledge::GetDamageForActivity( Activity act ) const
+{
+    // ZMRTODO: Stop using random values.
+    float damage = BaseClass::GetDamageForActivity( act );
+
+
+    auto* pConfig = GetSledgeConfig();
+
+    if ( act == ACT_VM_HITCENTER2 )
+    {
+        damage *= random->RandomFloat( pConfig->flSecondaryRandomMultMin, pConfig->flSecondaryRandomMultMax );
+    }
+    else
+    {
+        damage *= random->RandomFloat( pConfig->flPrimaryRandomMultMin, pConfig->flPrimaryRandomMultMax );
+    }
+
+    return damage;
 }
 
 void CZMWeaponSledge::Hit( trace_t& traceHit, Activity iHitActivity )
