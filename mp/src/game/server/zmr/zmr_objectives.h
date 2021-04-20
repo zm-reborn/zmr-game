@@ -21,9 +21,9 @@ public:
 
     static void WriteEmptyDisplayUserMsg();
 
-    void WriteArg();
-    void WriteDisplayUserMsg();
-    void WriteUpdateUserMsg();
+    void WriteArg() const;
+    void WriteDisplayUserMsg() const;
+    void WriteUpdateUserMsg() const;
     void ParseArg( const char* psz );
     void SetText( const char* psz );
 
@@ -48,7 +48,16 @@ public:
     CZMEntObjectives();
     ~CZMEntObjectives();
 
-    void Spawn( void ) OVERRIDE;
+    void Spawn() OVERRIDE;
+
+
+    enum DirtyStatus_t
+    {
+        OBJDIRTY_NONE = 0,  
+
+        OBJDIRTY_UPDATE, // Only needs to update values.
+        OBJDIRTY_DISPLAY, // Display new text.
+    };
     
 
     void InputDisplay( inputdata_t &inputData );
@@ -112,14 +121,26 @@ public:
 
     void Reset();
 
-    inline ObjRecipient_t GetRecipient() { return m_iRecipient; };
-    void GetRecipientFilter( CBaseEntity* pActivator, CRecipientFilter& filter, ObjRecipient_t = OBJRECIPIENT_INVALID );
+    inline ObjRecipient_t GetRecipient() const { return m_iRecipient; };
+    void GetRecipientFilter( CBaseEntity* pActivator, CRecipientFilter& filter, ObjRecipient_t = OBJRECIPIENT_INVALID ) const;
     static void RecipientToFilter( CBaseEntity* pActivator, CRecipientFilter& filter, ObjRecipient_t = OBJRECIPIENT_INVALID );
-    inline void WriteDisplayUserMsg( int i ) { m_Lines[i].WriteDisplayUserMsg(); };
-    inline void WriteUpdateUserMsg( int i ) { m_Lines[i].WriteUpdateUserMsg(); };
+    inline void WriteDisplayUserMsg( int i ) const { m_Lines[i].WriteDisplayUserMsg(); };
+    inline void WriteUpdateUserMsg( int i ) const { m_Lines[i].WriteUpdateUserMsg(); };
+
+
+    bool IsDirty() const { return m_iDirtyStatus != OBJDIRTY_NONE; }
+
+    bool IsDisplaying() const { return m_bDisplay; }
 
 private:
+    void CheckDirtyThink();
+    void UpdateDirtyStatus( DirtyStatus_t dirtytype );
+
     CObjLine m_Lines[NUM_OBJ_LINES];
     ObjRecipient_t m_iRecipient;
+
+    DirtyStatus_t m_iDirtyStatus;
+
+    bool m_bDisplay;
 };
 
