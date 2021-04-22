@@ -328,6 +328,13 @@ void C_SmokeTrail::Update( float fTimeDelta )
 		{
 			flMaxVal = m_StartColor[2];
 		}
+
+#ifdef ZMR // ZMRCHANGE: Prevent division by zero.
+		const float flEpsilon = 0.001f;
+		if ( flMaxVal <= flEpsilon )
+			flMaxVal = 1.0f;
+#endif
+
 		offsetColor /= flMaxVal;
 
 		offsetColor *= random->RandomFloat( -0.2f, 0.2f );
