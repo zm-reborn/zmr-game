@@ -33,8 +33,10 @@ namespace ZMItemAction
         CLASS_ITEM_CRATE        = ( 1 << 15 ),
 
         CLASS_MELEE             = ( 1 << 16 ),
+        CLASS_MELEE_BIG         = ( 1 << 17 ), // Sledge / fireaxe
+        CLASS_MELEE_MEDIUM      = ( 1 << 18 ), // Crowbar
 
-        CLASS_DONTUSE           = ( 1 << 17 ), // Class that shouldn't be used. Ie. this item shouldn't be spawned.
+        CLASS_DONTUSE           = ( 1 << 19 ), // Class that shouldn't be used. Ie. this item shouldn't be spawned.
     };
 
     enum ItemSpawnTime_t

@@ -45,9 +45,9 @@ ItemBaseData_t const CZMMapItemSystem::m_ItemData[] =
 
     ITEMDATA( weapon_zm_molotov, CLASS_WEAPON|CLASS_MOLOTOV ),
 
-    ITEMDATA( weapon_zm_improvised, CLASS_WEAPON|CLASS_MELEE ),
-    ITEMDATA( weapon_zm_sledge, CLASS_WEAPON|CLASS_MELEE ),
-    ITEMDATA( weapon_zm_fireaxe, CLASS_WEAPON|CLASS_MELEE ),
+    ITEMDATA( weapon_zm_improvised, CLASS_WEAPON|CLASS_MELEE|CLASS_MELEE_MEDIUM ),
+    ITEMDATA( weapon_zm_sledge, CLASS_WEAPON|CLASS_MELEE|CLASS_MELEE_BIG ),
+    ITEMDATA( weapon_zm_fireaxe, CLASS_WEAPON|CLASS_MELEE|CLASS_MELEE_BIG ),
 
     // Legacy weapons
     ITEMDATA( weapon_crowbar, CLASS_DONTUSE ),
