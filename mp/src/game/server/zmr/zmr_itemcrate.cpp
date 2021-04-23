@@ -12,7 +12,56 @@
 #include "tier0/memdbgon.h"
 
 
-#define CRATE_MODEL     "models/items/item_item_crate.mdl"
+enum CrateModelType_t
+{
+    CRATEMODEL_NONE = -1,
+
+    CRATEMODEL_AMMO,
+    CRATEMODEL_MELEE,
+    CRATEMODEL_THROWABLE,
+    CRATEMODEL_WEAPON,
+
+    CRATEMODEL_MAX
+};
+
+struct CrateItemData_t
+{
+    const char* pszItemName;
+    CrateModelType_t iCrateModel;
+    int iBodyGroup;
+    int iSubModel;
+    int iSkin;
+};
+
+
+const char* g_szCrateModels[] = {
+    "models/items/crates/crate_ammo.mdl",
+    "models/items/crates/crate_melee.mdl",
+    "models/items/crates/crate_throw.mdl",
+    "models/items/crates/crate_wepin.mdl"
+};
+
+const CrateItemData_t CrateItemData[] = {
+    { "item_ammo_pistol", CRATEMODEL_AMMO, 0, 0, 1 },
+    { "item_ammo_revolver", CRATEMODEL_AMMO, 0, 0, 2 },
+    { "item_box_buckshot", CRATEMODEL_AMMO, 0, 0, 3 },
+    { "item_ammo_357", CRATEMODEL_AMMO, 0, 0, 4 },
+    { "item_ammo_smg1", CRATEMODEL_AMMO, 0, 0, 5 },
+
+    { "weapon_zm_pistol", CRATEMODEL_WEAPON, 0, 0, 1 },
+    { "weapon_zm_revolver", CRATEMODEL_WEAPON, 0, 0, 2 },
+    { "weapon_zm_shotgun", CRATEMODEL_WEAPON, 0, 0, 3 },
+    { "weapon_zm_rifle", CRATEMODEL_WEAPON, 0, 0, 4 },
+    { "weapon_zm_mac10", CRATEMODEL_WEAPON, 0, 0, 5 },
+
+    { "weapon_zm_fireaxe", CRATEMODEL_MELEE, 1, 0, 0 },
+    { "weapon_zm_improvised", CRATEMODEL_MELEE, 1, 1, 0 },
+    { "weapon_zm_sledge", CRATEMODEL_MELEE, 1, 2, 0 },
+
+    { "weapon_zm_molotov", CRATEMODEL_THROWABLE, 0, 0, 0 },
+};
+
+#define CRATE_MODEL_OLD                     "models/items/item_item_crate.mdl"
 
 class CZMEntItemCrate : public CPhysicsProp
 {
@@ -26,6 +75,9 @@ public:
     void Spawn();
 
 
+    static CrateModelType_t TranslateItemClassNameToType( const char* pszItemClassName );
+    static int              TranslateItemClassToSkin( const char* pszItemClassName, int& iBodyGroup, int& iSubModel );
+
     inline const char*  GetItemClass() const { return STRING( m_iszItemClass ); };
     inline int          GetItemCount() const { return m_nItemCount; };
 
@@ -34,9 +86,6 @@ private:
 
     virtual void    OnPhysGunPickup( CBasePlayer* pPhysGunUser, PhysGunPickup_t reason ) OVERRIDE;
     virtual void    OnBreak( const Vector& vecVelocity, const AngularImpulse& angVel, CBaseEntity* pBreaker ) OVERRIDE;
-
-
-    int             TranslateItemClassToSkin();
 
     CBaseEntity*    CreateItem() const;
     CZMBaseWeapon*  CreateTemplateItem() const;
@@ -55,6 +104,7 @@ private:
 
 
 LINK_ENTITY_TO_CLASS( item_item_crate, CZMEntItemCrate );
+PRECACHE_REGISTER( item_item_crate );
 
 
 BEGIN_DATADESC( CZMEntItemCrate )
@@ -77,8 +127,12 @@ CZMEntItemCrate::CZMEntItemCrate()
 
 void CZMEntItemCrate::Precache()
 {
-    // Set this here to quiet base prop warnings
-    PrecacheModel( CRATE_MODEL );
+    Assert( ARRAYSIZE( g_szCrateModels ) == CRATEMODEL_MAX );
+    for ( int i = 0; i < ARRAYSIZE( g_szCrateModels ); i++ )
+    {
+        PrecacheModel( g_szCrateModels[i] );
+        
+    }
 
     BaseClass::Precache();
 
@@ -153,24 +207,47 @@ void CZMEntItemCrate::Spawn()
     }
 
 
-    SetModelName( AllocPooledString( CRATE_MODEL ) );
+    int iBodyGroup = 0;
+    int iSubModel = 0;
+    int iSkin = 0;
+
+    auto iCrateType = TranslateItemClassNameToType( STRING( m_iszItemClass ) );
+    iSkin = TranslateItemClassToSkin( STRING( m_iszItemClass ), iBodyGroup, iSubModel );
+
+    const char* pszModelName;
+
+    if ( iCrateType > CRATEMODEL_NONE && iCrateType < CRATEMODEL_MAX )
+    {
+        pszModelName = g_szCrateModels[iCrateType];
+    }
+    else
+    {
+        pszModelName = g_szCrateModels[0];
+    }
+
+    SetModelName( AllocPooledString( pszModelName ) );
 
     BaseClass::Spawn();
     Precache();
 
     DisableAutoFade();
-    SetModel( CRATE_MODEL );
+    SetModel( pszModelName );
     AddEFlags( EFL_NO_ROTORWASH_PUSH );
 
 
     // Set skin based on item we house.
-    if ( GetModelPtr() )
+    auto* pHdr = GetModelPtr();
+    if ( pHdr )
     {
-        int iItemSkin = TranslateItemClassToSkin();
-
-        if ( iItemSkin >= 0 && iItemSkin < GetModelPtr()->numskinfamilies() )
+        if ( iBodyGroup >= 0 && iBodyGroup < pHdr->numbodyparts() )
         {
-            m_nSkin = iItemSkin;
+            SetBodygroup( iBodyGroup, iSubModel );
+        }
+        
+
+        if ( iSkin >= 0 && iSkin < pHdr->numskinfamilies() )
+        {
+            m_nSkin = iSkin;
         }
     }
 }
@@ -297,85 +374,36 @@ void CZMEntItemCrate::OnPhysGunPickup( CBasePlayer* pPhysGunUser, PhysGunPickup_
 #define WEAPON_EQU(str,classname)           ( Q_strcmp( str, classname ) == 0 )
 
 
-// Return -1 for invalid
-int CZMEntItemCrate::TranslateItemClassToSkin()
+CrateModelType_t CZMEntItemCrate::TranslateItemClassNameToType( const char* pszItemClassName )
 {
-    // ZMRTODO: Also check template ones.
-    const char* c = STRING( m_iszItemClass );
+    Assert( pszItemClassName );
 
-    bool bIsWeapon = c[0] == 'w';
-
-
-    if ( bIsWeapon )
+    for ( int i = 0; i < ARRAYSIZE( CrateItemData ); i++ )
     {
-        // Skip weapon_zm_
-        int skip = sizeof( "weapon_zm_" ) - 1;
-
-        int len = Q_strlen( c );
-        if ( len <= skip )
-            return -1;
-
-        c += skip;
-
-
-        if ( WEAPON_EQU( c, "molotov" ) )
+        if ( Q_strcmp( pszItemClassName, CrateItemData[i].pszItemName ) == 0 )
         {
-            return 1;
-        }
-        if ( WEAPON_EQU( c, "sledge" ) )
-        {
-            return 2;
-        }
-        if ( WEAPON_EQU( c, "improvised" ) )
-        {
-            return 3;
-        }
-
-        if ( WEAPON_EQU( c, "pistol" ) )
-        {
-            return 9;
-        }
-        if ( WEAPON_EQU( c, "revolver" ) )
-        {
-            return 10;
-        }
-        if ( AMMO_EQU( c, "shotgun" ) ) // shotgun && shotgun_sporting
-        {
-            return 11;
-        }
-        if ( WEAPON_EQU( c, "rifle" ) )
-        {
-            return 12;
-        }
-        if ( WEAPON_EQU( c, "mac10" ) )
-        {
-            return 13;
-        }
-    }
-    else
-    {
-        if ( AMMO_EQU( c, "item_ammo_pistol" ) )
-        {
-            return 4;
-        }
-        if ( AMMO_EQU( c, "item_ammo_revolver" ) )
-        {
-            return 5;
-        }
-        if ( AMMO_EQU( c, "item_box_buckshot" ) )
-        {
-            return 6;
-        }
-        if ( AMMO_EQU( c, "item_ammo_357" ) )
-        {
-            return 7;
-        }
-        if ( AMMO_EQU( c, "item_ammo_smg1" ) )
-        {
-            return 8;
+            return CrateItemData[i].iCrateModel;
         }
     }
 
+    return CRATEMODEL_NONE;
+}
+
+// Return -1 for invalid
+int CZMEntItemCrate::TranslateItemClassToSkin( const char* pszItemClassName, int& iBodyGroup, int &iSubModel )
+{
+    iBodyGroup = 0;
+    iSubModel = 0;
+
+    for ( int i = 0; i < ARRAYSIZE( CrateItemData ); i++ )
+    {
+        if ( Q_strcmp( pszItemClassName, CrateItemData[i].pszItemName ) == 0 )
+        {
+            iBodyGroup = CrateItemData[i].iBodyGroup;
+            iSubModel = CrateItemData[i].iSubModel;
+            return CrateItemData[i].iSkin;
+        }
+    }
 
     return -1;
 }
