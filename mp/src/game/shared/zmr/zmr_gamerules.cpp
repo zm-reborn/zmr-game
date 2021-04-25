@@ -48,6 +48,9 @@ ConVar zm_sv_reward_zombiekill( "zm_sv_reward_zombiekill", "200", FCVAR_NOTIFY |
 ConVar zm_sv_reward_kill( "zm_sv_reward_kill", "100", FCVAR_NOTIFY | FCVAR_ARCHIVE, "How many resources ZM gets when a human dies." );
 #endif
 
+ConVar zm_sv_zombiemax( "zm_sv_zombiemax", "70", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE, "The maximum amount of zombie population allowed." );
+
+
 
 
 #ifndef CLIENT_DLL
@@ -143,9 +146,6 @@ const char* g_sTeamNames[] =
     "Survivors",
     "Zombie Master",
 };
-
-
-ConVar zm_sv_zombiemax( "zm_sv_zombiemax", "50", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_ARCHIVE, "" );
 
 
 CZMRules::CZMRules()
