@@ -137,8 +137,7 @@ IMPLEMENT_NETWORKCLASS_ALIASED( ZMGameRulesProxy, DT_ZM_GameRulesProxy )
 #endif
 
 
-
-// NOTE: the indices here must match TEAM_TERRORIST, TEAM_CT, TEAM_SPECTATOR, etc.
+// NOTE: the indices here must match ZMTEAM_SPECTATOR, ZMTEAM_HUMAN, ZMTEAM_ZM, etc.
 const char* g_sTeamNames[] =
 {
     "Unassigned",

@@ -378,7 +378,7 @@ void CZMWeaponHands::TertiaryAttack()
 }
 
 #ifdef CLIENT_DLL
-ConVar zm_cl_drawhands( "zm_cl_drawhands", "1", FCVAR_ARCHIVE );
+ConVar zm_cl_drawhands( "zm_cl_drawhands", "1", FCVAR_ARCHIVE, "Are the fists drawn?" );
 
 bool CZMWeaponHands::IsOverridingViewmodel()
 {

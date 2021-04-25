@@ -897,7 +897,7 @@ void CZMEntManipulateTrigger::Spawn()
     SetNextThink( gpGlobals->curtime + 0.5f );
 }
 
-ConVar zm_sv_trap_triggerrange( "zm_sv_trap_triggerrange", "100", FCVAR_NOTIFY );
+ConVar zm_sv_trap_triggerrange( "zm_sv_trap_triggerrange", "100", FCVAR_NOTIFY, "How close survivors have to get to a trap to trigger it." );
 
 void CZMEntManipulateTrigger::ScanThink()
 {
@@ -927,7 +927,7 @@ void CZMEntManipulateTrigger::ScanThink()
     Ambush trigger
 */
 
-ConVar zm_sv_ambush_triggerrange( "zm_sv_ambush_triggerrange", "100", FCVAR_NOTIFY );
+ConVar zm_sv_ambush_triggerrange( "zm_sv_ambush_triggerrange", "100", FCVAR_NOTIFY, "How close survivors have to get to an ambush to trigger it." );
 
 
 //IMPLEMENT_SERVERCLASS_ST( CZMEntManipulateTrigger, DT_ZM_EntManipulateTrigger )
@@ -1989,8 +1989,8 @@ PRECACHE_REGISTER( env_delayed_physexplosion );
 
 
 ConVar zm_sv_physexp_debug( "zm_sv_physexp_debug", "0" );
-ConVar zm_sv_physexp_disorientateplayer( "zm_sv_physexp_disorientateplayer", "10", FCVAR_NOTIFY | FCVAR_ARCHIVE );
-ConVar zm_sv_physexp_player_mult( "zm_sv_physexp_player_mult", "0.05", FCVAR_NOTIFY | FCVAR_ARCHIVE );
+ConVar zm_sv_physexp_disorientateplayer( "zm_sv_physexp_disorientateplayer", "10", FCVAR_NOTIFY | FCVAR_ARCHIVE, "Maximum angular disorientation applied to players." );
+ConVar zm_sv_physexp_player_mult( "zm_sv_physexp_player_mult", "0.05", FCVAR_NOTIFY | FCVAR_ARCHIVE, "How much players are pushed." );
 
 
 CZMPhysExplosion::CZMPhysExplosion()

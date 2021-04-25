@@ -159,17 +159,17 @@ float CZMBaseZombie::g_flLastZombieSound = 0.0f;
 
 
 ConVar zm_sv_swatmaxmass( "zm_sv_swatmaxmass", "200", FCVAR_NOTIFY );
-ConVar zm_sv_swatlift( "zm_sv_swatlift", "20000", FCVAR_NOTIFY );
-ConVar zm_sv_swatforcemin( "zm_sv_swatforcemin", "20000", FCVAR_NOTIFY );
-ConVar zm_sv_swatforcemax( "zm_sv_swatforcemax", "50000", FCVAR_NOTIFY ); // Originally 70000
+ConVar zm_sv_swatlift( "zm_sv_swatlift", "20000", FCVAR_NOTIFY, "How much upward force is applied to the swatted prop." );
+ConVar zm_sv_swatforcemin( "zm_sv_swatforcemin", "20000", FCVAR_NOTIFY, "Minimum amount of force applied to the swatted prop." );
+ConVar zm_sv_swatforcemax( "zm_sv_swatforcemax", "50000", FCVAR_NOTIFY, "Maximum amount of force applied to the swatted prop." ); // Originally 70000
 ConVar zm_sv_swatangvel( "zm_sv_swatangvel", "1000", FCVAR_NOTIFY, "Amount of angular velocity swatting applies to prop." );
 
 
 ConVar zm_sv_swat_scan_target_maxdist( "zm_sv_swat_scan_target_maxdist", "512", FCVAR_NOTIFY, "How far our target (enemy) can be for us to swat objects." );
 ConVar zm_sv_swat_scan_def_maxdist( "zm_sv_swat_scan_def_maxdist", "128", FCVAR_NOTIFY, "If no enemy, how far do we look for objects." );
 
-ConVar zm_sv_defense_chase_dist( "zm_sv_defense_chase_dist", "333", FCVAR_NOTIFY );
-ConVar zm_sv_defense_goal_tolerance( "zm_sv_defense_goal_tolerance", "64", FCVAR_NOTIFY );
+ConVar zm_sv_defense_chase_dist( "zm_sv_defense_chase_dist", "333", FCVAR_NOTIFY, "Zombies will begin chasing if enemy is closer than this." );
+ConVar zm_sv_defense_goal_tolerance( "zm_sv_defense_goal_tolerance", "64", FCVAR_NOTIFY, "How close is 'home' for a zombie going back to the spot being defended." );
 
 
 ConVar zm_sv_debug_zombieattack( "zm_sv_debug_zombieattack", "0" );

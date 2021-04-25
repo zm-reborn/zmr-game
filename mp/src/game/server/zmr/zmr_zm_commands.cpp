@@ -556,10 +556,10 @@ static ConCommand zm_cmd_closemenu( "zm_cmd_closemenu", ZM_Cmd_CloseMenu, "", FC
 */
 extern CUtlVector<CZMEntTriggerBlockPhysExp*> g_ZMBlockPhysExp;
 
-ConVar zm_sv_physexp_cost( "zm_sv_physexp_cost", "400", FCVAR_NOTIFY | FCVAR_ARCHIVE );
-ConVar zm_sv_physexp_radius( "zm_sv_physexp_radius", "222", FCVAR_NOTIFY | FCVAR_ARCHIVE );
-ConVar zm_sv_physexp_magnitude( "zm_sv_physexp_magnitude", "17500", FCVAR_NOTIFY | FCVAR_ARCHIVE );
-ConVar zm_sv_physexp_delay( "zm_sv_physexp_delay", "7.4", FCVAR_NOTIFY | FCVAR_ARCHIVE );
+ConVar zm_sv_physexp_cost( "zm_sv_physexp_cost", "400", FCVAR_NOTIFY | FCVAR_ARCHIVE, "How many resources physics explosion costs." );
+ConVar zm_sv_physexp_radius( "zm_sv_physexp_radius", "222", FCVAR_NOTIFY | FCVAR_ARCHIVE, "Physics explosion size." );
+ConVar zm_sv_physexp_magnitude( "zm_sv_physexp_magnitude", "17500", FCVAR_NOTIFY | FCVAR_ARCHIVE, "Physics explosion force amount." );
+ConVar zm_sv_physexp_delay( "zm_sv_physexp_delay", "7.4", FCVAR_NOTIFY | FCVAR_ARCHIVE, "How long the physics explosion cooks for." );
 
 void ZM_Cmd_PhysExp( const CCommand &args )
 {

@@ -21,11 +21,11 @@ ConVar zm_sv_debug_bansheerangeattack( "zm_sv_debug_bansheerangeattack", "0" );
 #define ZOMBIE_MODEL        "models/zombie/zm_fast.mdl"
 
 
-ConVar zm_sv_banshee_leapdist_min( "zm_sv_banshee_leapdist_min", "200", FCVAR_NOTIFY );
-ConVar zm_sv_banshee_leapdist_max( "zm_sv_banshee_leapdist_max", "300", FCVAR_NOTIFY );
+ConVar zm_sv_banshee_leapdist_min( "zm_sv_banshee_leapdist_min", "200", FCVAR_NOTIFY, "The minimum distance Banshees will perform a leap." );
+ConVar zm_sv_banshee_leapdist_max( "zm_sv_banshee_leapdist_max", "300", FCVAR_NOTIFY, "The maximum distance Banshees will perform a leap." );
 
-ConVar zm_sv_banshee_ceilambush_detectrange( "zm_sv_banshee_ceilambush_detectrange", "256", FCVAR_NOTIFY, "", true, 0.0f, false, 0.0f );
-ConVar zm_sv_banshee_ceilambush_maxheight( "zm_sv_banshee_ceilambush_maxheight", "375", FCVAR_NOTIFY, "", true, 0.0f, false, 0.0f );
+ConVar zm_sv_banshee_ceilambush_detectrange( "zm_sv_banshee_ceilambush_detectrange", "256", FCVAR_NOTIFY, "How far from the ambush point do the Banshees check for victims?", true, 0.0f, false, 0.0f );
+ConVar zm_sv_banshee_ceilambush_maxheight( "zm_sv_banshee_ceilambush_maxheight", "375", FCVAR_NOTIFY, "The maximum height for a ceiling ambush", true, 0.0f, false, 0.0f );
 
 extern ConVar zm_sk_banshee_melee_continuous_limit;
 
