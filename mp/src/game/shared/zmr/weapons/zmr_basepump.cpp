@@ -46,6 +46,25 @@ CZMBasePumpWeapon::CZMBasePumpWeapon()
     m_bCancelReload = false;
 }
 
+bool CZMBasePumpWeapon::CanAct( ZMWepActionType_t type ) const
+{
+    // Must pump first before attacking!
+    if ( NeedsPump() && type >= WEPACTION_ATTACK && type <= WEPACTION_ATTACK3 )
+    {
+        return false;
+    }
+
+    return BaseClass::CanAct( type );
+}
+
+void CZMBasePumpWeapon::Drop( const Vector& vecVelocity )
+{
+    BaseClass::Drop( vecVelocity );
+
+    m_iReloadState = RELOADSTATE_NONE;
+    m_bCancelReload = false;
+}
+
 bool CZMBasePumpWeapon::Holster( CBaseCombatWeapon* pSwitchTo )
 {
     bool res = BaseClass::Holster( pSwitchTo );

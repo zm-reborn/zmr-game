@@ -1877,6 +1877,13 @@ bool CZMBaseWeapon::CanAct( ZMWepActionType_t type ) const
     Assert( type != WEPACTION_GENERIC );
 
 
+    // Don't attack during a reload!
+    if ( IsInReload() && type >= WEPACTION_ATTACK && type <= WEPACTION_ATTACK3 )
+    {
+        return false;
+    }
+
+
     auto* pOwner = GetOwner();
 
     if ( !pOwner )

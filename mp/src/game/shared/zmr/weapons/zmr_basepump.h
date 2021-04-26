@@ -42,7 +42,9 @@ public:
 
     CZMBasePumpWeapon();
 
+    virtual bool CanAct( ZMWepActionType_t type = WEPACTION_GENERIC ) const OVERRIDE; 
 
+    virtual void Drop( const Vector& vecVelocity ) OVERRIDE;
     virtual bool Holster( CBaseCombatWeapon* pSwitchTo ) OVERRIDE;
     virtual void Shoot( int iAmmoType = -1, int nBullets = -1, int nAmmo = -1, float flMaxRange = -1.0f, bool bSecondary = false ) OVERRIDE;
     virtual	void CheckReload() OVERRIDE;
