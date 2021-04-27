@@ -1,4 +1,4 @@
-//====== Copyright © Sandern Corporation, All rights reserved. ===========//
+//====== Copyright ï¿½ Sandern Corporation, All rights reserved. ===========//
 //
 // Purpose: 
 //
@@ -29,7 +29,7 @@ bool replMatPossible = false;
 // List of materials that should be replaced
 //-----------------------------------------------------------------------------
 static const char * const pszShaderReplaceDict[][2] = {
-	"LightmappedGeneric",		"SDK_LightmappedGeneric",
+	{ "LightmappedGeneric",		"SDK_LightmappedGeneric" },
 };
 static const int iNumShaderReplaceDict = ARRAYSIZE( pszShaderReplaceDict );
 
