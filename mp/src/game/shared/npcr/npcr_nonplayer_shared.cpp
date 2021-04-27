@@ -7,7 +7,7 @@
 int CNPCRNonPlayer::GetAnimationRandomSeed()
 {
     static int i = 0;
-    return ( i = (++i % 50) );
+    return ( i = ((i + 1) % 50) );
 }
 
 bool CNPCRNonPlayer::HasActivity( Activity act )
