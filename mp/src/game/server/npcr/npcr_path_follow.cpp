@@ -477,6 +477,7 @@ int NPCR::CFollowNavPath::CheckAvoid( CBaseNPC* pNPC, Vector& vecGoalPos )
 
 
     Vector normal;
+    normal.Init();
 
     float side = 0.0f;
     if ( !rightClear && !leftClear )
