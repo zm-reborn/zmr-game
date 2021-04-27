@@ -154,7 +154,7 @@ void ZMClientUtil::ChatPrint( int iPlayerIndex, bool bPlaySound, const char* for
         Q_vsnprintf( msg, sizeof( msg ), format, marker );
         va_end( marker );
 
-        pChat->ChatPrintf( iPlayerIndex, CHAT_FILTER_NONE, msg );
+        pChat->ChatPrintf( iPlayerIndex, CHAT_FILTER_NONE, "%s", msg );
     }
 
     if ( bPlaySound )
