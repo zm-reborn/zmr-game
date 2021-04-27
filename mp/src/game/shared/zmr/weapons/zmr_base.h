@@ -30,9 +30,6 @@
 #define SF_ZMWEAPON_TEMPLATE        ( 1 << 1 )
 
 
-class ZMWeaponConfig::CZMBaseWeaponConfig;
-
-
 enum ZMWepActionType_t
 {
     WEPACTION_GENERIC = 0,
