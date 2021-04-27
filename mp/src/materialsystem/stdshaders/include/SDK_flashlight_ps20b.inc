@@ -24,7 +24,7 @@
 #include "shaderapi/ishadershadow.h"
 #include "materialsystem/imaterialvar.h"
 
-class sdk_flashlight_ps20b_Static_Index
+class SDK_flashlight_ps20b_Static_Index
 {
 	unsigned int m_nNORMALMAP : 2;
 	unsigned int m_nNORMALMAP2 : 2;
@@ -106,7 +106,7 @@ public:
 #endif	// _DEBUG
 	}
 
-	sdk_flashlight_ps20b_Static_Index( IShaderShadow* pShaderShadow, IMaterialVar** params )
+	SDK_flashlight_ps20b_Static_Index( IShaderShadow* pShaderShadow, IMaterialVar** params )
 	{
 		m_nNORMALMAP = 0;
 		m_nNORMALMAP2 = 0;
@@ -133,10 +133,10 @@ public:
 	}
 };
 
-#define shaderStaticTest_sdk_flashlight_ps20b psh_forgot_to_set_static_NORMALMAP + psh_forgot_to_set_static_NORMALMAP2 + psh_forgot_to_set_static_WORLDVERTEXTRANSITION + psh_forgot_to_set_static_SEAMLESS + psh_forgot_to_set_static_DETAILTEXTURE + psh_forgot_to_set_static_DETAIL_BLEND_MODE + psh_forgot_to_set_static_FLASHLIGHTDEPTHFILTERMODE
+#define shaderStaticTest_SDK_flashlight_ps20b psh_forgot_to_set_static_NORMALMAP + psh_forgot_to_set_static_NORMALMAP2 + psh_forgot_to_set_static_WORLDVERTEXTRANSITION + psh_forgot_to_set_static_SEAMLESS + psh_forgot_to_set_static_DETAILTEXTURE + psh_forgot_to_set_static_DETAIL_BLEND_MODE + psh_forgot_to_set_static_FLASHLIGHTDEPTHFILTERMODE
 
 
-class sdk_flashlight_ps20b_Dynamic_Index
+class SDK_flashlight_ps20b_Dynamic_Index
 {
 	unsigned int m_nPIXELFOGTYPE : 2;
 	unsigned int m_nFLASHLIGHTSHADOWS : 2;
@@ -163,7 +163,7 @@ public:
 #endif	// _DEBUG
 	}
 
-	sdk_flashlight_ps20b_Dynamic_Index( IShaderDynamicAPI* pShaderAPI )
+	SDK_flashlight_ps20b_Dynamic_Index( IShaderDynamicAPI* pShaderAPI )
 	{
 		m_nPIXELFOGTYPE = 0;
 		m_nFLASHLIGHTSHADOWS = 0;
@@ -180,7 +180,7 @@ public:
 	}
 };
 
-#define shaderDynamicTest_sdk_flashlight_ps20b psh_forgot_to_set_dynamic_PIXELFOGTYPE + psh_forgot_to_set_dynamic_FLASHLIGHTSHADOWS
+#define shaderDynamicTest_SDK_flashlight_ps20b psh_forgot_to_set_dynamic_PIXELFOGTYPE + psh_forgot_to_set_dynamic_FLASHLIGHTSHADOWS
 
 
 #endif	// SDK_FLASHLIGHT_PS20B_H

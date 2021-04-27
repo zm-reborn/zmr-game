@@ -44,8 +44,8 @@
 #include "lightmappedgeneric_bumpmappedlightmap.inc"
 #endif // GAME_SHADER_DLL
 
-#include "sdk_lightmappedgeneric_flashlight_vs20.inc"
-#include "sdk_flashlight_ps20b.inc"
+#include "SDK_lightmappedgeneric_flashlight_vs20.inc"
+#include "SDK_flashlight_ps20b.inc"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -1889,21 +1889,21 @@ void CBaseVSShader::DrawFlashlight_dx90( IMaterialVar** params, IShaderDynamicAP
 
         //if ( g_pHardwareConfig->SupportsShaderModel_3_0() )
         //{
-        //    DECLARE_STATIC_VERTEX_SHADER( sdk_lightmappedgeneric_flashlight_vs30 );
+        //    DECLARE_STATIC_VERTEX_SHADER( SDK_lightmappedgeneric_flashlight_vs30 );
         //    SET_STATIC_VERTEX_SHADER_COMBO( WORLDVERTEXTRANSITION, vars.m_bWorldVertexTransition );
         //    SET_STATIC_VERTEX_SHADER_COMBO( NORMALMAP, vars.m_bBump );
         //    SET_STATIC_VERTEX_SHADER_COMBO( SEAMLESS, bSeamless );
         //    SET_STATIC_VERTEX_SHADER_COMBO( DETAIL, bDetail );
-        //    SET_STATIC_VERTEX_SHADER( sdk_lightmappedgeneric_flashlight_vs30 );
+        //    SET_STATIC_VERTEX_SHADER( SDK_lightmappedgeneric_flashlight_vs30 );
         //}
         //else
         {
-            DECLARE_STATIC_VERTEX_SHADER( sdk_lightmappedgeneric_flashlight_vs20 );
+            DECLARE_STATIC_VERTEX_SHADER( SDK_lightmappedgeneric_flashlight_vs20 );
             SET_STATIC_VERTEX_SHADER_COMBO( WORLDVERTEXTRANSITION, vars.m_bWorldVertexTransition );
             SET_STATIC_VERTEX_SHADER_COMBO( NORMALMAP, vars.m_bBump );
             SET_STATIC_VERTEX_SHADER_COMBO( SEAMLESS, bSeamless );
             SET_STATIC_VERTEX_SHADER_COMBO( DETAIL, bDetail );
-            SET_STATIC_VERTEX_SHADER( sdk_lightmappedgeneric_flashlight_vs20 );
+            SET_STATIC_VERTEX_SHADER( SDK_lightmappedgeneric_flashlight_vs20 );
         }
 
 
@@ -1928,7 +1928,7 @@ void CBaseVSShader::DrawFlashlight_dx90( IMaterialVar** params, IShaderDynamicAP
 
 		int nShadowFilterMode = g_pHardwareConfig->GetShadowFilterMode();
 
-        DECLARE_STATIC_PIXEL_SHADER( sdk_flashlight_ps20b );
+        DECLARE_STATIC_PIXEL_SHADER( SDK_flashlight_ps20b );
         SET_STATIC_PIXEL_SHADER_COMBO( NORMALMAP, nBumpMapVariant );
         SET_STATIC_PIXEL_SHADER_COMBO( NORMALMAP2, bBump2 );
         SET_STATIC_PIXEL_SHADER_COMBO( WORLDVERTEXTRANSITION, vars.m_bWorldVertexTransition );
@@ -1936,7 +1936,7 @@ void CBaseVSShader::DrawFlashlight_dx90( IMaterialVar** params, IShaderDynamicAP
         SET_STATIC_PIXEL_SHADER_COMBO( DETAILTEXTURE, bDetail );
         SET_STATIC_PIXEL_SHADER_COMBO( DETAIL_BLEND_MODE, nDetailBlendMode );
         SET_STATIC_PIXEL_SHADER_COMBO( FLASHLIGHTDEPTHFILTERMODE, nShadowFilterMode );
-        SET_STATIC_PIXEL_SHADER( sdk_flashlight_ps20b );
+        SET_STATIC_PIXEL_SHADER( SDK_flashlight_ps20b );
 		
 		FogToBlack();
 	}
@@ -2007,9 +2007,9 @@ void CBaseVSShader::DrawFlashlight_dx90( IMaterialVar** params, IShaderDynamicAP
 			}
 		}
 
-		DECLARE_DYNAMIC_VERTEX_SHADER( sdk_lightmappedgeneric_flashlight_vs20 );
+		DECLARE_DYNAMIC_VERTEX_SHADER( SDK_lightmappedgeneric_flashlight_vs20 );
 		SET_DYNAMIC_VERTEX_SHADER_COMBO( DOWATERFOG, pShaderAPI->GetSceneFogMode() == MATERIAL_FOG_LINEAR_BELOW_FOG_Z );
-		SET_DYNAMIC_VERTEX_SHADER( sdk_lightmappedgeneric_flashlight_vs20 );
+		SET_DYNAMIC_VERTEX_SHADER( SDK_lightmappedgeneric_flashlight_vs20 );
 		if ( bSeamless )
 		{
 			float const0[4]={ vars.m_fSeamlessScale,0,0,0};
@@ -2044,10 +2044,10 @@ void CBaseVSShader::DrawFlashlight_dx90( IMaterialVar** params, IShaderDynamicAP
 		vEyePos_SpecExponent[3] = 0.0f;
 		pShaderAPI->SetPixelShaderConstant( PSREG_EYEPOS_SPEC_EXPONENT, vEyePos_SpecExponent, 1 );
 
-		DECLARE_DYNAMIC_PIXEL_SHADER( sdk_flashlight_ps20b );
+		DECLARE_DYNAMIC_PIXEL_SHADER( SDK_flashlight_ps20b );
 		SET_DYNAMIC_PIXEL_SHADER_COMBO( PIXELFOGTYPE,  pShaderAPI->GetPixelFogCombo() );
 		SET_DYNAMIC_PIXEL_SHADER_COMBO( FLASHLIGHTSHADOWS, flashlightState.m_bEnableShadows && ( pFlashlightDepthTexture != NULL ) );
-		SET_DYNAMIC_PIXEL_SHADER( sdk_flashlight_ps20b );
+		SET_DYNAMIC_PIXEL_SHADER( SDK_flashlight_ps20b );
 
 		float atten[4];										// Set the flashlight attenuation factors
 		atten[0] = flashlightState.m_fConstantAtten;

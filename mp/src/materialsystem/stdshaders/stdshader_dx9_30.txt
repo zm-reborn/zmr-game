@@ -1,7 +1,7 @@
 // Standard shaders
 // TODO: Still missing some shaders.
-//sdk_flashlight_ps30.fxc
-//sdk_lightmappedgeneric_flashlight_vs30.fxc
+//SDK_flashlight_ps30.fxc
+//SDK_lightmappedgeneric_flashlight_vs30.fxc
 
 // Custom
 pbr_ps30.fxc

@@ -12,7 +12,7 @@
 #include "shaderapi/ishadershadow.h"
 #include "materialsystem/imaterialvar.h"
 
-class sdk_lightmappedgeneric_vs20_Static_Index
+class SDK_lightmappedgeneric_vs20_Static_Index
 {
 	unsigned int m_nENVMAP_MASK : 2;
 	unsigned int m_nTANGENTSPACE : 2;
@@ -116,7 +116,7 @@ public:
 #endif	// _DEBUG
 	}
 
-	sdk_lightmappedgeneric_vs20_Static_Index( IShaderShadow* pShaderShadow, IMaterialVar** params )
+	SDK_lightmappedgeneric_vs20_Static_Index( IShaderShadow* pShaderShadow, IMaterialVar** params )
 	{
 		m_nENVMAP_MASK = 0;
 		m_nTANGENTSPACE = 0;
@@ -147,10 +147,10 @@ public:
 	}
 };
 
-#define shaderStaticTest_sdk_lightmappedgeneric_vs20 vsh_forgot_to_set_static_ENVMAP_MASK + vsh_forgot_to_set_static_TANGENTSPACE + vsh_forgot_to_set_static_BUMPMAP + vsh_forgot_to_set_static_DIFFUSEBUMPMAP + vsh_forgot_to_set_static_VERTEXCOLOR + vsh_forgot_to_set_static_VERTEXALPHATEXBLENDFACTOR + vsh_forgot_to_set_static_RELIEF_MAPPING + vsh_forgot_to_set_static_SEAMLESS + vsh_forgot_to_set_static_BUMPMASK
+#define shaderStaticTest_SDK_lightmappedgeneric_vs20 vsh_forgot_to_set_static_ENVMAP_MASK + vsh_forgot_to_set_static_TANGENTSPACE + vsh_forgot_to_set_static_BUMPMAP + vsh_forgot_to_set_static_DIFFUSEBUMPMAP + vsh_forgot_to_set_static_VERTEXCOLOR + vsh_forgot_to_set_static_VERTEXALPHATEXBLENDFACTOR + vsh_forgot_to_set_static_RELIEF_MAPPING + vsh_forgot_to_set_static_SEAMLESS + vsh_forgot_to_set_static_BUMPMASK
 
 
-class sdk_lightmappedgeneric_vs20_Dynamic_Index
+class SDK_lightmappedgeneric_vs20_Dynamic_Index
 {
 	unsigned int m_nFASTPATH : 2;
 	unsigned int m_nDOWATERFOG : 2;
@@ -188,7 +188,7 @@ public:
 #endif	// _DEBUG
 	}
 
-	sdk_lightmappedgeneric_vs20_Dynamic_Index( IShaderDynamicAPI* pShaderAPI )
+	SDK_lightmappedgeneric_vs20_Dynamic_Index( IShaderDynamicAPI* pShaderAPI )
 	{
 		m_nFASTPATH = 0;
 		m_nDOWATERFOG = 0;
@@ -207,7 +207,7 @@ public:
 	}
 };
 
-#define shaderDynamicTest_sdk_lightmappedgeneric_vs20 vsh_forgot_to_set_dynamic_FASTPATH + vsh_forgot_to_set_dynamic_DOWATERFOG + vsh_forgot_to_set_dynamic_LIGHTING_PREVIEW
+#define shaderDynamicTest_SDK_lightmappedgeneric_vs20 vsh_forgot_to_set_dynamic_FASTPATH + vsh_forgot_to_set_dynamic_DOWATERFOG + vsh_forgot_to_set_dynamic_LIGHTING_PREVIEW
 
 
 #endif	// SDK_LIGHTMAPPEDGENERIC_VS20_H

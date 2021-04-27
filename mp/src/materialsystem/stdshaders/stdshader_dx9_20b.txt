@@ -2,22 +2,22 @@
 // TODO: Still missing some shaders.
 cable_ps2x.fxc
 eye_refract_ps2x.fxc
-sdk_bloom_ps2x.fxc
-sdk_bloomadd_ps2x.fxc
-//sdk_flashlight_ps11.fxc
-sdk_flashlight_ps2x.fxc
-//sdk_lightmappedgeneric_flashlight_vs11.fxc
-sdk_lightmappedgeneric_flashlight_vs20.fxc
-//sdk_lightmappedgeneric_ps11.fxc
-sdk_lightmappedgeneric_ps2x.fxc
-sdk_lightmappedgeneric_vs20.fxc
-sdk_vertexlit_and_unlit_generic_bump_ps2x.fxc
-sdk_vertexlit_and_unlit_generic_ps2x.fxc
-//sdk_vertexlitgeneric_flashlight_vs11.fxc
-sdk_worldtwotextureblend_ps2x.fxc
+SDK_Bloom_ps2x.fxc
+SDK_bloomadd_ps2x.fxc
+//SDK_flashlight_ps11.fxc
+SDK_flashlight_ps2x.fxc
+//SDK_lightmappedgeneric_flashlight_vs11.fxc
+SDK_lightmappedgeneric_flashlight_vs20.fxc
+//SDK_lightmappedgeneric_ps11.fxc
+SDK_lightmappedgeneric_ps2x.fxc
+SDK_lightmappedgeneric_vs20.fxc
+SDK_vertexlit_and_unlit_generic_bump_ps2x.fxc
+SDK_vertexlit_and_unlit_generic_ps2x.fxc
+//SDK_vertexlitgeneric_flashlight_vs11.fxc
+SDK_worldtwotextureblend_ps2x.fxc
 
 
-sdk_screenspaceeffect_vs20.fxc
+SDK_screenspaceeffect_vs20.fxc
 
 // Custom
 pbr_ps20b.fxc

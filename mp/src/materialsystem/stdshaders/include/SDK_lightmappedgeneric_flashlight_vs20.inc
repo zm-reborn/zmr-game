@@ -8,7 +8,7 @@
 #include "shaderapi/ishadershadow.h"
 #include "materialsystem/imaterialvar.h"
 
-class sdk_lightmappedgeneric_flashlight_vs20_Static_Index
+class SDK_lightmappedgeneric_flashlight_vs20_Static_Index
 {
 	unsigned int m_nNORMALMAP : 2;
 	unsigned int m_nWORLDVERTEXTRANSITION : 2;
@@ -57,7 +57,7 @@ public:
 #endif	// _DEBUG
 	}
 
-	sdk_lightmappedgeneric_flashlight_vs20_Static_Index( IShaderShadow* pShaderShadow, IMaterialVar** params )
+	SDK_lightmappedgeneric_flashlight_vs20_Static_Index( IShaderShadow* pShaderShadow, IMaterialVar** params )
 	{
 		m_nNORMALMAP = 0;
 		m_nWORLDVERTEXTRANSITION = 0;
@@ -78,10 +78,10 @@ public:
 	}
 };
 
-#define shaderStaticTest_sdk_lightmappedgeneric_flashlight_vs20 vsh_forgot_to_set_static_NORMALMAP + vsh_forgot_to_set_static_WORLDVERTEXTRANSITION + vsh_forgot_to_set_static_SEAMLESS + vsh_forgot_to_set_static_DETAIL
+#define shaderStaticTest_SDK_lightmappedgeneric_flashlight_vs20 vsh_forgot_to_set_static_NORMALMAP + vsh_forgot_to_set_static_WORLDVERTEXTRANSITION + vsh_forgot_to_set_static_SEAMLESS + vsh_forgot_to_set_static_DETAIL
 
 
-class sdk_lightmappedgeneric_flashlight_vs20_Dynamic_Index
+class SDK_lightmappedgeneric_flashlight_vs20_Dynamic_Index
 {
 	unsigned int m_nDOWATERFOG : 2;
 #ifdef _DEBUG
@@ -97,7 +97,7 @@ public:
 #endif	// _DEBUG
 	}
 
-	sdk_lightmappedgeneric_flashlight_vs20_Dynamic_Index( IShaderDynamicAPI* pShaderAPI )
+	SDK_lightmappedgeneric_flashlight_vs20_Dynamic_Index( IShaderDynamicAPI* pShaderAPI )
 	{
 		m_nDOWATERFOG = 0;
 #ifdef _DEBUG
@@ -112,7 +112,7 @@ public:
 	}
 };
 
-#define shaderDynamicTest_sdk_lightmappedgeneric_flashlight_vs20 vsh_forgot_to_set_dynamic_DOWATERFOG
+#define shaderDynamicTest_SDK_lightmappedgeneric_flashlight_vs20 vsh_forgot_to_set_dynamic_DOWATERFOG
 
 
 #endif	// SDK_LIGHTMAPPEDGENERIC_FLASHLIGHT_VS20_H
