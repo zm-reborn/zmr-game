@@ -33,8 +33,9 @@ bool CZMRejoinData::ShouldKeepData( bool bMapChange, time_t leavetime )
 
         if ( zm_sv_debug_rejoindata.GetBool() )
         {
-            DevMsg( "Expiring in %lld seconds...\n",
-                exp > curtime ? (exp - curtime) : -1 );
+            int timeleft = (expire > 0 && exp > curtime) ? (int)(exp - curtime) : -1;
+
+            DevMsg( "Expiring in %i seconds...\n", timeleft );
         }
 
         if ( exp <= curtime )
@@ -324,9 +325,11 @@ void CZMRejoinDataSystem::PrintRejoinData()
         {
             int expire = pData->GetExpirationTime();
             time_t exp = leavetime + (time_t)expire;
-            Msg( "    %s | Expires in: %lld seconds\n",
+            int timeleft = (expire > 0 && exp > curtime) ? (int)(exp - curtime) : -1;
+
+            Msg( "    %s | Expires in: %i seconds\n",
                 pData->GetDataName(),
-                (expire > 0 && exp > curtime) ? (exp - curtime) : -1 );
+                timeleft );
         } );
     }
 }
