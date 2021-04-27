@@ -50,6 +50,7 @@ config.cfg
 Release_*/
 Debug_*/
 *.recipe
+*.project
 
 # Tool (vbsp/vvis/vrad) compilation output
 *.dll
