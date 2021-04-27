@@ -220,9 +220,6 @@ namespace ZMItemAction
         bool m_bMapItemsOnly;
 
         bool m_bOnlyOldMaps;
-
-
-        friend class CZMMapItemActionReplace;
     };
     //
 
