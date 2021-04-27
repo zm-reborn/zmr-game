@@ -385,7 +385,7 @@ void CZMHudDeathNotice::FireGameEvent( IGameEvent* event )
     {
         Q_snprintf( szMsg, sizeof( szMsg ), "%s killed %s", killer_name, victim_name );
 
-        if ( fullkilledwith && *fullkilledwith && iKillerTeam != ZMTEAM_ZM )
+        if ( fullkilledwith[0] != NULL && iKillerTeam != ZMTEAM_ZM )
         {
             Q_strncat( szMsg, VarArgs( " with %s.\n", &fullkilledwith[6] ), sizeof( szMsg ), COPY_ALL_CHARACTERS );
         }
