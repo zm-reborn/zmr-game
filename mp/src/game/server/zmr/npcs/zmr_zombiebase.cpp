@@ -258,7 +258,7 @@ CZMBaseZombie::CZMBaseZombie()
     m_flHealthRatio = 1.0f;
     m_bIsOnGround = false;
     static int randomseed = 0;
-    randomseed = (++randomseed) % 50;
+    randomseed = (randomseed + 1) % 50;
     m_iAnimationRandomSeed = (int)gpGlobals->curtime + randomseed;
     
     m_iAdditionalAnimRandomSeed = 0;
@@ -1295,7 +1295,7 @@ void CZMBaseZombie::GetAnimRandomSeed( int iEvent, int& nData )
     case ZOMBIEANIMEVENT_ATTACK :
     case ZOMBIEANIMEVENT_ON_BURN :
     case ZOMBIEANIMEVENT_ON_EXTINGUISH :
-        nData = ( randomseed = (++randomseed) % 50 );
+        nData = ( randomseed = (randomseed + 1) % 50 );
     default : break;
     }
 }
