@@ -127,7 +127,8 @@ void CSurvivorAttackCloseRangeSchedule::OnUpdate()
 
     if ( IsInRangeToAttack( pEnemy ) && pOuter->GetMotor()->IsFacing( vecAimTarget, grace ) )
     {
-        if ( pOuter->GetSenses()->CanSee( vecAimTarget ) && !pOuter->MustStopToShoot() || pOuter->GetLocalVelocity().IsLengthLessThan( 1.0f ) )
+        if (pOuter->GetSenses()->CanSee( vecAimTarget ) &&
+            (!pOuter->MustStopToShoot() || pOuter->GetLocalVelocity().IsLengthLessThan( 1.0f )))
         {
             pOuter->PressFire1( 0.1f );
         }
