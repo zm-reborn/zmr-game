@@ -1,5 +1,7 @@
 #pragma once
 
+#include "gameinterface.h"
+
 #include "npcr/npcr_basenpc.h"
 
 
