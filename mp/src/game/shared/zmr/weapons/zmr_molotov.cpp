@@ -556,7 +556,7 @@ void CZMWeaponMolotov::HandleAnimEventLight()
         SendWeaponAnim( ACT_VM_PRIMARYATTACK_4 );
     }
 
-    DevMsg( "Set throw state to: %i\n", m_iThrowState );
+    DevMsg( "Set throw state to: %i\n", m_iThrowState.Get() );
 }
 
 void CZMWeaponMolotov::HandleAnimEventThrow()
