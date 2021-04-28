@@ -73,7 +73,8 @@ CZMHudTooltip::CZMHudTooltip( const char *pElementName ) : CHudElement( pElement
 
 CZMHudTooltip::~CZMHudTooltip()
 {
-    delete[] m_pTextImage;
+    delete m_pTextImage;
+    m_pTextImage = nullptr;
 }
 
 void CZMHudTooltip::Init()
