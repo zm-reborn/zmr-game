@@ -100,6 +100,8 @@ private:
     int m_iPoseParamVertAim;
     int m_iAttachmentIronsight;
     int m_iAttachmentScopeEnd;
+
+    float m_flLastMoveX;
     
 
     Vector m_vecLastVel;

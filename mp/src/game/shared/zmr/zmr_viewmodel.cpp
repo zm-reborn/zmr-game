@@ -85,6 +85,8 @@ CZMViewModel::CZMViewModel()
     m_iAttachmentIronsight = -1;
     m_iAttachmentScopeEnd = -1;
 
+    m_flLastMoveX = 0.0f;
+
     m_vecLastVel.Init();
 #else
     SetModelColor2( 1.0f, 1.0f, 1.0f );
@@ -682,13 +684,15 @@ void C_ZMViewModel::PerformAnimBobbing()
         // When setting the pose parameter, we need to use former scale.
         // 
 
-        float cur = GetPoseParameter( m_iPoseParamMoveX );
-        cur = clamp( cur, 0.5f, 1.0f );
+        //float cur = GetPoseParameter( m_iPoseParamMoveX );
+        //cur = clamp( cur, 0.5f, 1.0f );
 
-        // Translate from
-        // 0.5 .. 1 to 0 .. 1
-        cur /= 0.5f;
-        cur -= 1.0f;
+        //// Translate from
+        //// 0.5 .. 1 to 0 .. 1
+        //cur /= 0.5f;
+        //cur -= 1.0f;
+
+        float cur = m_flLastMoveX;
 
 
         float add = 0.0f;
@@ -703,7 +707,10 @@ void C_ZMViewModel::PerformAnimBobbing()
 
 
         float newratio = cur + gpGlobals->frametime * add;
-        SetPoseParameter( m_iPoseParamMoveX, clamp( newratio, 0.0f, 1.0f ) );
+        newratio = clamp( newratio, 0.0f, 1.0f );
+
+        SetPoseParameter( m_iPoseParamMoveX, newratio );
+        m_flLastMoveX = newratio;
     }
 
     //
