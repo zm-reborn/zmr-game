@@ -58,6 +58,8 @@ END_PREDICTION_DATA()
 #endif
 
 #ifdef CLIENT_DLL
+ConVar zm_cl_bob_lag_interp( "zm_cl_bob_lag_interp", "0.1" );
+
 CZMViewModel::CZMViewModel() : m_LagAnglesHistory( "CZMViewModel::m_LagAnglesHistory" )
 #else
 CZMViewModel::CZMViewModel()
@@ -74,7 +76,12 @@ CZMViewModel::CZMViewModel()
 
 
     m_vLagAngles.Init();
-    AddVar( &m_vLagAngles, &m_LagAnglesHistory, 0, true );
+    // Don't attach it to the entity
+    // since resetting occurs way too often
+    // and it looks bad with high ping.
+    m_LagAnglesHistory.Setup( m_vLagAngles.Base(), 0 );
+    m_LagAnglesHistory.SetInterpolationAmount( zm_cl_bob_lag_interp.GetFloat() );
+    //AddVar( &m_vLagAngles, &m_LagAnglesHistory, 0, true );
 
     m_flLastImpactValue = 0.0f;
     m_flLastImpactGroundOffsetZ = 0;
@@ -207,6 +214,12 @@ CZMBaseWeapon* CZMViewModel::GetWeapon() const
 void C_ZMViewModel::OnTeleported()
 {
     m_vecLastVel = vec3_origin;
+
+    // Add an entry to the history.
+    m_LagAnglesHistory.ClearHistory();
+
+    m_vLagAngles = GetOwner()->EyeAngles();
+    m_LagAnglesHistory.NoteChanged( gpGlobals->curtime, zm_cl_bob_lag_interp.GetFloat(), false );
 }
 
 bool C_ZMViewModel::IsInIronsights() const
@@ -325,7 +338,6 @@ void C_ZMViewModel::GetScopeEndPosition( Vector& pos, QAngle& ang )
     GetAttachment( m_iAttachmentScopeEnd, pos, ang );
 }
 
-ConVar zm_cl_bob_lag_interp( "zm_cl_bob_lag_interp", "0.1" );
 ConVar zm_cl_bob_lag_angle_mult( "zm_cl_bob_lag_angle_mult", "0.07" );
 ConVar zm_cl_bob_lag_angle_move_mult( "zm_cl_bob_lag_angle_move_mult", "0.01" );
 //ConVar zm_cl_bob_lag_movement_fwd_pitch_mult( "zm_cl_bob_lag_movement_fwd_pitch_mult", "0.1" );
