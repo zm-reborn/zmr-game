@@ -158,17 +158,21 @@ void CZMViewModel::CalcViewModelView( CBasePlayer* pOwner, const Vector& eyePosi
     if ( ViewModelIndex() == VMINDEX_WEP )
     {
 #ifdef CLIENT_DLL
-        // HACK: We need to manually advance the idle animations because
-        // they are no longer interpolated. (pose parameter bobbing)
-        // Make sure this is called every frame.
-        Activity activity = GetSequenceActivity( GetSequence() );
-        if ( activity == ACT_VM_IDLE || activity == ACT_VM_IDLE_EMPTY )
-        {
-            FrameAdvance();
-        }
-
         if ( !prediction->InPrediction() )
         {
+            static float flPrevCycle = 0;
+            // HACK: We need to manually advance the idle animations because
+            // they are no longer interpolated. (pose parameter bobbing)
+            // Make sure this is called every frame.
+            Activity activity = GetSequenceActivity( GetSequence() );
+            if ( activity == ACT_VM_IDLE || activity == ACT_VM_IDLE_EMPTY )
+            {
+                SetCycle( flPrevCycle );
+                FrameAdvance( gpGlobals->frametime );
+            }
+            flPrevCycle = GetCycle();
+            
+
             PerformAnimBobbing();
 
             // Let the viewmodel shake at about 10% of the amplitude of the player's view
@@ -798,6 +802,14 @@ C_BaseAnimating* C_ZMViewModel::FindFollowedEntity()
     }
 
     return C_BaseAnimating::FindFollowedEntity();
+}
+
+bool C_ZMViewModel::ShouldPredict()
+{
+    if ( GetOwner() && GetOwner() == C_ZMPlayer::GetLocalPlayer() )
+        return true;
+    
+    return BaseClass::ShouldPredict();
 }
 
 class CViewModelColorMaterialProxy : public CEntityMaterialProxy

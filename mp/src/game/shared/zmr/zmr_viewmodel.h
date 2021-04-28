@@ -33,6 +33,8 @@ public:
     virtual bool                ShouldReceiveProjectedTextures( int flags ) OVERRIDE;
     virtual C_BaseAnimating*    FindFollowedEntity() OVERRIDE;
 
+	virtual bool                ShouldPredict() OVERRIDE;
+
     void                        OnTeleported();
 
     CZMBaseWeapon* GetWeapon() const;
