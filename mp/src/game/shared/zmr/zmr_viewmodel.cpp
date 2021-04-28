@@ -17,6 +17,8 @@
 
 #ifdef CLIENT_DLL
 ConVar zm_cl_crosshair_draw_ironsights( "zm_cl_crosshair_draw_ironsights", "0", FCVAR_ARCHIVE, "Is the crosshair drawn when zoomed in into ironsights." );
+
+ConVar zm_cl_bob_useold( "zm_cl_bob_useold", "0", 0, "Is animation bobbing not used?");
 #endif // CLIENT_DLL
 
 
@@ -555,7 +557,7 @@ bool C_ZMViewModel::PerformOldBobbing( Vector& vecPos, QAngle& ang )
 {
     // We're going to be doing the animation bobbing.
     // Skip us.
-    if ( CanAnimBob() )
+    if ( CanAnimBob() && !zm_cl_bob_useold.GetBool() )
     {
         return false;
     }
@@ -674,6 +676,13 @@ void C_ZMViewModel::PerformAnimBobbing()
     //
     if ( m_iPoseParamMoveX != -1 )
     {
+        if ( zm_cl_bob_useold.GetBool() )
+        {
+            SetPoseParameter( m_iPoseParamMoveX, 0.0f );
+            return;
+        }
+
+
         float flMaxGroundSpeed = pOwner->GetPlayerMaxSpeed();
         flMaxGroundSpeed = MAX( flMaxGroundSpeed, 1.0f ); // Please don't divide by 0
 
