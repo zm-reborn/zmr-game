@@ -643,7 +643,7 @@ bool C_ZMViewModel::PerformOldBobbing( Vector& vecPos, QAngle& ang )
 }
 
 ConVar zm_cl_bob_anim_accel( "zm_cl_bob_anim_accel", "1" );
-ConVar zm_cl_bob_anim_decel( "zm_cl_bob_anim_decel", "1.2" );
+ConVar zm_cl_bob_anim_decel( "zm_cl_bob_anim_decel", "1.6" );
 ConVar zm_cl_bob_ironsight_max( "zm_cl_bob_ironsight_max", "0.1" );
 
 void C_ZMViewModel::PerformAnimBobbing()
