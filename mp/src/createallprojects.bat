@@ -1,1 +1,1 @@
-devtools\bin\vpc.exe /zmr +everything /mksln zmr-everything.sln
+devtools\bin\vpc.exe /zmr +everything /mksln zmr-everything.sln %*

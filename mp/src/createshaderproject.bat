@@ -1,1 +1,1 @@
-devtools\bin\vpc.exe /zmr +shaders /mksln zmr-shaders.sln
+devtools\bin\vpc.exe /zmr +shaders /mksln zmr-shaders.sln %*
