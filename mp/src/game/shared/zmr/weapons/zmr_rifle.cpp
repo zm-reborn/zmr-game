@@ -59,6 +59,25 @@ void CZMWeaponRifle::ItemPostFrame( void )
     BaseClass::ItemPostFrame();
 }
 
+Vector CZMWeaponRifle::GetBulletSpread() const
+{
+    Vector cone = BaseClass::GetBulletSpread();
+
+    CZMPlayer* pOwner = GetPlayerOwner();
+    if ( pOwner )
+    {
+        float ratio = 1.0f - pOwner->GetAccuracyRatio();
+        ratio *= ratio;
+
+        cone.x = ratio * cone.x;
+        cone.y = ratio * cone.y;
+        cone.z = ratio * cone.z;
+    }
+
+
+    return cone;
+}
+
 bool CZMWeaponRifle::CanZoom() const
 {
     return m_flNextPrimaryAttack < gpGlobals->curtime;

@@ -19,26 +19,7 @@ public:
     ~CZMWeaponRifle();
 
 
-    virtual Vector GetBulletSpread() const OVERRIDE
-    {
-        Vector cone = BaseClass::GetBulletSpread();
-
-        CZMPlayer* pOwner = GetPlayerOwner();
-        if ( pOwner )
-        {
-            float ratio = 1.0f - pOwner->GetAccuracyRatio();
-            ratio *= ratio;
-
-            cone.x = ratio * cone.x;
-            cone.y = ratio * cone.y;
-            cone.z = ratio * cone.z;
-        }
-
-
-        return cone;
-    }
-
-
+    virtual Vector GetBulletSpread() const OVERRIDE;
     virtual bool Holster( CBaseCombatWeapon* pSwitchTo = nullptr ) OVERRIDE;
     virtual void Drop( const Vector& vecVelocity ) OVERRIDE;
     virtual void ItemBusyFrame() OVERRIDE;

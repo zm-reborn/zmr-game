@@ -35,6 +35,7 @@ public:
 
     virtual void Precache() OVERRIDE;
 
+    virtual Vector GetBulletSpread() const OVERRIDE;
 #ifdef CLIENT_DLL
     virtual float GetScopeFOVModifier() const OVERRIDE;
 #endif
@@ -90,6 +91,34 @@ void CZMWeaponR700::Equip( CBaseCombatCharacter* pCharacter )
     BaseClass::Equip( pCharacter );
 
     m_iZoomLevel = SCOPEZOOM_2X;
+}
+
+Vector CZMWeaponR700::GetBulletSpread() const
+{
+    Vector cone = CZMBaseWeapon::GetBulletSpread();
+
+    CZMPlayer* pOwner = GetPlayerOwner();
+    if ( pOwner )
+    {
+        float ratio;
+
+        if ( !IsZoomed() )
+        {
+            ratio = 1.0f;
+        }
+        else
+        {
+            ratio = 1.0f - pOwner->GetAccuracyRatio();
+            ratio *= ratio;
+        }
+
+        cone.x = ratio * cone.x;
+        cone.y = ratio * cone.y;
+        cone.z = ratio * cone.z;
+    }
+
+
+    return cone;
 }
 
 #ifdef CLIENT_DLL
