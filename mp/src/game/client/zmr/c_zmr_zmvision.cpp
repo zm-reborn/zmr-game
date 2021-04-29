@@ -11,7 +11,8 @@
 #include "tier0/memdbgon.h"
 
 
-ConVar zm_cl_zmvision_dlight( "zm_cl_zmvision_dlight", "1", FCVAR_ARCHIVE );
+ConVar zm_cl_zmvision_dlight( "zm_cl_zmvision_dlight", "1", FCVAR_ARCHIVE, "Does ZM vision have a dynamic light?" );
+ConVar zm_cl_zmvision_playsound( "zm_cl_zmvision_playsound", "1", FCVAR_ARCHIVE, "Is a sound played when ZM Vision is toggled?" );
 
 ConVar zm_cl_silhouette_onlyzmvision( "zm_cl_silhouette_onlyzmvision", "1", FCVAR_ARCHIVE, "Are silhouettes rendered only when ZM vision is on?" );
 ConVar zm_cl_silhouette_strength( "zm_cl_silhouette_strength", "0.8", FCVAR_ARCHIVE );
@@ -195,5 +196,20 @@ void CZMVision::RemoveSilhouette( C_BaseEntity* pEnt )
 
 CON_COMMAND( zm_vision, "Toggles ZM vision." )
 {
+    auto* pLocalPlayer = C_ZMPlayer::GetLocalPlayer();
+
+    if ( pLocalPlayer && zm_cl_zmvision_playsound.GetBool() )
+    {
+        if ( g_ZMVision.IsOn() )
+        {
+            pLocalPlayer->EmitSound( "ZMPlayer.ZMVisionOff" );
+        }
+        else
+        {
+            pLocalPlayer->EmitSound( "ZMPlayer.ZMVisionOn" );
+        }
+    }
+
+
     g_ZMVision.Toggle();
 }

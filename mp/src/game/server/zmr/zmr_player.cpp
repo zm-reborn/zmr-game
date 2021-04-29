@@ -198,6 +198,8 @@ void CZMPlayer::Precache()
 
 	PrecacheScriptSound( "ZMPlayer.FlashLightOn" );
 	PrecacheScriptSound( "ZMPlayer.FlashLightOff" );
+	PrecacheScriptSound( "ZMPlayer.ZMVisionOn" );
+	PrecacheScriptSound( "ZMPlayer.ZMVisionOff" );
 
 	PrecacheScriptSound( "HL2Player.SprintNoPower" );
 	PrecacheScriptSound( "HL2Player.SprintStart" );
