@@ -50,6 +50,10 @@ public:
     virtual Activity GetPumpAct() const OVERRIDE { return ACT_SHOTGUN_PUMP; }
 
     virtual bool IsZoomed() const OVERRIDE { return m_bInZoom; }
+    virtual bool CanZoom() const;
+
+    virtual void StartReload() OVERRIDE;
+
     void CheckToggleZoom();
     void CheckUnZoom();
     void ToggleZoom();

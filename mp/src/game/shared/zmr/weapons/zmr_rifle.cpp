@@ -59,6 +59,11 @@ void CZMWeaponRifle::ItemPostFrame( void )
     BaseClass::ItemPostFrame();
 }
 
+bool CZMWeaponRifle::CanZoom() const
+{
+    return m_flNextPrimaryAttack < gpGlobals->curtime;
+}
+
 void CZMWeaponRifle::CheckToggleZoom()
 {
     CZMPlayer* pPlayer = GetPlayerOwner();
@@ -73,7 +78,8 @@ void CZMWeaponRifle::CheckToggleZoom()
         }
         else
         {
-            Zoom( pPlayer );
+            if ( CanZoom() )
+                Zoom( pPlayer );
         }
     }
 }
@@ -83,6 +89,8 @@ void CZMWeaponRifle::Zoom( CZMPlayer* pPlayer )
     pPlayer->SetFOV( this, 35, 0.1f );
 
     m_bInZoom = true;
+
+    m_flNextPrimaryAttack = gpGlobals->curtime + 0.1f;
 }
 
 void CZMWeaponRifle::UnZoom( CZMPlayer* pPlayer )
@@ -90,6 +98,8 @@ void CZMWeaponRifle::UnZoom( CZMPlayer* pPlayer )
     pPlayer->SetFOV( this, 0, 0.1f );
 
     m_bInZoom = false;
+
+    m_flNextPrimaryAttack = gpGlobals->curtime + 0.1f;
 }
 
 void CZMWeaponRifle::CheckUnZoom()
@@ -119,4 +129,15 @@ void CZMWeaponRifle::Drop( const Vector& vecVelocity )
     CheckUnZoom();
 
     BaseClass::Drop( vecVelocity );
+}
+
+void CZMWeaponRifle::StartReload()
+{
+    BaseClass::StartReload();
+
+    // Don't stay zoomed when reloading.
+    if ( IsInReload() )
+    {
+        CheckUnZoom();
+    }
 }
