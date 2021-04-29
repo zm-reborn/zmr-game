@@ -11,7 +11,10 @@
 
 #include "c_zmr_legacy_objpanel.h"
 #include "c_zmr_tips.h"
+
+#if defined( ZMR_FINAL ) && defined( _WIN32 )
 #include "c_zmr_music.h"
+#endif
 
 #include "zmr_mainmenu.h"
 #include "zmr_loadingbg.h"
@@ -295,7 +298,7 @@ void CZMLoadingPanel::OnActivate()
 
     ChangeTip();
 
-#ifdef ZMR_FINAL
+#if defined( ZMR_FINAL ) && defined( _WIN32 )
     ZMMusic::g_ZMMusicManager.SetMusicState( ZMMusic::MUSICSTATE_LOADINGSCREEN );
 #endif
 
@@ -323,7 +326,7 @@ void CZMLoadingPanel::OnDeactivate()
     m_bActive = false;
 
 
-#ifdef ZMR_FINAL
+#if defined( ZMR_FINAL ) && defined( _WIN32 )
     ZMMusic::g_ZMMusicManager.SetMusicState( ZMMusic::MUSICSTATE_NONE );
 #endif
 
