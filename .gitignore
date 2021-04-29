@@ -46,11 +46,14 @@ config.cfg
 *.vpc_crc
 *.sentinel
 *.pdb
+# Force add libraries
 *.lib
 Release_*/
 Debug_*/
 *.recipe
 *.project
+# Force add libraries
+*.a 
 
 # Tool (vbsp/vvis/vrad) compilation output
 *.dll
