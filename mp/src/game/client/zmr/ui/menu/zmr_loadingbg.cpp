@@ -69,7 +69,6 @@ public:
     virtual void ApplySchemeSettings( vgui::IScheme* pScheme ) OVERRIDE;
 
     virtual void PaintBackground() OVERRIDE;
-    virtual void Paint() OVERRIDE;
 
 
     MESSAGE_FUNC( OnActivate, "activate" );
@@ -89,10 +88,6 @@ private:
     void SetTipText( const char* msg );
 
 
-    void FindLoadingPanel();
-    vgui::VPANEL m_loadingDialog;
-
-
     vgui::Label* m_pMapNameLabel;
     vgui::Label* m_pTipLabel;
 
@@ -100,6 +95,7 @@ private:
 
     bool m_bHasMapName;
 
+    int m_nTexBackgroundId;
     int m_nTexBgId;
     int m_nTexStripBgId;
     int m_nTexTipBgId;
@@ -142,8 +138,6 @@ IZMUi* g_pZMLoadingUI = static_cast<IZMUi*>( &g_ZMLoadingUIInt );
 
 CZMLoadingPanel::CZMLoadingPanel( VPANEL parent ) : BaseClass( nullptr, "ZMLoadingPanel" )
 {
-    m_loadingDialog = NULL;
-
     m_bActive = false;
 
     m_bHasMapName = false;
@@ -165,7 +159,9 @@ CZMLoadingPanel::CZMLoadingPanel( VPANEL parent ) : BaseClass( nullptr, "ZMLoadi
     SetProportional( true );
 
 
-    SetParent( parent );
+    //SetParent( parent );
+    MakePopup( false ); // IMPORTANT: Makes sure console and others aren't painted on top.
+    SetVisible( false );
 
     m_pGameUI = nullptr;
     if ( !LoadGameUI() )
@@ -173,6 +169,10 @@ CZMLoadingPanel::CZMLoadingPanel( VPANEL parent ) : BaseClass( nullptr, "ZMLoadi
         Warning( "Failed to load GameUI!!\n" );
     }
 
+
+    
+    m_nTexBackgroundId = surface()->CreateNewTextureID();
+    surface()->DrawSetTextureFile( m_nTexBackgroundId, "console/background01_widescreen", true, false );
 
     m_nTexBgId = surface()->CreateNewTextureID();
     surface()->DrawSetTextureFile( m_nTexBgId, "zmr_mainmenu/bg_mainmenu", true, false );
@@ -307,12 +307,6 @@ void CZMLoadingPanel::OnActivate()
     auto mainMenuPanel = g_pZMMainMenu->GetPanel()->GetVPanel();
     auto myPanel = GetVPanel();
     ipanel()->SendMessage( mainMenuPanel, new KeyValues( "loadingstart" ), myPanel );
-
-
-    // Find the loading dialog so we can draw it manually.
-    FindLoadingPanel();
-
-    surface()->RestrictPaintToSinglePanel( GetVPanel() );
 }
 
 void CZMLoadingPanel::OnDeactivate()
@@ -334,13 +328,23 @@ void CZMLoadingPanel::OnDeactivate()
     auto mainMenuPanel = g_pZMMainMenu->GetPanel()->GetVPanel();
     auto myPanel = GetVPanel();
     ipanel()->SendMessage( mainMenuPanel, new KeyValues( "loadingend" ), myPanel );
-
-    surface()->RestrictPaintToSinglePanel( NULL );
 }
 
 void CZMLoadingPanel::PaintBackground()
 {
     //BaseClass::PaintBackground();
+
+    int scr_width, scr_height;
+    surface()->GetScreenSize( scr_width, scr_height );
+
+
+    // Draw background
+    {
+        surface()->DrawSetColor( COLOR_WHITE );
+        //surface()->DrawFilledRect( 0, 0, scr_width, scr_height );
+        surface()->DrawSetTexture( m_nTexBackgroundId );
+        surface()->DrawTexturedRect( 0, 0, scr_width, scr_height );
+    }
 
 
     surface()->DrawSetColor( m_BgColor );
@@ -355,14 +359,9 @@ void CZMLoadingPanel::PaintBackground()
 
 
 
-        int h = m_pMapNameLabel->GetTall();
+        int h = m_pMapNameLabel->GetTall() + 10;
 
-        int offset_y = m_pMapNameLabel->GetYPos();
-
-        if ( (offset_y + h) > GetTall() )
-        {
-            h = GetTall() - offset_y;
-        }
+        int offset_y = m_pMapNameLabel->GetYPos() + m_pMapNameLabel->GetTall() / 2 - h / 2;
 
 
         repeats = w / (nTexWidth * (h / (float)nTexHeight));
@@ -372,8 +371,8 @@ void CZMLoadingPanel::PaintBackground()
 
 
         // Draw the zombie strip 1024x256
-        h = offset_y + 20;
-        offset_y = 0;
+        h = YRES( 180 );
+        offset_y = offset_y - h;
 
         nTexHeight = 256;
 
@@ -399,60 +398,6 @@ void CZMLoadingPanel::PaintBackground()
 
         //surface()->DrawSetTexture( m_nTexTipBgId );
         //surface()->DrawTexturedRect( x - padding_x, y - padding_y, x + w + padding_x, y + h + padding_y );
-    }
-}
-
-void CZMLoadingPanel::Paint()
-{
-    BaseClass::Paint();
-
-
-    // Unfortunately, we have to draw the loading dialog manually,
-    // because we have to restrict the drawing to this panel, because
-    // other main menu panels will draw on top of us.
-    // Blah.
-    if ( m_loadingDialog != NULL )
-    {
-        surface()->RestrictPaintToSinglePanel( NULL );
-
-        //int prevZ = ipanel()->GetZPos( m_loadingDialog );
-
-        //ipanel()->SetZPos( m_loadingDialog, 1337 );
-        ipanel()->PaintTraverse( m_loadingDialog, true );
-        //ipanel()->SetZPos( m_loadingDialog, prevZ );
-
-
-        surface()->RestrictPaintToSinglePanel( GetVPanel() );
-    }
-}
-
-void CZMLoadingPanel::FindLoadingPanel()
-{
-    VPANEL root = enginevgui->GetPanel( VGuiPanel_t::PANEL_GAMEUIDLL );
-
-    if ( root )
-    {
-        VPANEL panel1, panel2;
-        const char* name;
-        for ( int i = 0; i < ipanel()->GetChildCount( root ); i++ )
-        {
-            panel1 = ipanel()->GetChild( root, i );
-            if ( Q_stricmp( ipanel()->GetName( panel1 ), "BaseGameUIPanel" ) == 0 )
-            {
-                for ( int j = 0; j < ipanel()->GetChildCount( panel1 ); j++ )
-                {
-                    panel2 = ipanel()->GetChild( panel1, j );
-                    name = ipanel()->GetName( panel2 );
-                    if ( Q_stricmp( name, "LoadingDialog" ) == 0 )
-                    {
-                        m_loadingDialog = panel2;
-                        return;
-                    }
-                }
-
-                return;
-            }
-        }
     }
 }
 
