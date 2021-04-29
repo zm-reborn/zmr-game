@@ -38,6 +38,8 @@ public:
     virtual Vector GetBulletSpread() const OVERRIDE;
 #ifdef CLIENT_DLL
     virtual float GetScopeFOVModifier() const OVERRIDE;
+
+    virtual CZMBaseCrosshair* GetWeaponCrosshair() const OVERRIDE;
 #endif
 
     virtual void ItemPostFrame() OVERRIDE;
@@ -140,6 +142,11 @@ float CZMWeaponR700::GetScopeFOVModifier() const
     }
 
     return 1.0f / modifier;
+}
+
+CZMBaseCrosshair* CZMWeaponR700::GetWeaponCrosshair() const
+{
+    return nullptr; // No crosshair for you!
 }
 #endif
 
