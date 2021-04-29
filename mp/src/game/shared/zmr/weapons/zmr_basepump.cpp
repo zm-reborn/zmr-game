@@ -276,13 +276,14 @@ void CZMBasePumpWeapon::CancelReload()
 
 bool CZMBasePumpWeapon::ShouldCancelReload() const
 {
-    CZMPlayer* pOwner = GetPlayerOwner();
-    if  ( !pOwner )
-        return false;
-
-    if ( pOwner->GetAmmoCount( m_iPrimaryAmmoType ) <= 0 )
-        return true;
-
+    // We don't care about this as reload is always cancelled
+    // at the start of next cycle if no ammo exists.
+    // And the way the reload is cancelled mid animation
+    // on pump weapons looks bad.
+    //if ( pOwner->GetAmmoCount( m_iPrimaryAmmoType ) <= 0 )
+    //    return true;
+    
+    // Player wants to cancel reload.
     if ( m_bCancelReload )
     {
         // Starting or we just ended reloading.
