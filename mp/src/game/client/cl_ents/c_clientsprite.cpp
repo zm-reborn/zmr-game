@@ -58,7 +58,7 @@ bool C_ClientSprite::KeyValue( const char* szKeyName, const char* szValue )
         SetRenderMode( (RenderMode_t)atoi( szValue ) );
         return true;
     }
-    else if ( FStrEq( szKeyName, "size" ) )
+    else if ( FStrEq( szKeyName, "scale" ) )
     {
         m_flSpriteScale = atof( szValue );
         return true;
