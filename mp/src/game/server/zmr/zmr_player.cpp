@@ -149,6 +149,7 @@ CZMPlayer::CZMPlayer()
     m_flNextVoiceLineTime = 0.0f;
     m_flInterpNPCTime = 0.0f;
     m_ServerWepData.Reset();
+    m_hContinuousUseEntity.Set( nullptr );
 
 
     BaseClass::ChangeTeam( 0 );
@@ -586,7 +587,7 @@ void CZMPlayer::PhysicsSimulate()
 
         // This fixes continuous use buttons (momentary_rot_button) changing directions.
         // Their logic is run every 0.1s, so we need call Use within that time frame.
-        PlayerUse();
+        UpdatePlayerUseEntity();
     }
 }
 
@@ -1957,8 +1958,27 @@ void CZMPlayer::DeselectAllZombies()
     } );
 }
 
+//
+// Updates use entity that is set to "continuous"
+// This entity relies on the player constantly sending Use-input.
+//
+void CZMPlayer::UpdatePlayerUseEntity()
+{
+    auto* pUseEntity = m_hContinuousUseEntity.Get();
+
+	if ( pUseEntity && (pUseEntity->ObjectCaps() & FCAP_CONTINUOUS_USE) != 0 )
+	{
+        variant_t emptyVariant;
+        pUseEntity->AcceptInput( "Use", this, this, emptyVariant, USE_TOGGLE );
+	}
+}
+
 void CZMPlayer::PlayerUse()
 {
+    // Reacquire the continuous use entity
+    m_hContinuousUseEntity.Set( nullptr );
+
+
     auto* pOldUseEntity = GetUseEntity();
 
     bool bCanUse = IsHuman() && IsAlive() && GetMoveType() != MOVETYPE_LADDER;
@@ -1988,6 +2008,7 @@ void CZMPlayer::PlayerUse()
 		// Currently using a latched entity?
 		if ( ClearUseEntity() )
 		{
+			m_afPhysicsFlags &= ~PFLAG_USING;
 			return;
 		}
 		else
@@ -2027,8 +2048,10 @@ void CZMPlayer::PlayerUse()
 		if ( ( bHoldingUse && (caps & FCAP_CONTINUOUS_USE) ) ||
 			 ( bPressedUse && (caps & (FCAP_IMPULSE_USE|FCAP_ONOFF_USE)) ) )
 		{
-			if ( caps & FCAP_CONTINUOUS_USE )
-				m_afPhysicsFlags |= PFLAG_USING;
+			if ( caps & FCAP_CONTINUOUS_USE ) {
+				m_hContinuousUseEntity.Set( pUseEntity );
+                m_afPhysicsFlags |= PFLAG_USING;
+            }
 
             if ( caps & FCAP_ONOFF_USE )
             {
@@ -2063,11 +2086,11 @@ void CZMPlayer::PlayerUse()
 }
 
 //
-// Just stock ItemPreFrame, but without the PlayerUse.
+// Just stock ItemPreFrame
 //
 void CZMPlayer::ItemPreFrame()
 {
-	//PlayerUse();
+	PlayerUse();
 
 	auto* pActive = GetActiveWeapon();
 

@@ -176,6 +176,7 @@ public:
     virtual void    EquipSuit( bool bPlayEffects = false ) OVERRIDE;
     virtual void    RemoveAllItems( bool removeSuit ) OVERRIDE;
 
+    void UpdatePlayerUseEntity();
     virtual void PlayerUse() OVERRIDE;
     //virtual void PlayUseDenySound() OVERRIDE;
 
@@ -356,6 +357,9 @@ private:
     // Falldamage related
     float m_flTimeIgnoreFallDamage;
     bool m_bIgnoreFallDamageResetAfterImpact;
+
+
+    CHandle<CBaseEntity> m_hContinuousUseEntity;
 
 
     friend class CZMGameMovement;
