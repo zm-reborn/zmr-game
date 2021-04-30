@@ -963,8 +963,9 @@ void CZMBaseWeapon::PrimaryAttack()
     }
 
 
-    m_flNextPrimaryAttack = gpGlobals->curtime + GetPrimaryFireRate();
     Shoot();
+
+    m_flNextSecondaryAttack = m_flNextPrimaryAttack = gpGlobals->curtime + GetFireRate();
 }
 
 void CZMBaseWeapon::Shoot( int iAmmoType, int nBullets, int nAmmo, float flMaxRange, bool bSecondary )
