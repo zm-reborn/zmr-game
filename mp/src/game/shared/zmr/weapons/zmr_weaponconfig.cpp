@@ -77,7 +77,7 @@ void ZMAttackConfig_t::ToKeyValues( KeyValues* kv ) const
 void ZMAttackConfig_t::FromKeyValues( KeyValues* kv )
 {
     flDamage = kv->GetFloat( "damage", 0.0f );
-    flFireRate = kv->GetFloat( "firerate", 0.0f );
+    flFireRate = kv->GetFloat( "firerate", -1.0f );
     flRange = kv->GetFloat( "range", DEFAULT_MAX_RANGE );
     nBulletsPerShot = kv->GetInt( "bulletspershot", 1 );
 
