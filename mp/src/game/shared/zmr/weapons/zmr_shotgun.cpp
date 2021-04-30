@@ -26,6 +26,8 @@ public:
     virtual Activity GetPumpAct() const OVERRIDE { return ACT_SHOTGUN_PUMP; }
 };
 
+REGISTER_WEAPON_CONFIG( ZMWeaponConfig::ZMCONFIGSLOT_SHOTGUN, CZMBasePumpConfig );
+
 IMPLEMENT_NETWORKCLASS_ALIASED( ZMWeaponShotgun, DT_ZM_WeaponShotgun )
 
 BEGIN_NETWORK_TABLE( CZMWeaponShotgun, DT_ZM_WeaponShotgun )

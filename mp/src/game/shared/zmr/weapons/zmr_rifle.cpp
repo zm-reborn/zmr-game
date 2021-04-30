@@ -13,6 +13,8 @@
 #include "tier0/memdbgon.h"
 
 
+REGISTER_WEAPON_CONFIG( ZMWeaponConfig::ZMCONFIGSLOT_RIFLE, CZMBasePumpConfig );
+
 IMPLEMENT_NETWORKCLASS_ALIASED( ZMWeaponRifle, DT_ZM_WeaponRifle )
 
 BEGIN_NETWORK_TABLE( CZMWeaponRifle, DT_ZM_WeaponRifle )

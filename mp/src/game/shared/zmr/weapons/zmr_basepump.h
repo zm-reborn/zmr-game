@@ -31,6 +31,20 @@ enum ReloadState_t
     RELOADSTATE_MAX
 };
 
+class CZMBasePumpConfig : public ZMWeaponConfig::CZMBaseWeaponConfig
+{
+public:
+    CZMBasePumpConfig( const char* wepname, const char* configpath );
+
+    virtual void LoadFromConfig( KeyValues* kv ) OVERRIDE;
+
+    virtual KeyValues* ToKeyValues() const OVERRIDE;
+
+    
+    float flPumpTime;
+};
+
+
 // ZMRTODO: Separate pump and single reload weapon classes.
 class CZMBasePumpWeapon : public CZMBaseWeapon
 {
@@ -41,6 +55,8 @@ public:
 
 
     CZMBasePumpWeapon();
+
+    const CZMBasePumpConfig* GetBasePumpConfig() const;
 
     virtual bool CanAct( ZMWepActionType_t type = WEPACTION_GENERIC ) const OVERRIDE; 
 

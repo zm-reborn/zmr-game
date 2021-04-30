@@ -12,6 +12,28 @@
 #include "tier0/memdbgon.h"
 
 
+CZMBasePumpConfig::CZMBasePumpConfig( const char* wepname, const char* configpath ) : CZMBaseWeaponConfig( wepname, configpath )
+{
+    flPumpTime = -1.0f;
+}
+
+void CZMBasePumpConfig::LoadFromConfig( KeyValues* kv )
+{
+    CZMBaseWeaponConfig::LoadFromConfig( kv );
+
+    flPumpTime = kv->GetFloat( "pumptime", -1.0f );
+}
+
+KeyValues* CZMBasePumpConfig::ToKeyValues() const
+{
+    auto* kv = CZMBaseWeaponConfig::ToKeyValues();
+
+    kv->SetFloat( "pumptime", flPumpTime );
+
+    return kv;
+}
+
+
 IMPLEMENT_NETWORKCLASS_ALIASED( ZMBasePumpWeapon, DT_ZM_BasePumpWeapon )
 
 BEGIN_NETWORK_TABLE( CZMBasePumpWeapon, DT_ZM_BasePumpWeapon )
@@ -44,6 +66,11 @@ CZMBasePumpWeapon::CZMBasePumpWeapon()
     m_iPumpState = PUMPSTATE_NONE;
     m_iReloadState = RELOADSTATE_NONE;
     m_bCancelReload = false;
+}
+
+const CZMBasePumpConfig* CZMBasePumpWeapon::GetBasePumpConfig() const
+{
+    return static_cast<const CZMBasePumpConfig*>( GetWeaponConfig() );
 }
 
 bool CZMBasePumpWeapon::CanAct( ZMWepActionType_t type ) const
@@ -128,9 +155,19 @@ void CZMBasePumpWeapon::Pump()
 
     float flSeqTime = SequenceDuration();
 
-    float flReadyTime = GetFirstInstanceOfAnimEventTime( GetSequence(), (int)AE_WPN_PRIMARYATTACK, true );
-    if ( flReadyTime == -1.0f )
-        flReadyTime = flSeqTime;
+    float flReadyTime = GetBasePumpConfig()->flPumpTime;
+
+    if ( flReadyTime < 0.0f )
+    {
+        // Try animation event time.
+        flReadyTime = GetFirstInstanceOfAnimEventTime( GetSequence(), (int)AE_WPN_PRIMARYATTACK, true );
+        if ( flReadyTime == -1.0f )
+        {
+            // Fallback to sequence time
+            flReadyTime = flSeqTime;
+        }
+    }
+
 
     
     pOwner->m_flNextAttack = gpGlobals->curtime + flReadyTime;

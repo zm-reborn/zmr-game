@@ -53,6 +53,7 @@ private:
     CNetworkVar( ZMScopeZoomLevel_t, m_iZoomLevel );
 };
 
+REGISTER_WEAPON_CONFIG( ZMWeaponConfig::ZMCONFIGSLOT_R700, CZMBasePumpConfig );
 
 IMPLEMENT_NETWORKCLASS_ALIASED( ZMWeaponR700, DT_ZM_WeaponR700 )
 
