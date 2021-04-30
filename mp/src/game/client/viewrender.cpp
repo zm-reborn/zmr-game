@@ -3194,7 +3194,8 @@ void CViewRender::DrawScope( const CViewSetup &cameraView )
 	// Check to see if there's something in front of
 	// the camera to not render things through walls.
 	trace_t tr;
-	UTIL_TraceLine( MainViewOrigin(), vecScopePos + fwd * 10.0f, MASK_SOLID, nullptr, &tr );
+	CTraceFilterNoNPCsOrPlayer filter( nullptr, COLLISION_GROUP_NONE );
+	UTIL_TraceLine( MainViewOrigin(), vecScopePos + fwd * 10.0f, MASK_SOLID, &filter, &tr );
 
 	if ( tr.fraction != 1.0f )
 	{
