@@ -2557,6 +2557,18 @@ void CZMEntTriggerSpawnVolume::GetPositionWithin( const CBaseEntity* pEnt, Vecto
 
         pos = origin + dir * dist * mult;
 
+
+
+        // Trace to find a valid spot. In case the brush is enveloped by world brushes.
+        const Vector mins( -16, -16, 0 );
+        const Vector maxs( 16, 16, 72 );
+
+        trace_t tr;
+        CTraceFilterNoNPCsOrPlayer filter( pEnt, COLLISION_GROUP_NONE );
+        UTIL_TraceHull( origin, pos, mins, maxs, MASK_NPCSOLID, &filter, &tr );
+
+        pos = tr.endpos;
+
         break;
     }
 }
