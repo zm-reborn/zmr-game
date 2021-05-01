@@ -13,3 +13,8 @@ CON_COMMAND( zm_hudchat, "Prints a message to chat." )
 
     ZMClientUtil::PrintNotify( args.ArgS(), ( pLocal && pLocal->IsZM() ) ? ZMCHATNOTIFY_ZM : ZMCHATNOTIFY_NORMAL );
 }
+
+CON_COMMAND( quti, "The game." )
+{
+    Msg( "You just lost it.\n" );
+}
