@@ -77,11 +77,6 @@
 // Projective textures
 #include "C_Env_Projected_Texture.h"
 
-#ifdef ZMR
-#include "zmr_viewmodel.h"
-#include "zmr_player_shared.h"
-#endif
-
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
