@@ -108,7 +108,28 @@ void CZombieSwatObjSchedule::OnQueuedCommand( CBasePlayer* pPlayer, ZombieComman
 void CZombieSwatObjSchedule::DoSwatting()
 {
     CZMBaseZombie* pOuter = GetOuter();
-    if ( pOuter->SwatObject( m_hSwatObject.Get() ) )
+
+    auto* pSwat = m_hSwatObject.Get();
+
+    if ( !pSwat )
+    {
+        TryEnd( "Swatting object was removed?" );
+        return;
+    }
+
+    // Sanity check range just in case.
+    // It's possible other zombies have already swatted it
+    // out of range.
+    float range = pSwat->BoundingRadius() + pOuter->GetClawAttackRange() + 5.0f;
+
+    if ( pSwat->WorldSpaceCenter().DistToSqr( pOuter->GetAttackPos() ) > (range*range) )
+    {
+        TryEnd( "Swatting object was suddenly too far during the swat event!" );
+        return;
+    }
+
+
+    if ( pOuter->SwatObject( pSwat ) )
     {
         pOuter->EmitSound( "NPC_BaseZombie.Swat" );
     }
