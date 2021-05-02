@@ -18,6 +18,8 @@ extern ConVar zm_cl_precipitationquality;
 extern ConVar zm_cl_flashlight_expensive_max;
 extern ConVar zm_cl_colorcorrection_effects;
 extern ConVar zm_cl_muzzleflash_light;
+extern ConVar zm_cl_round_cinematic_effects;
+extern ConVar zm_cl_fireglow_max;
 
 
 CZMOptionsSubGraphics::CZMOptionsSubGraphics( Panel* parent ) : BaseClass( parent )
@@ -34,7 +36,9 @@ CZMOptionsSubGraphics::CZMOptionsSubGraphics( Panel* parent ) : BaseClass( paren
     LoadItem( &m_pExpFlashlightAmtBox, "ComboFlashlightAmount" );
     LoadItem( &m_pCheck_CC, "CheckCC" );
     LoadItem( &m_pMuzzleflashBox, "ComboMuzzleflash" );
-
+    LoadItem( &m_pCheck_CinematicBars, "CheckCinematicFX" );
+    LoadItem( &m_pFireLightsBox, "ComboFireLights" );
+    
 
     if ( FailedLoad() ) return;
 
@@ -54,6 +58,11 @@ CZMOptionsSubGraphics::CZMOptionsSubGraphics( Panel* parent ) : BaseClass( paren
     m_pMuzzleflashBox->AddItem( L"None", tempkv );
     m_pMuzzleflashBox->AddItem( L"Local Only", tempkv );
     m_pMuzzleflashBox->AddItem( L"All Players", tempkv );
+
+    m_pFireLightsBox->AddItem( L"0", tempkv );
+    m_pFireLightsBox->AddItem( L"2", tempkv );
+    m_pFireLightsBox->AddItem( L"5", tempkv );
+    m_pFireLightsBox->AddItem( L"10", tempkv );
 
     tempkv->deleteThis();
 
@@ -75,6 +84,7 @@ void CZMOptionsSubGraphics::OnApplyChanges()
     zm_cl_silhouette_onlyzmvision.SetValue( m_pCheck_SilhouetteVision->IsSelected() ? 1 : 0 );
     g_ragdoll_maxcount.SetValue( m_pSlider_MaxRagdolls->GetValue() );
     zm_cl_colorcorrection_effects.SetValue( m_pCheck_CC->IsSelected() ? 1 : 0 );
+    zm_cl_round_cinematic_effects.SetValue( m_pCheck_CinematicBars->IsSelected() ? 1 : 0 );
 
 
     zm_cl_flashlight_expensive_max.SetValue( m_pExpFlashlightAmtBox->GetActiveItem() );
@@ -93,6 +103,27 @@ void CZMOptionsSubGraphics::OnApplyChanges()
         zm_cl_precipitationquality.SetValue( 3 );
         break;
     }
+
+    int fireglowmax = zm_cl_fireglow_max.GetInt();
+    switch ( m_pFireLightsBox->GetActiveItem() )
+    {
+    case 0 : // 0
+        fireglowmax = 0;
+        break;
+    case 1 : // 2
+        fireglowmax = 2;
+        break;
+    case 2 : // 5
+        fireglowmax = 5;
+        break;
+    case 3 : // 10
+        fireglowmax = 10;
+        break;
+    default :
+        break;
+    }
+
+    zm_cl_fireglow_max.SetValue( fireglowmax );
 }
 
 void CZMOptionsSubGraphics::OnResetData()
@@ -106,7 +137,7 @@ void CZMOptionsSubGraphics::OnResetData()
     m_pCheck_SilhouetteVision->SetSelected( zm_cl_silhouette_onlyzmvision.GetBool() );
     m_pSlider_MaxRagdolls->SetValue( g_ragdoll_maxcount.GetInt() );
     m_pCheck_CC->SetSelected( zm_cl_colorcorrection_effects.GetBool() );
-
+    m_pCheck_CinematicBars->SetSelected( zm_cl_round_cinematic_effects.GetBool() );
 
 
     m_pExpFlashlightAmtBox->ActivateItem( zm_cl_flashlight_expensive_max.GetInt() );
@@ -123,6 +154,24 @@ void CZMOptionsSubGraphics::OnResetData()
     case 3 : // High
     default :
         m_pRainBox->ActivateItem( 3 );
+        break;
+    }
+
+
+    switch ( zm_cl_fireglow_max.GetInt() )
+    {
+    case 0 :
+        m_pFireLightsBox->ActivateItem( 0 ); // 0
+        break;
+    case 2 :
+        m_pFireLightsBox->ActivateItem( 1 ); // 2
+        break;
+    case 5 :
+        m_pFireLightsBox->ActivateItem( 2 ); // 5
+        break;
+    case 10 :
+    default :
+        m_pFireLightsBox->ActivateItem( 3 ); // 10
         break;
     }
 
