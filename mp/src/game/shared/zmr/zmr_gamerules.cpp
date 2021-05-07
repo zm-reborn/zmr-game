@@ -298,7 +298,7 @@ bool CZMRules::ShouldCollide( int collisionGroup0, int collisionGroup1 )
     }
 
     // Disable player collision.
-    if (collisionGroup0 == COLLISION_GROUP_PLAYER && collisionGroup1 == COLLISION_GROUP_PLAYER_MOVEMENT
+    if (collisionGroup0 == COLLISION_GROUP_PLAYER && (collisionGroup1 == COLLISION_GROUP_PLAYER || collisionGroup1 == COLLISION_GROUP_PLAYER_MOVEMENT)
     &&  zm_sv_playercollision.GetInt() <= 1)
     {
         return false;
