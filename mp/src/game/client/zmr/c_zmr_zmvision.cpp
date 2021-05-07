@@ -196,9 +196,14 @@ void CZMVision::RemoveSilhouette( C_BaseEntity* pEnt )
 
 CON_COMMAND( zm_vision, "Toggles ZM vision." )
 {
+    bool bPrevState = g_ZMVision.IsOn();
+
+    g_ZMVision.Toggle();
+
+
     auto* pLocalPlayer = C_ZMPlayer::GetLocalPlayer();
 
-    if ( pLocalPlayer && zm_cl_zmvision_playsound.GetBool() )
+    if ( bPrevState != g_ZMVision.IsOn() && pLocalPlayer && zm_cl_zmvision_playsound.GetBool() )
     {
         if ( g_ZMVision.IsOn() )
         {
@@ -209,7 +214,4 @@ CON_COMMAND( zm_vision, "Toggles ZM vision." )
             pLocalPlayer->EmitSound( "ZMPlayer.ZMVisionOn" );
         }
     }
-
-
-    g_ZMVision.Toggle();
 }
