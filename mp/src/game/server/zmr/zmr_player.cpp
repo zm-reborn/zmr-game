@@ -1014,6 +1014,16 @@ int CZMPlayer::GiveAmmo( int nCount, int nAmmoIndex, bool bSuppressSound )
         }
     }
 
+    if ( nAdd )
+    {
+        CSingleUserRecipientFilter user( this );
+        user.MakeReliable();
+        UserMessageBegin( user, "ZMAmmoPickup" );
+            WRITE_SHORT( nAmmoIndex );
+            WRITE_SHORT( nAdd );
+        MessageEnd();
+    }
+
     return nAdd;
 }
 

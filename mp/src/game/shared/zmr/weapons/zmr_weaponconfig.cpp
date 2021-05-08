@@ -2,7 +2,7 @@
 #include "ammodef.h"
 #include "filesystem.h"
 #ifdef CLIENT_DLL
-#include "history_resource.h"
+#include "ui/zmr_hud_itemhistory.h"
 #include "hud.h"
 
 
@@ -224,7 +224,7 @@ void CZMBaseWeaponConfig::LoadFromConfig( KeyValues* kv )
 
         if ( pIconActive )
         {
-            auto* pHudHR = GET_HUDELEMENT( CHudHistoryResource );
+            auto* pHudHR = CZMHudItemHistory::GetInstance();
             if ( pHudHR )
             {
                 pHudHR->SetHistoryGap( pIconActive->Height() );

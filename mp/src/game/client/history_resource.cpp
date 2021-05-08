@@ -283,7 +283,11 @@ bool CHudHistoryResource::ShouldDraw( void )
 #ifdef TF_CLIENT_DLL
 	return false;
 #else
+#ifdef ZMR // ZMRCHANGE: We can't remove this crap, but we can cripple it!
+	return false;
+#else
 	return ( ( m_iCurrentHistorySlot > 0 || m_bNeedsDraw ) && CHudElement::ShouldDraw() );
+#endif // ZMR
 #endif
 }
 

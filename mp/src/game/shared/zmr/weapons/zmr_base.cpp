@@ -2,7 +2,7 @@
 #include "ammodef.h"
 #ifdef CLIENT_DLL
 #include "prediction.h"
-#include "weapon_selection.h"
+#include "ui/zmr_hud_itemhistory.h"
 #include "view.h"
 #endif
 #include "datacache/imdlcache.h"
@@ -1393,13 +1393,11 @@ void CZMBaseWeapon::OnDataChanged( DataUpdateType_t type )
             // Tell the HUD this weapon's been picked up
             if ( ShouldDrawPickup() )
             {
-                auto* pHudSelection = GetHudWeaponSelection();
-                if ( pHudSelection )
+                auto* pItemHistory = CZMHudItemHistory::GetInstance();
+                if ( pItemHistory )
                 {
-                    pHudSelection->OnWeaponPickup( this );
+                    pItemHistory->AddWeaponToHistory( this );
                 }
-
-                //pPlayer->EmitSound( "Player.PickupWeapon" );
             }
         }
     }

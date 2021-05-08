@@ -6,7 +6,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-void RegisterZMUserMessages( void )
+static void RegisterZMUserMessages()
 {
     usermessages->Register( "ZMBuildMenuUpdate", -1 ); // 1 * spawn ehandle, 5 * queue bytes
 	usermessages->Register( "ZMManiMenuUpdate", -1 );
@@ -20,6 +20,7 @@ void RegisterZMUserMessages( void )
     usermessages->Register( "ZMTooltip", -1 );
 
     usermessages->Register( "ZMChatNotify", -1 );
+    usermessages->Register( "ZMAmmoPickup", -1 );
 
 
     // From vote_manager
