@@ -958,6 +958,10 @@ void CZMBaseWeapon::PrimaryAttack()
     // If my clip is empty (and I use clips) start reload
     if ( UsesClipsForAmmo1() && !m_iClip1 ) 
     {
+        // Try dry firing.
+        if ( DryFire( false ) )
+            return;
+
         Reload();
         return;
     }
@@ -966,6 +970,34 @@ void CZMBaseWeapon::PrimaryAttack()
     Shoot();
 
     m_flNextSecondaryAttack = m_flNextPrimaryAttack = gpGlobals->curtime + GetFireRate();
+}
+
+// If forced, don't check for ammo.
+bool CZMBaseWeapon::DryFire( bool bForce )
+{
+    auto* pOwner = GetPlayerOwner();
+
+    if ( !pOwner )
+    {
+        return false;
+    }
+
+    // Don't play if we have ammo (presumably reload)
+    if ( !bForce && pOwner->GetAmmoCount( GetPrimaryAmmoType() ) > 0 )
+    {
+        return false;
+    }
+
+    //
+    // Send dry fire anim.
+    //
+    if ( !SendWeaponAnim( ACT_VM_DRYFIRE ) )
+    {
+        return false;
+    }
+
+    m_flNextPrimaryAttack = m_flNextSecondaryAttack = gpGlobals->curtime + SequenceDuration();
+    return true;
 }
 
 void CZMBaseWeapon::Shoot( int iAmmoType, int nBullets, int nAmmo, float flMaxRange, bool bSecondary )

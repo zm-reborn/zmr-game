@@ -90,6 +90,8 @@ public:
     virtual void SecondaryAttackEffects( WeaponSound_t wpnsound );
     virtual void SecondaryAttack() OVERRIDE;
 
+    virtual bool DryFire( bool bForce );
+
 
     virtual void        SetViewModel() OVERRIDE;
 
