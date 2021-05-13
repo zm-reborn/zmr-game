@@ -215,6 +215,10 @@ $Project "Server (ZMR)"
 				$File	"$SRCDIR\game\shared\zmr\npcs\zmr_zombiebase_shared.cpp"
 				$File	"$SRCDIR\game\shared\zmr\npcs\zmr_zombiebase_shared.h"
 			}
+			$Folder "Projectiles"
+			{
+				$File	"zmr\zmr_projectile_molotov.cpp"
+			}
 			$Folder "Weapons"
 			{
 				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_base.cpp"
