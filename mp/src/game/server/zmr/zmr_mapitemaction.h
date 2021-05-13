@@ -28,7 +28,7 @@ namespace ZMItemAction
         CLASS_AMMO_PISTOL       = ( 1 << 12 ),
         CLASS_AMMO_BIGPISTOL    = ( 1 << 13 ),
 
-        CLASS_MOLOTOV           = ( 1 << 14 ),
+        CLASS_THROWABLE         = ( 1 << 14 ),
 
         CLASS_ITEM_CRATE        = ( 1 << 15 ),
 

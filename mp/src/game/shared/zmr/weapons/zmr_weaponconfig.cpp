@@ -656,6 +656,7 @@ CZMWeaponConfigSystem::CZMWeaponConfigSystem() : CAutoGameSystem( "ZMWeaponConfi
     m_ConfigRegisters[ZMCONFIGSLOT_RIFLE].pszWeaponName = "weapon_zm_rifle";
     m_ConfigRegisters[ZMCONFIGSLOT_R700].pszWeaponName = "weapon_zm_r700";
     m_ConfigRegisters[ZMCONFIGSLOT_MOLOTOV].pszWeaponName = "weapon_zm_molotov";
+    m_ConfigRegisters[ZMCONFIGSLOT_PIPEBOMB].pszWeaponName = "weapon_zm_pipebomb";
 
 
     InitPlayerAnimMap();

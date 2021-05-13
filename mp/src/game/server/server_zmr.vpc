@@ -218,6 +218,7 @@ $Project "Server (ZMR)"
 			$Folder "Projectiles"
 			{
 				$File	"zmr\zmr_projectile_molotov.cpp"
+				$File	"zmr\zmr_projectile_pipebomb.cpp"
 			}
 			$Folder "Weapons"
 			{
@@ -237,6 +238,7 @@ $Project "Server (ZMR)"
 				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_improvised.cpp"
 				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_mac10.cpp"
 				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_molotov.cpp"
+				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_pipebomb.cpp"
 				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_pistol.cpp"
 				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_revolver.cpp"
 				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_r700.cpp"

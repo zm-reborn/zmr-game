@@ -43,7 +43,8 @@ ItemBaseData_t const CZMMapItemSystem::m_ItemData[] =
     ITEMDATA( weapon_zm_pistol, CLASS_WEAPON|CLASS_PISTOL|CLASS_SECONDARY ),
     ITEMDATA( weapon_zm_revolver, CLASS_WEAPON|CLASS_PISTOL|CLASS_SECONDARY|CLASS_BIGPISTOL ),
 
-    ITEMDATA( weapon_zm_molotov, CLASS_WEAPON|CLASS_MOLOTOV ),
+    ITEMDATA( weapon_zm_molotov, CLASS_WEAPON|CLASS_THROWABLE ),
+    ITEMDATA( weapon_zm_pipebomb, CLASS_WEAPON|CLASS_THROWABLE ),
 
     ITEMDATA( weapon_zm_improvised, CLASS_WEAPON|CLASS_MELEE|CLASS_MELEE_MEDIUM ),
     ITEMDATA( weapon_zm_sledge, CLASS_WEAPON|CLASS_MELEE|CLASS_MELEE_BIG ),
@@ -89,7 +90,7 @@ const ClassData_t CZMMapItemSystem::m_Classes[] =
     CLASSDATA( BigPistolAmmo, CLASS_AMMO_BIGPISTOL ),
 
     // Misc
-    CLASSDATA( Molotov, CLASS_MOLOTOV ),
+    CLASSDATA( Throwable, CLASS_THROWABLE ),
     CLASSDATA( ItemCrate, CLASS_ITEM_CRATE ),
 };
 
