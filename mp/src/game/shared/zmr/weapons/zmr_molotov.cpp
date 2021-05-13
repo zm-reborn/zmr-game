@@ -13,7 +13,7 @@
 #endif
 
 #include "zmr_shareddefs.h"
-#include "zmr_base.h"
+#include "zmr_basethrowable.h"
 
 
 #include "zmr_player_shared.h"
@@ -24,29 +24,21 @@
 
 #define MOLOTOV_RADIUS      4.0f
 
-
-#define MOLOTOVSTATE_THROWN         -1
-#define MOLOTOVSTATE_IDLE           0
-#define MOLOTOVSTATE_DRAWBACK       4
-#define MOLOTOVSTATE_READYTOTHROW   5
-
 #define MOLOTOV_FIRE_SPRITE         "sprites/fire_vm_grey.vmt"
 
 #ifdef CLIENT_DLL
 #define CZMWeaponMolotov C_ZMWeaponMolotov
 #endif
 
-class CZMWeaponMolotov : public CZMBaseWeapon
+class CZMWeaponMolotov : public CZMBaseThrowableWeapon
 {
 public:
-	DECLARE_CLASS( CZMWeaponMolotov, CZMBaseWeapon );
+	DECLARE_CLASS( CZMWeaponMolotov, CZMBaseThrowableWeapon );
 	DECLARE_NETWORKCLASS(); 
 	DECLARE_PREDICTABLE();
 
     CZMWeaponMolotov();
     ~CZMWeaponMolotov();
-
-    CNetworkVar( int, m_iThrowState );
 
 #ifndef CLIENT_DLL
     void Operator_HandleAnimEvent( animevent_t*, CBaseCombatCharacter* ) OVERRIDE;
@@ -66,24 +58,14 @@ public:
 
     void Precache() OVERRIDE;
     void PrimaryAttack() OVERRIDE;
-    void Equip( CBaseCombatCharacter* pCharacter ) OVERRIDE;
     bool Deploy() OVERRIDE;
     bool Holster( CBaseCombatWeapon* pSwitchTo = nullptr ) OVERRIDE;
-    bool CanHolster() const OVERRIDE { return m_iThrowState < MOLOTOVSTATE_DRAWBACK && m_iThrowState >= MOLOTOVSTATE_IDLE; }
+    bool CanHolster() const OVERRIDE { return GetThrowState() < THROWSTATE_DRAW_BACK && GetThrowState() >= THROWSTATE_IDLE; }
     bool CanBeDropped() const OVERRIDE { return CanHolster(); }
-    
-#ifndef CLIENT_DLL
-    void Drop( const Vector& vecVelocity ) OVERRIDE;
-#endif
-    
-    void ItemPostFrame() OVERRIDE;
 
     void HandleAnimEventLight();
-    void HandleAnimEventThrow();
     
-
-    void Throw( CZMPlayer* pPlayer );
-    void GetThrowPos( CZMPlayer* pPlayer, Vector& outpos );
+    virtual const char* GetProjectileClassname() const OVERRIDE;
 
 #ifdef CLIENT_DLL
     HPARTICLEFFECT m_hClothFlameParticle;
@@ -95,11 +77,6 @@ public:
 IMPLEMENT_NETWORKCLASS_ALIASED( ZMWeaponMolotov, DT_ZM_WeaponMolotov )
 
 BEGIN_NETWORK_TABLE( CZMWeaponMolotov, DT_ZM_WeaponMolotov )
-#ifdef CLIENT_DLL
-    RecvPropInt( RECVINFO( m_iThrowState ) ),
-#else
-    SendPropInt( SENDINFO( m_iThrowState ) ),
-#endif
 END_NETWORK_TABLE()
 
 #ifdef CLIENT_DLL
@@ -110,6 +87,7 @@ END_PREDICTION_DATA()
 LINK_ENTITY_TO_CLASS( weapon_zm_molotov, CZMWeaponMolotov );
 PRECACHE_WEAPON_REGISTER( weapon_zm_molotov );
 
+REGISTER_WEAPON_CONFIG( ZMWeaponConfig::ZMCONFIGSLOT_MOLOTOV, CZMBaseThrowableConfig );
 
 CZMWeaponMolotov::CZMWeaponMolotov()
 {
@@ -133,10 +111,6 @@ CZMWeaponMolotov::~CZMWeaponMolotov()
 void CZMWeaponMolotov::Precache()
 {
     BaseClass::Precache();
-    
-#ifndef CLIENT_DLL
-    UTIL_PrecacheOther( "grenade_molotov" );
-#endif
 
     PrecacheMaterial( MOLOTOV_FIRE_SPRITE );
     PrecacheParticleSystem( "molotov_clothflame" );
@@ -148,9 +122,6 @@ bool CZMWeaponMolotov::Deploy()
 
     if ( ret )
     {
-        m_iThrowState = MOLOTOVSTATE_IDLE;
-
-
         // Remove lighter flame.
         CZMPlayer* pPlayer = GetPlayerOwner();
         if ( pPlayer && pPlayer->GetViewModel() )
@@ -187,89 +158,25 @@ void CZMWeaponMolotov::DestroyClothFlameParticle()
 }
 #endif
 
-void CZMWeaponMolotov::Equip( CBaseCombatCharacter* pCharacter )
-{
-    BaseClass::Equip( pCharacter );
-
-#ifndef CLIENT_DLL
-    if ( pCharacter && GetOwner() == pCharacter && pCharacter->GetAmmoCount( GetPrimaryAmmoType() ) < 1 )
-    {
-        pCharacter->GiveAmmo( 1, GetPrimaryAmmoType(), true );
-    }
-#endif
-}
-
-#ifndef CLIENT_DLL
-void CZMWeaponMolotov::Drop( const Vector& vecVelocity )
-{
-    CZMPlayer* pPlayer = GetPlayerOwner();
-    if ( pPlayer )
-    {
-        pPlayer->RemoveAmmo( 1, GetPrimaryAmmoType() );
-    }
-
-    BaseClass::Drop( vecVelocity );
-}
-#endif
-
-void CZMWeaponMolotov::ItemPostFrame()
-{
-    CZMPlayer* pPlayer = GetPlayerOwner();
-
-    if ( !pPlayer ) return;
-
-
-    // We've thrown the grenade, remove our weapon.
-#ifndef CLIENT_DLL
-    if ( m_iThrowState == MOLOTOVSTATE_THROWN && IsViewModelSequenceFinished() )
-    {
-        pPlayer->Weapon_Drop( this, nullptr, nullptr );
-
-        UTIL_Remove( this );
-        return;
-    }
-#endif
-
-
-    if ( pPlayer->m_nButtons & IN_ATTACK && m_flNextPrimaryAttack <= gpGlobals->curtime && m_iThrowState == MOLOTOVSTATE_IDLE )
-    {
-        PrimaryAttack();
-    }
-
-
-    if ( m_iThrowState >= MOLOTOVSTATE_READYTOTHROW && !(pPlayer->m_nButtons & IN_ATTACK) )
-    {
-        SendWeaponAnim( ACT_VM_THROW );
-        m_iThrowState = MOLOTOVSTATE_THROWN; // Reset our state so we don't keep trying to send the throw animation each frame.
-    }
-}
-
 void CZMWeaponMolotov::PrimaryAttack()
 {
     CZMPlayer* pPlayer = GetPlayerOwner();
     if ( !pPlayer ) return;
 
+    // No arming in water :(
     if ( pPlayer->GetWaterLevel() >= 2 ) return;
 
-
-    m_iThrowState = 1;
-
+    
     SendWeaponAnim( ACT_VM_PRIMARYATTACK_1 );
+    m_flNextPrimaryAttack = m_flNextSecondaryAttack = gpGlobals->curtime + SequenceDuration();
 
-
-    m_flNextPrimaryAttack = gpGlobals->curtime + 3.0f;
+    SetThrowState( THROWSTATE_ARMING );
 }
 
 void CZMWeaponMolotov::HandleAnimEventLight()
 {
-    if ( m_iThrowState >= MOLOTOVSTATE_DRAWBACK )
+    if ( GetThrowState() >= THROWSTATE_DRAW_BACK )
     {
-        // We've finished our drawback animation, now we're ready to throw.
-        if ( m_iThrowState == MOLOTOVSTATE_DRAWBACK )
-        {
-            m_iThrowState = MOLOTOVSTATE_READYTOTHROW;
-        }
-
         return;
     }
 
@@ -278,7 +185,9 @@ void CZMWeaponMolotov::HandleAnimEventLight()
 
     if ( !pPlayer ) return;
 
-    switch ( ++m_iThrowState )
+    // HACK
+    SetThrowState( (ZMThrowState_t)((int)GetThrowState() + 1) );
+    switch ( (int)GetThrowState() )
     {
     case 1 :
     case 2 : SendWeaponAnim( ACT_VM_PRIMARYATTACK_2 ); break;
@@ -287,78 +196,21 @@ void CZMWeaponMolotov::HandleAnimEventLight()
     }
 
 
-    if (m_iThrowState >= MOLOTOVSTATE_DRAWBACK ||
-        (m_iThrowState < MOLOTOVSTATE_DRAWBACK
+    if (GetThrowState() >= THROWSTATE_DRAW_BACK ||
+        (GetThrowState() < THROWSTATE_DRAW_BACK
     &&  random->RandomInt( 0, 100 ) < MIN( pPlayer->GetHealth(), 100 )) )
     {
-        m_iThrowState = MOLOTOVSTATE_DRAWBACK;
+        SetThrowState( THROWSTATE_DRAW_BACK );
 
         SendWeaponAnim( ACT_VM_PRIMARYATTACK_4 );
     }
 
-    DevMsg( "Set throw state to: %i\n", m_iThrowState.Get() );
+    DevMsg( "Set throw state to: %i\n", (int)GetThrowState() );
 }
 
-void CZMWeaponMolotov::HandleAnimEventThrow()
+const char* CZMWeaponMolotov::GetProjectileClassname() const
 {
-    Throw( GetPlayerOwner() );
-}
-
-void CZMWeaponMolotov::Throw( CZMPlayer* pPlayer )
-{
-    if ( !pPlayer ) return;
-
-
-#ifndef CLIENT_DLL
-    Vector pos;
-    GetThrowPos( pPlayer, pos );
-
-
-    Vector fwd;
-    AngleVectors( pPlayer->EyeAngles(), &fwd );
-    fwd[2] += 0.1f;
-
-
-    Vector vel = pPlayer->GetAbsVelocity() + fwd * 1200.0f;
-
-    CZMGrenadeMolotov* pMolotov = (CZMGrenadeMolotov*)CBaseEntity::Create( "grenade_molotov", pos, vec3_angle, pPlayer );
-
-    if ( !pMolotov )
-    {
-        Warning( "Couldn't create molotov entity!\n" );
-        return;
-    }
-
-
-    pMolotov->SetThrower( pPlayer );
-    pMolotov->SetOwnerEntity( pPlayer );
-    pMolotov->SetAbsVelocity( vel );
-    pMolotov->m_takedamage = DAMAGE_EVENTS_ONLY;
-    pMolotov->SetLocalAngularVelocity( QAngle( 0, 0, random->RandomFloat( -100, -500 ) ) );
-#endif
-
-    pPlayer->DoAnimationEvent( PLAYERANIMEVENT_ATTACK_PRIMARY );
-
-    //WeaponSound( SINGLE );
-}
-
-void CZMWeaponMolotov::GetThrowPos( CZMPlayer* pPlayer, Vector& outpos )
-{
-    if ( !pPlayer ) return;
-
-
-    trace_t trace;
-    Vector fwd;
-
-    AngleVectors( pPlayer->EyeAngles(), &fwd );
-    fwd[2] += 0.1f;
-
-    Vector maxs = Vector( MOLOTOV_RADIUS, MOLOTOV_RADIUS, MOLOTOV_RADIUS );
-
-    UTIL_TraceHull( pPlayer->EyePosition(), pPlayer->EyePosition() + fwd * 18.0f, -maxs, maxs, MASK_SHOT, pPlayer, COLLISION_GROUP_NONE, &trace );
-
-
-    outpos = trace.endpos;
+    return "grenade_molotov";
 }
 
 #ifndef CLIENT_DLL
@@ -369,11 +221,6 @@ void CZMWeaponMolotov::Operator_HandleAnimEvent( animevent_t *pEvent, CBaseComba
 	case EVENT_WEAPON_SEQUENCE_FINISHED :
 		HandleAnimEventLight();
 		break;
-    case EVENT_WEAPON_THROW :
-    case EVENT_WEAPON_THROW2 :
-    case EVENT_WEAPON_THROW3 :
-        HandleAnimEventThrow();
-        break;
 	default:
 		BaseClass::Operator_HandleAnimEvent( pEvent, pOperator );
 		break;
@@ -415,11 +262,6 @@ bool CZMWeaponMolotov::OnFireEvent( C_BaseViewModel* pViewModel, const Vector& o
 	case EVENT_WEAPON_SEQUENCE_FINISHED :
 		HandleAnimEventLight();
 		return true;
-    case EVENT_WEAPON_THROW :
-    case EVENT_WEAPON_THROW2 :
-    case EVENT_WEAPON_THROW3 :
-        HandleAnimEventThrow();
-        return true;
     case AE_ZM_LIGHTERFLAME :
         return true;
     case AE_ZM_CLOTHFLAME :
