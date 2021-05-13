@@ -9,58 +9,22 @@
 class CZMBitMapButton : public CBitmapButton
 {
 public:
-    CZMBitMapButton( vgui::Panel* parent, const char* name, const char* txt ) : CBitmapButton( parent, name, txt )
-    {
-        m_pszTooltipName = nullptr;
-    }
+    CZMBitMapButton( vgui::Panel* parent, const char* name, const char* txt );
+    CZMBitMapButton( vgui::Panel* parent, const char* name );
 
-    ~CZMBitMapButton()
-    {
-        delete[] m_pszTooltipName;
-    }
+    ~CZMBitMapButton();
 
-    virtual void OnCursorEntered() OVERRIDE
-    {
-        CBitmapButton::OnCursorEntered();
-
-
-        if ( !m_pszTooltipName ) return;
-
-        if ( !IsEnabled() ) return;
-
-
-        m_iTooltipIndex = ZMClientUtil::ShowTooltipByName( m_pszTooltipName );
-    }
+    virtual void OnCursorEntered() OVERRIDE;
     
-    virtual void OnCursorExited() OVERRIDE
-    {
-        CBitmapButton::OnCursorExited();
+    virtual void OnCursorExited() OVERRIDE;
 
-
-        if ( m_iTooltipIndex )
-        {
-            ZMClientUtil::HideTooltip( m_iTooltipIndex );
-        }
-    }
-
-    const char* GetTooltipName() { return m_pszTooltipName; };
-
-    void SetTooltipName( const char* msg )
-    {
-        delete[] m_pszTooltipName;
-
-        if ( !msg ) return;
-
-
-        int len = strlen( msg ) + 1;
-        m_pszTooltipName = new char[len];
-        Q_strncpy( m_pszTooltipName, msg, len );
-    }
+    const char* GetTooltipName() const;
+    void SetTooltipName( const char* msg );
 
     // Stops the awful depressed offset shit.
-    virtual void RecalculateDepressedState() OVERRIDE {};
+    virtual void RecalculateDepressedState() OVERRIDE;
 
-    BitmapImage* GetBitmapImage( int index ) { return &(m_pImage[index]); };
+    BitmapImage* GetBitmapImage( int index );
 
 private:
     char* m_pszTooltipName;
