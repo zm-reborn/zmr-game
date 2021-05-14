@@ -740,6 +740,10 @@ bool CZMBaseZombie::CanSwatObject( CBaseEntity* pEnt )
     if ( pEnt->MyCombatCharacterPointer() != nullptr )
         return false;
 
+    // Ignore projectiles.
+    if ( pEnt->IsCombatItem() )
+        return false;
+
     // Unfortunately need this exception because func_brush has vphysics and always moveable even though it can't really be moved.
     // Example: zm_asylum elevator floor
     if ( FClassnameIs( pEnt, "func_brush" ) )

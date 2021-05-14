@@ -106,6 +106,9 @@ public:
 
     void CreateFlyingChunk( const Vector& pos );
 
+
+    virtual bool IsCombatItem() const OVERRIDE;
+
 private:
     SmokeTrail* m_pFireTrail;
 };
@@ -273,4 +276,9 @@ void CZMProjectileMolotov::CreateFlyingChunk( const Vector& pos )
 
     pGib->SetAbsOrigin( pos );
     pGib->SetOwnerEntity( this );
+}
+
+bool CZMProjectileMolotov::IsCombatItem() const
+{
+    return true; // Return true to disable swatting of this object.
 }

@@ -17,6 +17,8 @@ public:
     void Precache() OVERRIDE;
 
     void PipebombThink();
+
+    virtual bool IsCombatItem() const OVERRIDE;
 };
 
 LINK_ENTITY_TO_CLASS( grenade_pipebomb, CZMProjectilePipebomb );
@@ -56,4 +58,9 @@ void CZMProjectilePipebomb::PipebombThink()
     Detonate();
 
     UTIL_Remove( this );
+}
+
+bool CZMProjectilePipebomb::IsCombatItem() const
+{
+    return true; // Return true to disable swatting of this object.
 }
