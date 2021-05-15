@@ -2,7 +2,7 @@
 #include "basegrenade_shared.h"
 #include "gib.h"
 #include "props_shared.h"
-#include "smoke_Trail.h"
+#include "smoke_trail.h"
 #include "fire.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
