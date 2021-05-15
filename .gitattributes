@@ -1,11 +1,13 @@
-creategameprojects text
-createallprojects text
+createallprojects text eol=lf
+creatededicated text eol=lf
+creategameprojects text eol=lf
+createshaderproject text eol=lf
 xcode_ccache_wrapper text
-vpc text
+vpc text eol=lf
 vpc_linux binary
 vpc_osx binary
 
-*.sh text
+*.sh text eol=lf
 *.bat text
 *.txt text
 *.c text
