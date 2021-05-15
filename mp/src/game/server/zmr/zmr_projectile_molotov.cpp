@@ -97,12 +97,12 @@ public:
     DECLARE_DATADESC();
 
 
-    void Spawn() OVERRIDE;
-    void Precache() OVERRIDE;
+    virtual void Spawn() OVERRIDE;
+    virtual void Precache() OVERRIDE;
 
     void MolotovTouch( CBaseEntity* pOther );
     void MolotovThink();
-    void Detonate() OVERRIDE;
+    virtual void Detonate() OVERRIDE;
 
     void CreateFlyingChunk( const Vector& pos );
 

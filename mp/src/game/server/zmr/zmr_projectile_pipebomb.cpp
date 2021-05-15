@@ -1,6 +1,9 @@
 #include "cbase.h"
 #include "basegrenade_shared.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 #define PIPEBOMB_MODEL      "models/weapons/w_pipebomb.mdl"
 
@@ -13,8 +16,8 @@ public:
     CZMProjectilePipebomb();
     ~CZMProjectilePipebomb();
 
-    void Spawn() OVERRIDE;
-    void Precache() OVERRIDE;
+    virtual void Spawn() OVERRIDE;
+    virtual void Precache() OVERRIDE;
 
     void PipebombThink();
 
