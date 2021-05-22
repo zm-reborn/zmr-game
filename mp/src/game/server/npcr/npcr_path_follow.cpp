@@ -488,7 +488,7 @@ int NPCR::CFollowNavPath::CheckAvoid( CBaseNPC* pNPC, Vector& vecGoalPos )
         const float epsilon = 0.001f;
         float delta = leftFrac - rightFrac;
 
-        if ( abs( delta ) > epsilon )
+        if ( fabsf( delta ) > epsilon )
         {
             side = delta > 0.0f ? -1.0f : 1.0f;
             normal = delta > 0.0f ? leftNormal : rightNormal;
@@ -530,7 +530,7 @@ int NPCR::CFollowNavPath::CheckAvoid( CBaseNPC* pNPC, Vector& vecGoalPos )
     normal.NormalizeInPlace();
 
     
-    float dot = abs( fwd.AsVector2D().Dot( normal.AsVector2D() ) );
+    float dot = fabsf( fwd.AsVector2D().Dot( normal.AsVector2D() ) );
     dot *= side;
 
 
