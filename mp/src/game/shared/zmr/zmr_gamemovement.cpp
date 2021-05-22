@@ -35,7 +35,7 @@ ConVar zm_sv_maxbunnyhopspeed( "zm_sv_maxbunnyhopspeed", "300", FCVAR_REPLICATED
 
 #define LADDER_AUTOMOUNT_DIST       32.0f
 #define LADDER_AUTOMOUNT_DOT        0.4f
-#define LADDER_DISMOUNT_DOT         0.8f
+#define LADDER_DISMOUNT_DOT         0.6f
 #define LADDER_DISMOUNT_MAX_DIST    100.0f
 #define LADDER_MAX_DIST             64.0f
 
