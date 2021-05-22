@@ -782,6 +782,8 @@ CStudioHdr* C_ZMViewModel::OnNewModel()
 
     m_LagAnglesHistory.ClearHistory();
 
+    m_bInIronSight = false;
+    m_flIronSightFrac = 0.0f;
 
     return pHdr;
 }
