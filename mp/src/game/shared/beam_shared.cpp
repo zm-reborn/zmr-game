@@ -484,7 +484,20 @@ const Vector &CBeam::GetAbsStartPos( void ) const
 		}
 		return ent->GetAbsOrigin();
 	}
+
+#if defined(ZMR) && !defined(CLIENT_DLL)
+	// ZMRCHANGE: Some maps' (redqueen/desert_laboratory) lasers/beams hit the wall it starts at.
+	// Offset the start a bit to fix it. This shit used to work in 2006...
+	auto& origin = GetAbsOrigin();
+	const float epsilon = 0.05f;
+
+	static Vector temp;
+	temp = origin + (GetAbsEndPos() - origin).Normalized() * epsilon;
+
+	return temp;
+#else
 	return GetAbsOrigin();
+#endif
 }
 
 

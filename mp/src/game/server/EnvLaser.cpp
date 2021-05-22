@@ -242,7 +242,15 @@ void CEnvLaser::StrikeThink( void )
 
 	trace_t tr;
 
+#ifdef ZMR
+	// ZMRCHANGE: Some maps' (redqueen/desert_laboratory) lasers/beams hit the wall it starts at.
+	// Offset the start a bit to fix it. This shit used to work in 2006...
+	const float epsilon = 0.05f;
+	Vector vecStartPos = GetAbsOrigin() + (vecFireAt - GetAbsOrigin()).Normalized() * epsilon;
+	UTIL_TraceLine( vecStartPos, vecFireAt, MASK_SOLID, NULL, COLLISION_GROUP_NONE, &tr );
+#else
 	UTIL_TraceLine( GetAbsOrigin(), vecFireAt, MASK_SOLID, NULL, COLLISION_GROUP_NONE, &tr );
+#endif
 	FireAtPoint( tr );
 	SetNextThink( gpGlobals->curtime );
 }
