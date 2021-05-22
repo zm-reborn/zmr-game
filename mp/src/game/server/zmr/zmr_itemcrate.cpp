@@ -43,10 +43,13 @@ const char* g_szCrateModels[] = {
 
 const CrateItemData_t CrateItemData[] = {
     { "item_ammo_pistol", CRATEMODEL_AMMO, 0, 0, 1 },
+    { "item_ammo_pistol_large", CRATEMODEL_AMMO, 0, 0, 1 },
     { "item_ammo_revolver", CRATEMODEL_AMMO, 0, 0, 2 },
     { "item_box_buckshot", CRATEMODEL_AMMO, 0, 0, 3 },
     { "item_ammo_357", CRATEMODEL_AMMO, 0, 0, 4 },
+    { "item_ammo_357_large", CRATEMODEL_AMMO, 0, 0, 4 },
     { "item_ammo_smg1", CRATEMODEL_AMMO, 0, 0, 5 },
+    { "item_ammo_smg1_large", CRATEMODEL_AMMO, 0, 0, 5 },
 
     { "weapon_zm_pistol", CRATEMODEL_WEAPON, 0, 0, 1 },
     { "weapon_zm_revolver", CRATEMODEL_WEAPON, 0, 0, 2 },
