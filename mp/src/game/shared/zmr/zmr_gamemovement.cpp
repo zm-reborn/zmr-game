@@ -35,7 +35,7 @@ ConVar zm_sv_maxbunnyhopspeed( "zm_sv_maxbunnyhopspeed", "300", FCVAR_REPLICATED
 
 #define LADDER_AUTOMOUNT_DIST       32.0f
 #define LADDER_AUTOMOUNT_DOT        0.4f
-#define LADDER_DISMOUNT_DOT         0.6f
+#define LADDER_DISMOUNT_DOT         0.8f
 #define LADDER_DISMOUNT_MAX_DIST    100.0f
 #define LADDER_MAX_DIST             64.0f
 
@@ -292,6 +292,47 @@ void CZMGameMovement::PlayerMove( void )
         default:
             DevMsg( 1, "Bogus pmove player movetype %i on (%i) 0=cl 1=sv\n", player->GetMoveType(), player->IsServer());
             break;
+    }
+
+
+    //
+    // Check for view clearance.
+    // Eg. if player is crouched under something, don't let the view clip through objects.
+    //
+    auto* pPlayer = GetZMPlayer();
+    if ( pPlayer->IsHuman() && pPlayer->IsAlive() )
+    {
+        const float flClearance = 11.0f;
+        const float flHalfHullSize = 8.0f;
+
+        Vector viewoff = GetPlayerViewOffset( pPlayer->IsDucked() );
+        Vector vecStartPos = pPlayer->GetAbsOrigin() + viewoff;
+        
+        Vector vecEndPos = vecStartPos;
+        vecEndPos.z += flClearance;
+
+        vecStartPos.z -= 2.0f; // Lower the start a bit for startsolid check.
+
+
+        CTraceFilterSimple filter( pPlayer, COLLISION_GROUP_PLAYER );
+        trace_t tr;
+
+        Vector mins(-flHalfHullSize, -flHalfHullSize, 0 );
+        Vector maxs( flHalfHullSize,  flHalfHullSize, 0 );
+
+        UTIL_TraceHull( vecStartPos, vecEndPos, mins, maxs, PlayerSolidMask(), &filter, &tr );
+
+        if ( tr.fraction != 1.0f && !tr.startsolid )
+        {
+            float offset = vecEndPos.z - tr.endpos.z;
+
+            viewoff.z -= offset;
+            pPlayer->SetViewOffset( viewoff );
+        }
+        else if ( !pPlayer->IsDucking() ) // If in the process of ducking/unducking, don't change.
+        {
+            pPlayer->SetViewOffset( viewoff );
+        }
     }
 }
 
