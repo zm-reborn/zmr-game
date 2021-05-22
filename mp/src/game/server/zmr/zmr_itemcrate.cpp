@@ -62,6 +62,7 @@ const CrateItemData_t CrateItemData[] = {
     { "weapon_zm_sledge", CRATEMODEL_MELEE, 1, 2, 0 },
 
     { "weapon_zm_molotov", CRATEMODEL_THROWABLE, 0, 0, 0 },
+    { "weapon_zm_pipebomb", CRATEMODEL_THROWABLE, 0, 0, 0 },
 };
 
 #define CRATE_MODEL_OLD                     "models/items/item_item_crate.mdl"
