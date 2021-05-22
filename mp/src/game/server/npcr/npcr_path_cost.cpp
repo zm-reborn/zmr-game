@@ -32,7 +32,7 @@ bool NPCR::CBasePathCost::CanBuildSimpleRoute( const Vector& vecStart, const Vec
     if ( !npcr_path_simplepathvischeck.GetBool() )
         return true;
 
-    //float delta_z = abs( vecGoal.z - vecStart.z );
+    //float delta_z = fabsf( vecGoal.z - vecStart.z );
 
     //if ( delta_z > 72.0f )
     //    return false;

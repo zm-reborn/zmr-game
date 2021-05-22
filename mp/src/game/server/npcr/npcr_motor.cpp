@@ -593,12 +593,12 @@ bool NPCR::CBaseMotor::IsFacing( const Vector& vecPos, float grace ) const
 
 bool NPCR::CBaseMotor::IsFacing( const QAngle& angGoal, float grace ) const
 {
-    grace = abs( grace );
+    grace = fabsf( grace );
 
     QAngle curAngles = GetNPC()->GetEyeAngles();
 
     float dx = UsePitch() ? UTIL_AngleDiff( angGoal.x, curAngles.x ) : 0.0f;
     float dy = UTIL_AngleDiff( angGoal.y, curAngles.y );
 
-    return abs( dx ) <= grace && abs( dy ) <= grace;
+    return fabsf( dx ) <= grace && fabsf( dy ) <= grace;
 }

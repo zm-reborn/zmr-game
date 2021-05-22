@@ -837,7 +837,7 @@ void CZMPlayer::SimulateBullet( ZMFireBulletsInfo_t& bulletinfo )
 #else
             const int dbgclr[4] = { 0, 0, 255, 255 };
 #endif // CLIENT_DLL
-            float t = abs( zm_sv_debugbullets_time.GetFloat() );
+            float t = fabsf( zm_sv_debugbullets_time.GetFloat() );
 
             if ( bulletinfo.bDoTraceHull )
             {

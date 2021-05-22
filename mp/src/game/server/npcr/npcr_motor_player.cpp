@@ -22,12 +22,12 @@ float NPCR::CPlayerMotor::GetStepHeight() const
 // Do a smooth transition to goal
 float NPCR::CPlayerMotor::GetPitchRate( float delta ) const
 {
-    return RemapValClamped( abs( delta ), 0.0f, 60.0f, 2.0f, 200.0f );
+    return RemapValClamped( fabsf( delta ), 0.0f, 60.0f, 2.0f, 200.0f );
 }
 
 float NPCR::CPlayerMotor::GetYawRate( float delta ) const
 {
-    return RemapValClamped( abs( delta ), 0.0f, 60.0f, 2.0f, 200.0f );
+    return RemapValClamped( fabsf( delta ), 0.0f, 60.0f, 2.0f, 200.0f );
 }
 
 bool NPCR::CPlayerMotor::ShouldDoFullMove() const

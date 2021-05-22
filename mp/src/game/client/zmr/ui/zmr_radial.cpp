@@ -335,7 +335,7 @@ CZMRadialButton* CZMRadialPanel::GetButton( int x, int y )
         if ( deg > start || deg < end )
         {
             // Account for the wrapping.
-            if ( abs( (end - start) - size ) > 5.0f )
+            if ( fabsf( (end - start) - size ) > 5.0f )
             {
                 end += 360.0f;
 

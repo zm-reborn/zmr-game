@@ -125,7 +125,7 @@ void CBansheeCeilAmbushSchedule::OnUpdate()
     // Face towards our leap direction
     else if ( m_bInLeap )
     {
-        float delta = abs( GetOuter()->GetAbsAngles().y - m_flLeapTowardsYaw );
+        float delta = fabsf( GetOuter()->GetAbsAngles().y - m_flLeapTowardsYaw );
         if ( delta > 1.0f )
             GetOuter()->GetMotor()->FaceTowards( m_flLeapTowardsYaw );
     }

@@ -86,7 +86,7 @@ bool CZMBansheeFollowPath::CanPotentiallyJumpTo( const Vector& vecStart, const V
     float height = vecGoal.z - vecStart.z;
     float dist = dir.NormalizeInPlace();
 
-    if ( abs( height ) < 24.0f && dist < 128.0f )
+    if ( fabsf( height ) < 24.0f && dist < 128.0f )
     {
         return false;
     }
