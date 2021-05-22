@@ -149,10 +149,14 @@ void CHudChat::MsgFunc_SayText2( bf_read &msg )
     auto importance = g_ZMImportanceSystem.GetPlayerImportance( client );
     if ( importance == ZMIMPORTANCE_DEV || importance == ZMIMPORTANCE_LEAD )
     {
+        //
+        // %s is for char, %ls is for wide-char
+        //
+
         // Rewrite the name to include the text color.
         wchar_t szTemp[256];
         V_wcsncpy( szTemp, szBuf[1], sizeof( szTemp ) );
-        V_snwprintf( szBuf[1], ARRAYSIZE( szBuf[1] ), L"%s\x01", szTemp );
+        V_snwprintf( szBuf[1], ARRAYSIZE( szBuf[1] ), L"%ls\x01", szTemp );
 
 
         // Rewrite the format to include the star and the coloring.
@@ -171,7 +175,7 @@ void CHudChat::MsgFunc_SayText2( bf_read &msg )
 
         // x03 = team color
         // \a = hex color
-        V_snwprintf( szBuf[0], ARRAYSIZE( szBuf[0] ), L"\x01\a%x%x%x★ \x03%s", clr[0], clr[1], clr[2], &szTemp[index] );
+        V_snwprintf( szBuf[0], ARRAYSIZE( szBuf[0] ), L"\x01\a%x%x%x★ \x03%ls", clr[0], clr[1], clr[2], &szTemp[index] );
     }
 
 
