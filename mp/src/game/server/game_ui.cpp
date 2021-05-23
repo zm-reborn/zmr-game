@@ -71,6 +71,7 @@ public:
 	int					m_nLastButtonState;
 
 	CHandle<CBasePlayer>	m_player;
+	int						m_iStartTeam;
 };
 
 
@@ -138,6 +139,10 @@ void CGameUI::Deactivate( CBaseEntity *pActivator )
 		{
 			m_player->RemoveFlag( FL_ATCONTROLS );
 		}
+
+#ifdef ZMR // ZMRCHANGE: Fix death-release. This never got changed back.
+		m_player->RemoveFlag( FL_ONTRAIN );
+#endif
 
 		// Restore weapons
 		if ( FBitSet( m_spawnflags, SF_GAMEUI_HIDE_WEAPON ) )
@@ -218,6 +223,9 @@ void CGameUI::InputActivate( inputdata_t &inputdata )
 
 	// Setup our internal data
 	m_player = pPlayer;
+#ifdef ZMR
+	m_iStartTeam = m_player->GetTeamNumber();
+#endif
 	m_playerOn.FireOutput( pPlayer, this, 0 );
 
 	// Turn the hud off
@@ -263,6 +271,14 @@ void CGameUI::Think( void )
 		SetNextThink( TICK_NEVER_THINK );
 		return;
 	}
+
+#ifdef ZMR // ZMRCHANGE: Deactivate game_ui if dead.
+	if (pPlayer->GetTeamNumber() != m_iStartTeam || !pPlayer->IsAlive())
+	{
+		Deactivate( pPlayer );
+		return;
+	}
+#endif
 
 	// If we're forcing an update, state with a clean button state
 	if ( m_bForceUpdate )
