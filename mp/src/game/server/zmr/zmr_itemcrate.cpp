@@ -238,6 +238,14 @@ void CZMEntItemCrate::Spawn()
     SetModel( pszModelName );
     AddEFlags( EFL_NO_ROTORWASH_PUSH );
 
+    // Unfortunately, due to the model changes, we need to wake em up 
+    // to settle them to the ground.
+    auto* pPhys = VPhysicsGetObject();
+    if ( pPhys && pPhys->IsAsleep() )
+    {
+        pPhys->Wake();
+    }
+
 
     // Set skin based on item we house.
     auto* pHdr = GetModelPtr();
