@@ -275,6 +275,8 @@ Activity CZMBaseWeapon::GetPrimaryAttackActivity()
         return ACT_VM_PRIMARYATTACK;
 
     auto* pVM = pOwner->GetViewModel( m_nViewModelIndex );
+    if ( !pVM )
+        return ACT_VM_PRIMARYATTACK;
 
     // If we have last bullet, play fitting animation if we have it.
     bool bUseLastAct =  !IsMeleeWeapon()
