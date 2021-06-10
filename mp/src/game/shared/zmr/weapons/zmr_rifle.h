@@ -28,7 +28,8 @@ public:
     virtual Activity GetIdleActivity() const OVERRIDE { return IsZoomed() ? ACT_VM_IDLE_SPECIAL : BaseClass::GetIdleActivity(); }
     virtual Activity GetReloadStartAct() const OVERRIDE { return ACT_VM_RELOAD_START; }
     virtual Activity GetReloadEndAct() const OVERRIDE { return ACT_VM_RELOAD_FINISH; }
-    virtual Activity GetPumpAct() const OVERRIDE { return ACT_SHOTGUN_PUMP; }
+    virtual Activity GetPrimaryAttackActivity() OVERRIDE;
+    virtual Activity GetPumpAct() const OVERRIDE;
 
     virtual bool IsZoomed() const OVERRIDE { return m_bInZoom; }
     virtual bool CanZoom() const;

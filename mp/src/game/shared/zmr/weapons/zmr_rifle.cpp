@@ -4,6 +4,7 @@
 #include "items.h"
 #endif
 
+#include "animation.h"
 #include "ai_activity.h"
 #include "in_buttons.h"
 
@@ -161,4 +162,42 @@ void CZMWeaponRifle::StartReload()
     {
         CheckUnZoom();
     }
+}
+
+Activity CZMWeaponRifle::GetPrimaryAttackActivity()
+{
+    auto* pOwner = GetPlayerOwner();
+    if ( !pOwner || !IsZoomed() )
+        return BaseClass::GetPrimaryAttackActivity();
+
+    auto* pVM = pOwner->GetViewModel( m_nViewModelIndex );
+    if ( !pVM )
+        return BaseClass::GetPrimaryAttackActivity();
+
+
+    // If we have a zoomed-in attack, play that while zoomed.
+    const Activity actShootZoomed = ACT_VM_PRIMARYATTACK_SILENCED;
+
+    bool bHasZoomedInActivity = ::SelectHeaviestSequence( pVM->GetModelPtr(), actShootZoomed ) != ACTIVITY_NOT_AVAILABLE;
+
+    return bHasZoomedInActivity ? actShootZoomed : BaseClass::GetPrimaryAttackActivity();
+}
+
+Activity CZMWeaponRifle::GetPumpAct() const
+{
+    auto* pOwner = GetPlayerOwner();
+    if ( !pOwner || !IsZoomed() )
+        return BaseClass::GetPumpAct();
+
+    auto* pVM = pOwner->GetViewModel( m_nViewModelIndex );
+    if ( !pVM )
+        return BaseClass::GetPumpAct();
+
+
+    // If we have a zoomed-in pump, play that while zoomed.
+    const Activity actPumpZoomed = ACT_VM_RELOAD_SILENCED;
+
+    bool bHasZoomedInActivity = ::SelectHeaviestSequence( pVM->GetModelPtr(), actPumpZoomed ) != ACTIVITY_NOT_AVAILABLE;
+
+    return bHasZoomedInActivity ? actPumpZoomed : BaseClass::GetPumpAct();
 }
