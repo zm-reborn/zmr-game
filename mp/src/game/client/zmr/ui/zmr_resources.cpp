@@ -196,7 +196,7 @@ void CZMResourceHud::Paint()
     surface()->GetTextSize( m_hMediumFont, text, w2, h );
 
 	surface()->DrawSetTextFont( m_hMediumFont );
-	surface()->DrawSetTextPos( 60 + w - w2, offsety + 25 );
+	surface()->DrawSetTextPos( 112 - w2, offsety + 27 );
 	surface()->DrawSetTextColor( m_FgColor );
 	surface()->DrawPrintText( text, wcslen( text ) );
 
