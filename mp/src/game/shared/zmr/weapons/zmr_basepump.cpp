@@ -24,6 +24,15 @@ void CZMBasePumpConfig::LoadFromConfig( KeyValues* kv )
     flPumpTime = kv->GetFloat( "pumptime", -1.0f );
 }
 
+bool CZMBasePumpConfig::OverrideFromConfig( KeyValues* kv )
+{
+    auto ret = CZMBaseWeaponConfig::OverrideFromConfig( kv );
+
+    OVERRIDE_FROM_WEPCONFIG_F( kv, pumptime, flPumpTime );
+
+    return ret;
+}
+
 KeyValues* CZMBasePumpConfig::ToKeyValues() const
 {
     auto* kv = CZMBaseWeaponConfig::ToKeyValues();

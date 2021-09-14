@@ -465,14 +465,7 @@ bool CZMBaseWeaponConfig::OverrideFromConfig( KeyValues* kv )
     const char* pszTmp;
     
 #ifdef GAME_DLL
-    float invalid = -1337;
-    int tmp;
-
-
-
-    tmp = kv->GetInt( "clip_size", invalid );
-    if ( tmp != invalid )
-        nClipSize = tmp;
+    OVERRIDE_FROM_WEPCONFIG( kv, clip_size, nClipSize );
 
 
     auto* primattack = kv->FindKey( "PrimaryAttack" );
@@ -573,23 +566,12 @@ void CZMBaseWeaponConfig::OverrideAttack( KeyValues* kv, ZMAttackConfig_t& attac
 
 
     const char* pszTemp;
-    float temp;
     Vector vecTemp;
     Vector vecInvalid( invalidf, invalidf, invalidf );
 
-    temp = kv->GetFloat( "damage", invalidf );
-    if ( temp != invalidf )
-        attack.flDamage = temp;
-
-    temp = kv->GetFloat( "firerate", invalidf );
-    if ( temp != invalidf )
-        attack.flFireRate = temp;
-
-    temp = kv->GetFloat( "range", invalidf );
-    if ( temp != invalidf )
-        attack.flRange = temp;
-
-
+    OVERRIDE_FROM_WEPCONFIG_F( kv, damage, attack.flDamage );
+    OVERRIDE_FROM_WEPCONFIG_F( kv, firerate, attack.flFireRate );
+    OVERRIDE_FROM_WEPCONFIG_F( kv, range, attack.flRange );
 
     pszTemp = kv->GetString( "spread", nullptr );
     if ( pszTemp )

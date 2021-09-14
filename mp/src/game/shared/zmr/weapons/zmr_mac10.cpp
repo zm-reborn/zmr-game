@@ -45,6 +45,23 @@ public:
         }
     }
 
+    virtual bool OverrideFromConfig( KeyValues* kv ) OVERRIDE
+    {
+        auto ret = CZMBaseWeaponConfig::OverrideFromConfig( kv );
+
+        KeyValues* inner;
+
+        inner = kv->FindKey( "PrimaryAttack" );
+        if ( inner )
+        {
+            OVERRIDE_FROM_WEPCONFIG_F( inner, easy_dampen, flEasyDampen );
+            OVERRIDE_FROM_WEPCONFIG_F( inner, max_vertical_kick, flVerticalKick );
+            OVERRIDE_FROM_WEPCONFIG_F( inner, slide_limit, flSlideLimit );
+        }
+
+        return ret;
+    }
+
     virtual KeyValues* ToKeyValues() const OVERRIDE
     {
         auto* kv = CZMBaseWeaponConfig::ToKeyValues();

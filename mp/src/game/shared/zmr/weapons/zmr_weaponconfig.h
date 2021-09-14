@@ -79,6 +79,11 @@ namespace ZMWeaponConfig
     //
 
     //
+#define OVERRIDE_FROM_WEPCONFIG(kv, name, value) if ( kv->GetInt( #name, -1337 ) != -1337 ) { value = kv->GetInt( #name, -1337 ); }
+#define OVERRIDE_FROM_WEPCONFIG_F(kv, name, value) if ( kv->GetFloat( #name, -1337.0f ) != -1337.0f ) { value = kv->GetFloat( #name, -1337.0f ); }
+    //
+
+    //
     class CZMBaseWeaponConfig
     {
     public:

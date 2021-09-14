@@ -272,6 +272,19 @@ void CZMBaseThrowableConfig::LoadFromConfig( KeyValues* kv )
     CopyVector( kv->GetString( "angvel_max" ), vecAngularVel_Max );
 }
 
+bool CZMBaseThrowableConfig::OverrideFromConfig( KeyValues* kv )
+{
+    auto ret = CZMBaseWeaponConfig::OverrideFromConfig( kv );
+
+    OVERRIDE_FROM_WEPCONFIG_F( kv, throw_velocity, flThrowVelocity );
+    OVERRIDE_FROM_WEPCONFIG_F( kv, projectile_damage, flProjectileDamage );
+    OVERRIDE_FROM_WEPCONFIG_F( kv, projectile_radius, flProjectileRadius );
+
+    // ZMRTODO: Override angular velocity.
+
+    return ret;
+}
+
 KeyValues* CZMBaseThrowableConfig::ToKeyValues() const
 {
     auto* kv = CZMBaseWeaponConfig::ToKeyValues();

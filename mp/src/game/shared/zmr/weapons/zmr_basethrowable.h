@@ -36,6 +36,7 @@ public:
     CZMBaseThrowableConfig( const char* wepname, const char* configpath );
 
     virtual void LoadFromConfig( KeyValues* kv ) OVERRIDE;
+    virtual bool OverrideFromConfig( KeyValues* kv ) OVERRIDE;
 
     virtual KeyValues* ToKeyValues() const OVERRIDE;
 
