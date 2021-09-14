@@ -150,9 +150,17 @@ bool CZMWeaponMolotov::Holster( CBaseCombatWeapon* pSwitchTo )
 #ifdef CLIENT_DLL
 void CZMWeaponMolotov::DestroyClothFlameParticle()
 {
-    if ( m_hClothFlameParticle )
+    if ( m_hClothFlameParticle != nullptr )
     {
-        m_hClothFlameParticle->StopEmission();
+        auto* pPlayer = GetPlayerOwner();
+        auto* pVM = pPlayer ? pPlayer->GetViewModel() : nullptr;
+
+        if ( pVM != nullptr )
+        {
+            Assert( pVM->ParticleProp()->FindEffect( m_hClothFlameParticle ) != -1 );
+            pVM->ParticleProp()->StopEmission( m_hClothFlameParticle );
+        }
+
         m_hClothFlameParticle = nullptr;
     }
 }
@@ -266,7 +274,7 @@ bool CZMWeaponMolotov::OnFireEvent( C_BaseViewModel* pViewModel, const Vector& o
         return true;
     case AE_ZM_CLOTHFLAME :
         // Toggle cloth flame.
-        if ( m_hClothFlameParticle )
+        if ( m_hClothFlameParticle != nullptr )
         {
             DestroyClothFlameParticle();
         }

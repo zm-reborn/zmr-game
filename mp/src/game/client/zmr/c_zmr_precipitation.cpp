@@ -484,11 +484,17 @@ void C_ZMPrecipitationSystem::UpdateParticles()
     }
 }
 
+// IMPORTANT: Always destroy particle systems through the particle prop and not directly.
+// The prop holds a reference to the particle system.
+// There was a crash when an entity was destroyed with its particle prop in ParticleProperty::StopEmission.
 void C_ZMPrecipitationSystem::DestroyInnerParticlePrecip()
 {
     if ( m_pParticlePrecipInner )
     {
-        m_pParticlePrecipInner->StopEmission();
+        auto* pParticles = ParticleProp();
+        Assert( pParticles->FindEffect( m_pParticlePrecipInner ) != -1 );
+
+        pParticles->StopEmission( m_pParticlePrecipInner );
         m_pParticlePrecipInner = nullptr;
     }
 }
@@ -497,7 +503,10 @@ void C_ZMPrecipitationSystem::DestroyOuterParticlePrecip()
 {
     if ( m_pParticlePrecipOuter )
     {
-        m_pParticlePrecipOuter->StopEmission();
+        auto* pParticles = ParticleProp();
+        Assert( pParticles->FindEffect( m_pParticlePrecipOuter ) != -1 );
+
+        pParticles->StopEmission( m_pParticlePrecipOuter );
         m_pParticlePrecipOuter = nullptr;
     }
 }
@@ -506,7 +515,10 @@ void C_ZMPrecipitationSystem::DestroyMistParticlePrecip()
 {
     if ( m_pParticlePrecipMist )
     {
-        m_pParticlePrecipMist->StopEmission();
+        auto* pParticles = ParticleProp();
+        Assert( pParticles->FindEffect( m_pParticlePrecipMist ) != -1 );
+
+        pParticles->StopEmission( m_pParticlePrecipMist );
         m_pParticlePrecipMist = nullptr;
     }
 }
