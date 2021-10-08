@@ -492,8 +492,6 @@ void C_ZMPrecipitationSystem::DestroyInnerParticlePrecip()
     if ( m_pParticlePrecipInner )
     {
         auto* pParticles = ParticleProp();
-        Assert( pParticles->FindEffect( m_pParticlePrecipInner ) != -1 );
-
         pParticles->StopEmission( m_pParticlePrecipInner );
         m_pParticlePrecipInner = nullptr;
     }
@@ -504,8 +502,6 @@ void C_ZMPrecipitationSystem::DestroyOuterParticlePrecip()
     if ( m_pParticlePrecipOuter )
     {
         auto* pParticles = ParticleProp();
-        Assert( pParticles->FindEffect( m_pParticlePrecipOuter ) != -1 );
-
         pParticles->StopEmission( m_pParticlePrecipOuter );
         m_pParticlePrecipOuter = nullptr;
     }
@@ -516,8 +512,6 @@ void C_ZMPrecipitationSystem::DestroyMistParticlePrecip()
     if ( m_pParticlePrecipMist )
     {
         auto* pParticles = ParticleProp();
-        Assert( pParticles->FindEffect( m_pParticlePrecipMist ) != -1 );
-
         pParticles->StopEmission( m_pParticlePrecipMist );
         m_pParticlePrecipMist = nullptr;
     }

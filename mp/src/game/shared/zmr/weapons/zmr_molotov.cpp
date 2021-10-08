@@ -157,7 +157,6 @@ void CZMWeaponMolotov::DestroyClothFlameParticle()
 
         if ( pVM != nullptr )
         {
-            Assert( pVM->ParticleProp()->FindEffect( m_hClothFlameParticle ) != -1 );
             pVM->ParticleProp()->StopEmission( m_hClothFlameParticle );
         }
 
