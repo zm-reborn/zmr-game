@@ -8,8 +8,8 @@ You can read it [here](https://github.com/zm-reborn/zmr-game/blob/master/LICENSE
 
 ### Windows
 1. Download [Visual Studio 2019](https://visualstudio.microsoft.com/vs/)
-2. Download components: **MSVC v142** and **Windows SDK 10.0** .
-3. Run `mp/src/fix_vcxproj.bat` and `mp/src/creategameprojects.bat`, preferably in cmd with admin privileges. (right click Windows icon -> Windows Powershell (Admin) -> `cmd` -> cd your way to project folder)
+2. Download components: **MSVC v142** and **Windows SDK 10.0.20348.0**.
+3. Run `mp/src/creategameprojects.bat`.
 4. You now have a solution file mp/src/zmr-games.sln
 
 ### Linux
@@ -51,7 +51,7 @@ Yes.
 
 **Project refuses to compile, says something about wrong/missing toolset.**
 
-Open project settings and make sure `Platform Toolset` is `v142` and `Windows SDK Version` is `10.0` (other 10.X versions should also work).
+Open project settings and make sure `Platform Toolset` is `v142` and `Windows SDK Version` is `10.0.20348.0` or lower.
 If it says one of them is missing, you need to download them from Visual Studio Installer (Tools -> Get Tools and Features)
 
 If you're having problems, just [ask Mehis in Discord](https://discord.gg/tZTUex3).
