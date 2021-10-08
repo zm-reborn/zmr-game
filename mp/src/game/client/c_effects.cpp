@@ -1675,7 +1675,7 @@ CSnowFallManager::CSnowFallManager( void )
 	m_vecSnowFallEmitOrigin.Init();
 	m_flSnowRadius = 0.0f;
 	m_vecMin.Init( FLT_MAX, FLT_MAX, FLT_MAX );
-	m_vecMax.Init( FLT_MIN, FLT_MIN, FLT_MIN );
+	m_vecMax.Init( -FLT_MAX, -FLT_MAX, -FLT_MAX );
 	m_nActiveSnowCount = 0;
 	m_aSnow.Purge();
 }

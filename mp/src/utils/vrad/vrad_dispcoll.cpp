@@ -865,7 +865,7 @@ bool CVRADDispColl::InitParentPatch( int iPatch, Vector *pPoints, float &flArea 
 
 	// Calculate the mins/maxs.
 	Vector vecMin( FLT_MAX, FLT_MAX, FLT_MAX );
-	Vector vecMax( FLT_MIN, FLT_MIN, FLT_MIN );
+	Vector vecMax( -FLT_MAX, -FLT_MAX, -FLT_MAX );
 	for ( int iPoint = 0; iPoint < 4; ++iPoint )
 	{
 		for ( int iAxis = 0; iAxis < 3; ++iAxis )
@@ -1014,7 +1014,7 @@ bool CVRADDispColl::InitPatch( int iPatch, int iParentPatch, int iChild, Vector 
 
 	// Calculate the mins/maxs.
 	Vector vecMin( FLT_MAX, FLT_MAX, FLT_MAX );
-	Vector vecMax( FLT_MIN, FLT_MIN, FLT_MIN );
+	Vector vecMax( -FLT_MAX, -FLT_MAX, -FLT_MAX );
 	for ( int iPoint = 0; iPoint < 3; ++iPoint )
 	{
 		for ( int iAxis = 0; iAxis < 3; ++iAxis )
