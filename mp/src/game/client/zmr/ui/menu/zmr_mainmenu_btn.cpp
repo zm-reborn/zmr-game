@@ -203,7 +203,6 @@ void CZMMainMenuButton::PositionSubButtons()
     int px, py;
     GetPos( px, py );
 
-    const int size_x = GetWide();
     const int size_y = GetTall() * 0.6f;
 
 
