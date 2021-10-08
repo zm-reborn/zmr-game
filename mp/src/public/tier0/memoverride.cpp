@@ -278,7 +278,12 @@ extern "C"
 		return pMemOut;
 	}
 
+	// HACK: Windows SDK 10.0.20348.0 changed this.
+#if _MSC_VER >= 1900 && defined( _CRT_NOEXCEPT )
+	size_t _msize_base( void *pMem ) _CRT_NOEXCEPT
+#else
 	size_t _msize_base( void *pMem )
+#endif
 	{
 		return g_pMemAlloc->GetSize(pMem);
 	}
