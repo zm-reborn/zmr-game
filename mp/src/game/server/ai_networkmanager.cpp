@@ -1042,6 +1042,17 @@ void CAI_NetworkManager::Spawn ( void )
 
 void CAI_NetworkManager::DelayedInit( void )
 {
+#ifdef ZMR // ZMRCHANGE: Don't generate a node graph if we have a nav mesh.
+    if ( TheNavMesh->IsLoaded() )
+    {
+        SetThink( nullptr );
+		// Consider the network loaded, so pseudo NPCs (like npc_enemyfinder) will work.
+		gm_fNetworksLoaded = true;
+		m_fInitalized = true;
+        return;
+    }
+#endif
+
 	if ( !g_pGameRules->FAllowNPCs() )
 	{
 		SetThink ( NULL );
@@ -1058,13 +1069,6 @@ void CAI_NetworkManager::DelayedInit( void )
 		// ----------------------------------------------------------
 		if (m_bNeedGraphRebuild)
 		{
-#ifdef ZMR // ZMRCHANGE: Don't generate a node graph if we have a nav mesh.
-            if ( TheNavMesh->IsLoaded() )
-            {
-                SetThink( nullptr );
-                return;
-            }
-#endif
 			Assert( !m_bDontSaveGraph );
 
 			BuildNetworkGraph();	// For now only one AI Network
