@@ -101,7 +101,7 @@ void CZMRNavMesh::UpdateTransientAreas()
     CZMNavTransientFilter filter;
     Vector mins, maxs, center;
 
-    const bool bDebugging = zm_sv_debug_nav_transient.GetBool();
+    const bool bDebugging = zm_sv_debug_nav_transient.GetFloat() > 0.0f;
 
 
     FOR_EACH_VEC( areas, i )
@@ -160,7 +160,7 @@ void CZMRNavMesh::UpdateFloorCheckAreas()
     CZMNavTransientFilter filter;
     Vector mins, maxs, center;
 
-    const bool bDebugging = zm_sv_debug_nav_transient_nofloor.GetBool();
+    const bool bDebugging = zm_sv_debug_nav_transient_nofloor.GetFloat() > 0.0f;
 
 
     FOR_EACH_VEC( areas, i )
@@ -195,7 +195,7 @@ void CZMRNavMesh::UpdateFloorCheckAreas()
 
         if ( bDebugging )
         {
-            NDebugOverlay::SweptBox( center, center, mins, maxs, vec3_angle, bBlock ? 255 : 0, (!bBlock) ? 255 : 0, 0, 255, zm_sv_debug_nav_transient.GetFloat() );
+            NDebugOverlay::SweptBox( center, center, mins, maxs, vec3_angle, bBlock ? 255 : 0, (!bBlock) ? 255 : 0, 0, 255, zm_sv_debug_nav_transient_nofloor.GetFloat() );
         }
 
 
