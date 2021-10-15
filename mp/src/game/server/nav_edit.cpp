@@ -29,6 +29,10 @@
 #include "dota_player.h"
 #endif
 
+#ifdef ZMR
+#include "nav/zmr_nav_mesh.h"
+#endif
+
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
 
@@ -979,6 +983,9 @@ void CNavMesh::DrawEditMode( void )
 					if ( attributes & NAV_MESH_STAIRS )		Q_strncat( attrib, "STAIRS ", sizeof( attrib ), -1 );
 					if ( attributes & NAV_MESH_OBSTACLE_TOP ) Q_strncat( attrib, "OBSTACLE ", sizeof( attrib ), -1 );
 					if ( attributes & NAV_MESH_CLIFF )		Q_strncat( attrib, "CLIFF ", sizeof( attrib ), -1 );
+#ifdef ZMR
+					if ( attributes & NAV_MESH_ZMR_NOFLOOR )Q_strncat( attrib, "NO FLOOR ", sizeof( attrib ), -1 );
+#endif
 #ifdef TERROR
 					if ( attributes & TerrorNavArea::NAV_PLAYERCLIP )		Q_strncat( attrib, "PLAYERCLIP ", sizeof( attrib ), -1 );
 					if ( attributes & TerrorNavArea::NAV_BREAKABLEWALL )	Q_strncat( attrib, "BREAKABLEWALL ", sizeof( attrib ), -1 );

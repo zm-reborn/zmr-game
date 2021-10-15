@@ -25,6 +25,10 @@
 #include "NextBot/NavMeshEntities/func_nav_prerequisite.h"
 #endif
 
+#ifdef ZMR
+#include "nav/zmr_nav_mesh.h"
+#endif
+
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
 
@@ -2816,6 +2820,9 @@ NavAttributeLookup TheNavAttributeTable[] =
 #ifdef TERROR
 	{ "PLAYERCLIP", (NavAttributeType)CNavArea::NAV_PLAYERCLIP },
 	{ "BREAKABLEWALL", (NavAttributeType)CNavArea::NAV_BREAKABLEWALL },
+#endif
+#ifdef ZMR
+	{ "NO_FLOOR", (NavAttributeType)NAV_MESH_ZMR_NOFLOOR },
 #endif
 	{ NULL, NAV_MESH_INVALID }
 };
