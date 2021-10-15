@@ -108,9 +108,8 @@ void CZMRNavMesh::UpdateTransientAreas()
     {
         auto* area = static_cast<CZMRNavArea*>( areas[i] );
 
+        // No floor areas are updated separately.
         if ( area->GetAttributes() & NAV_MESH_ZMR_NOFLOOR )
-            continue;
-        if ( area->IsBlocked( TEAM_ANY ) )
             continue;
 
 
@@ -146,6 +145,10 @@ void CZMRNavMesh::UpdateTransientAreas()
         if ( bBlock )
         {
             area->MarkAsBlocked( TEAM_ANY, nullptr );
+        }
+        else if ( area->IsBlocked( TEAM_ANY ) )
+        {
+            area->UnblockArea( TEAM_ANY );
         }
     }
 }
