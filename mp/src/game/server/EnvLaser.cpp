@@ -18,7 +18,7 @@ LINK_ENTITY_TO_CLASS( env_laser, CEnvLaser );
 BEGIN_DATADESC( CEnvLaser )
 
 	DEFINE_KEYFIELD( m_iszLaserTarget, FIELD_STRING, "LaserTarget" ),
-	DEFINE_FIELD( m_pSprite, FIELD_CLASSPTR ),
+	DEFINE_FIELD( m_hSprite, FIELD_EHANDLE ),
 	DEFINE_KEYFIELD( m_iszSpriteName, FIELD_STRING, "EndSprite" ),
 	DEFINE_FIELD( m_firePosition, FIELD_VECTOR ),
 	DEFINE_KEYFIELD( m_flStartFrame, FIELD_FLOAT, "framestart" ),
@@ -54,19 +54,19 @@ void CEnvLaser::Spawn( void )
 
 	Precache( );
 
-	if ( !m_pSprite && m_iszSpriteName != NULL_STRING )
+	if ( !m_hSprite.Get() && m_iszSpriteName != NULL_STRING )
 	{
-		m_pSprite = CSprite::SpriteCreate( STRING(m_iszSpriteName), GetAbsOrigin(), TRUE );
+		m_hSprite = CSprite::SpriteCreate( STRING(m_iszSpriteName), GetAbsOrigin(), TRUE );
 	}
 	else
 	{
-		m_pSprite = NULL;
+		m_hSprite.Set( nullptr );
 	}
 
-	if ( m_pSprite )
+	if ( m_hSprite.Get() )
 	{
-		m_pSprite->SetParent( GetMoveParent() );
-		m_pSprite->SetTransparency( kRenderGlow, m_clrRender->r, m_clrRender->g, m_clrRender->b, m_clrRender->a, m_nRenderFX );
+		m_hSprite->SetParent( GetMoveParent() );
+		m_hSprite->SetTransparency( kRenderGlow, m_clrRender->r, m_clrRender->g, m_clrRender->b, m_clrRender->a, m_nRenderFX );
 	}
 
 	if ( GetEntityName() != NULL_STRING && !(m_spawnflags & SF_BEAM_STARTON) )
@@ -178,8 +178,8 @@ void CEnvLaser::InputToggle( inputdata_t &inputdata )
 void CEnvLaser::TurnOff( void )
 {
 	AddEffects( EF_NODRAW );
-	if ( m_pSprite )
-		m_pSprite->TurnOff();
+	if ( m_hSprite.Get() )
+		m_hSprite->TurnOff();
 
 	SetNextThink( TICK_NEVER_THINK );
 	SetThink( NULL );
@@ -192,8 +192,8 @@ void CEnvLaser::TurnOff( void )
 void CEnvLaser::TurnOn( void )
 {
 	RemoveEffects( EF_NODRAW );
-	if ( m_pSprite )
-		m_pSprite->TurnOn();
+	if ( m_hSprite.Get() )
+		m_hSprite->TurnOn();
 
 	m_flFireTime = gpGlobals->curtime;
 
@@ -213,9 +213,9 @@ void CEnvLaser::TurnOn( void )
 void CEnvLaser::FireAtPoint( trace_t &tr )
 {
 	SetAbsEndPos( tr.endpos );
-	if ( m_pSprite )
+	if ( m_hSprite.Get() )
 	{
-		UTIL_SetOrigin( m_pSprite, tr.endpos );
+		UTIL_SetOrigin( m_hSprite, tr.endpos );
 	}
 
 	// Apply damage and do sparks every 1/10th of a second.

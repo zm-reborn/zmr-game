@@ -41,7 +41,7 @@ public:
 	DECLARE_DATADESC();
 
 	string_t m_iszLaserTarget;	// Name of entity or entities to strike at, randomly picked if more than one match.
-	CSprite	*m_pSprite;
+	CHandle<CSprite> m_hSprite;
 	string_t m_iszSpriteName;
 	Vector  m_firePosition;
 

@@ -2604,7 +2604,7 @@ public:
 	DECLARE_DATADESC();
 
 private:
-	CEnvLaser	*m_pLaser;
+	CHandle<CEnvLaser> m_hLaser;
 	float	m_laserTime;
 	string_t m_iszLaserName;
 };
@@ -2614,7 +2614,7 @@ BEGIN_DATADESC( CFuncTankLaser )
 
 	DEFINE_KEYFIELD( m_iszLaserName, FIELD_STRING, "laserentity" ),
 
-	DEFINE_FIELD( m_pLaser, FIELD_CLASSPTR ),
+	DEFINE_FIELD( m_hLaser, FIELD_EHANDLE ),
 	DEFINE_FIELD( m_laserTime, FIELD_TIME ),
 
 END_DATADESC()
@@ -2631,15 +2631,15 @@ void CFuncTankLaser::Activate( void )
 	}
 	else
 	{
-		m_pLaser->TurnOff();
+		m_hLaser->TurnOff();
 	}
 }
 
 
 CEnvLaser *CFuncTankLaser::GetLaser( void )
 {
-	if ( m_pLaser )
-		return m_pLaser;
+	if ( m_hLaser.Get() != nullptr )
+		return m_hLaser;
 
 	CBaseEntity *pLaser = gEntList.FindEntityByName( NULL, m_iszLaserName );
 	while ( pLaser )
@@ -2647,7 +2647,7 @@ CEnvLaser *CFuncTankLaser::GetLaser( void )
 		// Found the landmark
 		if ( FClassnameIs( pLaser, "env_laser" ) )
 		{
-			m_pLaser = (CEnvLaser *)pLaser;
+			m_hLaser = (CEnvLaser *)pLaser;
 			break;
 		}
 		else
@@ -2656,14 +2656,14 @@ CEnvLaser *CFuncTankLaser::GetLaser( void )
 		}
 	}
 
-	return m_pLaser;
+	return m_hLaser;
 }
 
 
 void CFuncTankLaser::Think( void )
 {
-	if ( m_pLaser && (gpGlobals->curtime > m_laserTime) )
-		m_pLaser->TurnOff();
+	if ( m_hLaser.Get() && (gpGlobals->curtime > m_laserTime) )
+		m_hLaser->TurnOff();
 
 	CFuncTank::Think();
 }
@@ -2674,18 +2674,19 @@ void CFuncTankLaser::Fire( int bulletCount, const Vector &barrelEnd, const Vecto
 	int i;
 	trace_t tr;
 
-	if ( GetLaser() )
+	CEnvLaser *pLaser = GetLaser();
+	if ( pLaser )
 	{
 		for ( i = 0; i < bulletCount; i++ )
 		{
-			m_pLaser->SetLocalOrigin( barrelEnd );
+			pLaser->SetLocalOrigin( barrelEnd );
 			TankTrace( barrelEnd, forward, gTankSpread[m_spread], tr );
 			
 			m_laserTime = gpGlobals->curtime;
-			m_pLaser->TurnOn();
-			m_pLaser->SetFireTime( gpGlobals->curtime - 1.0 );
-			m_pLaser->FireAtPoint( tr );
-			m_pLaser->SetNextThink( TICK_NEVER_THINK );
+			pLaser->TurnOn();
+			pLaser->SetFireTime( gpGlobals->curtime - 1.0 );
+			pLaser->FireAtPoint( tr );
+			pLaser->SetNextThink( TICK_NEVER_THINK );
 		}
 		CFuncTank::Fire( bulletCount, barrelEnd, forward, this, bIgnoreSpread );
 	}
