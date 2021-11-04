@@ -214,8 +214,6 @@ bool ClientModeZMNormal::DoPostScreenSpaceEffects( const CViewSetup* pSetup )
 
 void ClientModeZMNormal::PostRender()
 {
-    g_ZMVision.UpdateLight();
-
     BaseClass::PostRender();
 }
 

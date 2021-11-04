@@ -4,7 +4,7 @@
 class CZMVision
 {
 public:
-    CZMVision() { m_Silhouettes.Purge(); };
+    CZMVision();
 
 
     void RenderSilhouette();
@@ -19,14 +19,22 @@ public:
     void AddSilhouette( C_BaseEntity* pEnt );
     void RemoveSilhouette( C_BaseEntity* pEnt );
 
+    void Init();
+
 protected:
     CUtlVector<C_BaseEntity*> m_Silhouettes;
 
     bool m_bIsOn;
 
+    ClientShadowHandle_t m_FlashlightHandle;
+    // Texture for flashlight
+    CTextureReference m_FlashlightTexture;
+
 private:
     void SetVision( bool bEnable );
     void SetVisionOff();
+
+    void DestroyFlashlight();
 };
 
 extern CZMVision g_ZMVision;

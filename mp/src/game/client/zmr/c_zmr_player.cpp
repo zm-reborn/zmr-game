@@ -179,9 +179,6 @@ C_ZMPlayer::~C_ZMPlayer()
 void C_ZMPlayer::Spawn()
 {
     BaseClass::Spawn();
-
-    if ( !IsLocalPlayer() )
-        g_ZMVision.AddSilhouette( this );
 }
 
 C_ZMPlayer* C_ZMPlayer::GetLocalPlayer()
@@ -466,6 +463,8 @@ void C_ZMPlayer::Simulate()
 
     // Update player's flashlight
     UpdateFlashlight();
+
+    g_ZMVision.UpdateLight();
 
 
 	if ( gpGlobals->frametime != 0.0f  )
@@ -983,6 +982,18 @@ void C_ZMPlayer::PostDataUpdate( DataUpdateType_t updateType )
     }
 
     BaseClass::PostDataUpdate( updateType );
+
+    if ( updateType == DATA_UPDATE_CREATED )
+    {
+        if ( IsLocalPlayer() )
+        {
+            g_ZMVision.Init();
+        }
+        else
+        {
+            g_ZMVision.AddSilhouette( this );
+        }
+    }
 }
 
 void C_ZMPlayer::ReleaseFlashlight()

@@ -1,27 +1,51 @@
 #include "cbase.h"
-#include "dlight.h"
-#include "iefx.h"
 #include "model_types.h"
+#include "view.h"
 
 #include "c_zmr_player.h"
 #include "c_zmr_util.h"
 #include "c_zmr_zmvision.h"
 
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
 
-ConVar zm_cl_zmvision_dlight( "zm_cl_zmvision_dlight", "1", FCVAR_ARCHIVE, "Does ZM vision have a dynamic light?" );
+ConVar zm_cl_zmvision_dlight( "zm_cl_zmvision_dlight", "1", FCVAR_ARCHIVE, "Does ZM vision light up the area? No longer a dynamic light." );
+ConVar zm_cl_zmvision_color( "zm_cl_zmvision_color", "0.6 0.2 0.2 1", FCVAR_ARCHIVE, "" );
+ConVar zm_cl_zmvision_farz( "zm_cl_zmvision_farz", "4096" );
+
 ConVar zm_cl_zmvision_playsound( "zm_cl_zmvision_playsound", "1", FCVAR_ARCHIVE, "Is a sound played when ZM Vision is toggled?" );
 
 ConVar zm_cl_silhouette_onlyzmvision( "zm_cl_silhouette_onlyzmvision", "1", FCVAR_ARCHIVE, "Are silhouettes rendered only when ZM vision is on?" );
 ConVar zm_cl_silhouette_strength( "zm_cl_silhouette_strength", "0.8", FCVAR_ARCHIVE );
 
+extern ConVar r_flashlightnear;
+extern ConVar r_flashlightfar;
+extern ConVar r_flashlightdepthres;
+extern ConVar r_flashlightconstant;
+extern ConVar r_flashlightlinear;
+extern ConVar r_flashlightquadratic;
+extern ConVar r_flashlightambient;
+extern ConVar r_flashlightshadowatten;
+extern ConVar mat_slopescaledepthbias_shadowmap;
+extern ConVar mat_depthbias_shadowmap;
 
+void UTIL_ParseFloatColorFromString( const char* str, float clr[], int nColors );
 
 
 CZMVision g_ZMVision;
 
+CZMVision::CZMVision()
+{
+    m_Silhouettes.Purge();
+    m_FlashlightHandle = CLIENTSHADOW_INVALID_HANDLE;
+}
+
+void CZMVision::Init()
+{
+    m_FlashlightTexture.Init( "effects/flashlight_zm", TEXTURE_GROUP_OTHER );
+}
 
 void CZMVision::RenderSilhouette()
 {
@@ -114,31 +138,69 @@ void CZMVision::RenderSilhouette()
 
 void CZMVision::UpdateLight()
 {
-    if ( !IsOn() ) return;
+    if ( !IsOn() || !zm_cl_zmvision_dlight.GetBool() )
+    {
+        DestroyFlashlight();
+        return;
+    }
 
-    if ( !zm_cl_zmvision_dlight.GetBool() ) return;
+    auto* pPlayer = C_ZMPlayer::GetLocalPlayer();
+    if ( !pPlayer )
+    {
+        DestroyFlashlight();
+        return;
+    }
 
+    auto pos = MainViewOrigin();
+    auto fwd = MainViewForward();
+    auto up = MainViewUp();
+    auto right = MainViewRight();
 
-    C_ZMPlayer* pPlayer = C_ZMPlayer::GetLocalPlayer();
+    float fov = pPlayer->GetFOV();
 
-    if ( !pPlayer ) return;
+    auto aspect_ratio = engine->GetScreenAspectRatio();
+    if ( aspect_ratio <= 0.0f )
+    {
+        aspect_ratio = 1.0f;
+    }
 
+    aspect_ratio *= 0.75f; // ??? Taken from ScreenToWorld. It works...
 
-    dlight_t* dl = effects->CL_AllocDlight( pPlayer->entindex() );
+    float colors[4];
+    UTIL_ParseFloatColorFromString( zm_cl_zmvision_color.GetString(), colors, 4 );
 
-    if ( !dl ) return;
+    FlashlightState_t state;
+    state.m_vecLightOrigin = pos;
+    BasisToQuaternion( fwd, right, up, state.m_quatOrientation );
+    state.m_fHorizontalFOVDegrees = fov * aspect_ratio;
+    state.m_fVerticalFOVDegrees = fov;
+    state.m_fQuadraticAtten = r_flashlightquadratic.GetFloat();
+    state.m_fConstantAtten = r_flashlightconstant.GetFloat();
+    state.m_fLinearAtten = r_flashlightlinear.GetFloat();
+    state.m_Color[0] = colors[0];
+    state.m_Color[1] = colors[1];
+    state.m_Color[2] = colors[2];
+    state.m_Color[3] = colors[3];
+    state.m_NearZ = r_flashlightnear.GetFloat();
+    state.m_FarZ = zm_cl_zmvision_farz.GetFloat();
+    state.m_bEnableShadows = false;
+    state.m_flShadowMapResolution = r_flashlightdepthres.GetInt();
+    state.m_pSpotlightTexture = m_FlashlightTexture;
+    state.m_nSpotlightTextureFrame = 0;
+    state.m_flShadowAtten = r_flashlightshadowatten.GetFloat();
+    state.m_flShadowSlopeScaleDepthBias = mat_slopescaledepthbias_shadowmap.GetFloat();
+    state.m_flShadowDepthBias = mat_depthbias_shadowmap.GetFloat();
 
+    if ( m_FlashlightHandle == CLIENTSHADOW_INVALID_HANDLE )
+    {
+        m_FlashlightHandle = g_pClientShadowMgr->CreateFlashlight( state );
+    }
+    else
+    {
+        g_pClientShadowMgr->UpdateFlashlightState( m_FlashlightHandle, state );
+    }
     
-    dl->origin          = pPlayer->EyePosition();
-
-    dl->color.r         = 255;
-    dl->color.g         = 100;
-    dl->color.b         = 100;
-    dl->color.exponent  = 2;
-
-    dl->radius          = 4096.0f;
-    dl->decay           = dl->radius;
-    dl->die             = gpGlobals->curtime + 1.0f;
+    g_pClientShadowMgr->UpdateProjectedTexture( m_FlashlightHandle, true );
 }
 
 void CZMVision::TurnOff()
@@ -156,7 +218,20 @@ void CZMVision::Toggle()
     SetVision( !IsOn() );
 }
 
-void CZMVision::SetVisionOff() { m_bIsOn = false; };
+void CZMVision::SetVisionOff()
+{
+    m_bIsOn = false;
+    DestroyFlashlight();
+}
+
+void CZMVision::DestroyFlashlight()
+{
+    if ( m_FlashlightHandle != CLIENTSHADOW_INVALID_HANDLE )
+    {
+        g_pClientShadowMgr->DestroyFlashlight( m_FlashlightHandle );
+        m_FlashlightHandle = CLIENTSHADOW_INVALID_HANDLE;
+    }
+}
 
 void CZMVision::SetVision( bool bEnable )
 {
@@ -175,6 +250,11 @@ void CZMVision::SetVision( bool bEnable )
     }
 
     m_bIsOn = bEnable;
+    
+    if ( !bEnable )
+    {
+        DestroyFlashlight();
+    }
 }
 
 void CZMVision::AddSilhouette( C_BaseEntity* pEnt )
