@@ -38,6 +38,8 @@ ConVar	sv_gravity		( "sv_gravity", DEFAULT_GRAVITY_STRING, FCVAR_NOTIFY | FCVAR_
 
 #if defined( DOD_DLL ) || defined( CSTRIKE_DLL ) || defined( HL1MP_DLL )
 ConVar	sv_stopspeed	( "sv_stopspeed","100", FCVAR_NOTIFY | FCVAR_REPLICATED, "Minimum stopping speed when on ground." );
+#elif defined( ZMR )
+ConVar	sv_stopspeed	( "sv_stopspeed","80", FCVAR_NOTIFY | FCVAR_REPLICATED, "Minimum stopping speed when on ground." );
 #else
 ConVar	sv_stopspeed	( "sv_stopspeed","100", FCVAR_NOTIFY | FCVAR_REPLICATED | FCVAR_DEVELOPMENTONLY, "Minimum stopping speed when on ground." );
 #endif // DOD_DLL || CSTRIKE_DLL
@@ -60,6 +62,8 @@ ConVar	sv_maxspeed		( "sv_maxspeed", "320", FCVAR_NOTIFY | FCVAR_REPLICATED | FC
 
 #if defined( CSTRIKE_DLL ) || defined( HL1MP_DLL )
 	ConVar	sv_accelerate	( "sv_accelerate", "10", FCVAR_NOTIFY | FCVAR_REPLICATED);
+#elif defined( ZMR )
+	ConVar	sv_accelerate	( "sv_accelerate", "6", FCVAR_NOTIFY | FCVAR_REPLICATED );
 #else
 	ConVar	sv_accelerate	( "sv_accelerate", "10", FCVAR_NOTIFY | FCVAR_REPLICATED | FCVAR_DEVELOPMENTONLY);
 #endif // CSTRIKE_DLL
