@@ -222,6 +222,7 @@ $Project "Server (ZMR)"
 			}
 			$Folder "Weapons"
 			{
+				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_ar9mm.cpp"
 				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_base.cpp"
 				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_base.h"
 				$File	"$SRCDIR\game\shared\zmr\weapons\zmr_basemelee.cpp"
