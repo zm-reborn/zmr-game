@@ -60,7 +60,7 @@ public:
     void PrimaryAttack() OVERRIDE;
     bool Deploy() OVERRIDE;
     bool Holster( CBaseCombatWeapon* pSwitchTo = nullptr ) OVERRIDE;
-    bool CanHolster() const OVERRIDE { return GetThrowState() < THROWSTATE_DRAW_BACK && GetThrowState() >= THROWSTATE_IDLE; }
+    bool CanHolster() const OVERRIDE { return GetThrowState() <= THROWSTATE_ARMING; }
     bool CanBeDropped() const OVERRIDE { return CanHolster(); }
 
     void HandleAnimEventLight();
@@ -192,25 +192,10 @@ void CZMWeaponMolotov::HandleAnimEventLight()
 
     if ( !pPlayer ) return;
 
-    // HACK
-    SetThrowState( (ZMThrowState_t)((int)GetThrowState() + 1) );
-    switch ( (int)GetThrowState() )
-    {
-    case 1 :
-    case 2 : SendWeaponAnim( ACT_VM_PRIMARYATTACK_2 ); break;
-    case 3 : SendWeaponAnim( ACT_VM_PRIMARYATTACK_3 ); break;
-    default : break;
-    }
 
+    SetThrowState( THROWSTATE_DRAW_BACK );
 
-    if (GetThrowState() >= THROWSTATE_DRAW_BACK ||
-        (GetThrowState() < THROWSTATE_DRAW_BACK
-    &&  random->RandomInt( 0, 100 ) < MIN( pPlayer->GetHealth(), 100 )) )
-    {
-        SetThrowState( THROWSTATE_DRAW_BACK );
-
-        SendWeaponAnim( ACT_VM_PRIMARYATTACK_4 );
-    }
+    SendWeaponAnim( ACT_VM_PRIMARYATTACK_4 );
 
     DevMsg( "Set throw state to: %i\n", (int)GetThrowState() );
 }

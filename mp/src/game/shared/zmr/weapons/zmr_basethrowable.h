@@ -15,12 +15,8 @@ enum ZMThrowState_t
     THROWSTATE_IDLE = 0,
     
     THROWSTATE_ARMING, // Igniting. DRAW_BACK needs to be called manually...
-    // 1
-    // 2
-    // 3
-    // TODO: These are used by the molotov. Please refactor this at some point.
 
-    THROWSTATE_DRAW_BACK = 4, // Getting it ready to throw.
+    THROWSTATE_DRAW_BACK, // Getting it ready to throw.
 
     THROWSTATE_READYTOTHROW, // Throwable!
 
