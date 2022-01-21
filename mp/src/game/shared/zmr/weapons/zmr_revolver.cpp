@@ -10,82 +10,12 @@
 
 
 #include "zmr_shareddefs.h"
-#include "zmr_base.h"
+#include "zmr_revolver.h"
 
 
 #include "zmr_player_shared.h"
 
-
-#ifdef CLIENT_DLL
-#define CZMWeaponRevolver C_ZMWeaponRevolver
-#endif
-
-class CZMWeaponRevolver : public CZMBaseWeapon
-{
-public:
-	DECLARE_CLASS( CZMWeaponRevolver, CZMBaseWeapon );
-	DECLARE_NETWORKCLASS(); 
-	DECLARE_PREDICTABLE();
-
-
-    CZMWeaponRevolver();
-
-
-    virtual bool Deploy() OVERRIDE;
-
-
-    virtual Vector GetBulletSpread() const OVERRIDE
-    {
-        Vector cone = BaseClass::GetBulletSpread();
-
-        CZMPlayer* pOwner = GetPlayerOwner();
-
-        if ( pOwner )
-        {
-            float ratio = 1.0f - pOwner->GetAccuracyRatio();
-            ratio *= ratio;
-            
-            
-            // 2 degrees
-#define     SECONDARY_MIN_RATIO         0.1f
-
-            const bool bIsSecondary = IsInSecondaryAttack();
-
-            // Secondary is not perfectly accurate.
-            if ( bIsSecondary )
-                ratio = MAX( SECONDARY_MIN_RATIO, ratio );
-
-
-
-            cone.x = ratio * cone.x;
-            cone.y = ratio * cone.y;
-            cone.z = ratio * cone.z;
-        }
-
-        return cone;
-    }
-
     
-    virtual void AddViewKick() OVERRIDE;
-
-    virtual void PrimaryAttack() OVERRIDE;
-    virtual void PrimaryAttackEffects( WeaponSound_t wpnsound ) OVERRIDE;
-    virtual void SecondaryAttack() OVERRIDE;
-
-    void ItemPostFrame() OVERRIDE;
-
-    void HandleAnimEventRevolver();
-
-#ifndef CLIENT_DLL
-    void Operator_HandleAnimEvent( animevent_t* pEvent, CBaseCombatCharacter* pOperator ) OVERRIDE;
-#else
-    bool OnFireEvent( C_BaseViewModel* pViewModel, const Vector& origin, const QAngle& angles, int event, const char* options ) OVERRIDE;
-#endif
-
-protected:
-    CNetworkVar( float, m_flShootTime );
-};
-
 IMPLEMENT_NETWORKCLASS_ALIASED( ZMWeaponRevolver, DT_ZM_WeaponRevolver )
 
 BEGIN_NETWORK_TABLE( CZMWeaponRevolver, DT_ZM_WeaponRevolver )
@@ -173,6 +103,37 @@ void CZMWeaponRevolver::SecondaryAttack()
 
 
     m_flNextSecondaryAttack = m_flNextPrimaryAttack = gpGlobals->curtime + GetFireRate();
+}
+
+Vector CZMWeaponRevolver::GetBulletSpread() const
+{
+    Vector cone = BaseClass::GetBulletSpread();
+
+    CZMPlayer* pOwner = GetPlayerOwner();
+
+    if ( pOwner )
+    {
+        float ratio = 1.0f - pOwner->GetAccuracyRatio();
+        ratio *= ratio;
+            
+            
+        // 2 degrees
+#define     SECONDARY_MIN_RATIO         0.1f
+
+        const bool bIsSecondary = IsInSecondaryAttack();
+
+        // Secondary is not perfectly accurate.
+        if ( bIsSecondary )
+            ratio = MAX( SECONDARY_MIN_RATIO, ratio );
+
+
+
+        cone.x = ratio * cone.x;
+        cone.y = ratio * cone.y;
+        cone.z = ratio * cone.z;
+    }
+
+    return cone;
 }
 
 void CZMWeaponRevolver::ItemPostFrame()
