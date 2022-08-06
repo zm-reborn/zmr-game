@@ -631,6 +631,7 @@ CZMWeaponConfigSystem::CZMWeaponConfigSystem() : CAutoGameSystem( "ZMWeaponConfi
     m_ConfigRegisters[ZMCONFIGSLOT_SLEDGE].pszWeaponName = "weapon_zm_sledge";
     m_ConfigRegisters[ZMCONFIGSLOT_FIREAXE].pszWeaponName = "weapon_zm_fireaxe";
     m_ConfigRegisters[ZMCONFIGSLOT_PISTOL].pszWeaponName = "weapon_zm_pistol";
+    m_ConfigRegisters[ZMCONFIGSLOT_PISTOL_GLOCK].pszWeaponName = "weapon_zm_glock";
     m_ConfigRegisters[ZMCONFIGSLOT_REVOLVER].pszWeaponName = "weapon_zm_revolver";
     m_ConfigRegisters[ZMCONFIGSLOT_SNUBNOSE].pszWeaponName = "weapon_zm_snubnose";
     m_ConfigRegisters[ZMCONFIGSLOT_SHOTGUN].pszWeaponName = "weapon_zm_shotgun";

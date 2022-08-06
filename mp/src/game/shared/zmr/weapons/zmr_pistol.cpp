@@ -10,6 +10,9 @@
 
 #include "zmr_player_shared.h"
 
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 
 #ifdef CLIENT_DLL
 #define CZMWeaponPistol C_ZMWeaponPistol
