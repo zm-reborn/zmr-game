@@ -39,7 +39,9 @@ void CZombieClawAttackSched::OnStart()
     }
 
 
-    float wait = pOuter->SequenceDuration();
+    // ZMRTODO: Fix this.
+    int iSeq = pOuter->SelectWeightedSequence( ACT_MELEE_ATTACK1 );
+    float wait = pOuter->SequenceDuration( iSeq );
     pOuter->SetNextAttack( gpGlobals->curtime + wait );
     //pOuter->SetNextMove( gpGlobals->curtime + wait );
 

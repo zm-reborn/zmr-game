@@ -27,6 +27,8 @@ public:
     CZMBaseZombieMotor( CZMBaseZombie* pOuter );
 
     virtual float GetStepHeight() const OVERRIDE;
+
+    virtual float GetYawRate( float delta ) const OVERRIDE;
 };
 
 

@@ -31,7 +31,7 @@ CZMZombieAnimState::CZMZombieAnimState( CZMBaseZombie* pZombie )
     m_flMoveActSpeed = 0.0f;
     m_flMoveWeight = 0.0f;
     m_flLastSpdSqr = 0.0f;
-    m_bReady = false;
+    m_bModelParamsReady = false;
     m_iMoveSeq = -1;
     m_iMoveRandomSeed = 0;
 }
@@ -45,7 +45,12 @@ int CZMZombieAnimState::AnimEventToActivity( ZMZombieAnimEvent_t iEvent, int nDa
 {
     switch ( iEvent )
     {
-    case ZOMBIEANIMEVENT_ATTACK : return ACT_MELEE_ATTACK1;
+    case ZOMBIEANIMEVENT_ATTACK :
+    {
+        if ( !Uses9WayAnim() )
+            return ACT_MELEE_ATTACK1;
+        break;
+    }
     case ZOMBIEANIMEVENT_SWAT : return nData;
     case ZOMBIEANIMEVENT_BANSHEEANIM : return nData;
     default : break;
@@ -111,6 +116,14 @@ bool CZMZombieAnimState::HandleAnimEvent( ZMZombieAnimEvent_t iEvent, int nData 
         SetOuterActivity( ACT_IDLE );
         m_iMoveRandomSeed = nData; // Use the data as seed in the future.
         return true;
+    case ZOMBIEANIMEVENT_ATTACK :
+        Assert( Uses9WayAnim() ); // We should only get here if we use 9-way anims (so gesture attacks)
+
+        AddLayeredSequence( GetOuterRandomSequence( ACT_MELEE_ATTACK1 ), ANIMOVERLAY_SLOT_GESTURE );
+        SetLayerLooping( ANIMOVERLAY_SLOT_GESTURE, false );
+        SetLayerCycle( ANIMOVERLAY_SLOT_GESTURE, 0.0f );
+        SetLayerWeight( ANIMOVERLAY_SLOT_GESTURE, 1.0f );
+        return true;
     // We're burning, change idle & moving activities.
     case ZOMBIEANIMEVENT_ON_BURN :
         if ( GetOuter()->HasActivity( ACT_IDLE_ON_FIRE ) )
@@ -138,7 +151,7 @@ bool CZMZombieAnimState::HandleAnimEvent( ZMZombieAnimEvent_t iEvent, int nData 
 
 bool CZMZombieAnimState::InitParams()
 {
-    if ( m_bReady ) return true;
+    if ( m_bModelParamsReady ) return true;
 
 
     CZMBaseZombie* pOuter = GetOuter();
@@ -157,7 +170,24 @@ bool CZMZombieAnimState::InitParams()
     m_actIdle = ACT_IDLE;
 
 
-    m_bReady = true;
+    auto* pHdr = pOuter->GetModelPtr();
+    if ( !pHdr )
+    {
+        return false;
+    }
+
+    for ( int i = 0; i < pHdr->GetNumPoseParameters(); i++ )
+    {
+        pOuter->SetPoseParameter( pHdr, i, 0.0f );
+    }
+    
+
+    m_iPoseParamMoveX = pOuter->LookupPoseParameter( pHdr, "move_y" );
+    m_iPoseParamMoveY = pOuter->LookupPoseParameter( pHdr, "move_x" );
+    m_bIs9Way = ( m_iPoseParamMoveX >= 0 && m_iPoseParamMoveY >= 0 );
+
+
+    m_bModelParamsReady = true;
     return true;
 }
 
@@ -474,9 +504,19 @@ void CZMZombieAnimState::SetLayerWeight( ZMAnimLayerSlot_t index, float flWeight
 
 void CZMZombieAnimState::UpdateMovement()
 {
+    if ( Uses9WayAnim() )
+    {
+        Update9wayAnims();
+    }
+    else
+    {
+        UpdateOldAnims();
+    }
+}
+
+void CZMZombieAnimState::UpdateOldAnims()
+{
     // Update the idle <-> move animation layer transition to have the natural appearance of acceleration and deceleration.
-
-
 
 
     CZMBaseZombie* pOuter = GetOuter();
@@ -568,6 +608,98 @@ void CZMZombieAnimState::UpdateMovement()
 
     m_flLastSpdSqr = spdSqr;
     m_bWasMoving = bMoving;
+}
+
+float CZMZombieAnimState::GetMaxGroundSpeed() const
+{
+    auto* pOuter = GetOuter();
+    auto* pHdr = pOuter->GetModelPtr();
+    Assert( pOuter && pHdr );
+
+    int iSeq = pHdr->SelectWeightedSequence( GetMoveActivity(), pOuter->GetSequence() );
+
+
+    if ( !Uses9WayAnim() )
+    {
+        return pOuter->GetSequenceGroundSpeed( iSeq );
+    }
+
+  
+	float prevX = pOuter->GetPoseParameter( m_iPoseParamMoveX );
+	float prevY = pOuter->GetPoseParameter( m_iPoseParamMoveY );
+
+	pOuter->SetPoseParameter( pHdr, m_iPoseParamMoveX, 1.0f );
+	pOuter->SetPoseParameter( pHdr, m_iPoseParamMoveY, 0.0f );
+
+	float maxspeed = pOuter->GetSequenceGroundSpeed( iSeq );
+
+	pOuter->SetPoseParameter( pHdr, m_iPoseParamMoveX, prevX );
+	pOuter->SetPoseParameter( pHdr, m_iPoseParamMoveY, prevY );
+
+    return maxspeed;
+}
+
+float CZMZombieAnimState::CalcMovementPlaybackRate() const
+{
+    auto vel = GetOuterVelocity();
+
+    float curspeed = vel.Length2D();
+
+    float epsilon = 0.001f;
+    if ( curspeed < epsilon )
+    {
+        return 0.0f;
+    }
+
+    float maxspeed = GetMaxGroundSpeed();
+    Assert( maxspeed >= epsilon );
+    if ( maxspeed < epsilon )
+    {
+        return 0.0f;
+    }
+
+
+    return curspeed / maxspeed;
+}
+
+void CZMZombieAnimState::Update9wayAnims()
+{
+    auto* pOuter = GetOuter();
+    auto* pHdr = pOuter->GetModelPtr();
+
+    auto dir = GetOuterVelocity();
+    float speed = dir.NormalizeInPlace();
+
+    bool bIsMoving = speed > 0.01f;
+    
+
+    Vector2D vecCurrentMoveYaw( 0.0f, 0.0f );
+    if ( bIsMoving )
+    {
+        float flMyViewAngle = DEG2RAD( pOuter->GetAbsAngles()[1] );
+        float flMyVelAngle = atan2f( dir.y, dir.x );
+
+        float flRelativeYaw = flMyViewAngle - flMyVelAngle;
+
+        float flPlaybackRate = CalcMovementPlaybackRate();
+
+        vecCurrentMoveYaw.x = cos( flRelativeYaw ) * flPlaybackRate;
+        vecCurrentMoveYaw.y = sin( flRelativeYaw ) * flPlaybackRate;
+
+
+        SetOuterActivity( GetMoveActivity() );
+
+        //Msg( "Speed: %.2f\n", speed );
+    }
+
+    pOuter->SetPoseParameter( pHdr, m_iPoseParamMoveX, vecCurrentMoveYaw.x );
+    pOuter->SetPoseParameter( pHdr, m_iPoseParamMoveY, vecCurrentMoveYaw.y );
+
+}
+
+void CZMZombieAnimState::OnNewModel()
+{
+    m_bModelParamsReady = false;
 }
 
 void CZMZombieAnimState::UpdateMoveActivity()

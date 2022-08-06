@@ -114,8 +114,8 @@ public:
     Vector      GetOuterVelocity() const;
     int         GetOuterRandomSequence( Activity act ) const;
 
+    int         AnimEventToActivity( ZMZombieAnimEvent_t iEvent, int nData = 0 );
 
-    static int                  AnimEventToActivity( ZMZombieAnimEvent_t iEvent, int nData = 0 );
     static ZMZombieAnimEvent_t  ActivityToAnimEvent( int iActivity, int& nData );
 
     virtual bool HandleAnimEvent( ZMZombieAnimEvent_t iEvent, int nData );
@@ -143,6 +143,12 @@ public:
 
     void        UpdateMoveActivity();
 
+
+    float       CalcMovementPlaybackRate() const;
+    float       GetMaxGroundSpeed() const;
+
+    void        OnNewModel();
+
 protected:
     virtual bool InitParams();
     virtual bool ShouldUpdate() const;
@@ -165,6 +171,11 @@ protected:
     void    SetLayerWeight( ZMAnimLayerSlot_t index, float flWeight );
     ZMAnimLayerSlot_t FindSlotByLayerIndex( int index );
 
+    void UpdateOldAnims();
+    void Update9wayAnims();
+
+    bool Uses9WayAnim() const { return m_bIs9Way; }
+
 private:
     int m_iMoveRandomSeed;
     bool m_bWasMoving;
@@ -177,7 +188,11 @@ private:
 
     int m_iMoveSeq;
 
-    bool m_bReady;
+    bool m_bModelParamsReady;
+
+    bool m_bIs9Way;
+    int m_iPoseParamMoveX;
+    int m_iPoseParamMoveY;
 
 
     CZMAnimOverlay m_AnimOverlay[ANIMOVERLAY_SLOT_MAX];

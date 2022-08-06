@@ -241,6 +241,13 @@ float CZMBaseZombieMotor::GetStepHeight() const
     return zm_sv_zombie_stepheight.GetFloat();
 }
 
+// ZMRTODO: Balance correctly.
+float CZMBaseZombieMotor::GetYawRate( float delta ) const
+{
+    return RemapValClamped( fabsf( delta ), 0.0f, 60.0f, 20.0f, 200.0f );
+}
+
+
 CZMBaseZombie::CZMBaseZombie()
 {
     UseClientSideAnimation();
@@ -1238,12 +1245,7 @@ NPCR::QueryResult_t CZMBaseZombie::ShouldTouch( CBaseEntity* pEnt ) const
 
 float CZMBaseZombie::GetMoveActivityMovementSpeed()
 {
-    int iSeq = GetAnimState()->GetCurrentMoveSequence();
-
-    if ( iSeq > 0 )
-        return GetSequenceGroundSpeed( iSeq );
-
-    return BaseClass::GetMoveActivityMovementSpeed();
+    return GetAnimState()->GetMaxGroundSpeed();
 }
 
 bool CZMBaseZombie::ShouldPlayIdleSound() const
