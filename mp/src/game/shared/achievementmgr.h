@@ -175,7 +175,9 @@ int	CalcTeammateCount();
 
 class IMatchmaking;
 extern ConVar	cc_achievement_debug;
+#ifdef _X360
 extern IMatchmaking *matchmaking;
+#endif
 
 #ifdef CLIENT_DLL
 void MsgFunc_AchievementEvent( bf_read &msg );
