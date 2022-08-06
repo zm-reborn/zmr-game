@@ -578,7 +578,12 @@ int NPCR::CFollowNavPath::CheckStuck( CBaseNPC* pNPC, Vector& vecGoalPos )
     {
         // If we haven't moved, increase our stuck time.
         Vector vecMyPos = pNPC->GetPosition();
-        if ( m_vecStuckPos.AsVector2D().DistToSqr( vecMyPos.AsVector2D() ) < (2.0f*2.0f) )
+
+        // This was designed for default 15 tick update rate.
+        const float defaultUpdateInterval = 1.0f / 15.0f;
+        float stuckSizeSqr = (2.0f*2.0f) * (pNPC->GetUpdateInterval() / defaultUpdateInterval);
+
+        if ( m_vecStuckPos.AsVector2D().DistToSqr( vecMyPos.AsVector2D() ) < stuckSizeSqr )
         {
             ++m_nStuckTimes;
         }
