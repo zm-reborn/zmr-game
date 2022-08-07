@@ -202,7 +202,7 @@ void CZMHudVote::FireGameEvent( IGameEvent* event )
         int potential = event->GetInt( "potentialVotes" );
 
 
-        V_snwprintf( m_szVote, sizeof( m_szVote ), L"%i/%i", yesvotes, potential );
+        V_snwprintf( m_szVote, ARRAYSIZE( m_szVote ), L"%i/%i", yesvotes, potential );
     }
 }
 

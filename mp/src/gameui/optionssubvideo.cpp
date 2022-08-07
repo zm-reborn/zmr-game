@@ -477,7 +477,7 @@ public:
 
 		// append the recommended flag
 		wchar_t newText[512];
-		_snwprintf( newText, sizeof(newText) / sizeof(wchar_t), L"%s *", text );
+		V_snwprintf( newText, ARRAYSIZE( newText ), L"%s *", text );
 
 		// reset
 		combo->UpdateItem(iItem, newText, NULL);

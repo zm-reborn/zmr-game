@@ -462,7 +462,7 @@ void CZMClientScoreBoardDialog::UpdateMapStats()
         wchar_t buf[64];
         wchar_t round[16];
 
-        V_snwprintf( round, sizeof( round ), L"%i", ZMRules()->GetRoundsPlayed() + 1 );
+        V_snwprintf( round, ARRAYSIZE( round ), L"%i", ZMRules()->GetRoundsPlayed() + 1 );
 
         g_pVGuiLocalize->ConstructString( buf, sizeof( buf ), g_pVGuiLocalize->Find( "#ZMRoundCount" ), 1, round );
 

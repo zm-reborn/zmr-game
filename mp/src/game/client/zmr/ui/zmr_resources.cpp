@@ -176,11 +176,13 @@ void CZMResourceHud::Paint()
 
 
     static wchar_t text[32];
+    text[0] = NULL;
+
     int w, h;
 
     const int offsety = 45;
     
-    _snwprintf( text, ARRAYSIZE(text) - 1, L"%i", m_nResCount );
+    V_snwprintf( text, ARRAYSIZE( text ), L"%i", m_nResCount );
 
 	surface()->DrawSetTextFont( m_hLargeFont );
 	surface()->DrawSetTextPos( 60, offsety + 0 );
@@ -190,7 +192,7 @@ void CZMResourceHud::Paint()
     surface()->GetTextSize( m_hLargeFont, text, w, h );
 
 
-    _snwprintf( text, ARRAYSIZE(text) - 1, L"%.0f rpm", m_flResPerMin );
+    V_snwprintf( text, ARRAYSIZE( text ), L"%.0f rpm", m_flResPerMin );
 
     int w2;
     surface()->GetTextSize( m_hMediumFont, text, w2, h );
@@ -201,11 +203,12 @@ void CZMResourceHud::Paint()
 	surface()->DrawPrintText( text, wcslen( text ) );
 
 
-    _snwprintf( text, ARRAYSIZE(text) - 1, L"%i / %i", m_nPopCount, m_nPopMax );
+    V_snwprintf( text, ARRAYSIZE( text ), L"%i / %i", m_nPopCount, m_nPopMax );
 
     if ( m_nSelected > 0 )
-        _snwprintf( text, ARRAYSIZE(text) - 1, L"%s (%i)", text, m_nSelected );
-
+    {
+        V_snwprintf( text, ARRAYSIZE( text ), L"%s (%i)", text, m_nSelected );
+    }
 
 
 	surface()->DrawSetTextFont( m_hMediumFont );

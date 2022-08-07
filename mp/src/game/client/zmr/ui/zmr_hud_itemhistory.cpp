@@ -303,7 +303,7 @@ void CZMHudItemHistory::Paint()
         if ( nAmount )
         {
             wchar_t text[16];
-            _snwprintf( text, sizeof( text ) / sizeof(wchar_t), L"%i", hist.nCount );
+            V_snwprintf( text, ARRAYSIZE( text ), L"%i", hist.nCount );
 
             // offset the number to sit properly next to the icon
             ypos -= ( vgui::surface()->GetFontTall( m_hNumberFont ) - itemIcon->Height() ) / 2;

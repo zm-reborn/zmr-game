@@ -82,7 +82,7 @@ void CZMManiMenuNew::SetCost( int cost )
     wchar_t buffer[128];
     wchar_t wcost[32];
 
-    V_snwprintf( wcost, sizeof( wcost ), L"%i", cost );
+    V_snwprintf( wcost, ARRAYSIZE( wcost ), L"%i", cost );
     g_pVGuiLocalize->ConstructString( buffer, sizeof( buffer ), g_pVGuiLocalize->Find( "#ZMManiActivate" ), 1, wcost );
 
     Label* entry = dynamic_cast<Label*>( FindChildByName( "Activate", true ) );
@@ -103,7 +103,7 @@ void CZMManiMenuNew::SetTrapCost( int cost )
     {
         wchar_t wcost[32];
 
-        V_snwprintf( wcost, sizeof( wcost ), L"%i", cost );
+        V_snwprintf( wcost, ARRAYSIZE( wcost ), L"%i", cost );
         g_pVGuiLocalize->ConstructString( buffer, sizeof( buffer ), g_pVGuiLocalize->Find( "#ZMManiTrap" ), 1, wcost );
     }
     else

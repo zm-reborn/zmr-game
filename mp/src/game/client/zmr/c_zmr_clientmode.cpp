@@ -154,7 +154,7 @@ void ClientModeZMNormal::FireGameEvent( IGameEvent* pEvent )
 			}
 			else
 			{
-				_snwprintf ( wszTeam, sizeof( wszTeam ) / sizeof( wchar_t ), L"%d", team );
+				V_snwprintf( wszTeam, ARRAYSIZE( wszTeam ), L"%d", team );
 			}
 
 

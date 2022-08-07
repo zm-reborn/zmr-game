@@ -1115,7 +1115,7 @@ void CZMViewBase::UpdateHiddenSpawnSpot( int mx, int my )
     {
     case HSERROR_OK :
         //V_wcsncpy( buf, L"OK", sizeof( buf ) );
-        V_snwprintf( m_wszHiddenSpawnTxt, sizeof( m_wszHiddenSpawnTxt ), L"Cost: %i", rescost );
+        V_snwprintf( m_wszHiddenSpawnTxt, ARRAYSIZE( m_wszHiddenSpawnTxt ), L"Cost: %i", rescost );
         break;
     //case HSERROR_TOOCLOSE :
     //case HSERROR_CANSEE :
