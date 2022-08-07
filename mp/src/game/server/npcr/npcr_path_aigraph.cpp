@@ -21,11 +21,11 @@ AI_Waypoint_t* NPCR::CAIGraphPath::FindGraphPath( int startID, int endID, const 
         return nullptr;
     if ( endID == NO_NODE )
         return nullptr;
+
+    int nNodes = g_pBigAINet->NumNodes();
     if ( g_pBigAINet->NumNodes() < 1 )
         return nullptr;
     
-    
-    int nNodes = g_pBigAINet->NumNodes();
     CAI_Node** pNodes = g_pBigAINet->AccessNodes();
 
     CVarBitVec openBS( nNodes );
@@ -40,7 +40,7 @@ AI_Waypoint_t* NPCR::CAIGraphPath::FindGraphPath( int startID, int endID, const 
     for ( int node = 0; node < nNodes; node++ )
     {
         nodeG[node] = FLT_MAX;
-        nodeP[node] = -1.0f;
+        nodeP[node] = -1;
     }
 
     nodeG[startID] = 0.0f;

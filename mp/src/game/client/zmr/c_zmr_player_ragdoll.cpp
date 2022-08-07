@@ -162,9 +162,9 @@ void C_ZMRagdoll::CreateRagdoll()
     // Make us a ragdoll..
     m_nRenderFX = kRenderFxRagdoll;
 
-    matrix3x4_t boneDelta0[MAXSTUDIOBONES];
-    matrix3x4_t boneDelta1[MAXSTUDIOBONES];
-    matrix3x4_t currentBones[MAXSTUDIOBONES];
+    auto boneDelta0 = new matrix3x4_t[MAXSTUDIOBONES];
+    auto boneDelta1 = new matrix3x4_t[MAXSTUDIOBONES];
+    auto currentBones = new matrix3x4_t[MAXSTUDIOBONES];
     const float boneDt = 0.05f;
 
     if ( pPlayer && !pPlayer->IsDormant() )
@@ -177,6 +177,10 @@ void C_ZMRagdoll::CreateRagdoll()
     }
 
     InitAsClientRagdoll( boneDelta0, boneDelta1, currentBones, boneDt );
+
+    delete[] boneDelta0;
+    delete[] boneDelta1;
+    delete[] currentBones;
 }
 
 

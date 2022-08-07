@@ -459,13 +459,12 @@ void CZMRules::ClientSettingsChanged( CBasePlayer* pPlayer )
         {
             engine->ClientCommand( pZMPlayer->edict(), UTIL_VarArgs( "cl_playermodel %s", pCurrentModel ) );
 
+            auto timeleft = (pZMPlayer->GetNextModelChangeTime() - gpGlobals->curtime);
             ClientPrint(
                 pZMPlayer,
                 HUD_PRINTTALK,
-                UTIL_VarArgs(
-                    "Please wait %.1f more seconds before trying to switch player models.\n",
-                    (pZMPlayer->GetNextModelChangeTime() - gpGlobals->curtime)
-                ) );
+                UTIL_VarArgs( "Please wait %.1f more seconds before trying to switch player models.\n", timeleft )
+            );
             return;
         }
 

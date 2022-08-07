@@ -590,6 +590,7 @@ void CZMClientScoreBoardDialog::GetPlayerScoreInfo( int playerIndex, KeyValues* 
     auto importance = g_ZMImportanceSystem.GetPlayerImportance( playerIndex );
     int iImage = -1;
 
+#pragma warning( disable: 33011 )
     if ( importance >= 0 && importance < ARRAYSIZE( m_pImportanceImages ) && m_pImportanceImages[importance] != nullptr )
     {
         iImage = m_pList->AddImage( m_pImportanceImages[importance] );

@@ -296,6 +296,11 @@ bool GetPreferredCarryAngles_( CBaseEntity* pObject, CBasePlayer* pPlayer, QAngl
 
 void CGrabController::AttachEntity( CBasePlayer *pPlayer, CBaseEntity *pEntity, IPhysicsObject *pPhys, bool bIsMegaPhysCannon )
 {
+    if ( !pPlayer || !pEntity || !pPhys )
+    {
+        return;
+    }
+
     bool bHasPreferredAngles = false;
 
     // play the impact sound of the object hitting the player

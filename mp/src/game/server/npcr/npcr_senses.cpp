@@ -73,10 +73,9 @@ void NPCR::CBaseSenses::Update()
             auto* pEnt = known->GetEntity();
             if ( !pEnt ) continue;
 
-
-            Q_snprintf( buffer, sizeof( buffer ), "Sensed: %.1f | Seen: %.1f",
-                curtime - known->LastSensedTime(),
-                curtime - known->LastSeenTime() );
+            auto sensed = curtime - known->LastSensedTime();
+            auto seen = curtime - known->LastSeenTime();
+            Q_snprintf( buffer, sizeof( buffer ), "Sensed: %.1f | Seen: %.1f", sensed, seen );
             NDebugOverlay::Text( pEnt->GetAbsOrigin(), buffer, true, interval );
         }
         

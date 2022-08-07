@@ -799,7 +799,7 @@ bool CZMMapItemActionReplace::ParseReplaceFilter( KeyValues* kv )
 
 
     char buffer[256];
-
+    buffer[0] = NULL;
     
     const char* rangefilter = kv->GetString( "filter_range" );
     if ( *rangefilter )

@@ -1399,7 +1399,7 @@ LadderMoveRet_t CZMGameMovement::LadderMove_HL2()
         ladderUp.NormalizeInPlace();
 
 
-        bool ishorizontal = fabs( top.z - bottom.z ) < 64.0f ? true : false;
+        bool ishorizontal = fabsf( top.z - bottom.z ) < 64.0f ? true : false;
 
         float changeover = ishorizontal ? 0.0f : 0.3f;
 
