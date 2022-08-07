@@ -204,7 +204,7 @@ void CSurvivorCombatSchedule::OnForcedMove( CNavArea* pArea )
 {
     m_Path.Invalidate();
 
-    auto vecMyPos = GetOuter()->GetAbsOrigin();
+    auto& vecMyPos = GetOuter()->GetAbsOrigin();
     auto vecTarget = pArea->GetRandomPoint();
 
     auto* pStart = GetOuter()->GetLastKnownArea();

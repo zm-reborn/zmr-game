@@ -151,10 +151,10 @@ void CZMVision::UpdateLight()
         return;
     }
 
-    auto pos = MainViewOrigin();
-    auto fwd = MainViewForward();
-    auto up = MainViewUp();
-    auto right = MainViewRight();
+    auto& pos = MainViewOrigin();
+    auto& fwd = MainViewForward();
+    auto& up = MainViewUp();
+    auto& right = MainViewRight();
 
     float fov = pPlayer->GetFOV();
 

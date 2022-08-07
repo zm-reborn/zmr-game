@@ -105,7 +105,7 @@ void CZombieGotoSwatObjSchedule::OnUpdate()
 
         if ( pEnt && pOuter->IsEnemy( pEnt ) )
         {
-            auto mypos = pOuter->WorldSpaceCenter();
+            auto& mypos = pOuter->WorldSpaceCenter();
 
             float flCurDist = mypos.DistTo( vecCurPos );
             float flNewDist = mypos.DistTo( pEnt->WorldSpaceCenter() );
