@@ -408,7 +408,7 @@ bool CZMPlayerAnimState::HandleJumping( Activity &idealActivity )
         {
             if ( bNewJump )
             {
-                if ( gpGlobals->curtime - m_flJumpStartTime > 0.5 )
+                if ( (gpGlobals->curtime - m_flJumpStartTime) > 0.5f )
                 {
                     idealActivity = ACT_MP_JUMP_FLOAT;
                 }
@@ -609,8 +609,8 @@ void CZMPlayerAnimState::ComputePoseParam_MoveYaw( CStudioHdr *pStudioHdr )
             if ( mp_slammoveyaw.GetBool() )
                 flYaw = SnapYawTo( flYaw );
 
-            vecCurrentMoveYaw.x = cos( DEG2RAD( flYaw ) ) * flPlaybackRate;
-            vecCurrentMoveYaw.y = sin( DEG2RAD( flYaw ) ) * flPlaybackRate;
+            vecCurrentMoveYaw.x = cosf( DEG2RAD( flYaw ) ) * flPlaybackRate;
+            vecCurrentMoveYaw.y = sinf( DEG2RAD( flYaw ) ) * flPlaybackRate;
         }
 
         GetBasePlayer()->SetPoseParameter( pStudioHdr, m_PoseParameterData.m_iMoveX, vecCurrentMoveYaw.x );
@@ -883,7 +883,7 @@ float CZMPlayerAnimState::GetCurrentMaxGroundSpeed()
 //	float prevX = GetBasePlayer()->GetPoseParameter( m_PoseParameterData.m_iMoveX );
     float prevY = m_pZMPlayer->GetPoseParameter( m_PoseParameterData.m_iMoveY );
 
-    float d = sqrt( /*prevX * prevX + */prevY * prevY );
+    float d = sqrtf( /*prevX * prevX + */prevY * prevY );
     float newY;//, newX;
     if ( d == 0.0 )
     { 

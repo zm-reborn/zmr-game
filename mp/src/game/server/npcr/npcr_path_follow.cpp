@@ -617,7 +617,7 @@ int NPCR::CFollowNavPath::CheckStuck( CBaseNPC* pNPC, Vector& vecGoalPos )
             vecBack.NormalizeInPlace();
 
             // Pick the side that we were trying to move to last time
-            float angle = atan2( vecBack.y, vecBack.x ) + (m_flLastSide * m_flStuckAngle);
+            float angle = atan2f( vecBack.y, vecBack.x ) + (m_flLastSide * m_flStuckAngle);
 
             vecBack.x = cos( angle );
             vecBack.y = sin( angle );

@@ -288,9 +288,9 @@ void CZMFlashlightEffect::UpdateLightNew( const Vector& vecPos, const Vector& ve
     vRight -= DotProduct( vUp, vRight ) * vUp;
     VectorNormalize( vRight );
 
-    AssertFloatEquals( DotProduct( vDir, vRight ), 0.0f, 1e-3 );
-    AssertFloatEquals( DotProduct( vDir, vUp    ), 0.0f, 1e-3 );
-    AssertFloatEquals( DotProduct( vRight, vUp  ), 0.0f, 1e-3 );
+    AssertFloatEquals( DotProduct( vDir, vRight ), 0.0f, 1e-3f );
+    AssertFloatEquals( DotProduct( vDir, vUp    ), 0.0f, 1e-3f );
+    AssertFloatEquals( DotProduct( vRight, vUp  ), 0.0f, 1e-3f );
 
 
 

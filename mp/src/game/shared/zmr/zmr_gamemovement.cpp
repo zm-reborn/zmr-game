@@ -827,7 +827,7 @@ bool CZMGameMovement::CheckJumpButton( void )
     // 21.333... is the normal intended jump height.
     //
     Assert( GetCurrentGravity() == 600.0f );
-    float flMul = sqrt( 2 * GetCurrentGravity() * (21.333333f + 7) );
+    float flMul = sqrtf( 2.0f * GetCurrentGravity() * (21.333333f + 7) );
 
 
     // Acclerate upward

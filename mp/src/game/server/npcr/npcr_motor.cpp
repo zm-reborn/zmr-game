@@ -295,15 +295,15 @@ Vector NPCR::CBaseMotor::CalcJumpLaunchVelocity( const Vector& startPos, const V
     *pminHeight = MAX( *pminHeight, stepHeight );
 
     // time from start to apex
-    float t0 = sqrt( ( 2.0 * *pminHeight) / flGravity );
+    float t0 = sqrtf( (2.0f * *pminHeight) / flGravity );
     // time from apex to end
-    float t1 = sqrt( ( 2.0 * fabs( *pminHeight - stepHeight) ) / flGravity );
+    float t1 = sqrtf( (2.0f * fabsf(*pminHeight - stepHeight)) / flGravity );
 
     float velHorz = distance / (t0 + t1);
 
     Vector jumpVel = targetDir2D * velHorz;
 
-    jumpVel.z = (float)sqrt(2.0f * flGravity * (*pminHeight));
+    jumpVel.z = sqrtf( 2.0f * flGravity * (*pminHeight) );
 
     if (pvecApex)
     {

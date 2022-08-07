@@ -296,7 +296,7 @@ bool CBansheeLeapSchedule::DoLeap()
     //
     float height = ( vecEnemyPos.z - vecMyPos.z );
 
-    float speed = sqrt( 2 * gravity * MAX( 1.0f, height ) );
+    float speed = sqrtf( 2.0f * gravity * MAX( 1.0f, height ) );
 
     //
     // Scale the sideways velocity to get there at the right time

@@ -149,7 +149,7 @@ void CZMMainMenuImagePanel::PerformLayout()
 
         float curratio = ch / (float)cw;
 
-        if ( fabs( curratio - imgratio ) > 0.2f )
+        if ( fabsf( curratio - imgratio ) > 0.2f )
         {
             float frac = intendedratio / imgratio;
 

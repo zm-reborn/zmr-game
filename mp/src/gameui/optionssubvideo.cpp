@@ -95,7 +95,7 @@ int GetScreenAspectMode( int width, int height )
 	int closestAnamorphic = 0;
 	for (int i = 0; i < ARRAYSIZE(g_RatioToAspectModes); i++)
 	{
-		float dist = fabs( g_RatioToAspectModes[i].aspectRatio - aspectRatio );
+		float dist = fabsf( g_RatioToAspectModes[i].aspectRatio - aspectRatio );
 		if (dist < closestAspectRatioDist)
 		{
 			closestAspectRatioDist = dist;

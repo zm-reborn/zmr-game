@@ -260,7 +260,7 @@ void CZMHudTooltip::Paint()
 
     if ( m_bPulse )
     {
-        pulse = max( 128, 255 * sin( gpGlobals->curtime * 5.0f ) );
+        pulse = max( 128, 255 * sinf( gpGlobals->curtime * 5.0f ) );
     }
     else
     {
