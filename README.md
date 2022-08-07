@@ -7,10 +7,10 @@ You can read it [here](https://github.com/zm-reborn/zmr-game/blob/master/LICENSE
 ## Building
 
 ### Windows
-1. Download [Visual Studio 2019](https://visualstudio.microsoft.com/vs/)
-2. Download components: **MSVC v142** and **Windows SDK 10.0.20348.0**.
+1. Download [Visual Studio 2022](https://visualstudio.microsoft.com/vs/)
+2. Download components: **MSVC v143** and **Windows SDK 10.0** (10.0.20348.0 tested).
 3. Run `mp/src/creategameprojects.bat`.
-4. You now have a solution file mp/src/zmr-games.sln
+4. You now have a solution file `mp/src/zmr-games.sln`
 
 ### Linux
 
@@ -41,17 +41,14 @@ Turning on the conditional `ZMR_FINAL` in `mp/src/vpc_scripts/default.vgc` will 
 You'll also need a copy of the binaries to run the game. (discord-rpc.dll & fmod.dll)
 
 ## FAQ
-**Is compiling on Linux really this convoluted?**
+
+### Is compiling for Linux really this convoluted?
 
 Yes.
 
-**Opening the solution says something about upgrading.**
- 
- Run `mp/src/fix_vcxproj.bat`. If it still complains about upgrading, see below.
+### Project refuses to compile, says something about wrong/missing toolset. / Opening the solution says something about upgrading.
 
-**Project refuses to compile, says something about wrong/missing toolset.**
-
-Open project settings and make sure `Platform Toolset` is `v142` and `Windows SDK Version` is `10.0.20348.0` or lower.
+Open project settings and make sure `Platform Toolset` is `v143` and `Windows SDK Version` is `10.0 (latest installed version)` or lower.
 If it says one of them is missing, you need to download them from Visual Studio Installer (Tools -> Get Tools and Features)
 
 If you're having problems, just [ask Mehis in Discord](https://discord.gg/tZTUex3).
