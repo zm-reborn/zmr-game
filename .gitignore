@@ -53,7 +53,8 @@ Debug_*/
 *.recipe
 *.project
 # Force add libraries
-*.a 
+*.a
+.vscode/
 
 # Tool (vbsp/vvis/vrad) compilation output
 *.dll
