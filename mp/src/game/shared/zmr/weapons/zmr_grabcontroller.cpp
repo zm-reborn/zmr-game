@@ -170,11 +170,11 @@ float CGrabController::ComputeError()
             DetachEntity( false );
             return 9999; // force detach
         }
-    }
-    
-    if ( pAttached->IsEFlagSet( EFL_IS_BEING_LIFTED_BY_BARNACLE ) )
-    {
-        m_error *= 3.0f;
+
+        if ( pAttached->IsEFlagSet( EFL_IS_BEING_LIFTED_BY_BARNACLE ) )
+        {
+            m_error *= 3.0f;
+        }
     }
 
     m_errorTime = 0;

@@ -773,6 +773,9 @@ bool CZMBaseZombie::CanSwatObject( CBaseEntity* pEnt )
 
 bool CZMBaseZombie::CanBreakObject( CBaseEntity* pEnt, bool bSwat ) const
 {
+    if ( !pEnt )
+        return false;
+
     if ( pEnt->GetHealth() <= 0 || pEnt->m_takedamage != DAMAGE_YES )
         return false;
 

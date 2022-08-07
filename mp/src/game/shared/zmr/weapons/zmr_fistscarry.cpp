@@ -690,12 +690,13 @@ bool CGrabController::UpdateObject( CBasePlayer *pPlayer, float flError )
         return false;
     if ( pPlayer->GetGroundEntity() == pEntity )
         return false;
-    if (!pEntity->VPhysicsGetObject() )
-        return false;    
+
+    auto pPhys = pEntity->VPhysicsGetObject();
+    if ( !pPhys )
+        return false;
 
     //Adrian: Oops, our object became motion disabled, let go!
-    IPhysicsObject *pPhys = pEntity->VPhysicsGetObject();
-    if ( pPhys && pPhys->IsMoveable() == false )
+    if ( !pPhys->IsMoveable() )
     {
         return false;
     }

@@ -121,11 +121,11 @@ void CZMHudSpectatorUI::OnThink()
 
     SetVisible( pLocal && pLocal->IsObserver() );
 
+    if ( pLocal == nullptr || !IsVisible() )
+    {
+        return;
+    }
 
-
-    if ( !IsVisible() ) return;
-
-    
     if (m_pOldTarget
     &&  pLocal->GetObserverTarget() == m_pOldTarget
     &&  pLocal->GetObserverMode() == m_nOldObserverMode

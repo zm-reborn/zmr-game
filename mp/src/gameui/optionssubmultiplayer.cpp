@@ -2464,21 +2464,26 @@ void COptionsSubMultiplayer::RemapPalette( char *filename, int topcolor, int bot
 		dwBitsSize = dwFileSize - sizeof(bmfHeader);
 
 		HGLOBAL hDIB = GlobalAlloc( GMEM_MOVEABLE | GMEM_ZEROINIT, dwBitsSize );
-		char *pDIB = (LPSTR)GlobalLock((HGLOBAL)hDIB);
+		if ( hDIB != NULL )
 		{
-			g_pFullFileSystem->Read(pDIB, dwBitsSize, file );
+			void *pDIB = (void*)GlobalLock( hDIB );
+			if ( pDIB != nullptr )
+			{
+				g_pFullFileSystem->Read(pDIB, dwBitsSize, file );
 
-			lpbmi = (LPBITMAPINFO)pDIB;
+				lpbmi = (LPBITMAPINFO)pDIB;
 
-			// Remap palette
-			PaletteHueReplace( lpbmi->bmiColors, topcolor, SUIT_HUE_START, SUIT_HUE_END );
-			PaletteHueReplace( lpbmi->bmiColors, bottomcolor, PLATE_HUE_START, PLATE_HUE_END );
+				// Remap palette
+				PaletteHueReplace( lpbmi->bmiColors, topcolor, SUIT_HUE_START, SUIT_HUE_END );
+				PaletteHueReplace( lpbmi->bmiColors, bottomcolor, PLATE_HUE_START, PLATE_HUE_END );
 
-			outbuffer.Put( pDIB, dwBitsSize );
-		}	
+				outbuffer.Put( pDIB, dwBitsSize );
 
-		GlobalUnlock( hDIB);
-		GlobalFree((HGLOBAL) hDIB);
+				GlobalUnlock( hDIB );
+			}
+
+			GlobalFree( hDIB );
+		}
 	}
 
 	g_pFullFileSystem->Close(file);
