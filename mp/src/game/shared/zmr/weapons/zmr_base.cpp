@@ -485,6 +485,9 @@ bool CZMBaseWeapon::DefaultReload( int iClipSize1, int iClipSize2, int iActivity
     if ( flReadyTime == -1.0f )
         flReadyTime = flConfigReloadTime;
     
+    // Weapon has shorter ready time than clip fill time! Fix your config!
+    if ( flReadyTime < flReloadTime )
+        flReadyTime = flReloadTime;
 
     m_flNextPrimaryAttack = m_flNextSecondaryAttack = gpGlobals->curtime + flReadyTime;
 
