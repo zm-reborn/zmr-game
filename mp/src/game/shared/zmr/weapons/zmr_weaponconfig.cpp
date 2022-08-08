@@ -131,6 +131,8 @@ CZMBaseWeaponConfig::CZMBaseWeaponConfig( const char* wepname, const char* confi
 
 
     fFlags = WEPFLAG_NONE;
+
+    bFireSingly = false;
 }
 
 CZMBaseWeaponConfig::~CZMBaseWeaponConfig()
@@ -249,6 +251,8 @@ void CZMBaseWeaponConfig::LoadFromConfig( KeyValues* kv )
         fFlags |= WEPFLAG_ATTACK_INWATER;
     if ( kv->GetBool( "reloadonladder", true ) )
         fFlags |= WEPFLAG_RELOAD_ONLADDER;
+
+    bFireSingly = kv->GetBool( "firesingly", false );
 }
 
 KeyValues* CZMBaseWeaponConfig::ToKeyValues() const
@@ -351,6 +355,8 @@ KeyValues* CZMBaseWeaponConfig::ToKeyValues() const
     kv->SetBool( "reloadonladder", (fFlags & WEPFLAG_RELOAD_ONLADDER) ? true : false );
 
     kv->SetBool( "attackinwater", (fFlags & WEPFLAG_ATTACK_INWATER) ? true : false );
+
+    kv->SetBool( "firesingly", bFireSingly );
 
     return kv;
 }

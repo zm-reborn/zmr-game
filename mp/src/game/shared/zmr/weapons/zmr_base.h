@@ -223,6 +223,8 @@ public:
     inline int          GetReserveAmmo() const { return m_nReserveAmmo; }
     inline void         SetReserveAmmo( int ammo ) { m_nReserveAmmo = ammo; }
 #endif
+
+    inline bool IsHoldingAfterFiring() const { return m_bHoldingAfterFiring; }
     
 protected:
 #ifndef CLIENT_DLL
@@ -253,6 +255,8 @@ protected:
     // Override baseclass m_bInReload
     // Mainly to fix prediction errors, since m_bInReload is not networked.
     CNetworkVar( bool, m_bInReload2 );
+
+    CNetworkVar( bool, m_bHoldingAfterFiring );
 
 #ifdef GAME_DLL
     void ReleaseConstraint();

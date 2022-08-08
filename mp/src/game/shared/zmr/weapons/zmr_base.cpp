@@ -75,6 +75,7 @@ BEGIN_NETWORK_TABLE( CZMBaseWeapon, DT_ZM_BaseWeapon )
     RecvPropString( RECVINFO( m_sScriptFileName ) ),
 
     RecvPropBool( RECVINFO( m_bInReload2 ) ),
+    RecvPropBool( RECVINFO( m_bHoldingAfterFiring ) ),
 #else
     SendPropInt( SENDINFO( m_nOverrideClip1 ) ),
     SendPropTime( SENDINFO( m_flNextClipFillTime ) ),
@@ -85,6 +86,7 @@ BEGIN_NETWORK_TABLE( CZMBaseWeapon, DT_ZM_BaseWeapon )
     SendPropExclude( "DT_LocalWeaponData", "m_iSecondaryAmmoType" ),
 
     SendPropBool( SENDINFO( m_bInReload2 ) ),
+    SendPropBool( SENDINFO( m_bHoldingAfterFiring ) ),
 #endif
 END_NETWORK_TABLE()
 
@@ -95,6 +97,7 @@ BEGIN_PREDICTION_DATA( CZMBaseWeapon )
     DEFINE_PRED_FIELD_TOL( m_flNextClipFillTime, FIELD_FLOAT, FTYPEDESC_INSENDTABLE, TD_MSECTOLERANCE ),
     DEFINE_PRED_FIELD( m_bCanCancelReload, FIELD_BOOLEAN, FTYPEDESC_INSENDTABLE ),
     DEFINE_PRED_FIELD( m_bInReload2, FIELD_BOOLEAN, FTYPEDESC_INSENDTABLE ),
+    DEFINE_PRED_FIELD( m_bHoldingAfterFiring, FIELD_BOOLEAN, FTYPEDESC_INSENDTABLE ),
 END_PREDICTION_DATA()
 #endif
 
@@ -138,6 +141,7 @@ CZMBaseWeapon::CZMBaseWeapon()
     m_flNextClipFillTime = 0.0f;
     m_bCanCancelReload = true;
     m_bInReload2 = false;
+    m_bHoldingAfterFiring = false;
 
 #ifdef GAME_DLL
     m_sScriptFileName = MAKE_STRING( "" );
@@ -213,6 +217,11 @@ void CZMBaseWeapon::ItemPostFrame()
     bool bHoldingAttack = buttons & IN_ATTACK;
     bool bHoldingAttack2 = buttons & IN_ATTACK2;
     bool bHoldingReload = buttons & IN_RELOAD;
+
+    if ( !bHoldingAttack )
+    {
+        m_bHoldingAfterFiring = false;
+    }
 
     
 
@@ -972,6 +981,7 @@ void CZMBaseWeapon::PrimaryAttack()
     Shoot();
 
     m_flNextSecondaryAttack = m_flNextPrimaryAttack = gpGlobals->curtime + GetFireRate();
+    m_bHoldingAfterFiring = true;
 }
 
 // If forced, don't check for ammo.
@@ -1912,6 +1922,11 @@ bool CZMBaseWeapon::CanAct( ZMWepActionType_t type ) const
 
     // Don't attack during a reload!
     if ( IsInReload() && type >= WEPACTION_ATTACK && type <= WEPACTION_ATTACK3 )
+    {
+        return false;
+    }
+
+    if ( IsHoldingAfterFiring() && GetWeaponConfig()->bFireSingly && type >= WEPACTION_ATTACK && type <= WEPACTION_ATTACK3 )
     {
         return false;
     }
