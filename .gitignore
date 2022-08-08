@@ -48,13 +48,14 @@ config.cfg
 *.pdb
 # Force add libraries
 *.lib
-Release_*/
-Debug_*/
+Release*/
+Debug*/
 *.recipe
 *.project
 # Force add libraries
 *.a
 .vscode/
+*.lastcodeanalysissucceeded
 
 # Tool (vbsp/vvis/vrad) compilation output
 *.dll
