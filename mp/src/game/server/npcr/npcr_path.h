@@ -65,7 +65,7 @@ namespace NPCR
         virtual bool Compute( CBaseCombatCharacter* pNPC, CBaseCombatCharacter* pTarget, const CBasePathCost& cost );
         virtual bool Compute( CBaseCombatCharacter* pNPC, CBaseEntity* pTarget, const CBasePathCost& cost, float maxDistanceToArea = 10000.0f );
 
-        virtual bool ComputeNavPathDetails( int count, const Vector& vecStart, CNavArea* pLastArea, const Vector& vecGoal, const CBasePathCost& cost );
+        virtual bool ComputeNavPathDetails( const Vector& vecStart, CNavArea* pFirstArea, CNavArea* pLastArea, const Vector& vecGoal, const CBasePathCost& cost );
 
         // Builds a simple straight path with 2 links.
         virtual bool BuildSimplePath( const Vector& vecStart, const Vector& vecGoal, bool bNoNavArea = false, float maxDistanceToArea = 10000.0f );

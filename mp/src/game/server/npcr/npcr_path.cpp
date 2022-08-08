@@ -202,28 +202,58 @@ bool NPCR::CBaseNavPath::BuildSimplePath( const Vector& vecStart, const Vector& 
     return true;
 }
 
-bool NPCR::CBaseNavPath::ComputeNavPathDetails( int count, const Vector& vecStart, CNavArea* pLastArea, const Vector& vecGoal, const NPCR::CBasePathCost& cost )
+bool NPCR::CBaseNavPath::ComputeNavPathDetails( const Vector& vecStart, CNavArea* pStartArea, CNavArea* pLastArea, const Vector& vecGoal, const NPCR::CBasePathCost& cost )
 {
+    // Count total areas.
+    int totalAreas = 0;
+    for ( CNavArea* area = pLastArea; ; area = area->GetParent() )
+    {
+        // This should not be possible!!!
+        // We should end at the starting area.
+        if ( !area )
+        {
+            Assert( 0 );
+            break;
+        }
+
+        ++totalAreas;
+
+        if ( area == pStartArea )
+        {
+            break;
+        }
+    }
+
     Vector center;
     float halfWidth;
 
-    if ( count >= MAX_PATH_LINKS-1 )
+    // We need to save room for count + 1
+    m_nLinkCount = totalAreas;
+    if ( m_nLinkCount > MAX_PATH_LINKS )
     {
-        count = MAX_PATH_LINKS-1;
+        m_nLinkCount = MAX_PATH_LINKS;
     }
 
-    // We need to save room for count + 1
-    Assert( count < MAX_PATH_LINKS-1 );
-    m_nLinkCount = count;
-
     // Copy areas over starting from the last to the first.
-    CNavArea* area;
-    for ( area = pLastArea; count > 0 && area; area = area->GetParent() )
     {
-        --count;
-        m_Links[count].area = area;
-        m_Links[count].navTraverse = area->GetParentHow();
-        m_Links[count].navTravel = TRAVEL_ONGROUND;
+        // If we have too many areas, skip the ending ones.
+        int skip = totalAreas - m_nLinkCount;
+        int i = m_nLinkCount - 1;
+        for ( CNavArea* area = pLastArea; i >= 0; area = area->GetParent() )
+        {
+            Assert( area );
+
+            if ( skip > 0 )
+            {
+                --skip;
+                continue;
+            }
+
+            m_Links[i].area = area;
+            m_Links[i].navTraverse = area->GetParentHow();
+            m_Links[i].navTravel = TRAVEL_ONGROUND;
+            --i;
+        }
     }
 
 
@@ -295,49 +325,52 @@ bool NPCR::CBaseNavPath::ComputeNavPathDetails( int count, const Vector& vecStar
     }
     
 
-    // Setup the last link as the actual goal position.
-    // The link before is the position to the EDGE of the area.
-    // We insert this link to actually get to the wanted position inside that area.
-    ++m_nLinkCount;
-
-
-    
-    NavLink_t* last = &m_Links[i];
-
-    last->area = pLastArea;
-    last->fwd = prev->fwd;
-    last->fwd_dot = 1.0f;
-    last->length = 0.0f;
-    last->navTraverse = prev->navTraverse;
-    last->navTravel = TRAVEL_ONGROUND; // Assume we'll be traveling on ground.
-
-    prev->area->ComputePortal( last->area, (NavDirType)last->navTraverse, &center, &halfWidth );
-
-    if ( last->area->Contains( vecGoal ) )
+    if ( m_nLinkCount < MAX_PATH_LINKS )
     {
-        last->pos = vecGoal;
-        last->pos.z = last->area->GetZ( vecGoal );
-    }
-    else
-    {
-        // We want to go to the exact spot?
-        // This is for moving towards objects that may not be on the nav mesh.
-        if ( IsUsingExactGoal() )
+        // Setup the last link as the actual goal position.
+        // The link before is the position to the EDGE of the area.
+        // We insert this link to actually get to the wanted position inside that area.
+        ++m_nLinkCount;
+
+        NavLink_t* last = &m_Links[i];
+
+        last->area = pLastArea;
+        last->fwd = prev->fwd;
+        last->fwd_dot = 1.0f;
+        last->length = 0.0f;
+        last->navTraverse = prev->navTraverse;
+        last->navTravel = TRAVEL_ONGROUND; // Assume we'll be traveling on ground.
+
+        prev->area->ComputePortal( last->area, (NavDirType)last->navTraverse, &center, &halfWidth );
+
+        if ( last->area->Contains( vecGoal ) )
         {
             last->pos = vecGoal;
+            last->pos.z = last->area->GetZ( vecGoal );
         }
         else
         {
-            last->area->GetClosestPointOnArea( vecGoal, &last->pos );
-        }
+            // We want to go to the exact spot?
+            // This is for moving towards objects that may not be on the nav mesh.
+            if ( IsUsingExactGoal() )
+            {
+                last->pos = vecGoal;
+            }
+            else
+            {
+                last->area->GetClosestPointOnArea( vecGoal, &last->pos );
+            }
         
+        }
+
+        prev->fwd = last->pos - prev->pos;
+        prev->length = prev->fwd.NormalizeInPlace();
     }
 
-    prev->fwd = last->pos - prev->pos;
-    prev->length = prev->fwd.NormalizeInPlace();
 
-
+    //
     // Check for any jumps we have to do.
+    //
     for ( i = 1; i < m_nLinkCount; i++ )
     {
         NavLink_t* from = &m_Links[i-1];
@@ -444,22 +477,10 @@ bool NPCR::CBaseNavPath::BuildNavPath( const Vector& vecStart, const Vector& vec
         return false;
 
 
-    // Get count of segments we're going to go through.
-    int count = 0;
-
-    CNavArea* area;
-    for ( area = closestArea; area; area = area->GetParent() )
+    if ( !ComputeNavPathDetails( vecStart, pStartArea, closestArea, vecGoal, cost ) )
     {
-        ++count;
-
-        if ( area == pStartArea )
-            break;
-    }
-
-
-    if ( !ComputeNavPathDetails( count, vecStart, closestArea, vecGoal, cost ) )
         return false;
-
+    }
 
     return bPathResult;
 }
