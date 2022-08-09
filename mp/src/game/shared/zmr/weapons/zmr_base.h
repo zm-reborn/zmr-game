@@ -256,6 +256,7 @@ protected:
     // Mainly to fix prediction errors, since m_bInReload is not networked.
     CNetworkVar( bool, m_bInReload2 );
 
+    CNetworkVar( float, m_flNextClipFillTime );
     CNetworkVar( bool, m_bHoldingAfterFiring );
 
 #ifdef GAME_DLL
@@ -275,7 +276,6 @@ private:
     CNetworkVar( int, m_nOverrideClip1 );
 
 
-    CNetworkVar( float, m_flNextClipFillTime );
     CNetworkVar( bool, m_bCanCancelReload );
 
 #define MAX_CUSTOM_SCRIPTFILENAME_LENGTH        128

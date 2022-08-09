@@ -232,16 +232,34 @@ void CZMBasePumpWeapon::StartReload()
         return;
     }
 
+    bool bEmptyReload = false;
 
-    SendWeaponAnim( GetReloadStartAct() );
+    Activity act = GetReloadStartAct();
+    if ( Clip1() == 0 && SelectWeightedSequence( GetEmptyReloadStartAct() ) > 0 )
+    {
+        act = GetEmptyReloadStartAct();
+        bEmptyReload = true;
+    }
 
+    SendWeaponAnim( act );
 
-    float nextattack = gpGlobals->curtime + SequenceDuration();
-    pPlayer->SetNextAttack( nextattack );
-    m_flNextPrimaryAttack = nextattack;
+    float flSeqDuration = SequenceDuration();
 
+    m_flNextPrimaryAttack = m_flNextSecondaryAttack = gpGlobals->curtime + flSeqDuration;
 
-    m_iReloadState = RELOADSTATE_START;
+    // If it has increment ammo event, consider it reloading.
+    float flReloadTime = GetFirstInstanceOfAnimEventTime( GetSequence(), (int)AE_WPN_INCREMENTAMMO );
+    if ( flReloadTime != -1.0f )
+    {
+        m_flNextClipFillTime = gpGlobals->curtime + MIN( flReloadTime, flSeqDuration );
+
+        m_iReloadState = RELOADSTATE_RELOADING;
+        m_bInReload2 = true;
+    }
+    else
+    {
+        m_iReloadState = RELOADSTATE_START;
+    }
 }
 
 void CZMBasePumpWeapon::StopReload()

@@ -73,6 +73,7 @@ public:
     virtual Activity GetReloadEndAct() const { return ACT_VM_RELOAD_FINISH; }
     virtual Activity GetPumpAct() const { return ACT_SHOTGUN_PUMP; }
     virtual Activity GetEmptyPumpAct() const { return ACT_VM_RELOAD_SILENCED; }
+    virtual Activity GetEmptyReloadStartAct() const { return ACT_VM_RELOAD_EMPTY; }
     virtual void StartReload();
     virtual void Pump();
 
