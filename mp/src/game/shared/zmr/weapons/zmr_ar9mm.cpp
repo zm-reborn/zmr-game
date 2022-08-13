@@ -3,6 +3,8 @@
 #include "zmr_mac10.h"
 
 #ifdef CLIENT_DLL
+#include "prediction.h"
+
 #define CZMWeaponAR9mm C_ZMWeaponAR9mm
 #endif
 
@@ -28,6 +30,8 @@ public:
     virtual void ItemPostFrame() OVERRIDE;
 
     virtual void SecondaryAttack() OVERRIDE;
+
+    virtual void SecondaryAttackEffects( WeaponSound_t wpnsound ) OVERRIDE;
 
 
     bool IsFiringBurst() const;
@@ -132,4 +136,30 @@ void CZMWeaponAR9mm::FireBurstBullet( int index )
     Shoot( m_iPrimaryAmmoType, -1, -1, GetWeaponConfig()->secondary.flRange, true );
 
     m_nBurstShots = index + 1;
+}
+
+void CZMWeaponAR9mm::SecondaryAttackEffects( WeaponSound_t wpnsound )
+{
+    CZMPlayer* pPlayer = GetPlayerOwner();
+    if ( !pPlayer )
+        return;
+
+
+    // Only play burst anim once.
+    if ( m_nBurstShots == NOT_IN_BURST )
+    {
+        // IMPORTANT: Always needs to be called
+        SendWeaponAnim( GetSecondaryAttackActivity() );
+    }
+
+#ifdef CLIENT_DLL
+    if ( prediction->IsFirstTimePredicted() )
+#endif
+    {
+        pPlayer->DoMuzzleFlash();
+
+        pPlayer->DoAnimationEvent( PLAYERANIMEVENT_ATTACK_SECONDARY );
+
+        WeaponSound( wpnsound );
+    }
 }
