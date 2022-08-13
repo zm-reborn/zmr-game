@@ -66,6 +66,8 @@ namespace ZMWeaponConfig
         float flRange;
 
         int nBulletsPerShot;
+
+        bool bFireSingly;
     };
     //
     
@@ -140,8 +142,6 @@ namespace ZMWeaponConfig
         int fFlags; // WeaponFlags_t
 
         float flReloadTime;
-
-        bool bFireSingly;
         //
 
     

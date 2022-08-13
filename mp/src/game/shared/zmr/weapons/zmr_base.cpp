@@ -1929,9 +1929,12 @@ bool CZMBaseWeapon::CanAct( ZMWepActionType_t type ) const
         return false;
     }
 
-    if ( IsHoldingAfterFiring() && GetWeaponConfig()->bFireSingly && type >= WEPACTION_ATTACK && type <= WEPACTION_ATTACK3 )
+    if ( IsHoldingAfterFiring() )
     {
-        return false;
+        if ( type == WEPACTION_ATTACK && GetWeaponConfig()->primary.bFireSingly )
+            return false;
+        if ( type == WEPACTION_ATTACK2 && GetWeaponConfig()->secondary.bFireSingly )
+            return false;
     }
 
 

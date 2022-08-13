@@ -53,6 +53,7 @@ void ZMAttackConfig_t::Reset()
     flRange = DEFAULT_MAX_RANGE;
     flFireRate = 1.0f;
     nBulletsPerShot = 1;
+    bFireSingly = false;
 }
 
 void ZMAttackConfig_t::ToKeyValues( KeyValues* kv ) const
@@ -61,6 +62,7 @@ void ZMAttackConfig_t::ToKeyValues( KeyValues* kv ) const
     kv->SetFloat( "firerate", flFireRate );
     kv->SetFloat( "range", flRange );
     kv->SetInt( "bulletspershot", nBulletsPerShot );
+    kv->SetBool( "firesingly", bFireSingly );
 
     
     // Radius in radians to diameter in degrees
@@ -80,6 +82,7 @@ void ZMAttackConfig_t::FromKeyValues( KeyValues* kv )
     flFireRate = kv->GetFloat( "firerate", -1.0f );
     flRange = kv->GetFloat( "range", DEFAULT_MAX_RANGE );
     nBulletsPerShot = kv->GetInt( "bulletspershot", 1 );
+    bFireSingly = kv->GetBool( "firesingly", false );
 
 
     CZMBaseWeaponConfig::ComputeSpread( kv->GetString( "spread" ), vecSpread );
@@ -131,8 +134,6 @@ CZMBaseWeaponConfig::CZMBaseWeaponConfig( const char* wepname, const char* confi
 
 
     fFlags = WEPFLAG_NONE;
-
-    bFireSingly = false;
 }
 
 CZMBaseWeaponConfig::~CZMBaseWeaponConfig()
@@ -251,8 +252,6 @@ void CZMBaseWeaponConfig::LoadFromConfig( KeyValues* kv )
         fFlags |= WEPFLAG_ATTACK_INWATER;
     if ( kv->GetBool( "reloadonladder", true ) )
         fFlags |= WEPFLAG_RELOAD_ONLADDER;
-
-    bFireSingly = kv->GetBool( "firesingly", false );
 }
 
 KeyValues* CZMBaseWeaponConfig::ToKeyValues() const
@@ -355,8 +354,6 @@ KeyValues* CZMBaseWeaponConfig::ToKeyValues() const
     kv->SetBool( "reloadonladder", (fFlags & WEPFLAG_RELOAD_ONLADDER) ? true : false );
 
     kv->SetBool( "attackinwater", (fFlags & WEPFLAG_ATTACK_INWATER) ? true : false );
-
-    kv->SetBool( "firesingly", bFireSingly );
 
     return kv;
 }
