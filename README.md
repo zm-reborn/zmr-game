@@ -51,7 +51,11 @@ Yes.
 Open project settings and make sure `Platform Toolset` is `v143` and `Windows SDK Version` is `10.0 (latest installed version)` or lower.
 If it says one of them is missing, you need to download them from Visual Studio Installer (Tools -> Get Tools and Features)
 
-If you're having problems, just [ask Mehis in Discord](https://discord.gg/tZTUex3).
+Running `mp/src/fix_vcxproj.bat` might also help.
+
+### Other problems
+
+Just [ask Mehis in Discord](https://discord.gg/tZTUex3).
 
 ## Contributing
 
