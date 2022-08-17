@@ -7,6 +7,8 @@
 
 #define PIPEBOMB_MODEL      "models/weapons/w_pipebomb.mdl"
 
+#define RINGTONE_SND        "Weapon_Pipebomb_ZM.Ringtone"
+
 class CZMProjectilePipebomb : public CBaseGrenade
 {
 public:
@@ -38,6 +40,7 @@ CZMProjectilePipebomb::~CZMProjectilePipebomb()
 void CZMProjectilePipebomb::Precache()
 {
     PrecacheModel( PIPEBOMB_MODEL );
+    PrecacheScriptSound( RINGTONE_SND );
 }
 
 void CZMProjectilePipebomb::Spawn()
@@ -54,6 +57,8 @@ void CZMProjectilePipebomb::Spawn()
     SetNextThink( gpGlobals->curtime + 3.0f );
 
     BaseClass::Spawn();
+
+    EmitSound( RINGTONE_SND );
 }
 
 void CZMProjectilePipebomb::PipebombThink()
@@ -61,6 +66,8 @@ void CZMProjectilePipebomb::PipebombThink()
     Detonate();
 
     UTIL_Remove( this );
+
+    StopSound( RINGTONE_SND );
 }
 
 bool CZMProjectilePipebomb::IsCombatItem() const
