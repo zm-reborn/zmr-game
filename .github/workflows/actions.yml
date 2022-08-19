@@ -1,0 +1,89 @@
+name: Build game
+
+on:
+  push:
+    branches:
+    - master
+    - dev
+    - hotfix*
+    paths:
+    - mp/src/**
+    - forcebuild.txt
+    - .github/workflows/*
+
+# NOTE: Each step sets cwd back to git folder.
+jobs:
+  build-linux:
+    name: Build for Linux
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Install Dependencies
+      run: |
+        sudo apt update
+        sudo apt install build-essential gcc-multilib g++-multilib
+    - name: Download Steam Runtime
+      run: |
+        sudo mkdir /valve
+        sudo wget http://media.steampowered.com/client/runtime/steam-runtime-sdk_latest.tar.xz
+        sudo tar xvf steam-runtime-sdk_latest.tar.xz
+        sudo mv steam-runtime-sdk_2013-09-05 /valve/steam-runtime
+    - name: Install Runtime
+      run: cat build/steam-runtime-install.txt | sudo /valve/steam-runtime/setup.sh
+    - name: Create make file
+      run: |
+        cd mp/src
+        ./creategameprojects
+    - name: Make
+      run: cat build/make-game-script.txt | sudo /valve/steam-runtime/shell-i386.sh
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: linux-artifact
+        path: |
+          mp/game/zombie_master_reborn/bin/client.sp
+          mp/game/zombie_master_reborn/bin/client.so.dbg
+          mp/game/zombie_master_reborn/bin/game_shader_dx9.so
+          mp/game/zombie_master_reborn/bin/game_shader_dx9.so.dbg
+          mp/game/zombie_master_reborn/bin/server.so
+          mp/game/zombie_master_reborn/bin/server.so.dbg
+          mp/game/zombie_master_reborn/bin/server_srv.so
+          mp/game/zombie_master_reborn/bin/server_srv.so.dbg
+        if-no-files-found: error
+
+  build-windows:
+    name: Build for Windows
+    runs-on: windows-2022
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Setup msbuild
+      uses: microsoft/setup-msbuild@v1.1
+    - name: Run fix_vcxproj.bat
+      run: |
+        cd mp/src
+        ./fix_vcxproj.bat
+    - name: Run creategameprojects.bat
+      run: |
+        cd mp/src
+        ./creategameprojects.bat
+    - name: Fix solution
+      shell: cmd
+      run: |
+        cd mp/src
+        COPY zmr-games.sln+sln_fix.txt zmr-games.sln /b
+    - name: Build
+      run: msbuild mp/src/zmr-games.sln -property:Configuration=Release
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: windows-artifact
+        path: |
+          mp/game/zombie_master_reborn/bin/client.dll
+          mp/game/zombie_master_reborn/bin/client.pdb
+          mp/game/zombie_master_reborn/bin/game_shader_dx9.dll
+          mp/game/zombie_master_reborn/bin/game_shader_dx9.pdb
+          mp/game/zombie_master_reborn/bin/server.dll
+          mp/game/zombie_master_reborn/bin/server.pdb
+        if-no-files-found: error
