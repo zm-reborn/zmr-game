@@ -22,6 +22,7 @@ END_NETWORK_TABLE()
 
 #ifdef CLIENT_DLL
 BEGIN_PREDICTION_DATA( CZMBaseThrowableWeapon )
+    DEFINE_PRED_FIELD( m_iThrowState, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
 END_PREDICTION_DATA()
 #endif
 
@@ -89,6 +90,11 @@ void CZMBaseThrowableWeapon::ItemPostFrame()
             Throw( pPlayer );
         }
     }
+
+    //
+    // Check weapon idle anims.
+    //
+    WeaponIdle();
 }
 
 bool CZMBaseThrowableWeapon::Deploy()
