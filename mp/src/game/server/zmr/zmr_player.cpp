@@ -301,7 +301,15 @@ void CZMPlayer::PreThink()
 
 
     SetMaxSpeed( ZM_WALK_SPEED );
-    State_PreThink();
+
+    if ( IsObserver() )
+    {
+        State_PreThink_OBSERVER_MODE();
+    }
+    else
+    {
+        State_PreThink_ACTIVE();
+    }
 
     // Reset bullet force accumulator, only lasts one frame
     m_vecTotalBulletForce = vec3_origin;
@@ -844,9 +852,7 @@ void CZMPlayer::CheckObserverSettings()
 
 void CZMPlayer::SetTeamSpecificProps()
 {
-    // To shut up the asserts...
-    // These states aren't even used, except for going into observer mode.
-    State_Transition( ZMSTATE_ACTIVE );
+    State_Enter_ACTIVE();
 
 
     RemoveFlag( FL_NOTARGET );
@@ -893,7 +899,7 @@ void CZMPlayer::SetTeamSpecificProps()
         else
         {
             // Apparently this sets the observer physics flag.
-            State_Transition( ZMSTATE_OBSERVER_MODE );
+            State_Enter_OBSERVER_MODE();
         }
 
 
@@ -2344,60 +2350,6 @@ int CZMPlayer::ShouldTransmit( const CCheckTransmitInfo* pInfo )
 
 
     return CBaseEntity::ShouldTransmit( pInfo );
-}
-
-void CZMPlayer::State_Transition( ZMPlayerState_t newState )
-{
-    State_Leave();
-    State_Enter( newState );
-}
-
-
-void CZMPlayer::State_Enter( ZMPlayerState_t newState )
-{
-    m_iPlayerState = newState;
-    m_pCurStateInfo = State_LookupInfo( newState );
-
-    // Initialize the new state.
-    if ( m_pCurStateInfo && m_pCurStateInfo->pfnEnterState )
-        (this->*m_pCurStateInfo->pfnEnterState)();
-}
-
-
-void CZMPlayer::State_Leave()
-{
-    if ( m_pCurStateInfo && m_pCurStateInfo->pfnLeaveState )
-    {
-        (this->*m_pCurStateInfo->pfnLeaveState)();
-    }
-}
-
-
-void CZMPlayer::State_PreThink()
-{
-    if ( m_pCurStateInfo && m_pCurStateInfo->pfnPreThink )
-    {
-        (this->*m_pCurStateInfo->pfnPreThink)();
-    }
-}
-
-
-CZMPlayerStateInfo* CZMPlayer::State_LookupInfo( ZMPlayerState_t state )
-{
-    // This table MUST match the 
-    static CZMPlayerStateInfo playerStateInfos[] =
-    {
-        { ZMSTATE_ACTIVE,			"STATE_ACTIVE",			&CZMPlayer::State_Enter_ACTIVE, NULL, &CZMPlayer::State_PreThink_ACTIVE },
-        { ZMSTATE_OBSERVER_MODE,	"STATE_OBSERVER_MODE",	&CZMPlayer::State_Enter_OBSERVER_MODE,	NULL, &CZMPlayer::State_PreThink_OBSERVER_MODE }
-    };
-
-    for ( int i=0; i < ARRAYSIZE( playerStateInfos ); i++ )
-    {
-        if ( playerStateInfos[i].m_iPlayerState == state )
-            return &playerStateInfos[i];
-    }
-
-    return NULL;
 }
 
 bool CZMPlayer::StartObserverMode( int mode )

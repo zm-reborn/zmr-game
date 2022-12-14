@@ -34,27 +34,6 @@ class CZMRagdoll;
 class CZMPlayerModelData;
 class CZMViewModel;
 
-enum ZMPlayerState_t
-{
-    // Happily running around in the game.
-    ZMSTATE_ACTIVE = 0,
-    ZMSTATE_OBSERVER_MODE, // Noclipping around, watching players, etc.
-
-    NUM_ZMSTATE_PLAYER
-};
-
-class CZMPlayerStateInfo
-{
-public:
-    ZMPlayerState_t m_iPlayerState;
-    const char* m_pStateName;
-
-    void (CZMPlayer::*pfnEnterState)();	// Init and deinit the state.
-    void (CZMPlayer::*pfnLeaveState)();
-
-    void (CZMPlayer::*pfnPreThink)(); // Do a PreThink() in this state.
-};
-
 struct ZMServerWepData_t
 {
     void Reset()
@@ -179,13 +158,6 @@ public:
     void UpdatePlayerUseEntity();
     virtual void PlayerUse() OVERRIDE;
     //virtual void PlayUseDenySound() OVERRIDE;
-
-
-    void State_Transition( ZMPlayerState_t newState );
-    void State_Enter( ZMPlayerState_t newState );
-    void State_Leave();
-    void State_PreThink();
-    CZMPlayerStateInfo* State_LookupInfo( ZMPlayerState_t state );
 
     void State_Enter_ACTIVE();
     void State_PreThink_ACTIVE();
@@ -320,8 +292,6 @@ private:
 
     int                 m_iLastWeaponFireUsercmd;
     Vector              m_vecTotalBulletForce; // Accumulator for bullet force in a single frame
-	ZMPlayerState_t     m_iPlayerState;
-	CZMPlayerStateInfo* m_pCurStateInfo;
     bool                m_bEnterObserver;
     float               m_flNextModelChangeTime;
     float               m_flNextVoiceLineTime;
