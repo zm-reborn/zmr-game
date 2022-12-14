@@ -297,6 +297,11 @@ Vector CZMPlayer::GetAutoaimVector( float flScale )
 // Play normal footsteps instead of HL2DM ones.
 void CZMPlayer::PlayStepSound( Vector& vecOrigin, surfacedata_t* psurface, float fvol, bool force )
 {
+    if ( IsRat() )
+    {
+        return;
+    }
+
     CBasePlayer::PlayStepSound( vecOrigin, psurface, fvol, force );
 }
 

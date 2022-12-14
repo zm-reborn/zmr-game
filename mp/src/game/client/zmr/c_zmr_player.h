@@ -93,6 +93,7 @@ public:
     // Custom...
     inline bool IsZM() const { return GetTeamNumber() == ZMTEAM_ZM; }
     inline bool IsHuman() const { return GetTeamNumber() == ZMTEAM_HUMAN; }
+    inline bool IsRat() const { return GetTeamNumber() == ZMTEAM_SPECTATOR && !IsObserver(); }
 
     static C_ZMPlayer* GetLocalPlayer();
 

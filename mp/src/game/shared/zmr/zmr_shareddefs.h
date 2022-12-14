@@ -172,6 +172,10 @@ enum ZMChatNotifyType_t
 #define VEC_ZM_HULL_MAX     (ZMRules()->GetZMViewVectors()->m_vZMHullMax)
 #define VEC_ZM_VIEW         (ZMRules()->GetZMViewVectors()->m_vZMView)
 
+#define VEC_RAT_HULL_MIN    (ZMRules()->GetZMViewVectors()->m_vRatHullMin)
+#define VEC_RAT_HULL_MAX    (ZMRules()->GetZMViewVectors()->m_vRatHullMax)
+#define VEC_RAT_VIEW        (ZMRules()->GetZMViewVectors()->m_vRatView)
+
 enum HappyZombieEvent_t
 {
     HZEVENT_INVALID = 0,

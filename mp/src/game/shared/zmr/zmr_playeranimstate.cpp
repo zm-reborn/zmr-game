@@ -337,7 +337,24 @@ bool CZMPlayerAnimState::HandleSwimming( Activity &idealActivity )
 //-----------------------------------------------------------------------------
 bool CZMPlayerAnimState::HandleMoving( Activity &idealActivity )
 {
-    return BaseClass::HandleMoving( idealActivity );
+    float flSpeed = GetOuterXYSpeed();
+
+    if ( flSpeed <= MOVING_MINIMUM_SPEED )
+    {
+        return false;
+    }
+
+
+    if ( m_pZMPlayer->IsRat() )
+    {
+        idealActivity = flSpeed > 100.0f ? ACT_MP_RUN : ACT_MP_WALK;
+    }
+    else
+    {
+        idealActivity = ACT_MP_RUN;
+    }
+
+    return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -347,6 +364,11 @@ bool CZMPlayerAnimState::HandleMoving( Activity &idealActivity )
 //-----------------------------------------------------------------------------
 bool CZMPlayerAnimState::HandleDucking( Activity &idealActivity )
 {
+    if ( m_pZMPlayer->IsRat() )
+    {
+        return false;
+    }
+
     if ( m_pZMPlayer->GetFlags() & FL_DUCKING )
     {
         if ( GetOuterXYSpeed() < MOVING_MINIMUM_SPEED )
@@ -452,12 +474,7 @@ bool CZMPlayerAnimState::SetupPoseParameters( CStudioHdr *pStudioHdr )
         m_bIs9Way = true;
 
         m_PoseParameterData.m_iAimPitch = m_pZMPlayer->LookupPoseParameter( pStudioHdr, "body_pitch" );
-        if ( m_PoseParameterData.m_iAimPitch < 0 )
-            return false;
-
         m_PoseParameterData.m_iAimYaw = m_pZMPlayer->LookupPoseParameter( pStudioHdr, "body_yaw" );
-        if ( m_PoseParameterData.m_iAimYaw < 0 )
-            return false;
     }
     //
     // Fallback to 8way blending
@@ -668,7 +685,10 @@ void CZMPlayerAnimState::ComputePoseParam_AimPitch( CStudioHdr *pStudioHdr )
     float flAimPitch = m_flEyePitch;
 
     // Set the aim pitch pose parameter and save.
-    m_pZMPlayer->SetPoseParameter( pStudioHdr, m_PoseParameterData.m_iAimPitch, flAimPitch );
+    if ( m_PoseParameterData.m_iAimPitch >= 0 )
+    {
+        m_pZMPlayer->SetPoseParameter( pStudioHdr, m_PoseParameterData.m_iAimPitch, flAimPitch );
+    }
     m_DebugAnimData.m_flAimPitch = flAimPitch;
 }
 
@@ -738,9 +758,17 @@ void CZMPlayerAnimState::ComputePoseParam_AimYaw( CStudioHdr *pStudioHdr )
     flAimYaw = AngleNormalize( flAimYaw );
 
     // Set the aim yaw and save.
-    m_pZMPlayer->SetPoseParameter( pStudioHdr, m_PoseParameterData.m_iAimYaw, flAimYaw );
+    if ( m_PoseParameterData.m_iAimYaw >= 0 )
+    {
+        m_pZMPlayer->SetPoseParameter( pStudioHdr, m_PoseParameterData.m_iAimYaw, flAimYaw );
+        m_flCurrentAimYaw = flAimYaw;
+    }
+    else
+    {
+        m_flCurrentAimYaw = 0.0f;
+    }
+
     m_DebugAnimData.m_flAimYaw	= flAimYaw;
-    m_flCurrentAimYaw = flAimYaw;
 
     // Turn off a force aim yaw - either we have already updated or we don't need to.
     m_bForceAimYaw = false;

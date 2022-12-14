@@ -44,7 +44,10 @@ public:
         Vector vDeadViewHeight,
         Vector vZMHullMin,
         Vector vZMHullMax,
-        Vector vZMView ) :
+        Vector vZMView,
+        Vector vRatHullMin,
+        Vector vRatHullMax,
+        Vector vRatView ) :
             CViewVectors( 
                 vView,
                 vHullMin,
@@ -59,11 +62,19 @@ public:
         m_vZMHullMin = vZMHullMin;
         m_vZMHullMax = vZMHullMax;
         m_vZMView = vZMView;
+
+        m_vRatHullMin = vRatHullMin;
+        m_vRatHullMax = vRatHullMax;
+        m_vRatView = vRatView;
     }
 
     Vector m_vZMHullMin;
     Vector m_vZMHullMax;
     Vector m_vZMView;
+
+    Vector m_vRatHullMin;
+    Vector m_vRatHullMax;
+    Vector m_vRatView;
 };
 
 

@@ -86,7 +86,10 @@ static CZMViewVectors g_ZMViewVectors(
     // To keep things like before, we need to keep the view offset the same.
     Vector( -16, -16, 48 ),    //VEC_ZM_HULL_MIN (vZMHullMin)
     Vector( 16, 16, 80 ),       //VEC_ZM_HULL_MAX (vZMHullMax)
-    Vector( 0, 0, 64 )          //VEC_ZM_VIEW (vZMView)
+    Vector( 0, 0, 64 ),         //VEC_ZM_VIEW (vZMView)
+    Vector( -10, -10, 0 ),      // VEC_RAT_HULL_MIN (vRatHullMin)
+    Vector( 10, 10, 12 ),       // VEC_RAT_HULL_MAX (vRatHullMax)
+    Vector( 0, 0, 10 )          // VEC_RAT_HULL_VIEW (vRatView)
 );
 
 

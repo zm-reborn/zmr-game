@@ -342,6 +342,10 @@ Vector CZMGameMovement::GetPlayerMins() const
     {
         return VEC_ZM_HULL_MIN;
     }
+    else if ( GetZMPlayer()->IsRat() )
+    {
+        return VEC_RAT_HULL_MIN;
+    }
 
     return CGameMovement::GetPlayerMins();
 }
@@ -351,6 +355,10 @@ Vector CZMGameMovement::GetPlayerMins( bool ducked ) const
     if ( GetZMPlayer()->IsZM() )
     {
         return VEC_ZM_HULL_MIN;
+    }
+    else if ( GetZMPlayer()->IsRat() )
+    {
+        return VEC_RAT_HULL_MAX;
     }
 
     return CGameMovement::GetPlayerMins( ducked );
@@ -362,6 +370,10 @@ Vector CZMGameMovement::GetPlayerMaxs() const
     {
         return VEC_ZM_HULL_MAX;
     }
+    else if ( GetZMPlayer()->IsRat() )
+    {
+        return VEC_RAT_HULL_MAX;
+    }
 
     return CGameMovement::GetPlayerMaxs();
 }
@@ -372,6 +384,10 @@ Vector CZMGameMovement::GetPlayerMaxs( bool ducked ) const
     {
         return VEC_ZM_HULL_MAX;
     }
+    else if ( GetZMPlayer()->IsRat() )
+    {
+        return VEC_RAT_HULL_MAX;
+    }
 
     return CGameMovement::GetPlayerMaxs( ducked );
 }
@@ -381,6 +397,10 @@ Vector CZMGameMovement::GetPlayerViewOffset( bool ducked ) const
     if ( GetZMPlayer()->IsZM() )
     {
         return VEC_ZM_VIEW;
+    }
+    else if ( GetZMPlayer()->IsRat() )
+    {
+        return VEC_RAT_VIEW;
     }
 
     return CGameMovement::GetPlayerViewOffset( ducked );
@@ -533,6 +553,11 @@ void CZMGameMovement::Accelerate( Vector& wishdir, float wishspeed, float accel 
     if ( !CanAccelerate() )
         return;
 
+    if ( GetZMPlayer()->IsRat() )
+    {
+        accel = 8.0f;
+    }
+
 
     // See if we are changing direction a bit
 
@@ -676,12 +701,18 @@ void CZMGameMovement::PlayerRoughLandingEffects( float fvol )
     if ( GetZMPlayer()->IsZM() )
         return;
 
+    if ( GetZMPlayer()->IsRat() )
+        return;
+
     CGameMovement::PlayerRoughLandingEffects( fvol );
 }
 
 void CZMGameMovement::Duck()
 {
     if ( GetZMPlayer()->IsZM() )
+        return;
+
+    if ( GetZMPlayer()->IsRat() )
         return;
 
     CGameMovement::Duck();

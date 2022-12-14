@@ -34,6 +34,8 @@
 
 #define VMHANDS_FALLBACKMODEL   "models/weapons/c_arms_citizen.mdl"
 
+#define RAT_MODEL               "models/rat/horatio.mdl"
+
 
 
 extern int TrainSpeed( int iSpeed, int iMax );
@@ -194,6 +196,8 @@ void CZMPlayer::Precache()
 
     PrecacheModel( VMHANDS_FALLBACKMODEL );
 
+    PrecacheModel( RAT_MODEL );
+
     PrecacheScriptSound( "ZMPlayer.PickupWeapon" );
     PrecacheScriptSound( "ZMPlayer.PickupAmmo" );
 
@@ -299,8 +303,6 @@ void CZMPlayer::PreThink()
     PreThink_HL2();
 
 
-
-    SetMaxSpeed( ZM_WALK_SPEED );
 
     if ( IsObserver() )
     {
@@ -857,6 +859,9 @@ void CZMPlayer::SetTeamSpecificProps()
 
     RemoveFlag( FL_NOTARGET );
 
+    // Walk speed
+    SetMaxSpeed( ZM_WALK_SPEED );
+
 
     switch ( GetTeamNumber() )
     {
@@ -909,6 +914,37 @@ void CZMPlayer::SetTeamSpecificProps()
         break;
     default : break;
     }
+}
+
+void CZMPlayer::StartRatMode()
+{
+    if ( GetTeamNumber() != ZMTEAM_SPECTATOR )
+    {
+        ChangeTeam( ZMTEAM_SPECTATOR );
+    }
+
+    StopObserverMode();
+    
+    SetModel( RAT_MODEL );
+    SetHealth( 10 );
+
+    m_lifeState = LIFE_ALIVE;
+    pl.deadflag = false;
+
+    m_takedamage = DAMAGE_YES;
+
+    SetMoveType( MOVETYPE_WALK );
+
+    RemoveEffects( EF_NODRAW );
+
+    RemoveFlag( FL_DUCKING );
+    m_Local.m_bDucking = false;
+    m_Local.m_bDucked = false;
+
+    SetViewOffset( VEC_RAT_VIEW );
+
+    // Walk speed
+    SetMaxSpeed( 65.0f );
 }
 
 void CZMPlayer::UnlinkAndRemoveChildren()

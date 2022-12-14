@@ -171,6 +171,7 @@ public:
     
     inline bool IsZM() const { return GetTeamNumber() == ZMTEAM_ZM; }
     inline bool IsHuman() const { return GetTeamNumber() == ZMTEAM_HUMAN; }
+    inline bool IsRat() const { return GetTeamNumber() == ZMTEAM_SPECTATOR && !IsObserver(); }
 
 
     void SetMenuEnt( CZMEntBaseUsable* pEnt )
@@ -271,6 +272,8 @@ public:
 
     void StartWaterDeathSounds();
 	void StopWaterDeathSounds();
+
+    void StartRatMode();
 
 protected:
     void PreThink_HL2();
