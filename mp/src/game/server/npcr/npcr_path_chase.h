@@ -17,6 +17,7 @@ namespace NPCR
 
         virtual bool NeedsRepath( CBaseNPC* pNPC, CBaseEntity* pTarget );
 
+        virtual bool Compute( CBaseCombatCharacter* pNPC, CBaseEntity* pTarget, const CBasePathCost& cost, float maxDistanceToArea = 10000.0f ) OVERRIDE;
 
         // Don't decelerate when chasing a target.
         virtual bool ShouldDecelerateToGoal() const OVERRIDE { return false; }

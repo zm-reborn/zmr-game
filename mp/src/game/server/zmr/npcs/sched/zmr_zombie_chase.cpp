@@ -53,7 +53,7 @@ void CZombieChaseSchedule::OnStart()
     m_PathCost.SetStartPos( vecStart, start );
     m_PathCost.SetGoalPos( vecEnd, goal );
 
-    m_Path.Compute( vecStart, vecEnd, start, goal, m_PathCost );
+    m_Path.CBaseNavPath::Compute( vecStart, vecEnd, start, goal, m_PathCost );
     if ( !m_Path.IsValid() )
     {
         End( "Couldn't compute chase path!" );
