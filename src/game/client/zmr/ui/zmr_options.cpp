@@ -13,7 +13,6 @@
 #include "zmr_options_graphics.h"
 #include "zmr_options_misc.h"
 #include "zmr_options_crosshair.h"
-//#include "zmr_options_keys.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -82,7 +81,6 @@ CZMOptionsMenu::CZMOptionsMenu( VPANEL parent ) : BaseClass( nullptr, "ZMOptions
     AddPage( new CZMOptionsSubGraphics( this ), "Video" );
     AddPage( new CZMOptionsSubCrosshair( this ), "Crosshair" );
     AddPage( new CZMOptionsSubMisc( this ), "Misc" );
-    //AddPage( new CZMOptionsSubKeys( this ), "Keys" );
 }
 
 CZMOptionsMenu::~CZMOptionsMenu()
