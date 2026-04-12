@@ -48,6 +48,34 @@ void CZombieMainSchedule::OnUpdate()
 {
     CZMBaseZombie* pOuter = GetOuter();
 
+    //
+    // Update our queued commands
+    // and pick the ones we will handle.
+    //
+    CZMCommandBase* pQueued = pOuter->GetCommandQueue()->NextCommand();
+    if ( pQueued )
+    {
+        if ( pOuter->IsBusy() != NPCR::RES_YES )
+        {
+            bool bRes = true;
+
+            switch ( pQueued->GetCommandType() )
+            {
+            case COMMAND_MOVE :
+                Command( pQueued->GetCommander(), pQueued->GetVectorTarget() );
+                break;
+            case COMMAND_SWAT :
+                CommandSwat( pQueued->GetCommander(), pQueued->GetObjectTarget(), static_cast<CZMCommandSwat*>( pQueued )->BreakObject() );
+                break;
+            default :
+                bRes = false;
+                break;
+            }
+
+            if ( bRes )
+                pOuter->GetCommandQueue()->RemoveCommand( pQueued );
+        }
+    }
             
     //
     // Update move path.
@@ -104,36 +132,6 @@ void CZombieMainSchedule::OnUpdate()
                 Command( nullptr, defpos );
                 return;
             }
-        }
-    }
-
-
-    //
-    // Update our queued commands
-    // and pick the ones we will handle.
-    //
-    CZMCommandBase* pQueued = pOuter->GetCommandQueue()->NextCommand();
-    if ( pQueued )
-    {
-        if ( pOuter->IsBusy() != NPCR::RES_YES )
-        {
-            bool bRes = true;
-
-            switch ( pQueued->GetCommandType() )
-            {
-            case COMMAND_MOVE :
-                Command( pQueued->GetCommander(), pQueued->GetVectorTarget() );
-                break;
-            case COMMAND_SWAT :
-                CommandSwat( pQueued->GetCommander(), pQueued->GetObjectTarget(), static_cast<CZMCommandSwat*>( pQueued )->BreakObject() );
-                break;
-            default :
-                bRes = false;
-                break;
-            }
-
-            if ( bRes )
-                pOuter->GetCommandQueue()->RemoveCommand( pQueued );
         }
     }
 }
