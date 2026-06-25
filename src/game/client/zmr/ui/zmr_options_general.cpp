@@ -14,6 +14,7 @@ extern ConVar zm_cl_usenewmenus;
 extern ConVar zm_cl_zmview_switchmousebuttons;
 extern ConVar zm_cl_poweruser;
 extern ConVar zm_cl_poweruser_boxselect;
+extern ConVar zm_cl_zmcontrolstyle;
 
 extern ConVar zm_cl_border_yawspeed;
 extern ConVar zm_cl_border_pitchspeed;
@@ -31,6 +32,7 @@ CZMOptionsSubGeneral::CZMOptionsSubGeneral( Panel* parent ) : BaseClass( parent 
     LoadItem( &m_pCheck_SwitchMouseBtns, "CheckSwitchMouseBtns" );
     LoadItem( &m_pCheck_PowerUser, "CheckPowerUser" );
     LoadItem( &m_pCheck_BoxPowerUser, "CheckPowerUserBox" );
+    LoadItem( &m_pCheck_ControlStyle, "CheckControlStyle" );
     LoadItem( &m_pSlider_Yaw, "SliderScrollHor" );
     LoadItem( &m_pSlider_Pitch, "SliderScrollVer" );
     // LoadItem( &m_pModelPanel, "CZMModelPanel1" );
@@ -105,6 +107,8 @@ void CZMOptionsSubGeneral::OnApplyChanges()
     zm_cl_border_scroll.SetValue( m_pSlider_Border->GetValue() );
 
     cl_playermodel.SetValue( GetCurrentPlayerModel() );
+
+    zm_cl_zmcontrolstyle.SetValue( m_pCheck_ControlStyle->IsSelected() ? 0 : 1 );
 }
 
 void CZMOptionsSubGeneral::OnResetData()
@@ -121,7 +125,7 @@ void CZMOptionsSubGeneral::OnResetData()
     m_pCheck_SwitchMouseBtns->SetSelected( zm_cl_zmview_switchmousebuttons.GetBool() );
     m_pCheck_PowerUser->SetSelected( zm_cl_poweruser.GetBool() );
     m_pCheck_BoxPowerUser->SetSelected( zm_cl_poweruser_boxselect.GetBool() );
-
+    m_pCheck_ControlStyle->SetSelected( zm_cl_zmcontrolstyle.GetInt() == 0 );
 
     m_pSlider_Yaw->SetValue( (int)zm_cl_border_yawspeed.GetFloat() );
     m_pSlider_Pitch->SetValue( (int)zm_cl_border_pitchspeed.GetFloat() );

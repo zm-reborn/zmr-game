@@ -30,6 +30,7 @@ private:
     vgui::CheckButton*  m_pCheck_SwitchMouseBtns;
     vgui::CheckButton*  m_pCheck_PowerUser;
     vgui::CheckButton*  m_pCheck_BoxPowerUser;
+    vgui::CheckButton*  m_pCheck_ControlStyle;
     vgui::Slider*       m_pSlider_Pitch;
     vgui::Slider*       m_pSlider_Yaw;
     vgui::Slider*       m_pSlider_Border;
