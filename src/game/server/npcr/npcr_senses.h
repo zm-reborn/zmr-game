@@ -19,6 +19,8 @@ namespace NPCR
     public:
         KnownEntity( CBaseEntity* pEnt, bool bSees )
         {
+            m_flLastSensedTime = -FLT_MAX;
+            m_flLastSeenTime = -FLT_MAX;
             m_pEnt = pEnt;
             m_flAcquiredTime = gpGlobals->curtime;
 
