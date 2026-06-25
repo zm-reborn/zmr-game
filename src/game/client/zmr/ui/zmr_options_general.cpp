@@ -33,7 +33,7 @@ CZMOptionsSubGeneral::CZMOptionsSubGeneral( Panel* parent ) : BaseClass( parent 
     LoadItem( &m_pCheck_BoxPowerUser, "CheckPowerUserBox" );
     LoadItem( &m_pSlider_Yaw, "SliderScrollHor" );
     LoadItem( &m_pSlider_Pitch, "SliderScrollVer" );
-    LoadItem( &m_pModelPanel, "CZMModelPanel1" );
+    // LoadItem( &m_pModelPanel, "CZMModelPanel1" );
     LoadItem( &m_pModelCombo, "ModelComboBox" );
     LoadItem( &m_pSlider_Border, "SliderBorder" );
 
@@ -68,7 +68,7 @@ CZMOptionsSubGeneral::CZMOptionsSubGeneral( Panel* parent ) : BaseClass( parent 
 
 
 
-    m_pModelPanel->SetPanelDirty();
+    // m_pModelPanel->SetPanelDirty();
     m_pModelCombo->ActivateItemByRow( 0 );
 
     ZMGetPlayerModels()->LoadModelsFromFile();
@@ -201,8 +201,8 @@ const char* CZMOptionsSubGeneral::GetCurrentPlayerModel()
 
 void CZMOptionsSubGeneral::OnComboChanged( KeyValues* kv )
 {
-    if ( !FailedLoad() )
-    {
-        m_pModelPanel->SwapModel( GetCurrentPlayerModel() );
-    }
+    //if ( !FailedLoad() )
+    //{
+    //    m_pModelPanel->SwapModel( GetCurrentPlayerModel() );
+    //}
 }
