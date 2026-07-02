@@ -47,7 +47,11 @@ Start hl2 with the Steam runtime.
 
 ## Final Build
 
-Turning on the conditional `ZMR_FINAL` will enable FMOD sound engine and Discord RPC. FMOD headers need to be placed in `public/fmod/` (they cannot be distributed here).
+Turning on the conditional `ZMR_FINAL` will enable FMOD sound engine and Discord RPC.
+
+FMOD headers need to be placed in `src/public/fmod/` and library `fmod_vc.lib` in `src/lib/public/x64/`. These files cannot be distributed here.
+
+Steam build is activated with the `ZMR_STEAM`-conditional.
 
 ```bash
 # You might have to use /f to force a rebuild.
