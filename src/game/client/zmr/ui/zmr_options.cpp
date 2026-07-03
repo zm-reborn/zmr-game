@@ -69,7 +69,7 @@ CZMOptionsMenu::CZMOptionsMenu( VPANEL parent ) : BaseClass( nullptr, "ZMOptions
     SetParent( parent );
 
 
-    SetBounds( 0, 0, 420, 350 );
+    SetBounds( 0, 0, QuickPropScale( 420 ), QuickPropScale( 350 ) );
 
 	SetDeleteSelfOnClose( true );
     SetSizeable( false );
