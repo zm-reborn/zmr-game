@@ -11,13 +11,10 @@ public:
     DECLARE_CLASS_SIMPLE( CZMHudControlPanel, vgui::Panel );
 
     CZMHudControlPanel( vgui::Panel* pParent );
-    ~CZMHudControlPanel();
-
-
     
     virtual void ApplySchemeSettings( vgui::IScheme* pScheme ) OVERRIDE;
 
-    virtual void OnScreenSizeChanged( int oldw, int oldh ) OVERRIDE;
+    virtual void PerformLayout() OVERRIDE;
     virtual void OnThink() OVERRIDE;
     virtual void OnCommand( const char* command ) OVERRIDE;
     
@@ -35,19 +32,9 @@ public:
     
 
     void UpdateTabs( int activatedTab = -1 );
-    
 
-    //qck: Keeps track of ents by handle serial numbers. They are unique, so there shouldn't be any problem.
-    CUtlVector<int> m_ComboBoxItems;
-    vgui::ComboBox *m_pZombieGroups;
-
-    int m_nTexBgId;
-
-
-
-
-    enum// Button
-    { 
+    enum
+    {
         BUTTON_POWER_PHYSEXP,
         BUTTON_POWER_NIGHTVISION,
         BUTTON_MODE_OFFENSIVE,
@@ -56,56 +43,42 @@ public:
         BUTTON_MODE_AMBUSH,
         BUTTON_GROUP_CREATE,
         BUTTON_GROUP_GOTO,
-        BUTTON_POWER_SPOTCREATE, // LAWYER: Spot create stuff
-        BUTTON_POWER_DELETEZOMBIES, // LAWYER: Spot create stuff
-        BUTTON_MODE_CEILING, //fastie ceiling ambush
-        NUM_BUTTONS	//needs to be last! holds number of icons in enum
+        BUTTON_POWER_SPOTCREATE,
+        BUTTON_POWER_DELETEZOMBIES,
+        BUTTON_MODE_CEILING,
+
+        NUM_BUTTONS
     };
 
-    enum// Tab
+    enum
     {
         TAB_MODES,
         TAB_POWERS,
         TAB_ZEDS,
+
         NUM_TABS
     };
-
-
-
 private:
+    void CreateButtons();
 
-    //create buttons
-    void LoadButtons();
-    //remove buttons
-    void RemoveButtons();
-
-    CZMBitMapButton *m_pButtons[NUM_BUTTONS];
-    CZMBitMapButton *m_pTabs[NUM_TABS];
+    CZMBitMapButton* m_pButtons[NUM_BUTTONS];
+    CZMBitMapButton* m_pTabs[NUM_TABS];
 
     int m_iActiveTab;
 
     Color m_BgColor;
     Color m_FgColor;
 
-    //see CBaseZombieMasterViewPort constructor on why these are needed -> the SetBounds part
-    static const int HOR_ADJUST = 8; //8
-    static const int VER_ADJUST = 40; //28
-    //base positioning values
-    static const int BUTTON_SIZE = 32; //32 //40
-    static const int BUTTON_SPACING = 10;
-    static const int PANEL_SPACING = 5;
+    CUtlVector<int> m_ComboBoxItems;
+    vgui::ComboBox* m_pZombieGroups;
 
-    //TGB: the constants here assumed a 4:3 resolution
-    //TGB: to fix we can simply define desired panel size here, and use that in combo with ScreenWidth to place on right
-    //static const int PANEL_TOPLEFT_X = 540 + HOR_ADJUST - PANEL_SPACING;
-    //static const int PANEL_TOPLEFT_Y = 380 + VER_ADJUST - PANEL_SPACING;
-    //static const int PANEL_BOTRIGHT_X = 640 + HOR_ADJUST - PANEL_SPACING;
-    //static const int PANEL_BOTRIGHT_Y = 480 + VER_ADJUST - PANEL_SPACING;
-    
-    static const int PANEL_SIZE_X = 156; // 156
-    static const int PANEL_SIZE_Y = 150; // 156
+    int m_nTexBgId;
 
-    static const int COMBO_BOX_X_OFFSET = 11;
-    static const int COMBO_BOX_Y_OFFSET = 64;
-    static const int COMBO_BOX_WIDTH = 100;
+    static const int BUTTON_SIZE = 16;
+    static const int BUTTON_SPACING = 4;
+    static const int MARGIN_TOP = 12;
+    static const int MARGIN_LEFT = 18;
+    static const int MARGIN_BOTTOM_RIGHT = 8;
+
+    static const int TAB_SPACING = 8;
 };
