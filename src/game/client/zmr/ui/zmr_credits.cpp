@@ -65,7 +65,6 @@ CZMCreditsMenu::CZMCreditsMenu( vgui::VPANEL parent ) : BaseClass( nullptr, "ZMC
 
     SetMouseInputEnabled( true );
     SetKeyBoardInputEnabled( true );
-    SetProportional( false );
     SetDeleteSelfOnClose( true );
     SetMoveable( true );
     SetSizeable( false );

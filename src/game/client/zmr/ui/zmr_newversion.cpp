@@ -62,14 +62,9 @@ CZMNewVerMenu::CZMNewVerMenu( vgui::VPANEL parent ) : BaseClass( nullptr, "ZMNew
 
     SetMouseInputEnabled( true );
     SetKeyBoardInputEnabled( true );
-    SetProportional( false );
     SetDeleteSelfOnClose( true );
     SetMoveable( true );
     SetSizeable( false );
-
-
-    //SetScheme( vgui::scheme()->LoadSchemeFromFile( "resource/SourceScheme.res", "SourceScheme" ) );
-
 
     LoadControlSettings( "resource/ui/zmnewver.res" );
 }
