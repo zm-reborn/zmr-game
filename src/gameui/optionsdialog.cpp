@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2005, Valve Corporation, All rights reserved. ============//
+//========= Copyright ï¿½ 1996-2005, Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
 //
@@ -35,68 +35,34 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 // Purpose: Basic help dialog
 //-----------------------------------------------------------------------------
-COptionsDialog::COptionsDialog(vgui::Panel *parent, OptionsDialogTabStyle iTabStyle) : PropertyDialog(parent, "OptionsDialog")
+COptionsDialog::COptionsDialog(vgui::VPANEL parent) : PropertyDialog(nullptr, "OptionsDialog")
 {
-	SetProportional( false );
+	SetParent( parent ); // Scaling won't work otherwise.
+
 	SetDeleteSelfOnClose( true );
 	SetBounds( 
 		0, 
 		0,
-        512,
-        415 );
-		//vgui::scheme()->GetProportionalScaledValueEx( GetScheme(), 512 ),
-		//vgui::scheme()->GetProportionalScaledValueEx( GetScheme(), 415 ) );
+		QuickPropScale( 512 ),
+		QuickPropScale( 406 ) );
 	SetSizeable( false );
 
-	// debug timing code, this function takes too long
-//	double s4 = system()->GetCurrentTime();
 
-	if ( iTabStyle == OPTIONS_DIALOG_ALL_TABS )
-	{
-		SetTitle("#GameUI_Options", true);
+	SetTitle("#GameUI_Options", true);
 
-		//if ( ModInfo().IsSinglePlayerOnly() && !ModInfo().NoDifficulty() )
-		//{
-		//	AddPage(new COptionsSubDifficulty(this), "#GameUI_Difficulty");
-		//}
+	AddPage(new COptionsSubKeyboard(this), "#GameUI_Keyboard");
+	AddPage(new COptionsSubMouse(this), "#GameUI_Mouse");
 
-		//if ( ModInfo().HasPortals() )
-		//{
-		//	AddPage(new COptionsSubPortal(this), "#GameUI_Portal");
-		//}
+	m_pOptionsSubAudio = new COptionsSubAudio(this);
+	AddPage(m_pOptionsSubAudio, "#GameUI_Audio");
+	m_pOptionsSubVideo = new COptionsSubVideo(this);
+	AddPage(m_pOptionsSubVideo, "#GameUI_Video");
 
-		AddPage(new COptionsSubKeyboard(this), "#GameUI_Keyboard");
-		AddPage(new COptionsSubMouse(this), "#GameUI_Mouse");
-
-		m_pOptionsSubAudio = new COptionsSubAudio(this);
-		AddPage(m_pOptionsSubAudio, "#GameUI_Audio");
-		m_pOptionsSubVideo = new COptionsSubVideo(this);
-		AddPage(m_pOptionsSubVideo, "#GameUI_Video");
-
-		if ( !ModInfo().IsSinglePlayerOnly() ) 
-		{
-			AddPage(new COptionsSubVoice(this), "#GameUI_Voice");
-		}
-
-		// add the multiplay page last, if we're combo single/multi or just multi
-		if ( (ModInfo().IsMultiplayerOnly() && !ModInfo().IsSinglePlayerOnly()) ||
-			 (!ModInfo().IsMultiplayerOnly() && !ModInfo().IsSinglePlayerOnly()) )
-		{
-			AddPage(new COptionsSubMultiplayer(this), "#GameUI_Multiplayer");
-		}
-	}
-	else if ( iTabStyle == OPTIONS_DIALOG_ONLY_BINDING_TABS )
-	{
-		SetTitle("#L4D360UI_Controller_Edit_Keys_Buttons", true);
-
-		AddPage(new COptionsSubKeyboard(this), "#GameUI_Console_UserSettings");
-	}
-
-//	double s5 = system()->GetCurrentTime();
-//	Msg("COptionsDialog::COptionsDialog(): %.3fms\n", (float)(s5 - s4) * 1000.0f);
+	AddPage(new COptionsSubVoice(this), "#GameUI_Voice");
+	AddPage(new COptionsSubMultiplayer(this), "#GameUI_Multiplayer");
 
 	SetApplyButtonVisible(true);
-	GetPropertySheet()->SetTabWidth(84);
+	GetPropertySheet()->SetTabWidth(QuickPropScale(72));
 }
 
 //-----------------------------------------------------------------------------

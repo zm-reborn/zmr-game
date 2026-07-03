@@ -371,17 +371,14 @@ void COptionsSubAudio::OpenThirdPartySoundCreditsDialog()
 
 COptionsSubAudioThirdPartyCreditsDlg::COptionsSubAudioThirdPartyCreditsDlg( vgui::VPANEL hParent ) : BaseClass( NULL, NULL )
 {
-	SetProportional( true );
+	SetParent( hParent ); // Scaling won't work otherwise.
 
 #ifdef SWARM_DLL
-	// parent is ignored, since we want look like we're steal focus from the parent (we'll become modal below)
 	SetScheme( "SwarmFrameScheme" );
 #endif
 
 	SetTitle( "#GameUI_ThirdPartyAudio_Title", true );
-	SetSize( 
-		vgui::scheme()->GetProportionalScaledValueEx( GetScheme(), 500 ),
-		vgui::scheme()->GetProportionalScaledValueEx( GetScheme(), 200 ) );
+	SetSize( QuickPropScale( 500 ), QuickPropScale( 200 ) );
 
 	MoveToCenterOfScreen();
 	SetSizeable( false );

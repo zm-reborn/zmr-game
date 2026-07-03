@@ -25,8 +25,7 @@ CON_COMMAND( OpenZMGameUIOptions, "" )
             return;
         }
 
-        auto* pPanel = new COptionsDialog( nullptr );
-        pPanel->SetParent( parent );
+        auto* pPanel = new COptionsDialog( parent );
 
         g_hGameUIOptions.Set( pPanel );
     }

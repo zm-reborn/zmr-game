@@ -46,12 +46,10 @@ class COptionsSubKeyboardAdvancedDlg : public vgui::Frame
 {
 	DECLARE_CLASS_SIMPLE( COptionsSubKeyboardAdvancedDlg, vgui::Frame );
 public:
-	COptionsSubKeyboardAdvancedDlg( vgui::VPANEL hParent ) : BaseClass( NULL, NULL )
+	COptionsSubKeyboardAdvancedDlg( vgui::Panel *parent ) : BaseClass( parent, NULL )
 	{
-		// parent is ignored, since we want look like we're steal focus from the parent (we'll become modal below)
-
 		SetTitle("#GameUI_KeyboardAdvanced_Title", true);
-		SetSize( 280, 140 );
+		SetSize( QuickPropScale( 280 ), QuickPropScale( 140 ) );
 		LoadControlSettings( "resource/OptionsSubKeyboardAdvancedDlg.res" );
 		MoveToCenterOfScreen();
 		SetSizeable( false );
@@ -1040,7 +1038,7 @@ void COptionsSubKeyboard::OpenKeyboardAdvancedDialog()
 {
 	if (!m_OptionsSubKeyboardAdvancedDlg.Get())
 	{
-		m_OptionsSubKeyboardAdvancedDlg = new COptionsSubKeyboardAdvancedDlg(GetVParent());
+		m_OptionsSubKeyboardAdvancedDlg = new COptionsSubKeyboardAdvancedDlg(this);
         m_OptionsSubKeyboardAdvancedDlg->OnResetData();
 	}
 	m_OptionsSubKeyboardAdvancedDlg->Activate();

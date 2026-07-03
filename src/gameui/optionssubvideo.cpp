@@ -133,7 +133,7 @@ public:
 	{
 		// parent is ignored, since we want look like we're steal focus from the parent (we'll become modal below)
 		SetTitle("#GameUI_AdjustGamma_Title", true);
-		SetSize( 400, 260 );
+		SetSize( QuickPropScale( 400 ), QuickPropScale( 260 ) );
 		SetDeleteSelfOnClose( true );
 
 		m_pGammaSlider = new CCvarSlider( this, "Gamma", "#GameUI_Gamma", 1.6f, 2.6f, "mat_monitorgamma" );
@@ -246,7 +246,7 @@ public:
 	COptionsSubVideoAdvancedDlg( vgui::Panel *parent ) : BaseClass( parent , "OptionsSubVideoAdvancedDlg" )
 	{
 		SetTitle("#GameUI_VideoAdvanced_Title", true);
-		SetSize( 260, 400 );
+		SetSize( QuickPropScale( 260 ), QuickPropScale( 400 ) );
 
 		m_pDXLevel = new ComboBox(this, "dxlabel", 6, false );
 		const MaterialSystem_Config_t &config = materials->GetCurrentConfigForVideoCard();
@@ -1385,17 +1385,14 @@ void COptionsSubVideo::OpenThirdPartyVideoCreditsDialog()
 
 COptionsSubVideoThirdPartyCreditsDlg::COptionsSubVideoThirdPartyCreditsDlg( vgui::VPANEL hParent ) : BaseClass( NULL, NULL )
 {
-	SetProportional( true );
+	SetParent( hParent ); // Scaling won't work otherwise.
 
-	// parent is ignored, since we want look like we're steal focus from the parent (we'll become modal below)
 #ifdef SWARM_DLL
 	SetScheme( "SwarmFrameScheme" );
 #endif
 
 	SetTitle("#GameUI_ThirdPartyVideo_Title", true);
-	SetSize( 
-		vgui::scheme()->GetProportionalScaledValueEx( GetScheme(), 500 ),
-		vgui::scheme()->GetProportionalScaledValueEx( GetScheme(), 200 ) );
+	SetSize( QuickPropScale( 500 ), QuickPropScale( 200 ) );
 
 	MoveToCenterOfScreen();
 	SetSizeable( false );
