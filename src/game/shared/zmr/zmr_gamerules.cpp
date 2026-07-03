@@ -935,9 +935,8 @@ int CZMRules::IncPopCount( ZombieClass_t zclass )
 void CZMRules::DecPopCount( int cost )
 {
     CZMRules* pRules = ZMRules();
-    Assert( pRules );
 
-    if ( !pRules )
+    if ( !pRules ) // Possible if exiting the game.
     {
         return;
     }
