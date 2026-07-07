@@ -57,6 +57,8 @@ private:
     Label* m_pResourceLabel;
     Label* m_pResourceGainRateLabel;
     Label* m_pPopulationLabel;
+
+    CPanelAnimationVar( Color, m_BgColor, "BgColor", "ZMHudBgColor" );
 };
 
 DECLARE_HUDELEMENT( CZMResourceHud );
