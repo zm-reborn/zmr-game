@@ -25,6 +25,8 @@ CZMMainMenuBaseButton::CZMMainMenuBaseButton( Panel* pParent, const char* name )
     m_iImageX = 0;
     m_iImageY = 0;
     m_nImageMargin = 0;
+
+    SetTextInset( 0, 0 );
 }
 
 CZMMainMenuBaseButton::~CZMMainMenuBaseButton()
@@ -67,6 +69,7 @@ void CZMMainMenuBaseButton::ApplySettings( KeyValues* in )
 {
     BaseClass::ApplySettings( in );
 
+    SetTextInset( 0, 0 );
 
     // Load image
     const char* image = in->GetString( "imagematerial" );
@@ -134,7 +137,7 @@ void CZMMainMenuBaseButton::LayoutImage()
     ComputeAlignment( tx0, ty0, tx1, ty1 );
 
 
-    int image_x = tx0 - image_size - m_nImageMargin;
+    int image_x = tx0 - image_size - QuickPropScale( m_nImageMargin );
 
     if ( image_x < 0 )
     {

@@ -210,7 +210,7 @@ void CZMMainMenuButton::PositionSubButtons()
     m_nSubBtnHeight = size_y;
 
 
-    const int offset_x = 0;
+    const int offset_x = (GetWide() - m_nMaxSubTextWidth) / 2;
     const int offset_y = -size_y;
 
     int len = m_vSubBtns.Count();

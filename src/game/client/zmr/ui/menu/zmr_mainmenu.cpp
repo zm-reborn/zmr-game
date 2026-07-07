@@ -333,11 +333,12 @@ void CZMMainMenu::PaintBackground()
     //
     // Draw the sub button background
     //
-#define SECTION_PADDING_SIDES       20
-#define SECTION_PADDING_TOP         50
-#define SECTION_PADDING_BOTTOM      10
-#define SECTION_FADEOUT_TIME        0.25f
-#define SECTION_FADEIN_TIME         0.3f
+    const float fadeOutTime = 0.25f;
+    const float fadeInTime = 0.3f;
+
+    const int paddingSides = QuickPropScale( 12 );
+    const int paddingTop = QuickPropScale( 35 );
+    const int paddingBottom = QuickPropScale( 10 );
 
     int len = m_vBtns.Count();
     for ( int i = 0; i < len; i++ )
@@ -352,7 +353,7 @@ void CZMMainMenu::PaintBackground()
         float unarmedtime = pButton->GetUnarmedTime();
         float unarmeddelta = (gpGlobals->realtime - pButton->GetUnarmedTime());
 
-        bool bFadeOut = unarmedtime != 0.0f && unarmeddelta < SECTION_FADEOUT_TIME;
+        bool bFadeOut = unarmedtime != 0.0f && unarmeddelta < fadeOutTime;
 
 
         if ( pButton->IsSubButtonsVisible() || bFadeOut )
@@ -364,12 +365,13 @@ void CZMMainMenu::PaintBackground()
 
             int totalheight = pButton->GetSubButtonHeight() * pButton->GetSubButtonCount();
 
+            const int subTextWidth = pButton->GetMaxSubTextWidth();
 
-            int start_x = px - SECTION_PADDING_SIDES;
-            int start_y = py - totalheight - SECTION_PADDING_TOP;
+            int start_x = px - paddingSides + (pButton->GetWide() - subTextWidth) / 2;
+            int start_y = py - totalheight - paddingTop;
 
-            int end_x = start_x + (pButton->GetMaxSubTextWidth() + SECTION_PADDING_SIDES*2);
-            int end_y = py + SECTION_PADDING_BOTTOM;
+            int end_x = start_x + (subTextWidth + paddingSides*2);
+            int end_y = py + paddingBottom;
 
 
 
@@ -389,15 +391,15 @@ void CZMMainMenu::PaintBackground()
             float armeddelta = gpGlobals->realtime - pButton->GetArmedTime();
             if ( bFadeOut )
             {
-                int a = (1.0f - (unarmeddelta / SECTION_FADEOUT_TIME)) * 255;
+                int a = (1.0f - (unarmeddelta / fadeOutTime)) * 255;
                 if ( a > 255 ) a = 255;
 
                 clr[3] = a;
                 Repaint();
             }
-            else if ( armeddelta < SECTION_FADEIN_TIME )
+            else if ( armeddelta < fadeInTime )
             {
-                int a = armeddelta / SECTION_FADEIN_TIME * 255;
+                int a = armeddelta / fadeInTime * 255;
                 if ( a > 255 ) a = 255;
 
                 clr[3] = a;
