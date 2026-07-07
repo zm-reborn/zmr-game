@@ -1,5 +1,6 @@
 #include "cbase.h"
 #include "hudelement.h"
+#include <vgui_controls/ImagePanel.h>
 
 #include "iclientmode.h"
 #include "baseviewport.h"
@@ -32,24 +33,15 @@ public:
     DECLARE_CLASS_SIMPLE( CZMResourceHud, Panel );
 
     CZMResourceHud( const char* );
-    ~CZMResourceHud();
 
-    void VidInit() OVERRIDE;
-    void Init() OVERRIDE;
-    void Reset() OVERRIDE;
-    void OnThink() OVERRIDE;
-    void Paint() OVERRIDE;
+    virtual void PerformLayout() OVERRIDE;
+    virtual void VidInit() OVERRIDE;
+    virtual void Init() OVERRIDE;
+    virtual void Reset() OVERRIDE;
+    virtual void OnThink() OVERRIDE;
+    virtual void PaintBackground() OVERRIDE;
 
 private:
-    void LoadIcons();
-    void Reposition();
-
-    void PaintBg();
-
-
-    HFont m_hMediumFont;
-    HFont m_hLargeFont;
-
     int m_nTexBgId;
 
     int m_nResCount;
@@ -60,9 +52,11 @@ private:
 
     CHudTexture* m_pIcons[NUM_ICONS];
 
-
-    CPanelAnimationVar( Color, m_BgColor, "BgColor", "ZMHudBgColor" );
-    CPanelAnimationVar( Color, m_FgColor, "FgColor", "ZMFgColor" );
+    ImagePanel* m_pResourcesImage;
+    ImagePanel* m_pPopulationImage;
+    Label* m_pResourceLabel;
+    Label* m_pResourceGainRateLabel;
+    Label* m_pPopulationLabel;
 };
 
 DECLARE_HUDELEMENT( CZMResourceHud );
@@ -70,18 +64,32 @@ DECLARE_HUDELEMENT( CZMResourceHud );
 
 CZMResourceHud::CZMResourceHud( const char *pElementName ) : CHudElement( pElementName ), BaseClass( g_pClientMode->GetViewport(), "ZMHudResource" )
 {
+    SetPaintBackgroundEnabled( true );
+    SetProportional( true );
     HScheme scheme = vgui::scheme()->LoadSchemeFromFile( "resource/ClientScheme.res", "ClientScheme" );
 
-    m_hMediumFont = vgui::scheme()->GetIScheme( scheme )->GetFont( "Trebuchet20", false );
-    m_hLargeFont = vgui::scheme()->GetIScheme( scheme )->GetFont( "Trebuchet30", false );
     
-
-    SetPaintBackgroundEnabled( false );
-    SetProportional( false );
-    SetSize( 140, 140 );
+    HFont mediumFont = vgui::scheme()->GetIScheme( scheme )->GetFont( "Trebuchet12", true );
+    HFont largeFont = vgui::scheme()->GetIScheme( scheme )->GetFont( "Trebuchet16", true );
 
 
-    LoadIcons();
+    m_pResourcesImage = new ImagePanel( this, "ResourcesImage" );
+    m_pResourcesImage->SetImage( vgui::scheme()->GetImage( "miniskull", false ) );
+    m_pResourcesImage->SetShouldScaleImage( true );
+    m_pPopulationImage = new ImagePanel( this, "PopulationImage" );
+    m_pPopulationImage->SetImage( vgui::scheme()->GetImage( "minifigures", false ) );
+    m_pPopulationImage->SetShouldScaleImage( true );
+    m_pResourceLabel = new Label( this, "ResourceLabel", "00000" );
+    m_pResourceLabel->SetFont( largeFont );
+    m_pResourceLabel->SizeToContents();
+    m_pResourceGainRateLabel = new Label( this, "ResourceGainRateLabel", "0000 rpm" );
+    m_pResourceGainRateLabel->SetFont( mediumFont );
+    m_pResourceGainRateLabel->SetContentAlignment( Label::Alignment::a_northeast );
+    m_pResourceGainRateLabel->SizeToContents();
+    m_pPopulationLabel = new Label( this, "PopulationLabel", "000 / 000 (000)" );
+    m_pPopulationLabel->SetFont( mediumFont );
+    m_pPopulationLabel->SizeToContents();
+    
     Reset();
 
 
@@ -89,28 +97,9 @@ CZMResourceHud::CZMResourceHud( const char *pElementName ) : CHudElement( pEleme
     surface()->DrawSetTextureFile( m_nTexBgId, "zmr_effects/hud_bg_zmres", true, false );
 }
 
-CZMResourceHud::~CZMResourceHud()
-{
-    // HUD icons are automatically loaded/unloaded. gHUD.GetIcon doesn't do any allocation.
-    /*for ( int i = 0; i < NUM_ICONS; i++ )
-    {
-        if ( m_pIcons[i] )
-        {
-            delete m_pIcons[i];
-            m_pIcons[i] = nullptr;
-        }
-    }*/
-}
-
 void CZMResourceHud::Init()
 {
     Reset();
-}
-
-void CZMResourceHud::LoadIcons()
-{
-	m_pIcons[ICON_RES] = gHUD.GetIcon( "icon_resources" );
-	m_pIcons[ICON_ZEDS] = gHUD.GetIcon( "icon_figures" );
 }
 
 void CZMResourceHud::Reset()
@@ -118,20 +107,37 @@ void CZMResourceHud::Reset()
     m_nResCount = 0;
     m_flResPerMin = 0.0f;
     m_nPopCount = 0;
+    m_nPopMax = 0;
     m_nSelected = 0;
-
-    Reposition();
 }
 
 void CZMResourceHud::VidInit()
 {
-    LoadIcons();
     Reset();
 }
 
-void CZMResourceHud::Reposition()
+void CZMResourceHud::PerformLayout()
 {
-    SetPos( 0, ScreenHeight() - GetTall() );
+    int width = QuickPropScale( 75 );
+    int height = QuickPropScale( 70 );
+
+    SetBounds( 0, GetParent()->GetTall() - height, width, height );
+
+    int image_size = QuickPropScale( 16 );
+    int image_size_half = QuickPropScale( 8 );
+
+    m_pResourcesImage->SetPos( QuickPropScale( 6 ), QuickPropScale( 16 ) );
+    m_pResourcesImage->SetSize( image_size, image_size );
+    m_pResourceLabel->SetPos( QuickPropScale( 24 ), QuickPropScale( 16 ) );
+    m_pResourceLabel->SizeToContents();
+
+    m_pResourceGainRateLabel->SetPos( QuickPropScale( 18 ), QuickPropScale( 30 ) );
+    m_pResourceGainRateLabel->SizeToContents();
+
+    m_pPopulationImage->SetPos( QuickPropScale( 10 ), QuickPropScale( 52 ) + 1 );
+    m_pPopulationImage->SetSize( image_size_half, image_size_half );
+    m_pPopulationLabel->SetPos( QuickPropScale( 22 ), QuickPropScale( 50 ) );
+    m_pPopulationLabel->SizeToContents();
 }
 
 void CZMResourceHud::OnThink()
@@ -144,23 +150,55 @@ void CZMResourceHud::OnThink()
 
     if ( !IsVisible() ) return;
 
-
+    static wchar_t text[32];
+    text[0] = L'\0';
 
     C_ZMRules* pRules = ZMRules();
 
-    m_nSelected = ZMClientUtil::GetSelectedZombieCount();
-    m_nPopCount = pRules ? pRules->GetZombiePop() : 0;
-    m_nPopMax = zm_sv_zombiemax.GetInt();
-
-    int newres = pPlayer->GetResources();
+    int selectedZombieCount = ZMClientUtil::GetSelectedZombieCount();
+    int newPopCount = pRules ? pRules->GetZombiePop() : 0;
+    int zombieMax = zm_sv_zombiemax.GetInt();
+    int newResources = pPlayer->GetResources();
 
     g_ZMResourceSystem.UpdateState();
-    m_flResPerMin = g_ZMResourceSystem.GetResourcesPerMinute();
 
-    m_nResCount = newres;
+    float newResPerMin = g_ZMResourceSystem.GetResourcesPerMinute();
+    
+
+
+    if ( m_nResCount != newResources )
+    {
+        V_snwprintf( text, ARRAYSIZE( text ), L"%i", newResources );
+        m_pResourceLabel->SetText( text );
+        m_pResourceLabel->SizeToContents();
+    }
+
+    if ( m_flResPerMin != newResPerMin )
+    {
+        V_snwprintf( text, ARRAYSIZE( text ), L"%.0f rpm", newResPerMin );
+        m_pResourceGainRateLabel->SetText( text );
+        m_pResourceGainRateLabel->SizeToContents();
+    }
+
+    if ( m_nSelected != selectedZombieCount || m_nPopCount != newPopCount || m_nPopMax != zombieMax )
+    {
+        V_snwprintf( text, ARRAYSIZE( text ), L"%i / %i", newPopCount, zombieMax );
+        if ( selectedZombieCount > 0 )
+        {
+            V_snwprintf( text, ARRAYSIZE( text ), L"%s (%i)", text, selectedZombieCount );
+        }
+        m_pPopulationLabel->SetText( text );
+        m_pPopulationLabel->SizeToContents();
+    }
+
+    m_nSelected = selectedZombieCount;
+    m_nPopCount = newPopCount;
+    m_nPopMax = zombieMax;
+    m_nResCount = newResources;
+    m_flResPerMin = newResPerMin;
 }
 
-void CZMResourceHud::PaintBg()
+void CZMResourceHud::PaintBackground()
 {
     int sizex = GetWide();
     int sizey = GetTall();
@@ -168,81 +206,4 @@ void CZMResourceHud::PaintBg()
     vgui::surface()->DrawSetColor( m_BgColor );
     surface()->DrawSetTexture( m_nTexBgId );
     surface()->DrawTexturedRect( 0, 0, sizex, sizey );
-}
-
-void CZMResourceHud::Paint()
-{
-    PaintBg();
-
-
-    static wchar_t text[32];
-    text[0] = L'\0';
-
-    int w, h;
-
-    const int offsety = 45;
-    
-    V_snwprintf( text, ARRAYSIZE( text ), L"%i", m_nResCount );
-
-	surface()->DrawSetTextFont( m_hLargeFont );
-	surface()->DrawSetTextPos( 60, offsety + 0 );
-	surface()->DrawSetTextColor( m_FgColor );
-	surface()->DrawPrintText( text, wcslen( text ) );
-
-    surface()->GetTextSize( m_hLargeFont, text, w, h );
-
-
-    V_snwprintf( text, ARRAYSIZE( text ), L"%.0f rpm", m_flResPerMin );
-
-    int w2;
-    surface()->GetTextSize( m_hMediumFont, text, w2, h );
-
-	surface()->DrawSetTextFont( m_hMediumFont );
-	surface()->DrawSetTextPos( 112 - w2, offsety + 27 );
-	surface()->DrawSetTextColor( m_FgColor );
-	surface()->DrawPrintText( text, wcslen( text ) );
-
-
-    V_snwprintf( text, ARRAYSIZE( text ), L"%i / %i", m_nPopCount, m_nPopMax );
-
-    if ( m_nSelected > 0 )
-    {
-        V_snwprintf( text, ARRAYSIZE( text ), L"%s (%i)", text, m_nSelected );
-    }
-
-
-	surface()->DrawSetTextFont( m_hMediumFont );
-	surface()->DrawSetTextPos( 50, offsety + 53 );
-	surface()->DrawSetTextColor( m_FgColor );
-	surface()->DrawPrintText( text, wcslen( text ) );
-    
-
-
-    int x = 17;
-    int y = offsety + 0;
-    for ( int i = 0; i < NUM_ICONS; i++ )
-    {
-        if ( m_pIcons[i] )
-        {
-            //when we get better/larger icons than the current 32x32 ones, replace Width/Height calls with hardcoded 32 size
-            w = (int)m_pIcons[i]->Width();
-            h = (int)m_pIcons[i]->Height();
-
-            //can't avoid some icon-specific positioning
-            int indent = 2;
-            switch ( i )
-            {
-                case ICON_ZEDS:
-                    indent = 10;
-                    break;
-                default:
-                    break;
-            }
-
-            m_pIcons[i]->DrawSelf( x + indent, y, w, h, m_FgColor );
-
-            //for now just assume we move down
-            y += h + 25;
-        }
-    }
 }
