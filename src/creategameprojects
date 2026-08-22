@@ -2,13 +2,13 @@
 
 pushd `dirname $0`
 
-export VPC_NINJA_BUILD_MODE="release"
+export VPC_NINJA_BUILD_MODE="${VPC_NINJA_BUILD_MODE:-release}"
 solution_out="_vpc_/ninja/game_$VPC_NINJA_BUILD_MODE"
-devtools/bin/vpc /zmr /linux64 /ninja +game /mksln "$solution_out" $@
+devtools/bin/vpc /zmr /linux64 /ninja /define:SOURCESDK +game /mksln "$solution_out" $@
 # Generate compile commands.
 ninja -f "$solution_out.ninja" -t compdb > compile_commands.json
 # Remove some unsupported clang commands.
 sed -i 's/-fpredictive-commoning//g; s/-fvar-tracking-assignments//g' compile_commands.json
-sed -i 's|/my_mod/src|.|g' compile_commands.json
+sed -i "s|$(pwd)|.|g" compile_commands.json
 
 popd
