@@ -28,6 +28,15 @@ cd /build/src
 ./strip_debug_symbols
 ```
 
+Dedicated server binaries must be built separately:
+
+```bash
+./creatededicatedprojects
+./build dedicated # Outputs server_srv.so
+# Optionally strip debug symbols, keeps essential stuff for mods.
+./strip_debug_symbols
+```
+
 ## Running
 
 - Requires Source SDK Base 2013 Multiplayer to be downloaded from Steam. (In the Tools-page)

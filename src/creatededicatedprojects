@@ -1,0 +1,16 @@
+#!/bin/bash
+
+set -euo pipefail
+
+pushd `dirname $0` > /dev/null
+
+export VPC_NINJA_BUILD_MODE="${VPC_NINJA_BUILD_MODE:-release}"
+solution_out="_vpc_/ninja/dedicated_$VPC_NINJA_BUILD_MODE"
+devtools/bin/vpc /zmr /linux64 /ninja /define:SOURCESDK /dedicated +dedicated /mksln "$solution_out" "$@"
+# Generate compile commands.
+ninja -f "$solution_out.ninja" -t compdb > compile_commands.json
+# Remove some unsupported clang commands.
+sed -i 's/-fpredictive-commoning//g; s/-fvar-tracking-assignments//g' compile_commands.json
+sed -i "s|$(pwd)|.|g" compile_commands.json
+
+popd > /dev/null

@@ -1,12 +1,19 @@
 #!/bin/bash
 
+set -euo pipefail
+
 pushd "../game/zombie_master_reborn/bin/linux64" > /dev/null
 
-strip_all=("client.so" "game_shader_generic_zmr.so")
-strip_debug=("server.so")
+strip_all=("client.so" "game_shader_generic_zmr.so", "server.so")
+strip_debug=("server_srv.so")
 
 for file in "${strip_all[@]}"
 do
+    if [ ! -f "$file" ]; then
+        echo "$file does not exist, skipping."
+        continue
+    fi
+
     res=$(file "$file" | grep "not stripped")
     if [[ -z $res ]]; then
         echo "$file is already stripped."
@@ -21,6 +28,11 @@ done
 
 for file in "${strip_debug[@]}"
 do
+    if [ ! -f "$file" ]; then
+        echo "$file does not exist, skipping."
+        continue
+    fi
+
     res=$(file "$file" | grep "with debug_info")
     if [[ -z $res ]]; then
         echo "$file is already stripped."

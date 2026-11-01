@@ -1,10 +1,42 @@
 #!/bin/bash
 
-pushd `dirname $0`
+set -euo pipefail
+
+pushd `dirname $0` > /dev/null
+
+project="$1"
+
+libdir="lib/public/linux64"
+dedi_libs=("choreoobjects.a" "dmxloader.a" "particles.a" "tier2.a" "tier3.a")
+
+if [ $project == "dedicated" ]; then
+    echo "Building dedicated server, copying required libraries as *_srv.a"
+
+    pushd $libdir > /dev/null
+
+    for file in "${dedi_libs[@]}"
+    do
+        if [ ! -f "$file" ]; then
+            echo "$file does not exist!"
+            exit 1
+        fi
+
+        output_file="$(basename $file .a)_srv.a"
+
+        if [ -f "$output_file" ]; then
+            echo "$file exists, skipping."
+            continue
+        fi
+
+        ln -s $file $output_file
+    done
+
+    popd > /dev/null
+fi
 
 # Actual build
 export VPC_NINJA_BUILD_MODE="${VPC_NINJA_BUILD_MODE:-release}"
-solution_out="_vpc_/ninja/$1_$VPC_NINJA_BUILD_MODE"
+solution_out="_vpc_/ninja/${project}_$VPC_NINJA_BUILD_MODE"
 ninja -f "$solution_out.ninja" -j$(nproc)
 
-popd
+popd > /dev/null
