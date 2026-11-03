@@ -20,6 +20,8 @@ public:
     CZMCreditsMenu( vgui::VPANEL parent );
     ~CZMCreditsMenu();
 
+    virtual void ApplySchemeSettings( vgui::IScheme* pScheme ) OVERRIDE;
+
 private:
     vgui::RichText* m_pRichText;
 };
@@ -97,4 +99,16 @@ CZMCreditsMenu::CZMCreditsMenu( vgui::VPANEL parent ) : BaseClass( nullptr, "ZMC
 
 CZMCreditsMenu::~CZMCreditsMenu()
 {
+}
+
+void CZMCreditsMenu::ApplySchemeSettings( vgui::IScheme* pScheme )
+{
+    BaseClass::ApplySchemeSettings( pScheme );
+
+	vgui::HScheme scheme = vgui::scheme()->GetScheme( "ClientScheme" );
+	vgui::HFont font = vgui::scheme()->GetIScheme( scheme )->GetFont( "ZMMainMenuCreditsText", true );
+    if ( font != vgui::INVALID_FONT )
+    {
+        m_pRichText->SetFont( font );
+    }
 }
