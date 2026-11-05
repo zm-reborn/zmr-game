@@ -3,7 +3,7 @@
 
 #include "cbase.h"
 
-#include "npcr_component.h"
+#include "npcr_basenpc.h"
 
 
 namespace NPCR
