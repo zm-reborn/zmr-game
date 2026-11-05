@@ -184,11 +184,15 @@ void CZMResourceHud::OnThink()
 
     if ( m_nSelected != selectedZombieCount || m_nPopCount != newPopCount || m_nPopMax != zombieMax )
     {
-        V_snwprintf( text, ARRAYSIZE( text ), L"%i / %i", newPopCount, zombieMax );
         if ( selectedZombieCount > 0 )
         {
-            V_snwprintf( text, ARRAYSIZE( text ), L"%s (%i)", text, selectedZombieCount );
+            V_snwprintf( text, ARRAYSIZE( text ), L"%i / %i (%i)", newPopCount, zombieMax, selectedZombieCount );
         }
+        else
+        {
+            V_snwprintf( text, ARRAYSIZE( text ), L"%i / %i", newPopCount, zombieMax );
+        }
+
         m_pPopulationLabel->SetText( text );
         m_pPopulationLabel->SizeToContents();
     }
