@@ -100,9 +100,9 @@ public:
     ~CZMZombieAnimState();
 
 #ifndef CLIENT_DLL
-    virtual const char* GetComponentName() const OVERRIDE { return "ZombieAnimState"; }
+    virtual const char* GetComponentName() const override { return "ZombieAnimState"; }
 
-    virtual CZMBaseZombie* GetOuter() const OVERRIDE { return static_cast<CZMBaseZombie*>( BaseClass::GetOuter() ); }
+    virtual CZMBaseZombie* GetOuter() const override { return static_cast<CZMBaseZombie*>( BaseClass::GetOuter() ); }
 #else
     CZMBaseZombie* GetOuter() const { return m_pOuter; }
 #endif

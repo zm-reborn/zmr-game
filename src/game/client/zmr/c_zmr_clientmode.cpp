@@ -272,7 +272,7 @@ public:
     DECLARE_CLASS_SIMPLE( CZMViewport, CBaseViewport );
 
 
-    virtual void ApplySchemeSettings( IScheme* pScheme ) OVERRIDE
+    virtual void ApplySchemeSettings( IScheme* pScheme ) override
     {
         BaseClass::ApplySchemeSettings( pScheme );
 
@@ -281,7 +281,7 @@ public:
         SetPaintBackgroundEnabled( false );
     }
 
-    virtual IViewPortPanel* CreatePanelByName( const char* szPanelName ) OVERRIDE;
+    virtual IViewPortPanel* CreatePanelByName( const char* szPanelName ) override;
 };
 
 using namespace vgui;

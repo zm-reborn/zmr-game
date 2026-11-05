@@ -14,8 +14,8 @@ public:
     ~CZMMainMenuContactButtonList();
 
 
-    virtual void ApplySchemeSettings( vgui::IScheme* pScheme ) OVERRIDE;
-    virtual void ApplySettings( KeyValues* kv ) OVERRIDE;
+    virtual void ApplySchemeSettings( vgui::IScheme* pScheme ) override;
+    virtual void ApplySettings( KeyValues* kv ) override;
 
 
     void AddButton( KeyValues* kv );

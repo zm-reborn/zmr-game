@@ -27,13 +27,13 @@ public:
     ~CZMViewModel();
 
 #ifdef CLIENT_DLL
-    virtual int                 CalcOverrideModelIndex() OVERRIDE;
-    virtual CStudioHdr*         OnNewModel() OVERRIDE;
-    virtual int                 DrawModel( int flags ) OVERRIDE;
-    virtual bool                ShouldReceiveProjectedTextures( int flags ) OVERRIDE;
-    virtual C_BaseAnimating*    FindFollowedEntity() OVERRIDE;
+    virtual int                 CalcOverrideModelIndex() override;
+    virtual CStudioHdr*         OnNewModel() override;
+    virtual int                 DrawModel( int flags ) override;
+    virtual bool                ShouldReceiveProjectedTextures( int flags ) override;
+    virtual C_BaseAnimating*    FindFollowedEntity() override;
 
-	virtual bool                ShouldPredict() OVERRIDE;
+	virtual bool                ShouldPredict() override;
 
     void                        OnTeleported();
 
@@ -61,12 +61,12 @@ public:
 
     CZMPlayer* GetOwner() const;
 
-    virtual void CalcViewModelView( CBasePlayer* pOwner, const Vector& eyePosition, const QAngle& eyeAngles ) OVERRIDE;
+    virtual void CalcViewModelView( CBasePlayer* pOwner, const Vector& eyePosition, const QAngle& eyeAngles ) override;
 
 
     void SetWeaponModelEx( const char* pszModel, CBaseCombatWeapon* pWep, bool bOverriden );
 
-    virtual CBaseCombatWeapon* GetOwningWeapon() OVERRIDE;
+    virtual CBaseCombatWeapon* GetOwningWeapon() override;
 
 #ifdef GAME_DLL
     void SetModelColor2( float r, float g, float b ) { m_flClr.Set( 0, r ); m_flClr.Set( 1, g ); m_flClr.Set( 2, b ); };
@@ -119,9 +119,9 @@ public:
 
     ~C_ZMViewModelClient();
 
-    virtual C_BaseAnimating* FindFollowedEntity() OVERRIDE;
-    virtual bool ShouldInterpolate() OVERRIDE;
-    virtual void UpdateVisibility() OVERRIDE;
+    virtual C_BaseAnimating* FindFollowedEntity() override;
+    virtual bool ShouldInterpolate() override;
+    virtual void UpdateVisibility() override;
     virtual void SetWeaponModel( const char* pszModelname, CBaseCombatWeapon* weapon );
 
 };

@@ -604,7 +604,7 @@ void CZMPlayer::PlayerDeathThink()
 class CPhysicsPlayerCallback : public IPhysicsPlayerControllerEvent
 {
 public:
-	virtual int ShouldMoveTo( IPhysicsObject* pObject, const Vector& position ) OVERRIDE
+	virtual int ShouldMoveTo( IPhysicsObject* pObject, const Vector& position ) override
 	{
 		auto* pPlayer = ToZMPlayer( (CBaseEntity*)pObject->GetGameData() );
 		if ( pPlayer )

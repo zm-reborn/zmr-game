@@ -15,13 +15,13 @@ public:
     ~CZMBlockerScanner();
 
 
-    virtual const char* GetComponentName() const OVERRIDE { return "BlockerScanner"; }
+    virtual const char* GetComponentName() const override { return "BlockerScanner"; }
 
 
-    virtual void Update() OVERRIDE;
+    virtual void Update() override;
 
 
-    virtual CZMBaseZombie* GetOuter() const OVERRIDE { return static_cast<CZMBaseZombie*>( BaseClass::GetOuter() ); }
+    virtual CZMBaseZombie* GetOuter() const override { return static_cast<CZMBaseZombie*>( BaseClass::GetOuter() ); }
 
 
     int             GetTimesBlocked() const { return m_nTimesBlocked; }

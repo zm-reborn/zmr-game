@@ -36,10 +36,10 @@ class CZMBasePumpConfig : public ZMWeaponConfig::CZMBaseWeaponConfig
 public:
     CZMBasePumpConfig( const char* wepname, const char* configpath );
 
-    virtual void LoadFromConfig( KeyValues* kv ) OVERRIDE;
-    virtual bool OverrideFromConfig( KeyValues* kv ) OVERRIDE;
+    virtual void LoadFromConfig( KeyValues* kv ) override;
+    virtual bool OverrideFromConfig( KeyValues* kv ) override;
 
-    virtual KeyValues* ToKeyValues() const OVERRIDE;
+    virtual KeyValues* ToKeyValues() const override;
 
     
     float flPumpTime;
@@ -59,15 +59,15 @@ public:
 
     const CZMBasePumpConfig* GetBasePumpConfig() const;
 
-    virtual bool CanAct( ZMWepActionType_t type = WEPACTION_GENERIC ) const OVERRIDE; 
+    virtual bool CanAct( ZMWepActionType_t type = WEPACTION_GENERIC ) const override; 
 
-    virtual void Drop( const Vector& vecVelocity ) OVERRIDE;
-    virtual bool Holster( CBaseCombatWeapon* pSwitchTo ) OVERRIDE;
-    virtual void Shoot( int iAmmoType = -1, int nBullets = -1, int nAmmo = -1, float flMaxRange = -1.0f, bool bSecondary = false ) OVERRIDE;
-    virtual	void CheckReload() OVERRIDE;
-    virtual bool Reload() OVERRIDE;
-    virtual void ItemPostFrame() OVERRIDE;
-    virtual void FinishReload() OVERRIDE;
+    virtual void Drop( const Vector& vecVelocity ) override;
+    virtual bool Holster( CBaseCombatWeapon* pSwitchTo ) override;
+    virtual void Shoot( int iAmmoType = -1, int nBullets = -1, int nAmmo = -1, float flMaxRange = -1.0f, bool bSecondary = false ) override;
+    virtual	void CheckReload() override;
+    virtual bool Reload() override;
+    virtual void ItemPostFrame() override;
+    virtual void FinishReload() override;
 
     virtual Activity GetReloadStartAct() const { return ACT_VM_RELOAD_START; }
     virtual Activity GetReloadEndAct() const { return ACT_VM_RELOAD_FINISH; }
@@ -77,11 +77,11 @@ public:
     virtual void StartReload();
     virtual void Pump();
 
-    virtual void StopReload() OVERRIDE;
-    virtual void CancelReload() OVERRIDE;
-    virtual bool ShouldCancelReload() const OVERRIDE;
+    virtual void StopReload() override;
+    virtual void CancelReload() override;
+    virtual bool ShouldCancelReload() const override;
 
-    virtual bool IsInReload() const OVERRIDE;
+    virtual bool IsInReload() const override;
     bool NeedsPump() const { return m_iPumpState != PUMPSTATE_NONE; }
     
 protected:

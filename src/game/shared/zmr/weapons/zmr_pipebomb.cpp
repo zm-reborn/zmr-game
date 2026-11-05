@@ -23,9 +23,9 @@ public:
     ~CZMWeaponPipebomb();
 
 
-    virtual void PrimaryAttack() OVERRIDE;
+    virtual void PrimaryAttack() override;
 
-    virtual const char* GetProjectileClassname() const OVERRIDE;
+    virtual const char* GetProjectileClassname() const override;
 };
 
 IMPLEMENT_NETWORKCLASS_ALIASED( ZMWeaponPipebomb, DT_ZM_WeaponPipebomb )

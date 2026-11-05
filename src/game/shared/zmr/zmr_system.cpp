@@ -59,11 +59,11 @@ public:
     {
     }
 
-    virtual void PostInit() OVERRIDE;
+    virtual void PostInit() override;
 
 
-    virtual void LevelShutdownPreEntity() OVERRIDE;
-    virtual void LevelInitPostEntity() OVERRIDE;
+    virtual void LevelShutdownPreEntity() override;
+    virtual void LevelInitPostEntity() override;
 
 
 #ifndef CLIENT_DLL
@@ -75,7 +75,7 @@ public:
 #endif
 
 
-    virtual void FireGameEvent( IGameEvent* pEvent ) OVERRIDE;
+    virtual void FireGameEvent( IGameEvent* pEvent ) override;
 };
 
 void CZMSystem::PostInit()

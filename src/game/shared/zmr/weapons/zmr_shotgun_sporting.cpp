@@ -26,17 +26,17 @@ public:
     bool IsFiringBothBarrels() const { return IsInSecondaryAttack(); }
 
 
-    virtual void PrimaryAttack() OVERRIDE;
-    virtual void SecondaryAttack() OVERRIDE;
-    virtual bool Reload() OVERRIDE;
-    virtual void SecondaryAttackEffects( WeaponSound_t wpnsound ) OVERRIDE;
+    virtual void PrimaryAttack() override;
+    virtual void SecondaryAttack() override;
+    virtual bool Reload() override;
+    virtual void SecondaryAttackEffects( WeaponSound_t wpnsound ) override;
 
 
     void ShootBarrels( bool bWantBoth );
 
 
 #ifdef GAME_DLL
-    virtual int GetMaxUserCmdBullets( ZMUserCmdValidData_t& data ) const OVERRIDE;
+    virtual int GetMaxUserCmdBullets( ZMUserCmdValidData_t& data ) const override;
 #endif
 };
 

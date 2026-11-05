@@ -16,18 +16,18 @@ public:
     CZMHudSpectatorUI( const char* pElementName );
 
 
-    virtual void ApplySchemeSettings( vgui::IScheme* pScheme ) OVERRIDE;
+    virtual void ApplySchemeSettings( vgui::IScheme* pScheme ) override;
 
-    virtual void Init() OVERRIDE;
-    virtual void VidInit() OVERRIDE;
-    virtual void LevelInit() OVERRIDE;
-    virtual void Reset() OVERRIDE;
+    virtual void Init() override;
+    virtual void VidInit() override;
+    virtual void LevelInit() override;
+    virtual void Reset() override;
 
-    virtual void OnThink() OVERRIDE;
-    virtual void Paint() OVERRIDE;
+    virtual void OnThink() override;
+    virtual void Paint() override;
 
-    virtual bool ShouldDraw() OVERRIDE;
-    virtual bool IsVisible() OVERRIDE;
+    virtual bool ShouldDraw() override;
+    virtual bool IsVisible() override;
 
 protected:
     void PaintBar( int y, int h, bool bFlip );
@@ -64,23 +64,23 @@ public:
     ~CZMHudSpectatorUI();
 
 
-	virtual const char*     GetName() OVERRIDE { return ""; };
-	virtual void            SetData( KeyValues* data ) OVERRIDE {};
-	virtual void            Reset() OVERRIDE {};
-	virtual bool            NeedsUpdate() OVERRIDE { return false; };
-	virtual bool            HasInputElements() OVERRIDE { return false; };
-    vgui::VPANEL            GetVPanel() OVERRIDE { return BaseClass::GetVPanel(); };
-	virtual bool            IsVisible() OVERRIDE { return BaseClass::IsVisible(); };
-	virtual void            SetParent( vgui::VPANEL parent ) OVERRIDE { BaseClass::SetParent( parent ); };
+	virtual const char*     GetName() override { return ""; };
+	virtual void            SetData( KeyValues* data ) override {};
+	virtual void            Reset() override {};
+	virtual bool            NeedsUpdate() override { return false; };
+	virtual bool            HasInputElements() override { return false; };
+    vgui::VPANEL            GetVPanel() override { return BaseClass::GetVPanel(); };
+	virtual bool            IsVisible() override { return BaseClass::IsVisible(); };
+	virtual void            SetParent( vgui::VPANEL parent ) override { BaseClass::SetParent( parent ); };
 
-    virtual void            ShowPanel( bool bShow ) OVERRIDE;
-    virtual void            Update() OVERRIDE;
+    virtual void            ShowPanel( bool bShow ) override;
+    virtual void            Update() override;
 
 
-    virtual void    OnThink() OVERRIDE;
-    virtual void    Paint() OVERRIDE;
-    virtual void    PerformLayout() OVERRIDE;
-    virtual void    ApplySchemeSettings( vgui::IScheme* pScheme ) OVERRIDE;
+    virtual void    OnThink() override;
+    virtual void    Paint() override;
+    virtual void    PerformLayout() override;
+    virtual void    ApplySchemeSettings( vgui::IScheme* pScheme ) override;
 
 private:
     bool m_bSpecScoreboard;

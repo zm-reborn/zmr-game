@@ -67,7 +67,7 @@ namespace NPCR
 
         virtual const char* GetName() const { return ""; }
 
-        virtual NPCRChar* GetOuter() const OVERRIDE { return m_pOuter; }
+        virtual NPCRChar* GetOuter() const override { return m_pOuter; }
 
 
         bool HasStarted() const { return m_State != SCHED_INSTART; }
@@ -282,14 +282,14 @@ namespace NPCR
         }
 
 
-        virtual void StartInitialSchedule() OVERRIDE
+        virtual void StartInitialSchedule() override
         {
             auto* pChar = dynamic_cast<NPCRChar*>( GetNPC()->GetOuter() );
             auto* pSchedInt = dynamic_cast<CScheduleInterface*>( CComponent::GetOwner() );
             RunStart( pChar, pSchedInt );
         }
 
-        virtual void Update() OVERRIDE
+        virtual void Update() override
         {
             // Starts from the initial schedule.
             // Run through all the other schedules.
@@ -371,11 +371,11 @@ namespace NPCR
         CScheduleInterface( CBaseNPC* pNPC, CScheduleInt* pInitialSched );
         ~CScheduleInterface();
 
-        virtual const char* GetComponentName() const OVERRIDE { return "ScheduleInterface"; }
+        virtual const char* GetComponentName() const override { return "ScheduleInterface"; }
 
 
     protected:
-        virtual void Update() OVERRIDE;
+        virtual void Update() override;
 
     private:
         CScheduleInt* m_pInitialSched;

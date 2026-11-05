@@ -17,8 +17,8 @@ public:
     CZMOptionsSubGeneral( vgui::Panel* parent );
     ~CZMOptionsSubGeneral();
 
-    virtual void OnApplyChanges() OVERRIDE;
-    virtual void OnResetData() OVERRIDE;
+    virtual void OnApplyChanges() override;
+    virtual void OnResetData() override;
 
     MESSAGE_FUNC_PARAMS( OnComboChanged, "TextChanged", data );
 

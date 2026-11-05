@@ -21,15 +21,15 @@ public:
     CZombieScanSwatObjSchedule();
     ~CZombieScanSwatObjSchedule();
 
-    virtual const char* GetName() const OVERRIDE { return "ZombieScanSwatObj"; }
+    virtual const char* GetName() const override { return "ZombieScanSwatObj"; }
 
 
-    virtual void OnStart() OVERRIDE;
+    virtual void OnStart() override;
 
-    virtual void OnContinue() OVERRIDE;
+    virtual void OnContinue() override;
 
     // We should never reach here.
-    virtual void OnUpdate() OVERRIDE;
+    virtual void OnUpdate() override;
 
 private:
     CBaseEntity* GetSwatObject();

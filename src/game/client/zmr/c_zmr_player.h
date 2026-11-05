@@ -38,57 +38,57 @@ public:
 	void				Zoom( float fov, float flTime );
 	float				GetZoom();
 
-    virtual void Spawn() OVERRIDE;
-    virtual void ClientThink() OVERRIDE;
-    virtual void PreThink() OVERRIDE;
-    virtual bool CreateMove( float delta, CUserCmd* cmd ) OVERRIDE;
+    virtual void Spawn() override;
+    virtual void ClientThink() override;
+    virtual void PreThink() override;
+    virtual bool CreateMove( float delta, CUserCmd* cmd ) override;
 
     void            OnSpawn();
-    virtual void    TeamChange( int iNewTeam ) OVERRIDE;
+    virtual void    TeamChange( int iNewTeam ) override;
     static void     TeamChangeStatic( int iNewTeam );
 
 
-    virtual void            Simulate() OVERRIDE;
-    virtual void            CreateLightEffects() OVERRIDE {};
-    virtual ShadowType_t    ShadowCastType() OVERRIDE;
-    virtual bool            ShouldReceiveProjectedTextures( int flags ) OVERRIDE;
-    virtual bool            ShouldDraw() OVERRIDE;
-    virtual int             DrawModel( int flags ) OVERRIDE;
+    virtual void            Simulate() override;
+    virtual void            CreateLightEffects() override {};
+    virtual ShadowType_t    ShadowCastType() override;
+    virtual bool            ShouldReceiveProjectedTextures( int flags ) override;
+    virtual bool            ShouldDraw() override;
+    virtual int             DrawModel( int flags ) override;
     int                     DrawModelAndEffects( int flags );
-    virtual const QAngle&   GetRenderAngles() OVERRIDE;
-    virtual const QAngle&   EyeAngles() OVERRIDE;
+    virtual const QAngle&   GetRenderAngles() override;
+    virtual const QAngle&   EyeAngles() override;
     void                    SetLocalAngles( const QAngle& angles );
-    virtual float           GetFOV() OVERRIDE;
-    virtual float           GetMinFOV() const OVERRIDE { return 5.0f; };
+    virtual float           GetFOV() override;
+    virtual float           GetMinFOV() const override { return 5.0f; };
     static float            GetLocalDefaultFOV();
-    virtual void            ProcessMuzzleFlashEvent() OVERRIDE;
+    virtual void            ProcessMuzzleFlashEvent() override;
 
     int GetIDTarget() const;
 
-    virtual void UpdateClientSideAnimation() OVERRIDE;
-    virtual void CalculateIKLocks( float currentTime ) OVERRIDE;
+    virtual void UpdateClientSideAnimation() override;
+    virtual void CalculateIKLocks( float currentTime ) override;
 
-    virtual C_BaseAnimating*    BecomeRagdollOnClient() OVERRIDE;
-    IRagdoll*                   GetRepresentativeRagdoll() const OVERRIDE;
+    virtual C_BaseAnimating*    BecomeRagdollOnClient() override;
+    IRagdoll*                   GetRepresentativeRagdoll() const override;
     C_ZMRagdoll*                GetRagdoll() const;
     int                         GetEyeAttachment() const;
-    virtual void                CalcView( Vector& eyeOrigin, QAngle& eyeAngles, float& zNear, float& zFar, float& fov ) OVERRIDE;
+    virtual void                CalcView( Vector& eyeOrigin, QAngle& eyeAngles, float& zNear, float& zFar, float& fov ) override;
 
     void                        DeathCam_Firstperson( C_ZMPlayer* pPlayer, Vector& eyeOrigin, QAngle& eyeAngles, float& zNear, float& zFar, float& fov );
     void                        DeathCam_Thirdperson( C_ZMPlayer* pPlayer, Vector& eyeOrigin, QAngle& eyeAngles, float& zNear, float& zFar, float& fov );
 
-    virtual CStudioHdr*         OnNewModel() OVERRIDE;
+    virtual CStudioHdr*         OnNewModel() override;
     void                        Initialize();
     inline void                 SetLookat( const Vector& pos ) { m_viewtarget = pos; };
     inline void                 BlinkEyes() { m_blinktoggle = !m_blinktoggle; };
 
-    virtual void                TraceAttack( const CTakeDamageInfo& info, const Vector& vecDir, trace_t* ptr, CDmgAccumulator* pAccumulator ) OVERRIDE;
-    virtual void                DoImpactEffect( trace_t& tr, int nDamageType ) OVERRIDE;
+    virtual void                TraceAttack( const CTakeDamageInfo& info, const Vector& vecDir, trace_t* ptr, CDmgAccumulator* pAccumulator ) override;
+    virtual void                DoImpactEffect( trace_t& tr, int nDamageType ) override;
 
-    virtual void                NotifyShouldTransmit( ShouldTransmitState_t state ) OVERRIDE;
-    virtual void                OnDataChanged( DataUpdateType_t type ) OVERRIDE;
-    virtual void                PostDataUpdate( DataUpdateType_t updateType ) OVERRIDE;
-    virtual bool                ShouldInterpolate() OVERRIDE;
+    virtual void                NotifyShouldTransmit( ShouldTransmitState_t state ) override;
+    virtual void                OnDataChanged( DataUpdateType_t type ) override;
+    virtual void                PostDataUpdate( DataUpdateType_t updateType ) override;
+    virtual bool                ShouldInterpolate() override;
 
     // Custom...
     inline bool IsZM() const { return GetTeamNumber() == ZMTEAM_ZM; }
@@ -106,23 +106,23 @@ public:
     void                    SetResources( int res );
     float                   GetFlashlightBattery() const;
     void                    SetFlashlightBattery( float battery );
-    bool                    Weapon_CanSwitchTo( C_BaseCombatWeapon* pWeapon ) OVERRIDE;
+    bool                    Weapon_CanSwitchTo( C_BaseCombatWeapon* pWeapon ) override;
     Participation_t         GetParticipation() const;
     static Participation_t  GetLocalParticipation();
     static void             SetLocalParticipation( Participation_t part );
-    virtual void            PlayStepSound( Vector& vecOrigin, surfacedata_t* psurface, float fvol, bool force ) OVERRIDE;
+    virtual void            PlayStepSound( Vector& vecOrigin, surfacedata_t* psurface, float fvol, bool force ) override;
     C_BaseCombatWeapon*     GetWeaponForAmmo( int iAmmoType ) const;
     Vector                  GetAttackSpread( C_BaseCombatWeapon* pWeapon, C_BaseEntity* pTarget = nullptr );
-    Vector                  GetAutoaimVector( float flScale ) OVERRIDE;
+    Vector                  GetAutoaimVector( float flScale ) override;
     void                    DoAnimationEvent( PlayerAnimEvent_t playerAnim, int nData = 0 );
     float                   GetAccuracyRatio() const;
     void                    UpdateAccuracyRatio();
     void                    GetZMMovementVars( float& maxspd, float& accel, float& decel ) const;
-    virtual void            FireBullets( const FireBulletsInfo_t& info ) OVERRIDE;
+    virtual void            FireBullets( const FireBulletsInfo_t& info ) override;
     void                    SimulateBullet( ZMFireBulletsInfo_t& bulletinfo );
     bool                    HandleBulletPenetration( trace_t& tr, const ZMFireBulletsInfo_t& bulletinfo, Vector& vecNextSrc, float& flDistance );
     bool                    HandleShotImpactingWater( const FireBulletsInfo_t& info, const Vector& vecEnd, CTraceFilter* pFilter );
-    virtual void            DoMuzzleFlash() OVERRIDE;
+    virtual void            DoMuzzleFlash() override;
     int                     GetTotalAmmoAmount( int iValidAmmoIndex ) const;
     int                     GetAmmoRoom( int iValidAmmoIndex ) const;
     bool                    IsFlashlightOn() const;

@@ -17,10 +17,10 @@ public:
     ~CZMFlashlightSystem();
 
 
-    virtual void LevelInitPostEntity() OVERRIDE;
-    virtual void LevelShutdownPostEntity() OVERRIDE;
+    virtual void LevelInitPostEntity() override;
+    virtual void LevelShutdownPostEntity() override;
 
-    virtual void Update( float delta ) OVERRIDE;
+    virtual void Update( float delta ) override;
 
 
     bool AddPlayerToExpensiveList( C_ZMPlayer* pPlayer );

@@ -27,7 +27,7 @@ ConVar zm_sv_debug_zombie_flinch( "zm_sv_debug_zombie_flinch", "0", 0, "Play fli
 class CZMLOSFilter : public CTraceFilter
 {
 public:
-    virtual bool ShouldHitEntity( IHandleEntity* pEntity, int contentsMask ) OVERRIDE
+    virtual bool ShouldHitEntity( IHandleEntity* pEntity, int contentsMask ) override
     {
         CBaseEntity* pEnt = EntityFromEntityHandle( pEntity );
         if ( !pEnt )
@@ -55,7 +55,7 @@ public:
     bool DidHit() const { return m_vHitEnts.Count() > 0; }
     void CopyHitEntities( CUtlVector<CBaseEntity*>& vec ) const { vec.CopyArray( m_vHitEnts.Base(), m_vHitEnts.Count() ); }
 
-    virtual bool ShouldHitEntity( IHandleEntity* pEntity, int contentsMask ) OVERRIDE
+    virtual bool ShouldHitEntity( IHandleEntity* pEntity, int contentsMask ) override
     {
         CBaseEntity* pEnt = EntityFromEntityHandle( pEntity );
         if ( !pEnt )

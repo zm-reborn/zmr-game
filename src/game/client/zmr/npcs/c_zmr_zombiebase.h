@@ -29,23 +29,23 @@ public:
     C_ZMBaseZombie();
     ~C_ZMBaseZombie();
 
-    virtual void Spawn( void ) OVERRIDE;
+    virtual void Spawn( void ) override;
 
-    virtual int     DrawModel( int flags ) OVERRIDE;
+    virtual int     DrawModel( int flags ) override;
     int             DrawModelAndEffects( int flags );
 
-    virtual void CalculateIKLocks( float currentTime ) OVERRIDE;
+    virtual void CalculateIKLocks( float currentTime ) override;
 
 
-    virtual void OnDataChanged( DataUpdateType_t type ) OVERRIDE;
-    virtual void UpdateClientSideAnimation() OVERRIDE;
+    virtual void OnDataChanged( DataUpdateType_t type ) override;
+    virtual void UpdateClientSideAnimation() override;
 
-    virtual void HandleAnimEvent( animevent_t* pEvent ) OVERRIDE;
+    virtual void HandleAnimEvent( animevent_t* pEvent ) override;
 
 
-    virtual Vector          GetObserverCamOrigin() OVERRIDE { return WorldSpaceCenter(); }
-    virtual const QAngle&   EyeAngles() OVERRIDE;
-    virtual Vector          EyePosition() OVERRIDE;
+    virtual Vector          GetObserverCamOrigin() override { return WorldSpaceCenter(); }
+    virtual const QAngle&   EyeAngles() override;
+    virtual Vector          EyePosition() override;
 
     virtual const char* GetZombieLocalization() const { return ""; }
 
@@ -56,7 +56,7 @@ public:
     virtual void AttackSound() {}
     void PlayFootstepSound( const char* soundname );
     
-    virtual void TraceAttack( const CTakeDamageInfo& info, const Vector& vecDir, trace_t* ptr, CDmgAccumulator* pAccumulator ) OVERRIDE;
+    virtual void TraceAttack( const CTakeDamageInfo& info, const Vector& vecDir, trace_t* ptr, CDmgAccumulator* pAccumulator ) override;
     
     
     // Implemented in zmr_zombiebase_shared
@@ -73,7 +73,7 @@ public:
     void                    SetSelector( int index );
     ZombieClass_t           GetZombieClass() const;
     bool                    DoAnimationEvent( int iEvent, int nData );
-    virtual int             GetAnimationRandomSeed() OVERRIDE;
+    virtual int             GetAnimationRandomSeed() override;
     virtual bool            CanBePenetrated() const;
 protected:
     void                    SetZombieClass( ZombieClass_t zclass );
@@ -90,9 +90,9 @@ public:
 
 
 
-    virtual CStudioHdr* OnNewModel() OVERRIDE;
-    virtual C_BaseAnimating* BecomeRagdollOnClient() OVERRIDE;
-    virtual void UpdateVisibility() OVERRIDE;
+    virtual CStudioHdr* OnNewModel() override;
+    virtual C_BaseAnimating* BecomeRagdollOnClient() override;
+    virtual void UpdateVisibility() override;
 protected:
     virtual bool    CreateEventAccessories();
     void            ReleaseHat();

@@ -23,9 +23,9 @@ public:
     CZMWeaponCrowbar();
 
 
-    virtual bool UsesAnimEvent( bool bSecondary ) const OVERRIDE { return false; }
+    virtual bool UsesAnimEvent( bool bSecondary ) const override { return false; }
 
-    virtual bool CanSecondaryAttack() const OVERRIDE { return false; }
+    virtual bool CanSecondaryAttack() const override { return false; }
 };
 
 IMPLEMENT_NETWORKCLASS_ALIASED( ZMWeaponCrowbar, DT_ZM_WeaponCrowbar )

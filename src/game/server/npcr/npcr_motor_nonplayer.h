@@ -17,17 +17,17 @@ namespace NPCR
         ~CNonPlayerMotor();
 
 
-        virtual CNPCRNonPlayer* GetOuter() const OVERRIDE;
+        virtual CNPCRNonPlayer* GetOuter() const override;
 
 
-        virtual void Update() OVERRIDE;
+        virtual void Update() override;
 
 
-        virtual const Vector& GetVelocity() const OVERRIDE { return m_vecVelocity; }
-        virtual void SetVelocity( const Vector& vecVel ) OVERRIDE { m_vecVelocity = vecVel; BaseClass::SetVelocity( vecVel ); }
+        virtual const Vector& GetVelocity() const override { return m_vecVelocity; }
+        virtual void SetVelocity( const Vector& vecVel ) override { m_vecVelocity = vecVel; BaseClass::SetVelocity( vecVel ); }
 
 
-        virtual void Approach( const Vector& vecDesiredGoal ) OVERRIDE;
+        virtual void Approach( const Vector& vecDesiredGoal ) override;
 
         // Applied when moving
         virtual float GetFrictionSideways() const { return 5.0f; }
@@ -36,7 +36,7 @@ namespace NPCR
         virtual float GetFriction() const { return 6.0f; }
 
 
-        virtual float GetMovementSpeed() const OVERRIDE;
+        virtual float GetMovementSpeed() const override;
 
     protected:
         void Move();

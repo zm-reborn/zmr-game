@@ -20,7 +20,7 @@ public:
     CZMCreditsMenu( vgui::VPANEL parent );
     ~CZMCreditsMenu();
 
-    virtual void ApplySchemeSettings( vgui::IScheme* pScheme ) OVERRIDE;
+    virtual void ApplySchemeSettings( vgui::IScheme* pScheme ) override;
 
 private:
     vgui::RichText* m_pRichText;

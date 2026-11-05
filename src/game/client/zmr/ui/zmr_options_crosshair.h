@@ -24,8 +24,8 @@ public:
     MESSAGE_FUNC_PTR( OnSliderMoved, "SliderMoved", panel );
     //MESSAGE_FUNC_PTR( OnTextChanged, "TextChanged", panel );
 
-    virtual void OnApplyChanges() OVERRIDE;
-    virtual void OnResetData() OVERRIDE;
+    virtual void OnApplyChanges() override;
+    virtual void OnResetData() override;
 
     void UpdateCrosshair( int index = -1 );
     void UpdateSettings( int index = -1 );

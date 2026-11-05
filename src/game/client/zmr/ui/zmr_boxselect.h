@@ -13,9 +13,9 @@ public:
     CZMBoxSelect( vgui::Panel* pParent );
 
 
-    //virtual bool ShouldDraw() OVERRIDE;
-    //virtual void Init() OVERRIDE;
-    virtual void Paint() OVERRIDE;
+    //virtual bool ShouldDraw() override;
+    //virtual void Init() override;
+    virtual void Paint() override;
     
     //inline void SetDraw( bool b ) { m_bDraw = b; };
 

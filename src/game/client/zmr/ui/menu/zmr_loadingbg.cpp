@@ -33,7 +33,7 @@ public:
     CZMLoadingScreenText( vgui::Panel* pParent, const char* name );
     ~CZMLoadingScreenText();
 
-    virtual void ApplySchemeSettings( vgui::IScheme* pScheme ) OVERRIDE;
+    virtual void ApplySchemeSettings( vgui::IScheme* pScheme ) override;
 };
 
 DECLARE_BUILD_FACTORY( CZMLoadingScreenText );
@@ -64,11 +64,11 @@ public:
     ~CZMLoadingPanel();
 
 
-    virtual void FireGameEvent( IGameEvent* pEvent ) OVERRIDE;
+    virtual void FireGameEvent( IGameEvent* pEvent ) override;
 
-    virtual void ApplySchemeSettings( vgui::IScheme* pScheme ) OVERRIDE;
+    virtual void ApplySchemeSettings( vgui::IScheme* pScheme ) override;
 
-    virtual void PaintBackground() OVERRIDE;
+    virtual void PaintBackground() override;
 
 
     MESSAGE_FUNC( OnActivate, "activate" );
@@ -111,11 +111,11 @@ class CZMLoadingPanelInterface : public IZMUi
 public:
     CZMLoadingPanelInterface() { m_Panel = nullptr; };
 
-    void Create( vgui::VPANEL parent ) OVERRIDE
+    void Create( vgui::VPANEL parent ) override
     {
         m_Panel = new CZMLoadingPanel( parent );
     }
-    void Destroy() OVERRIDE
+    void Destroy() override
     {
         if ( m_Panel )
         {
@@ -123,7 +123,7 @@ public:
             delete m_Panel;
         }
     }
-    vgui::Panel* GetPanel() OVERRIDE { return m_Panel; }
+    vgui::Panel* GetPanel() override { return m_Panel; }
 
 private:
     CZMLoadingPanel* m_Panel;

@@ -189,8 +189,8 @@ namespace ZMItemAction
         static CZMMapItemActionReplace* Create( KeyValues* kv );
 
 
-        virtual int     PerformAction( ActionData_t& actiondata, ItemSpawnTime_t status ) OVERRIDE;
-        virtual bool    AffectsItem( ItemEntData_t& itemEntData, ItemSpawnTime_t status ) const OVERRIDE;
+        virtual int     PerformAction( ActionData_t& actiondata, ItemSpawnTime_t status ) override;
+        virtual bool    AffectsItem( ItemEntData_t& itemEntData, ItemSpawnTime_t status ) const override;
 
     private:
         bool CalcChance();
@@ -235,7 +235,7 @@ namespace ZMItemAction
 
 
         // Entry points
-        virtual void LevelInitPreEntity() OVERRIDE;
+        virtual void LevelInitPreEntity() override;
 
         void        SpawnItems();
         const char* OnCreateItem( const char* classname );

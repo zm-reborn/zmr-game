@@ -2299,7 +2299,7 @@ public:
 
     CZMEntTeamScore();
 
-    void Spawn() OVERRIDE;
+    void Spawn() override;
 
 
     void InputApplyScore( inputdata_t& inputData );
@@ -2641,8 +2641,8 @@ public:
     ~CZMEntPrecipitation();
 
 
-    virtual void Spawn() OVERRIDE;
-    virtual int UpdateTransmitState() OVERRIDE;
+    virtual void Spawn() override;
+    virtual int UpdateTransmitState() override;
 
 private:
     CNetworkVar( PrecipitationType_t, m_nPrecipType );

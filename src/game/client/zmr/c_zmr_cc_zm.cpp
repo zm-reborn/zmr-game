@@ -23,7 +23,7 @@ public:
         m_bAlive = false;
     }
 
-    virtual bool OnTeamChange( int iTeam ) OVERRIDE
+    virtual bool OnTeamChange( int iTeam ) override
     {
         if ( iTeam == ZMTEAM_ZM )
         {
@@ -38,18 +38,18 @@ public:
         return false;
     }
 
-    virtual bool OnDeath() OVERRIDE
+    virtual bool OnDeath() override
     {
         m_bAlive = false;
         return false;
     }
 
-    virtual float GetWeight() const OVERRIDE
+    virtual float GetWeight() const override
     {
         return zm_cl_colorcorrection_zm_weight.GetFloat();
     }
 
-    virtual bool IsDone() const OVERRIDE
+    virtual bool IsDone() const override
     {
         return !m_bAlive;
     }
@@ -59,4 +59,3 @@ private:
 };
 
 CZMZMEffect g_ZMCCZMEffect;
-

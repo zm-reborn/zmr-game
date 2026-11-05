@@ -23,9 +23,9 @@ public:
     CZMWeaponBaseballBat();
 
 
-    virtual bool UsesAnimEvent( bool bSecondary ) const OVERRIDE { return false; }
+    virtual bool UsesAnimEvent( bool bSecondary ) const override { return false; }
 
-    virtual bool CanSecondaryAttack() const OVERRIDE { return false; }
+    virtual bool CanSecondaryAttack() const override { return false; }
 };
 
 IMPLEMENT_NETWORKCLASS_ALIASED( ZMWeaponBaseballBat, DT_ZM_WeaponBaseballBat )

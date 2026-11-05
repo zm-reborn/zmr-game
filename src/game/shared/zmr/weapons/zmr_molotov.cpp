@@ -41,13 +41,13 @@ public:
     ~CZMWeaponMolotov();
 
 #ifndef CLIENT_DLL
-    void Operator_HandleAnimEvent( animevent_t*, CBaseCombatCharacter* ) OVERRIDE;
-    void HandleAnimEvent( animevent_t *pEvent ) OVERRIDE;
+    void Operator_HandleAnimEvent( animevent_t*, CBaseCombatCharacter* ) override;
+    void HandleAnimEvent( animevent_t *pEvent ) override;
 #else
-    bool OnFireEvent( C_BaseViewModel*, const Vector&, const QAngle&, int event, const char* ) OVERRIDE;
+    bool OnFireEvent( C_BaseViewModel*, const Vector&, const QAngle&, int event, const char* ) override;
 
 
-    //void ViewModelDrawn( C_BaseViewModel* ) OVERRIDE;
+    //void ViewModelDrawn( C_BaseViewModel* ) override;
 
     //CMaterialReference m_matClothFlame;
 
@@ -56,14 +56,14 @@ public:
 #endif
 
 
-    void Precache() OVERRIDE;
-    void PrimaryAttack() OVERRIDE;
-    bool Deploy() OVERRIDE;
-    bool Holster( CBaseCombatWeapon* pSwitchTo = nullptr ) OVERRIDE;
+    void Precache() override;
+    void PrimaryAttack() override;
+    bool Deploy() override;
+    bool Holster( CBaseCombatWeapon* pSwitchTo = nullptr ) override;
 
     void HandleAnimEventLight();
     
-    virtual const char* GetProjectileClassname() const OVERRIDE;
+    virtual const char* GetProjectileClassname() const override;
 
 #ifdef CLIENT_DLL
     HPARTICLEFFECT m_hClothFlameParticle;

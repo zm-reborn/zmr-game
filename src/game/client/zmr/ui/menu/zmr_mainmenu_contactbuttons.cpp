@@ -24,14 +24,14 @@ public:
     ~CZMMainMenuContactButton();
 
 
-    //virtual void ApplySchemeSettings( vgui::IScheme* pScheme ) OVERRIDE;
-    //virtual void ApplySettings( KeyValues* kv ) OVERRIDE;
+    //virtual void ApplySchemeSettings( vgui::IScheme* pScheme ) override;
+    //virtual void ApplySettings( KeyValues* kv ) override;
 
-    virtual void Paint() OVERRIDE;
+    virtual void Paint() override;
 
-    virtual void OnMousePressed( vgui::MouseCode code ) OVERRIDE;
-    virtual void OnCursorEntered() OVERRIDE { SetCursor( vgui::dc_hand ); }
-    virtual void OnCursorExited() OVERRIDE { SetCursor( vgui::dc_arrow ); }
+    virtual void OnMousePressed( vgui::MouseCode code ) override;
+    virtual void OnCursorEntered() override { SetCursor( vgui::dc_hand ); }
+    virtual void OnCursorExited() override { SetCursor( vgui::dc_arrow ); }
 
 
     void SetImage( const char* name );

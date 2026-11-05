@@ -24,8 +24,8 @@ public:
     ~CZMMainMenuImagePanel();
 
 
-    virtual void ApplySettings( KeyValues* kv ) OVERRIDE;
-    virtual void PerformLayout() OVERRIDE;
+    virtual void ApplySettings( KeyValues* kv ) override;
+    virtual void PerformLayout() override;
 
 private:
     bool m_bAlignBottom;

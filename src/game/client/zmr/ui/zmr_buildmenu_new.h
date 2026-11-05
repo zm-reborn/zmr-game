@@ -27,10 +27,10 @@ public:
     CZMBuildMenuNew( vgui::Panel* pParent );
     ~CZMBuildMenuNew();
 
-    virtual void Paint() OVERRIDE;
+    virtual void Paint() override;
 
-    virtual void ShowPanel( bool state ) OVERRIDE;
-	virtual void OnThink() OVERRIDE;
+    virtual void ShowPanel( bool state ) override;
+	virtual void OnThink() override;
 
 
     
@@ -38,11 +38,11 @@ public:
     MESSAGE_FUNC_PARAMS( OnRadialOver, "OnRadialOver", kv );
     MESSAGE_FUNC_PARAMS( OnRadialLeave, "OnRadialLeave", kv );
 
-    virtual const char* GetName() OVERRIDE { return "ZMBuildMenuNew"; };
+    virtual const char* GetName() override { return "ZMBuildMenuNew"; };
 
-    virtual void ShowMenu( C_ZMEntZombieSpawn* pSpawn ) OVERRIDE;
-    virtual void UpdateMenu( C_ZMEntZombieSpawn* pSpawn ) OVERRIDE;
-    virtual void UpdateQueue( const ZMQueueSlotData_t queue[], int size ) OVERRIDE;
+    virtual void ShowMenu( C_ZMEntZombieSpawn* pSpawn ) override;
+    virtual void UpdateMenu( C_ZMEntZombieSpawn* pSpawn ) override;
+    virtual void UpdateQueue( const ZMQueueSlotData_t queue[], int size ) override;
 
 private:
     void UpdateButtons();

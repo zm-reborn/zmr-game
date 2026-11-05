@@ -26,28 +26,28 @@ public:
     CZMWeaponHands();
 
 
-    virtual void	ItemPreFrame() OVERRIDE;
-    virtual void	ItemPostFrame() OVERRIDE;
+    virtual void	ItemPreFrame() override;
+    virtual void	ItemPostFrame() override;
 
-    virtual void	PrimaryAttack() OVERRIDE;
-    virtual void	SecondaryAttack() OVERRIDE;
+    virtual void	PrimaryAttack() override;
+    virtual void	SecondaryAttack() override;
     void			TertiaryAttack();
 
-    virtual void	Drop( const Vector& vecVelocity ) OVERRIDE;
+    virtual void	Drop( const Vector& vecVelocity ) override;
     void			ForceDrop( CBaseEntity* pEnt );
-    virtual bool	CanHolster() const OVERRIDE;
-    virtual bool	Holster( CBaseCombatWeapon* pSwitchingTo = nullptr ) OVERRIDE;
-    virtual bool	Deploy() OVERRIDE;
+    virtual bool	CanHolster() const override;
+    virtual bool	Holster( CBaseCombatWeapon* pSwitchingTo = nullptr ) override;
+    virtual bool	Deploy() override;
 
-    virtual Activity GetIdleActivity() const OVERRIDE;
+    virtual Activity GetIdleActivity() const override;
 
 
 #ifdef CLIENT_DLL
-    virtual bool	ShouldDrawPickup() OVERRIDE { return false; }
-    virtual bool    IsOverridingViewmodel() OVERRIDE;
+    virtual bool	ShouldDrawPickup() override { return false; }
+    virtual bool    IsOverridingViewmodel() override;
 #endif
-    virtual bool	HasAnyAmmo() OVERRIDE { return true; }
-    virtual bool	CanBeDropped() const OVERRIDE { return false; }
+    virtual bool	HasAnyAmmo() override { return true; }
+    virtual bool	CanBeDropped() const override { return false; }
 
 
     bool TryPickupObject( CBaseEntity* pEnt );
@@ -68,11 +68,11 @@ public:
     bool IsAbleToPickupObjects() const;
 
 
-    virtual float	GetRange() const OVERRIDE { return 45.0f; }
+    virtual float	GetRange() const override { return 45.0f; }
 
-    virtual Activity	GetPrimaryAttackActivity() OVERRIDE { return ACT_VM_HITCENTER; }
-    virtual float		GetDamageForActivity( Activity act ) const OVERRIDE { return 5.0f; }
-    virtual void		Hit( trace_t& traceHit, Activity iHitActivity ) OVERRIDE;
+    virtual Activity	GetPrimaryAttackActivity() override { return ACT_VM_HITCENTER; }
+    virtual float		GetDamageForActivity( Activity act ) const override { return 5.0f; }
+    virtual void		Hit( trace_t& traceHit, Activity iHitActivity ) override;
 
 
 protected:
@@ -95,7 +95,7 @@ protected:
 #endif	// GAME_DLL
 
 #ifdef CLIENT_DLL
-    virtual void	OnDataChanged( DataUpdateType_t type ) OVERRIDE;
+    virtual void	OnDataChanged( DataUpdateType_t type ) override;
     
     void			ManagePredictedObject();
 #endif	// CLIENT_DLL

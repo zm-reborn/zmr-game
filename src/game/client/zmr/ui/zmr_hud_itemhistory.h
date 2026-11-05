@@ -36,14 +36,14 @@ public:
 
     CZMHudItemHistory( const char* pszElementName );
 
-    virtual void Init() OVERRIDE;
-    virtual void Reset() OVERRIDE;
+    virtual void Init() override;
+    virtual void Reset() override;
 
-    virtual bool ShouldDraw() OVERRIDE;
+    virtual bool ShouldDraw() override;
 
-    virtual void Paint() OVERRIDE;
+    virtual void Paint() override;
 
-    virtual void ApplySchemeSettings( vgui::IScheme* pScheme ) OVERRIDE;
+    virtual void ApplySchemeSettings( vgui::IScheme* pScheme ) override;
 
 
     static float GetItemSlotTypeDrawTime( ZMItemHistorySlotType_t type );

@@ -12,15 +12,15 @@ public:
 
     CZMHudControlPanel( vgui::Panel* pParent );
     
-    virtual void ApplySchemeSettings( vgui::IScheme* pScheme ) OVERRIDE;
+    virtual void ApplySchemeSettings( vgui::IScheme* pScheme ) override;
 
-    virtual void PerformLayout() OVERRIDE;
-    virtual void OnThink() OVERRIDE;
-    virtual void OnCommand( const char* command ) OVERRIDE;
+    virtual void PerformLayout() override;
+    virtual void OnThink() override;
+    virtual void OnCommand( const char* command ) override;
     
     void SetBgColor( const Color& clr );
     void SetFgColor( const Color& clr );
-    virtual void PaintBackground() OVERRIDE;
+    virtual void PaintBackground() override;
 
     void PositionButtons();
     void PositionComboBox();

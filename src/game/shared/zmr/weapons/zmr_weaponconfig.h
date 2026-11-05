@@ -269,11 +269,11 @@ namespace ZMWeaponConfig
         static bool IsDebugging();
 
 
-        virtual void PostInit() OVERRIDE;
-        virtual void LevelInitPreEntity() OVERRIDE;
+        virtual void PostInit() override;
+        virtual void LevelInitPreEntity() override;
 
 #ifdef CLIENT_DLL
-        virtual void FireGameEvent( IGameEvent* event ) OVERRIDE;
+        virtual void FireGameEvent( IGameEvent* event ) override;
 #endif
 
         bool IsSlotRegistered( WeaponConfigSlot_t slot ) const;

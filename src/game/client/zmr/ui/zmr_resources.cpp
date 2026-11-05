@@ -34,12 +34,12 @@ public:
 
     CZMResourceHud( const char* );
 
-    virtual void PerformLayout() OVERRIDE;
-    virtual void VidInit() OVERRIDE;
-    virtual void Init() OVERRIDE;
-    virtual void Reset() OVERRIDE;
-    virtual void OnThink() OVERRIDE;
-    virtual void PaintBackground() OVERRIDE;
+    virtual void PerformLayout() override;
+    virtual void VidInit() override;
+    virtual void Init() override;
+    virtual void Reset() override;
+    virtual void OnThink() override;
+    virtual void PaintBackground() override;
 
 private:
     int m_nTexBgId;

@@ -13,12 +13,12 @@ public:
     ~CZMRNavArea();
 
     // Override to make these do nothing.
-    virtual void ComputeHidingSpots() OVERRIDE;
-    virtual void ComputeSniperSpots() OVERRIDE;
-    virtual void ComputeSpotEncounters() OVERRIDE;
-    virtual void UpdateBlocked( bool force = false, int teamID = TEAM_ANY ) OVERRIDE;
+    virtual void ComputeHidingSpots() override;
+    virtual void ComputeSniperSpots() override;
+    virtual void ComputeSpotEncounters() override;
+    virtual void UpdateBlocked( bool force = false, int teamID = TEAM_ANY ) override;
 
-    virtual bool IsBlocked( int teamID, bool ignoreNavBlockers = false ) const OVERRIDE;
+    virtual bool IsBlocked( int teamID, bool ignoreNavBlockers = false ) const override;
     void SetNoFloor( bool state ) { m_bHasNoFloor = state; }
 
     void GetWorldBounds( Vector& mins, Vector& maxs ) const;

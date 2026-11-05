@@ -14,9 +14,9 @@ public:
     ~C_ZMDrifter();
 
 
-    virtual const char* GetZombieLocalization() const OVERRIDE { return "#ZMClassDrifter"; }
+    virtual const char* GetZombieLocalization() const override { return "#ZMClassDrifter"; }
 
 protected:
-    virtual bool        IsAffectedByEvent( HappyZombieEvent_t iEvent ) const OVERRIDE;
-    virtual const char* GetEventHatModel( HappyZombieEvent_t iEvent ) const OVERRIDE;
+    virtual bool        IsAffectedByEvent( HappyZombieEvent_t iEvent ) const override;
+    virtual const char* GetEventHatModel( HappyZombieEvent_t iEvent ) const override;
 };

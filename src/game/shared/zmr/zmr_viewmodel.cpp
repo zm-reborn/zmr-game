@@ -841,11 +841,11 @@ public:
     CViewModelColorMaterialProxy();
     ~CViewModelColorMaterialProxy();
 
-    virtual bool Init( IMaterial* pMaterial, KeyValues* pKeyValues ) OVERRIDE;
-    virtual IMaterial* GetMaterial() OVERRIDE;
+    virtual bool Init( IMaterial* pMaterial, KeyValues* pKeyValues ) override;
+    virtual IMaterial* GetMaterial() override;
 
 private:
-    virtual void OnBind( C_BaseEntity* pEntity ) OVERRIDE;
+    virtual void OnBind( C_BaseEntity* pEntity ) override;
 
 
     IMaterialVar*   m_defaultVar;

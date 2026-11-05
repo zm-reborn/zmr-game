@@ -58,7 +58,7 @@ namespace NPCR
 
         CPlayerMotor* GetPlayerMotor() const;
 
-        virtual CBaseMotor* CreateMotor() OVERRIDE;
+        virtual CBaseMotor* CreateMotor() override;
 
 
 
@@ -77,7 +77,7 @@ namespace NPCR
         {
         }
 
-        virtual void PostConstructor( const char* szClassname ) OVERRIDE
+        virtual void PostConstructor( const char* szClassname ) override
         {
             PlayerClass::PostConstructor( szClassname );
 
@@ -85,11 +85,11 @@ namespace NPCR
         }
 
 
-        virtual bool IsNetClient() const OVERRIDE { return false; }
-        virtual bool IsFakeClient() const OVERRIDE { return true; }
-        virtual bool IsBot() const OVERRIDE { return true; }
+        virtual bool IsNetClient() const override { return false; }
+        virtual bool IsFakeClient() const override { return true; }
+        virtual bool IsBot() const override { return true; }
 
-        virtual CBaseNPC* MyNPCRPointer() OVERRIDE { return this; }
+        virtual CBaseNPC* MyNPCRPointer() override { return this; }
 
 
         template<typename BotClass>
@@ -111,7 +111,7 @@ namespace NPCR
             return pPlayer;
         }
         
-        virtual bool RemoveNPC() OVERRIDE
+        virtual bool RemoveNPC() override
         {
             // We can't be removed as an entity. Kick instead.
             int userid = PlayerClass::GetUserID();
@@ -129,7 +129,7 @@ namespace NPCR
         virtual bool OverrideUserCmd( CUserCmd& com ) { return false; }
 
 
-        virtual void PhysicsSimulate() OVERRIDE
+        virtual void PhysicsSimulate() override
         {
             Update();
 

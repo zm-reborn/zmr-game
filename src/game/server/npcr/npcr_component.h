@@ -157,13 +157,13 @@ namespace NPCR
         CUtlVector<CComponent*> m_Components;
     public:
 
-#define COMP_DISPATCH_Q(func)                                   QueryResult_t func() const OVERRIDE { return ForEachComponentQuery( []( CComponent* c ) { return c->func(); } ); }
-#define COMP_DISPATCH_Q_1ARG(func,argtype1,arg1)                QueryResult_t func( argtype1 arg1 ) const OVERRIDE { return ForEachComponentQuery( [ &arg1 ]( CComponent* c ) { return c->func( arg1 ); } ); }
-#define COMP_DISPATCH(func)                                     void func() OVERRIDE { ForEachComponent( []( CComponent* c ) { c->func(); } ); }
-#define COMP_DISPATCH_1ARG(func,argtype1,arg1)                  void func( argtype1 arg1 ) OVERRIDE { ForEachComponent( [ &arg1 ]( CComponent* c ) { c->func( arg1 ); } ); }
-#define COMP_DISPATCH_2ARG(func,argtype1,arg1,argtype2,arg2)    void func( argtype1 arg1, argtype2 arg2 ) OVERRIDE { ForEachComponent( [ &arg1, &arg2 ]( CComponent* c ) { c->func( arg1, arg2 ); } ); }
+#define COMP_DISPATCH_Q(func)                                   QueryResult_t func() const override { return ForEachComponentQuery( []( CComponent* c ) { return c->func(); } ); }
+#define COMP_DISPATCH_Q_1ARG(func,argtype1,arg1)                QueryResult_t func( argtype1 arg1 ) const override { return ForEachComponentQuery( [ &arg1 ]( CComponent* c ) { return c->func( arg1 ); } ); }
+#define COMP_DISPATCH(func)                                     void func() override { ForEachComponent( []( CComponent* c ) { c->func(); } ); }
+#define COMP_DISPATCH_1ARG(func,argtype1,arg1)                  void func( argtype1 arg1 ) override { ForEachComponent( [ &arg1 ]( CComponent* c ) { c->func( arg1 ); } ); }
+#define COMP_DISPATCH_2ARG(func,argtype1,arg1,argtype2,arg2)    void func( argtype1 arg1, argtype2 arg2 ) override { ForEachComponent( [ &arg1, &arg2 ]( CComponent* c ) { c->func( arg1, arg2 ); } ); }
 
-        void Update() OVERRIDE { ForEachComponent( []( CComponent* c ){ c->Update(); } ); }
+        void Update() override { ForEachComponent( []( CComponent* c ){ c->Update(); } ); }
         
 
         // Events

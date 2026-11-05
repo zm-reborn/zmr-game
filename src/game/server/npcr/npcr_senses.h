@@ -92,10 +92,10 @@ namespace NPCR
         ~CBaseSenses();
 
 
-        virtual const char* GetComponentName() const OVERRIDE { return "BaseSenses"; }
+        virtual const char* GetComponentName() const override { return "BaseSenses"; }
 
 
-        virtual void Update() OVERRIDE;
+        virtual void Update() override;
 
         const KnownEntity* GetKnownOf( CBaseEntity* pEnt ) const;
 
@@ -120,7 +120,7 @@ namespace NPCR
 
         virtual bool IsValidKnownEntity( CBaseEntity* pEnt ) const;
 
-        virtual void OnHeardSound( CSound* pSound ) OVERRIDE;
+        virtual void OnHeardSound( CSound* pSound ) override;
 
         template<typename EachFunc>
         void IterateKnown( EachFunc func ) const

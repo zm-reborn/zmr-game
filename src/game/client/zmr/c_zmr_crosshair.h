@@ -77,8 +77,8 @@ private:
 class CZMEmptyCrosshair : public CZMBaseCrosshair
 {
 public:
-    virtual void WriteValues( KeyValues* kv ) const OVERRIDE;
-    virtual void Draw() OVERRIDE;
+    virtual void WriteValues( KeyValues* kv ) const override;
+    virtual void Draw() override;
 
 };
 //
@@ -91,8 +91,8 @@ public:
     CZMBaseDynamicCrosshair();
 
 
-    virtual void LoadValues( KeyValues* kv ) OVERRIDE;
-    virtual void WriteValues( KeyValues* kv ) const OVERRIDE;
+    virtual void LoadValues( KeyValues* kv ) override;
+    virtual void WriteValues( KeyValues* kv ) const override;
 
 
     virtual float GetMaxDynamicMove() const { return m_flDynamicMove; }
@@ -112,9 +112,9 @@ protected:
 class CZMDotCrosshair : public CZMBaseCrosshair
 {
 public:
-    virtual void WriteValues( KeyValues* kv ) const OVERRIDE;
+    virtual void WriteValues( KeyValues* kv ) const override;
 
-    virtual void Draw() OVERRIDE;
+    virtual void Draw() override;
 };
 //
 
@@ -126,10 +126,10 @@ public:
     CZMMaterialCrosshair();
 
 
-    virtual void LoadValues( KeyValues* kv ) OVERRIDE;
-    virtual void WriteValues( KeyValues* kv ) const OVERRIDE;
+    virtual void LoadValues( KeyValues* kv ) override;
+    virtual void WriteValues( KeyValues* kv ) const override;
 
-    virtual void Draw() OVERRIDE;
+    virtual void Draw() override;
 
 
 protected:
@@ -143,9 +143,9 @@ protected:
 class CZMPistolCrosshair : public CZMBaseCrosshair
 {
 public:
-    virtual void LoadValues( KeyValues* kv ) OVERRIDE;
+    virtual void LoadValues( KeyValues* kv ) override;
 
-    virtual void Draw() OVERRIDE;
+    virtual void Draw() override;
 };
 //
 
@@ -156,16 +156,16 @@ class CZMAccuracyCrosshair : public CZMBaseDynamicCrosshair
 public:
     CZMAccuracyCrosshair();
 
-    virtual void LoadValues( KeyValues* kv ) OVERRIDE;
-    virtual void WriteValues( KeyValues* kv ) const OVERRIDE;
+    virtual void LoadValues( KeyValues* kv ) override;
+    virtual void WriteValues( KeyValues* kv ) const override;
 
 
-    virtual void Draw() OVERRIDE;
+    virtual void Draw() override;
 
     virtual float GetWidth() const;
     virtual float GetLength() const;
 
-    virtual float GetDynamicMoveScale() const OVERRIDE;
+    virtual float GetDynamicMoveScale() const override;
 
 protected:
     float m_flWidth;
@@ -180,7 +180,7 @@ class CZMCrosshairSystem : private CAutoGameSystem
 public:
     CZMCrosshairSystem();
 
-    virtual bool Init() OVERRIDE;
+    virtual bool Init() override;
 
 
     CUtlVector<CZMBaseCrosshair*>* GetCrosshairs() { return &m_vCrosshairs; }

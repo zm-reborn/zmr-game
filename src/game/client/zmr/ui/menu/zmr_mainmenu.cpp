@@ -44,11 +44,11 @@ class CZMMainMenuInterface : public IZMUi
 public:
     CZMMainMenuInterface() { m_Panel = nullptr; };
 
-    void Create( VPANEL parent ) OVERRIDE
+    void Create( VPANEL parent ) override
     {
         m_Panel = new CZMMainMenu( parent );
     }
-    void Destroy() OVERRIDE
+    void Destroy() override
     {
         if ( m_Panel )
         {
@@ -56,7 +56,7 @@ public:
             delete m_Panel;
         }
     }
-    vgui::Panel* GetPanel() OVERRIDE { return m_Panel; }
+    vgui::Panel* GetPanel() override { return m_Panel; }
 
 private:
     CZMMainMenu* m_Panel;

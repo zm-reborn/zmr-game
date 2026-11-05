@@ -11,12 +11,12 @@ public:
     ClientModeZMNormal();
     ~ClientModeZMNormal();
 
-    virtual void Init() OVERRIDE;
+    virtual void Init() override;
 
-    virtual void FireGameEvent( IGameEvent* pEvent ) OVERRIDE;
+    virtual void FireGameEvent( IGameEvent* pEvent ) override;
 
-    virtual bool DoPostScreenSpaceEffects( const CViewSetup* pSetup ) OVERRIDE;
-    virtual void PostRender() OVERRIDE;
+    virtual bool DoPostScreenSpaceEffects( const CViewSetup* pSetup ) override;
+    virtual void PostRender() override;
 
     virtual int KeyInput( int down, ButtonCode_t keynum, const char* pszCurrentBinding );
 

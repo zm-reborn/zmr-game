@@ -21,9 +21,9 @@ public:
     CZMWeaponShotgun();
     
 
-    virtual Activity GetReloadStartAct() const OVERRIDE;
-    virtual Activity GetReloadEndAct() const OVERRIDE;
-    virtual Activity GetPumpAct() const OVERRIDE { return ACT_SHOTGUN_PUMP; }
+    virtual Activity GetReloadStartAct() const override;
+    virtual Activity GetReloadEndAct() const override;
+    virtual Activity GetPumpAct() const override { return ACT_SHOTGUN_PUMP; }
 };
 
 REGISTER_WEAPON_CONFIG( ZMWeaponConfig::ZMCONFIGSLOT_SHOTGUN, CZMBasePumpConfig );

@@ -8,7 +8,7 @@ public:
     CZMLineTool( vgui::Panel* pParent );
 
 
-    virtual void Paint() OVERRIDE;
+    virtual void Paint() override;
 
     void SetStart( int x, int y );
     void SetEnd( int x, int y );

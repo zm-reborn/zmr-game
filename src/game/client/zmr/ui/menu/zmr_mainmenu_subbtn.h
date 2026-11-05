@@ -17,9 +17,9 @@ public:
     ~CZMMainMenuSubButton();
 
 
-    virtual void Paint() OVERRIDE;
+    virtual void Paint() override;
 
-    virtual void FireActionSignal() OVERRIDE;
+    virtual void FireActionSignal() override;
 
 
     void FadeIn( float fade );

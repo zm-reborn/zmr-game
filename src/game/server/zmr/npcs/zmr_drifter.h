@@ -16,25 +16,25 @@ public:
     ~CZMDrifter();
 
 
-    virtual void Precache() OVERRIDE;
-    virtual void Spawn() OVERRIDE;
+    virtual void Precache() override;
+    virtual void Spawn() override;
 
-    virtual void HandleAnimEvent( animevent_t* pEvent ) OVERRIDE;
+    virtual void HandleAnimEvent( animevent_t* pEvent ) override;
 
 
     // Drifter doesn't get any damage changes.
-    virtual bool ScaleDamageByHitgroup( int iHitGroup, CTakeDamageInfo& info ) const OVERRIDE { return false; }
+    virtual bool ScaleDamageByHitgroup( int iHitGroup, CTakeDamageInfo& info ) const override { return false; }
 
 
-    virtual float GetClawAttackRange() const OVERRIDE { return 112.0f; }
-    virtual void GetAttackHull( Vector& mins, Vector& maxs ) const OVERRIDE;
-    virtual float GetAttackLowest() const OVERRIDE { return -20.0f; }
+    virtual float GetClawAttackRange() const override { return 112.0f; }
+    virtual void GetAttackHull( Vector& mins, Vector& maxs ) const override;
+    virtual float GetAttackLowest() const override { return -20.0f; }
 
 
-    virtual bool ShouldPlayIdleSound() const OVERRIDE;
-    virtual float IdleSound() OVERRIDE;
-    virtual void AlertSound() OVERRIDE;
-    virtual void DeathSound() OVERRIDE;
+    virtual bool ShouldPlayIdleSound() const override;
+    virtual float IdleSound() override;
+    virtual void AlertSound() override;
+    virtual void DeathSound() override;
 
 
     static int AE_DRAGGY_SICK;

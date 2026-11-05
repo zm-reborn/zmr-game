@@ -73,90 +73,90 @@ public:
     }
 
 
-    virtual void    Precache() OVERRIDE;
-    virtual void    InitialSpawn() OVERRIDE;
-    virtual void    Spawn() OVERRIDE;
+    virtual void    Precache() override;
+    virtual void    InitialSpawn() override;
+    virtual void    Spawn() override;
 
-	virtual void    InitVCollision( const Vector& vecAbsOrigin, const Vector& vecAbsVelocity ) OVERRIDE;
-	virtual void    SetupVisibility( CBaseEntity* pViewEntity, unsigned char* pvs, int pvssize ) OVERRIDE;
+	virtual void    InitVCollision( const Vector& vecAbsOrigin, const Vector& vecAbsVelocity ) override;
+	virtual void    SetupVisibility( CBaseEntity* pViewEntity, unsigned char* pvs, int pvssize ) override;
 
-    virtual void    UpdateOnRemove() OVERRIDE;
-    virtual void    PreThink() OVERRIDE;
-    virtual void    PostThink() OVERRIDE;
-    virtual void    PlayerDeathThink() OVERRIDE;
-    virtual void    PhysicsSimulate() OVERRIDE;
+    virtual void    UpdateOnRemove() override;
+    virtual void    PreThink() override;
+    virtual void    PostThink() override;
+    virtual void    PlayerDeathThink() override;
+    virtual void    PhysicsSimulate() override;
     void            ItemPreFrame();
-    virtual void    ItemPostFrame() OVERRIDE;
-    virtual bool    ClientCommand( const CCommand& args ) OVERRIDE;
+    virtual void    ItemPostFrame() override;
+    virtual bool    ClientCommand( const CCommand& args ) override;
 
-	virtual void UpdateClientData() OVERRIDE;
-	virtual void StopLoopingSounds() OVERRIDE;
-	virtual void Splash() OVERRIDE;
+	virtual void UpdateClientData() override;
+	virtual void StopLoopingSounds() override;
+	virtual void Splash() override;
 
     void            PickDefaultSpawnTeam();
-    virtual void    ChangeTeam( int iTeam ) OVERRIDE;
+    virtual void    ChangeTeam( int iTeam ) override;
     bool            ShouldSpawn();
 
-    virtual bool            IsValidObserverTarget( CBaseEntity* pEnt ) OVERRIDE;
-    virtual CBaseEntity*    FindNextObserverTarget( bool bReverse ) OVERRIDE;
-    virtual void            CheckObserverSettings() OVERRIDE;
+    virtual bool            IsValidObserverTarget( CBaseEntity* pEnt ) override;
+    virtual CBaseEntity*    FindNextObserverTarget( bool bReverse ) override;
+    virtual void            CheckObserverSettings() override;
 
-    virtual int     ShouldTransmit( const CCheckTransmitInfo* ) OVERRIDE;
+    virtual int     ShouldTransmit( const CCheckTransmitInfo* ) override;
 
-    virtual void    SetAnimation( PLAYER_ANIM playerAnim ) OVERRIDE;
+    virtual void    SetAnimation( PLAYER_ANIM playerAnim ) override;
     bool            SetPlayerModel();
     void            UpdatePlayerFOV();
     void            UpdateArms( int iArmVersion );
-    virtual void    CreateViewModel( int index = 0 ) OVERRIDE;
+    virtual void    CreateViewModel( int index = 0 ) override;
 
 
-    virtual int     FlashlightIsOn() OVERRIDE;
-    virtual void    FlashlightTurnOn() OVERRIDE;
-    virtual void    FlashlightTurnOff() OVERRIDE;
+    virtual int     FlashlightIsOn() override;
+    virtual void    FlashlightTurnOn() override;
+    virtual void    FlashlightTurnOff() override;
 
-    virtual void    CreateCorpse() OVERRIDE;
-    virtual bool    BecomeRagdollOnClient( const Vector& force ) OVERRIDE;
+    virtual void    CreateCorpse() override;
+    virtual bool    BecomeRagdollOnClient( const Vector& force ) override;
     void            CreateRagdollEntity();
 
     LadderMove_t* GetLadderMove() { return &m_ZMLocal.m_LadderMove; }
-	virtual void ExitLadder() OVERRIDE;
-	virtual surfacedata_t* GetLadderSurface( const Vector& origin ) OVERRIDE;
+	virtual void ExitLadder() override;
+	virtual surfacedata_t* GetLadderSurface( const Vector& origin ) override;
 
-    virtual void PickupObject( CBaseEntity* pObject, bool bLimitMassAndSize ) OVERRIDE;
-    virtual float GetHeldObjectMass( IPhysicsObject* pHeldObject ) OVERRIDE;
-    virtual void ForceDropOfCarriedPhysObjects( CBaseEntity* pOnlyIfHoldindThis ) OVERRIDE;
+    virtual void PickupObject( CBaseEntity* pObject, bool bLimitMassAndSize ) override;
+    virtual float GetHeldObjectMass( IPhysicsObject* pHeldObject ) override;
+    virtual void ForceDropOfCarriedPhysObjects( CBaseEntity* pOnlyIfHoldindThis ) override;
 
     void InputForceDropPhysObjects( inputdata_t& data );
     void InputIgnoreFallDamage( inputdata_t& data );
     void InputIgnoreFallDamageWithoutReset( inputdata_t& data );
 
-    virtual bool BumpWeapon( CBaseCombatWeapon* pWeapon ) OVERRIDE;
+    virtual bool BumpWeapon( CBaseCombatWeapon* pWeapon ) override;
 
     // Lag compensation stuff...
     bool WantsLagCompensationOnNPC( const CZMBaseZombie* pZombie, const CUserCmd* pCmd, const CBitVec<MAX_EDICTS>* pEntityTransmitBits ) const;
     void NoteWeaponFired();
 
-    virtual void    DeathSound( const CTakeDamageInfo& info ) OVERRIDE;
-    virtual void    Event_Killed( const CTakeDamageInfo& info ) OVERRIDE;
-    virtual int     OnTakeDamage( const CTakeDamageInfo& info ) OVERRIDE;
-    virtual int     OnTakeDamage_Alive( const CTakeDamageInfo& info ) OVERRIDE;
-	virtual void    CommitSuicide( bool bExplode = false, bool bForce = false ) OVERRIDE;
-	virtual void    CommitSuicide( const Vector &vecForce, bool bExplode = false, bool bForce = false ) OVERRIDE;
-    virtual void    Ignite( float flFlameLifetime, bool bNPCOnly, float flSize, bool bCalledByLevelDesigner ) OVERRIDE;
+    virtual void    DeathSound( const CTakeDamageInfo& info ) override;
+    virtual void    Event_Killed( const CTakeDamageInfo& info ) override;
+    virtual int     OnTakeDamage( const CTakeDamageInfo& info ) override;
+    virtual int     OnTakeDamage_Alive( const CTakeDamageInfo& info ) override;
+	virtual void    CommitSuicide( bool bExplode = false, bool bForce = false ) override;
+	virtual void    CommitSuicide( const Vector &vecForce, bool bExplode = false, bool bForce = false ) override;
+    virtual void    Ignite( float flFlameLifetime, bool bNPCOnly, float flSize, bool bCalledByLevelDesigner ) override;
 
-    virtual CBaseEntity* EntSelectSpawnPoint( void ) OVERRIDE;
+    virtual CBaseEntity* EntSelectSpawnPoint( void ) override;
 
-    virtual void    ImpulseCommands() OVERRIDE;
-    virtual void    CheatImpulseCommands( int ) OVERRIDE;
+    virtual void    ImpulseCommands() override;
+    virtual void    CheatImpulseCommands( int ) override;
 
-    virtual int     GiveAmmo( int nCount, int nAmmoIndex, bool bSuppressSound ) OVERRIDE;
+    virtual int     GiveAmmo( int nCount, int nAmmoIndex, bool bSuppressSound ) override;
     void            GiveDefaultItems( void );
-    virtual void    EquipSuit( bool bPlayEffects = false ) OVERRIDE;
-    virtual void    RemoveAllItems( bool removeSuit ) OVERRIDE;
+    virtual void    EquipSuit( bool bPlayEffects = false ) override;
+    virtual void    RemoveAllItems( bool removeSuit ) override;
 
     void UpdatePlayerUseEntity();
-    virtual void PlayerUse() OVERRIDE;
-    //virtual void PlayUseDenySound() OVERRIDE;
+    virtual void PlayerUse() override;
+    //virtual void PlayUseDenySound() override;
 
     void State_Enter_ACTIVE();
     void State_PreThink_ACTIVE();
@@ -164,8 +164,8 @@ public:
     void State_PreThink_OBSERVER_MODE();
 
 
-    virtual bool StartObserverMode( int mode ) OVERRIDE;
-    virtual void StopObserverMode( void ) OVERRIDE;
+    virtual bool StartObserverMode( int mode ) override;
+    virtual void StopObserverMode( void ) override;
 
     
     inline bool IsZM() const { return GetTeamNumber() == ZMTEAM_ZM; }
@@ -210,21 +210,21 @@ public:
     void                SetResources( int res );
     float               GetFlashlightBattery() const;
     void                SetFlashlightBattery( float battery );
-    bool                Weapon_CanSwitchTo( CBaseCombatWeapon* pWeapon ) OVERRIDE;
+    bool                Weapon_CanSwitchTo( CBaseCombatWeapon* pWeapon ) override;
     Participation_t     GetParticipation() const;
-    virtual void        PlayStepSound( Vector& vecOrigin, surfacedata_t* psurface, float fvol, bool force ) OVERRIDE;
+    virtual void        PlayStepSound( Vector& vecOrigin, surfacedata_t* psurface, float fvol, bool force ) override;
     CBaseCombatWeapon*  GetWeaponForAmmo( int iAmmoType ) const;
-    virtual Vector      GetAttackSpread( CBaseCombatWeapon* pWeapon, CBaseEntity* pTarget = nullptr ) OVERRIDE;
-    virtual Vector      GetAutoaimVector( float flScale ) OVERRIDE;
+    virtual Vector      GetAttackSpread( CBaseCombatWeapon* pWeapon, CBaseEntity* pTarget = nullptr ) override;
+    virtual Vector      GetAutoaimVector( float flScale ) override;
     void                DoAnimationEvent( PlayerAnimEvent_t playerAnim, int nData = 0 );
     float               GetAccuracyRatio() const;
     void                UpdateAccuracyRatio();
     void                GetZMMovementVars( float& maxspd, float& accel, float& decel ) const;
-    virtual void        FireBullets( const FireBulletsInfo_t& info ) OVERRIDE;
+    virtual void        FireBullets( const FireBulletsInfo_t& info ) override;
     void                SimulateBullet( ZMFireBulletsInfo_t& bulletinfo );
     bool                HandleBulletPenetration( trace_t& tr, const ZMFireBulletsInfo_t& bulletinfo, Vector& vecNextSrc, float& flDistance );
     bool                HandleShotImpactingWater( const FireBulletsInfo_t& info, const Vector& vecEnd, CTraceFilter* pFilter );
-    virtual void        DoMuzzleFlash() OVERRIDE;
+    virtual void        DoMuzzleFlash() override;
     int                 GetTotalAmmoAmount( int iValidAmmoIndex ) const;
     int                 GetAmmoRoom( int iValidAmmoIndex ) const;
     bool                IsFlashlightOn() const;
@@ -278,7 +278,7 @@ protected:
     void PreThink_HL2();
 
     void UpdateControllableTrain();
-    virtual void CheckTrainUpdate() OVERRIDE;
+    virtual void CheckTrainUpdate() override;
 
 private:
     void SetArmsData( CZMPlayerModelData* pData, int iArmVersion = -1 );

@@ -12,7 +12,7 @@ class CZMNavTransientFilter : public CTraceFilterSimple
 public:
     CZMNavTransientFilter();
 
-    virtual bool ShouldHitEntity( IHandleEntity* pHandleEntity, int contentsMask ) OVERRIDE;
+    virtual bool ShouldHitEntity( IHandleEntity* pHandleEntity, int contentsMask ) override;
 };
 
 class CZMRNavMesh : public CNavMesh
@@ -25,15 +25,15 @@ public:
     CZMRNavMesh();
     ~CZMRNavMesh();
 
-    virtual void Update() OVERRIDE;
+    virtual void Update() override;
 
-    virtual CNavArea* CreateArea() const OVERRIDE;
-
-
-    virtual void OnServerActivate() OVERRIDE;
+    virtual CNavArea* CreateArea() const override;
 
 
-    virtual void FireGameEvent( IGameEvent* pEvent ) OVERRIDE;
+    virtual void OnServerActivate() override;
+
+
+    virtual void FireGameEvent( IGameEvent* pEvent ) override;
 
 
     static float GetTransientCheckStartHeight() { return 17.0f; }

@@ -19,13 +19,13 @@ public:
     CPlayerBotMainSchedule();
     ~CPlayerBotMainSchedule();
 
-    virtual const char* GetName() const OVERRIDE { return "PlayerBotMain"; }
+    virtual const char* GetName() const override { return "PlayerBotMain"; }
 
-    virtual NPCR::CSchedule<CZMPlayerBot>* CreateFriendSchedule() OVERRIDE;
+    virtual NPCR::CSchedule<CZMPlayerBot>* CreateFriendSchedule() override;
 
-    virtual void OnStart() OVERRIDE;
+    virtual void OnStart() override;
 
-    virtual void OnUpdate() OVERRIDE;
+    virtual void OnUpdate() override;
     
 
 private:

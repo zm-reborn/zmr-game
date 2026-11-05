@@ -19,14 +19,14 @@ public:
     CZMBaseMeleeWeapon();
 
 
-    virtual void ItemBusyFrame() OVERRIDE;
-    virtual void ItemPostFrame() OVERRIDE;
+    virtual void ItemBusyFrame() override;
+    virtual void ItemPostFrame() override;
 
-    virtual bool Deploy() OVERRIDE;
+    virtual bool Deploy() override;
 
 
-    virtual void PrimaryAttack() OVERRIDE;
-    virtual void SecondaryAttack() OVERRIDE;
+    virtual void PrimaryAttack() override;
+    virtual void SecondaryAttack() override;
 
 
     virtual bool UsesAnimEvent( bool bSecondary ) const { return false; }
@@ -36,19 +36,19 @@ public:
 
     virtual bool CanPrimaryAttack() const { return true; }
     virtual bool CanSecondaryAttack() const { return false; }
-    virtual Activity GetPrimaryAttackActivity() OVERRIDE { return ACT_VM_HITCENTER; }
-	virtual Activity GetSecondaryAttackActivity() OVERRIDE { return ACT_VM_HITCENTER2; }
+    virtual Activity GetPrimaryAttackActivity() override { return ACT_VM_HITCENTER; }
+	virtual Activity GetSecondaryAttackActivity() override { return ACT_VM_HITCENTER2; }
 
     virtual WeaponSound_t GetPrimaryAttackSound() const { return SINGLE; }
     virtual WeaponSound_t GetSecondaryAttackSound() const { return SINGLE; }
 
 #ifndef CLIENT_DLL
     // Lower the sound distance a bit.
-    virtual float GetAISoundVolume() const OVERRIDE { return 500.0f; }
+    virtual float GetAISoundVolume() const override { return 500.0f; }
 #endif
 
 #ifdef GAME_DLL
-    virtual float GetMaxDamageDist( ZMUserCmdValidData_t& data ) const OVERRIDE;
+    virtual float GetMaxDamageDist( ZMUserCmdValidData_t& data ) const override;
 #endif
 
 protected:
@@ -66,9 +66,9 @@ protected:
 
 
 #ifndef CLIENT_DLL
-    virtual void Operator_HandleAnimEvent( animevent_t* pEvent, CBaseCombatCharacter* pOperator ) OVERRIDE;
+    virtual void Operator_HandleAnimEvent( animevent_t* pEvent, CBaseCombatCharacter* pOperator ) override;
 #else
-    virtual bool OnFireEvent( C_BaseViewModel* pViewModel, const Vector& origin, const QAngle& angles, int event, const char* options ) OVERRIDE;
+    virtual bool OnFireEvent( C_BaseViewModel* pViewModel, const Vector& origin, const QAngle& angles, int event, const char* options ) override;
 #endif
 
 

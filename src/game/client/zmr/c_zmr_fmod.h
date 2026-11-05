@@ -23,11 +23,11 @@ public:
     CFMODSystem();
     ~CFMODSystem();
 
-    virtual bool Init() OVERRIDE;
-    virtual void PostInit() OVERRIDE;
-    virtual void Shutdown() OVERRIDE;
+    virtual bool Init() override;
+    virtual void PostInit() override;
+    virtual void Shutdown() override;
 
-    virtual void Update( float frametime ) OVERRIDE;
+    virtual void Update( float frametime ) override;
 
 
     static bool HasFMOD() { return s_pFMODSystem != nullptr; }

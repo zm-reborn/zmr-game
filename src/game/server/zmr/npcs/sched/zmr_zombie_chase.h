@@ -20,20 +20,20 @@ public:
     CZombieChaseSchedule();
     ~CZombieChaseSchedule();
 
-    virtual const char* GetName() const OVERRIDE { return "ZombieChase"; }
+    virtual const char* GetName() const override { return "ZombieChase"; }
 
 
-    virtual void OnStart() OVERRIDE;
+    virtual void OnStart() override;
 
-    virtual void OnContinue() OVERRIDE;
+    virtual void OnContinue() override;
 
-    virtual void OnEnd() OVERRIDE;
+    virtual void OnEnd() override;
 
-    virtual void OnUpdate() OVERRIDE;
+    virtual void OnUpdate() override;
 
-    virtual void OnCommanded( CBasePlayer* pCommander, ZombieCommandType_t com ) OVERRIDE;
+    virtual void OnCommanded( CBasePlayer* pCommander, ZombieCommandType_t com ) override;
 
-    virtual void OnStuck() OVERRIDE;
+    virtual void OnStuck() override;
 
 private:
     CZombieClawAttackSched* m_pAttackSched;

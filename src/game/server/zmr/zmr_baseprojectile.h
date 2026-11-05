@@ -12,12 +12,12 @@ public:
 
     virtual void OnThrow() {};
 
-    virtual void Detonate() OVERRIDE;
+    virtual void Detonate() override;
 
     float GetDetonationTime() const { return m_flDetonateTime; }
     void SetDetonationTime( float t ) { m_flDetonateTime = t; }
 
-    virtual void Spawn() OVERRIDE;
+    virtual void Spawn() override;
     void ArmedDetonateThink();
 
 protected:

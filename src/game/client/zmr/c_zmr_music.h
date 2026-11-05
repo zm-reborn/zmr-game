@@ -68,11 +68,11 @@ namespace ZMMusic
         ~CZMMusicManager();
 
 
-        virtual void PostInit() OVERRIDE;
+        virtual void PostInit() override;
 
         void Release();
 
-        virtual void Update( float frametime ) OVERRIDE;
+        virtual void Update( float frametime ) override;
 
 
         float GetVolume() const;

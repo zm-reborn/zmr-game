@@ -28,7 +28,7 @@ public:
 
     static void OnRoundEnd( ZMRoundEndReason_t reason );
 
-    void Spawn() OVERRIDE;
+    void Spawn() override;
 
     void InputHumanWin( inputdata_t &inputdata );
     void InputHumanLose( inputdata_t &inputdata );
@@ -50,8 +50,8 @@ public:
 	DECLARE_CLASS( CZMEntBaseSimple, CBaseAnimating )
     DECLARE_SERVERCLASS()
 
-    virtual int ShouldTransmit( const CCheckTransmitInfo* pInfo ) OVERRIDE;
-    virtual int UpdateTransmitState() OVERRIDE;
+    virtual int ShouldTransmit( const CCheckTransmitInfo* pInfo ) override;
+    virtual int UpdateTransmitState() override;
 };
 
 
@@ -67,7 +67,7 @@ public:
 
     CZMEntBaseUsable();
 
-    void Spawn() OVERRIDE;
+    void Spawn() override;
 
 
     void UpdateUsable();
@@ -109,10 +109,10 @@ public:
     CZMEntZombieSpawn();
 
 
-    void Spawn() OVERRIDE;
-    void Precache() OVERRIDE;
+    void Spawn() override;
+    void Precache() override;
 
-    bool AcceptInput( const char *szInputName, CBaseEntity *pActivator, CBaseEntity *pCaller, variant_t Value, int outputID ) OVERRIDE;
+    bool AcceptInput( const char *szInputName, CBaseEntity *pActivator, CBaseEntity *pCaller, variant_t Value, int outputID ) override;
 
     void InputToggle( inputdata_t &inputdata );
     void InputHide( inputdata_t &inputdata );
@@ -146,7 +146,7 @@ public:
     void QueueClear( int inamount = -1, int inpos = -1 );
     bool CanSpawn( ZombieClass_t zclass ) const;
 
-    void SendMenuUpdate() OVERRIDE;
+    void SendMenuUpdate() override;
 
     void SetRallyPoint( const Vector& pos );
 
@@ -198,8 +198,8 @@ public:
 
     CZMEntSpawnNode();
 
-    void Spawn() OVERRIDE;
-    void Precache() OVERRIDE;
+    void Spawn() override;
+    void Precache() override;
 
     string_t m_sNextNodeName;
 
@@ -217,8 +217,8 @@ public:
 	DECLARE_CLASS( CZMEntRallyPoint, CZMEntBaseSimple )
     DECLARE_DATADESC()
 
-    void Spawn() OVERRIDE;
-    void Precache() OVERRIDE;
+    void Spawn() override;
+    void Precache() override;
 };
 
 
@@ -236,8 +236,8 @@ public:
     ~CZMEntManipulateTrigger();
 
 
-    void Spawn() OVERRIDE;
-    void Precache() OVERRIDE;
+    void Spawn() override;
+    void Precache() override;
 
 
     void ScanThink();
@@ -258,8 +258,8 @@ public:
     ~CZMEntAmbushTrigger();
 
 
-    void Spawn() OVERRIDE;
-    void Precache() OVERRIDE;
+    void Spawn() override;
+    void Precache() override;
 
 
     void SetAmbushZombies( int count );
@@ -292,10 +292,10 @@ public:
     ~CZMEntManipulate();
 
 
-    void Spawn() OVERRIDE;
-    void Precache() OVERRIDE;
+    void Spawn() override;
+    void Precache() override;
 
-    bool AcceptInput( const char *szInputName, CBaseEntity *pActivator, CBaseEntity *pCaller, variant_t Value, int outputID ) OVERRIDE;
+    bool AcceptInput( const char *szInputName, CBaseEntity *pActivator, CBaseEntity *pCaller, variant_t Value, int outputID ) override;
 
     void InputToggle( inputdata_t &inputdata );
     void InputHide( inputdata_t &inputdata );
@@ -315,7 +315,7 @@ public:
 
     COutputEvent m_OnPressed;
 
-	void SendMenuUpdate() OVERRIDE;
+	void SendMenuUpdate() override;
 
 
     inline const char* GetDescription() const { return m_sDescription.Get().ToCStr(); }
@@ -386,7 +386,7 @@ public:
     ~CZMEntLoadout();
 
 
-    void Spawn() OVERRIDE;
+    void Spawn() override;
 
 
 
@@ -421,7 +421,7 @@ public:
     CZMEntTriggerBlockHidden();
     ~CZMEntTriggerBlockHidden();
 
-    void Spawn() OVERRIDE;
+    void Spawn() override;
 
 
     inline bool IsActive() const { return m_bActive; }
@@ -448,7 +448,7 @@ public:
     CZMEntTriggerBlockPhysExp();
     ~CZMEntTriggerBlockPhysExp();
 
-    void Spawn() OVERRIDE;
+    void Spawn() override;
 
 
     inline bool IsActive() const { return m_bActive; }
@@ -480,8 +480,8 @@ public:
 
     static CZMPhysExplosion* CreatePhysExplosion( const Vector& pos, float delay, float magnitude, float radius );
 
-    void Spawn() OVERRIDE;
-    void Precache() OVERRIDE;
+    void Spawn() override;
+    void Precache() override;
 
 
     float GetMagnitude() const { return m_flMagnitude; }
@@ -568,7 +568,7 @@ public:
     CZMEntTriggerSpawnVolume();
     ~CZMEntTriggerSpawnVolume();
 
-    void Spawn() OVERRIDE;
+    void Spawn() override;
 
 
     static void GetPositionWithin( const CBaseEntity* pEnt, Vector& pos );

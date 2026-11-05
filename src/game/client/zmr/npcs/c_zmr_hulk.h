@@ -13,17 +13,17 @@ public:
     C_ZMHulk();
     ~C_ZMHulk();
 
-    virtual void FootstepSound( bool bRightFoot = false ) OVERRIDE;
-    virtual void AttackSound() OVERRIDE;
+    virtual void FootstepSound( bool bRightFoot = false ) override;
+    virtual void AttackSound() override;
 
-    virtual const char* GetZombieLocalization() const OVERRIDE { return "#ZMClassHulk"; }
+    virtual const char* GetZombieLocalization() const override { return "#ZMClassHulk"; }
 
 
     // Shared
-    virtual bool    CanBePenetrated() const OVERRIDE;
+    virtual bool    CanBePenetrated() const override;
 
 
 protected:
-    virtual bool        IsAffectedByEvent( HappyZombieEvent_t iEvent ) const OVERRIDE;
-    virtual const char* GetEventHatModel( HappyZombieEvent_t iEvent ) const OVERRIDE;
+    virtual bool        IsAffectedByEvent( HappyZombieEvent_t iEvent ) const override;
+    virtual const char* GetEventHatModel( HappyZombieEvent_t iEvent ) const override;
 };

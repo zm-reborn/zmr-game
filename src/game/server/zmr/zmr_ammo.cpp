@@ -17,8 +17,8 @@ int ITEM_GiveAmmo( CBasePlayer* pPlayer, float flCount, const char* pszAmmoName,
                                                                         { \
                                                                         public: \
                                                                             classname2() { m_nMaxAmmo = ammocount; m_nAmmo = m_nMaxAmmo; } \
-                                                                            virtual const char* GetItemModel() const OVERRIDE { return model; } \
-                                                                            virtual const char* GetAmmoName() const OVERRIDE { return ammoname; } \
+                                                                            virtual const char* GetItemModel() const override { return model; } \
+                                                                            virtual const char* GetAmmoName() const override { return ammoname; } \
                                                                         }; \
                                                                         LINK_ENTITY_TO_CLASS( classname, classname2 );
 

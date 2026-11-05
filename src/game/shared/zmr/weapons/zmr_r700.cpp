@@ -33,18 +33,18 @@ public:
     CZMWeaponR700();
 
 
-    virtual void Precache() OVERRIDE;
+    virtual void Precache() override;
 
-    virtual Vector GetBulletSpread() const OVERRIDE;
+    virtual Vector GetBulletSpread() const override;
 #ifdef CLIENT_DLL
-    virtual float GetScopeFOVModifier() const OVERRIDE;
+    virtual float GetScopeFOVModifier() const override;
 
-    virtual CZMBaseCrosshair* GetWeaponCrosshair() const OVERRIDE;
+    virtual CZMBaseCrosshair* GetWeaponCrosshair() const override;
 #endif
 
-    virtual void ItemPostFrame() OVERRIDE;
+    virtual void ItemPostFrame() override;
 
-    virtual void Equip( CBaseCombatCharacter* pCharacter ) OVERRIDE;
+    virtual void Equip( CBaseCombatCharacter* pCharacter ) override;
 
 
     void ChangeZoom();

@@ -17,23 +17,23 @@ public:
     CSurvivorFollowSchedule();
     ~CSurvivorFollowSchedule();
 
-    virtual const char* GetName() const OVERRIDE { return "SurvivorFollow"; }
+    virtual const char* GetName() const override { return "SurvivorFollow"; }
 
-    virtual void OnStart() OVERRIDE;
+    virtual void OnStart() override;
 
-    virtual void OnContinue() OVERRIDE;
+    virtual void OnContinue() override;
 
-    virtual void OnUpdate() OVERRIDE;
+    virtual void OnUpdate() override;
 
-    virtual void OnSpawn() OVERRIDE;
+    virtual void OnSpawn() override;
 
-    virtual void OnHeardSound( CSound* pSound ) OVERRIDE;
+    virtual void OnHeardSound( CSound* pSound ) override;
 
-    //virtual NPCR::QueryResult_t IsBusy() const OVERRIDE;
+    //virtual NPCR::QueryResult_t IsBusy() const override;
 
-    virtual NPCR::QueryResult_t ShouldChase( CBaseEntity* pEnemy ) const OVERRIDE;
+    virtual NPCR::QueryResult_t ShouldChase( CBaseEntity* pEnemy ) const override;
 
-    //virtual void OnMoveSuccess( NPCR::CBaseNavPath* pPath ) OVERRIDE;
+    //virtual void OnMoveSuccess( NPCR::CBaseNavPath* pPath ) override;
 
 
 private:

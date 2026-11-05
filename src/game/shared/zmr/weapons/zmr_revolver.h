@@ -18,25 +18,25 @@ public:
     CZMWeaponRevolver();
 
 
-    virtual bool Deploy() OVERRIDE;
+    virtual bool Deploy() override;
 
 
-    virtual Vector GetBulletSpread() const OVERRIDE;
+    virtual Vector GetBulletSpread() const override;
     
-    virtual void AddViewKick() OVERRIDE;
+    virtual void AddViewKick() override;
 
-    virtual void PrimaryAttack() OVERRIDE;
-    virtual void PrimaryAttackEffects( WeaponSound_t wpnsound ) OVERRIDE;
-    virtual void SecondaryAttack() OVERRIDE;
+    virtual void PrimaryAttack() override;
+    virtual void PrimaryAttackEffects( WeaponSound_t wpnsound ) override;
+    virtual void SecondaryAttack() override;
 
-    virtual void ItemPostFrame() OVERRIDE;
+    virtual void ItemPostFrame() override;
 
     void HandleAnimEventRevolver();
 
 #ifndef CLIENT_DLL
-    void Operator_HandleAnimEvent( animevent_t* pEvent, CBaseCombatCharacter* pOperator ) OVERRIDE;
+    void Operator_HandleAnimEvent( animevent_t* pEvent, CBaseCombatCharacter* pOperator ) override;
 #else
-    bool OnFireEvent( C_BaseViewModel* pViewModel, const Vector& origin, const QAngle& angles, int event, const char* options ) OVERRIDE;
+    bool OnFireEvent( C_BaseViewModel* pViewModel, const Vector& origin, const QAngle& angles, int event, const char* options ) override;
 #endif
 
 protected:

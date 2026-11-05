@@ -25,13 +25,13 @@ public:
 
     CZMWeaponAR9mm();
 
-    virtual bool Deploy() OVERRIDE;
+    virtual bool Deploy() override;
 
-    virtual void ItemPostFrame() OVERRIDE;
+    virtual void ItemPostFrame() override;
 
-    virtual void SecondaryAttack() OVERRIDE;
+    virtual void SecondaryAttack() override;
 
-    virtual void SecondaryAttackEffects( WeaponSound_t wpnsound ) OVERRIDE;
+    virtual void SecondaryAttackEffects( WeaponSound_t wpnsound ) override;
 
 
     bool IsFiringBurst() const;

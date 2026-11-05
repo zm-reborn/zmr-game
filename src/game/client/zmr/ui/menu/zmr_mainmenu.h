@@ -19,20 +19,20 @@ public:
     CZMMainMenu( vgui::VPANEL parent );
     ~CZMMainMenu();
 
-    virtual void OnThink() OVERRIDE;
-    virtual void PerformLayout() OVERRIDE;
-    virtual void ApplySettings( KeyValues* kv ) OVERRIDE;
-    virtual void ApplySchemeSettings( vgui::IScheme* pScheme ) OVERRIDE;
-    virtual void OnCommand( const char* command ) OVERRIDE;
-    virtual void OnKeyCodePressed( vgui::KeyCode code ) OVERRIDE;
-    virtual void OnMousePressed( vgui::KeyCode code ) OVERRIDE;
+    virtual void OnThink() override;
+    virtual void PerformLayout() override;
+    virtual void ApplySettings( KeyValues* kv ) override;
+    virtual void ApplySchemeSettings( vgui::IScheme* pScheme ) override;
+    virtual void OnCommand( const char* command ) override;
+    virtual void OnKeyCodePressed( vgui::KeyCode code ) override;
+    virtual void OnMousePressed( vgui::KeyCode code ) override;
 
 
-    virtual void Repaint() OVERRIDE;
+    virtual void Repaint() override;
 
-    virtual void PaintBackground() OVERRIDE;
+    virtual void PaintBackground() override;
 
-    virtual bool IsVisible() OVERRIDE;
+    virtual bool IsVisible() override;
 
 
     MESSAGE_FUNC( OnLoadingScreenStart, "loadingstart" );

@@ -23,17 +23,17 @@ public:
     CZMManiMenu( vgui::Panel* pParent );
     ~CZMManiMenu();
 
-    virtual const char* GetName() OVERRIDE { return "ZMManiMenu"; };
+    virtual const char* GetName() override { return "ZMManiMenu"; };
 
-    virtual void ShowPanel( bool state ) OVERRIDE;
-	virtual void OnThink( void ) OVERRIDE;
+    virtual void ShowPanel( bool state ) override;
+	virtual void OnThink( void ) override;
 
 
 
     
 
 
-    virtual void SetDescription( const char* ) OVERRIDE;
-    virtual void SetCost( int ) OVERRIDE;
-    virtual void SetTrapCost( int ) OVERRIDE;
+    virtual void SetDescription( const char* ) override;
+    virtual void SetCost( int ) override;
+    virtual void SetTrapCost( int ) override;
 };

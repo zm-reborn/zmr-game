@@ -60,7 +60,7 @@ public:
     void            AddClientSideEntityListener( const char* pszClassname, CLIENTENTCREATENEW fn );
 
 
-	virtual void    PostInit() OVERRIDE;
+	virtual void    PostInit() override;
 
 	void            ParseAllEntities( const char* pMapData );
 	const char*     ParseEntity( const char* pEntData );

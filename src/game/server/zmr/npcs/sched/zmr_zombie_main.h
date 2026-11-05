@@ -23,26 +23,26 @@ class CZombieGotoSwatObjSchedule;
 class CZombieMainSchedule : public CBaseZombieSchedule
 {
 public:
-    virtual const char* GetName() const OVERRIDE { return "ZombieMain"; }
+    virtual const char* GetName() const override { return "ZombieMain"; }
 
-    virtual NPCR::CSchedule<CZMBaseZombie>* CreateFriendSchedule() OVERRIDE;
+    virtual NPCR::CSchedule<CZMBaseZombie>* CreateFriendSchedule() override;
 
-    virtual void OnStart() OVERRIDE;
+    virtual void OnStart() override;
 
-    //virtual void OnEnd() OVERRIDE;
+    //virtual void OnEnd() override;
 
-    virtual void OnUpdate() OVERRIDE;
+    virtual void OnUpdate() override;
 
-    virtual void OnCommanded( CBasePlayer* pCommander, ZombieCommandType_t type ) OVERRIDE;
+    virtual void OnCommanded( CBasePlayer* pCommander, ZombieCommandType_t type ) override;
 
-    virtual void OnQueuedCommand( CBasePlayer* pPlayer, ZombieCommandType_t com ) OVERRIDE;
+    virtual void OnQueuedCommand( CBasePlayer* pPlayer, ZombieCommandType_t com ) override;
 
-    virtual void OnChase( CBaseEntity* pEnt ) OVERRIDE;
+    virtual void OnChase( CBaseEntity* pEnt ) override;
 
-    virtual NPCR::QueryResult_t ShouldChase( CBaseEntity* pEnemy ) const OVERRIDE;
+    virtual NPCR::QueryResult_t ShouldChase( CBaseEntity* pEnemy ) const override;
 
     // Wait for us to finish before doing something else.
-    virtual NPCR::QueryResult_t IsBusy() const OVERRIDE;
+    virtual NPCR::QueryResult_t IsBusy() const override;
 
 private:
     CZombieMainSchedule();

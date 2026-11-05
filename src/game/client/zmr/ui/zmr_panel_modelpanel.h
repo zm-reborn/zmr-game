@@ -11,9 +11,9 @@ public:
     CZMModelPanel( vgui::Panel *parent, const char *name );
 
 
-    virtual void Paint() OVERRIDE;
-    virtual void DeleteModelData( void ) OVERRIDE;
+    virtual void Paint() override;
+    virtual void DeleteModelData( void ) override;
 
 protected:
-    virtual void SetupModel( void ) OVERRIDE;
+    virtual void SetupModel( void ) override;
 };

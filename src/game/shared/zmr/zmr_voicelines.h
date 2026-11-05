@@ -41,12 +41,12 @@ public:
     ~CZMVoiceLines();
 
 
-    virtual void PostInit() OVERRIDE;
+    virtual void PostInit() override;
 
 #ifdef CLIENT_DLL
-    virtual void LevelInitPreEntity() OVERRIDE;
+    virtual void LevelInitPreEntity() override;
 
-    virtual void FireGameEvent( IGameEvent* pEvent ) OVERRIDE;
+    virtual void FireGameEvent( IGameEvent* pEvent ) override;
 
 
     static void PlayVoiceLine( C_BasePlayer* pOrigin, const Vector* vecPos, const char* szLine, int seed = -1 );

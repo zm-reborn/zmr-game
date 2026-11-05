@@ -44,10 +44,10 @@ public:
     CZMFireGlowSystem();
     ~CZMFireGlowSystem();
 
-    virtual void PostInit() OVERRIDE;
-    virtual void LevelInitPostEntity() OVERRIDE;
-    virtual void FireGameEvent( IGameEvent* pEvent ) OVERRIDE;
-    virtual void Update( float frametime ) OVERRIDE;
+    virtual void PostInit() override;
+    virtual void LevelInitPostEntity() override;
+    virtual void FireGameEvent( IGameEvent* pEvent ) override;
+    virtual void Update( float frametime ) override;
     
 
     int AddFireEntity( FireGlowEnt_t* pEnt, FireGlowType_t glowType );

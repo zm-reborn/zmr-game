@@ -34,10 +34,10 @@ class CZMBaseThrowableConfig : public ZMWeaponConfig::CZMBaseWeaponConfig
 public:
     CZMBaseThrowableConfig( const char* wepname, const char* configpath );
 
-    virtual void LoadFromConfig( KeyValues* kv ) OVERRIDE;
-    virtual bool OverrideFromConfig( KeyValues* kv ) OVERRIDE;
+    virtual void LoadFromConfig( KeyValues* kv ) override;
+    virtual bool OverrideFromConfig( KeyValues* kv ) override;
 
-    virtual KeyValues* ToKeyValues() const OVERRIDE;
+    virtual KeyValues* ToKeyValues() const override;
 
     float flProjectileDamage;
     float flProjectileRadius;
@@ -69,20 +69,20 @@ public:
     const CZMBaseThrowableConfig* GetBaseThrowableConfig() const;
 
 
-    virtual void Precache() OVERRIDE;
+    virtual void Precache() override;
 
-    virtual void ItemPostFrame() OVERRIDE;
+    virtual void ItemPostFrame() override;
 
-    virtual bool CanHolster() const OVERRIDE { return GetThrowState() <= THROWSTATE_ARMING; }
-    virtual bool CanBeDropped() const OVERRIDE { return CanHolster(); }
+    virtual bool CanHolster() const override { return GetThrowState() <= THROWSTATE_ARMING; }
+    virtual bool CanBeDropped() const override { return CanHolster(); }
 
-    virtual void Equip( CBaseCombatCharacter* pCharacter ) OVERRIDE;
-    virtual bool Deploy() OVERRIDE;
+    virtual void Equip( CBaseCombatCharacter* pCharacter ) override;
+    virtual bool Deploy() override;
 
 #ifndef CLIENT_DLL
-    void Drop( const Vector& vecVelocity ) OVERRIDE;
+    void Drop( const Vector& vecVelocity ) override;
 
-    virtual void Operator_HandleAnimEvent( animevent_t* pEvent, CBaseCombatCharacter* pOperator ) OVERRIDE;
+    virtual void Operator_HandleAnimEvent( animevent_t* pEvent, CBaseCombatCharacter* pOperator ) override;
 #endif
 
     virtual const char* GetProjectileClassname() const;

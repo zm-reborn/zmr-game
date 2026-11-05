@@ -53,7 +53,7 @@ public:
     ~CZMEntObjectivesManager();
 
 
-    void Spawn( void ) OVERRIDE;
+    void Spawn( void ) override;
     
 
     static void Display( CZMEntObjectives* pObj, CBaseEntity* pActivator = nullptr, ObjRecipient_t rec = OBJRECIPIENT_INVALID );

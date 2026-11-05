@@ -24,7 +24,7 @@ public:
     DECLARE_CLASS( C_ZMTEFireBullets, C_BaseTempEntity );
     DECLARE_CLIENTCLASS();
 
-    virtual void PostDataUpdate( DataUpdateType_t updateType ) OVERRIDE;
+    virtual void PostDataUpdate( DataUpdateType_t updateType ) override;
 
     void CreateEffects();
 

@@ -13,5 +13,5 @@ public:
     ~CZMZombieSenses();
 
 
-    virtual void OnDamaged( const CTakeDamageInfo& info ) OVERRIDE;
+    virtual void OnDamaged( const CTakeDamageInfo& info ) override;
 };

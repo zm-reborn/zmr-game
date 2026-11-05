@@ -23,31 +23,31 @@ public:
 	void InitZMAnimState( CZMPlayer* pPlayer );
 	CZMPlayer* GetZMPlayer() const { return m_pZMPlayer; }
 
-	virtual void GetOuterAbsVelocity( Vector& vel ) OVERRIDE;
+	virtual void GetOuterAbsVelocity( Vector& vel ) override;
 
-    virtual bool ShouldUpdateAnimState() OVERRIDE;
-	virtual void ClearAnimationState() OVERRIDE;
-	virtual Activity TranslateActivity( Activity actDesired ) OVERRIDE;
-	virtual void Update( float eyeYaw, float eyePitch ) OVERRIDE;
+    virtual bool ShouldUpdateAnimState() override;
+	virtual void ClearAnimationState() override;
+	virtual Activity TranslateActivity( Activity actDesired ) override;
+	virtual void Update( float eyeYaw, float eyePitch ) override;
 
-	void DoAnimationEvent( PlayerAnimEvent_t playerAnim, int nData = 0 ) OVERRIDE;
+	void DoAnimationEvent( PlayerAnimEvent_t playerAnim, int nData = 0 ) override;
 
-	bool HandleMoving( Activity &idealActivity ) OVERRIDE;
-	bool HandleJumping( Activity &idealActivity ) OVERRIDE;
-	bool HandleDucking( Activity &idealActivity ) OVERRIDE;
-	bool HandleSwimming( Activity &idealActivity ) OVERRIDE;
+	bool HandleMoving( Activity &idealActivity ) override;
+	bool HandleJumping( Activity &idealActivity ) override;
+	bool HandleDucking( Activity &idealActivity ) override;
+	bool HandleSwimming( Activity &idealActivity ) override;
 
-	virtual float GetCurrentMaxGroundSpeed() OVERRIDE;
+	virtual float GetCurrentMaxGroundSpeed() override;
 
 	bool Uses9WayAnim() const { return m_bIs9Way; }
 
 private:
 
 	bool            SetupPoseParameters( CStudioHdr* pStudioHdr );
-	virtual void    EstimateYaw() OVERRIDE;
-	virtual void    ComputePoseParam_MoveYaw( CStudioHdr* pStudioHdr ) OVERRIDE;
-	virtual void    ComputePoseParam_AimPitch( CStudioHdr* pStudioHdr ) OVERRIDE;
-	virtual void    ComputePoseParam_AimYaw( CStudioHdr* pStudioHdr ) OVERRIDE;
+	virtual void    EstimateYaw() override;
+	virtual void    ComputePoseParam_MoveYaw( CStudioHdr* pStudioHdr ) override;
+	virtual void    ComputePoseParam_AimPitch( CStudioHdr* pStudioHdr ) override;
+	virtual void    ComputePoseParam_AimYaw( CStudioHdr* pStudioHdr ) override;
 
 #ifdef CLIENT_DLL
     void            ComputePoseParam_Head( CStudioHdr* pStudioHdr );

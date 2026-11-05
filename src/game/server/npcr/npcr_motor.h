@@ -13,9 +13,9 @@ namespace NPCR
         ~CBaseMotor();
         
 
-        virtual const char* GetComponentName() const OVERRIDE { return "BaseMotor"; }
+        virtual const char* GetComponentName() const override { return "BaseMotor"; }
 
-        virtual void Update() OVERRIDE;
+        virtual void Update() override;
 
         virtual void Approach( const Vector& vecDesiredGoal );
 
@@ -51,8 +51,8 @@ namespace NPCR
         virtual CBaseEntity*    GetGroundEntity() const { return m_hGroundEnt.Get(); }
         virtual bool            IsOnGround() const { return m_bOnGround; }
 
-        virtual void OnLandedGround( CBaseEntity* pGround ) OVERRIDE;
-        virtual void OnLeftGround( CBaseEntity* pOldGround ) OVERRIDE;
+        virtual void OnLandedGround( CBaseEntity* pGround ) override;
+        virtual void OnLeftGround( CBaseEntity* pOldGround ) override;
 
         virtual void Jump();
         virtual void NavJump( const Vector& vecGoal, float flOverrideHeight = 0.0f );

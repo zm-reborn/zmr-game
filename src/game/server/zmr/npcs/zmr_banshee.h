@@ -13,18 +13,18 @@ public:
 
     CZMBansheeMotor( CZMBaseZombie* pOuter );
 
-    virtual float GetHullHeight() const OVERRIDE;
+    virtual float GetHullHeight() const override;
 
-    //virtual float GetFrictionForward() const OVERRIDE { return IsAttemptingToMove() ? 0.0f : 0.2f; }
+    //virtual float GetFrictionForward() const override { return IsAttemptingToMove() ? 0.0f : 0.2f; }
 
-    virtual void OnLandedGround( CBaseEntity* pGround ) OVERRIDE;
-    virtual void NavJump( const Vector& vecGoal, float flOverrideHeight = 0.0f ) OVERRIDE;
+    virtual void OnLandedGround( CBaseEntity* pGround ) override;
+    virtual void NavJump( const Vector& vecGoal, float flOverrideHeight = 0.0f ) override;
 
 
     bool IsInNavJump() const { return m_bIsInNavJump; }
 
 protected:
-    virtual bool ShouldAdjustVelocity() const OVERRIDE;
+    virtual bool ShouldAdjustVelocity() const override;
 
 private:
     bool m_bIsInNavJump;
@@ -43,45 +43,45 @@ public:
 
 
     CZMBansheeMotor* GetBansheeMotor() const;
-    virtual CZMBansheeMotor* CreateMotor() OVERRIDE { return new CZMBansheeMotor( this ); }
+    virtual CZMBansheeMotor* CreateMotor() override { return new CZMBansheeMotor( this ); }
 
 
-    virtual void Precache() OVERRIDE;
-    virtual void Spawn() OVERRIDE;
+    virtual void Precache() override;
+    virtual void Spawn() override;
 
-    virtual void HandleAnimEvent( animevent_t* pEvent ) OVERRIDE;
-
-
-    virtual NPCR::CSchedule<CZMBaseZombie>* OverrideCombatSchedule() const OVERRIDE;
+    virtual void HandleAnimEvent( animevent_t* pEvent ) override;
 
 
-    virtual void OnNavJump() OVERRIDE;
+    virtual NPCR::CSchedule<CZMBaseZombie>* OverrideCombatSchedule() const override;
 
 
-    virtual NPCR::QueryResult_t ShouldChase( CBaseEntity* pEnemy ) const OVERRIDE;
-    virtual bool IsAttacking() const OVERRIDE;
+    virtual void OnNavJump() override;
+
+
+    virtual NPCR::QueryResult_t ShouldChase( CBaseEntity* pEnemy ) const override;
+    virtual bool IsAttacking() const override;
 
 
     void StartCeilingAmbush( CZMPlayer* pCommander );
     bool LeapAttack( const QAngle& angPunch, const Vector& vecPunchVel, float flDamage );
 
 
-    virtual bool    HasConditionsForRangeAttack( CBaseEntity* pEnemy ) const OVERRIDE;
-    virtual NPCR::CSchedule<CZMBaseZombie>* GetRangeAttackSchedule() const OVERRIDE;
+    virtual bool    HasConditionsForRangeAttack( CBaseEntity* pEnemy ) const override;
+    virtual NPCR::CSchedule<CZMBaseZombie>* GetRangeAttackSchedule() const override;
 
 
-    virtual NPCR::CPathCostGroundOnly* GetPathCost() const OVERRIDE;
-    virtual NPCR::CFollowNavPath* GetFollowPath() const OVERRIDE;
+    virtual NPCR::CPathCostGroundOnly* GetPathCost() const override;
+    virtual NPCR::CFollowNavPath* GetFollowPath() const override;
 
 
     float GetNextLeapAttack() const { return m_flNextLeapAttack; }
     void SetNextLeapAttack( float time ) { m_flNextLeapAttack = time; }
 
 
-    virtual void OnAnimActivityFinished( Activity completedActivity ) OVERRIDE;
+    virtual void OnAnimActivityFinished( Activity completedActivity ) override;
 
 
-    virtual float GetClawAttackRange() const OVERRIDE { return 50.0f; }
+    virtual float GetClawAttackRange() const override { return 50.0f; }
 
     static float GetBansheeHullHeight() { return 52.0f; }
     static float GetMaxNavJumpDist() { return 512.0f; }
@@ -90,11 +90,11 @@ public:
     static float GetMaxLeapSpeed() { return 900.0f; }
 
     // Sounds
-    virtual bool ShouldPlayIdleSound() const OVERRIDE;
-    virtual float IdleSound() OVERRIDE;
-    virtual void AlertSound() OVERRIDE;
-    virtual void DeathSound() OVERRIDE;
-    virtual void ClawImpactSound( bool bHit = true ) OVERRIDE;
+    virtual bool ShouldPlayIdleSound() const override;
+    virtual float IdleSound() override;
+    virtual void AlertSound() override;
+    virtual void DeathSound() override;
+    virtual void ClawImpactSound( bool bHit = true ) override;
     void LeapAttackSound();
 
 private:

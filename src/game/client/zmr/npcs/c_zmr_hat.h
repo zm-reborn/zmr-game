@@ -12,5 +12,5 @@ public:
     virtual bool Initialize( C_BaseEntity* pOwner, const char* pszModel );
     virtual void AttachToEntity( C_BaseEntity* pOwner );
 
-    //virtual C_BaseAnimating* FindFollowedEntity() OVERRIDE;
+    //virtual C_BaseAnimating* FindFollowedEntity() override;
 };

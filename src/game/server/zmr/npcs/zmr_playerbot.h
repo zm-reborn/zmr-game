@@ -28,16 +28,16 @@ public:
     ~CZMPlayerBot();
 
     //
-    virtual NPCR::CScheduleInterface*   CreateScheduleInterface() OVERRIDE;
-    virtual NPCR::CBaseSenses*          CreateSenses() OVERRIDE;
+    virtual NPCR::CScheduleInterface*   CreateScheduleInterface() override;
+    virtual NPCR::CBaseSenses*          CreateSenses() override;
 
     // HACK
-    virtual void SetEyeAngles( const QAngle& ang ) OVERRIDE { SetAngles( ang ); pl.v_angle = ang; }
+    virtual void SetEyeAngles( const QAngle& ang ) override { SetAngles( ang ); pl.v_angle = ang; }
     
-    virtual bool ShouldUpdate() const OVERRIDE;    
+    virtual bool ShouldUpdate() const override;    
     //
 
-    virtual void Spawn() OVERRIDE;
+    virtual void Spawn() override;
 
     //
     static CZMPlayer* CreateZMBot( const char* playername = "" );
@@ -46,7 +46,7 @@ public:
     //
 
 
-    virtual bool OverrideUserCmd( CUserCmd& cmd ) OVERRIDE;
+    virtual bool OverrideUserCmd( CUserCmd& cmd ) override;
     
 
     //

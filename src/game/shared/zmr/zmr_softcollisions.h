@@ -72,7 +72,7 @@ class CZMSoftCollisions :
 {
 public:
 #ifdef GAME_DLL
-    virtual void FrameUpdatePostEntityThink() OVERRIDE;
+    virtual void FrameUpdatePostEntityThink() override;
 #endif
 
     

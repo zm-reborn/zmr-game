@@ -24,7 +24,7 @@ public:
     ~CZMImageRowItem();
 
 
-    virtual void Paint() OVERRIDE;
+    virtual void Paint() override;
 
 
     vgui::IImage* GetImage() const;
@@ -86,9 +86,9 @@ public:
     };
 
 
-    virtual void OnMousePressed( vgui::MouseCode code ) OVERRIDE;
-    virtual void OnThink() OVERRIDE;
-    virtual void PerformLayout() OVERRIDE;
+    virtual void OnMousePressed( vgui::MouseCode code ) override;
+    virtual void OnThink() override;
+    virtual void PerformLayout() override;
 
 private:
     CUtlVector<CZMImageRowItem*> m_Images;

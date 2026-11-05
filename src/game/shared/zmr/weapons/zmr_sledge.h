@@ -22,7 +22,7 @@ public:
         flSecondaryRandomMultMax = 1.0f;
     }
 
-    virtual void LoadFromConfig( KeyValues* kv ) OVERRIDE
+    virtual void LoadFromConfig( KeyValues* kv ) override
     {
         CZMBaseWeaponConfig::LoadFromConfig( kv );
 
@@ -43,7 +43,7 @@ public:
         }
     }
 
-    virtual bool OverrideFromConfig( KeyValues* kv ) OVERRIDE
+    virtual bool OverrideFromConfig( KeyValues* kv ) override
     {
         auto ret = CZMBaseWeaponConfig::OverrideFromConfig( kv );
 
@@ -66,7 +66,7 @@ public:
         return ret;
     }
 
-    virtual KeyValues* ToKeyValues() const OVERRIDE
+    virtual KeyValues* ToKeyValues() const override
     {
         auto* kv = CZMBaseWeaponConfig::ToKeyValues();
 
@@ -108,20 +108,20 @@ public:
     CZMWeaponSledge();
 
 
-    virtual void PrimaryAttack() OVERRIDE;
-    virtual void SecondaryAttack() OVERRIDE;
+    virtual void PrimaryAttack() override;
+    virtual void SecondaryAttack() override;
 
 
     const CZMSledgeConfig* GetSledgeConfig() const;
 
 
-    virtual bool CanSecondaryAttack() const OVERRIDE;
+    virtual bool CanSecondaryAttack() const override;
     virtual WeaponSound_t GetSecondaryAttackSound() const;
 
-    virtual bool UsesAnimEvent( bool bSecondary ) const OVERRIDE;
+    virtual bool UsesAnimEvent( bool bSecondary ) const override;
 
 
-    virtual float GetDamageForActivity( Activity act ) const OVERRIDE;
+    virtual float GetDamageForActivity( Activity act ) const override;
 
-    virtual void Hit( trace_t& traceHit, Activity iHitActivity ) OVERRIDE;
+    virtual void Hit( trace_t& traceHit, Activity iHitActivity ) override;
 };

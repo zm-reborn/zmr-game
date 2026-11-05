@@ -56,7 +56,7 @@ abstract_class CZMUserCmdHitWepValidator : public CZMUserCmdHitValidator
 {
 public:
 #ifdef GAME_DLL
-    virtual bool IsUserCmdHitsValid( ZMUserCmdValidData_t& data ) OVERRIDE;
+    virtual bool IsUserCmdHitsValid( ZMUserCmdValidData_t& data ) override;
 
     virtual float GetMaxDamageDist( ZMUserCmdValidData_t& data ) const { return 1024.0f; }
 

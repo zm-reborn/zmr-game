@@ -16,18 +16,18 @@ public:
     CZMManiMenuNew( vgui::Panel* pParent );
     ~CZMManiMenuNew();
 
-    virtual const char* GetName() OVERRIDE { return "ZMManiMenu"; };
+    virtual const char* GetName() override { return "ZMManiMenu"; };
 
-    virtual void Paint() OVERRIDE;
+    virtual void Paint() override;
 
-    virtual void ShowPanel( bool state ) OVERRIDE;
-	virtual void OnThink( void ) OVERRIDE;
+    virtual void ShowPanel( bool state ) override;
+	virtual void OnThink( void ) override;
 
 
-    virtual void ShowMenu( C_ZMEntManipulate* pMani ) OVERRIDE;
-    virtual void SetDescription( const char* ) OVERRIDE;
-    virtual void SetCost( int ) OVERRIDE;
-    virtual void SetTrapCost( int ) OVERRIDE;
+    virtual void ShowMenu( C_ZMEntManipulate* pMani ) override;
+    virtual void SetDescription( const char* ) override;
+    virtual void SetCost( int ) override;
+    virtual void SetTrapCost( int ) override;
 
 private:
     CZMRadialPanel* m_pRadial;

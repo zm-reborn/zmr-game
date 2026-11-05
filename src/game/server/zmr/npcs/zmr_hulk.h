@@ -11,9 +11,9 @@ public:
     {
     }
 
-    virtual float GetHullHeight() const OVERRIDE { return 100.0f; }
+    virtual float GetHullHeight() const override { return 100.0f; }
 
-    //virtual float GetFrictionForward() const OVERRIDE { return IsAttemptingToMove() ? 0.0f : 0.2f; }
+    //virtual float GetFrictionForward() const override { return IsAttemptingToMove() ? 0.0f : 0.2f; }
 };
 
 class CZMHulk : public CZMBaseZombie
@@ -28,32 +28,32 @@ public:
     ~CZMHulk();
 
 
-    virtual CZMHulkMotor* CreateMotor() OVERRIDE { return new CZMHulkMotor( this ); }
+    virtual CZMHulkMotor* CreateMotor() override { return new CZMHulkMotor( this ); }
 
 
-    virtual void Precache() OVERRIDE;
-    virtual void Spawn() OVERRIDE;
+    virtual void Precache() override;
+    virtual void Spawn() override;
 
-    virtual void HandleAnimEvent( animevent_t* pEvent ) OVERRIDE;
-
-
-    virtual NPCR::CPathCostGroundOnly*  GetPathCost() const OVERRIDE;
+    virtual void HandleAnimEvent( animevent_t* pEvent ) override;
 
 
-    virtual bool ScaleDamageByHitgroup( int iHitGroup, CTakeDamageInfo& info ) const OVERRIDE;
+    virtual NPCR::CPathCostGroundOnly*  GetPathCost() const override;
 
 
-    virtual float GetClawAttackRange() const OVERRIDE { return 80.0f; }
-    virtual float GetAttackHeight() const OVERRIDE { return CollisionProp()->OBBMaxs().z + 10.0f; }
+    virtual bool ScaleDamageByHitgroup( int iHitGroup, CTakeDamageInfo& info ) const override;
 
 
-    virtual bool ShouldPlayIdleSound() const OVERRIDE;
-    virtual float IdleSound() OVERRIDE;
-    virtual float PainSound( const CTakeDamageInfo& info ) OVERRIDE;
-    virtual void AlertSound() OVERRIDE;
-    virtual void DeathSound() OVERRIDE;
+    virtual float GetClawAttackRange() const override { return 80.0f; }
+    virtual float GetAttackHeight() const override { return CollisionProp()->OBBMaxs().z + 10.0f; }
+
+
+    virtual bool ShouldPlayIdleSound() const override;
+    virtual float IdleSound() override;
+    virtual float PainSound( const CTakeDamageInfo& info ) override;
+    virtual void AlertSound() override;
+    virtual void DeathSound() override;
 
 
     // Shared
-    virtual bool    CanBePenetrated() const OVERRIDE;
+    virtual bool    CanBePenetrated() const override;
 };

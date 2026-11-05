@@ -38,8 +38,8 @@ public:
     ~C_ZMImportanceSystem();
 
 
-    virtual void PostInit() OVERRIDE;
-    virtual void LevelInitPostEntity() OVERRIDE;
+    virtual void PostInit() override;
+    virtual void LevelInitPostEntity() override;
 
 
 

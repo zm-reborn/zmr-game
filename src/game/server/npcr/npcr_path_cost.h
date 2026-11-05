@@ -68,7 +68,7 @@ namespace NPCR
         //void    SetHullHeight( int h ) { m_flHullHeight = h; }
 
         
-        virtual void SetStepHeight( float h ) OVERRIDE
+        virtual void SetStepHeight( float h ) override
         {
             // Make sure height change is at least step height.
             if ( GetMaxHeightChange() < h )
@@ -85,7 +85,7 @@ namespace NPCR
         float   GetAbsMaxGap() const { return m_flAbsMaxGap; }
         void    SetAbsMaxGap( float g ) { m_flAbsMaxGap = g; }
 
-        virtual void SetMaxWalkGap( float g ) OVERRIDE
+        virtual void SetMaxWalkGap( float g ) override
         {
             if ( GetAbsMaxGap() < g )
                 SetAbsMaxGap( g );
@@ -109,9 +109,9 @@ namespace NPCR
 
         // Returns "cost" of moving from one area to another.
         // Return -1 if not possible.
-        virtual float operator()( CNavArea* area, CNavArea* fromArea, const CNavLadder* ladder, const CFuncElevator* elevator, float length ) const OVERRIDE;
+        virtual float operator()( CNavArea* area, CNavArea* fromArea, const CNavLadder* ladder, const CFuncElevator* elevator, float length ) const override;
 
-        virtual float operator()( const Vector& vecNodePos, const Vector& vecTestPos, int fCapBitMask ) const OVERRIDE;
+        virtual float operator()( const Vector& vecNodePos, const Vector& vecTestPos, int fCapBitMask ) const override;
 
     protected:
         float m_flMaxHeightChange;

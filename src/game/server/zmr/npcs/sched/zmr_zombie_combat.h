@@ -20,25 +20,25 @@ public:
     CZombieCombatSchedule();
     ~CZombieCombatSchedule();
 
-    virtual const char* GetName() const OVERRIDE { return "ZombieCombat"; }
+    virtual const char* GetName() const override { return "ZombieCombat"; }
 
-    virtual void OnStart() OVERRIDE;
+    virtual void OnStart() override;
 
-    virtual void OnContinue() OVERRIDE;
+    virtual void OnContinue() override;
 
-    virtual void OnUpdate() OVERRIDE;
+    virtual void OnUpdate() override;
 
-    virtual void OnAcquiredEnemy( CBaseEntity* pEnt ) OVERRIDE;
+    virtual void OnAcquiredEnemy( CBaseEntity* pEnt ) override;
 
-    virtual void OnSightGained( CBaseEntity* pEnt ) OVERRIDE;
+    virtual void OnSightGained( CBaseEntity* pEnt ) override;
 
-    virtual void OnDamaged( const CTakeDamageInfo& info ) OVERRIDE;
+    virtual void OnDamaged( const CTakeDamageInfo& info ) override;
 
-    virtual void OnHeardSound( CSound* pSound ) OVERRIDE;
+    virtual void OnHeardSound( CSound* pSound ) override;
 
-    virtual void OnCommanded( CBasePlayer* pCommander, ZombieCommandType_t com ) OVERRIDE;
+    virtual void OnCommanded( CBasePlayer* pCommander, ZombieCommandType_t com ) override;
 
-    virtual void OnQueuedCommand( CBasePlayer* pPlayer, ZombieCommandType_t com ) OVERRIDE;
+    virtual void OnQueuedCommand( CBasePlayer* pPlayer, ZombieCommandType_t com ) override;
 
 private:
     bool ShouldCareAboutThreat() const;

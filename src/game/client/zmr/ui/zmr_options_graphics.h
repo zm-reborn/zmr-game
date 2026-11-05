@@ -17,8 +17,8 @@ public:
     CZMOptionsSubGraphics( vgui::Panel* parent );
     ~CZMOptionsSubGraphics();
 
-    virtual void OnApplyChanges() OVERRIDE;
-    virtual void OnResetData() OVERRIDE;
+    virtual void OnApplyChanges() override;
+    virtual void OnResetData() override;
 
 
     MESSAGE_FUNC_PTR( OnSliderMoved, "SliderMoved", panel );

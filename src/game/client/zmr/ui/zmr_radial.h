@@ -43,7 +43,7 @@ public:
     void SetLabelData( KeyValues* kv );
     void ApplyLabelData();
 
-    virtual void PerformLayout() OVERRIDE;
+    virtual void PerformLayout() override;
     void Paint( int w, int h );
 
 private:
@@ -84,17 +84,17 @@ public:
     void SetBackgroundImage( const char* image );
 
     
-    virtual void OnMousePressed( vgui::MouseCode code ) OVERRIDE;
-    virtual void OnMouseDoublePressed( vgui::MouseCode code ) OVERRIDE;
-    virtual void OnThink() OVERRIDE;
-    virtual void ApplySettings( KeyValues* inResourceData ) OVERRIDE;
+    virtual void OnMousePressed( vgui::MouseCode code ) override;
+    virtual void OnMouseDoublePressed( vgui::MouseCode code ) override;
+    virtual void OnThink() override;
+    virtual void ApplySettings( KeyValues* inResourceData ) override;
 
 protected:
-    virtual void GetSettings( KeyValues* outResourceData ) OVERRIDE;
-    virtual const char* GetDescription() OVERRIDE;
+    virtual void GetSettings( KeyValues* outResourceData ) override;
+    virtual const char* GetDescription() override;
     
-    virtual void PaintBackground() OVERRIDE;
-    virtual void Paint() OVERRIDE;
+    virtual void PaintBackground() override;
+    virtual void Paint() override;
 
 private:
     CZMRadialButton* GetButton( int x, int y );

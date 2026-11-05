@@ -15,22 +15,22 @@ public:
     CZMShambler();
     ~CZMShambler();
 
-    virtual void Precache() OVERRIDE;
-    virtual void Spawn() OVERRIDE;
+    virtual void Precache() override;
+    virtual void Spawn() override;
 
-    virtual void    HandleAnimEvent( animevent_t* pEvent ) OVERRIDE;
+    virtual void    HandleAnimEvent( animevent_t* pEvent ) override;
 
-    virtual bool        CanBreakObject( CBaseEntity* pEnt, bool bSwat = false ) const OVERRIDE;
-    virtual bool        CanSwatPhysicsObjects() const OVERRIDE { return true; }
-    virtual Activity    GetSwatActivity( CBaseEntity* pEnt, bool bBreak = true ) const OVERRIDE;
-
-
-    virtual bool ScaleDamageByHitgroup( int iHitGroup, CTakeDamageInfo& info ) const OVERRIDE;
+    virtual bool        CanBreakObject( CBaseEntity* pEnt, bool bSwat = false ) const override;
+    virtual bool        CanSwatPhysicsObjects() const override { return true; }
+    virtual Activity    GetSwatActivity( CBaseEntity* pEnt, bool bBreak = true ) const override;
 
 
-    virtual bool ShouldPlayIdleSound() const OVERRIDE;
-    virtual float IdleSound() OVERRIDE;
-    virtual float PainSound( const CTakeDamageInfo& info ) OVERRIDE;
-    virtual void AlertSound() OVERRIDE;
-    virtual void DeathSound() OVERRIDE;
+    virtual bool ScaleDamageByHitgroup( int iHitGroup, CTakeDamageInfo& info ) const override;
+
+
+    virtual bool ShouldPlayIdleSound() const override;
+    virtual float IdleSound() override;
+    virtual float PainSound( const CTakeDamageInfo& info ) override;
+    virtual void AlertSound() override;
+    virtual void DeathSound() override;
 };

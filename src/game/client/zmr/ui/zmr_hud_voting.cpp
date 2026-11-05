@@ -32,13 +32,13 @@ public:
     ~CZMHudVote();
 
 
-    virtual void Init( void ) OVERRIDE;
-    virtual void LevelInit() OVERRIDE;
-    virtual void VidInit( void ) OVERRIDE;
-    virtual void Reset() OVERRIDE;
-    virtual void OnThink() OVERRIDE;
-    virtual void Paint() OVERRIDE;
-    virtual void FireGameEvent( IGameEvent* event ) OVERRIDE;
+    virtual void Init( void ) override;
+    virtual void LevelInit() override;
+    virtual void VidInit( void ) override;
+    virtual void Reset() override;
+    virtual void OnThink() override;
+    virtual void Paint() override;
+    virtual void FireGameEvent( IGameEvent* event ) override;
 
     void MsgFunc_CallVoteFailed( bf_read &msg );
     void MsgFunc_VoteStart( bf_read &msg );

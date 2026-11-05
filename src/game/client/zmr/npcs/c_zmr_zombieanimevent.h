@@ -11,7 +11,7 @@ public:
     DECLARE_CLASS( C_ZMTEZombieAnimEvent, C_BaseTempEntity );
     DECLARE_CLIENTCLASS();
 
-    virtual void PostDataUpdate( DataUpdateType_t updateType ) OVERRIDE;
+    virtual void PostDataUpdate( DataUpdateType_t updateType ) override;
 
 public:
     CNetworkHandle( C_ZMBaseZombie, m_hZombie );

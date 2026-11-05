@@ -13,9 +13,9 @@ public:
     C_NPCRNonPlayer();
 
 
-    virtual void PostDataUpdate( DataUpdateType_t updateType ) OVERRIDE;
+    virtual void PostDataUpdate( DataUpdateType_t updateType ) override;
 
-    virtual bool IsNPCR() const OVERRIDE { return true; }
+    virtual bool IsNPCR() const override { return true; }
 
 
     // Shared - Implemented in npcr_nonplayer_shared

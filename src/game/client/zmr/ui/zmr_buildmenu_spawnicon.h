@@ -14,9 +14,9 @@ public:
     ~CZMImageRowItemSpawn();
 
 
-    virtual void ApplySettings( KeyValues* kv ) OVERRIDE;
-    virtual void Paint() OVERRIDE;
-    virtual void PaintBackground() OVERRIDE;
+    virtual void ApplySettings( KeyValues* kv ) override;
+    virtual void Paint() override;
+    virtual void PaintBackground() override;
 
 
     // HACK:

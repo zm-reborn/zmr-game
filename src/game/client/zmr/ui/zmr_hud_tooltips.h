@@ -18,13 +18,13 @@ public:
     ~CZMHudTooltip();
 
 
-    virtual void Init() OVERRIDE;
-    virtual void LevelInit() OVERRIDE;
-    virtual void LevelShutdown() OVERRIDE;
-    virtual void VidInit() OVERRIDE;
-    virtual void Reset() OVERRIDE;
-    virtual void OnThink() OVERRIDE;
-    virtual void Paint() OVERRIDE;
+    virtual void Init() override;
+    virtual void LevelInit() override;
+    virtual void LevelShutdown() override;
+    virtual void VidInit() override;
+    virtual void Reset() override;
+    virtual void OnThink() override;
+    virtual void Paint() override;
 
 
     void FindNextQueueTip();

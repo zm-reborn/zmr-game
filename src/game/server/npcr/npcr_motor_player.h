@@ -17,19 +17,19 @@ namespace NPCR
         ~CPlayerMotor();
 
 
-        virtual void Update() OVERRIDE;
+        virtual void Update() override;
 
 
-        virtual float GetHullWidth() const OVERRIDE { return 16.0f; }
+        virtual float GetHullWidth() const override { return 16.0f; }
 
-        virtual bool UsePitch() const OVERRIDE { return true; }
-        virtual float GetPitchRate( float delta ) const OVERRIDE;
-        virtual float GetYawRate( float delta ) const OVERRIDE;
-        virtual float GetStepHeight() const OVERRIDE;
+        virtual bool UsePitch() const override { return true; }
+        virtual float GetPitchRate( float delta ) const override;
+        virtual float GetYawRate( float delta ) const override;
+        virtual float GetStepHeight() const override;
 
 
-        virtual CBaseEntity* GetGroundEntity() const OVERRIDE { return GetOuter()->GetGroundEntity(); }
-        virtual bool IsOnGround() const OVERRIDE { return GetGroundEntity() != nullptr; }
+        virtual CBaseEntity* GetGroundEntity() const override { return GetOuter()->GetGroundEntity(); }
+        virtual bool IsOnGround() const override { return GetGroundEntity() != nullptr; }
 
 
         virtual bool ShouldDoFullMove() const;

@@ -14,8 +14,8 @@ public:
     DECLARE_CLASS_GAMEROOT( CZMClientRenderTargets, CBaseClientRenderTargets );
 
 
-	virtual void InitClientRenderTargets( IMaterialSystem* pMaterialSystem, IMaterialSystemHardwareConfig* pHardwareConfig ) OVERRIDE;
-	virtual void ShutdownClientRenderTargets() OVERRIDE;
+	virtual void InitClientRenderTargets( IMaterialSystem* pMaterialSystem, IMaterialSystemHardwareConfig* pHardwareConfig ) override;
+	virtual void ShutdownClientRenderTargets() override;
 
 protected:
 	ITexture* CreateScopeTexture( IMaterialSystem* pMaterialSystem );

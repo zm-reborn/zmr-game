@@ -11,5 +11,5 @@ public:
 
     CZMFramePanel( vgui::Panel* pParent, const char* szName = "" );
     
-    virtual void OnMousePressed( vgui::MouseCode code ) OVERRIDE;
+    virtual void OnMousePressed( vgui::MouseCode code ) override;
 };

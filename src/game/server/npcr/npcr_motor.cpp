@@ -20,7 +20,7 @@ public:
         m_pRootParent = pNPC->GetCharacter()->GetRootMoveParent();
     }
 
-    virtual bool ShouldHitEntity( IHandleEntity* pHandleEntity, int contentsMask ) OVERRIDE
+    virtual bool ShouldHitEntity( IHandleEntity* pHandleEntity, int contentsMask ) override
     {
         CBaseEntity* pEnt = EntityFromEntityHandle( pHandleEntity );
         if ( !pEnt )

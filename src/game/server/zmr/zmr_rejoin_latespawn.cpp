@@ -23,9 +23,9 @@ public:
     {
     }
 
-    virtual const char* GetDataName() const OVERRIDE { return "Late spawn"; }
+    virtual const char* GetDataName() const override { return "Late spawn"; }
 
-    virtual bool DeleteOnMapChange() const OVERRIDE { return true; }
+    virtual bool DeleteOnMapChange() const override { return true; }
 
     virtual bool Validate() const
     {
@@ -47,7 +47,7 @@ public:
 class CZMRejoinLateSpawn : public CZMRejoinListener
 {
 public:
-    virtual CZMRejoinData* OnPlayerLeave( CZMPlayer* pPlayer ) OVERRIDE
+    virtual CZMRejoinData* OnPlayerLeave( CZMPlayer* pPlayer ) override
     {
         auto* pRules = ZMRules();
         Assert( pRules );

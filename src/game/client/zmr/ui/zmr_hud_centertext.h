@@ -13,13 +13,13 @@ public:
     ~CZMHudCenterText();
 
 
-    virtual void Init( void ) OVERRIDE;
-    virtual void VidInit( void ) OVERRIDE;
-    virtual void Reset() OVERRIDE;
-    virtual void OnThink() OVERRIDE;
-    virtual void Paint() OVERRIDE;
+    virtual void Init( void ) override;
+    virtual void VidInit( void ) override;
+    virtual void Reset() override;
+    virtual void OnThink() override;
+    virtual void Paint() override;
 
-    virtual void FireGameEvent( IGameEvent* pEvent ) OVERRIDE;
+    virtual void FireGameEvent( IGameEvent* pEvent ) override;
 
 
     void ShowRoundStart( const char* smalltxt = nullptr );

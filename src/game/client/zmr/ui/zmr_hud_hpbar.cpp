@@ -30,12 +30,12 @@ public:
     CZMHudHPBar( const char *pElementName );
 
 
-    virtual void Init() OVERRIDE;
-    virtual void VidInit() OVERRIDE;
-    virtual void Reset() OVERRIDE;
+    virtual void Init() override;
+    virtual void VidInit() override;
+    virtual void Reset() override;
 
-    virtual void OnThink() OVERRIDE;
-    virtual void Paint() OVERRIDE;
+    virtual void OnThink() override;
+    virtual void Paint() override;
 
     void MsgFunc_Damage( bf_read &msg );
 

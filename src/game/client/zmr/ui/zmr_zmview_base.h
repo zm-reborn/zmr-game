@@ -47,20 +47,20 @@ public:
 
 
     // CHudElement
-    virtual void LevelInit() OVERRIDE;
-    virtual bool ShouldDraw() OVERRIDE;
+    virtual void LevelInit() override;
+    virtual bool ShouldDraw() override;
 
     // Panel
-    virtual void Paint() OVERRIDE;
-    virtual void OnThink() OVERRIDE;
-    virtual void SetVisible( bool visible ) OVERRIDE;
-    virtual bool IsVisible() OVERRIDE; // Need to override some functions to make them public
+    virtual void Paint() override;
+    virtual void OnThink() override;
+    virtual void SetVisible( bool visible ) override;
+    virtual bool IsVisible() override; // Need to override some functions to make them public
 private:
-    virtual void OnCursorMoved( int x, int y ) OVERRIDE;
-    virtual void OnMouseReleased( MouseCode code ) OVERRIDE;
-    virtual void OnMousePressed( MouseCode code ) OVERRIDE;
-    virtual void OnMouseDoublePressed( MouseCode code ) OVERRIDE;
-    virtual void OnMouseWheeled( int delta ) OVERRIDE;
+    virtual void OnCursorMoved( int x, int y ) override;
+    virtual void OnMouseReleased( MouseCode code ) override;
+    virtual void OnMousePressed( MouseCode code ) override;
+    virtual void OnMouseDoublePressed( MouseCode code ) override;
+    virtual void OnMouseWheeled( int delta ) override;
 public:
 
 

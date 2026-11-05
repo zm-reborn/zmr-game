@@ -15,23 +15,23 @@ public:
     ~CZMImmolator();
 
 
-    virtual void Precache() OVERRIDE;
-    virtual void Spawn() OVERRIDE;
+    virtual void Precache() override;
+    virtual void Spawn() override;
 
-    virtual void HandleAnimEvent( animevent_t* pEvent ) OVERRIDE;
+    virtual void HandleAnimEvent( animevent_t* pEvent ) override;
 
-    virtual void PreUpdate() OVERRIDE;
+    virtual void PreUpdate() override;
 
-    virtual void Ignite( float flFlameLifetime, bool bNPCOnly = false, float flSize = 0.0f, bool bCalledByLevelDesigner = false ) OVERRIDE;
-    virtual void Event_Killed( const CTakeDamageInfo& info ) OVERRIDE;
+    virtual void Ignite( float flFlameLifetime, bool bNPCOnly = false, float flSize = 0.0f, bool bCalledByLevelDesigner = false ) override;
+    virtual void Event_Killed( const CTakeDamageInfo& info ) override;
 
 
-    virtual bool ScaleDamageByHitgroup( int iHitGroup, CTakeDamageInfo& info ) const OVERRIDE;
+    virtual bool ScaleDamageByHitgroup( int iHitGroup, CTakeDamageInfo& info ) const override;
 
-    virtual bool ShouldPlayIdleSound() const OVERRIDE;
-    virtual float IdleSound() OVERRIDE;
-    virtual void AlertSound() OVERRIDE;
-    virtual void DeathSound() OVERRIDE;
+    virtual bool ShouldPlayIdleSound() const override;
+    virtual float IdleSound() override;
+    virtual void AlertSound() override;
+    virtual void DeathSound() override;
 
 
 private:

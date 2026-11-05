@@ -28,11 +28,11 @@ public:
     ~CZMHudCrosshair();
 
 
-    virtual void ApplySchemeSettings( vgui::IScheme* scheme ) OVERRIDE;
+    virtual void ApplySchemeSettings( vgui::IScheme* scheme ) override;
 
 
-    virtual bool ShouldDraw() OVERRIDE;
-    virtual void Paint() OVERRIDE;
+    virtual bool ShouldDraw() override;
+    virtual void Paint() override;
 };
 
 DECLARE_HUDELEMENT( CZMHudCrosshair );

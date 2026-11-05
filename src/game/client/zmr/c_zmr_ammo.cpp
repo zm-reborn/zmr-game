@@ -25,15 +25,15 @@ public:
     C_ZMAmmo();
 
 
-    virtual void    Spawn() OVERRIDE;
-    virtual void    ClientThink() OVERRIDE;
+    virtual void    Spawn() override;
+    virtual void    ClientThink() override;
 
 
     void            UpdateGlow();
-    virtual void    GetGlowEffectColor( float& r, float& g, float& b ) const OVERRIDE;
+    virtual void    GetGlowEffectColor( float& r, float& g, float& b ) const override;
     
-    virtual bool    GlowOccluded() const OVERRIDE { return false; };
-    virtual bool    GlowUnoccluded() const OVERRIDE { return true; };
+    virtual bool    GlowOccluded() const override { return false; };
+    virtual bool    GlowUnoccluded() const override { return true; };
 
 protected:
     CNetworkVar( int, m_iAmmoType );

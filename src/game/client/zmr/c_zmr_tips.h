@@ -167,8 +167,8 @@ public:
     ~CZMTipSystem();
 
 
-    virtual void PostInit() OVERRIDE;
-    virtual void LevelShutdownPostEntity() OVERRIDE;
+    virtual void PostInit() override;
+    virtual void LevelShutdownPostEntity() override;
 
 
     CZMTipManager* GetManagerByName( const char* name ) const;
@@ -184,5 +184,3 @@ private:
 
 extern CZMTipSystem g_ZMTipSystem;
 //
-
-

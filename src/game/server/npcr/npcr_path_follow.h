@@ -36,12 +36,12 @@ namespace NPCR
         }
 
 
-        virtual bool IsValid() const OVERRIDE
+        virtual bool IsValid() const override
         {
             return CBaseNavPath::IsValid() && m_pGoal;
         }
 
-        virtual void Invalidate() OVERRIDE;
+        virtual void Invalidate() override;
 
 
         virtual void OnNewGoal( CBaseNPC* pNPC );
@@ -60,7 +60,7 @@ namespace NPCR
         float   GetMoveTolerance() const { return m_flMoveTolerance; }
         void    SetMoveTolerance( float tolerance ) { m_flMoveTolerance = tolerance; }
 
-        virtual void OnPathCreated() OVERRIDE
+        virtual void OnPathCreated() override
         {
             m_pGoal = FirstLink();
             m_pCurLink = nullptr;
@@ -72,7 +72,7 @@ namespace NPCR
         virtual void Draw();
 
 
-        virtual bool ShouldDecelerateToGoal() const OVERRIDE;
+        virtual bool ShouldDecelerateToGoal() const override;
 
     protected:
         virtual void    UpdateMove( CBaseNPC* pNPC );

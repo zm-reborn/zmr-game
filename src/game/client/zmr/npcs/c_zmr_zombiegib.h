@@ -12,7 +12,7 @@ public:
     ~C_ZMZombieGib();
 
 
-    virtual void ClientThink() OVERRIDE;
+    virtual void ClientThink() override;
 
     void FadeOut();
 

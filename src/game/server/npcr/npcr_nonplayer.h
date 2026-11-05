@@ -28,39 +28,39 @@ public:
     CNPCRNonPlayer();
     ~CNPCRNonPlayer();
 
-    virtual NPCR::CBaseMotor* CreateMotor() OVERRIDE;
+    virtual NPCR::CBaseMotor* CreateMotor() override;
 
-    virtual void PostConstructor( const char* szClassname ) OVERRIDE;
-    virtual void Spawn() OVERRIDE;
+    virtual void PostConstructor( const char* szClassname ) override;
+    virtual void Spawn() override;
 
-    virtual void PostUpdate() OVERRIDE;
+    virtual void PostUpdate() override;
 
 
-    virtual CBaseNPC* MyNPCRPointer() OVERRIDE { return this; }
-    //virtual bool IsNPC() const OVERRIDE { return true; }
-    virtual bool IsTemplate() OVERRIDE { return HasSpawnFlags( SF_NPC_TEMPLATE ); }
+    virtual CBaseNPC* MyNPCRPointer() override { return this; }
+    //virtual bool IsNPC() const override { return true; }
+    virtual bool IsTemplate() override { return HasSpawnFlags( SF_NPC_TEMPLATE ); }
 
     // Just outright remove us.
-    virtual bool RemoveNPC() OVERRIDE { UTIL_Remove( this ); return true; }
+    virtual bool RemoveNPC() override { UTIL_Remove( this ); return true; }
 
 
-    virtual void VPhysicsUpdate( IPhysicsObject* pPhys ) OVERRIDE;
-    virtual void PerformCustomPhysics( Vector* pNewPosition, Vector* pNewVelocity, QAngle* pNewAngles, QAngle* pNewAngVelocity ) OVERRIDE;
+    virtual void VPhysicsUpdate( IPhysicsObject* pPhys ) override;
+    virtual void PerformCustomPhysics( Vector* pNewPosition, Vector* pNewVelocity, QAngle* pNewAngles, QAngle* pNewAngVelocity ) override;
 
 
-    virtual void HandleAnimEvent( animevent_t* pEvent ) OVERRIDE;
+    virtual void HandleAnimEvent( animevent_t* pEvent ) override;
 
-    virtual int OnTakeDamage_Alive( const CTakeDamageInfo& info ) OVERRIDE;
+    virtual int OnTakeDamage_Alive( const CTakeDamageInfo& info ) override;
 
-    virtual void Event_Killed( const CTakeDamageInfo& info ) OVERRIDE;
+    virtual void Event_Killed( const CTakeDamageInfo& info ) override;
 
 
     // Don't mind the odd name, it's to avoid confusion between move activity ground speed and "move speed"
     virtual float GetMoveActivityMovementSpeed();
 
 
-    virtual bool    IsEnemy( CBaseEntity* pEnt ) const OVERRIDE { return pEnt && pEnt->IsPlayer(); }
-    virtual bool    IsTargetedEnemy( CBaseEntity* pEnt ) const OVERRIDE { return pEnt && GetEnemy() == pEnt; }
+    virtual bool    IsEnemy( CBaseEntity* pEnt ) const override { return pEnt && pEnt->IsPlayer(); }
+    virtual bool    IsTargetedEnemy( CBaseEntity* pEnt ) const override { return pEnt && GetEnemy() == pEnt; }
 
 
         

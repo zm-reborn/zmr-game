@@ -15,31 +15,31 @@ class CBansheeLeapSchedule : public CBaseZombieSchedule
 public:
     CBansheeLeapSchedule();
 
-    virtual const char* GetName() const OVERRIDE { return "BansheeLeap"; }
+    virtual const char* GetName() const override { return "BansheeLeap"; }
 
-    virtual CZMBanshee* GetOuter() const OVERRIDE { return static_cast<CZMBanshee*>( CBaseZombieSchedule::GetOuter() ); }
+    virtual CZMBanshee* GetOuter() const override { return static_cast<CZMBanshee*>( CBaseZombieSchedule::GetOuter() ); }
 
-    virtual void OnStart() OVERRIDE;
+    virtual void OnStart() override;
 
-    virtual void OnUpdate() OVERRIDE;
+    virtual void OnUpdate() override;
 
-    virtual void OnAnimEvent( animevent_t* pEvent ) OVERRIDE;
+    virtual void OnAnimEvent( animevent_t* pEvent ) override;
 
-    virtual void OnLandedGround( CBaseEntity* pGround ) OVERRIDE;
+    virtual void OnLandedGround( CBaseEntity* pGround ) override;
 
-    virtual void OnTouch( CBaseEntity* pEnt, trace_t* pTrace ) OVERRIDE;
+    virtual void OnTouch( CBaseEntity* pEnt, trace_t* pTrace ) override;
 
-    virtual void OnAnimActivityInterrupted( Activity newActivity ) OVERRIDE;
+    virtual void OnAnimActivityInterrupted( Activity newActivity ) override;
 
-    virtual void OnAnimActivityFinished( Activity completedActivity ) OVERRIDE;
+    virtual void OnAnimActivityFinished( Activity completedActivity ) override;
 
-    virtual void OnEnd() OVERRIDE;
+    virtual void OnEnd() override;
 
-    virtual NPCR::QueryResult_t IsBusy() const OVERRIDE;
+    virtual NPCR::QueryResult_t IsBusy() const override;
 
-    virtual void OnCommanded( CBasePlayer* pCommander, ZombieCommandType_t com ) OVERRIDE;
+    virtual void OnCommanded( CBasePlayer* pCommander, ZombieCommandType_t com ) override;
 
-    virtual void OnQueuedCommand( CBasePlayer* pPlayer, ZombieCommandType_t com ) OVERRIDE;
+    virtual void OnQueuedCommand( CBasePlayer* pPlayer, ZombieCommandType_t com ) override;
 
 private:
     void DoLeapStart();

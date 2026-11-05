@@ -14,15 +14,15 @@ public:
 
     ~CZMBitMapButton();
 
-    virtual void OnCursorEntered() OVERRIDE;
+    virtual void OnCursorEntered() override;
     
-    virtual void OnCursorExited() OVERRIDE;
+    virtual void OnCursorExited() override;
 
     const char* GetTooltipName() const;
     void SetTooltipName( const char* msg );
 
     // Stops the awful depressed offset shit.
-    virtual void RecalculateDepressedState() OVERRIDE;
+    virtual void RecalculateDepressedState() override;
 
     BitmapImage* GetBitmapImage( int index );
 

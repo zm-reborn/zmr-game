@@ -51,27 +51,27 @@ public:
     ~CZMClientScoreBoardDialog();
 
 
-    virtual void PerformLayout() OVERRIDE;
-    virtual void PaintBackground() OVERRIDE;
+    virtual void PerformLayout() override;
+    virtual void PaintBackground() override;
 
-    virtual const char* GetName() OVERRIDE { return PANEL_SCOREBOARD; };
-    virtual void        SetData( KeyValues *data) OVERRIDE {};
-    virtual bool        HasInputElements() OVERRIDE { return true; };
-    vgui::VPANEL        GetVPanel( void ) OVERRIDE { return BaseClass::GetVPanel(); };
-    virtual bool        IsVisible() OVERRIDE { return BaseClass::IsVisible(); };
-    virtual void        SetParent( vgui::VPANEL parent ) OVERRIDE { BaseClass::SetParent( parent ); };
+    virtual const char* GetName() override { return PANEL_SCOREBOARD; };
+    virtual void        SetData( KeyValues *data) override {};
+    virtual bool        HasInputElements() override { return true; };
+    vgui::VPANEL        GetVPanel( void ) override { return BaseClass::GetVPanel(); };
+    virtual bool        IsVisible() override { return BaseClass::IsVisible(); };
+    virtual void        SetParent( vgui::VPANEL parent ) override { BaseClass::SetParent( parent ); };
 
 
-    virtual void        ApplySchemeSettings( vgui::IScheme* pScheme ) OVERRIDE;
-    virtual void        FireGameEvent( IGameEvent* event ) OVERRIDE;
+    virtual void        ApplySchemeSettings( vgui::IScheme* pScheme ) override;
+    virtual void        FireGameEvent( IGameEvent* event ) override;
     
-    virtual void        OnThink() OVERRIDE;
-    virtual void        Reset() OVERRIDE;
-    virtual void        Update() OVERRIDE;
-    virtual bool        NeedsUpdate() OVERRIDE;
-    virtual void        ShowPanel( bool bShow ) OVERRIDE;
+    virtual void        OnThink() override;
+    virtual void        Reset() override;
+    virtual void        Update() override;
+    virtual bool        NeedsUpdate() override;
+    virtual void        ShowPanel( bool bShow ) override;
 
-    virtual GameActionSet_t GetPreferredActionSet() OVERRIDE { return GAME_ACTION_SET_NONE; };
+    virtual GameActionSet_t GetPreferredActionSet() override { return GAME_ACTION_SET_NONE; };
 
     MESSAGE_FUNC_PARAMS( OnListLayout, "OnListLayout", kv );
     MESSAGE_FUNC_PARAMS( OnRowItemPressed, "OnRowItemPressed", kv );

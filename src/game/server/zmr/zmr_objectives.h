@@ -48,7 +48,7 @@ public:
     CZMEntObjectives();
     ~CZMEntObjectives();
 
-    void Spawn() OVERRIDE;
+    void Spawn() override;
 
 
     enum DirtyStatus_t

@@ -17,20 +17,20 @@ public:
         m_flEnd = 0.0f;
     }
 
-    virtual bool OnDeath() OVERRIDE
+    virtual bool OnDeath() override
     {
         m_flEnd = gpGlobals->curtime + 6.0f;
 
         return true;
     }
 
-    virtual float GetWeight() const OVERRIDE
+    virtual float GetWeight() const override
     {
         float v = m_flEnd - gpGlobals->curtime;
         return clamp( v / 2.5f, 0.0f, 1.0f );
     }
 
-    virtual bool IsDone() const OVERRIDE
+    virtual bool IsDone() const override
     {
         return (m_flEnd - gpGlobals->curtime) <= 0.0f;
     }
@@ -40,4 +40,3 @@ private:
 };
 
 CZMDeathEffect g_ZMCCDeathEffect;
-

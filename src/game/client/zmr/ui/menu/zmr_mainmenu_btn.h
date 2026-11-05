@@ -18,15 +18,15 @@ public:
     ~CZMMainMenuButton();
 
 
-    virtual void OnCursorExited() OVERRIDE;
+    virtual void OnCursorExited() override;
 
-    virtual void ApplySettings( KeyValues* kv ) OVERRIDE;
+    virtual void ApplySettings( KeyValues* kv ) override;
 
-    virtual void PerformLayout() OVERRIDE;
+    virtual void PerformLayout() override;
 
-    virtual void DoClick() OVERRIDE;
-    virtual void SetSelected( bool state ) OVERRIDE;
-    virtual void SetArmed( bool state ) OVERRIDE;
+    virtual void DoClick() override;
+    virtual void SetSelected( bool state ) override;
+    virtual void SetArmed( bool state ) override;
 
 
     void AttemptToShowButtons();

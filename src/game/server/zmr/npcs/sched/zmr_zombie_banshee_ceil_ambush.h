@@ -14,33 +14,33 @@ class CBansheeCeilAmbushSchedule : public CBaseZombieSchedule
 public:
     CBansheeCeilAmbushSchedule();
 
-    virtual const char* GetName() const OVERRIDE { return "BansheeCeilingAmbush"; }
+    virtual const char* GetName() const override { return "BansheeCeilingAmbush"; }
 
-    virtual CZMBanshee* GetOuter() const OVERRIDE { return static_cast<CZMBanshee*>( CBaseZombieSchedule::GetOuter() ); }
+    virtual CZMBanshee* GetOuter() const override { return static_cast<CZMBanshee*>( CBaseZombieSchedule::GetOuter() ); }
 
-    virtual void OnStart() OVERRIDE;
+    virtual void OnStart() override;
 
-    virtual void OnEnd() OVERRIDE;
+    virtual void OnEnd() override;
 
-    virtual void OnUpdate() OVERRIDE;
+    virtual void OnUpdate() override;
 
-    virtual void OnContinue() OVERRIDE;
+    virtual void OnContinue() override;
 
-    virtual void OnAnimEvent( animevent_t* pEvent ) OVERRIDE;
+    virtual void OnAnimEvent( animevent_t* pEvent ) override;
 
-    virtual void OnAnimActivityInterrupted( Activity newActivity ) OVERRIDE;
+    virtual void OnAnimActivityInterrupted( Activity newActivity ) override;
 
-    virtual void OnLandedGround( CBaseEntity* pEnt ) OVERRIDE;
+    virtual void OnLandedGround( CBaseEntity* pEnt ) override;
 
-    virtual void OnTouch( CBaseEntity* pEnt, trace_t* tr ) OVERRIDE;
+    virtual void OnTouch( CBaseEntity* pEnt, trace_t* tr ) override;
 
-    virtual void OnCommanded( CBasePlayer* pCommander, ZombieCommandType_t com ) OVERRIDE;
+    virtual void OnCommanded( CBasePlayer* pCommander, ZombieCommandType_t com ) override;
 
-    virtual void OnQueuedCommand( CBasePlayer* pPlayer, ZombieCommandType_t com ) OVERRIDE;
+    virtual void OnQueuedCommand( CBasePlayer* pPlayer, ZombieCommandType_t com ) override;
 
-    virtual NPCR::QueryResult_t IsBusy() const OVERRIDE;
+    virtual NPCR::QueryResult_t IsBusy() const override;
 
-    virtual NPCR::QueryResult_t ShouldChase( CBaseEntity* pEnemy ) const OVERRIDE;
+    virtual NPCR::QueryResult_t ShouldChase( CBaseEntity* pEnemy ) const override;
 
 private:
     bool IsCeilingFlat( const Vector& plane ) const;

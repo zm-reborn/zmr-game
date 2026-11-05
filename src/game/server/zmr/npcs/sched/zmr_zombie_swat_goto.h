@@ -29,20 +29,20 @@ public:
     void SetCheckForEnemies( bool state ) { m_bCheckForEnemies = state; }
 
 
-    virtual const char* GetName() const OVERRIDE { return "ZombieGotoSwatObj"; }
+    virtual const char* GetName() const override { return "ZombieGotoSwatObj"; }
 
 
-    virtual void OnStart() OVERRIDE;
+    virtual void OnStart() override;
 
-    virtual void OnContinue() OVERRIDE;
+    virtual void OnContinue() override;
 
-    virtual void OnUpdate() OVERRIDE;
+    virtual void OnUpdate() override;
 
-    virtual void OnChase( CBaseEntity* pEnemy ) OVERRIDE;
+    virtual void OnChase( CBaseEntity* pEnemy ) override;
 
-    virtual void OnQueuedCommand( CBasePlayer* pPlayer, ZombieCommandType_t com ) OVERRIDE;
+    virtual void OnQueuedCommand( CBasePlayer* pPlayer, ZombieCommandType_t com ) override;
 
-    virtual void OnCommanded( CBasePlayer* pCommander, ZombieCommandType_t com ) OVERRIDE;
+    virtual void OnCommanded( CBasePlayer* pCommander, ZombieCommandType_t com ) override;
 
 
 private:

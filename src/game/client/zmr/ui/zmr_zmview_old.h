@@ -23,11 +23,11 @@ public:
     ~CZMViewOld();
 
 
-    virtual CZMBuildMenuBase* GetBuildMenu() OVERRIDE;
-    virtual CZMManiMenuBase* GetManiMenu() OVERRIDE;
+    virtual CZMBuildMenuBase* GetBuildMenu() override;
+    virtual CZMManiMenuBase* GetManiMenu() override;
 
 protected:
-    virtual void CloseChildMenus() OVERRIDE;
+    virtual void CloseChildMenus() override;
 
 private:
     CZMHudControlPanel* m_pZMControl;

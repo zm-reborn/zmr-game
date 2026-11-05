@@ -19,7 +19,7 @@ public:
     ~CZMPanelCrosshair();
 
 
-    virtual void ApplySchemeSettings( vgui::IScheme* pScheme ) OVERRIDE;
+    virtual void ApplySchemeSettings( vgui::IScheme* pScheme ) override;
 
     virtual void Paint();
 

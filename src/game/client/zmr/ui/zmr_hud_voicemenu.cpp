@@ -93,19 +93,19 @@ public:
     ~CZMHudVoiceMenu();
 
 
-    virtual void Init() OVERRIDE;
-    virtual void VidInit() OVERRIDE;
-    virtual void Reset() OVERRIDE;
+    virtual void Init() override;
+    virtual void VidInit() override;
+    virtual void Reset() override;
 
 
-    virtual bool ShouldDraw() OVERRIDE { return IsVisible() && CHudElement::ShouldDraw(); }
+    virtual bool ShouldDraw() override { return IsVisible() && CHudElement::ShouldDraw(); }
 
-    virtual void OnMousePressed( vgui::MouseCode code ) OVERRIDE;
-    virtual void OnThink() OVERRIDE;
-    virtual void Paint() OVERRIDE;
+    virtual void OnMousePressed( vgui::MouseCode code ) override;
+    virtual void OnThink() override;
+    virtual void Paint() override;
 
 
-    virtual void SetVisible( bool state ) OVERRIDE;
+    virtual void SetVisible( bool state ) override;
 
 
 

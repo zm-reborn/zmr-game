@@ -33,10 +33,10 @@ public:
     ~CZMBuildMenu();
 
 
-    virtual void ShowPanel( bool state ) OVERRIDE;
+    virtual void ShowPanel( bool state ) override;
 	void OnThink( void );
 
-    virtual const char* GetName() OVERRIDE { return "ZMBuildMenu"; };
+    virtual const char* GetName() override { return "ZMBuildMenu"; };
 
     
 
@@ -46,7 +46,7 @@ public:
 	void AutoAssign();
 	int m_iLastFlags;
 	
-	virtual void UpdateQueue( const ZMQueueSlotData_t q[], int size ) OVERRIDE;
+	virtual void UpdateQueue( const ZMQueueSlotData_t q[], int size ) override;
 
 protected:
 

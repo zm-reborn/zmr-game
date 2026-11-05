@@ -48,10 +48,10 @@ public:
         m_vecTarget = vecPos;
     }
 
-    virtual ZombieCommandType_t     GetCommandType() const OVERRIDE { return COMMAND_MOVE; }
+    virtual ZombieCommandType_t     GetCommandType() const override { return COMMAND_MOVE; }
 
-    virtual const Vector&           GetVectorTarget() const OVERRIDE { return m_vecTarget; }
-    virtual void                    SetVectorTarget( const Vector& vecPos ) OVERRIDE { m_vecTarget = vecPos; }
+    virtual const Vector&           GetVectorTarget() const override { return m_vecTarget; }
+    virtual void                    SetVectorTarget( const Vector& vecPos ) override { m_vecTarget = vecPos; }
 
 private:
     Vector m_vecTarget;
@@ -67,7 +67,7 @@ public:
         m_bBreak = bBreak;
     }
 
-    virtual ZombieCommandType_t     GetCommandType() const OVERRIDE { return COMMAND_SWAT; }
+    virtual ZombieCommandType_t     GetCommandType() const override { return COMMAND_SWAT; }
 
     /*
     virtual bool                    IsSameCommand( CZMCommandBase* pCom )
@@ -84,8 +84,8 @@ public:
     */
 
 
-    virtual CBaseEntity*            GetObjectTarget() const OVERRIDE { return m_hSwatObject.Get(); }
-    virtual void                    SetObjectTarget( CBaseEntity* pEnt ) OVERRIDE { m_hSwatObject.Set( pEnt ); }
+    virtual CBaseEntity*            GetObjectTarget() const override { return m_hSwatObject.Get(); }
+    virtual void                    SetObjectTarget( CBaseEntity* pEnt ) override { m_hSwatObject.Set( pEnt ); }
 
     bool    BreakObject() const { return m_bBreak; }
 
@@ -100,9 +100,9 @@ public:
     CZMCommandCeilingAmbush( CZMPlayer* pCommander ) : CZMCommandBase( pCommander ) {}
 
 
-    virtual ZombieCommandType_t     GetCommandType() const OVERRIDE { return COMMAND_CEILINGAMBUSH; }
+    virtual ZombieCommandType_t     GetCommandType() const override { return COMMAND_CEILINGAMBUSH; }
 
-    virtual float                   GetExpireTime() const OVERRIDE { return 3.0f; }
+    virtual float                   GetExpireTime() const override { return 3.0f; }
 };
 
 struct ZMCommandSlot_t

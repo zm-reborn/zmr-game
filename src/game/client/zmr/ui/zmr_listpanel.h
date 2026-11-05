@@ -43,9 +43,9 @@ public:
     ~CZMListRow();
 
 
-    virtual void OnMousePressed( vgui::MouseCode code ) OVERRIDE;
-    virtual void OnCursorMoved( int x, int y ) OVERRIDE;
-    virtual void PerformLayout() OVERRIDE;
+    virtual void OnMousePressed( vgui::MouseCode code ) override;
+    virtual void OnCursorMoved( int x, int y ) override;
+    virtual void PerformLayout() override;
 
 
     int         GetItemId() const { return m_iItemId; };
@@ -196,8 +196,8 @@ public:
     CZMListPanel( vgui::Panel* parent, const char* name );
     ~CZMListPanel();
 
-    virtual void    ApplySettings( KeyValues* inKv ) OVERRIDE;
-    virtual void    PerformLayout() OVERRIDE;
+    virtual void    ApplySettings( KeyValues* inKv ) override;
+    virtual void    PerformLayout() override;
 
     void    Clear();
 

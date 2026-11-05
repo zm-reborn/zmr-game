@@ -109,8 +109,8 @@ public:
     ~CZMZombieModelGroupSystem();
 
     //
-    virtual void LevelInitPreEntity() OVERRIDE;
-    virtual bool Init() OVERRIDE;
+    virtual void LevelInitPreEntity() override;
+    virtual bool Init() override;
     //
 
 

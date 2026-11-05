@@ -27,18 +27,18 @@ public:
     ~CZMBuildMenuBase();
 
 
-    virtual vgui::VPANEL GetVPanel( void ) OVERRIDE { return BaseClass::GetVPanel(); };
-    virtual bool IsVisible() OVERRIDE { return BaseClass::IsVisible(); };
-    virtual void SetParent( vgui::VPANEL parent ) OVERRIDE { BaseClass::SetParent( parent ); };
+    virtual vgui::VPANEL GetVPanel( void ) override { return BaseClass::GetVPanel(); };
+    virtual bool IsVisible() override { return BaseClass::IsVisible(); };
+    virtual void SetParent( vgui::VPANEL parent ) override { BaseClass::SetParent( parent ); };
 
-    virtual void SetData( KeyValues *data ) OVERRIDE {};
-    virtual void Reset() OVERRIDE {};
-    virtual void Update() OVERRIDE {};
-    virtual bool NeedsUpdate( void ) OVERRIDE { return false; }
-    virtual bool HasInputElements( void ) OVERRIDE { return true; }
+    virtual void SetData( KeyValues *data ) override {};
+    virtual void Reset() override {};
+    virtual void Update() override {};
+    virtual bool NeedsUpdate( void ) override { return false; }
+    virtual bool HasInputElements( void ) override { return true; }
 
-    virtual void OnCommand( const char* command ) OVERRIDE;
-    virtual void OnClose() OVERRIDE;
+    virtual void OnCommand( const char* command ) override;
+    virtual void OnClose() override;
 
 
     virtual int ZMKeyInput( ButtonCode_t keynum, int down );
@@ -59,7 +59,7 @@ public:
 
     int GetAltSpawnAmount() const;
 
-    virtual GameActionSet_t GetPreferredActionSet() OVERRIDE { return GAME_ACTION_SET_NONE; };
+    virtual GameActionSet_t GetPreferredActionSet() override { return GAME_ACTION_SET_NONE; };
 
 private:
     int m_iLastSpawnIndex;

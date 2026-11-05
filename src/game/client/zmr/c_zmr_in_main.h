@@ -21,7 +21,7 @@ public:
         float flLastStateChange;
     };
 
-    virtual void AdjustYaw( float speed, QAngle& viewangles ) OVERRIDE;
+    virtual void AdjustYaw( float speed, QAngle& viewangles ) override;
 
 
     void SetScreenScrollStatePitch( ScrollState_t state );

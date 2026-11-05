@@ -86,10 +86,10 @@ public:
     inline int          GetItemCount() const { return m_nItemCount; };
 
 private:
-    virtual int     ObjectCaps() OVERRIDE { return BaseClass::ObjectCaps() | FCAP_WCEDIT_POSITION; };
+    virtual int     ObjectCaps() override { return BaseClass::ObjectCaps() | FCAP_WCEDIT_POSITION; };
 
-    virtual void    OnPhysGunPickup( CBasePlayer* pPhysGunUser, PhysGunPickup_t reason ) OVERRIDE;
-    virtual void    OnBreak( const Vector& vecVelocity, const AngularImpulse& angVel, CBaseEntity* pBreaker ) OVERRIDE;
+    virtual void    OnPhysGunPickup( CBasePlayer* pPhysGunUser, PhysGunPickup_t reason ) override;
+    virtual void    OnBreak( const Vector& vecVelocity, const AngularImpulse& angVel, CBaseEntity* pBreaker ) override;
 
     CBaseEntity*    CreateItem() const;
     CZMBaseWeapon*  CreateTemplateItem() const;

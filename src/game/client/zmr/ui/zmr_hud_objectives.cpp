@@ -302,11 +302,11 @@ public:
     ~CZMHudObjectives();
 
 
-    virtual void Init( void ) OVERRIDE;
-    virtual void VidInit( void ) OVERRIDE;
-    virtual void Reset() OVERRIDE;
-    virtual void OnThink() OVERRIDE;
-    virtual void Paint( void ) OVERRIDE;
+    virtual void Init( void ) override;
+    virtual void VidInit( void ) override;
+    virtual void Reset() override;
+    virtual void OnThink() override;
+    virtual void Paint( void ) override;
 
 
     void MsgFunc_ZMObjDisplay( bf_read& msg );

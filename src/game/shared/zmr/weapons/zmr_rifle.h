@@ -19,22 +19,22 @@ public:
     ~CZMWeaponRifle();
 
 
-    virtual Vector GetBulletSpread() const OVERRIDE;
-    virtual bool Holster( CBaseCombatWeapon* pSwitchTo = nullptr ) OVERRIDE;
-    virtual void Drop( const Vector& vecVelocity ) OVERRIDE;
-    virtual void ItemBusyFrame() OVERRIDE;
-    virtual void ItemPostFrame() OVERRIDE;
+    virtual Vector GetBulletSpread() const override;
+    virtual bool Holster( CBaseCombatWeapon* pSwitchTo = nullptr ) override;
+    virtual void Drop( const Vector& vecVelocity ) override;
+    virtual void ItemBusyFrame() override;
+    virtual void ItemPostFrame() override;
 
-    virtual Activity GetIdleActivity() const OVERRIDE { return IsZoomed() ? ACT_VM_IDLE_SPECIAL : BaseClass::GetIdleActivity(); }
-    virtual Activity GetReloadStartAct() const OVERRIDE { return ACT_VM_RELOAD_START; }
-    virtual Activity GetReloadEndAct() const OVERRIDE { return ACT_VM_RELOAD_FINISH; }
-    virtual Activity GetPrimaryAttackActivity() OVERRIDE;
-    virtual Activity GetPumpAct() const OVERRIDE;
+    virtual Activity GetIdleActivity() const override { return IsZoomed() ? ACT_VM_IDLE_SPECIAL : BaseClass::GetIdleActivity(); }
+    virtual Activity GetReloadStartAct() const override { return ACT_VM_RELOAD_START; }
+    virtual Activity GetReloadEndAct() const override { return ACT_VM_RELOAD_FINISH; }
+    virtual Activity GetPrimaryAttackActivity() override;
+    virtual Activity GetPumpAct() const override;
 
-    virtual bool IsZoomed() const OVERRIDE { return m_bInZoom; }
+    virtual bool IsZoomed() const override { return m_bInZoom; }
     virtual bool CanZoom() const;
 
-    virtual void StartReload() OVERRIDE;
+    virtual void StartReload() override;
 
     void CheckToggleZoom();
     void CheckUnZoom();

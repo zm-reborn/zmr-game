@@ -19,14 +19,14 @@ public:
     CZMProjectilePipebomb();
     ~CZMProjectilePipebomb();
 
-    virtual void Spawn() OVERRIDE;
-    virtual void Precache() OVERRIDE;
+    virtual void Spawn() override;
+    virtual void Precache() override;
 
-    virtual void OnThrow() OVERRIDE;
+    virtual void OnThrow() override;
 
-    virtual bool IsCombatItem() const OVERRIDE;
+    virtual bool IsCombatItem() const override;
 
-    virtual void Detonate() OVERRIDE;
+    virtual void Detonate() override;
 };
 
 LINK_ENTITY_TO_CLASS( grenade_pipebomb, CZMProjectilePipebomb );

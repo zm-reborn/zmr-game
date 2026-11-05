@@ -25,7 +25,7 @@ class CZMPlayerAttackTraceFilter : public CTraceFilter
 public:
     CZMPlayerAttackTraceFilter( CBaseEntity* pAttacker, CBaseEntity* pIgnore, int collisionGroup );
 
-    virtual bool ShouldHitEntity( IHandleEntity* pHandleEntity, int contentsMask ) OVERRIDE;
+    virtual bool ShouldHitEntity( IHandleEntity* pHandleEntity, int contentsMask ) override;
 
 
     int     AddToIgnoreList( CBaseEntity* pIgnore );

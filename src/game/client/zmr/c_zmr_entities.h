@@ -16,15 +16,15 @@ public:
     DECLARE_CLIENTCLASS()
 
 
-    virtual bool ShouldDraw() OVERRIDE;
-    virtual ShadowType_t ShadowCastType() OVERRIDE { return SHADOWS_NONE; };
+    virtual bool ShouldDraw() override;
+    virtual ShadowType_t ShadowCastType() override { return SHADOWS_NONE; };
 #ifdef _DEBUG
-    virtual void OnDataChanged( DataUpdateType_t type ) OVERRIDE;
+    virtual void OnDataChanged( DataUpdateType_t type ) override;
 #endif
 
     // Never go dormant, so we can render it even outside the world.
     // For now use dormant until we get this rolling. Disabled spawns/traps would show.
-    //virtual bool IsDormant() OVERRIDE { return false; };
+    //virtual bool IsDormant() override { return false; };
 };
 
 abstract_class C_ZMEntBaseUsable : public C_ZMEntBaseSimple
@@ -37,8 +37,8 @@ public:
     C_ZMEntBaseUsable();
 
 
-    virtual bool ShouldDraw() OVERRIDE;
-    virtual int DrawModel( int flags ) OVERRIDE;
+    virtual bool ShouldDraw() override;
+    virtual int DrawModel( int flags ) override;
 
 protected:
     virtual void InitSpriteMat() {};
@@ -57,9 +57,9 @@ public:
     C_ZMEntZombieSpawn();
 
 
-    void Precache() OVERRIDE;
+    void Precache() override;
 
-	void OnDataChanged( DataUpdateType_t type ) OVERRIDE;
+	void OnDataChanged( DataUpdateType_t type ) override;
 
     int GetZombieFlags() const { return m_fZombieFlags; };
     const int* GetZombieCosts() const { return m_iZombieCosts.Base(); };
@@ -68,7 +68,7 @@ public:
 	CZMBuildMenuBase* GetMenu() const { return m_pBuildMenu; };
 
 protected:
-    virtual void InitSpriteMat() OVERRIDE;
+    virtual void InitSpriteMat() override;
 
 private:
     CNetworkVar( int, m_fZombieFlags );
@@ -87,20 +87,20 @@ public:
     C_ZMEntManipulate();
 
 
-    void Precache() OVERRIDE;
+    void Precache() override;
 
     inline int GetCost() const { return m_nCost; };
     inline int GetTrapCost() const { return m_nTrapCost; };
 
     inline const char* GetDescription() { return m_sDescription; };
 
-	void OnDataChanged( DataUpdateType_t type ) OVERRIDE;
+	void OnDataChanged( DataUpdateType_t type ) override;
 
 	void SetMenu( CZMManiMenuBase* pMenu ) { m_pManiMenu = pMenu; };
 	CZMManiMenuBase* GetMenu() const { return m_pManiMenu; };
 
 protected:
-    virtual void InitSpriteMat() OVERRIDE;
+    virtual void InitSpriteMat() override;
 
     char m_sDescription[ZM_MAX_MANI_DESC];
 
@@ -120,7 +120,7 @@ public:
     C_ZMEntPrecipitation();
     ~C_ZMEntPrecipitation();
 
-    virtual void PostDataUpdate( DataUpdateType_t updateType ) OVERRIDE;
+    virtual void PostDataUpdate( DataUpdateType_t updateType ) override;
 
     float GetDensity() const { return m_flDensity; }
     PrecipitationType_t GetPrecipitationType() const { return m_nPrecipType; }

@@ -11,7 +11,7 @@ class CHudChatLine : public CBaseHudChatLine
 public:
     CHudChatLine( vgui::Panel* parent, const char* panelName ) : CBaseHudChatLine( parent, panelName ) {}
 
-    virtual void    ApplySchemeSettings( vgui::IScheme* pScheme ) OVERRIDE;
+    virtual void    ApplySchemeSettings( vgui::IScheme* pScheme ) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -24,7 +24,7 @@ class CHudChatInputLine : public CBaseHudChatInputLine
 public:
     CHudChatInputLine( CBaseHudChat* parent, char const* panelName ) : CBaseHudChatInputLine( parent, panelName ) {}
 
-    virtual void ApplySchemeSettings( vgui::IScheme* pScheme ) OVERRIDE;
+    virtual void ApplySchemeSettings( vgui::IScheme* pScheme ) override;
 };
 
 class CHudChat : public CBaseHudChat
@@ -34,16 +34,16 @@ class CHudChat : public CBaseHudChat
 public:
     CHudChat( const char* pElementName );
 
-    virtual void CreateChatInputLine() OVERRIDE;
-    virtual void CreateChatLines( void ) OVERRIDE;
+    virtual void CreateChatInputLine() override;
+    virtual void CreateChatLines( void ) override;
 
-    virtual void Init() OVERRIDE;
-    virtual void Reset() OVERRIDE;
-    virtual void ApplySchemeSettings( vgui::IScheme* pScheme ) OVERRIDE;
+    virtual void Init() override;
+    virtual void Reset() override;
+    virtual void ApplySchemeSettings( vgui::IScheme* pScheme ) override;
 
-    virtual int GetChatInputOffset() OVERRIDE;
+    virtual int GetChatInputOffset() override;
 
-    virtual Color GetClientColor( int clientIndex ) OVERRIDE;
+    virtual Color GetClientColor( int clientIndex ) override;
 
-    virtual void MsgFunc_SayText2( bf_read &msg ) OVERRIDE;
+    virtual void MsgFunc_SayText2( bf_read &msg ) override;
 };

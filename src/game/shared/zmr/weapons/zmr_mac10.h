@@ -13,11 +13,11 @@ class CZMMac10Config : public ZMWeaponConfig::CZMBaseWeaponConfig
 public:
     CZMMac10Config( const char* wepname, const char* configpath );
 
-    virtual void LoadFromConfig( KeyValues* kv ) OVERRIDE;
+    virtual void LoadFromConfig( KeyValues* kv ) override;
 
-    virtual bool OverrideFromConfig( KeyValues* kv ) OVERRIDE;
+    virtual bool OverrideFromConfig( KeyValues* kv ) override;
 
-    virtual KeyValues* ToKeyValues() const OVERRIDE;
+    virtual KeyValues* ToKeyValues() const override;
 
     
     float flEasyDampen;
@@ -38,5 +38,5 @@ public:
     const CZMMac10Config* GetMac10Config() const;
 
     
-    virtual void AddViewKick() OVERRIDE;
+    virtual void AddViewKick() override;
 };

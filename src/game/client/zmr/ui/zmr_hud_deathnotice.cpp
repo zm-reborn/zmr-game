@@ -48,16 +48,16 @@ class CZMHudDeathNotice : public CHudElement, public Panel
 public:
     CZMHudDeathNotice( const char* pElementName );
 
-    void Init() OVERRIDE;
-    void VidInit() OVERRIDE;
-    virtual bool ShouldDraw() OVERRIDE;
-    virtual void OnThink() OVERRIDE;
-    virtual void Paint() OVERRIDE;
-    virtual void ApplySchemeSettings( IScheme* scheme ) OVERRIDE;
+    void Init() override;
+    void VidInit() override;
+    virtual bool ShouldDraw() override;
+    virtual void OnThink() override;
+    virtual void Paint() override;
+    virtual void ApplySchemeSettings( IScheme* scheme ) override;
 
     void RetireExpiredDeathNotices();
     
-    virtual void FireGameEvent( IGameEvent* pEvent ) OVERRIDE;
+    virtual void FireGameEvent( IGameEvent* pEvent ) override;
 
 private:
 

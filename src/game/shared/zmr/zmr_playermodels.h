@@ -37,7 +37,7 @@ public:
     ~CZMPlayerModelSystem();
 
 #ifdef GAME_DLL
-    virtual void LevelInitPreEntity() OVERRIDE;
+    virtual void LevelInitPreEntity() override;
 #endif
 
     static bool IsDebugging();

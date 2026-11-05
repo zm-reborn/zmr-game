@@ -14,10 +14,10 @@ public:
     ~C_ZMBanshee();
 
 
-    virtual const char* GetZombieLocalization() const OVERRIDE { return "#ZMClassBanshee"; }
+    virtual const char* GetZombieLocalization() const override { return "#ZMClassBanshee"; }
 
 
-    virtual void AttackSound() OVERRIDE;
+    virtual void AttackSound() override;
 
-    virtual void HandleAnimEvent( animevent_t* pEvent ) OVERRIDE;
+    virtual void HandleAnimEvent( animevent_t* pEvent ) override;
 };

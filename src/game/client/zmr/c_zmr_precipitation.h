@@ -23,9 +23,9 @@ public:
     ~C_ZMPrecipitationSystem();
 
 
-    virtual void PostInit() OVERRIDE;
-    virtual void Update( float frametime ) OVERRIDE;
-    virtual void LevelInitPostEntity() OVERRIDE;
+    virtual void PostInit() override;
+    virtual void Update( float frametime ) override;
+    virtual void LevelInitPostEntity() override;
 
     bool AddPrecipitation( C_ZMEntPrecipitation* pEnt );
     bool RemovePrecipitation( C_ZMEntPrecipitation* pEnt );

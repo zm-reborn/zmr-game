@@ -22,7 +22,7 @@ public:
         m_bAlive = false;
     }
 
-    virtual bool OnTeamChange( int iTeam ) OVERRIDE
+    virtual bool OnTeamChange( int iTeam ) override
     {
         //if ( iTeam != ZMTEAM_SURVIVOR )
         if ( iTeam != ZMTEAM_ZM ) // Enable for spectators as well for now.
@@ -38,19 +38,19 @@ public:
         return false;
     }
 
-    virtual bool OnDeath() OVERRIDE
+    virtual bool OnDeath() override
     {
         //m_bAlive = false;
         //return false;
         return true;
     }
 
-    virtual float GetWeight() const OVERRIDE
+    virtual float GetWeight() const override
     {
         return zm_cl_colorcorrection_survivor_weight.GetFloat();
     }
 
-    virtual bool IsDone() const OVERRIDE
+    virtual bool IsDone() const override
     {
         return !m_bAlive;
     }
@@ -60,4 +60,3 @@ private:
 };
 
 CZMSurvivorEffect g_ZMCCSurvivorEffect;
-

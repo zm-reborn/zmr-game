@@ -21,7 +21,7 @@ class CFlamingGib : public CGib
 public:
     DECLARE_CLASS( CFlamingGib, CGib );
     
-    virtual void Spawn() OVERRIDE;
+    virtual void Spawn() override;
 };
 
 LINK_ENTITY_TO_CLASS( flaming_gib, CFlamingGib );
@@ -99,19 +99,19 @@ public:
 
     CZMProjectileMolotov();
 
-    virtual void Spawn() OVERRIDE;
-    virtual void Precache() OVERRIDE;
+    virtual void Spawn() override;
+    virtual void Precache() override;
 
     void MolotovTouch( CBaseEntity* pOther );
     void MolotovThink();
-    virtual void Detonate() OVERRIDE;
+    virtual void Detonate() override;
 
     void CreateFlyingChunk( const Vector& pos );
 
-    virtual void OnThrow() OVERRIDE;
+    virtual void OnThrow() override;
 
 
-    virtual bool IsCombatItem() const OVERRIDE;
+    virtual bool IsCombatItem() const override;
 
 private:
     SmokeTrail* m_pFireTrail;

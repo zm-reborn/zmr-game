@@ -34,19 +34,19 @@ class CZombieSwatObjSchedule : public CBaseZombieSchedule, public CSwatInt
 public:
     CZombieSwatObjSchedule();
 
-    virtual const char* GetName() const OVERRIDE { return "ZombieSwatObj"; }
+    virtual const char* GetName() const override { return "ZombieSwatObj"; }
 
-    virtual void OnStart() OVERRIDE;
+    virtual void OnStart() override;
 
-    virtual void OnUpdate() OVERRIDE;
+    virtual void OnUpdate() override;
 
-    virtual void OnAnimEvent( animevent_t* pEvent ) OVERRIDE;
+    virtual void OnAnimEvent( animevent_t* pEvent ) override;
 
-    virtual NPCR::QueryResult_t IsBusy() const OVERRIDE;
+    virtual NPCR::QueryResult_t IsBusy() const override;
 
-    virtual NPCR::QueryResult_t ShouldChase( CBaseEntity* pEnemy ) const OVERRIDE;
+    virtual NPCR::QueryResult_t ShouldChase( CBaseEntity* pEnemy ) const override;
 
-    virtual void OnQueuedCommand( CBasePlayer* pPlayer, ZombieCommandType_t com ) OVERRIDE;
+    virtual void OnQueuedCommand( CBasePlayer* pPlayer, ZombieCommandType_t com ) override;
 
 private:
     void DoSwatting();

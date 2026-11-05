@@ -23,7 +23,7 @@ public:
         m_pRootParent = pNPC->GetCharacter()->GetRootMoveParent();
     }
 
-    virtual bool ShouldHitEntity( IHandleEntity* pServerEntity, int contentsMask ) OVERRIDE
+    virtual bool ShouldHitEntity( IHandleEntity* pServerEntity, int contentsMask ) override
     {
         if ( CTraceFilterSimple::ShouldHitEntity( pServerEntity, contentsMask ) )
         {
@@ -662,4 +662,3 @@ void NPCR::CFollowNavPath::StopCheckingStuck()
     m_bStuckPosCheck = false;
     m_nStuckTimes = 0;
 }
-

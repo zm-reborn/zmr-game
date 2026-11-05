@@ -92,13 +92,13 @@ namespace NPCR
 
     protected:
         void PostConstructor();
-        virtual void OnCreatedComponents() OVERRIDE;
+        virtual void OnCreatedComponents() override;
 
         virtual bool ShouldUpdate() const;
 
 
         virtual void PreUpdate() {}
-        virtual void Update() OVERRIDE;
+        virtual void Update() override;
         virtual void PostUpdate() {}
     private:
         void UpdateInterval();

@@ -16,7 +16,7 @@ public:
     void            RemoveGlowEffect();
     inline bool     IsGlowEffectActive() { return m_bGlowEnabled; };
 
-    virtual bool    KeyValue( const char* szKeyValue, const char* szKeyName ) OVERRIDE;
+    virtual bool    KeyValue( const char* szKeyValue, const char* szKeyName ) override;
 
 
     void            InputEnableGlow( inputdata_t& inputData );

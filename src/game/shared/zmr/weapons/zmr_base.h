@@ -59,61 +59,61 @@ public:
     static bool IsDebugging();
     
 #ifdef CLIENT_DLL
-    virtual void Spawn() OVERRIDE;
-    virtual void PostDataUpdate( DataUpdateType_t updateType ) OVERRIDE;
+    virtual void Spawn() override;
+    virtual void PostDataUpdate( DataUpdateType_t updateType ) override;
 #endif
-    virtual void Precache() OVERRIDE;
+    virtual void Precache() override;
 
-    virtual void ItemPostFrame() OVERRIDE;
+    virtual void ItemPostFrame() override;
 
-    virtual bool Deploy() OVERRIDE;
+    virtual bool Deploy() override;
     virtual bool DefaultDeploy();
-    virtual bool Holster( CBaseCombatWeapon* pSwitchingTo = nullptr ) OVERRIDE;
+    virtual bool Holster( CBaseCombatWeapon* pSwitchingTo = nullptr ) override;
 
-    virtual acttable_t* ActivityList( int& iActivityCount ) OVERRIDE;
-    virtual Activity GetPrimaryAttackActivity() OVERRIDE;
-    //virtual Activity GetSecondaryAttackActivity() OVERRIDE;
-    virtual Activity GetDrawActivity() OVERRIDE;
+    virtual acttable_t* ActivityList( int& iActivityCount ) override;
+    virtual Activity GetPrimaryAttackActivity() override;
+    //virtual Activity GetSecondaryAttackActivity() override;
+    virtual Activity GetDrawActivity() override;
     virtual Activity GetIdleActivity() const;
 
-    virtual void WeaponIdle() OVERRIDE;
+    virtual void WeaponIdle() override;
 
     bool DefaultReload( int iClipSize1, int iClipSize2, int iActivity );
-    virtual	void CheckReload() OVERRIDE;
-    virtual bool Reload() OVERRIDE;
+    virtual	void CheckReload() override;
+    virtual bool Reload() override;
     // NOTE: Always use this to get the damage from .txt file.
-    virtual void FireBullets( const FireBulletsInfo_t& info ) OVERRIDE;
+    virtual void FireBullets( const FireBulletsInfo_t& info ) override;
     virtual void FireBullets( int numShots, int iAmmoType, float flMaxDist );
-    virtual void PrimaryAttack() OVERRIDE;
+    virtual void PrimaryAttack() override;
     virtual void Shoot( int iAmmoType = -1, int nBullets = -1, int nAmmo = -1, float flMaxRange = -1.0f, bool bSecondary = false );
     virtual void PrimaryAttackEffects( WeaponSound_t wpnsound );
     virtual void SecondaryAttackEffects( WeaponSound_t wpnsound );
-    virtual void SecondaryAttack() OVERRIDE;
+    virtual void SecondaryAttack() override;
 
     virtual bool DryFire( bool bForce );
 
 
-    virtual void        SetViewModel() OVERRIDE;
+    virtual void        SetViewModel() override;
 
 #ifdef CLIENT_DLL
-    virtual void    ClientThink() OVERRIDE;
-    virtual void    GetGlowEffectColor( float& r, float& g, float& b ) const OVERRIDE;
+    virtual void    ClientThink() override;
+    virtual void    GetGlowEffectColor( float& r, float& g, float& b ) const override;
     void            UpdateGlow();
 
-    virtual bool    GlowOccluded() const OVERRIDE { return false; }
-    virtual bool    GlowUnoccluded() const OVERRIDE { return true; }
+    virtual bool    GlowOccluded() const override { return false; }
+    virtual bool    GlowUnoccluded() const override { return true; }
 
 
-    virtual ShadowType_t ShadowCastType() OVERRIDE;
+    virtual ShadowType_t ShadowCastType() override;
 
-    virtual void OnDataChanged( DataUpdateType_t ) OVERRIDE;
-    virtual bool ShouldPredict() OVERRIDE;
+    virtual void OnDataChanged( DataUpdateType_t ) override;
+    virtual bool ShouldPredict() override;
 #endif
-    virtual bool IsPredicted() const OVERRIDE { return true; };
+    virtual bool IsPredicted() const override { return true; };
 
-    virtual void SetWeaponVisible( bool visible ) OVERRIDE;
+    virtual void SetWeaponVisible( bool visible ) override;
 
-    void WeaponSound( WeaponSound_t sound_type, float soundtime = 0.0f ) OVERRIDE;
+    void WeaponSound( WeaponSound_t sound_type, float soundtime = 0.0f ) override;
 
     void DoMachineGunKick( float dampEasy, float maxVerticleKickAngle, float fireDurationTime, float slideLimitTime );
 
@@ -124,8 +124,8 @@ public:
 #endif
 
     
-    virtual int GetMinBurst() OVERRIDE { return 1; }
-    virtual int GetMaxBurst() OVERRIDE { return 1; }
+    virtual int GetMinBurst() override { return 1; }
+    virtual int GetMaxBurst() override { return 1; }
     
 #ifndef CLIENT_DLL
     // Volume = distance
@@ -133,30 +133,30 @@ public:
     virtual void    PlayAISound() const;
 
 
-    virtual bool IsTemplate() OVERRIDE;
+    virtual bool IsTemplate() override;
 
-    virtual void Materialize() OVERRIDE;
+    virtual void Materialize() override;
 
-    virtual void FallThink() OVERRIDE;
+    virtual void FallThink() override;
 #endif
     // Makes our weapons not cry about spawning.
     virtual void FallInit();
     // Override this so our guns don't disappear.
-    virtual void SetPickupTouch() OVERRIDE;
-    virtual void OnPickedUp( CBaseCombatCharacter* pNewOwner ) OVERRIDE;
-    virtual bool CanBeSelected() OVERRIDE;
+    virtual void SetPickupTouch() override;
+    virtual void OnPickedUp( CBaseCombatCharacter* pNewOwner ) override;
+    virtual bool CanBeSelected() override;
     // Never let anybody tell you're not beautiful even without any ammo, alright?
     // Let us always select this weapon even when we don't have any ammo for it.
-    virtual bool AllowsAutoSwitchFrom() const OVERRIDE { return false; }
-    virtual void Drop( const Vector& vecVelocity ) OVERRIDE;
+    virtual bool AllowsAutoSwitchFrom() const override { return false; }
+    virtual void Drop( const Vector& vecVelocity ) override;
 
     // Add weapon slot flag.
-    virtual void Equip( CBaseCombatCharacter* pCharacter ) OVERRIDE;
+    virtual void Equip( CBaseCombatCharacter* pCharacter ) override;
 
 
     // Viewmodel/misc stuff
-    float   CalcViewmodelBob() OVERRIDE;
-    void    AddViewmodelBob( CBaseViewModel* pVM, Vector& origin, QAngle& angles ) OVERRIDE;
+    float   CalcViewmodelBob() override;
+    void    AddViewmodelBob( CBaseViewModel* pVM, Vector& origin, QAngle& angles ) override;
     
     // Our stuff
     CZMPlayer*    GetPlayerOwner() const;
@@ -177,25 +177,25 @@ public:
     virtual bool UsesDryActivity( Activity act );
 
 
-    virtual void AddViewKick() OVERRIDE;
+    virtual void AddViewKick() override;
 
     virtual bool IsInSecondaryAttack() const;
     const ZMWeaponConfig::CZMBaseWeaponConfig* GetWeaponConfig() const;
-	virtual CHudTexture const* GetSpriteActive() const OVERRIDE;
-	virtual CHudTexture const* GetSpriteInactive() const OVERRIDE;
-    virtual CHudTexture const* GetSpriteAmmo() const OVERRIDE;
-	virtual const char*     GetViewModel( int vmIndex = 0 ) const OVERRIDE;
-	virtual const char*     GetWorldModel() const OVERRIDE;
-    virtual int             GetMaxClip1() const OVERRIDE;
-    virtual int             GetMaxClip2() const OVERRIDE;
-    virtual int             GetDefaultClip1() const OVERRIDE;
+	virtual CHudTexture const* GetSpriteActive() const override;
+	virtual CHudTexture const* GetSpriteInactive() const override;
+    virtual CHudTexture const* GetSpriteAmmo() const override;
+	virtual const char*     GetViewModel( int vmIndex = 0 ) const override;
+	virtual const char*     GetWorldModel() const override;
+    virtual int             GetMaxClip1() const override;
+    virtual int             GetMaxClip2() const override;
+    virtual int             GetDefaultClip1() const override;
     virtual const char*     GetAnimPrefix() const;
-    virtual int             GetSlot() const OVERRIDE;
-    virtual int             GetPosition() const OVERRIDE;
-    virtual int             GetWeight() const OVERRIDE;
-    virtual char const*     GetName() const OVERRIDE;
-    virtual char const*     GetPrintName() const OVERRIDE;
-    virtual char const*     GetShootSound( int iIndex ) const OVERRIDE;
+    virtual int             GetSlot() const override;
+    virtual int             GetPosition() const override;
+    virtual int             GetWeight() const override;
+    virtual char const*     GetName() const override;
+    virtual char const*     GetPrintName() const override;
+    virtual char const*     GetShootSound( int iIndex ) const override;
     float                   GetPrimaryFireRate() const;
     float                   GetAccuracyIncreaseRate() const;
     float                   GetAccuracyDecreaseRate() const;
@@ -203,7 +203,7 @@ public:
     int                     GetMaxPenetrations() const;
     float                   GetMaxPenetrationDist() const;
     virtual Vector          GetBulletSpread() const;
-    virtual float           GetFireRate() OVERRIDE;
+    virtual float           GetFireRate() override;
     virtual float           GetReloadTime() const;
     // How many bullets we fire per one "bullet", or clip "unit".
     virtual int             GetBulletsPerShot() const;
@@ -236,9 +236,9 @@ protected:
 
 
     // Client side hit reg stuff
-    virtual float GetMaxDamageDist( ZMUserCmdValidData_t& data ) const OVERRIDE;
-    virtual int GetMaxUserCmdBullets( ZMUserCmdValidData_t& data ) const OVERRIDE;
-    virtual int GetMaxNumPenetrate( ZMUserCmdValidData_t& data ) const OVERRIDE;
+    virtual float GetMaxDamageDist( ZMUserCmdValidData_t& data ) const override;
+    virtual int GetMaxUserCmdBullets( ZMUserCmdValidData_t& data ) const override;
+    virtual int GetMaxNumPenetrate( ZMUserCmdValidData_t& data ) const override;
 
 
     inline int GetOverrideDamage() const { return m_nOverrideDamage; }

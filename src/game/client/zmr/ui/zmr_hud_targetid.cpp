@@ -28,9 +28,9 @@ public:
     CZMHudTargetID( const char* name );
     ~CZMHudTargetID();
 
-    virtual void VidInit() OVERRIDE;
-    virtual void ApplySchemeSettings( vgui::IScheme* scheme ) OVERRIDE;
-    virtual void Paint() OVERRIDE;
+    virtual void VidInit() override;
+    virtual void ApplySchemeSettings( vgui::IScheme* scheme ) override;
+    virtual void Paint() override;
     
 
     bool ShouldRebuildTargetId( C_BasePlayer* pPlayer );

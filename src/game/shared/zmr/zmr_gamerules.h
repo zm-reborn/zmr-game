@@ -101,67 +101,67 @@ public:
     ~CZMRules();
 
 
-    virtual bool ShouldCollide( int collisionGroup0, int collisionGroup1 ) OVERRIDE;
+    virtual bool ShouldCollide( int collisionGroup0, int collisionGroup1 ) override;
 
-    virtual const CViewVectors* GetViewVectors() const OVERRIDE;
+    virtual const CViewVectors* GetViewVectors() const override;
     const CZMViewVectors* GetZMViewVectors() const;
 
     static float GetMapRemainingTime();
 
 
-    virtual bool IsConnectedUserInfoChangeAllowed( CBasePlayer *pPlayer ) OVERRIDE;
+    virtual bool IsConnectedUserInfoChangeAllowed( CBasePlayer *pPlayer ) override;
 
 #ifndef CLIENT_DLL
-    virtual void Precache() OVERRIDE;
-    virtual void DeathNotice( CBasePlayer* pVictim, const CTakeDamageInfo& info ) OVERRIDE;
-    virtual bool FShouldSwitchWeapon( CBasePlayer* pPlayer, CBaseCombatWeapon* pWeapon ) OVERRIDE;
-    virtual int PlayerRelationship( CBaseEntity* pPlayer, CBaseEntity* pTarget ) OVERRIDE;
-    virtual bool ClientCommand( CBaseEntity* pEdict, const CCommand& args ) OVERRIDE;
+    virtual void Precache() override;
+    virtual void DeathNotice( CBasePlayer* pVictim, const CTakeDamageInfo& info ) override;
+    virtual bool FShouldSwitchWeapon( CBasePlayer* pPlayer, CBaseCombatWeapon* pWeapon ) override;
+    virtual int PlayerRelationship( CBaseEntity* pPlayer, CBaseEntity* pTarget ) override;
+    virtual bool ClientCommand( CBaseEntity* pEdict, const CCommand& args ) override;
 
 
     void ExecuteMapConfigs();
 
-    virtual void CreateStandardEntities() OVERRIDE;
-    virtual void LevelInitPostEntity() OVERRIDE;
+    virtual void CreateStandardEntities() override;
+    virtual void LevelInitPostEntity() override;
 
-    void ClientSettingsChanged( CBasePlayer* pPlayer ) OVERRIDE;
+    void ClientSettingsChanged( CBasePlayer* pPlayer ) override;
 
-    virtual const char* GetGameDescription() OVERRIDE;
+    virtual const char* GetGameDescription() override;
 
-    virtual void Think() OVERRIDE;
+    virtual void Think() override;
 
-    virtual void PlayerSpawn( CBasePlayer* pPlayer ) OVERRIDE;
-    virtual void PlayerThink( CBasePlayer* pPlayer ) OVERRIDE;
+    virtual void PlayerSpawn( CBasePlayer* pPlayer ) override;
+    virtual void PlayerThink( CBasePlayer* pPlayer ) override;
 
-    virtual const char* GetChatFormat( bool bTeamOnly, CBasePlayer* pPlayer ) OVERRIDE;
-    virtual const char* GetChatPrefix( bool bTeamOnly, CBasePlayer* pPlayer ) OVERRIDE { return ""; };
-    virtual const char* GetChatLocation( bool bTeamOnly, CBasePlayer* pPlayer ) OVERRIDE { return nullptr; };
+    virtual const char* GetChatFormat( bool bTeamOnly, CBasePlayer* pPlayer ) override;
+    virtual const char* GetChatPrefix( bool bTeamOnly, CBasePlayer* pPlayer ) override { return ""; };
+    virtual const char* GetChatLocation( bool bTeamOnly, CBasePlayer* pPlayer ) override { return nullptr; };
 
-    virtual int WeaponShouldRespawn( CBaseCombatWeapon* pWeapon ) OVERRIDE;
+    virtual int WeaponShouldRespawn( CBaseCombatWeapon* pWeapon ) override;
 
     // Yes, always teamplay.
-    virtual bool IsTeamplay( void ) OVERRIDE { return true; };
-    virtual int GetAutoAimMode() OVERRIDE { return AUTOAIM_NONE; };
+    virtual bool IsTeamplay( void ) override { return true; };
+    virtual int GetAutoAimMode() override { return AUTOAIM_NONE; };
 
-    virtual int ItemShouldRespawn( CItem* pItem ) OVERRIDE;
-	virtual bool CanHaveAmmo( CBaseCombatCharacter* pPlayer, int iAmmoIndex ) OVERRIDE; // can this player take more of this ammo?
-	virtual bool CanHaveAmmo( CBaseCombatCharacter* pPlayer, const char* szName ) OVERRIDE;
-    virtual bool CanHavePlayerItem( CBasePlayer* pPlayer, CBaseCombatWeapon* pWeapon ) OVERRIDE;
+    virtual int ItemShouldRespawn( CItem* pItem ) override;
+	virtual bool CanHaveAmmo( CBaseCombatCharacter* pPlayer, int iAmmoIndex ) override; // can this player take more of this ammo?
+	virtual bool CanHaveAmmo( CBaseCombatCharacter* pPlayer, const char* szName ) override;
+    virtual bool CanHavePlayerItem( CBasePlayer* pPlayer, CBaseCombatWeapon* pWeapon ) override;
 
-    virtual const char* SetDefaultPlayerTeam( CBasePlayer* pPlayer ) OVERRIDE;
+    virtual const char* SetDefaultPlayerTeam( CBasePlayer* pPlayer ) override;
 
-    virtual CBaseEntity* GetPlayerSpawnSpot( CBasePlayer* pPlayer ) OVERRIDE;
+    virtual CBaseEntity* GetPlayerSpawnSpot( CBasePlayer* pPlayer ) override;
 
-    virtual bool IsSpawnPointValid( CBaseEntity* pSpawn, CBasePlayer* pPlayer ) OVERRIDE;
+    virtual bool IsSpawnPointValid( CBaseEntity* pSpawn, CBasePlayer* pPlayer ) override;
     
-    virtual void ClientDisconnected( edict_t* pPlayer ) OVERRIDE;
-    virtual void PlayerKilled( CBasePlayer* pPlayer, const CTakeDamageInfo& info ) OVERRIDE;
+    virtual void ClientDisconnected( edict_t* pPlayer ) override;
+    virtual void PlayerKilled( CBasePlayer* pPlayer, const CTakeDamageInfo& info ) override;
 
-    virtual bool UseSuicidePenalty() OVERRIDE { return false; };
-    virtual bool FlPlayerFallDeathDoesScreenFade( CBasePlayer* pPlayer ) OVERRIDE { return false; }; // Don't fade to eternal darkness when getting killed.
+    virtual bool UseSuicidePenalty() override { return false; };
+    virtual bool FlPlayerFallDeathDoesScreenFade( CBasePlayer* pPlayer ) override { return false; }; // Don't fade to eternal darkness when getting killed.
 
-    virtual void InitDefaultAIRelationships() OVERRIDE;
-    virtual bool FAllowNPCs() OVERRIDE;
+    virtual void InitDefaultAIRelationships() override;
+    virtual bool FAllowNPCs() override;
 
 
     static int IncPopCount( ZombieClass_t );
@@ -173,7 +173,7 @@ public:
     void PunishInactivity( CZMPlayer* pPlayer );
     bool ReplaceZM( CZMPlayer* pPlayer );
 
-    //bool RoundCleanupShouldIgnore( CBaseEntity* ) OVERRIDE;
+    //bool RoundCleanupShouldIgnore( CBaseEntity* ) override;
     void EndRound( ZMRoundEndReason_t reason );
     void ResetWorld();
     void RestoreMap();
@@ -207,7 +207,7 @@ public:
 
 protected:
 #ifndef CLIENT_DLL
-    virtual void GoToIntermission() OVERRIDE;
+    virtual void GoToIntermission() override;
 #endif
 
 private:

@@ -11,16 +11,16 @@ public:
 
     CZMHudBars( const char *pElementName );
 
-    virtual void Init() OVERRIDE;
-    virtual void VidInit() OVERRIDE;
-    virtual void LevelInit() OVERRIDE;
-    virtual void Reset() OVERRIDE;
+    virtual void Init() override;
+    virtual void VidInit() override;
+    virtual void LevelInit() override;
+    virtual void Reset() override;
 
-    virtual void FireGameEvent( IGameEvent* pEvent ) OVERRIDE;
+    virtual void FireGameEvent( IGameEvent* pEvent ) override;
 
-    virtual void OnThink() OVERRIDE;
+    virtual void OnThink() override;
 
-    virtual void Paint() OVERRIDE;
+    virtual void Paint() override;
 
 
     static void Show( float displaytime = 0.0f );

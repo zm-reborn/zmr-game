@@ -26,9 +26,9 @@ class CZMBaseZombieMotor : public NPCR::CNonPlayerMotor
 public:
     CZMBaseZombieMotor( CZMBaseZombie* pOuter );
 
-    virtual float GetStepHeight() const OVERRIDE;
+    virtual float GetStepHeight() const override;
 
-    virtual float GetYawRate( float delta ) const OVERRIDE;
+    virtual float GetYawRate( float delta ) const override;
 };
 
 
@@ -46,34 +46,34 @@ public:
     ~CZMBaseZombie();
 
 
-    virtual void Precache() OVERRIDE;
-    virtual void Spawn() OVERRIDE;
+    virtual void Precache() override;
+    virtual void Spawn() override;
 
     void ZombieThink();
-    virtual void PreUpdate() OVERRIDE;
-    virtual void PostUpdate() OVERRIDE;
+    virtual void PreUpdate() override;
+    virtual void PostUpdate() override;
 
 
-    virtual bool IsBaseZombie() const OVERRIDE { return true; }
-    virtual Class_T Classify() OVERRIDE { return CLASS_ZOMBIE; }
+    virtual bool IsBaseZombie() const override { return true; }
+    virtual Class_T Classify() override { return CLASS_ZOMBIE; }
 
 
     // Components
-    virtual bool CreateComponents() OVERRIDE;
+    virtual bool CreateComponents() override;
 
     virtual CZMBlockerScanner*          CreateBlockerScanner();
     virtual CZMZombieAnimState*         CreateAnimState();
 
-    virtual NPCR::CScheduleInterface*   CreateScheduleInterface() OVERRIDE;
-    virtual NPCR::CBaseSenses*          CreateSenses() OVERRIDE;
-    virtual NPCR::CNonPlayerMotor*      CreateMotor() OVERRIDE;
+    virtual NPCR::CScheduleInterface*   CreateScheduleInterface() override;
+    virtual NPCR::CBaseSenses*          CreateSenses() override;
+    virtual NPCR::CNonPlayerMotor*      CreateMotor() override;
 
     CZMBlockerScanner*                  GetBlockerFinder() const { return m_pBlockerScanner; }
 
-    virtual bool ShouldUpdate() const OVERRIDE;
+    virtual bool ShouldUpdate() const override;
 
-    virtual NPCR::QueryResult_t ShouldChase( CBaseEntity* pEnemy ) const OVERRIDE;
-    virtual NPCR::QueryResult_t ShouldTouch( CBaseEntity* pEnt ) const OVERRIDE;
+    virtual NPCR::QueryResult_t ShouldChase( CBaseEntity* pEnemy ) const override;
+    virtual NPCR::QueryResult_t ShouldTouch( CBaseEntity* pEnt ) const override;
 
 
     virtual NPCR::CSchedule<CZMBaseZombie>* OverrideCombatSchedule() const { return nullptr; }
@@ -82,24 +82,24 @@ public:
 
 
     // Damage/death related
-    virtual void    Extinguish() OVERRIDE;
-    virtual void    Ignite( float flFlameLifetime, bool bNPCOnly = false, float flSize = 0.0f, bool bCalledByLevelDesigner = false ) OVERRIDE;
+    virtual void    Extinguish() override;
+    virtual void    Ignite( float flFlameLifetime, bool bNPCOnly = false, float flSize = 0.0f, bool bCalledByLevelDesigner = false ) override;
     bool            ShouldIgnite( const CTakeDamageInfo& info );
 
-    virtual void            Event_Killed( const CTakeDamageInfo& info ) OVERRIDE;
-    virtual int             OnTakeDamage_Alive( const CTakeDamageInfo& inputInfo ) OVERRIDE;
-    virtual void            TraceAttack( const CTakeDamageInfo& inputInfo, const Vector& vecDir, trace_t* pTrace, CDmgAccumulator* pAccumulator ) OVERRIDE;
+    virtual void            Event_Killed( const CTakeDamageInfo& info ) override;
+    virtual int             OnTakeDamage_Alive( const CTakeDamageInfo& inputInfo ) override;
+    virtual void            TraceAttack( const CTakeDamageInfo& inputInfo, const Vector& vecDir, trace_t* pTrace, CDmgAccumulator* pAccumulator ) override;
     virtual bool            ScaleDamageByHitgroup( int iHitGroup, CTakeDamageInfo& info ) const;
     void                    MultiplyBuckshotDamage( CTakeDamageInfo& info ) const;
 
 
-    virtual bool            Event_Gibbed( const CTakeDamageInfo& info ) OVERRIDE;
-    virtual bool            CorpseGib( const CTakeDamageInfo& info ) OVERRIDE;
-    virtual bool            ShouldGib( const CTakeDamageInfo& info ) OVERRIDE;
+    virtual bool            Event_Gibbed( const CTakeDamageInfo& info ) override;
+    virtual bool            CorpseGib( const CTakeDamageInfo& info ) override;
+    virtual bool            ShouldGib( const CTakeDamageInfo& info ) override;
 
 
 
-    virtual void HandleAnimEvent( animevent_t* pEvent ) OVERRIDE;
+    virtual void HandleAnimEvent( animevent_t* pEvent ) override;
 
 
     // Sounds
@@ -129,7 +129,7 @@ public:
     void                    SetSelector( int index );
     ZombieClass_t           GetZombieClass() const;
     bool                    DoAnimationEvent( int iEvent, int nData = 0 );
-    virtual int             GetAnimationRandomSeed() OVERRIDE;
+    virtual int             GetAnimationRandomSeed() override;
     virtual bool            CanBePenetrated() const;
 protected:
     void                    SetZombieClass( ZombieClass_t zclass );
@@ -171,10 +171,10 @@ public:
     float           GetLastTimeCommanded() const { return m_flLastCommanded; }
     void            UpdateLastTimeCommanded() { m_flLastCommanded = gpGlobals->curtime; }
 
-    virtual bool    IsEnemy( CBaseEntity* pEnt ) const OVERRIDE;
+    virtual bool    IsEnemy( CBaseEntity* pEnt ) const override;
 
 
-    virtual float GetMoveActivityMovementSpeed() OVERRIDE;
+    virtual float GetMoveActivityMovementSpeed() override;
 
 
     virtual NPCR::CPathCostGroundOnly* GetPathCost() const;

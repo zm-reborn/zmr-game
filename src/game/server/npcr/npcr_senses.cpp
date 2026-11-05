@@ -22,7 +22,7 @@ public:
         m_pSenses = pNPC->GetSenses();
     }
 
-    virtual bool ShouldHitEntity( IHandleEntity* pHandleEntity, int contentsMask ) OVERRIDE
+    virtual bool ShouldHitEntity( IHandleEntity* pHandleEntity, int contentsMask ) override
     {
         bool ret = BaseClass::ShouldHitEntity( pHandleEntity, contentsMask );
         if ( !ret )

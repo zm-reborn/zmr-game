@@ -25,7 +25,7 @@ public:
     {
     }
 
-    virtual void FindNewEntities( CUtlVector<CBaseEntity*>& vListEntities ) OVERRIDE
+    virtual void FindNewEntities( CUtlVector<CBaseEntity*>& vListEntities ) override
     {
         CBaseEntity* pEnt = nullptr;
         while ( (pEnt = gEntList.FindEntityByClassname( pEnt, "npc_*" )) != nullptr )
@@ -35,7 +35,7 @@ public:
         }
     }
 
-    virtual int GetSoundMask() const OVERRIDE { return SOUND_COMBAT | SOUND_DANGER; }
+    virtual int GetSoundMask() const override { return SOUND_COMBAT | SOUND_DANGER; }
 };
 
 

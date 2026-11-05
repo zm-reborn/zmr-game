@@ -59,7 +59,7 @@ public:
         m_vecMaxs -= 1.0f;
     }
 
-    virtual bool ShouldHitEntity( IHandleEntity* pHandleEntity, int contentsMask ) OVERRIDE
+    virtual bool ShouldHitEntity( IHandleEntity* pHandleEntity, int contentsMask ) override
     {
         if ( pHandleEntity == GetPassEntity() )
             return false;

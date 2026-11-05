@@ -14,8 +14,8 @@ public:
 
     bool UsesLeftHanded( int playerEntIndex ) const;
 
-    virtual void LevelShutdownPostEntity() OVERRIDE;
-    virtual void LevelInitPreEntity() OVERRIDE;
+    virtual void LevelShutdownPostEntity() override;
+    virtual void LevelInitPreEntity() override;
 
 private:
     void Clear( const char* reason );

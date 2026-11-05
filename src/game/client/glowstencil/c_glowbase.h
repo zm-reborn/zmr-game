@@ -40,14 +40,14 @@ public:
     DECLARE_CLIENTCLASS()
 
 
-    virtual void    OnPreDataChanged( DataUpdateType_t updateType ) OVERRIDE;
-    virtual void    OnDataChanged( DataUpdateType_t updateType ) OVERRIDE;
+    virtual void    OnPreDataChanged( DataUpdateType_t updateType ) override;
+    virtual void    OnDataChanged( DataUpdateType_t updateType ) override;
 
-    virtual bool    ShouldCreateGlow() const OVERRIDE;
-    virtual void    GetGlowEffectColor( float& r, float& g, float& b ) const OVERRIDE;
+    virtual bool    ShouldCreateGlow() const override;
+    virtual void    GetGlowEffectColor( float& r, float& g, float& b ) const override;
 
-    virtual bool    GlowOccluded() const OVERRIDE;
-    virtual bool    GlowUnoccluded() const OVERRIDE;
+    virtual bool    GlowOccluded() const override;
+    virtual bool    GlowUnoccluded() const override;
 
 protected:
     CNetworkVar( bool, m_bGlowEnabled );

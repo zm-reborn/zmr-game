@@ -26,12 +26,12 @@ public:
     ~CZMDiscordSystem();
 
 
-    virtual void PostInit() OVERRIDE;
+    virtual void PostInit() override;
 
-    virtual void LevelInitPostEntity() OVERRIDE;
-    virtual void LevelShutdownPostEntity() OVERRIDE;
+    virtual void LevelInitPostEntity() override;
+    virtual void LevelShutdownPostEntity() override;
 
-    virtual void Update( float frametime ) OVERRIDE;
+    virtual void Update( float frametime ) override;
 
 private:
     void PresenceEmpty();

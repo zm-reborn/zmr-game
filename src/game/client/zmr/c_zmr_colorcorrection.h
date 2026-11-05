@@ -48,7 +48,7 @@ public:
     ~C_ZMEntColorCorrection();
 
 
-    virtual void ClientThink() OVERRIDE;
+    virtual void ClientThink() override;
 
 
     void AddCC( CZMBaseCCEffect* cc );
@@ -71,8 +71,8 @@ public:
     virtual ~CZMColorCorrectionSystem();
 
 
-    virtual bool Init() OVERRIDE;
-    virtual void FireGameEvent( IGameEvent* event ) OVERRIDE;
+    virtual bool Init() override;
+    virtual void FireGameEvent( IGameEvent* event ) override;
 
 
     void AddEffect( CZMBaseCCEffect* pEffect );

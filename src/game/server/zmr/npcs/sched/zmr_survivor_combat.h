@@ -24,25 +24,25 @@ public:
     CSurvivorCombatSchedule();
     ~CSurvivorCombatSchedule();
 
-    virtual const char* GetName() const OVERRIDE { return "SurvivorCombat"; }
+    virtual const char* GetName() const override { return "SurvivorCombat"; }
 
-    virtual NPCR::CSchedule<CZMPlayerBot>* CreateFriendSchedule() OVERRIDE;
+    virtual NPCR::CSchedule<CZMPlayerBot>* CreateFriendSchedule() override;
 
-    virtual void OnStart() OVERRIDE;
+    virtual void OnStart() override;
 
-    virtual void OnContinue() OVERRIDE;
+    virtual void OnContinue() override;
 
-    virtual void OnIntercept() OVERRIDE;
+    virtual void OnIntercept() override;
 
-    virtual void OnUpdate() OVERRIDE;
+    virtual void OnUpdate() override;
 
-    virtual void OnSpawn() OVERRIDE;
+    virtual void OnSpawn() override;
 
-    virtual void OnHeardSound( CSound* pSound ) OVERRIDE;
+    virtual void OnHeardSound( CSound* pSound ) override;
 
-    virtual void OnForcedMove( CNavArea* pArea ) OVERRIDE;
+    virtual void OnForcedMove( CNavArea* pArea ) override;
 
-    virtual NPCR::QueryResult_t IsBusy() const OVERRIDE;
+    virtual NPCR::QueryResult_t IsBusy() const override;
 
 private:
     bool ShouldMoveBack( CBaseEntity* pEnemy ) const;

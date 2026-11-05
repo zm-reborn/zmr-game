@@ -57,7 +57,7 @@ ConVar zm_sv_zombiemax( "zm_sv_zombiemax", "70", FCVAR_REPLICATED | FCVAR_NOTIFY
 class CVoiceGameMgrHelper : public IVoiceGameMgrHelper
 {
 public:
-    virtual bool CanPlayerHearPlayer( CBasePlayer* pListener, CBasePlayer* pTalker, bool& bProximity ) OVERRIDE
+    virtual bool CanPlayerHearPlayer( CBasePlayer* pListener, CBasePlayer* pTalker, bool& bProximity ) override
     {
         return ( pListener->GetTeamNumber() == pTalker->GetTeamNumber() );
     }

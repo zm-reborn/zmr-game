@@ -24,11 +24,11 @@ public:
     {
     }
 
-    virtual const char* GetDataName() const OVERRIDE { return "Pick priority"; }
+    virtual const char* GetDataName() const override { return "Pick priority"; }
 
-    virtual int GetExpirationTime() const OVERRIDE { return zm_sv_rejoin_priority_expire.GetInt(); }
+    virtual int GetExpirationTime() const override { return zm_sv_rejoin_priority_expire.GetInt(); }
 
-    virtual void RestoreData( CZMPlayer* pPlayer ) OVERRIDE
+    virtual void RestoreData( CZMPlayer* pPlayer ) override
     {
         pPlayer->SetPickPriority( m_nPriority );
 
@@ -43,7 +43,7 @@ public:
 class CZMRejoinPriority : public CZMRejoinListener
 {
 public:
-    virtual CZMRejoinData* OnPlayerLeave( CZMPlayer* pPlayer ) OVERRIDE
+    virtual CZMRejoinData* OnPlayerLeave( CZMPlayer* pPlayer ) override
     {
         return new CZMRejoinPriorityData( pPlayer->GetPickPriority() );
     }

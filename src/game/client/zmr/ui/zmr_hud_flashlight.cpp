@@ -26,14 +26,14 @@ public:
     CZMHudFlashlight( const char *pElementName );
 
 
-    virtual void Init() OVERRIDE;
-    virtual void VidInit() OVERRIDE;
-    virtual void Reset() OVERRIDE;
+    virtual void Init() override;
+    virtual void VidInit() override;
+    virtual void Reset() override;
 
-    virtual void OnThink() OVERRIDE;
+    virtual void OnThink() override;
 
-    virtual bool ShouldDraw() OVERRIDE;
-    virtual void Paint() OVERRIDE;
+    virtual bool ShouldDraw() override;
+    virtual void Paint() override;
 
 private:
     float m_flBattery;

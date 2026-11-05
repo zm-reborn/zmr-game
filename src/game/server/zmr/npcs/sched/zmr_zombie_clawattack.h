@@ -13,28 +13,28 @@ public:
     CZombieClawAttackSched();
     ~CZombieClawAttackSched();
 
-    virtual const char* GetName() const OVERRIDE { return "ZombieClawAttack"; }
+    virtual const char* GetName() const override { return "ZombieClawAttack"; }
 
 
-    virtual void OnStart() OVERRIDE;
+    virtual void OnStart() override;
 
-    virtual void OnUpdate() OVERRIDE;
+    virtual void OnUpdate() override;
 
-    //virtual void OnAnimActivityFinished( Activity completedActivity ) OVERRIDE;
+    //virtual void OnAnimActivityFinished( Activity completedActivity ) override;
 
-    virtual void OnAnimActivityInterrupted( Activity newActivity ) OVERRIDE;
+    virtual void OnAnimActivityInterrupted( Activity newActivity ) override;
 
-    virtual NPCR::QueryResult_t IsBusy() const OVERRIDE;
+    virtual NPCR::QueryResult_t IsBusy() const override;
 
-    virtual NPCR::QueryResult_t ShouldChase( CBaseEntity* pEnemy ) const OVERRIDE;
+    virtual NPCR::QueryResult_t ShouldChase( CBaseEntity* pEnemy ) const override;
 
-    virtual void OnAttacked() OVERRIDE;
+    virtual void OnAttacked() override;
 
-    virtual void OnEnd() OVERRIDE;
+    virtual void OnEnd() override;
 
-    virtual void OnCommanded( CBasePlayer* pCommander, ZombieCommandType_t com ) OVERRIDE;
+    virtual void OnCommanded( CBasePlayer* pCommander, ZombieCommandType_t com ) override;
 
-    virtual void OnQueuedCommand( CBasePlayer* pPlayer, ZombieCommandType_t com ) OVERRIDE;
+    virtual void OnQueuedCommand( CBasePlayer* pPlayer, ZombieCommandType_t com ) override;
 
 private:
     CountdownTimer m_FinishTimer;
