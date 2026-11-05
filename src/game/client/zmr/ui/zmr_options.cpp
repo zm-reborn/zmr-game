@@ -36,7 +36,7 @@ CON_COMMAND( OpenZMOptions, "" )
     if ( !g_hZMOptions.Get() )
     {
         vgui::VPANEL parent = enginevgui->GetPanel( PANEL_GAMEUIDLL );
-        if ( parent == NULL )
+        if ( parent == 0 )
         {
             Assert( 0 );
             return;

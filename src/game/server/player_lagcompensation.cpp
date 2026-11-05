@@ -425,7 +425,7 @@ void CLagCompensationManager::FrameUpdatePostEntityThink()
 		    LagRecordNPC &head = track->Element( track->Head() );
  
 		    // check if entity changed simulation time since last time updated
-		    if ( &head && head.m_flSimulationTime >= pNPC->GetSimulationTime() )
+		    if ( head.m_flSimulationTime >= pNPC->GetSimulationTime() )
 			    continue; // don't add new entry for same or older time
  
 		    // Simulation Time is set when an entity moves or rotates ...
@@ -1474,5 +1474,3 @@ void CLagCompensationManager::FinishLagCompensation( CBasePlayer *player )
 
 	m_isCurrentlyDoingCompensation = false;
 }
-
-
